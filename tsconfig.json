@@ -1,0 +1,22 @@
+{
+  "include": ["src", "tests"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "pretty": true,
+    "strict": true,
+    "outDir": "dist",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2017"]
+  }
+}
