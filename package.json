@@ -1,10 +1,10 @@
 {
   "name": "tardis-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
     "node": ">=12"
   },
-  "description": "Node.js client for tardis.dev API - historical tick-level crypto markets data replay service.",
+  "description": "Node.js client for tardis.dev -  historical cryptocurrency market data replay API.",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
