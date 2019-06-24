@@ -62,5 +62,6 @@
       "\\.(ts|tsx)?$": "ts-jest"
     },
     "testEnvironment": "node"
-  }
+  },
+  "runkitExampleFilename": "example.js"
 }
