@@ -1,27 +1,20 @@
-const { TardisClient } = require('tardis-client')
-const tardisClient = new TardisClient(/* { apiKey: '<OPTIONALLY>' } */)
+const { TardisClient } = require('tardis-client');
+const tardisClient = new TardisClient(/* { apiKey:'<OPTIONAL>'} */);
 
-async function bitmexLiquidationsSample() {
-  const bitmexLiquidationsMessages = tardisClient.replay({
+async function replay() {
+  const liquidations = [];
+
+  const messages = tardisClient.replay({
     exchange: 'bitmex',
     from: '2019-05-01',
-    to: '2019-05-02',
+    to: '2019-05-01 03:00',
     filters: [{ channel: 'liquidation', symbols: ['XBTUSD'] }]
-  })
+  });
 
-  const liquidations = []
-  for await (let { message, localTimestamp } of bitmexLiquidationsMessages) {
-    liquidations.push(
-      ...message.data.map(liquidation => ({
-        side: liquidation.side,
-        action: message.action,
-        localTimestamp: localTimestamp.toISOString(),
-        size: liquidation.leavesQty
-      }))
-    )
+  for await (let { message, localTimestamp } of messages) {
+    liquidations.push(message);
   }
-
-  return liquidations
+  return liquidations;
 }
 
-await bitmexLiquidationsSample()
+await replay();

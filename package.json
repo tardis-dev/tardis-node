@@ -1,6 +1,6 @@
 {
   "name": "tardis-client",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "engines": {
     "node": ">=12"
   },
@@ -19,7 +19,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "example.js"
   ],
   "keywords": [
     "cryptocurrency data feed",
