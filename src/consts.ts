@@ -16,7 +16,7 @@ export type Exchange = typeof EXCHANGES[number]
 
 const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'miniTicker', 'depthSnapshot'] as const
 
-const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'marketDepth', 'kline_1m', 'ticker', 'depthSnapshot'] as const
+const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'kline_1m', 'ticker', 'depthSnapshot'] as const
 
 const BITFINEX_CHANNELS = ['trades', 'book'] as const
 
