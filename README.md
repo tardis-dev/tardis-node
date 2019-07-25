@@ -104,7 +104,7 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 | `exchange`           | `string`                                 | -             | requested exchange name. Check out [allowed echanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts)                                   |
 | `from`               | `string`                                 | -             | requested UTC start date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                     |
 | `to`                 | `string`                                 | -             | requested UTC end date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                       |
-| `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed. Check out [allowed channels](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) for each exchange |
+| `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed. Channel field names are the same as channels names exchange APIs expose, same for symbols. Check out [allowed channels](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) for each exchange, or use the [/exchanges/:/exchange](https://docs.tardis.dev/api#exchanges-exchange) API call to get allowed channel name and symbols for requested exchange |
 
 Examples:
 
@@ -190,6 +190,8 @@ for await (let { message, localTimestamp } of wholeDeribitExchangeDataFeedInFirs
 #### How to debug it if something went wrong?
 
 This lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-client`.
+
+## [tardis.dev API docs] (https://docs.tardis.dev/api)
 
 ## License
 
