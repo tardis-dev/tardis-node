@@ -1,14 +1,17 @@
 import crypto from 'crypto'
-import https from 'https'
+import https, { RequestOptions } from 'https'
 import path from 'path'
 import { parentPort, isMainThread, workerData } from 'worker_threads'
 import dbg from 'debug'
 import pMap from 'p-map'
 import { existsSync, ensureDirSync, createWriteStream, rename } from 'fs-extra'
-import fetch, { RequestInit } from 'node-fetch'
-
 import { Exchange, Filter } from './consts'
 import { wait, sha256, formatDateToPath, addMinutes, ONE_SEC_IN_MS, HttpError, sequence } from './handy'
+
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 10 * ONE_SEC_IN_MS
+})
 
 const debug = dbg('tardis-client')
 
@@ -26,22 +29,6 @@ process.on('unhandledRejection', (err, promise) => {
 async function getDataFeedSlices(payload: WorkerJobPayload) {
   const MILLISECONDS_IN_MINUTE = 60 * 1000
   const CONCURRENCY_LIMIT = 60
-  const fetchInit = {
-    headers: {
-      'Accept-Encoding': 'gzip',
-      Authorization: payload.apiKey ? `Bearer ${payload.apiKey}` : ''
-    },
-
-    timeout: 20 * ONE_SEC_IN_MS,
-
-    agent: new https.Agent({
-      keepAlive: true,
-      keepAliveMsecs: 10 * ONE_SEC_IN_MS
-    }),
-    // do not auto decompress responses!
-    compress: false
-  }
-
   // deduplicate filters (if the channel was provided multiple times)
   const filters = payload.filters.reduce(
     (prev, current) => {
@@ -91,34 +78,26 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}/`
 
   // start with fetching last slice - it will tell quickly if user has access to the end of requested date range
-  await getDataFeedSlice(payload.exchange, payload.fromDate, minutesCountToFetch - 1, filters, cacheDir, fetchInit, payload.endpoint)
+  await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
   // then fetch first slice - it will tell quickly if user has access to the beginning of requested date range
-  await getDataFeedSlice(payload.exchange, payload.fromDate, 0, filters, cacheDir, fetchInit, payload.endpoint)
+  await getDataFeedSlice(payload, 0, filters, cacheDir)
   // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
 
   await pMap(
     sequence(minutesCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch - 1 - as we already fetched first and last slice so no need to fetch them again
-    offset => getDataFeedSlice(payload.exchange, payload.fromDate, offset, filters, cacheDir, fetchInit, payload.endpoint),
+    offset => getDataFeedSlice(payload, offset, filters, cacheDir),
     { concurrency: CONCURRENCY_LIMIT }
   )
 }
 
-async function getDataFeedSlice(
-  exchange: Exchange,
-  fromDate: Date,
-  offset: number,
-  filters: object[],
-  cacheDir: string,
-  fetchInit: RequestInit,
-  endpoint: string
-) {
-  const sliceTimestamp = addMinutes(fromDate, offset)
+async function getDataFeedSlice(payload: WorkerJobPayload, offset: number, filters: object[], cacheDir: string) {
+  const sliceTimestamp = addMinutes(payload.fromDate, offset)
   const sliceKey = sliceTimestamp.toISOString()
   const slicePath = `${cacheDir}/${formatDateToPath(sliceTimestamp)}.json.gz`
   const isCached = existsSync(slicePath)
 
   if (!isCached) {
-    await fetchAndCacheSlice(exchange, fromDate, offset, filters, slicePath, fetchInit, endpoint)
+    await reliablyFetchAndCacheSlice(payload, offset, filters, slicePath)
     debug('getDataFeedSlice fetched from API and cached, %s', sliceKey)
   } else {
     debug('getDataFeedSlice already cached: %s', sliceKey)
@@ -131,39 +110,34 @@ async function getDataFeedSlice(
   parentPort!.postMessage(message)
 }
 
-async function fetchAndCacheSlice(
-  exchange: Exchange,
-  fromDate: Date,
+async function reliablyFetchAndCacheSlice(
+  { exchange, fromDate, endpoint, apiKey }: WorkerJobPayload,
   offset: number,
   filters: object[],
-  sliceCachePath: string,
-  fetchInit: RequestInit,
-  endpoint: string
+  sliceCachePath: string
 ) {
-  const MAX_ATTEMPTS = 4
-  let attempts = 0
   let url = `${endpoint}/v1/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}`
 
   if (filters) {
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
   }
 
+  const httpRequestOptions = {
+    agent: httpsAgent,
+    headers: {
+      'Accept-Encoding': 'gzip',
+      Authorization: apiKey ? `Bearer ${apiKey}` : ''
+    }
+  }
+
+  const MAX_ATTEMPTS = 6
+  let attempts = 0
+
   while (true) {
-    // simple retry logic when fetching from network...
+    // simple retry logic when fetching from the network...
     attempts++
     try {
-      const response = await fetch(url, fetchInit)
-      if (response.status === 200) {
-        // if response is ok let's cache it and be done with it
-        await cacheResponse(response.body, sliceCachePath)
-        return
-      } else {
-        let errorText = ''
-        try {
-          errorText = await response.text()
-        } catch {}
-        throw new HttpError(response.status, errorText, url)
-      }
+      return await fetchAndCacheSlice(url, httpRequestOptions, sliceCachePath)
     } catch (error) {
       const badOrUnauthorizedRequest = error instanceof HttpError && (error.status === 400 || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
@@ -173,7 +147,7 @@ async function fetchAndCacheSlice(
       }
 
       const randomIngridient = Math.random() * 300
-      const attemptsDelayMS = Math.pow(2, attempts) * 300
+      const attemptsDelayMS = Math.pow(2, attempts) * ONE_SEC_IN_MS
       let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
 
       if (tooManyRequests) {
@@ -188,25 +162,45 @@ async function fetchAndCacheSlice(
   }
 }
 
-async function cacheResponse(responseStream: NodeJS.ReadableStream, sliceCachePath: string) {
+async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCachePath: string) {
+  // first ensure that directory where we want to cache slice exists
   ensureDirSync(path.dirname(sliceCachePath))
+
+  // create write file stream that we'll save slice data into - first as unconfirmed temp file
   const tmpFilePath = `${sliceCachePath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
-  // first write response stream to temp file
-  const fileWriteableStream = createWriteStream(tmpFilePath)
-
-  const writingTask = new Promise(function(resolve, reject) {
-    responseStream.on('end', () => {
-      fileWriteableStream.end(resolve)
+  const fileWriteStream = createWriteStream(tmpFilePath)
+  try {
+    // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
+    await new Promise((resolve, reject) => {
+      https
+        .get(url, options, res => {
+          const { statusCode } = res
+          if (statusCode != 200) {
+            // read the error response text and throw it as an HttpError
+            res.setEncoding('utf8')
+            let body = ''
+            res.on('data', chunk => (body += chunk))
+            res.on('end', () => {
+              reject(new HttpError(statusCode!, body, url))
+            })
+          } else {
+            // consume the response stream by writing it to the file
+            res
+              .on('error', reject)
+              .on('aborted', () => reject(new Error('premature close')))
+              .pipe(fileWriteStream)
+              .on('error', reject)
+              .on('finish', resolve)
+          }
+        })
+        .on('error', reject)
     })
+  } finally {
+    fileWriteStream.destroy()
+  }
 
-    responseStream.on('error', reject)
-  })
-
-  responseStream.pipe(fileWriteableStream)
-  await writingTask
-
-  // when it succeded rename tmp file to normal name
-  // so we're sure that responses is 100% saved and also even it different process was doing the same we're good
+  // lastly when saving from the network to file succeded rename tmp file to normal name
+  // so we're sure that responses is 100% saved and also even if different process was doing the same we're good
   await rename(tmpFilePath, sliceCachePath)
 }
 
