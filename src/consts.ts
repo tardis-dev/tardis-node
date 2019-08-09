@@ -9,7 +9,8 @@ export const EXCHANGES = [
   'binance',
   'binance-jersey',
   'binance-dex',
-  'bitfinex'
+  'bitfinex',
+  'ftx'
 ] as const
 
 export type Exchange = typeof EXCHANGES[number]
@@ -94,6 +95,8 @@ const OKEX_CHANNELS = [
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
+const FTX_CHANNELS = ['orderbook', 'trades']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -105,7 +108,8 @@ export const EXCHANGE_CHANNELS_INFO = {
   binance: BINANCE_CHANNELS,
   'binance-jersey': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
-  bitfinex: BITFINEX_CHANNELS
+  bitfinex: BITFINEX_CHANNELS,
+  ftx: FTX_CHANNELS
 }
 
 export type FilterForExchange = { [key in Exchange]: Filter<typeof EXCHANGE_CHANNELS_INFO[key][number]> }
