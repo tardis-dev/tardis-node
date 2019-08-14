@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=12"
   },
-  "description": "Node.js client for tardis.dev -  historical cryptocurrency market data replay API.",
+  "description": "A Node.js client for tardis.dev - historical tick-level cryptocurrency market data replay API.",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
