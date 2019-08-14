@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/npm/v/tardis-client.svg)](https://www.npmjs.org/package/tardis-client)
 [![Try on RunKit](https://badge.runkitcdn.com/tardis-client.svg)](https://runkit.com/npm/tardis-client)
 
-A Node.js client for [tardis.dev](https://tardis.dev) - historical tick-level cryptocurrency market data replay API.
+Node.js client for [tardis.dev](https://tardis.dev) - historical tick-level cryptocurrency market data replay API.
 
 Provides fast easy to use wrapper for more level [REST API](https://docs.tardis.dev/api#http-api) with local file based caching build in.
 
