@@ -128,15 +128,17 @@ export class TardisClient {
         .pipe(new BinarySplitStream())
 
       let linesCount = 0
+      // date is always formatted to have lendth of 28 so we can skip looking for first space in line and use it
+      // as hardcoded value
+      const DATE_MESSAGE_SPLIT_INDEX = 28
 
       for await (const line of linesStream) {
         const bufferLine = line as Buffer
         // ignore empty lines
         if (bufferLine.length > 0) {
           linesCount++
-          const splitIndex = bufferLine.indexOf(SPACE_BYTE)
-          const localTimestampBuffer = bufferLine.slice(0, splitIndex)
-          const messageBuffer = bufferLine.slice(splitIndex + 1)
+          const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
+          const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
           if (decodeLine == true) {
             yield {
