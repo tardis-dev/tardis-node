@@ -26,7 +26,10 @@
     "cryptocurrency data feed",
     "market data",
     "api client",
-    "crypto markets data replay"
+    "crypto markets data replay",
+    "historical data",
+    "historical cryptocurrency prices",
+    "cryptocurrency api"
   ],
   "license": "MPL-2.0",
   "dependencies": {
