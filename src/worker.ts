@@ -124,6 +124,7 @@ async function reliablyFetchAndCacheSlice(
 
   const httpRequestOptions = {
     agent: httpsAgent,
+    timeout: 45 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': 'gzip',
       Authorization: apiKey ? `Bearer ${apiKey}` : ''
@@ -172,7 +173,7 @@ async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCac
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
     await new Promise((resolve, reject) => {
-      https
+      const req = https
         .get(url, options, res => {
           const { statusCode } = res
           if (statusCode != 200) {
@@ -187,13 +188,17 @@ async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCac
             // consume the response stream by writing it to the file
             res
               .on('error', reject)
-              .on('aborted', () => reject(new Error('premature close')))
+              .on('aborted', () => reject(new Error('Request aborted')))
               .pipe(fileWriteStream)
               .on('error', reject)
               .on('finish', resolve)
           }
         })
         .on('error', reject)
+        .on('timeout', () => {
+          debug('fetchAndCacheSlice request timeout')
+          req.abort()
+        })
     })
   } finally {
     fileWriteStream.destroy()
