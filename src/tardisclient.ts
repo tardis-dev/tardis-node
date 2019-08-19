@@ -200,7 +200,7 @@ export class TardisClient {
 
         if (!filter.channel || (EXCHANGE_CHANNELS_INFO[exchange] as any).includes(filter.channel) === false) {
           throw new Error(
-            `Invalid "filters[].channel" argument: ${exchange}. Please provide one of the following channels: ${EXCHANGE_CHANNELS_INFO[
+            `Invalid "filters[].channel" argument: ${filter.channel}. Please provide one of the following channels: ${EXCHANGE_CHANNELS_INFO[
               exchange
             ].join(', ')}.`
           )
