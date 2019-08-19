@@ -207,7 +207,7 @@ export class TardisClient {
         }
 
         if (filter.symbols && Array.isArray(filter.symbols) === false) {
-          throw new Error(`Invalid "filters[].symbols" argument: ${exchange}. Please provide array of symbol strings`)
+          throw new Error(`Invalid "filters[].symbols" argument: ${filter.symbols}. Please provide array of symbol strings`)
         }
       }
     }
