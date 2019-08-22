@@ -66,7 +66,7 @@ Optional client constructor options
 | name                  | type                  | default value               | description                                                                                                                                                     |
 | --------------------- | --------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apiKey` (optional)   | `string or undefined` | `undefined`                 | optional `string` containing API key for [tardis.dev](https://tardis.dev) API. If not provided only first day of each month of data is accessible (free access) |
-| `cacheDir` (optional) | `string`              | `<os.tmpdir>/.tardis-cache` | optional `string` with path to local dir that will be used as cache location. If not provided default `temp` dir for given OS isused                            |
+| `cacheDir` (optional) | `string`              | `<os.tmpdir>/.tardis-cache` | optional `string` with path to local dir that will be used as cache location. If not provided default `temp` dir for given OS will be used.                         |
 
 Example:
 
