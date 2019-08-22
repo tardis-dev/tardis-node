@@ -9,7 +9,7 @@ Provides fast easy to use wrapper for more level [REST API](https://docs.tardis.
 
 ## Installation
 
-Requires Node.js v12 installed.
+Requires Node.js v12+ installed.
 
 ```sh
 npm install tardis-client
