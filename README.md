@@ -5,7 +5,7 @@
 
 Node.js client for [tardis.dev](https://tardis.dev) - historical tick-level cryptocurrency market data replay API.
 
-Provides fast easy to use wrapper for more level [REST API](https://docs.tardis.dev/api#http-api) with local file based caching build in.
+Provides fast easy to use wrapper for more low level [HTTP API](https://docs.tardis.dev/api#http-api) with local file based caching build in.
 
 ## Installation
 
