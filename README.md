@@ -100,7 +100,7 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 
 | name                 | type                                     | default value | description                                                                                                                                                  |
 | -------------------- | ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `exchange`           | `string`                                 | -             | requested exchange name - see [allowed echanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) list |
+| `exchange`           | `string`                                 | -             | requested exchange name - see [allowed exchanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) list |
 | `from`               | `string`                                 | -             | requested UTC start date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                     |
 | `to`                 | `string`                                 | -             | requested UTC end date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                       |
 | `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed.  Use [/exchanges/:/exchange](https://docs.tardis.dev/api#exchanges-exchange) API call to get allowed channel names and symbols for requested exchange |
