@@ -90,7 +90,7 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 - ### `tardisClient.replay(ReplayOptions)`
 
   Replays historical market data messages for given replay options.
-  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with object of `{ localTimestamp: Date; message: object }` type.
+  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with objects of `{ localTimestamp: Date; message: object }` type.
 
   - `localTimestamp` is a JS Date object specyfying when message has been received from the exchange real-time data feed.
 
@@ -164,7 +164,7 @@ for await (let { message, localTimestamp } of wholeDeribitExchangeDataFeedInFirs
 
   Replays historical market data messages for given replay options.
   Accepts the same options as `replay` method.
-  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with object of `{ localTimestamp: Buffer; message: Buffer }` type. It's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
+  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with objects of `{ localTimestamp: Buffer; message: Buffer }` type. It's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
 
   Example:
 
