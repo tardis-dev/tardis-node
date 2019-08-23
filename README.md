@@ -89,11 +89,10 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 
 - ### `tardisClient.replay(ReplayOptions)`
 
-  Replays data feed for given replay options as [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of).
+  Replays historical market data messages for given replay options.
+  Returns [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) of `{ localTimestamp: Date; message: object }` type.
 
-  Returns iterator of `{ localTimestamp: Date; message: object }` type.
-
-  - `localTimestamp` is a date when message has been received in ISO 8601 format with 100 nano second resolution.
+  - `localTimestamp` is a JS Date object specyfying when message has been received from the exchange real-time data feed.
 
   - `message` is and JSON object/array with exactly the same structure as provided by particular exchange.
 
@@ -101,7 +100,7 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 
 | name                 | type                                     | default value | description                                                                                                                                                  |
 | -------------------- | ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `exchange`           | `string`                                 | -             | requested exchange name. Check out [allowed echanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts)                                   |
+| `exchange`           | `string`                                 | -             | requested exchange name - see [allowed echanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) list |
 | `from`               | `string`                                 | -             | requested UTC start date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                     |
 | `to`                 | `string`                                 | -             | requested UTC end date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                       |
 | `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed.  Use [/exchanges/:/exchange](https://docs.tardis.dev/api#exchanges-exchange) API call to get allowed channel names and symbols for requested exchange |
@@ -163,11 +162,9 @@ for await (let { message, localTimestamp } of wholeDeribitExchangeDataFeedInFirs
 
 - ### `tardisClient.ReplayRaw(ReplayOptions)`
 
-  Replays data feed for given replay options as [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of).
-
+  Replays historical market data messages for given replay options.
   Accepts the same options as `replay` method.
-
-  Returns iterator of `{ localTimestamp: Buffer; message: Buffer }` type, it's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
+  Returns [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) of `{ localTimestamp: Buffer; message: Buffer }` type, it's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
 
   Example:
 
