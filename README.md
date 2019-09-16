@@ -5,11 +5,11 @@
 
 Node.js client for [tardis.dev](https://tardis.dev) - historical tick-level cryptocurrency market data replay API.
 
-Provides fast easy to use wrapper for more level [REST API](https://docs.tardis.dev/api#http-api) with local file based caching build in.
+Provides fast easy to use wrapper for more low level [HTTP API](https://docs.tardis.dev/api#http-api) with local file based caching build in.
 
 ## Installation
 
-Requires Node.js v12 installed.
+Requires Node.js v12+ installed.
 
 ```sh
 npm install tardis-client
@@ -21,7 +21,7 @@ npm install tardis-client
 const { TardisClient } = require('tardis-client')
 const tardisClient = new TardisClient()
 
-// replay method returns async iterator
+// replay method returns async iterable
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of
 
 const bitmexDataFeedMessages = tardisClient.replay({
@@ -66,7 +66,7 @@ Optional client constructor options
 | name                  | type                  | default value               | description                                                                                                                                                     |
 | --------------------- | --------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apiKey` (optional)   | `string or undefined` | `undefined`                 | optional `string` containing API key for [tardis.dev](https://tardis.dev) API. If not provided only first day of each month of data is accessible (free access) |
-| `cacheDir` (optional) | `string`              | `<os.tmpdir>/.tardis-cache` | optional `string` with path to local dir that will be used as cache location. If not provided default `temp` dir for given OS isused                            |
+| `cacheDir` (optional) | `string`              | `<os.tmpdir>/.tardis-cache` | optional `string` with path to local dir that will be used as cache location. If not provided default `temp` dir for given OS will be used.                         |
 
 Example:
 
@@ -89,11 +89,10 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 
 - ### `tardisClient.replay(ReplayOptions)`
 
-  Replays data feed for given replay options as [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of).
+  Replays historical market data messages for given replay options.
+  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with objects of `{ localTimestamp: Date; message: object }` type.
 
-  Returns iterator of `{ localTimestamp: Date; message: object }` type.
-
-  - `localTimestamp` is a date when message has been received in ISO 8601 format with 100 nano second resolution.
+  - `localTimestamp` is a JS Date object specyfying when message has been received from the exchange real-time data feed.
 
   - `message` is and JSON object/array with exactly the same structure as provided by particular exchange.
 
@@ -101,10 +100,10 @@ new TardisClient({ cacheDir: './cache' }) // creates new client with custom cach
 
 | name                 | type                                     | default value | description                                                                                                                                                  |
 | -------------------- | ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `exchange`           | `string`                                 | -             | requested exchange name. Check out [allowed echanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts)                                   |
+| `exchange`           | `string`                                 | -             | requested exchange name - see [allowed exchanges](https://github.com/tardis-dev/node-client/blob/master/src/consts.ts) list |
 | `from`               | `string`                                 | -             | requested UTC start date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                     |
 | `to`                 | `string`                                 | -             | requested UTC end date of data feed - (eg: `2019-04-05` or `2019-05-05T00:00:00.000Z`)                                                                       |
-| `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed.  Use [/exchanges/:/exchange](https://docs.tardis.dev/api#exchanges-exchange) API call to get allowed channel names and symbols for requested exchange |
+| `filters` (optional) | `{channel:string, symbols?: string[]}[]` | undefined     | optional filters of requested data feed.  Use [/exchanges/:exchange](https://docs.tardis.dev/api#exchanges-exchange) API call to get allowed channel names and symbols for requested exchange |
 
 Examples:
 
@@ -163,11 +162,9 @@ for await (let { message, localTimestamp } of wholeDeribitExchangeDataFeedInFirs
 
 - ### `tardisClient.ReplayRaw(ReplayOptions)`
 
-  Replays data feed for given replay options as [async iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of).
-
+  Replays historical market data messages for given replay options.
   Accepts the same options as `replay` method.
-
-  Returns iterator of `{ localTimestamp: Buffer; message: Buffer }` type, it's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
+  Returns [async iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) with objects of `{ localTimestamp: Buffer; message: Buffer }` type. It's faster than `replay` (no decoding to objects/dates, just raw buffers), but may manual decoding from buffers depending on the use case.
 
   Example:
 
