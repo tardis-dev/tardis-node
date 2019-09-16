@@ -105,7 +105,7 @@ const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicat
 
 const BITFLYER_CHANNELS = ['lightning_board_snapshot', 'lightning_board', 'lightning_ticker', 'lightning_executions'] as const
 
-const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot']
+const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot'] as const
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
