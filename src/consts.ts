@@ -1,16 +1,20 @@
 export const EXCHANGES = [
   'bitmex',
-  'coinbase',
-  'deribit',
-  'cryptofacilities',
-  'bitstamp',
-  'kraken',
-  'okex',
   'binance',
+  'binance-futures',
+  'deribit',
+  'bitstamp',
+  'coinbase',
+  'cryptofacilities',
+  'kraken',
+  'bitfinex',
+  'bitfinex-derivatives',
+  'okex',
   'binance-jersey',
   'binance-dex',
-  'bitfinex',
-  'ftx'
+  'ftx',
+  'gemini',
+  'bitflyer'
 ] as const
 
 export type Exchange = typeof EXCHANGES[number]
@@ -97,6 +101,14 @@ const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snap
 
 const FTX_CHANNELS = ['orderbook', 'trades'] as const
 
+const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
+
+const BITFLYER_CHANNELS = ['lightning_board_snapshot', 'lightning_board', 'lightning_ticker', 'lightning_executions'] as const
+
+const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot']
+
+const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -109,7 +121,11 @@ export const EXCHANGE_CHANNELS_INFO = {
   'binance-jersey': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
-  ftx: FTX_CHANNELS
+  ftx: FTX_CHANNELS,
+  gemini: GEMINI_CHANNELS,
+  bitflyer: BITFLYER_CHANNELS,
+  'binance-futures': BINANCE_FUTURES_CHANNELS,
+  'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS
 }
 
 export type FilterForExchange = { [key in Exchange]: Filter<typeof EXCHANGE_CHANNELS_INFO[key][number]> }
