@@ -9,9 +9,9 @@ import { Exchange, FilterForExchange, EXCHANGES, EXCHANGE_CHANNELS_INFO } from '
 import { parseAsUTCDate, wait } from './handy'
 import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
+import { getMapper, DataType } from './mappers'
 
 const debug = dbg('tardis-client')
-const SPACE_BYTE = 32
 
 export class TardisClient {
   private static _defaultOptions: Options = {
@@ -28,14 +28,6 @@ export class TardisClient {
     debug('initialized with: %o', this._options)
   }
 
-  public replay<T extends Exchange>(options: ReplayOptions<T>) {
-    return this._replayImpl(options, true)
-  }
-
-  public replayRaw<T extends Exchange>(options: ReplayOptions<T>) {
-    return this._replayImpl(options, false)
-  }
-
   public async clearCache() {
     const dirToRemove = `${this._options.cacheDir}`
 
@@ -50,10 +42,10 @@ export class TardisClient {
     }
   }
 
-  private async *_replayImpl<T extends Exchange, U extends boolean>(
+  public async *replay<T extends Exchange, U extends boolean = false>(
     { exchange, from, to, filters = undefined }: ReplayOptions<T>,
-    decodeLine: U
-  ): AsyncIterableIterator<U extends true ? { localTimestamp: Date; message: object } : { localTimestamp: Buffer; message: Buffer }> {
+    skipDecoding?: U
+  ): AsyncIterableIterator<U extends true ? { localTimestamp: Buffer; message: Buffer } : { localTimestamp: Date; message: any }> {
     this._validateInputs(exchange, from, to, filters)
     const fromDate = parseAsUTCDate(from)
     const toDate = parseAsUTCDate(to)
@@ -140,16 +132,16 @@ export class TardisClient {
           const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
           const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
-          if (decodeLine == true) {
-            yield {
-              // when decode line is set to true decode timestamp to Date object and message to object
-              localTimestamp: new Date(localTimestampBuffer.toString()),
-              message: JSON.parse(messageBuffer.toString()) as object
-            } as any
-          } else {
+          if (skipDecoding) {
             yield {
               localTimestamp: localTimestampBuffer,
               message: messageBuffer
+            } as any
+          } else {
+            yield {
+              // when skipDecoding is not set, decode timestamp to Date and message to object
+              localTimestamp: new Date(localTimestampBuffer.toString()),
+              message: JSON.parse(messageBuffer.toString())
             } as any
           }
         }
@@ -170,6 +162,101 @@ export class TardisClient {
       toDate.toISOString(),
       filters
     )
+  }
+
+  public async *replayTrades(options: ReplayNormalizedOptions) {
+    const { mapper, messages } = this._getMapperAndMessages(options, ['trades'])
+
+    for await (const { localTimestamp, message } of messages) {
+      for (const trade of mapper.mapTrades(localTimestamp, message)) {
+        yield trade
+      }
+    }
+  }
+
+  public async *replayOrderBookChanges(options: ReplayNormalizedOptions) {
+    const { mapper, messages } = this._getMapperAndMessages(options, ['bookChange'])
+
+    for await (const { localTimestamp, message } of messages) {
+      yield mapper.mapBookChange(localTimestamp, message)
+    }
+  }
+
+  public async *replayQuotes(options: ReplayNormalizedOptions) {
+    const { mapper, messages } = this._getMapperAndMessages(options, ['quote'])
+
+    for await (const { localTimestamp, message } of messages) {
+      yield mapper.mapQuote(localTimestamp, message)
+    }
+  }
+
+  public async *replayTicker(options: ReplayNormalizedOptions) {
+    const { mapper, messages } = this._getMapperAndMessages(options, ['ticker'])
+
+    for await (const { localTimestamp, message } of messages) {
+      yield mapper.mapTicker(localTimestamp, message)
+    }
+  }
+
+  public async *replayNormalized(options: ReplayNormalizedOptions) {
+    const { mapper, messages } = this._getMapperAndMessages(options, ['trades', 'bookChange', 'quote', 'ticker'])
+    for await (const { localTimestamp, message } of messages) {
+      const dataType = mapper.getDataType(message)
+      if (!dataType) {
+        continue
+      }
+
+      if (dataType == 'bookChange') {
+        const bookChange = mapper.mapBookChange(localTimestamp, message)
+        yield {
+          dataType,
+          data: bookChange
+        }
+      }
+
+      if (dataType == 'trades') {
+        for (const trade of mapper.mapTrades(localTimestamp, message)) {
+          yield {
+            dataType,
+            data: trade
+          }
+        }
+      }
+
+      if (dataType == 'quote') {
+        const quote = mapper.mapQuote(localTimestamp, message)
+        yield {
+          dataType,
+          data: quote
+        }
+      }
+
+      if (dataType == 'ticker') {
+        const ticker = mapper.mapTicker(localTimestamp, message)
+        yield {
+          dataType,
+          data: ticker
+        }
+      }
+    }
+  }
+
+  private _getMapperAndMessages({ exchange, from, to, symbols }: ReplayNormalizedOptions, dataTypes: DataType[]) {
+    const mapper = getMapper({
+      exchange,
+      symbols
+    })
+
+    const messages = this.replay({
+      exchange,
+      from,
+      to,
+      filters: dataTypes.map(dt => mapper.getFilterForDataType(dt))
+    })
+    return {
+      mapper,
+      messages
+    }
   }
 
   private _validateInputs<T extends Exchange>(
@@ -200,9 +287,9 @@ export class TardisClient {
 
         if (!filter.channel || (EXCHANGE_CHANNELS_INFO[exchange] as any).includes(filter.channel) === false) {
           throw new Error(
-            `Invalid "filters[].channel" argument: ${filter.channel}. Please provide one of the following channels: ${EXCHANGE_CHANNELS_INFO[
-              exchange
-            ].join(', ')}.`
+            `Invalid "filters[].channel" argument: ${
+              filter.channel
+            }. Please provide one of the following channels: ${EXCHANGE_CHANNELS_INFO[exchange].join(', ')}.`
           )
         }
 
@@ -225,4 +312,11 @@ export type ReplayOptions<T extends Exchange> = {
   from: string
   to: string
   filters?: FilterForExchange[T][]
+}
+
+export type ReplayNormalizedOptions = {
+  from: string
+  to: string
+  exchange: Exchange
+  symbols: string[]
 }
