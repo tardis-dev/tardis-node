@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Data normalization - mappers Deribit mapper maps order book changes 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 179803,
+        "price": 218.6,
+      },
+      Object {
+        "amount": 7887,
+        "price": 218.65,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1895,
+        "price": 217.8,
+      },
+      Object {
+        "amount": 712,
+        "price": 217.75,
+      },
+    ],
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "symbol": "ETH-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:00.273Z,
+  },
+]
+`;
+
+exports[`Data normalization - mappers Deribit mapper maps order book changes 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 64903,
+        "price": 219.2,
+      },
+      Object {
+        "amount": 19343,
+        "price": 219.1,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 217.8,
+      },
+    ],
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "symbol": "ETH-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:54.272Z,
+  },
+]
+`;
+
+exports[`Data normalization - mappers Deribit mapper maps quotes 1`] = `
+Array [
+  Object {
+    "bestAskAmount": 49710,
+    "bestAskPrice": 9601,
+    "bestBidAmount": 162800,
+    "bestBidPrice": 9600.5,
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:00.183Z,
+  },
+]
+`;
+
+exports[`Data normalization - mappers Deribit mapper maps ticker 1`] = `
+Array [
+  Object {
+    "bestAskAmount": 1,
+    "bestAskPrice": 0,
+    "bestBidAmount": 45,
+    "bestBidPrice": 0.649,
+    "localTimestamp": 2019-08-01T00:00:54.453Z,
+    "symbol": "ETH-27SEP19-360-P",
+    "timestamp": 2019-08-01T00:00:54.446Z,
+  },
+]
+`;
+
+exports[`Data normalization - mappers Deribit mapper maps trades 1`] = `
+Array [
+  Object {
+    "amount": 2000,
+    "id": "39355898",
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+  },
+  Object {
+    "amount": 50,
+    "id": "39355899",
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+  },
+]
+`;

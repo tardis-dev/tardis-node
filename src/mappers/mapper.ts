@@ -1,16 +1,19 @@
 import { FilterForExchange, Exchange } from '../consts'
 
-export type DataType = 'trades' | 'bookChange' | 'quote' | 'ticker'
+export type DataType = 'trade' | 'l2Change' | 'quote' | 'ticker'
 
-export abstract class Mapper<T extends Exchange> {
-  constructor(protected readonly _symbols: string[]) {}
+export type Mapper<T extends Exchange> = {
+  getDataType(message: any): DataType | undefined
 
-  abstract getDataType(message: any): DataType | undefined
-  abstract getFilterForDataType(dataType: DataType): FilterForExchange[T]
-  abstract mapTrades(localTimestamp: Date, message: any): IterableIterator<Trade>
-  abstract mapQuote(localTimestamp: Date, message: any): Quote
-  abstract mapBookChange(localTimestamp: Date, message: any): BookChange
-  abstract mapTicker(localTimestamp: Date, message: any): Ticker
+  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange[T][]
+
+  mapTrades(message: any, localTimestamp?: Date): IterableIterator<Trade>
+
+  mapQuotes(message: any, localTimestamp?: Date): IterableIterator<Quote>
+
+  mapOrderBookL2Changes(message: any, localTimestamp?: Date): IterableIterator<OrderBookL2Change>
+
+  mapTickers(message: any, localTimestamp?: Date): IterableIterator<Ticker>
 }
 
 export type Trade = {
@@ -20,15 +23,20 @@ export type Trade = {
   amount: number
   side: 'buy' | 'sell' // liquidity taker side (aggressor)
   timestamp: Date
-  localTimestamp: Date
+  localTimestamp?: Date
 }
 
-export type BookChange = {
+export type BookPriceLevel = {
+  price: number
+  amount: number
+}
+
+export type OrderBookL2Change = {
   symbol: string
-  bids: [number, number][]
-  asks: [number, number][]
-  timestamp: Date
-  localTimestamp: Date
+  bids: BookPriceLevel[]
+  asks: BookPriceLevel[]
+  timestamp?: Date
+  localTimestamp?: Date
 }
 
 export type Quote = {
@@ -38,7 +46,7 @@ export type Quote = {
   bestAskPrice: number
   bestAskAmount: number
   timestamp: Date
-  localTimestamp: Date
+  localTimestamp?: Date
 }
 
 export type Ticker = {
@@ -54,5 +62,5 @@ export type Ticker = {
   markPrice?: number
 
   timestamp: Date
-  localTimestamp: Date
+  localTimestamp?: Date
 }

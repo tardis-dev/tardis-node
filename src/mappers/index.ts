@@ -1,18 +1,20 @@
 import { Mapper } from './mapper'
 import { DeribitMapper } from './deribit'
 import { Exchange } from '..'
+import { BitmexMapper } from './bitmex'
 
 export * from './mapper'
 
 const exchangeMapperMap: {
-  [key in Exchange]?: new (symbols: string[]) => Mapper<key>
+  [key in Exchange]?: new () => Mapper<key>
 } = {
-  deribit: DeribitMapper
+  deribit: DeribitMapper,
+  bitmex: BitmexMapper
 }
 
-export function getMapper<T extends Exchange>({ exchange, symbols }: { exchange: T; symbols: string[] }) {
+export function getMapper(exchange: Exchange) {
   if (exchangeMapperMap[exchange]) {
-    return new exchangeMapperMap[exchange]!(symbols)
+    return new exchangeMapperMap[exchange]!()
   }
 
   throw new Error(`not supported exchange ${exchange}`)

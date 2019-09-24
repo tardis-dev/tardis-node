@@ -1,7 +1,14 @@
-import { Mapper, DataType, Trade, Ticker, Quote, BookChange } from './mapper'
+import { Mapper, DataType, OrderBookL2Change, Quote, Ticker, Trade } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class DeribitMapper extends Mapper<'deribit'> {
+export class DeribitMapper implements Mapper<'deribit'> {
+  private readonly _dataTypeChannelMap: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
+    l2Change: 'book',
+    trade: 'trades',
+    quote: 'quote',
+    ticker: 'ticker'
+  }
+
   getDataType(message: any): DataType | undefined {
     const channel = message.params && (message.params.channel as string | undefined)
 
@@ -10,11 +17,11 @@ export class DeribitMapper extends Mapper<'deribit'> {
     }
 
     if (channel.startsWith('trades')) {
-      return 'trades'
+      return 'trade'
     }
 
     if (channel.startsWith('book')) {
-      return 'bookChange'
+      return 'l2Change'
     }
 
     if (channel.startsWith('ticker')) {
@@ -28,15 +35,17 @@ export class DeribitMapper extends Mapper<'deribit'> {
     return
   }
 
-  getFilterForDataType(dataType: DataType) {
-    const channel: FilterForExchange['deribit']['channel'] = dataType == 'bookChange' ? 'book' : dataType
-    return {
-      channel,
-      symbols: this._symbols
-    }
+  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+    const channel = this._dataTypeChannelMap[dataType]
+    return [
+      {
+        channel,
+        symbols
+      }
+    ]
   }
 
-  *mapTrades(localTimestamp: Date, message: DeribitTradeMessage): IterableIterator<Trade> {
+  *mapTrades(message: DeribitTradesMessage, localTimestamp?: Date): IterableIterator<Trade> {
     for (const deribitTrade of message.params.data) {
       yield {
         id: deribitTrade.trade_id,
@@ -50,10 +59,10 @@ export class DeribitMapper extends Mapper<'deribit'> {
     }
   }
 
-  mapTicker(localTimestamp: Date, message: DeribitTickerMessage): Ticker {
+  *mapTickers(message: DeribitTickerMessage, localTimestamp?: Date): IterableIterator<Ticker> {
     const deribitTicker = message.params.data
 
-    return {
+    yield {
       symbol: deribitTicker.instrument_name,
       bestBidPrice: deribitTicker.best_bid_price,
       bestAskPrice: deribitTicker.best_ask_price,
@@ -69,10 +78,10 @@ export class DeribitMapper extends Mapper<'deribit'> {
     }
   }
 
-  mapQuote(localTimestamp: Date, message: DeribitQuoteMessage): Quote {
+  *mapQuotes(message: DeribitQuoteMessage, localTimestamp?: Date): IterableIterator<Quote> {
     const deribitQuote = message.params.data
 
-    return {
+    yield {
       symbol: deribitQuote.instrument_name,
       bestBidPrice: deribitQuote.best_bid_price,
       bestBidAmount: deribitQuote.best_bid_amount,
@@ -83,10 +92,10 @@ export class DeribitMapper extends Mapper<'deribit'> {
     }
   }
 
-  mapBookChange(localTimestamp: Date, message: DeribitBookMessage): BookChange {
+  *mapOrderBookL2Changes(message: DeribitBookMessage, localTimestamp?: Date): IterableIterator<OrderBookL2Change> {
     const deribitBookChange = message.params.data
 
-    return {
+    yield {
       symbol: deribitBookChange.instrument_name,
       bids: deribitBookChange.bids.map(this._mapBookLevel),
       asks: deribitBookChange.asks.map(this._mapBookLevel),
@@ -95,11 +104,11 @@ export class DeribitMapper extends Mapper<'deribit'> {
     }
   }
 
-  private _mapBookLevel(level: BookLevel): [number, number] {
+  private _mapBookLevel(level: DeribitBookLevel) {
     const price = level[1]
     const amount = level[0] == 'delete' ? 0 : level[2]
 
-    return [price, amount]
+    return { price, amount }
   }
 }
 
@@ -122,7 +131,7 @@ type DeribitQuoteMessage = DeribitMessage & {
   }
 }
 
-type DeribitTradeMessage = DeribitMessage & {
+type DeribitTradesMessage = DeribitMessage & {
   params: {
     data: {
       trade_id: string
@@ -136,15 +145,15 @@ type DeribitTradeMessage = DeribitMessage & {
   }
 }
 
-type BookLevel = ['new' | 'change' | 'delete', number, number]
+type DeribitBookLevel = ['new' | 'change' | 'delete', number, number]
 
 type DeribitBookMessage = DeribitMessage & {
   params: {
     data: {
       timestamp: number
       instrument_name: string
-      bids: BookLevel[]
-      asks: BookLevel[]
+      bids: DeribitBookLevel[]
+      asks: DeribitBookLevel[]
     }
   }
 }

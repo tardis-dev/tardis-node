@@ -42,10 +42,15 @@ export class TardisClient {
     }
   }
 
-  public async *replay<T extends Exchange, U extends boolean = false>(
-    { exchange, from, to, filters = undefined }: ReplayOptions<T>,
-    skipDecoding?: U
-  ): AsyncIterableIterator<U extends true ? { localTimestamp: Buffer; message: Buffer } : { localTimestamp: Date; message: any }> {
+  public async *replay<T extends Exchange, U extends boolean = false>({
+    exchange,
+    from,
+    to,
+    filters = undefined,
+    skipDecoding = undefined
+  }: ReplayOptions<T, U>): AsyncIterableIterator<
+    U extends true ? { localTimestamp: Buffer; message: Buffer } : { localTimestamp: Date; message: any }
+  > {
     this._validateInputs(exchange, from, to, filters)
     const fromDate = parseAsUTCDate(from)
     const toDate = parseAsUTCDate(to)
@@ -141,7 +146,7 @@ export class TardisClient {
             yield {
               // when skipDecoding is not set, decode timestamp to Date and message to object
               localTimestamp: new Date(localTimestampBuffer.toString()),
-              message: JSON.parse(messageBuffer.toString())
+              message: JSON.parse(messageBuffer as any)
             } as any
           }
         }
@@ -164,98 +169,87 @@ export class TardisClient {
     )
   }
 
-  public async *replayTrades(options: ReplayNormalizedOptions) {
-    const { mapper, messages } = this._getMapperAndMessages(options, ['trades'])
-
-    for await (const { localTimestamp, message } of messages) {
-      for (const trade of mapper.mapTrades(localTimestamp, message)) {
-        yield trade
-      }
-    }
+  public replayTrades(options: ReplayNormalizedOptions) {
+    return this.replayNormalized(options, ['trade'])
   }
 
-  public async *replayOrderBookChanges(options: ReplayNormalizedOptions) {
-    const { mapper, messages } = this._getMapperAndMessages(options, ['bookChange'])
-
-    for await (const { localTimestamp, message } of messages) {
-      yield mapper.mapBookChange(localTimestamp, message)
-    }
+  public replayOrderBookL2Changes(options: ReplayNormalizedOptions) {
+    return this.replayNormalized(options, ['l2Change'])
   }
 
-  public async *replayQuotes(options: ReplayNormalizedOptions) {
-    const { mapper, messages } = this._getMapperAndMessages(options, ['quote'])
-
-    for await (const { localTimestamp, message } of messages) {
-      yield mapper.mapQuote(localTimestamp, message)
-    }
+  public replayQuotes(options: ReplayNormalizedOptions) {
+    return this.replayNormalized(options, ['quote'])
   }
 
-  public async *replayTicker(options: ReplayNormalizedOptions) {
-    const { mapper, messages } = this._getMapperAndMessages(options, ['ticker'])
-
-    for await (const { localTimestamp, message } of messages) {
-      yield mapper.mapTicker(localTimestamp, message)
-    }
+  public replayTicker(options: ReplayNormalizedOptions) {
+    return this.replayNormalized(options, ['ticker'])
   }
 
-  public async *replayNormalized(options: ReplayNormalizedOptions) {
-    const { mapper, messages } = this._getMapperAndMessages(options, ['trades', 'bookChange', 'quote', 'ticker'])
+  public async *replayNormalized(
+    { exchange, from, to, symbols }: ReplayNormalizedOptions,
+    dataTypes: DataType[] = ['trade', 'l2Change', 'quote', 'ticker']
+  ) {
+    const mapper = getMapper(exchange)
+
+    const messages = this.replay({
+      exchange,
+      from,
+      to,
+      filters: dataTypes.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols))
+    })
+
+    // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
+    const symbolsInclude = (symbol: string) => !symbols || symbols.includes(symbol)
+
     for await (const { localTimestamp, message } of messages) {
       const dataType = mapper.getDataType(message)
       if (!dataType) {
         continue
       }
 
-      if (dataType == 'bookChange') {
-        const bookChange = mapper.mapBookChange(localTimestamp, message)
-        yield {
-          dataType,
-          data: bookChange
+      if (dataType == 'l2Change') {
+        for (const bookL2Change of mapper.mapOrderBookL2Changes(message, localTimestamp)) {
+          if (symbolsInclude(bookL2Change.symbol)) {
+            yield {
+              dataType,
+              data: bookL2Change
+            }
+          }
         }
       }
 
-      if (dataType == 'trades') {
-        for (const trade of mapper.mapTrades(localTimestamp, message)) {
-          yield {
-            dataType,
-            data: trade
+      if (dataType == 'trade') {
+        for (const trade of mapper.mapTrades(message, localTimestamp)) {
+          if (symbolsInclude(trade.symbol)) {
+            yield {
+              dataType,
+              data: trade
+            }
           }
         }
       }
 
       if (dataType == 'quote') {
-        const quote = mapper.mapQuote(localTimestamp, message)
-        yield {
-          dataType,
-          data: quote
+        for (const quote of mapper.mapQuotes(message, localTimestamp)) {
+          if (symbolsInclude(quote.symbol)) {
+            yield {
+              dataType,
+              data: quote
+            }
+          }
         }
       }
 
       if (dataType == 'ticker') {
-        const ticker = mapper.mapTicker(localTimestamp, message)
-        yield {
-          dataType,
-          data: ticker
+        for (const ticker of mapper.mapTickers(message, localTimestamp)) {
+          if (symbolsInclude(ticker.symbol)) {
+            yield {
+              dataType,
+              data: ticker
+            }
+          }
         }
       }
-    }
-  }
-
-  private _getMapperAndMessages({ exchange, from, to, symbols }: ReplayNormalizedOptions, dataTypes: DataType[]) {
-    const mapper = getMapper({
-      exchange,
-      symbols
-    })
-
-    const messages = this.replay({
-      exchange,
-      from,
-      to,
-      filters: dataTypes.map(dt => mapper.getFilterForDataType(dt))
-    })
-    return {
-      mapper,
-      messages
     }
   }
 
@@ -307,16 +301,17 @@ type Options = {
   apiKey: string
 }
 
-export type ReplayOptions<T extends Exchange> = {
+export type ReplayOptions<T extends Exchange, U extends boolean = false> = {
   exchange: T
   from: string
   to: string
   filters?: FilterForExchange[T][]
+  skipDecoding?: U
 }
 
 export type ReplayNormalizedOptions = {
   from: string
   to: string
   exchange: Exchange
-  symbols: string[]
+  symbols?: string[]
 }

@@ -17,6 +17,6 @@
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["es2017"]
+    "lib": ["es2019"]
   }
 }
