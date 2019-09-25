@@ -9,7 +9,7 @@ import { Exchange, FilterForExchange, EXCHANGES, EXCHANGE_CHANNELS_INFO } from '
 import { parseAsUTCDate, wait } from './handy'
 import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
-import { getMapper, DataType } from './mappers'
+import { getMapper, DataType, MessageForDataType, Message } from './mappers'
 
 const debug = dbg('tardis-client')
 
@@ -170,84 +170,50 @@ export class TardisClient {
   }
 
   public replayTrades(options: ReplayNormalizedOptions) {
-    return this.replayNormalized(options, ['trade'])
+    return this._replayNormalized(options, 'trade')
   }
 
   public replayOrderBookL2Changes(options: ReplayNormalizedOptions) {
-    return this.replayNormalized(options, ['l2Change'])
+    return this._replayNormalized(options, 'l2change')
   }
 
   public replayQuotes(options: ReplayNormalizedOptions) {
-    return this.replayNormalized(options, ['quote'])
+    return this._replayNormalized(options, 'quote')
   }
 
   public replayTicker(options: ReplayNormalizedOptions) {
-    return this.replayNormalized(options, ['ticker'])
+    return this._replayNormalized(options, 'ticker')
   }
 
-  public async *replayNormalized(
+  public replayNormalized(options: ReplayNormalizedOptions, dataTypes: DataType[] = ['trade', 'l2change', 'quote', 'ticker']) {
+    return this._replayNormalized(options, dataTypes)
+  }
+
+  private async *_replayNormalized<T extends DataType | DataType[]>(
     { exchange, from, to, symbols }: ReplayNormalizedOptions,
-    dataTypes: DataType[] = ['trade', 'l2Change', 'quote', 'ticker']
-  ) {
+    dataTypes: T
+  ): AsyncIterableIterator<T extends DataType ? MessageForDataType[T] : Message> {
     const mapper = getMapper(exchange)
+    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
 
     const messages = this.replay({
       exchange,
       from,
       to,
-      filters: dataTypes.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols))
+      filters: dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols))
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
     const symbolsInclude = (symbol: string) => !symbols || symbols.includes(symbol)
 
     for await (const { localTimestamp, message } of messages) {
-      const dataType = mapper.getDataType(message)
-      if (!dataType) {
+      const mappedMessages = mapper.map(message, localTimestamp)
+      if (!mappedMessages) {
         continue
       }
-
-      if (dataType == 'l2Change') {
-        for (const bookL2Change of mapper.mapOrderBookL2Changes(message, localTimestamp)) {
-          if (symbolsInclude(bookL2Change.symbol)) {
-            yield {
-              dataType,
-              data: bookL2Change
-            }
-          }
-        }
-      }
-
-      if (dataType == 'trade') {
-        for (const trade of mapper.mapTrades(message, localTimestamp)) {
-          if (symbolsInclude(trade.symbol)) {
-            yield {
-              dataType,
-              data: trade
-            }
-          }
-        }
-      }
-
-      if (dataType == 'quote') {
-        for (const quote of mapper.mapQuotes(message, localTimestamp)) {
-          if (symbolsInclude(quote.symbol)) {
-            yield {
-              dataType,
-              data: quote
-            }
-          }
-        }
-      }
-
-      if (dataType == 'ticker') {
-        for (const ticker of mapper.mapTickers(message, localTimestamp)) {
-          if (symbolsInclude(ticker.symbol)) {
-            yield {
-              dataType,
-              data: ticker
-            }
-          }
+      for (const message of mappedMessages) {
+        if (symbolsInclude(message.symbol)) {
+          continue
         }
       }
     }

@@ -1,15 +1,25 @@
-import { Mapper, DataType, OrderBookL2Change, Quote, Ticker, Trade } from './mapper'
+import { Mapper, DataType, L2Change, Quote, Ticker, Trade } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class DeribitMapper implements Mapper<'deribit'> {
+export class DeribitMapper extends Mapper<'deribit'> {
   private readonly _dataTypeChannelMap: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
-    l2Change: 'book',
+    l2change: 'book',
     trade: 'trades',
     quote: 'quote',
     ticker: 'ticker'
   }
 
-  getDataType(message: any): DataType | undefined {
+  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+    const channel = this._dataTypeChannelMap[dataType]
+    return [
+      {
+        channel,
+        symbols
+      }
+    ]
+  }
+
+  protected getDataType(message: any): DataType | undefined {
     const channel = message.params && (message.params.channel as string | undefined)
 
     if (!channel) {
@@ -21,7 +31,7 @@ export class DeribitMapper implements Mapper<'deribit'> {
     }
 
     if (channel.startsWith('book')) {
-      return 'l2Change'
+      return 'l2change'
     }
 
     if (channel.startsWith('ticker')) {
@@ -35,19 +45,10 @@ export class DeribitMapper implements Mapper<'deribit'> {
     return
   }
 
-  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
-    const channel = this._dataTypeChannelMap[dataType]
-    return [
-      {
-        channel,
-        symbols
-      }
-    ]
-  }
-
-  *mapTrades(message: DeribitTradesMessage, localTimestamp?: Date): IterableIterator<Trade> {
+  protected *mapTrades(message: DeribitTradesMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const deribitTrade of message.params.data) {
       yield {
+        type: 'trade',
         id: deribitTrade.trade_id,
         symbol: deribitTrade.instrument_name,
         price: deribitTrade.price,
@@ -59,15 +60,15 @@ export class DeribitMapper implements Mapper<'deribit'> {
     }
   }
 
-  *mapTickers(message: DeribitTickerMessage, localTimestamp?: Date): IterableIterator<Ticker> {
+  protected *mapTickers(message: DeribitTickerMessage, localTimestamp: Date): IterableIterator<Ticker> {
     const deribitTicker = message.params.data
 
     yield {
+      type: 'ticker',
       symbol: deribitTicker.instrument_name,
       bestBidPrice: deribitTicker.best_bid_price,
       bestAskPrice: deribitTicker.best_ask_price,
       lastPrice: deribitTicker.last_price,
-      volume: deribitTicker.stats.volume,
 
       openInterest: deribitTicker.open_interest,
       fundingRate: deribitTicker.current_funding,
@@ -78,10 +79,11 @@ export class DeribitMapper implements Mapper<'deribit'> {
     }
   }
 
-  *mapQuotes(message: DeribitQuoteMessage, localTimestamp?: Date): IterableIterator<Quote> {
+  protected *mapQuotes(message: DeribitQuoteMessage, localTimestamp: Date): IterableIterator<Quote> {
     const deribitQuote = message.params.data
 
     yield {
+      type: 'quote',
       symbol: deribitQuote.instrument_name,
       bestBidPrice: deribitQuote.best_bid_price,
       bestBidAmount: deribitQuote.best_bid_amount,
@@ -92,10 +94,11 @@ export class DeribitMapper implements Mapper<'deribit'> {
     }
   }
 
-  *mapOrderBookL2Changes(message: DeribitBookMessage, localTimestamp?: Date): IterableIterator<OrderBookL2Change> {
+  protected *mapL2OrderBookChanges(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<L2Change> {
     const deribitBookChange = message.params.data
 
     yield {
+      type: 'l2change',
       symbol: deribitBookChange.instrument_name,
       bids: deribitBookChange.bids.map(this._mapBookLevel),
       asks: deribitBookChange.asks.map(this._mapBookLevel),
@@ -162,12 +165,6 @@ type DeribitTickerMessage = DeribitMessage & {
   params: {
     data: {
       timestamp: number
-      stats: {
-        volume: number
-        low: number
-        high: number
-      }
-
       open_interest: number
 
       mark_price: number

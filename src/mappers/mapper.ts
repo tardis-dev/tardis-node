@@ -1,29 +1,57 @@
 import { FilterForExchange, Exchange } from '../consts'
 
-export type DataType = 'trade' | 'l2Change' | 'quote' | 'ticker'
+export type Message = Quote | Trade | L2Change | Ticker
 
-export type Mapper<T extends Exchange> = {
-  getDataType(message: any): DataType | undefined
+export type MessageForDataType = {
+  trade: Trade
+  l2change: L2Change
+  quote: Quote
+  ticker: Ticker
+}
 
-  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange[T][]
+export type DataType = keyof MessageForDataType
 
-  mapTrades(message: any, localTimestamp?: Date): IterableIterator<Trade>
+export abstract class Mapper<T extends Exchange> {
+  public map(message: any, localTimestamp: Date = new Date()): IterableIterator<Message> | undefined {
+    const dataType = this.getDataType(message)
+    if (!dataType) {
+      return
+    }
 
-  mapQuotes(message: any, localTimestamp?: Date): IterableIterator<Quote>
+    switch (dataType) {
+      case 'l2change':
+        return this.mapL2OrderBookChanges(message, localTimestamp)
+      case 'trade':
+        return this.mapTrades(message, localTimestamp)
+      case 'quote':
+        return this.mapQuotes(message, localTimestamp)
+      case 'ticker':
+        return this.mapTickers(message, localTimestamp)
+    }
+  }
 
-  mapOrderBookL2Changes(message: any, localTimestamp?: Date): IterableIterator<OrderBookL2Change>
+  public abstract getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange[T][]
 
-  mapTickers(message: any, localTimestamp?: Date): IterableIterator<Ticker>
+  protected abstract getDataType(message: any): DataType | undefined
+
+  protected abstract mapTrades(message: any, localTimestamp: Date): IterableIterator<Trade>
+
+  protected abstract mapQuotes(message: any, localTimestamp: Date): IterableIterator<Quote>
+
+  protected abstract mapL2OrderBookChanges(message: any, localTimestamp: Date): IterableIterator<L2Change>
+
+  protected abstract mapTickers(message: any, localTimestamp: Date): IterableIterator<Ticker>
 }
 
 export type Trade = {
+  type: 'trade'
   id: string
   symbol: string
   price: number
   amount: number
   side: 'buy' | 'sell' // liquidity taker side (aggressor)
   timestamp: Date
-  localTimestamp?: Date
+  localTimestamp: Date
 }
 
 export type BookPriceLevel = {
@@ -31,30 +59,33 @@ export type BookPriceLevel = {
   amount: number
 }
 
-export type OrderBookL2Change = {
+export type L2Change = {
+  type: 'l2change'
   symbol: string
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]
-  timestamp?: Date
-  localTimestamp?: Date
+
+  timestamp: Date
+  localTimestamp: Date
 }
 
 export type Quote = {
+  type: 'quote'
   symbol: string
   bestBidPrice: number
   bestBidAmount: number
   bestAskPrice: number
   bestAskAmount: number
   timestamp: Date
-  localTimestamp?: Date
+  localTimestamp: Date
 }
 
 export type Ticker = {
+  type: 'ticker'
   symbol: string
   bestBidPrice: number
   bestAskPrice: number
   lastPrice: number
-  volume: number
 
   openInterest?: number
   fundingRate?: number
@@ -62,5 +93,5 @@ export type Ticker = {
   markPrice?: number
 
   timestamp: Date
-  localTimestamp?: Date
+  localTimestamp: Date
 }

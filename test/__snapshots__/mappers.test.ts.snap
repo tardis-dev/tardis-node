@@ -1,6 +1,222 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Data normalization - mappers Deribit mapper maps order book changes 1`] = `
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 1`] = `
+Array [
+  Object {
+    "amount": 1000,
+    "id": "f73b6f28-075a-3548-a81c-8c843afd2746",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 8544.5,
+    "side": "sell",
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:19.163Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 2`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 4`] = `
+Array [
+  Object {
+    "bestAskPrice": 0.03163,
+    "bestBidPrice": 0.03162,
+    "fundingRate": undefined,
+    "indexPrice": 0.03131,
+    "lastPrice": 0.03161,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.03162,
+    "openInterest": 150499,
+    "symbol": "ETHM19",
+    "timestamp": 2019-05-31T23:59:30.000Z,
+    "type": "ticker",
+  },
+  Object {
+    "bestAskPrice": 0.01354,
+    "bestBidPrice": 0.013535,
+    "fundingRate": undefined,
+    "indexPrice": 0.013382,
+    "lastPrice": 0.01354,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.013533,
+    "openInterest": 204654,
+    "symbol": "LTCM19",
+    "timestamp": 2019-05-31T23:59:55.000Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 5`] = `
+Array [
+  Object {
+    "bestAskPrice": 267.75,
+    "bestBidPrice": 267.7,
+    "fundingRate": undefined,
+    "indexPrice": 0.03131,
+    "lastPrice": 0.03161,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.03162,
+    "openInterest": 150499,
+    "symbol": "ETHM19",
+    "timestamp": 2019-05-31T23:59:58.022Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 6`] = `
+Array [
+  Object {
+    "bestAskAmount": 62427,
+    "bestAskPrice": 267.75,
+    "bestBidAmount": 701,
+    "bestBidPrice": 267.7,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-05-31T23:59:59.942Z,
+    "type": "quote",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 501,
+        "price": 88846.5,
+      },
+      Object {
+        "amount": 40,
+        "price": 9780.5,
+      },
+      Object {
+        "amount": 61227,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "l2change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 417,
+        "price": 0.0010102,
+      },
+    ],
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "EOSM19",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 91227,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitmex messages 10`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 416,
+        "price": 0.0010102,
+      },
+    ],
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "EOSM19",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps deribit messages 1`] = `
+Array [
+  Object {
+    "amount": 2000,
+    "id": "39355898",
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 50,
+    "id": "39355899",
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps deribit messages 2`] = `
+Array [
+  Object {
+    "bestAskAmount": 49710,
+    "bestAskPrice": 9601,
+    "bestBidAmount": 162800,
+    "bestBidPrice": 9600.5,
+    "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:00.183Z,
+    "type": "quote",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps deribit messages 3`] = `
 Array [
   Object {
     "asks": Array [
@@ -26,11 +242,12 @@ Array [
     "localTimestamp": 2019-09-01T00:00:22.578Z,
     "symbol": "ETH-PERPETUAL",
     "timestamp": 2019-08-01T00:00:00.273Z,
+    "type": "l2change",
   },
 ]
 `;
 
-exports[`Data normalization - mappers Deribit mapper maps order book changes 2`] = `
+exports[`Mapper.map(message, localTimestmap) maps deribit messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -52,57 +269,25 @@ Array [
     "localTimestamp": 2019-09-01T00:00:22.578Z,
     "symbol": "ETH-PERPETUAL",
     "timestamp": 2019-08-01T00:00:54.272Z,
+    "type": "l2change",
   },
 ]
 `;
 
-exports[`Data normalization - mappers Deribit mapper maps quotes 1`] = `
+exports[`Mapper.map(message, localTimestmap) maps deribit messages 5`] = `
 Array [
   Object {
-    "bestAskAmount": 49710,
-    "bestAskPrice": 9601,
-    "bestBidAmount": 162800,
-    "bestBidPrice": 9600.5,
+    "bestAskPrice": 10095.5,
+    "bestBidPrice": 10095,
+    "fundingRate": 0,
+    "indexPrice": 10091.15,
+    "lastPrice": 10095.5,
     "localTimestamp": 2019-09-01T00:00:22.578Z,
+    "markPrice": 10094.1,
+    "openInterest": 66128281,
     "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-09-01T00:00:00.183Z,
-  },
-]
-`;
-
-exports[`Data normalization - mappers Deribit mapper maps ticker 1`] = `
-Array [
-  Object {
-    "bestAskAmount": 1,
-    "bestAskPrice": 0,
-    "bestBidAmount": 45,
-    "bestBidPrice": 0.649,
-    "localTimestamp": 2019-08-01T00:00:54.453Z,
-    "symbol": "ETH-27SEP19-360-P",
-    "timestamp": 2019-08-01T00:00:54.446Z,
-  },
-]
-`;
-
-exports[`Data normalization - mappers Deribit mapper maps trades 1`] = `
-Array [
-  Object {
-    "amount": 2000,
-    "id": "39355898",
-    "localTimestamp": 2019-09-01T00:00:22.578Z,
-    "price": 9598.5,
-    "side": "sell",
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-09-01T00:00:22.565Z,
-  },
-  Object {
-    "amount": 50,
-    "id": "39355899",
-    "localTimestamp": 2019-09-01T00:00:22.578Z,
-    "price": 9598.5,
-    "side": "sell",
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-09-01T00:00:22.565Z,
+    "timestamp": 2019-08-01T00:00:04.229Z,
+    "type": "ticker",
   },
 ]
 `;

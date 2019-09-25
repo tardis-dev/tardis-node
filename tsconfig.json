@@ -1,5 +1,5 @@
 {
-  "include": ["src", "tests"],
+  "include": ["src", "test"],
   "compilerOptions": {
     "rootDir": "src",
     "allowSyntheticDefaultImports": true,

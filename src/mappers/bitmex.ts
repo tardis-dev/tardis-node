@@ -1,19 +1,28 @@
-import { Mapper, DataType, Trade, Quote, OrderBookL2Change, BookPriceLevel, Ticker } from './mapper'
+import { Mapper, DataType, Trade, Quote, L2Change, BookPriceLevel, Ticker } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class BitmexMapper implements Mapper<'bitmex'> {
+export class BitmexMapper extends Mapper<'bitmex'> {
   private readonly _idToPriceLevelMap: Map<number, number> = new Map()
   private readonly _instrumentsMap: Map<string, Required<BitmexInstrument>> = new Map()
   private readonly _dataTypeChannelMap: { [key in DataType]: FilterForExchange['bitmex']['channel'] } = {
-    l2Change: 'orderBookL2',
+    l2change: 'orderBookL2',
     trade: 'trade',
     quote: 'quote',
     ticker: 'instrument'
   }
 
-  getDataType(message: BitmexDataMessage): DataType | undefined {
+  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+    return [
+      {
+        channel: this._dataTypeChannelMap[dataType],
+        symbols
+      }
+    ]
+  }
+
+  protected getDataType(message: BitmexDataMessage): DataType | undefined {
     if (message.table == 'orderBookL2') {
-      return 'l2Change'
+      return 'l2change'
     }
 
     // trades are insert only, let's skip partials as otherwise we'd end up with potential duplicates
@@ -33,18 +42,10 @@ export class BitmexMapper implements Mapper<'bitmex'> {
     return
   }
 
-  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
-    return [
-      {
-        channel: this._dataTypeChannelMap[dataType],
-        symbols
-      }
-    ]
-  }
-
-  *mapTrades(bitmexTradesMessage: BitmexTradesMessage, localTimestamp?: Date): IterableIterator<Trade> {
+  protected *mapTrades(bitmexTradesMessage: BitmexTradesMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const bitmexTrade of bitmexTradesMessage.data) {
       yield {
+        type: 'trade',
         id: bitmexTrade.trdMatchID,
         symbol: bitmexTrade.symbol,
         price: bitmexTrade.price,
@@ -56,9 +57,10 @@ export class BitmexMapper implements Mapper<'bitmex'> {
     }
   }
 
-  *mapQuotes(bitmexQuotesMessage: BitmexQuotesMessage, localTimestamp?: Date): IterableIterator<Quote> {
+  protected *mapQuotes(bitmexQuotesMessage: BitmexQuotesMessage, localTimestamp: Date): IterableIterator<Quote> {
     for (const bitmexQuote of bitmexQuotesMessage.data) {
       yield {
+        type: 'quote',
         symbol: bitmexQuote.symbol,
         bestBidPrice: bitmexQuote.bidPrice,
         bestBidAmount: bitmexQuote.bidSize,
@@ -70,7 +72,7 @@ export class BitmexMapper implements Mapper<'bitmex'> {
     }
   }
 
-  *mapOrderBookL2Changes(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<OrderBookL2Change> {
+  protected *mapL2OrderBookChanges(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<L2Change> {
     let bitmexBookMessagesGrouppedBySymbol
     // only partial messages can contain different symbols (when subscribed via {"op": "subscribe", "args": ["orderBookL2"]} for example)
     if (bitmexOrderBookL2Message.action == 'partial') {
@@ -99,7 +101,7 @@ export class BitmexMapper implements Mapper<'bitmex'> {
       const bids: BookPriceLevel[] = []
       const asks: BookPriceLevel[] = []
 
-      for (const item of bitmexOrderBookL2Message.data) {
+      for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
         if (item.price != undefined) {
           // store the mapping from id to price level if price is specified
           this._idToPriceLevelMap.set(item.id, item.price)
@@ -118,18 +120,22 @@ export class BitmexMapper implements Mapper<'bitmex'> {
         }
       }
 
-      const bookChange: OrderBookL2Change = {
-        symbol,
-        bids,
-        asks,
-        localTimestamp
-      }
+      if (bids.length > 0 || asks.length > 0) {
+        const bookChange: L2Change = {
+          type: 'l2change',
+          symbol,
+          bids,
+          asks,
+          timestamp: localTimestamp,
+          localTimestamp
+        }
 
-      yield bookChange
+        yield bookChange
+      }
     }
   }
 
-  *mapTickers(bitmexInstrumentsMessage: BitmexInstrumentsMessage, localTimestamp?: Date): IterableIterator<Ticker> {
+  protected *mapTickers(bitmexInstrumentsMessage: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<Ticker> {
     for (const bitmexInstrument of bitmexInstrumentsMessage.data) {
       // unfortunately bitmex doesn't provide each instrument change as new 'insert' with full data, hence we need to cache initial
       // inserts and apply updates locally
@@ -141,24 +147,23 @@ export class BitmexMapper implements Mapper<'bitmex'> {
         this._instrumentsMap.set(bitmexInstrument.symbol, bitmexCompleteInstrument)
       } else {
         // skip message if we've received update before partial
-        const matching = this._instrumentsMap.get(bitmexInstrument.symbol)
-        if (!matching) {
+        const instrumentToUpdate = this._instrumentsMap.get(bitmexInstrument.symbol)
+        if (!instrumentToUpdate) {
           continue
         }
         // apply updates to stored 'ticker' and store in local cache map
-        bitmexCompleteInstrument = { ...matching, ...bitmexInstrument }
+        bitmexCompleteInstrument = { ...instrumentToUpdate, ...bitmexInstrument }
         this._instrumentsMap.set(bitmexInstrument.symbol, bitmexCompleteInstrument)
       }
 
       yield {
+        type: 'ticker',
         symbol: bitmexCompleteInstrument.symbol,
         bestBidPrice: bitmexCompleteInstrument.bidPrice,
         bestAskPrice: bitmexCompleteInstrument.askPrice,
         lastPrice: bitmexCompleteInstrument.lastPrice,
-        volume: bitmexCompleteInstrument.volume24h,
-
         openInterest: bitmexCompleteInstrument.openInterest,
-        fundingRate: bitmexCompleteInstrument.fundingRate,
+        fundingRate: bitmexCompleteInstrument.fundingRate != null ? bitmexCompleteInstrument.fundingRate : undefined,
         indexPrice: bitmexCompleteInstrument.indicativeSettlePrice,
         markPrice: bitmexCompleteInstrument.markPrice,
 
@@ -196,7 +201,6 @@ type BitmexInstrument = {
   bidPrice?: number
   askPrice?: number
   lastPrice?: number
-  volume24h?: number
   openInterest?: number
   fundingRate?: number
   markPrice?: number
