@@ -1,6 +1,6 @@
 import { getMapper } from '../src'
 
-describe.only('Mapper.map(message, localTimestmap)', () => {
+describe('Mapper.map(message, localTimestmap)', () => {
   test('maps deribit messages', () => {
     const messages = [
       {
@@ -402,5 +402,172 @@ describe.only('Mapper.map(message, localTimestmap)', () => {
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
       expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }
+  })
+
+  test('maps okex messages', () => {
+    const messages = [
+      {
+        table: 'futures/trade',
+        data: [
+          {
+            side: 'sell',
+            trade_id: '2578238628528131',
+            price: 4061.94,
+            qty: 4,
+            instrument_id: 'BTC-USD-190628',
+            timestamp: '2019-03-31T23:59:59.388Z'
+          }
+        ]
+      },
+      {
+        table: 'futures/trade',
+        data: [
+          {
+            side: 'buy',
+            trade_id: '3269040623943685',
+            price: '10209.43',
+            qty: '5',
+            instrument_id: 'BTC-USD-190927',
+            timestamp: '2019-08-01T00:00:01.320Z'
+          }
+        ]
+      },
+      {
+        table: 'spot/trade',
+        data: [
+          {
+            instrument_id: 'BCH-USDT',
+            price: '328.74',
+            side: 'sell',
+            size: '0.12',
+            timestamp: '2019-08-01T00:00:08.806Z',
+            trade_id: '423886239'
+          }
+        ]
+      },
+      {
+        table: 'swap/depth',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'XRP-USD-SWAP',
+            asks: [['0.3198', '264', '0', '5'], ['0.3199', '222', '0', '4'], ['0.3219', '2014', '0', '2']],
+            bids: [['0.3196', '1646', '0', '14'], ['0.3195', '1672', '0', '6']],
+            timestamp: '2019-08-01T00:00:08.930Z',
+            checksum: 1684272782
+          }
+        ]
+      },
+
+      {
+        table: 'futures/depth',
+        action: 'partial',
+        data: [
+          {
+            instrument_id: 'BTC-USD-190405',
+            asks: [[4084.57, 38, 0, 3], [4085.0, 20, 0, 1]],
+            bids: [[4084.56, 4, 0, 1], [4084.5, 29, 0, 1]],
+            timestamp: '2019-08-01T00:00:08.930Z'
+          }
+        ]
+      },
+      {
+        table: 'spot/ticker',
+        data: [
+          {
+            instrument_id: 'TRX-ETH',
+            last: '0.0001659',
+            best_bid: '0.0001654',
+            best_ask: '0.0001659',
+            open_24h: '0.0001629',
+            high_24h: '0.0001665',
+            low_24h: '0.0001629',
+            base_volume_24h: '207761417.05',
+            quote_volume_24h: '34230.351676558',
+            timestamp: '2019-04-01T00:00:27.106Z'
+          }
+        ]
+      },
+      {
+        table: 'swap/ticker',
+        data: [
+          {
+            best_ask: '329.3',
+            best_bid: '329.29',
+            high_24h: '337.89',
+            instrument_id: 'BCH-USD-SWAP',
+            last: '329.3',
+            low_24h: '318.13',
+            timestamp: '2019-08-01T00:00:02.483Z',
+            volume_24h: '2099540'
+          }
+        ]
+      }
+    ]
+    const okexMapper = getMapper('okex')
+
+    for (const message of messages) {
+      const mappedMessages = Array.from(okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))!)
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+})
+
+describe('Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?)', () => {
+  test('for okex', () => {
+    const okexMapper = getMapper('okex')
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('trade')).toEqual([
+      {
+        channel: 'spot/trade'
+      },
+      {
+        channel: 'swap/trade'
+      },
+      {
+        channel: 'futures/trade'
+      }
+    ])
+
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change')).toEqual([
+      {
+        channel: 'spot/depth'
+      },
+      {
+        channel: 'swap/depth'
+      },
+      {
+        channel: 'futures/depth'
+      }
+    ])
+
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toEqual([
+      {
+        channel: 'swap/depth',
+        symbols: ['LTC-USD-SWAP']
+      },
+      {
+        channel: 'futures/depth',
+        symbols: ['TRX-USD-190927']
+      },
+      {
+        channel: 'spot/depth',
+        symbols: ['XRP-OKB']
+      }
+    ])
+
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change', ['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toEqual([
+      {
+        channel: 'swap/depth',
+        symbols: ['LTC-USD-SWAP']
+      },
+      {
+        channel: 'swap/depth',
+        symbols: ['ETH-USD-SWAP']
+      },
+      {
+        channel: 'spot/depth',
+        symbols: ['XRP-OKB']
+      }
+    ])
   })
 })

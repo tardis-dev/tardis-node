@@ -21,6 +21,10 @@ export class BitmexMapper extends Mapper<'bitmex'> {
   }
 
   protected getDataType(message: BitmexDataMessage): DataType | undefined {
+    if (!message.table) {
+      return
+    }
+
     if (message.table == 'orderBookL2') {
       return 'l2change'
     }

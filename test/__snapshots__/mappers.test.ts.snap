@@ -291,3 +291,142 @@ Array [
   },
 ]
 `;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 1`] = `
+Array [
+  Object {
+    "amount": 4,
+    "id": "2578238628528131",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 4061.94,
+    "side": "sell",
+    "symbol": "BTC-USD-190628",
+    "timestamp": 2019-03-31T23:59:59.388Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 2`] = `
+Array [
+  Object {
+    "amount": 5,
+    "id": "3269040623943685",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 10209.43,
+    "side": "buy",
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:01.320Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 3`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "id": "423886239",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.806Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 264,
+        "price": 0.3198,
+      },
+      Object {
+        "amount": 222,
+        "price": 0.3199,
+      },
+      Object {
+        "amount": 2014,
+        "price": 0.3219,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1646,
+        "price": 0.3196,
+      },
+      Object {
+        "amount": 1672,
+        "price": 0.3195,
+      },
+    ],
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "XRP-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 38,
+        "price": 4084.57,
+      },
+      Object {
+        "amount": 20,
+        "price": 4085,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4,
+        "price": 4084.56,
+      },
+      Object {
+        "amount": 29,
+        "price": 4084.5,
+      },
+    ],
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 6`] = `
+Array [
+  Object {
+    "bestAskPrice": 0.0001659,
+    "bestBidPrice": 0.0001654,
+    "lastPrice": 0.0001659,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "TRX-ETH",
+    "timestamp": 2019-04-01T00:00:27.106Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps okex messages 7`] = `
+Array [
+  Object {
+    "bestAskPrice": 329.3,
+    "bestBidPrice": 329.29,
+    "lastPrice": 329.3,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BCH-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:02.483Z,
+    "type": "ticker",
+  },
+]
+`;
