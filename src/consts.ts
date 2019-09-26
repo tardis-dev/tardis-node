@@ -10,11 +10,12 @@ export const EXCHANGES = [
   'bitfinex',
   'bitfinex-derivatives',
   'okex',
-  'binance-jersey',
-  'binance-dex',
+  'bitflyer',
   'ftx',
   'gemini',
-  'bitflyer'
+  'binance-us',
+  'binance-jersey',
+  'binance-dex'
 ] as const
 
 export type Exchange = typeof EXCHANGES[number]
@@ -94,7 +95,8 @@ const OKEX_CHANNELS = [
   'futures/depth',
   'futures/price_range',
   'futures/mark_price',
-  'futures/estimated_price'
+  'futures/estimated_price',
+  'index/ticker'
 ] as const
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
@@ -119,6 +121,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   okex: OKEX_CHANNELS,
   binance: BINANCE_CHANNELS,
   'binance-jersey': BINANCE_CHANNELS,
+  'binance-us': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
