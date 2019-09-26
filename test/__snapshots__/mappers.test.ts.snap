@@ -1,5 +1,115 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 2`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 4`] = `
+Array [
+  Object {
+    "amount": 0.00705845,
+    "id": "382489563",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "price": 10087.98969503,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-08-01T00:00:00.709Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 5`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 6`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 13.33333333,
+        "price": 218.75,
+      },
+      Object {
+        "amount": 2,
+        "price": 218.76,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 31.52,
+        "price": 216,
+      },
+    ],
+    "changeType": "snapshot",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:00.541Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 18.10913638,
+        "price": 219.11,
+      },
+    ],
+    "bids": Array [],
+    "changeType": "update",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:01.214Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 218.99,
+      },
+    ],
+    "bids": Array [],
+    "changeType": "update",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:01.769Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 10`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 218.03,
+      },
+    ],
+    "changeType": "update",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:02.483Z,
+    "type": "l2change",
+  },
+]
+`;
+
 exports[`Mapper.map(message, localTimestmap) maps bitmex messages 1`] = `
 Array [
   Object {
@@ -101,6 +211,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "changeType": "snapshot",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-06-01T00:00:28.619Z,
@@ -114,6 +225,7 @@ Array [
         "price": 0.0010102,
       },
     ],
+    "changeType": "snapshot",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "EOSM19",
     "timestamp": 2019-06-01T00:00:28.619Z,
@@ -132,6 +244,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "changeType": "update",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-06-01T00:00:28.619Z,
@@ -150,6 +263,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "changeType": "update",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-06-01T00:00:28.619Z,
@@ -168,6 +282,7 @@ Array [
         "price": 0.0010102,
       },
     ],
+    "changeType": "update",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "EOSM19",
     "timestamp": 2019-06-01T00:00:28.619Z,
@@ -239,6 +354,7 @@ Array [
         "price": 217.75,
       },
     ],
+    "changeType": "snapshot",
     "localTimestamp": 2019-09-01T00:00:22.578Z,
     "symbol": "ETH-PERPETUAL",
     "timestamp": 2019-08-01T00:00:00.273Z,
@@ -266,6 +382,7 @@ Array [
         "price": 217.8,
       },
     ],
+    "changeType": "update",
     "localTimestamp": 2019-09-01T00:00:22.578Z,
     "symbol": "ETH-PERPETUAL",
     "timestamp": 2019-08-01T00:00:54.272Z,
@@ -364,6 +481,7 @@ Array [
         "price": 0.3195,
       },
     ],
+    "changeType": "update",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "symbol": "XRP-USD-SWAP",
     "timestamp": 2019-08-01T00:00:08.930Z,
@@ -395,6 +513,7 @@ Array [
         "price": 4084.5,
       },
     ],
+    "changeType": "snapshot",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "symbol": "BTC-USD-190405",
     "timestamp": 2019-08-01T00:00:08.930Z,

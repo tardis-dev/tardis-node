@@ -1,4 +1,4 @@
-import { FilterForExchange, Exchange } from '../consts'
+import { Filter } from '../consts'
 
 export type Message = Quote | Trade | L2Change | Ticker
 
@@ -11,7 +11,7 @@ export type MessageForDataType = {
 
 export type DataType = keyof MessageForDataType
 
-export abstract class Mapper<T extends Exchange> {
+export abstract class Mapper {
   public map(message: any, localTimestamp: Date = new Date()): IterableIterator<Message> | undefined {
     const dataType = this.getDataType(message)
     if (!dataType) {
@@ -30,7 +30,11 @@ export abstract class Mapper<T extends Exchange> {
     }
   }
 
-  public abstract getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange[T][]
+  public getSupportedDataTypes(): DataType[] {
+    return ['trade', 'l2change', 'quote', 'ticker']
+  }
+
+  public abstract getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
 
   protected abstract getDataType(message: any): DataType | undefined
 
@@ -61,6 +65,7 @@ export type BookPriceLevel = {
 
 export type L2Change = {
   type: 'l2change'
+  changeType: 'snapshot' | 'update'
   symbol: string
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]

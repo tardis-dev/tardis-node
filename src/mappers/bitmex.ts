@@ -1,10 +1,10 @@
 import { Mapper, DataType, Trade, Quote, L2Change, BookPriceLevel, Ticker } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class BitmexMapper extends Mapper<'bitmex'> {
+export class BitmexMapper extends Mapper {
   private readonly _idToPriceLevelMap: Map<number, number> = new Map()
   private readonly _instrumentsMap: Map<string, Required<BitmexInstrument>> = new Map()
-  private readonly _dataTypeChannelMap: { [key in DataType]: FilterForExchange['bitmex']['channel'] } = {
+  private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['bitmex']['channel'] } = {
     l2change: 'orderBookL2',
     trade: 'trade',
     quote: 'quote',
@@ -14,7 +14,7 @@ export class BitmexMapper extends Mapper<'bitmex'> {
   public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
     return [
       {
-        channel: this._dataTypeChannelMap[dataType],
+        channel: this._dataTypeChannelMapping[dataType],
         symbols
       }
     ]
@@ -127,6 +127,7 @@ export class BitmexMapper extends Mapper<'bitmex'> {
       if (bids.length > 0 || asks.length > 0) {
         const bookChange: L2Change = {
           type: 'l2change',
+          changeType: bitmexOrderBookL2Message.action == 'partial' ? 'snapshot' : 'update',
           symbol,
           bids,
           asks,

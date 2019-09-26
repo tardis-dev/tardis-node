@@ -1,8 +1,8 @@
 import { Mapper, DataType, L2Change, Quote, Ticker, Trade } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class DeribitMapper extends Mapper<'deribit'> {
-  private readonly _dataTypeChannelMap: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
+export class DeribitMapper extends Mapper {
+  private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
     l2change: 'book',
     trade: 'trades',
     quote: 'quote',
@@ -10,7 +10,7 @@ export class DeribitMapper extends Mapper<'deribit'> {
   }
 
   public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
-    const channel = this._dataTypeChannelMap[dataType]
+    const channel = this._dataTypeChannelMapping[dataType]
     return [
       {
         channel,
@@ -96,9 +96,10 @@ export class DeribitMapper extends Mapper<'deribit'> {
 
   protected *mapL2OrderBookChanges(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<L2Change> {
     const deribitBookChange = message.params.data
-
+    const isSnapshot = deribitBookChange.bids.every(e => e[0] == 'new') && deribitBookChange.asks.every(e => e[0] == 'new')
     yield {
       type: 'l2change',
+      changeType: isSnapshot ? 'snapshot' : 'update',
       symbol: deribitBookChange.instrument_name,
       bids: deribitBookChange.bids.map(this._mapBookLevel),
       asks: deribitBookChange.asks.map(this._mapBookLevel),

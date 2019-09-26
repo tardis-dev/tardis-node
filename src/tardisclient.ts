@@ -200,7 +200,7 @@ export class TardisClient {
       exchange,
       from,
       to,
-      filters: dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols))
+      filters: dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any)
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)

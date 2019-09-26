@@ -1,19 +1,23 @@
 import { Mapper, DataType, L2Change, Quote, Trade, Ticker } from './mapper'
 import { FilterForExchange } from '../consts'
 
-export class OkexMapper extends Mapper<'okex'> {
-  private readonly _dataTypeChannelSuffixMap: { [key in DataType]?: string } = {
+export class OkexMapper extends Mapper {
+  private readonly _dataTypeChannelSuffixMapping: { [key in DataType]?: string } = {
     l2change: 'depth',
     trade: 'trade',
     ticker: 'ticker'
   }
 
+  public getSupportedDataTypes(): DataType[] {
+    return ['l2change', 'trade', 'ticker']
+  }
+
   public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
-    if (dataType == 'quote') {
-      throw new Error('OKEx does not support normalized quote data')
+    if (!this.getSupportedDataTypes().includes(dataType)) {
+      throw new Error(`OKEx does not support normalized ${dataType} data`)
     }
     const prefixes = ['spot', 'swap', 'futures']
-    const suffix = this._dataTypeChannelSuffixMap[dataType]!
+    const suffix = this._dataTypeChannelSuffixMapping[dataType]!
     if (!symbols) {
       return prefixes.map(
         p =>
@@ -84,6 +88,7 @@ export class OkexMapper extends Mapper<'okex'> {
     for (const message of okexDepthDataMessage.data) {
       yield {
         type: 'l2change',
+        changeType: okexDepthDataMessage.action == 'partial' ? 'snapshot' : 'update',
         symbol: message.instrument_id,
         bids: message.bids.map(this._mapBookLevel),
         asks: message.asks.map(this._mapBookLevel),
