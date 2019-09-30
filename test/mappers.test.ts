@@ -511,6 +511,184 @@ describe('Mapper.map(message, localTimestmap)', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('maps bitfinex messages', () => {
+    const messages = [
+      [6957, 'tu', [382490248, 1564617600489, 0.43426, 218.74], 11, 1564617600570],
+      { event: 'subscribed', channel: 'trades', chanId: 89, symbol: 'tBTCUSD', pair: 'BTCUSD' },
+      [89, [[382489562, 1564617598688, 0.01302607, 10088]], 1, 1564617600401],
+      [89, 'te', [382489563, 1564617600709, 0.00705845, 10087.98969503], 18, 1564617600784],
+      [89, 'tu', [382489563, 1564617600709, 0.00705845, 10087.98969503], 19, 1564617600834],
+
+      { event: 'subscribed', channel: 'book', chanId: 6959, symbol: 'tETHUSD', prec: 'P0', freq: 'F0', len: '100', pair: 'ETHUSD' },
+
+      [6959, [[216, 2, 31.52], [218.75, 1, -13.33333333], [218.76, 1, -2]], 10, 1564617600541],
+      [6959, [219.11, 3, -18.10913638], 45, 1564617601214],
+      [6959, [218.99, 0, -1], 61, 1564617601769],
+      [6959, [218.03, 0, 1], 430, 1564617602483]
+    ]
+    const bitfinex = getMapper('bitfinex')
+    for (const message of messages) {
+      const mappedMessages = bitfinex.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps binance messages', () => {
+    const messages = [
+      {
+        stream: 'bnbbtc@trade',
+        data: {
+          e: 'trade',
+          E: 1554076800945,
+          s: 'BNBBTC',
+          t: 40756030,
+          p: '0.00426990',
+          q: '33.82000000',
+          b: 133829535,
+          a: 133829504,
+          T: 1554076800940,
+          m: false,
+          M: true
+        }
+      },
+      {
+        stream: 'bnbbtc@trade',
+        data: {
+          e: 'trade',
+          E: 1567296001038,
+          s: 'BNBBTC',
+          t: 60276726,
+          p: '0.00219650',
+          q: '6.48000000',
+          b: 255533165,
+          a: 255532831,
+          T: 1567296001034,
+          m: true,
+          M: true
+        }
+      },
+      {
+        stream: 'btcusdt@bookTicker',
+        data: { u: 1127645101, s: 'BTCUSDT', b: '8010.00000000', B: '0.14245900', a: '8012.15000000', A: '0.03120100' }
+      },
+      {
+        stream: 'dogebnb@ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1569805259092,
+          s: 'DOGEBNB',
+          p: '0.00000291',
+          P: '2.068',
+          w: '0.00014188',
+          x: '0.00014069',
+          c: '0.00014360',
+          Q: '51135.00000000',
+          b: '0.00014365',
+          B: '7080.00000000',
+          a: '0.00014498',
+          A: '275033.00000000',
+          o: '0.00014069',
+          h: '0.00014550',
+          l: '0.00013851',
+          v: '20014582.00000000',
+          q: '2839.62578157',
+          O: 1569718859088,
+          C: 1569805259088,
+          F: 64171,
+          L: 64684,
+          n: 514
+        }
+      },
+
+      {
+        stream: 'btcusdc@depthSnapshot',
+        generated: true,
+        data: {
+          lastUpdateId: 16084251,
+          bids: [['4091.92000000', '0.00976500'], ['4089.09000000', '0.76393100']],
+          asks: [['4095.99000000', '2.31652000'], ['4096.00000000', '1.42541900']]
+        }
+      },
+      {
+        stream: 'btcusdc@depth',
+        data: {
+          e: 'depthUpdate',
+          E: 1554076801699,
+          s: 'BTCUSDC',
+          U: 16084252,
+          u: 16084253,
+          b: [['4084.88000000', '0.00000000']],
+          a: [['4111.84000000', '0.00000000']]
+        }
+      },
+
+      {
+        stream: 'gntbtc@depth',
+        data: {
+          e: 'depthUpdate',
+          E: 1554076807698,
+          s: 'GNTBTC',
+          U: 41603407,
+          u: 41603413,
+          b: [
+            ['0.00002246', '1215.00000000'],
+            ['0.00002245', '2673.00000000'],
+            ['0.00002244', '390.00000000'],
+            ['0.00002239', '2126.00000000']
+          ],
+          a: [['0.00002267', '0.00000000'], ['0.00002269', '7840.00000000']]
+        }
+      },
+      {
+        stream: 'gntbtc@depth',
+        data: {
+          e: 'depthUpdate',
+          E: 1554076808698,
+          s: 'GNTBTC',
+          U: 41603414,
+          u: 41603418,
+          b: [['0.00002248', '114.00000000'], ['0.00002246', '370.00000000']],
+          a: [['0.00002253', '3945.00000000']]
+        }
+      },
+      {
+        stream: 'gntbtc@depthSnapshot',
+        generated: true,
+        data: {
+          lastUpdateId: 41603417,
+          bids: [
+            ['0.00002248', '114.00000000'],
+            ['0.00002246', '370.00000000'],
+            ['0.00002245', '2673.00000000'],
+            ['0.00002244', '390.00000000'],
+            ['0.00002243', '3425.00000000']
+          ],
+          asks: [['0.00002253', '3945.00000000'], ['0.00002256', '50641.00000000'], ['0.00002258', '1777.00000000']]
+        }
+      },
+      {
+        stream: 'gntbtc@depth',
+        data: {
+          e: 'depthUpdate',
+          E: 1554076809699,
+          s: 'GNTBTC',
+          U: 41603417,
+          u: 41603419,
+          b: [],
+          a: [['0.00002257', '0.00000000'], ['0.00002262', '6080.00000000']]
+        }
+      }
+    ]
+
+    const binanceMapper = getMapper('binance')
+    for (const message of messages) {
+      const mappedMessages = binanceMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
 })
 
 describe('Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?)', () => {

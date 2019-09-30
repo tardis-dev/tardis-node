@@ -1,5 +1,218 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Mapper.map(message, localTimestmap) maps binance messages 1`] = `
+Array [
+  Object {
+    "amount": 33.82,
+    "id": "40756030",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.0042699,
+    "side": "buy",
+    "symbol": "BNBBTC",
+    "timestamp": 2019-04-01T00:00:00.940Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 2`] = `
+Array [
+  Object {
+    "amount": 6.48,
+    "id": "60276726",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.0021965,
+    "side": "sell",
+    "symbol": "BNBBTC",
+    "timestamp": 2019-09-01T00:00:01.034Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 3`] = `
+Array [
+  Object {
+    "bestAskAmount": 0.031201,
+    "bestAskPrice": 8012.15,
+    "bestBidAmount": 0.142459,
+    "bestBidPrice": 8010,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "quote",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 4`] = `
+Array [
+  Object {
+    "bestAskPrice": 0.00014498,
+    "bestBidPrice": 0.00014365,
+    "lastPrice": 0.0001436,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "DOGEBNB",
+    "timestamp": 2019-09-30T01:00:59.092Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.31652,
+        "price": 4095.99,
+      },
+      Object {
+        "amount": 1.425419,
+        "price": 4096,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.009765,
+        "price": 4091.92,
+      },
+      Object {
+        "amount": 0.763931,
+        "price": 4089.09,
+      },
+    ],
+    "changeType": "snapshot",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 4111.84,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 4084.88,
+      },
+    ],
+    "changeType": "update",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDC",
+    "timestamp": 2019-04-01T00:00:01.699Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 7`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 8`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3945,
+        "price": 0.00002253,
+      },
+      Object {
+        "amount": 50641,
+        "price": 0.00002256,
+      },
+      Object {
+        "amount": 1777,
+        "price": 0.00002258,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 114,
+        "price": 0.00002248,
+      },
+      Object {
+        "amount": 370,
+        "price": 0.00002246,
+      },
+      Object {
+        "amount": 2673,
+        "price": 0.00002245,
+      },
+      Object {
+        "amount": 390,
+        "price": 0.00002244,
+      },
+      Object {
+        "amount": 3425,
+        "price": 0.00002243,
+      },
+    ],
+    "changeType": "snapshot",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "l2change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3945,
+        "price": 0.00002253,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 114,
+        "price": 0.00002248,
+      },
+      Object {
+        "amount": 370,
+        "price": 0.00002246,
+      },
+    ],
+    "changeType": "update",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-04-01T00:00:08.698Z,
+    "type": "l2change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance messages 10`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.00002257,
+      },
+      Object {
+        "amount": 6080,
+        "price": 0.00002262,
+      },
+    ],
+    "bids": Array [],
+    "changeType": "update",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-04-01T00:00:09.699Z,
+    "type": "l2change",
+  },
+]
+`;
+
 exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 1`] = `undefined`;
 
 exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 2`] = `undefined`;
