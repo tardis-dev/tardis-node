@@ -1,6 +1,8 @@
 import { Mapper, DataType, L2Change, Quote, Trade, Ticker } from './mapper'
 import { FilterForExchange } from '../consts'
 
+// https://www.okex.com/docs/en/#ws_swap-README
+
 export class OkexMapper extends Mapper {
   private readonly _dataTypeChannelSuffixMapping: { [key in DataType]?: string } = {
     l2change: 'depth',
@@ -14,7 +16,7 @@ export class OkexMapper extends Mapper {
 
   public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
     if (!this.getSupportedDataTypes().includes(dataType)) {
-      throw new Error(`OKEx does not support normalized ${dataType} data`)
+      throw new Error(`OKEx mapper does not support normalized ${dataType} data`)
     }
     const prefixes = ['spot', 'swap', 'futures']
     const suffix = this._dataTypeChannelSuffixMapping[dataType]!
@@ -81,7 +83,7 @@ export class OkexMapper extends Mapper {
   }
 
   protected mapQuotes(): IterableIterator<Quote> {
-    throw new Error('OKEx does not support normalized quote data')
+    throw new Error('normalized quotes not supported.')
   }
 
   protected *mapL2OrderBookChanges(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<L2Change> {

@@ -1,6 +1,8 @@
 import { Mapper, DataType, Quote, Ticker, Trade, L2Change } from './mapper'
 import { FilterForExchange } from '../consts'
 
+// https://docs.bitfinex.com/v2/docs/ws-general
+
 export class BitfinexMapper extends Mapper {
   private readonly _channelIdToSymbolAndChannelLevelMap: Map<
     number,
@@ -16,9 +18,13 @@ export class BitfinexMapper extends Mapper {
     return ['l2change', 'trade']
   }
 
+  public reset() {
+    this._channelIdToSymbolAndChannelLevelMap.clear()
+  }
+
   public getFiltersForDataTypeAndSymbols(dataType: DataType) {
     if (!this.getSupportedDataTypes().includes(dataType)) {
-      throw new Error(`Bitfinex does not support normalized ${dataType} data`)
+      throw new Error(`Bitfinex mapper does not support normalized ${dataType} data`)
     }
     // bitfinex does not support server side filtering
     return []
@@ -82,7 +88,6 @@ export class BitfinexMapper extends Mapper {
       return
     }
 
-    // https://docs.bitfinex.com/v2/reference#ws-public-order-books
     const isSnapshot = Array.isArray(message[1][0])
     const bookLevels = (isSnapshot ? message[1] : [message[1]]) as BitfinexBookLevel[]
 

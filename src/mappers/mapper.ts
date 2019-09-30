@@ -30,6 +30,8 @@ export abstract class Mapper {
     }
   }
 
+  public reset() {}
+
   public getSupportedDataTypes(): DataType[] {
     return ['trade', 'l2change', 'quote', 'ticker']
   }

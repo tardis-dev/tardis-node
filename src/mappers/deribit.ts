@@ -1,6 +1,8 @@
 import { Mapper, DataType, L2Change, Quote, Ticker, Trade } from './mapper'
 import { FilterForExchange } from '../consts'
 
+// https://docs.deribit.com/v2/#subscriptions
+
 export class DeribitMapper extends Mapper {
   private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
     l2change: 'book',

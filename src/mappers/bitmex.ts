@@ -1,6 +1,8 @@
 import { Mapper, DataType, Trade, Quote, L2Change, BookPriceLevel, Ticker } from './mapper'
 import { FilterForExchange } from '../consts'
 
+// https://www.bitmex.com/app/wsAPI
+
 export class BitmexMapper extends Mapper {
   private readonly _idToPriceLevelMap: Map<number, number> = new Map()
   private readonly _instrumentsMap: Map<string, Required<BitmexInstrument>> = new Map()
@@ -18,6 +20,11 @@ export class BitmexMapper extends Mapper {
         symbols
       }
     ]
+  }
+
+  public reset() {
+    this._instrumentsMap.clear()
+    this._idToPriceLevelMap.clear()
   }
 
   protected getDataType(message: BitmexDataMessage): DataType | undefined {
@@ -106,6 +113,7 @@ export class BitmexMapper extends Mapper {
       const asks: BookPriceLevel[] = []
 
       for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
+        // https://www.bitmex.com/app/restAPI#OrderBookL2
         if (item.price != undefined) {
           // store the mapping from id to price level if price is specified
           this._idToPriceLevelMap.set(item.id, item.price)
