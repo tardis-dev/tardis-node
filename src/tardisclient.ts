@@ -42,14 +42,21 @@ export class TardisClient {
     }
   }
 
-  public async *replay<T extends Exchange, U extends boolean = false>({
+  public async *replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
     exchange,
     from,
     to,
     filters = undefined,
-    skipDecoding = undefined
-  }: ReplayOptions<T, U>): AsyncIterableIterator<
-    U extends true ? { localTimestamp: Buffer; message: Buffer } : { localTimestamp: Date; message: any }
+    skipDecoding = undefined,
+    returnDisconnectsAsUndefined = undefined
+  }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
+    Z extends true
+      ? U extends true
+        ? { localTimestamp: Buffer; message: Buffer } | undefined
+        : { localTimestamp: Date; message: any } | undefined
+      : U extends true
+      ? { localTimestamp: Buffer; message: Buffer }
+      : { localTimestamp: Date; message: any }
   > {
     this._validateInputs(exchange, from, to, filters)
     const fromDate = parseAsUTCDate(from)
@@ -131,9 +138,8 @@ export class TardisClient {
 
       for await (const line of linesStream) {
         const bufferLine = line as Buffer
-        // ignore empty lines
+        linesCount++
         if (bufferLine.length > 0) {
-          linesCount++
           const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
           const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
@@ -149,7 +155,14 @@ export class TardisClient {
               message: JSON.parse(messageBuffer as any)
             } as any
           }
+          // ignore empty lines unless returnDisconnectsAsUndefined is set to true
+        } else if (returnDisconnectsAsUndefined) {
+          yield undefined as any
         }
+      }
+      // if slice was empty (no lines at all) yield undefined if flag is set
+      if (linesCount == 0 && returnDisconnectsAsUndefined) {
+        yield undefined as any
       }
 
       debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
@@ -195,25 +208,40 @@ export class TardisClient {
   ): AsyncIterableIterator<T extends DataType ? MessageForDataType[T] : Message> {
     const mapper = getMapper(exchange)
     const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
+    // mappers assume that symbols are uppercased by default
+    // if user by mistake provide lowercase one let's automatically fix it
+    if (symbols) {
+      symbols = symbols.map(s => s.toUpperCase())
+    }
 
     const messages = this.replay({
       exchange,
       from,
       to,
+      returnDisconnectsAsUndefined: true,
       filters: dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any)
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
     const symbolsInclude = (symbol: string) => !symbols || symbols.includes(symbol)
 
-    for await (const { localTimestamp, message } of messages) {
-      const mappedMessages = mapper.map(message, localTimestamp)
+    for await (const messageWithTimestamp of messages) {
+      if (!messageWithTimestamp) {
+        // we received undefined meaning Websocket disconnection when recording the data, we may need to clean up
+        // some 'state' for the mappers like for example channelid to channel mappings
+        // for bitfinex as those may have changed when 'subscribed' again
+        mapper.reset()
+        continue
+      }
+
+      const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
       if (!mappedMessages) {
         continue
       }
+
       for (const message of mappedMessages) {
         if (symbolsInclude(message.symbol)) {
-          continue
+          yield message as any
         }
       }
     }
@@ -267,12 +295,13 @@ type Options = {
   apiKey: string
 }
 
-export type ReplayOptions<T extends Exchange, U extends boolean = false> = {
+export type ReplayOptions<T extends Exchange, U extends boolean = false, Z extends boolean = false> = {
   exchange: T
   from: string
   to: string
   filters?: FilterForExchange[T][]
   skipDecoding?: U
+  returnDisconnectsAsUndefined?: Z
 }
 
 export type ReplayNormalizedOptions = {
