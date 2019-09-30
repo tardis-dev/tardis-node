@@ -1,6 +1,6 @@
 import { getMapper } from '../src'
 
-describe('Mapper.map(message, localTimestmap)', () => {
+describe('Mapper.map(message, localTimestamp)', () => {
   test('maps deribit messages', () => {
     const messages = [
       {
@@ -525,11 +525,33 @@ describe('Mapper.map(message, localTimestmap)', () => {
       [6959, [[216, 2, 31.52], [218.75, 1, -13.33333333], [218.76, 1, -2]], 10, 1564617600541],
       [6959, [219.11, 3, -18.10913638], 45, 1564617601214],
       [6959, [218.99, 0, -1], 61, 1564617601769],
-      [6959, [218.03, 0, 1], 430, 1564617602483]
+      [6959, [218.03, 0, 1], 430, 1564617602483],
+      [6959, 'hb', 3603, 1569715249702]
     ]
     const bitfinex = getMapper('bitfinex')
     for (const message of messages) {
       const mappedMessages = bitfinex.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps bitfinex derivatives messages', () => {
+    const messages = [
+      { event: 'subscribed', channel: 'status', chanId: 127758, key: 'deriv:tBTCF0:USTF0' },
+      [127758, [1569715201000, null, 173.535, 173.57, null, 101052.04082882, null, 1569744000000, 0, 0, null, null], 7, 1569715201369],
+      [127758, 'hb', 3603, 1569715249702],
+      [
+        127758,
+        [1569801649000, null, 8090.5, 8051.45, null, 101052.31005666, null, 1569830400000, 0.00000843, 16, null, 0.00196337],
+        3256,
+        1569801652225
+      ]
+    ]
+
+    const bitfinexDerivativesMapper = getMapper('bitfinex-derivatives')
+    for (const message of messages) {
+      const mappedMessages = bitfinexDerivativesMapper.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
       expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }
@@ -778,6 +800,45 @@ describe('Mapper.map(message, localTimestmap)', () => {
     const binanceDexMapper = getMapper('binance-dex')
     for (const message of messages) {
       const mappedMessages = binanceDexMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps binance futures messages', () => {
+    const messages = [
+      {
+        stream: 'btcusdt@aggTrade',
+        data: { e: 'aggTrade', E: 1568693103463, s: 'BTCUSDT', p: '10223.74', q: '0.236', f: 181349, l: 181349, T: 1568693103463, m: false }
+      },
+      {
+        stream: 'btcusdt@ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1568693103467,
+          s: 'BTCUSDT',
+          p: '-88.17',
+          P: '-0.855',
+          w: '10223.98',
+          c: '10223.74',
+          Q: '2.097',
+          o: '10311.91',
+          h: '10329.38',
+          l: '10080.70',
+          v: '20248.900',
+          q: '207024349.13',
+          O: 1568606704662,
+          C: 1568693103463,
+          F: 148927,
+          L: 181349,
+          n: 32423
+        }
+      }
+    ]
+
+    const binanceFuturesMapper = getMapper('binance-futures')
+    for (const message of messages) {
+      const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
       expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }

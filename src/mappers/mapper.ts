@@ -90,8 +90,8 @@ export type Quote = {
 export type Ticker = {
   type: 'ticker'
   symbol: string
-  bestBidPrice: number
-  bestAskPrice: number
+  bestBidPrice?: number
+  bestAskPrice?: number
   lastPrice: number
 
   openInterest?: number

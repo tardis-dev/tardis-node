@@ -3,8 +3,8 @@ import { DeribitMapper } from './deribit'
 import { Exchange } from '..'
 import { BitmexMapper } from './bitmex'
 import { OkexMapper } from './okex'
-import { BitfinexMapper } from './bitfinex'
-import { BinanceMapper } from './binance'
+import { BitfinexMapper, BitfinexDerivativesMapper } from './bitfinex'
+import { BinanceMapper, BinanceFuturesMapper } from './binance'
 import { BinanceDexMapper } from './binancedex'
 
 export * from './mapper'
@@ -16,11 +16,12 @@ const exchangeMapperMap: {
   bitmex: BitmexMapper,
   okex: OkexMapper,
   bitfinex: BitfinexMapper,
-  'bitfinex-derivatives': BitfinexMapper,
+  'bitfinex-derivatives': BitfinexDerivativesMapper,
   binance: BinanceMapper,
   'binance-us': BinanceMapper,
   'binance-jersey': BinanceMapper,
-  'binance-dex': BinanceDexMapper
+  'binance-dex': BinanceDexMapper,
+  'binance-futures': BinanceFuturesMapper
 }
 
 export function getMapper(exchange: Exchange) {
@@ -29,4 +30,8 @@ export function getMapper(exchange: Exchange) {
   }
 
   throw new Error(`not supported exchange ${exchange}`)
+}
+
+export function setMapper(exchange: Exchange, mapper: new () => Mapper) {
+  exchangeMapperMap[exchange] = mapper
 }

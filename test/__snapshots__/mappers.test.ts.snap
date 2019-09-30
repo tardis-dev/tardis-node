@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Mapper.map(message, localTimestmap) maps binance dex messages 1`] = `undefined`;
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 1`] = `undefined`;
 
-exports[`Mapper.map(message, localTimestmap) maps binance dex messages 2`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 2`] = `
 Array [
   Object {
     "amount": 2070,
@@ -27,7 +27,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance dex messages 3`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 3`] = `
 Array [
   Object {
     "bestAskPrice": 0.00008414,
@@ -41,7 +41,36 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 1`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 1`] = `
+Array [
+  Object {
+    "amount": 0.236,
+    "id": "181349",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 10223.74,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-17T04:05:03.463Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 2`] = `
+Array [
+  Object {
+    "bestAskPrice": NaN,
+    "bestBidPrice": NaN,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-17T04:05:03.467Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 1`] = `
 Array [
   Object {
     "amount": 33.82,
@@ -56,7 +85,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 2`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 2`] = `
 Array [
   Object {
     "amount": 6.48,
@@ -71,7 +100,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 3`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 3`] = `
 Array [
   Object {
     "bestAskAmount": 0.031201,
@@ -86,7 +115,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 4`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 4`] = `
 Array [
   Object {
     "bestAskPrice": 0.00014498,
@@ -100,7 +129,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 5`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -132,7 +161,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 6`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 6`] = `
 Array [
   Object {
     "asks": Array [
@@ -156,11 +185,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 7`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps binance messages 7`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 8`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps binance messages 8`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 9`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -231,7 +260,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps binance messages 10`] = `
+exports[`Mapper.map(message, localTimestamp) maps binance messages 10`] = `
 Array [
   Object {
     "asks": Array [
@@ -254,13 +283,45 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 1`] = `undefined`;
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 1`] = `undefined`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 2`] = `undefined`;
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 2`] = `
+Array [
+  Object {
+    "fundingRate": null,
+    "indexPrice": 173.57,
+    "lastPrice": 173.535,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-09-29T00:00:01.369Z,
+    "type": "ticker",
+  },
+]
+`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 3`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 4`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 4`] = `
+Array [
+  Object {
+    "fundingRate": 0.00196337,
+    "indexPrice": 8051.45,
+    "lastPrice": 8090.5,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-09-30T00:00:52.225Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 2`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 4`] = `
 Array [
   Object {
     "amount": 0.00705845,
@@ -275,11 +336,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 5`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 5`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 6`] = `undefined`;
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 6`] = `undefined`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 7`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -307,7 +368,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 8`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 8`] = `
 Array [
   Object {
     "asks": Array [
@@ -326,7 +387,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 9`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -345,7 +406,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitfinex messages 10`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 10`] = `
 Array [
   Object {
     "asks": Array [],
@@ -364,7 +425,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 1`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 11`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 1`] = `
 Array [
   Object {
     "amount": 1000,
@@ -379,11 +442,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 2`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 2`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 3`] = `Array []`;
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 4`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 4`] = `
 Array [
   Object {
     "bestAskPrice": 0.03163,
@@ -414,7 +477,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 5`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 5`] = `
 Array [
   Object {
     "bestAskPrice": 267.75,
@@ -432,7 +495,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 6`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 6`] = `
 Array [
   Object {
     "bestAskAmount": 62427,
@@ -447,7 +510,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 7`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -488,7 +551,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 8`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 8`] = `
 Array [
   Object {
     "asks": Array [
@@ -507,7 +570,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 9`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -526,7 +589,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps bitmex messages 10`] = `
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 10`] = `
 Array [
   Object {
     "asks": Array [],
@@ -545,7 +608,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps deribit messages 1`] = `
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 1`] = `
 Array [
   Object {
     "amount": 2000,
@@ -570,7 +633,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps deribit messages 2`] = `
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 2`] = `
 Array [
   Object {
     "bestAskAmount": 49710,
@@ -585,7 +648,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps deribit messages 3`] = `
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 3`] = `
 Array [
   Object {
     "asks": Array [
@@ -617,7 +680,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps deribit messages 4`] = `
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -645,7 +708,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps deribit messages 5`] = `
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 5`] = `
 Array [
   Object {
     "bestAskPrice": 10095.5,
@@ -663,7 +726,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 1`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 1`] = `
 Array [
   Object {
     "amount": 4,
@@ -678,7 +741,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 2`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 2`] = `
 Array [
   Object {
     "amount": 5,
@@ -693,7 +756,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 3`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 3`] = `
 Array [
   Object {
     "amount": 0.12,
@@ -708,7 +771,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 4`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -744,7 +807,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 5`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -776,7 +839,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 6`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 6`] = `
 Array [
   Object {
     "bestAskPrice": 0.0001659,
@@ -790,7 +853,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestmap) maps okex messages 7`] = `
+exports[`Mapper.map(message, localTimestamp) maps okex messages 7`] = `
 Array [
   Object {
     "bestAskPrice": 329.3,
