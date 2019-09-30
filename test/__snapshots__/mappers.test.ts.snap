@@ -1,5 +1,46 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Mapper.map(message, localTimestmap) maps binance dex messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance dex messages 2`] = `
+Array [
+  Object {
+    "amount": 2070,
+    "id": "16927042-0",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.00042701,
+    "side": "buy",
+    "symbol": "PHB-2DF_BNB",
+    "timestamp": 2019-07-01T00:00:22.635Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 2930,
+    "id": "16927042-1",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.00042701,
+    "side": "buy",
+    "symbol": "PHB-2DF_BNB",
+    "timestamp": 2019-07-01T00:00:22.635Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestmap) maps binance dex messages 3`] = `
+Array [
+  Object {
+    "bestAskPrice": 0.00008414,
+    "bestBidPrice": 0.00008379,
+    "lastPrice": 0.00008398,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "RAVEN-F66_BNB",
+    "timestamp": 1970-01-19T01:52:19.223Z,
+    "type": "ticker",
+  },
+]
+`;
+
 exports[`Mapper.map(message, localTimestmap) maps binance messages 1`] = `
 Array [
   Object {

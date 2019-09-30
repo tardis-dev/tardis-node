@@ -689,6 +689,99 @@ describe('Mapper.map(message, localTimestmap)', () => {
       expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }
   })
+
+  test('maps binance dex messages', () => {
+    const messages = [
+      {
+        stream: 'marketDiff',
+        data: {
+          e: 'depthUpdate',
+          E: 1561939201,
+          s: 'VRAB-B56_BNB',
+          b: [['0.00000400', '0.00000000'], ['0.00000005', '350000.00000000']],
+          a: [
+            ['0.00005253', '0.00000000'],
+            ['0.02246000', '0.00000000'],
+            ['0.00002399', '0.00000000'],
+            ['0.00002404', '0.00000000'],
+            ['0.00002578', '0.00000000'],
+            ['0.00002590', '0.00000000'],
+            ['0.00002606', '0.00000000'],
+            ['0.00002733', '0.00000000'],
+            ['0.00002738', '0.00000000'],
+            ['0.00002633', '0.00000000'],
+            ['0.00004800', '1900.00000000']
+          ]
+        }
+      },
+      {
+        stream: 'trades',
+        data: [
+          {
+            e: 'trade',
+            E: 16927042,
+            s: 'PHB-2DF_BNB',
+            t: '16927042-0',
+            p: '0.00042701',
+            q: '2070.00000000',
+            b: '31363F61C6A1E3D956435BEC81363B8903BD9B8D-41617',
+            a: '3B086ADDF228A40CDB976807ACA62679608B22A1-336',
+            T: 1561939222635379202,
+            sa: 'bnb18vyx4h0j9zjqekuhdqr6ef3x09sgkg4py604hr',
+            ba: 'bnb1xymr7cwx583aj4jrt0kgzd3m3ypmmxud5ldpfg'
+          },
+          {
+            e: 'trade',
+            E: 16927042,
+            s: 'PHB-2DF_BNB',
+            t: '16927042-1',
+            p: '0.00042701',
+            q: '2930.00000000',
+            b: 'A9D1434FE2C1082A52FF68E6D04E292E8CB54B2A-150',
+            a: '3B086ADDF228A40CDB976807ACA62679608B22A1-336',
+            T: 1561939222635379202,
+            sa: 'bnb18vyx4h0j9zjqekuhdqr6ef3x09sgkg4py604hr',
+            ba: 'bnb148g5xnlzcyyz55hldrndqn3f96xt2je24ctzc8'
+          }
+        ]
+      },
+      {
+        stream: 'ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1561939223,
+          s: 'RAVEN-F66_BNB',
+          p: '-0.00000073',
+          P: '-0.00860000',
+          w: '0.00008289',
+          x: '0.00008362',
+          c: '0.00008398',
+          Q: '9200.00000000',
+          b: '0.00008379',
+          B: '394500.00000000',
+          a: '0.00008414',
+          A: '646900.00000000',
+          o: '0.00008471',
+          h: '0.00008590',
+          l: '0.00008114',
+          v: '27305600.00000000',
+          q: '2263.48604700',
+          O: 1561852822969,
+          C: 1561939222969,
+          F: '16691022-0',
+          L: '16916084-0',
+          n: 276
+        }
+      }
+    ]
+
+    const binanceDexMapper = getMapper('binance-dex')
+    for (const message of messages) {
+      const mappedMessages = binanceDexMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
 })
 
 describe('Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?)', () => {

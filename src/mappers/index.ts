@@ -5,6 +5,7 @@ import { BitmexMapper } from './bitmex'
 import { OkexMapper } from './okex'
 import { BitfinexMapper } from './bitfinex'
 import { BinanceMapper } from './binance'
+import { BinanceDexMapper } from './binancedex'
 
 export * from './mapper'
 
@@ -18,7 +19,8 @@ const exchangeMapperMap: {
   'bitfinex-derivatives': BitfinexMapper,
   binance: BinanceMapper,
   'binance-us': BinanceMapper,
-  'binance-jersey': BinanceMapper
+  'binance-jersey': BinanceMapper,
+  'binance-dex': BinanceDexMapper
 }
 
 export function getMapper(exchange: Exchange) {
