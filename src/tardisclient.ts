@@ -182,19 +182,19 @@ export class TardisClient {
     )
   }
 
-  public replayTrades(options: ReplayNormalizedOptions) {
+  public replayTrades<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
     return this._replayNormalized(options, 'trade')
   }
 
-  public replayOrderBookL2Changes(options: ReplayNormalizedOptions) {
+  public replayOrderBookL2Changes<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
     return this._replayNormalized(options, 'l2change')
   }
 
-  public replayQuotes(options: ReplayNormalizedOptions) {
+  public replayQuotes<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
     return this._replayNormalized(options, 'quote')
   }
 
-  public replayTicker(options: ReplayNormalizedOptions) {
+  public replayTicker<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
     return this._replayNormalized(options, 'ticker')
   }
 
@@ -202,10 +202,14 @@ export class TardisClient {
     return this._replayNormalized(options, dataTypes)
   }
 
-  private async *_replayNormalized<T extends DataType | DataType[]>(
-    { exchange, from, to, symbols }: ReplayNormalizedOptions,
+  private async *_replayNormalized<T extends DataType | DataType[], Z extends boolean = false>(
+    { exchange, from, to, symbols, returnDisconnectsAsUndefined = undefined }: ReplayNormalizedOptions<Z>,
     dataTypes: T
-  ): AsyncIterableIterator<T extends DataType ? MessageForDataType[T] : Message> {
+  ): AsyncIterableIterator<
+    T extends DataType
+      ? (Z extends true ? MessageForDataType[T] | undefined : MessageForDataType[T])
+      : (Z extends true ? Message | undefined : Message)
+  > {
     const mapper = getMapper(exchange)
     const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
     // mappers assume that symbols are uppercased by default
@@ -231,6 +235,11 @@ export class TardisClient {
         // some 'state' for the mappers like for example channelid to channel mappings
         // for bitfinex as those may have changed when 'subscribed' again
         mapper.reset()
+
+        // if flag returnDisconnectsAsUndefined is set yield undefined
+        if (returnDisconnectsAsUndefined) {
+          yield undefined as any
+        }
         continue
       }
 
@@ -304,9 +313,10 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   returnDisconnectsAsUndefined?: Z
 }
 
-export type ReplayNormalizedOptions = {
+export type ReplayNormalizedOptions<Z extends boolean = false> = {
   from: string
   to: string
   exchange: Exchange
   symbols?: string[]
+  returnDisconnectsAsUndefined?: Z
 }
