@@ -106,6 +106,8 @@ export class TardisClient {
     worker.on('exit', code => {
       debug('worker finished with code: %d', code)
     })
+    // this helper flag helps us not yielding two subsequent undefined/disconnect messages
+    let lastMessageWasUndefined = false
 
     let currentSliceDate = new Date(fromDate)
     // iterate over every minute in <=from,to> date range
@@ -147,6 +149,7 @@ export class TardisClient {
         const bufferLine = line as Buffer
         linesCount++
         if (bufferLine.length > 0) {
+          lastMessageWasUndefined = false
           const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
           const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
@@ -163,12 +166,16 @@ export class TardisClient {
             } as any
           }
           // ignore empty lines unless returnDisconnectsAsUndefined is set to true
-        } else if (returnDisconnectsAsUndefined) {
+          // do not yield subsequent undefined messages
+        } else if (returnDisconnectsAsUndefined && !lastMessageWasUndefined) {
+          lastMessageWasUndefined = true
           yield undefined as any
         }
       }
       // if slice was empty (no lines at all) yield undefined if flag is set
-      if (linesCount == 0 && returnDisconnectsAsUndefined) {
+      // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
+      if (linesCount == 0 && returnDisconnectsAsUndefined && !lastMessageWasUndefined) {
+        lastMessageWasUndefined = true
         yield undefined as any
       }
 

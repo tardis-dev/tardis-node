@@ -1,5 +1,5 @@
 import { Mapper, DataType, Trade, Quote, L2Change, Ticker } from './mapper'
-import { FilterForExchange } from '../consts'
+import { FilterForExchange, Filter } from '../consts'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
@@ -17,7 +17,7 @@ export class BinanceMapper extends Mapper {
     this._symbolToDepthInfoMapping = {}
   }
 
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[] {
     const matchingChannels = this._dataTypeChannelsMapping[dataType]
     if (symbols) {
       symbols = symbols.map(s => s.toLocaleLowerCase())
@@ -30,7 +30,7 @@ export class BinanceMapper extends Mapper {
     })
   }
 
-  public getDataType(message: BinanceResponse<any>): DataType | undefined {
+  public detectDataType(message: BinanceResponse<any>): DataType | undefined {
     if (message.stream.endsWith('@ticker')) {
       return 'ticker'
     }
@@ -60,7 +60,7 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  *mapQuotes(binanceBookTickerResponse: BinanceResponse<BinanceBookTickerData>, localTimestamp: Date): IterableIterator<Quote> {
+  protected *mapQuotes(binanceBookTickerResponse: BinanceResponse<BinanceBookTickerData>, localTimestamp: Date): IterableIterator<Quote> {
     const binanceQuote = binanceBookTickerResponse.data
     yield {
       type: 'quote',
@@ -74,7 +74,7 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  *mapL2OrderBookChanges(
+  protected *mapL2OrderBookChanges(
     message: BinanceResponse<BinanceDepthData | BinanceDepthSnapshotData>,
     localTimestamp: Date
   ): IterableIterator<L2Change> {
@@ -89,6 +89,7 @@ export class BinanceMapper extends Mapper {
 
     // first check if received message is snapshot and process it as such if it is
     if (message.data.lastUpdateId) {
+      // TODO: what to do
       if (snapshotAlreadyProcessed) {
         throw new Error(`Received snapshot when already processed one, ${localTimestamp.toISOString()}`)
       }
@@ -131,7 +132,7 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  *mapTickers(binanceTickerResponse: BinanceResponse<BinanceTickerData>, localTimestamp: Date): IterableIterator<Ticker> {
+  protected *mapTickers(binanceTickerResponse: BinanceResponse<BinanceTickerData>, localTimestamp: Date): IterableIterator<Ticker> {
     const binanceTicker = binanceTickerResponse.data
     yield {
       type: 'ticker',
@@ -144,7 +145,7 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  _mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): L2Change | undefined {
+  private _mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): L2Change | undefined {
     // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
     // when we've already processed the snapshot
     const depthContext = this._symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
@@ -175,10 +176,113 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  _mapBookLevel(level: BinanceBookLevel) {
+  private _mapBookLevel(level: BinanceBookLevel) {
     const price = Number(level[0])
     const amount = Number(level[1])
     return { price, amount }
+  }
+}
+
+// https://binanceapitest.github.io/Binance-Futures-API-doc/wss/
+export class BinanceFuturesMapper extends BinanceMapper {
+  private readonly _channelsMapping: { [key in DataType]?: FilterForExchange['binance-futures']['channel'][] } = {
+    l2change: ['depth', 'depthSnapshot'],
+    trade: ['aggTrade'],
+    ticker: ['ticker', 'markPrice'] // use mark price channel to suplement ticker that does not have that info
+  }
+
+  private readonly _symbolToMarkPriceMap: Map<
+    string,
+    {
+      fundingRate: number
+      markPrice: number
+    }
+  > = new Map()
+
+  public reset() {
+    super.reset()
+    this._symbolToMarkPriceMap.clear()
+  }
+
+  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+    if (!this.getSupportedDataTypes().includes(dataType)) {
+      throw new Error(`BinanceFutures mapper does not support normalized ${dataType} data`)
+    }
+
+    const matchingChannels = this._channelsMapping[dataType]
+    if (symbols) {
+      symbols = symbols.map(s => s.toLocaleLowerCase())
+    }
+
+    return matchingChannels!.map(channel => {
+      return {
+        channel,
+        symbols
+      }
+    })
+  }
+
+  public detectDataType(message: BinanceResponse<any>): DataType | undefined {
+    if (message.stream.endsWith('@markPrice')) {
+      // store last mark price info for symbol given symbol
+      const binanceMarkPrice = message.data as BinanceFuturesMarkPriceData
+      this._symbolToMarkPriceMap.set(binanceMarkPrice.s, {
+        fundingRate: Number(binanceMarkPrice.r),
+        markPrice: Number(binanceMarkPrice.p)
+      })
+    }
+
+    if (message.stream.endsWith('@ticker')) {
+      return 'ticker'
+    }
+
+    if (message.stream.endsWith('@aggTrade')) {
+      return 'trade'
+    }
+
+    if (message.stream.includes('@depth')) {
+      return 'l2change'
+    }
+    return
+  }
+
+  public getSupportedDataTypes(): DataType[] {
+    return ['trade', 'ticker', 'l2change']
+  }
+
+  // binance futures currently does not support bookTicker
+  protected mapQuotes(): IterableIterator<Quote> {
+    throw new Error('normalized quotes not supported.')
+  }
+
+  // binance futures currently doesn't provide individual trades only aggTrade
+  protected *mapTrades(binanceFuturesAggTrade: any, localTimestamp: Date): IterableIterator<Trade> {
+    const binanceTrade = binanceFuturesAggTrade.data as BinanceFuturesAggTradeData
+    yield {
+      type: 'trade',
+      id: String(binanceTrade.l),
+      symbol: binanceTrade.s,
+      price: Number(binanceTrade.p),
+      amount: Number(binanceTrade.q),
+      side: binanceTrade.m ? 'sell' : 'buy',
+      timestamp: new Date(binanceTrade.T),
+      localTimestamp
+    }
+  }
+
+  protected *mapTickers(binanceTickerResponse: BinanceResponse<any>, localTimestamp: Date): IterableIterator<Ticker> {
+    const binanceFuturesTicker = binanceTickerResponse.data as BinanceFuturesTickerData
+    const markPriceInfo = this._symbolToMarkPriceMap.get(binanceFuturesTicker.s)
+    //  suplement ticker with last mark price info if exists
+    yield {
+      type: 'ticker',
+      symbol: binanceFuturesTicker.s,
+      lastPrice: Number(binanceFuturesTicker.c),
+      timestamp: new Date(binanceFuturesTicker.E),
+      fundingRate: markPriceInfo && markPriceInfo.fundingRate,
+      markPrice: markPriceInfo && markPriceInfo.markPrice,
+      localTimestamp
+    }
   }
 }
 
@@ -231,4 +335,26 @@ type LocalDepthInfo = {
   snapshotProcessed?: boolean
   lastUpdateId?: number
   validatedFirstUpdate?: boolean
+}
+
+type BinanceFuturesAggTradeData = {
+  s: string // Symbol
+  p: string // Price
+  q: string // Quantity
+  f: number // First trade ID
+  l: number // Last trade ID
+  T: number // Trade time
+  m: boolean // Is the buyer the market maker?
+}
+
+type BinanceFuturesMarkPriceData = {
+  s: string // Symbol
+  p: string // Mark price
+  r: string // Funding rate
+}
+
+type BinanceFuturesTickerData = {
+  E: number // Event time
+  s: string // Symbol
+  c: string // Last price
 }

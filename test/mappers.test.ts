@@ -811,6 +811,34 @@ describe('Mapper.map(message, localTimestamp)', () => {
         stream: 'btcusdt@aggTrade',
         data: { e: 'aggTrade', E: 1568693103463, s: 'BTCUSDT', p: '10223.74', q: '0.236', f: 181349, l: 181349, T: 1568693103463, m: false }
       },
+
+      {
+        stream: 'btcusdt@ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1568693103467,
+          s: 'BTCUSDT',
+          p: '-88.17',
+          P: '-0.855',
+          w: '10223.98',
+          c: '10223.74',
+          Q: '2.097',
+          o: '10311.91',
+          h: '10329.38',
+          l: '10080.70',
+          v: '20248.900',
+          q: '207024349.13',
+          O: 1568606704662,
+          C: 1568693103463,
+          F: 148927,
+          L: 181349,
+          n: 32423
+        }
+      },
+      {
+        stream: 'btcusdt@markPrice',
+        data: { e: 'markPriceUpdate', E: 1569888003001, s: 'BTCUSDT', p: '8291.34697815', r: '0.00010000', T: 1569916800000 }
+      },
       {
         stream: 'btcusdt@ticker',
         data: {

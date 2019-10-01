@@ -59,10 +59,26 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps binance futures messages 2`] = `
 Array [
   Object {
-    "bestAskPrice": NaN,
-    "bestBidPrice": NaN,
+    "fundingRate": undefined,
     "lastPrice": 10223.74,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-17T04:05:03.467Z,
+    "type": "ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 3`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 4`] = `
+Array [
+  Object {
+    "fundingRate": 0.0001,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 8291.34697815,
     "symbol": "BTCUSDT",
     "timestamp": 2019-09-17T04:05:03.467Z,
     "type": "ticker",
@@ -846,6 +862,7 @@ Array [
     "bestBidPrice": 0.0001654,
     "lastPrice": 0.0001659,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "openInterest": undefined,
     "symbol": "TRX-ETH",
     "timestamp": 2019-04-01T00:00:27.106Z,
     "type": "ticker",
@@ -860,6 +877,7 @@ Array [
     "bestBidPrice": 329.29,
     "lastPrice": 329.3,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "openInterest": undefined,
     "symbol": "BCH-USD-SWAP",
     "timestamp": 2019-08-01T00:00:02.483Z,
     "type": "ticker",
