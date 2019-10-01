@@ -2,6 +2,7 @@ import os from 'os'
 import path from 'path'
 import zlib from 'zlib'
 import { Worker } from 'worker_threads'
+import got from 'got'
 import dbg from 'debug'
 import { createReadStream, remove } from 'fs-extra'
 
@@ -40,6 +41,12 @@ export class TardisClient {
     } catch (e) {
       debug('clearing cache dir error: %o', e)
     }
+  }
+
+  public async getExchangeDetails<T extends Exchange>(exchange: T) {
+    const exchangeDetails = await got.get(`${this._options.endpoint}/v1/exchanges/${exchange}`).json()
+
+    return exchangeDetails as ExchangeDetails<T>
   }
 
   public async *replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
@@ -319,4 +326,25 @@ export type ReplayNormalizedOptions<Z extends boolean = false> = {
   exchange: Exchange
   symbols?: string[]
   returnDisconnectsAsUndefined?: Z
+}
+
+export type ExchangeDetails<T extends Exchange> = {
+  id: T
+  name: string
+  enabled: boolean
+  filterable: boolean
+  availableSince: string
+  availableSymbols: {
+    id: string
+    type: 'spot' | 'future' | 'perpetual' | 'option'
+    availableSince: string
+    availableTo?: string
+  }[]
+  availableChannels: FilterForExchange[T]['channel'][]
+  incidentReports: {
+    from: string
+    to: string
+    status: string
+    details: string
+  }
 }
