@@ -5,7 +5,7 @@ import { parentPort, isMainThread, workerData } from 'worker_threads'
 import dbg from 'debug'
 import pMap from 'p-map'
 import { existsSync, ensureDirSync, createWriteStream, rename } from 'fs-extra'
-import { Exchange, Filter } from './consts'
+import { Exchange, Filter } from './types'
 import { wait, sha256, formatDateToPath, addMinutes, ONE_SEC_IN_MS, HttpError, sequence } from './handy'
 
 const httpsAgent = new https.Agent({

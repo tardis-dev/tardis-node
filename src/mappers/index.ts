@@ -1,11 +1,11 @@
 import { Mapper } from './mapper'
 import { DeribitMapper } from './deribit'
-import { Exchange } from '..'
 import { BitmexMapper } from './bitmex'
 import { OkexMapper } from './okex'
 import { BitfinexMapper, BitfinexDerivativesMapper } from './bitfinex'
 import { BinanceMapper, BinanceFuturesMapper } from './binance'
 import { BinanceDexMapper } from './binancedex'
+import { Exchange } from '../types'
 
 export * from './mapper'
 

@@ -1,19 +1,8 @@
-import { Filter } from '../consts'
-
-export type Message = Quote | Trade | L2Change | Ticker
-
-export type MessageForDataType = {
-  trade: Trade
-  l2change: L2Change
-  quote: Quote
-  ticker: Ticker
-}
-
-export type DataType = keyof MessageForDataType
+import { Trade, Quote, L2Change, Ticker, Message, DataType, Filter } from '../types'
 
 export abstract class Mapper {
   public map(message: any, localTimestamp: Date = new Date()): IterableIterator<Message> | undefined {
-    const dataType = this.getDataType(message)
+    const dataType = this.detectDataType(message)
     if (!dataType) {
       return
     }
@@ -36,9 +25,13 @@ export abstract class Mapper {
     return ['trade', 'l2change', 'quote', 'ticker']
   }
 
+  public supports(dataType: DataType) {
+    return this.getSupportedDataTypes().includes(dataType)
+  }
+
   public abstract getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
 
-  protected abstract getDataType(message: any): DataType | undefined
+  protected abstract detectDataType(message: any): DataType | undefined
 
   protected abstract mapTrades(message: any, localTimestamp: Date): IterableIterator<Trade>
 
@@ -47,58 +40,4 @@ export abstract class Mapper {
   protected abstract mapL2OrderBookChanges(message: any, localTimestamp: Date): IterableIterator<L2Change>
 
   protected abstract mapTickers(message: any, localTimestamp: Date): IterableIterator<Ticker>
-}
-
-export type Trade = {
-  type: 'trade'
-  id: string
-  symbol: string
-  price: number
-  amount: number
-  side: 'buy' | 'sell' // liquidity taker side (aggressor)
-  timestamp: Date
-  localTimestamp: Date
-}
-
-export type BookPriceLevel = {
-  price: number
-  amount: number
-}
-
-export type L2Change = {
-  type: 'l2change'
-  changeType: 'snapshot' | 'update'
-  symbol: string
-  bids: BookPriceLevel[]
-  asks: BookPriceLevel[]
-
-  timestamp: Date
-  localTimestamp: Date
-}
-
-export type Quote = {
-  type: 'quote'
-  symbol: string
-  bestBidPrice: number
-  bestBidAmount: number
-  bestAskPrice: number
-  bestAskAmount: number
-  timestamp: Date
-  localTimestamp: Date
-}
-
-export type Ticker = {
-  type: 'ticker'
-  symbol: string
-  bestBidPrice?: number
-  bestAskPrice?: number
-  lastPrice: number
-
-  openInterest?: number
-  fundingRate?: number
-  indexPrice?: number
-  markPrice?: number
-
-  timestamp: Date
-  localTimestamp: Date
 }

@@ -1,5 +1,5 @@
-import { Mapper, DataType, Trade, Quote, L2Change, BookPriceLevel, Ticker } from './mapper'
-import { FilterForExchange } from '../consts'
+import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange, BookPriceLevel } from '../types'
+import { Mapper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
 
@@ -27,7 +27,7 @@ export class BitmexMapper extends Mapper {
     this._idToPriceLevelMap.clear()
   }
 
-  protected getDataType(message: BitmexDataMessage): DataType | undefined {
+  protected detectDataType(message: BitmexDataMessage): DataType | undefined {
     if (!message.table) {
       return
     }

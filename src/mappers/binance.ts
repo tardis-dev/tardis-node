@@ -1,5 +1,5 @@
-import { Mapper, DataType, Trade, Quote, L2Change, Ticker } from './mapper'
-import { FilterForExchange, Filter } from '../consts'
+import { DataType, Trade, Quote, L2Change, Ticker, FilterForExchange, Filter } from '../types'
+import { Mapper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
@@ -89,7 +89,6 @@ export class BinanceMapper extends Mapper {
 
     // first check if received message is snapshot and process it as such if it is
     if (message.data.lastUpdateId) {
-      // TODO: what to do
       if (snapshotAlreadyProcessed) {
         throw new Error(`Received snapshot when already processed one, ${localTimestamp.toISOString()}`)
       }

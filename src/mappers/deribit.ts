@@ -1,5 +1,5 @@
-import { Mapper, DataType, L2Change, Quote, Ticker, Trade } from './mapper'
-import { FilterForExchange } from '../consts'
+import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange } from '../types'
+import { Mapper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
 
@@ -21,7 +21,7 @@ export class DeribitMapper extends Mapper {
     ]
   }
 
-  protected getDataType(message: any): DataType | undefined {
+  protected detectDataType(message: any): DataType | undefined {
     const channel = message.params && (message.params.channel as string | undefined)
 
     if (!channel) {

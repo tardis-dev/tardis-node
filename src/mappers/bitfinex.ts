@@ -1,5 +1,5 @@
-import { Mapper, DataType, Quote, Ticker, Trade, L2Change } from './mapper'
-import { FilterForExchange } from '../consts'
+import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange } from '../types'
+import { Mapper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
 
@@ -22,7 +22,7 @@ export class BitfinexMapper extends Mapper {
     return []
   }
 
-  protected getDataType(message: BitfinexMessage): DataType | undefined {
+  protected detectDataType(message: BitfinexMessage): DataType | undefined {
     // non sub messages are provided as arrays
     if (Array.isArray(message)) {
       // we need to find matching channel for channel id

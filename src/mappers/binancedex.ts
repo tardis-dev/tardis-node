@@ -1,5 +1,6 @@
-import { DataType, Mapper, L2Change, Quote, Ticker, Trade } from './mapper'
-import { FilterForExchange } from '../consts'
+import { DataType, L2Change, Quote, Ticker, Trade, FilterForExchange } from '../types'
+
+import { Mapper } from './mapper'
 
 // https://docs.binance.org/api-reference/dex-api/ws-streams.html
 
@@ -31,7 +32,7 @@ export class BinanceDexMapper extends Mapper {
     })
   }
 
-  public getDataType(message: BinanceDexResponse<any>): DataType | undefined {
+  public detectDataType(message: BinanceDexResponse<any>): DataType | undefined {
     if (message.stream == 'ticker') {
       return 'ticker'
     }

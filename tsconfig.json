@@ -1,5 +1,5 @@
 {
-  "include": ["src", "test"],
+  "include": ["src"],
   "compilerOptions": {
     "rootDir": "src",
     "allowSyntheticDefaultImports": true,
@@ -16,6 +16,7 @@
     "noImplicitReturns": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["es2019"]
   }
