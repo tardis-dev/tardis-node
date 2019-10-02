@@ -49,6 +49,18 @@ export class TardisClient {
     return exchangeDetails as ExchangeDetails<T>
   }
 
+  public async getApiKeyAccessInfo() {
+    const apiKeyAccessInfo = await got
+      .get(`${this._options.endpoint}/v1/api-key-info`, {
+        headers: {
+          Authorization: `Bearer ${this._options.apiKey}`
+        }
+      })
+      .json()
+
+    return apiKeyAccessInfo as ApiKeyAccessInfo
+  }
+
   public async *replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
     exchange,
     from,
@@ -355,3 +367,10 @@ export type ExchangeDetails<T extends Exchange> = {
     details: string
   }
 }
+
+export type ApiKeyAccessInfo = {
+  exchange: Exchange
+  from: string
+  to: string
+  symbols: string[]
+}[]
