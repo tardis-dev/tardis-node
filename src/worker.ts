@@ -118,7 +118,7 @@ async function reliablyFetchAndCacheSlice(
 ) {
   let url = `${endpoint}/v1/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}`
 
-  if (filters) {
+  if (filters.length > 0) {
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
   }
 

@@ -1,17 +1,18 @@
-import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange } from '../types'
-import { Mapper } from './mapper'
+import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange } from '../types'
+import { MapperBase } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
 
-export class DeribitMapper extends Mapper {
+export class DeribitMapper extends MapperBase {
+  public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
+
   private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['deribit']['channel'] } = {
-    l2change: 'book',
+    book_change: 'book',
     trade: 'trades',
-    quote: 'quote',
-    ticker: 'ticker'
+    derivative_ticker: 'ticker'
   }
 
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
     const channel = this._dataTypeChannelMapping[dataType]
     return [
       {
@@ -24,7 +25,7 @@ export class DeribitMapper extends Mapper {
   protected detectDataType(message: any): DataType | undefined {
     const channel = message.params && (message.params.channel as string | undefined)
 
-    if (!channel) {
+    if (channel === undefined) {
       return
     }
 
@@ -33,15 +34,11 @@ export class DeribitMapper extends Mapper {
     }
 
     if (channel.startsWith('book')) {
-      return 'l2change'
+      return 'book_change'
     }
 
     if (channel.startsWith('ticker')) {
-      return 'ticker'
-    }
-
-    if (channel.startsWith('quote')) {
-      return 'quote'
+      return 'derivative_ticker'
     }
 
     return
@@ -51,68 +48,49 @@ export class DeribitMapper extends Mapper {
     for (const deribitTrade of message.params.data) {
       yield {
         type: 'trade',
-        id: deribitTrade.trade_id,
         symbol: deribitTrade.instrument_name,
+        id: deribitTrade.trade_id,
         price: deribitTrade.price,
         amount: deribitTrade.amount,
         side: deribitTrade.direction,
         timestamp: new Date(deribitTrade.timestamp),
-        localTimestamp
+        localTimestamp: localTimestamp
       }
     }
   }
 
-  protected *mapTickers(message: DeribitTickerMessage, localTimestamp: Date): IterableIterator<Ticker> {
+  protected *mapDerivativeTickerInfo(message: DeribitTickerMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const deribitTicker = message.params.data
+    const pendingTickerInfo = this.getPendingTickerInfo(deribitTicker.instrument_name)
 
-    yield {
-      type: 'ticker',
-      symbol: deribitTicker.instrument_name,
-      bestBidPrice: deribitTicker.best_bid_price,
-      bestAskPrice: deribitTicker.best_ask_price,
-      lastPrice: deribitTicker.last_price,
+    pendingTickerInfo.updateFundingRate(deribitTicker.funding_8h)
+    pendingTickerInfo.updateIndexPrice(deribitTicker.index_price)
+    pendingTickerInfo.updateMarkPrice(deribitTicker.mark_price)
+    pendingTickerInfo.updateOpenInterest(deribitTicker.open_interest)
 
-      openInterest: deribitTicker.open_interest,
-      fundingRate: deribitTicker.current_funding,
-      indexPrice: deribitTicker.index_price,
-      markPrice: deribitTicker.mark_price,
-      timestamp: new Date(deribitTicker.timestamp),
-      localTimestamp
+    if (pendingTickerInfo.hasChanged()) {
+      yield pendingTickerInfo.getSnapshot(new Date(deribitTicker.timestamp), localTimestamp)
     }
   }
 
-  protected *mapQuotes(message: DeribitQuoteMessage, localTimestamp: Date): IterableIterator<Quote> {
-    const deribitQuote = message.params.data
-
-    yield {
-      type: 'quote',
-      symbol: deribitQuote.instrument_name,
-      bestBidPrice: deribitQuote.best_bid_price,
-      bestBidAmount: deribitQuote.best_bid_amount,
-      bestAskPrice: deribitQuote.best_ask_price,
-      bestAskAmount: deribitQuote.best_ask_amount,
-      timestamp: new Date(deribitQuote.timestamp),
-      localTimestamp
-    }
-  }
-
-  protected *mapL2OrderBookChanges(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<L2Change> {
+  protected *mapOrderBookChanges(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const deribitBookChange = message.params.data
-    const isSnapshot = deribitBookChange.bids.every(e => e[0] == 'new') && deribitBookChange.asks.every(e => e[0] == 'new')
+    const isSnapshot = deribitBookChange.bids.every(e => e[0] === 'new') && deribitBookChange.asks.every(e => e[0] === 'new')
+
     yield {
-      type: 'l2change',
-      changeType: isSnapshot ? 'snapshot' : 'update',
+      type: 'book_change',
       symbol: deribitBookChange.instrument_name,
+      isSnapshot,
       bids: deribitBookChange.bids.map(this._mapBookLevel),
       asks: deribitBookChange.asks.map(this._mapBookLevel),
       timestamp: new Date(deribitBookChange.timestamp),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
   private _mapBookLevel(level: DeribitBookLevel) {
     const price = level[1]
-    const amount = level[0] == 'delete' ? 0 : level[2]
+    const amount = level[0] === 'delete' ? 0 : level[2]
 
     return { price, amount }
   }
@@ -121,19 +99,6 @@ export class DeribitMapper extends Mapper {
 type DeribitMessage = {
   params: {
     channel: string
-  }
-}
-
-type DeribitQuoteMessage = DeribitMessage & {
-  params: {
-    data: {
-      timestamp: number
-      instrument_name: string
-      best_bid_price: number
-      best_bid_amount: number
-      best_ask_price: number
-      best_ask_amount: number
-    }
   }
 }
 
@@ -169,14 +134,11 @@ type DeribitTickerMessage = DeribitMessage & {
     data: {
       timestamp: number
       open_interest: number
-
       mark_price: number
-      last_price: number
       instrument_name: string
       index_price: number
       current_funding?: number
-      best_bid_price: number
-      best_ask_price: number
+      funding_8h?: number
     }
   }
 }

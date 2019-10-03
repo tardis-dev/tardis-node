@@ -1,43 +1,139 @@
-import { Trade, Quote, L2Change, Ticker, Message, DataType, Filter } from '../types'
+import { Trade, BookChange, DerivativeTicker, Message, DataType, Filter } from '../types'
 
-export abstract class Mapper {
-  public map(message: any, localTimestamp: Date = new Date()): IterableIterator<Message> | undefined {
+export type Mapper = {
+  map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined
+  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
+  supportedDataTypes: readonly DataType[]
+}
+
+export abstract class MapperBase implements Mapper {
+  private readonly _pendingTickers: Map<string, PendingDerivativeTickerInfo> = new Map()
+
+  public map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined {
     const dataType = this.detectDataType(message)
-    if (!dataType) {
+    if (dataType === undefined) {
       return
     }
 
     switch (dataType) {
-      case 'l2change':
-        return this.mapL2OrderBookChanges(message, localTimestamp)
+      case 'book_change':
+        return this.mapOrderBookChanges(message, localTimestamp)
       case 'trade':
         return this.mapTrades(message, localTimestamp)
-      case 'quote':
-        return this.mapQuotes(message, localTimestamp)
-      case 'ticker':
-        return this.mapTickers(message, localTimestamp)
+      case 'derivative_ticker':
+        return this.mapDerivativeTickerInfo(message, localTimestamp)
+      default:
+        return
     }
   }
 
-  public reset() {}
+  protected getPendingTickerInfo(symbol: string) {
+    let pendingTickerInfo = this._pendingTickers.get(symbol)
+    if (pendingTickerInfo === undefined) {
+      pendingTickerInfo = new PendingDerivativeTickerInfo(symbol)
+      this._pendingTickers.set(symbol, pendingTickerInfo)
+    }
 
-  public getSupportedDataTypes(): DataType[] {
-    return ['trade', 'l2change', 'quote', 'ticker']
+    return pendingTickerInfo
   }
 
-  public supports(dataType: DataType) {
-    return this.getSupportedDataTypes().includes(dataType)
+  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+    if (!this.supportedDataTypes.includes(dataType)) {
+      throw new Error(`${(this as {}).constructor.name} does not support ${dataType} data type`)
+    }
+
+    return this.mapDataTypeAndSymbolsToFilters(dataType, symbols)
   }
 
-  public abstract getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
+  public abstract supportedDataTypes: readonly DataType[]
+
+  protected abstract mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[]
 
   protected abstract detectDataType(message: any): DataType | undefined
 
   protected abstract mapTrades(message: any, localTimestamp: Date): IterableIterator<Trade>
 
-  protected abstract mapQuotes(message: any, localTimestamp: Date): IterableIterator<Quote>
+  protected abstract mapOrderBookChanges(message: any, localTimestamp: Date): IterableIterator<BookChange>
 
-  protected abstract mapL2OrderBookChanges(message: any, localTimestamp: Date): IterableIterator<L2Change>
-
-  protected abstract mapTickers(message: any, localTimestamp: Date): IterableIterator<Ticker>
+  protected abstract mapDerivativeTickerInfo(message: any, localTimestamp: Date): IterableIterator<DerivativeTicker>
 }
+
+const isNullOrUndefined = (input: number | undefined | null): input is null | undefined => input === undefined || input === null
+
+class PendingDerivativeTickerInfo {
+  private _pendingTicker: Writeable<DerivativeTicker>
+  private _hasChanged: boolean
+
+  constructor(symbol: string) {
+    this._pendingTicker = {
+      type: 'derivative_ticker',
+      symbol,
+      openInterest: undefined,
+      fundingRate: undefined,
+      indexPrice: undefined,
+      markPrice: undefined,
+      timestamp: new Date(),
+      localTimestamp: new Date()
+    }
+
+    this._hasChanged = true
+  }
+
+  public updateOpenInterest(openInterest: number | undefined | null) {
+    if (isNullOrUndefined(openInterest)) {
+      return
+    }
+
+    if (this._pendingTicker.openInterest !== openInterest) {
+      this._pendingTicker.openInterest = openInterest
+      this._hasChanged = true
+    }
+  }
+
+  public updateMarkPrice(markPrice: number | undefined | null) {
+    if (isNullOrUndefined(markPrice)) {
+      return
+    }
+
+    if (this._pendingTicker.markPrice !== markPrice) {
+      this._pendingTicker.markPrice = markPrice
+      this._hasChanged = true
+    }
+  }
+
+  public updateFundingRate(fundingRate: number | undefined | null) {
+    if (isNullOrUndefined(fundingRate)) {
+      return
+    }
+
+    if (this._pendingTicker.fundingRate !== fundingRate) {
+      this._pendingTicker.fundingRate = fundingRate
+      this._hasChanged = true
+    }
+  }
+
+  public updateIndexPrice(indexPrice: number | undefined | null) {
+    if (isNullOrUndefined(indexPrice)) {
+      return
+    }
+
+    if (this._pendingTicker.indexPrice !== indexPrice) {
+      this._pendingTicker.indexPrice = indexPrice
+      this._hasChanged = true
+    }
+  }
+
+  public hasChanged() {
+    return this._hasChanged
+  }
+
+  public getSnapshot(timestamp: Date, localTimestamp: Date): DerivativeTicker {
+    this._hasChanged = false
+    this._pendingTicker.timestamp = timestamp
+    this._pendingTicker.localTimestamp = localTimestamp
+
+    return { ...this._pendingTicker }
+  }
+}
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] }

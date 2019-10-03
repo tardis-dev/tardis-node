@@ -6,11 +6,12 @@ import got from 'got'
 import dbg from 'debug'
 import { createReadStream, remove } from 'fs-extra'
 
-import { Exchange, FilterForExchange, EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
+import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { parseAsUTCDate, wait } from './handy'
 import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
-import { getMapper, DataType, MessageForDataType, Message } from './mappers'
+import { DataType, MessageForDataType, Message, FilterForExchange, Exchange } from './types'
+import { createMapper } from './mappers'
 
 const debug = dbg('tardis-client')
 
@@ -130,15 +131,15 @@ export class TardisClient {
       debug('getting slice: %s, exchange: %s', sliceKey, exchange)
 
       let cachedSlicePath
-      while (!cachedSlicePath) {
+      while (cachedSlicePath === undefined) {
         cachedSlicePath = cachedSlicePaths.get(sliceKey)
 
         // if something went wrong with worker throw error it has returned (network issue, auth issue etc)
-        if (workerError) {
+        if (workerError !== undefined) {
           throw workerError
         }
 
-        if (!cachedSlicePath) {
+        if (cachedSlicePath === undefined) {
           // if response for requested date is not ready yet wait 100ms and try again
           debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
           await wait(100)
@@ -165,7 +166,7 @@ export class TardisClient {
           const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
           const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
-          if (skipDecoding) {
+          if (skipDecoding === true) {
             yield {
               localTimestamp: localTimestampBuffer,
               message: messageBuffer
@@ -179,14 +180,14 @@ export class TardisClient {
           }
           // ignore empty lines unless returnDisconnectsAsUndefined is set to true
           // do not yield subsequent undefined messages
-        } else if (returnDisconnectsAsUndefined && !lastMessageWasUndefined) {
+        } else if (returnDisconnectsAsUndefined === true && lastMessageWasUndefined === false) {
           lastMessageWasUndefined = true
           yield undefined as any
         }
       }
       // if slice was empty (no lines at all) yield undefined if flag is set
       // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
-      if (linesCount == 0 && returnDisconnectsAsUndefined && !lastMessageWasUndefined) {
+      if (linesCount === 0 && returnDisconnectsAsUndefined === true && lastMessageWasUndefined === false) {
         lastMessageWasUndefined = true
         yield undefined as any
       }
@@ -209,26 +210,17 @@ export class TardisClient {
   }
 
   public replayTrades<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this._replayNormalized(options, 'trade')
+    return this.replayNormalized(options, 'trade')
   }
 
-  public replayOrderBookL2Changes<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this._replayNormalized(options, 'l2change')
+  public replayOrderBookChanges<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
+    return this.replayNormalized(options, 'book_change')
+  }
+  public replayDerivativeTicker<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
+    return this.replayNormalized(options, 'derivative_ticker')
   }
 
-  public replayQuotes<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this._replayNormalized(options, 'quote')
-  }
-
-  public replayTicker<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this._replayNormalized(options, 'ticker')
-  }
-
-  public replayNormalized(options: ReplayNormalizedOptions, dataTypes: DataType[] = ['trade', 'l2change', 'quote', 'ticker']) {
-    return this._replayNormalized(options, dataTypes)
-  }
-
-  private async *_replayNormalized<T extends DataType | DataType[], Z extends boolean = false>(
+  public async *replayNormalized<T extends DataType | DataType[] | undefined, Z extends boolean = false>(
     { exchange, from, to, symbols, returnDisconnectsAsUndefined = undefined }: ReplayNormalizedOptions<Z>,
     dataTypes: T
   ): AsyncIterableIterator<
@@ -236,13 +228,17 @@ export class TardisClient {
       ? (Z extends true ? MessageForDataType[T] | undefined : MessageForDataType[T])
       : (Z extends true ? Message | undefined : Message)
   > {
-    const mapper = getMapper(exchange)
-    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
+    let mapper = createMapper(exchange)
     // mappers assume that symbols are uppercased by default
     // if user by mistake provide lowercase one let's automatically fix it
-    if (symbols) {
+    if (symbols !== undefined) {
       symbols = symbols.map(s => s.toUpperCase())
     }
+
+    if (dataTypes === undefined || dataTypes.length === 0) {
+      dataTypes = mapper.supportedDataTypes as any
+    }
+    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
 
     const messages = this.replay({
       exchange,
@@ -253,17 +249,16 @@ export class TardisClient {
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
-    const symbolsInclude = (symbol: string) => !symbols || symbols.includes(symbol)
+    const symbolsInclude = (symbol: string) => symbols === undefined || symbols.length == 0 || symbols.includes(symbol)
 
     for await (const messageWithTimestamp of messages) {
-      if (!messageWithTimestamp) {
-        // we received undefined meaning Websocket disconnection when recording the data, we may need to clean up
-        // some 'state' for the mappers like for example channelid to channel mappings
-        // for bitfinex as those may have changed when 'subscribed' again
-        mapper.reset()
+      if (messageWithTimestamp === undefined) {
+        // we received undefined meaning Websocket disconnection when recording the data
+        // lets create new mapper with clean state for 'new connection'
+        mapper = createMapper(exchange)
 
         // if flag returnDisconnectsAsUndefined is set yield undefined
-        if (returnDisconnectsAsUndefined) {
+        if (returnDisconnectsAsUndefined === true) {
           yield undefined as any
         }
         continue

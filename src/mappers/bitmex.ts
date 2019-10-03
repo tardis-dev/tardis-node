@@ -1,19 +1,20 @@
-import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange, BookPriceLevel } from '../types'
-import { Mapper } from './mapper'
+import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange, BookPriceLevel } from '../types'
+import { MapperBase } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
 
-export class BitmexMapper extends Mapper {
+export class BitmexMapper extends MapperBase {
+  public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
+
   private readonly _idToPriceLevelMap: Map<number, number> = new Map()
-  private readonly _instrumentsMap: Map<string, Required<BitmexInstrument>> = new Map()
+
   private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['bitmex']['channel'] } = {
-    l2change: 'orderBookL2',
+    book_change: 'orderBookL2',
     trade: 'trade',
-    quote: 'quote',
-    ticker: 'instrument'
+    derivative_ticker: 'instrument'
   }
 
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
     return [
       {
         channel: this._dataTypeChannelMapping[dataType],
@@ -22,32 +23,22 @@ export class BitmexMapper extends Mapper {
     ]
   }
 
-  public reset() {
-    this._instrumentsMap.clear()
-    this._idToPriceLevelMap.clear()
-  }
-
   protected detectDataType(message: BitmexDataMessage): DataType | undefined {
-    if (!message.table) {
+    if (message.table === undefined) {
       return
     }
 
-    if (message.table == 'orderBookL2') {
-      return 'l2change'
+    if (message.table === 'orderBookL2') {
+      return 'book_change'
     }
 
     // trades are insert only, let's skip partials as otherwise we'd end up with potential duplicates
-    if (message.table == 'trade' && message.action == 'insert') {
+    if (message.table === 'trade' && message.action === 'insert') {
       return 'trade'
     }
 
-    // quotes are insert only, let's skip partials as otherwise we'd end up with potential duplicates
-    if (message.table == 'quote' && message.action == 'insert') {
-      return 'quote'
-    }
-
-    if (message.table == 'instrument') {
-      return 'ticker'
+    if (message.table === 'instrument') {
+      return 'derivative_ticker'
     }
 
     return
@@ -57,36 +48,21 @@ export class BitmexMapper extends Mapper {
     for (const bitmexTrade of bitmexTradesMessage.data) {
       yield {
         type: 'trade',
-        id: bitmexTrade.trdMatchID,
         symbol: bitmexTrade.symbol,
+        id: bitmexTrade.trdMatchID,
         price: bitmexTrade.price,
         amount: bitmexTrade.size,
-        side: bitmexTrade.side == BitmexSide.Buy ? 'buy' : 'sell',
+        side: bitmexTrade.side !== undefined ? (bitmexTrade.side === 'Buy' ? 'buy' : 'sell') : 'unknown',
         timestamp: new Date(bitmexTrade.timestamp),
-        localTimestamp
+        localTimestamp: localTimestamp
       }
     }
   }
 
-  protected *mapQuotes(bitmexQuotesMessage: BitmexQuotesMessage, localTimestamp: Date): IterableIterator<Quote> {
-    for (const bitmexQuote of bitmexQuotesMessage.data) {
-      yield {
-        type: 'quote',
-        symbol: bitmexQuote.symbol,
-        bestBidPrice: bitmexQuote.bidPrice,
-        bestBidAmount: bitmexQuote.bidSize,
-        bestAskPrice: bitmexQuote.askPrice,
-        bestAskAmount: bitmexQuote.askSize,
-        timestamp: new Date(bitmexQuote.timestamp),
-        localTimestamp
-      }
-    }
-  }
-
-  protected *mapL2OrderBookChanges(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<L2Change> {
+  protected *mapOrderBookChanges(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<BookChange> {
     let bitmexBookMessagesGrouppedBySymbol
     // only partial messages can contain different symbols (when subscribed via {"op": "subscribe", "args": ["orderBookL2"]} for example)
-    if (bitmexOrderBookL2Message.action == 'partial') {
+    if (bitmexOrderBookL2Message.action === 'partial') {
       bitmexBookMessagesGrouppedBySymbol = bitmexOrderBookL2Message.data.reduce(
         (prev, current) => {
           if (prev[current.symbol]) {
@@ -125,7 +101,7 @@ export class BitmexMapper extends Mapper {
           continue
         }
 
-        if (item.side == BitmexSide.Buy) {
+        if (item.side === 'Buy') {
           bids.push({ price, amount })
         } else {
           asks.push({ price, amount })
@@ -133,14 +109,14 @@ export class BitmexMapper extends Mapper {
       }
 
       if (bids.length > 0 || asks.length > 0) {
-        const bookChange: L2Change = {
-          type: 'l2change',
-          changeType: bitmexOrderBookL2Message.action == 'partial' ? 'snapshot' : 'update',
+        const bookChange: BookChange = {
+          type: 'book_change',
           symbol,
+          isSnapshot: bitmexOrderBookL2Message.action === 'partial',
           bids,
           asks,
           timestamp: localTimestamp,
-          localTimestamp
+          localTimestamp: localTimestamp
         }
 
         yield bookChange
@@ -148,40 +124,17 @@ export class BitmexMapper extends Mapper {
     }
   }
 
-  protected *mapTickers(bitmexInstrumentsMessage: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<Ticker> {
-    for (const bitmexInstrument of bitmexInstrumentsMessage.data) {
-      // unfortunately bitmex doesn't provide each instrument change as new 'insert' with full data, hence we need to cache initial
-      // inserts and apply updates locally
-      let bitmexCompleteInstrument
+  protected *mapDerivativeTickerInfo(message: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    for (const bitmexInstrument of message.data) {
+      const pendingTickerInfo = this.getPendingTickerInfo(bitmexInstrument.symbol)
 
-      const shouldUpdateInstrumentsMap = bitmexInstrumentsMessage.action == 'partial' || bitmexInstrumentsMessage.action == 'insert'
-      if (shouldUpdateInstrumentsMap) {
-        bitmexCompleteInstrument = bitmexInstrument as Required<BitmexInstrument>
-        this._instrumentsMap.set(bitmexInstrument.symbol, bitmexCompleteInstrument)
-      } else {
-        // skip message if we've received update before partial
-        const instrumentToUpdate = this._instrumentsMap.get(bitmexInstrument.symbol)
-        if (!instrumentToUpdate) {
-          continue
-        }
-        // apply updates to stored 'ticker' and store in local cache map
-        bitmexCompleteInstrument = { ...instrumentToUpdate, ...bitmexInstrument }
-        this._instrumentsMap.set(bitmexInstrument.symbol, bitmexCompleteInstrument)
-      }
+      pendingTickerInfo.updateFundingRate(bitmexInstrument.fundingRate)
+      pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)
+      pendingTickerInfo.updateMarkPrice(bitmexInstrument.markPrice)
+      pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
 
-      yield {
-        type: 'ticker',
-        symbol: bitmexCompleteInstrument.symbol,
-        bestBidPrice: bitmexCompleteInstrument.bidPrice,
-        bestAskPrice: bitmexCompleteInstrument.askPrice,
-        lastPrice: bitmexCompleteInstrument.lastPrice,
-        openInterest: bitmexCompleteInstrument.openInterest,
-        fundingRate: bitmexCompleteInstrument.fundingRate != null ? bitmexCompleteInstrument.fundingRate : undefined,
-        indexPrice: bitmexCompleteInstrument.indicativeSettlePrice,
-        markPrice: bitmexCompleteInstrument.markPrice,
-
-        timestamp: new Date(bitmexCompleteInstrument.timestamp),
-        localTimestamp
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(new Date(bitmexInstrument.timestamp), localTimestamp)
       }
     }
   }
@@ -192,32 +145,18 @@ type BitmexDataMessage = {
   action: 'partial' | 'update' | 'insert' | 'delete'
 }
 
-const enum BitmexSide {
-  Buy = 'Buy',
-  Sell = 'Sell'
-}
-
 type BitmexTradesMessage = BitmexDataMessage & {
   table: 'trade'
   action: 'insert'
-  data: { symbol: string; trdMatchID: string; side: BitmexSide; size: number; price: number; timestamp: string }[]
-}
-
-type BitmexQuotesMessage = BitmexDataMessage & {
-  table: 'quote'
-  action: 'insert'
-  data: { timestamp: string; symbol: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number }[]
+  data: { symbol: string; trdMatchID: string; side?: 'Buy' | 'Sell'; size: number; price: number; timestamp: string }[]
 }
 
 type BitmexInstrument = {
   symbol: string
-  bidPrice?: number
-  askPrice?: number
-  lastPrice?: number
-  openInterest?: number
-  fundingRate?: number
-  markPrice?: number
-  indicativeSettlePrice?: number
+  openInterest?: number | null
+  fundingRate?: number | null
+  markPrice?: number | null
+  indicativeSettlePrice?: number | null
   timestamp: string
 }
 
@@ -228,9 +167,5 @@ type BitmexInstrumentsMessage = BitmexDataMessage & {
 
 type BitmexOrderBookL2Message = BitmexDataMessage & {
   table: 'orderBookL2'
-  data: { symbol: string; id: number; side: BitmexSide; size?: number; price?: number }[]
-}
-
-type Required<T> = {
-  [P in keyof T]-?: T[P]
+  data: { symbol: string; id: number; side: 'Buy' | 'Sell'; size?: number; price?: number }[]
 }

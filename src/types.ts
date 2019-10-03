@@ -9,61 +9,47 @@ export type Filter<T> = {
   symbols?: string[]
 }
 
-export type Message = Quote | Trade | L2Change | Ticker
+export type Message = Trade | BookChange | DerivativeTicker
 
 export type MessageForDataType = {
   trade: Trade
-  l2change: L2Change
-  quote: Quote
-  ticker: Ticker
+  book_change: BookChange
+  derivative_ticker: DerivativeTicker
 }
 
 export type DataType = keyof MessageForDataType
 
-export type Trade = {
+export type Trade = Readonly<{
   type: 'trade'
-  id: string
   symbol: string
+  id: string
   price: number
   amount: number
-  side: 'buy' | 'sell' // liquidity taker side (aggressor)
+  side: 'buy' | 'sell' | 'unknown' // liquidity taker side (aggressor)
   timestamp: Date
   localTimestamp: Date
-}
+}>
 
-export type BookPriceLevel = {
+export type BookPriceLevel = Readonly<{
   price: number
   amount: number
-}
+}>
 
-export type L2Change = {
-  type: 'l2change'
-  changeType: 'snapshot' | 'update'
+export type BookChange = Readonly<{
+  type: 'book_change'
   symbol: string
+
+  isSnapshot: boolean
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]
 
   timestamp: Date
   localTimestamp: Date
-}
+}>
 
-export type Quote = {
-  type: 'quote'
+export type DerivativeTicker = Readonly<{
+  type: 'derivative_ticker'
   symbol: string
-  bestBidPrice: number
-  bestBidAmount: number
-  bestAskPrice: number
-  bestAskAmount: number
-  timestamp: Date
-  localTimestamp: Date
-}
-
-export type Ticker = {
-  type: 'ticker'
-  symbol: string
-  bestBidPrice?: number
-  bestAskPrice?: number
-  lastPrice: number
 
   openInterest?: number
   fundingRate?: number
@@ -72,4 +58,4 @@ export type Ticker = {
 
   timestamp: Date
   localTimestamp: Date
-}
+}>

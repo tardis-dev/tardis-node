@@ -1,5 +1,5 @@
 import SortedSet from 'collections/sorted-set'
-import { BookPriceLevel, L2Change } from './types'
+import { BookPriceLevel, BookChange } from './types'
 
 const isBookLevelEqual = (first: BookPriceLevel, second: BookPriceLevel) => first.price == second.price
 
@@ -7,15 +7,15 @@ export class OrderBook {
   private readonly _bids = new SortedSet<BookPriceLevel>([], isBookLevelEqual, (first, second) => second.price - first.price)
   private readonly _asks = new SortedSet<BookPriceLevel>([], isBookLevelEqual, (first, second) => first.price - second.price)
 
-  public update(l2Change: L2Change) {
+  public update(bookChange: BookChange) {
     // clear everything up, when snapshot received so we don't have stale levels by accident
-    if (l2Change.changeType == 'snapshot') {
+    if (bookChange.isSnapshot) {
       this._bids.clear()
       this._bids.clear()
     }
 
-    applyPriceLevelChanges(this._asks, l2Change.asks)
-    applyPriceLevelChanges(this._bids, l2Change.bids)
+    applyPriceLevelChanges(this._asks, bookChange.asks)
+    applyPriceLevelChanges(this._bids, bookChange.bids)
   }
 
   public bestBid() {
