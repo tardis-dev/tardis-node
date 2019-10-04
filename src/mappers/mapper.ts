@@ -55,7 +55,9 @@ export abstract class MapperBase implements Mapper {
 
   protected abstract mapOrderBookChanges(message: any, localTimestamp: Date): IterableIterator<BookChange>
 
-  protected abstract mapDerivativeTickerInfo(message: any, localTimestamp: Date): IterableIterator<DerivativeTicker>
+  protected mapDerivativeTickerInfo(_: any, __: Date): IterableIterator<DerivativeTicker> {
+    throw new Error('mapDerivativeTickerInfo not implemented for mapper')
+  }
 }
 
 const isNullOrUndefined = (input: number | undefined | null): input is null | undefined => input === undefined || input === null

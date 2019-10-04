@@ -1,25 +1,21 @@
-import { DataType, Trade, Quote, L2Change, Ticker, FilterForExchange, Filter } from '../types'
-import { Mapper } from './mapper'
+import { DataType, Trade, BookChange, DerivativeTicker, FilterForExchange, Filter } from '../types'
+import { MapperBase } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
-export class BinanceMapper extends Mapper {
-  private _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+export class BinanceMapper extends MapperBase {
+  public supportedDataTypes: DataType[] = ['trade', 'book_change']
 
-  private readonly _dataTypeChannelsMapping: { [key in DataType]: FilterForExchange['binance']['channel'][] } = {
-    l2change: ['depth', 'depthSnapshot'],
-    trade: ['trade'],
-    quote: ['bookTicker'],
-    ticker: ['ticker']
+  private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+
+  private readonly _dataTypeChannelsMapping: { [key in DataType]?: FilterForExchange['binance']['channel'][] } = {
+    book_change: ['depth', 'depthSnapshot'],
+    trade: ['trade']
   }
 
-  public reset() {
-    this._symbolToDepthInfoMapping = {}
-  }
-
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[] {
-    const matchingChannels = this._dataTypeChannelsMapping[dataType]
-    if (symbols) {
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[] {
+    const matchingChannels = this._dataTypeChannelsMapping[dataType]!
+    if (symbols !== undefined) {
       symbols = symbols.map(s => s.toLocaleLowerCase())
     }
     return matchingChannels.map(channel => {
@@ -30,19 +26,15 @@ export class BinanceMapper extends Mapper {
     })
   }
 
-  public detectDataType(message: BinanceResponse<any>): DataType | undefined {
-    if (message.stream.endsWith('@ticker')) {
-      return 'ticker'
-    }
+  protected detectDataType(message: BinanceResponse<any>): DataType | undefined {
     if (message.stream.endsWith('@trade')) {
       return 'trade'
     }
-    if (message.stream.endsWith('@bookTicker')) {
-      return 'quote'
-    }
+
     if (message.stream.includes('@depth')) {
-      return 'l2change'
+      return 'book_change'
     }
+
     return
   }
 
@@ -50,55 +42,43 @@ export class BinanceMapper extends Mapper {
     const binanceTrade = binanceTradeResponse.data
     yield {
       type: 'trade',
-      id: String(binanceTrade.t),
       symbol: binanceTrade.s,
+      id: String(binanceTrade.t),
       price: Number(binanceTrade.p),
       amount: Number(binanceTrade.q),
       side: binanceTrade.m ? 'sell' : 'buy',
       timestamp: new Date(binanceTrade.T),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
-  protected *mapQuotes(binanceBookTickerResponse: BinanceResponse<BinanceBookTickerData>, localTimestamp: Date): IterableIterator<Quote> {
-    const binanceQuote = binanceBookTickerResponse.data
-    yield {
-      type: 'quote',
-      symbol: binanceQuote.s,
-      bestBidPrice: Number(binanceQuote.b),
-      bestBidAmount: Number(binanceQuote.B),
-      bestAskPrice: Number(binanceQuote.a),
-      bestAskAmount: Number(binanceQuote.A),
-      timestamp: localTimestamp,
-      localTimestamp
-    }
-  }
-
-  protected *mapL2OrderBookChanges(
+  protected *mapOrderBookChanges(
     message: BinanceResponse<BinanceDepthData | BinanceDepthSnapshotData>,
     localTimestamp: Date
-  ): IterableIterator<L2Change> {
+  ): IterableIterator<BookChange> {
     const symbol = message.stream.split('@')[0].toUpperCase()
-    if (!this._symbolToDepthInfoMapping[symbol]) {
+
+    if (this._symbolToDepthInfoMapping[symbol] === undefined) {
       this._symbolToDepthInfoMapping[symbol] = {
         bufferedUpdates: []
       }
     }
+
     const symbolDepthInfo = this._symbolToDepthInfoMapping[symbol]
     const snapshotAlreadyProcessed = symbolDepthInfo.snapshotProcessed
 
     // first check if received message is snapshot and process it as such if it is
-    if (message.data.lastUpdateId) {
+    if (message.data.lastUpdateId !== undefined) {
       if (snapshotAlreadyProcessed) {
         throw new Error(`Received snapshot when already processed one, ${localTimestamp.toISOString()}`)
       }
 
       const binanceDepthSnapshotData = message.data
-      // produce snapshot l2Change
+      // produce snapshot book_change
       yield {
-        type: 'l2change',
-        changeType: 'snapshot',
+        type: 'book_change',
         symbol,
+        isSnapshot: true,
         bids: binanceDepthSnapshotData.bids.map(this._mapBookLevel),
         asks: binanceDepthSnapshotData.asks.map(this._mapBookLevel),
         timestamp: localTimestamp,
@@ -111,18 +91,18 @@ export class BinanceMapper extends Mapper {
 
       // if there were any depth updates buffered, let's proccess those
       for (const update of symbolDepthInfo.bufferedUpdates) {
-        const l2Change = this._mapBookDepthUpdate(update, localTimestamp)
-        if (l2Change) {
-          yield l2Change
+        const bookChange = this._mapBookDepthUpdate(update, localTimestamp)
+        if (bookChange !== undefined) {
+          yield bookChange
         }
       }
       // remove all buffered updates
       symbolDepthInfo.bufferedUpdates = []
     } else if (snapshotAlreadyProcessed) {
-      // snapshot was already processed let's map the message as normal l2change
-      const l2Change = this._mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
-      if (l2Change) {
-        yield l2Change
+      // snapshot was already processed let's map the message as normal book_change
+      const bookChange = this._mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
+      if (bookChange !== undefined) {
+        yield bookChange
       }
     } else {
       // if snapshot hasn't been yet processed and we've got depthUpdate message, let's buffer it for later processing
@@ -131,20 +111,7 @@ export class BinanceMapper extends Mapper {
     }
   }
 
-  protected *mapTickers(binanceTickerResponse: BinanceResponse<BinanceTickerData>, localTimestamp: Date): IterableIterator<Ticker> {
-    const binanceTicker = binanceTickerResponse.data
-    yield {
-      type: 'ticker',
-      symbol: binanceTicker.s,
-      bestBidPrice: Number(binanceTicker.b),
-      bestAskPrice: Number(binanceTicker.a),
-      lastPrice: Number(binanceTicker.c),
-      timestamp: new Date(binanceTicker.E),
-      localTimestamp
-    }
-  }
-
-  private _mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): L2Change | undefined {
+  private _mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): BookChange | undefined {
     // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
     // when we've already processed the snapshot
     const depthContext = this._symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
@@ -165,13 +132,14 @@ export class BinanceMapper extends Mapper {
     }
 
     return {
-      type: 'l2change',
-      changeType: 'update',
+      type: 'book_change',
       symbol: binanceDepthUpdateData.s,
+      isSnapshot: false,
+
       bids: binanceDepthUpdateData.b.map(this._mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this._mapBookLevel),
       timestamp: new Date(binanceDepthUpdateData.E),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
@@ -184,30 +152,15 @@ export class BinanceMapper extends Mapper {
 
 // https://binanceapitest.github.io/Binance-Futures-API-doc/wss/
 export class BinanceFuturesMapper extends BinanceMapper {
+  public supportedDataTypes: DataType[] = ['trade', 'book_change', 'derivative_ticker']
+
   private readonly _channelsMapping: { [key in DataType]?: FilterForExchange['binance-futures']['channel'][] } = {
-    l2change: ['depth', 'depthSnapshot'],
+    book_change: ['depth', 'depthSnapshot'],
     trade: ['aggTrade'],
-    ticker: ['ticker', 'markPrice'] // use mark price channel to suplement ticker that does not have that info
+    derivative_ticker: ['markPrice']
   }
 
-  private readonly _symbolToMarkPriceMap: Map<
-    string,
-    {
-      fundingRate: number
-      markPrice: number
-    }
-  > = new Map()
-
-  public reset() {
-    super.reset()
-    this._symbolToMarkPriceMap.clear()
-  }
-
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
-    if (!this.getSupportedDataTypes().includes(dataType)) {
-      throw new Error(`BinanceFutures mapper does not support normalized ${dataType} data`)
-    }
-
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
     const matchingChannels = this._channelsMapping[dataType]
     if (symbols) {
       symbols = symbols.map(s => s.toLocaleLowerCase())
@@ -221,18 +174,9 @@ export class BinanceFuturesMapper extends BinanceMapper {
     })
   }
 
-  public detectDataType(message: BinanceResponse<any>): DataType | undefined {
+  protected detectDataType(message: BinanceResponse<any>): DataType | undefined {
     if (message.stream.endsWith('@markPrice')) {
-      // store last mark price info for symbol given symbol
-      const binanceMarkPrice = message.data as BinanceFuturesMarkPriceData
-      this._symbolToMarkPriceMap.set(binanceMarkPrice.s, {
-        fundingRate: Number(binanceMarkPrice.r),
-        markPrice: Number(binanceMarkPrice.p)
-      })
-    }
-
-    if (message.stream.endsWith('@ticker')) {
-      return 'ticker'
+      return 'derivative_ticker'
     }
 
     if (message.stream.endsWith('@aggTrade')) {
@@ -240,18 +184,10 @@ export class BinanceFuturesMapper extends BinanceMapper {
     }
 
     if (message.stream.includes('@depth')) {
-      return 'l2change'
+      return 'book_change'
     }
+
     return
-  }
-
-  public getSupportedDataTypes(): DataType[] {
-    return ['trade', 'ticker', 'l2change']
-  }
-
-  // binance futures currently does not support bookTicker
-  protected mapQuotes(): IterableIterator<Quote> {
-    throw new Error('normalized quotes not supported.')
   }
 
   // binance futures currently doesn't provide individual trades only aggTrade
@@ -259,28 +195,28 @@ export class BinanceFuturesMapper extends BinanceMapper {
     const binanceTrade = binanceFuturesAggTrade.data as BinanceFuturesAggTradeData
     yield {
       type: 'trade',
-      id: String(binanceTrade.l),
       symbol: binanceTrade.s,
+      id: String(binanceTrade.l),
       price: Number(binanceTrade.p),
       amount: Number(binanceTrade.q),
       side: binanceTrade.m ? 'sell' : 'buy',
       timestamp: new Date(binanceTrade.T),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
-  protected *mapTickers(binanceTickerResponse: BinanceResponse<any>, localTimestamp: Date): IterableIterator<Ticker> {
-    const binanceFuturesTicker = binanceTickerResponse.data as BinanceFuturesTickerData
-    const markPriceInfo = this._symbolToMarkPriceMap.get(binanceFuturesTicker.s)
-    //  suplement ticker with last mark price info if exists
-    yield {
-      type: 'ticker',
-      symbol: binanceFuturesTicker.s,
-      lastPrice: Number(binanceFuturesTicker.c),
-      timestamp: new Date(binanceFuturesTicker.E),
-      fundingRate: markPriceInfo && markPriceInfo.fundingRate,
-      markPrice: markPriceInfo && markPriceInfo.markPrice,
-      localTimestamp
+  protected *mapDerivativeTickerInfo(
+    binanceFuturesMarkPrice: BinanceResponse<BinanceFuturesMarkPriceData>,
+    localTimestamp: Date
+  ): IterableIterator<DerivativeTicker> {
+    const markPriceInfo = binanceFuturesMarkPrice.data
+    const pendingTickerInfo = this.getPendingTickerInfo(markPriceInfo.s)
+
+    pendingTickerInfo.updateFundingRate(Number(markPriceInfo.r))
+    pendingTickerInfo.updateMarkPrice(Number(markPriceInfo.p))
+
+    if (pendingTickerInfo.hasChanged()) {
+      yield pendingTickerInfo.getSnapshot(new Date(markPriceInfo.E), localTimestamp)
     }
   }
 }
@@ -289,6 +225,7 @@ type BinanceResponse<T> = {
   stream: string
   data: T
 }
+
 type BinanceTradeData = {
   s: string
   t: number
@@ -297,20 +234,7 @@ type BinanceTradeData = {
   T: number
   m: true
 }
-type BinanceBookTickerData = {
-  s: string
-  b: string
-  B: string
-  a: string
-  A: string
-}
-type BinanceTickerData = {
-  E: number
-  s: string
-  c: string
-  b: string
-  a: string
-}
+
 type BinanceBookLevel = [string, string]
 
 type BinanceDepthData = {
@@ -348,12 +272,7 @@ type BinanceFuturesAggTradeData = {
 
 type BinanceFuturesMarkPriceData = {
   s: string // Symbol
+  E: number // Event time
   p: string // Mark price
   r: string // Funding rate
-}
-
-type BinanceFuturesTickerData = {
-  E: number // Event time
-  s: string // Symbol
-  c: string // Last price
 }

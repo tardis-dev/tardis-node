@@ -90,7 +90,7 @@ export class BitmexMapper extends MapperBase {
 
       for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
         // https://www.bitmex.com/app/restAPI#OrderBookL2
-        if (item.price != undefined) {
+        if (item.price !== undefined) {
           // store the mapping from id to price level if price is specified
           this._idToPriceLevelMap.set(item.id, item.price)
         }

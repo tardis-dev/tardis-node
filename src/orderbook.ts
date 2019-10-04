@@ -6,16 +6,20 @@ const isBookLevelEqual = (first: BookPriceLevel, second: BookPriceLevel) => firs
 export class OrderBook {
   private readonly _bids = new SortedSet<BookPriceLevel>([], isBookLevelEqual, (first, second) => second.price - first.price)
   private readonly _asks = new SortedSet<BookPriceLevel>([], isBookLevelEqual, (first, second) => first.price - second.price)
+  private _receivedInitialSnapshot = false
 
   public update(bookChange: BookChange) {
     // clear everything up, when snapshot received so we don't have stale levels by accident
     if (bookChange.isSnapshot) {
       this._bids.clear()
       this._bids.clear()
+      this._receivedInitialSnapshot = true
     }
-
-    applyPriceLevelChanges(this._asks, bookChange.asks)
-    applyPriceLevelChanges(this._bids, bookChange.bids)
+    // process updates as long as we've received initial snapshot, otherwise ignore such messages
+    if (this._receivedInitialSnapshot) {
+      applyPriceLevelChanges(this._asks, bookChange.asks)
+      applyPriceLevelChanges(this._bids, bookChange.bids)
+    }
   }
 
   public bestBid() {

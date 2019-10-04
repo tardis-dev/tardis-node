@@ -1,25 +1,28 @@
-import { DataType, Quote, Ticker, Trade, L2Change, FilterForExchange } from '../types'
-import { Mapper } from './mapper'
+import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange } from '../types'
+import { MapperBase } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
 
-export class BitfinexMapper extends Mapper {
+export class BitfinexMapper extends MapperBase {
+  public supportedDataTypes: DataType[] = ['trade', 'book_change']
+
+  private readonly _dataTypeChannelMapping: { [key in DataType]: string } = {
+    book_change: 'book',
+    trade: 'trades',
+    derivative_ticker: 'status'
+  }
+
   private readonly _channelIdToSymbolAndDataTypeMap: Map<number, { symbol: string; dataType: DataType }> = new Map()
 
-  public getSupportedDataTypes(): DataType[] {
-    return ['l2change', 'trade']
-  }
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
+    const channel = this._dataTypeChannelMapping[dataType]
 
-  public reset() {
-    this._channelIdToSymbolAndDataTypeMap.clear()
-  }
-
-  public getFiltersForDataTypeAndSymbols(dataType: DataType) {
-    if (!this.getSupportedDataTypes().includes(dataType)) {
-      throw new Error(`Bitfinex mapper does not support normalized ${dataType} data`)
-    }
-    // bitfinex does not support server side filtering
-    return []
+    return [
+      {
+        channel,
+        symbols
+      }
+    ]
   }
 
   protected detectDataType(message: BitfinexMessage): DataType | undefined {
@@ -34,45 +37,47 @@ export class BitfinexMapper extends Mapper {
     }
 
     // store mapping between channel id and symbols and channel
-    if (message.event == 'subscribed') {
-      const isBookP0Channel = message.channel == 'book' && message.prec == 'P0'
+    if (message.event === 'subscribed') {
+      const isBookP0Channel = message.channel === 'book' && message.prec === 'P0'
       if (isBookP0Channel) {
         this._channelIdToSymbolAndDataTypeMap.set(message.chanId, {
           symbol: message.pair,
-          dataType: 'l2change'
+          dataType: 'book_change'
         })
       }
-      const isTradeChannel = message.channel == 'trades'
+      const isTradeChannel = message.channel === 'trades'
       if (isTradeChannel) {
         this._channelIdToSymbolAndDataTypeMap.set(message.chanId, {
           symbol: message.pair,
           dataType: 'trade'
         })
       }
-      const isDerivStatusChannel = message.channel == 'status' && message.key && message.key.startsWith('deriv:')
+      const isDerivStatusChannel = message.channel === 'status' && message.key && message.key.startsWith('deriv:')
 
       if (isDerivStatusChannel) {
         this._channelIdToSymbolAndDataTypeMap.set(message.chanId, {
           symbol: message.key!.replace('deriv:t', ''),
-          dataType: 'ticker'
+          dataType: 'derivative_ticker'
         })
       }
     }
+
     return
   }
 
   protected *mapTrades(message: BitfinexTrades, localTimestamp: Date): IterableIterator<Trade> {
     const matchingChannel = this._channelIdToSymbolAndDataTypeMap.get(message[0])
     // ignore if we don't have matching channel
-    if (!matchingChannel) {
+    if (matchingChannel === undefined) {
       return
     }
+
     // ignore heartbeats
-    if (message[1] == 'hb') {
+    if (message[1] === 'hb') {
       return
     }
     // ignore snapshots
-    if (message[1] != 'te') {
+    if (message[1] !== 'te') {
       return
     }
 
@@ -80,24 +85,24 @@ export class BitfinexMapper extends Mapper {
 
     yield {
       type: 'trade',
-      id: String(id),
       symbol: matchingChannel.symbol,
-      price: price,
+      id: String(id),
+      price,
       amount: Math.abs(amount),
       side: amount < 0 ? 'sell' : 'buy',
       timestamp: new Date(timestamp),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
-  protected *mapL2OrderBookChanges(message: BitfinexBooks, localTimestamp: Date): IterableIterator<L2Change> {
+  protected *mapOrderBookChanges(message: BitfinexBooks, localTimestamp: Date): IterableIterator<BookChange> {
     const matchingChannel = this._channelIdToSymbolAndDataTypeMap.get(message[0])
     // ignore if we don't have matching channel
-    if (!matchingChannel) {
+    if (matchingChannel === undefined) {
       return
     }
     // ignore heartbeats
-    if (message[1] == 'hb') {
+    if (message[1] === 'hb') {
       return
     }
 
@@ -108,51 +113,48 @@ export class BitfinexMapper extends Mapper {
     const bids = bookLevels.filter(level => level[2] > 0)
 
     yield {
-      type: 'l2change',
-      changeType: isSnapshot ? 'snapshot' : 'update',
+      type: 'book_change',
       symbol: matchingChannel.symbol,
+      isSnapshot,
+
       bids: bids.map(this._mapBookLevel),
       asks: asks.map(this._mapBookLevel),
       timestamp: new Date(message[3]),
-      localTimestamp
+      localTimestamp: localTimestamp
     }
   }
 
-  protected *mapTickers(message: BitfinexStatusMessage, localTimestamp: Date): IterableIterator<Ticker> {
+  protected *mapDerivativeTickerInfo(message: BitfinexStatusMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    // TODO:
     const matchingChannel = this._channelIdToSymbolAndDataTypeMap.get(message[0])
+
     // ignore if we don't have matching channel
-    if (!matchingChannel) {
+    if (matchingChannel === undefined) {
       return
     }
 
     // ignore heartbeats
-    if (message[1] == 'hb') {
+    if (message[1] === 'hb') {
       return
     }
 
     // https://docs.bitfinex.com/v2/reference#ws-public-status
     const fundingRate = message[1][11]
     const indexPrice = message[1][3]
-    const lastPrice = message[1][2]!
 
-    yield {
-      type: 'ticker',
-      symbol: matchingChannel.symbol,
-      lastPrice,
-      fundingRate,
-      indexPrice,
-      timestamp: new Date(message[3]),
-      localTimestamp
+    const pendingTickerInfo = this.getPendingTickerInfo(matchingChannel.symbol)
+
+    pendingTickerInfo.updateFundingRate(fundingRate)
+    pendingTickerInfo.updateIndexPrice(indexPrice)
+
+    if (pendingTickerInfo.hasChanged()) {
+      yield pendingTickerInfo.getSnapshot(new Date(message[3]), localTimestamp)
     }
-  }
-
-  protected mapQuotes(): IterableIterator<Quote> {
-    throw new Error('normalized quotes not supported.')
   }
 
   private _mapBookLevel(level: BitfinexBookLevel) {
     const [price, count, bitfinexAmount] = level
-    const amount = count == 0 ? 0 : Math.abs(bitfinexAmount)
+    const amount = count === 0 ? 0 : Math.abs(bitfinexAmount)
 
     return { price, amount }
   }
@@ -178,7 +180,5 @@ type BitfinexStatusMessage = [number, (number | undefined)[], number, number] | 
 
 // bitfinex derivatives mapper additionaly can get ticker info from status channel (funding, index price etc)
 export class BitfinexDerivativesMapper extends BitfinexMapper {
-  public getSupportedDataTypes(): DataType[] {
-    return ['l2change', 'trade', 'ticker']
-  }
+  public supportedDataTypes: DataType[] = ['trade', 'book_change', 'derivative_ticker']
 }

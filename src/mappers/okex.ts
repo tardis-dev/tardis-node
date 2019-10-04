@@ -1,60 +1,75 @@
-import { Mapper, DataType, L2Change, Quote, Trade, Ticker } from './mapper'
-import { FilterForExchange } from '../consts'
+import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange } from '../types'
+import { MapperBase } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
 
-export class OkexMapper extends Mapper {
-  private readonly _dataTypeChannelSuffixMapping: { [key in DataType]?: string } = {
-    l2change: 'depth',
-    trade: 'trade',
-    ticker: 'ticker'
+export class OkexMapper extends MapperBase {
+  public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
+
+  private readonly _dataTypeChannelSuffixMapping: { [key in DataType]: FilterForExchange['okex']['channel'][] } = {
+    book_change: ['spot/depth', 'futures/depth', 'swap/depth'],
+    trade: ['spot/trade', 'futures/trade', 'swap/trade'],
+    derivative_ticker: ['spot/ticker', 'futures/ticker', 'swap/ticker', 'futures/mark_price', 'futures/mark_price', 'swap/funding_rate']
   }
 
-  public getSupportedDataTypes(): DataType[] {
-    return ['l2change', 'trade', 'ticker']
-  }
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
+    // depending if symbols is for spot/swap/futures it needs different underlying channel
+    // for ticker symbol we also need data for funding_rate and mark_price when applicable
 
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
-    if (!this.getSupportedDataTypes().includes(dataType)) {
-      throw new Error(`OKEx mapper does not support normalized ${dataType} data`)
+    if (symbols === undefined) {
+      return this._dataTypeChannelSuffixMapping[dataType].map(channel => {
+        return {
+          channel
+        }
+      })
     }
-    const prefixes = ['spot', 'swap', 'futures']
-    const suffix = this._dataTypeChannelSuffixMapping[dataType]!
-    if (!symbols) {
-      return prefixes.map(
-        p =>
-          ({
-            channel: `${p}/${suffix}`
-          } as any)
+
+    return symbols
+      .map(symbol => {
+        const isSwap = symbol.endsWith('-SWAP')
+        const isFuture = symbol.match(/[0-9]$/)
+
+        let prefix: string
+        if (isSwap) {
+          prefix = 'swap'
+        } else if (isFuture) {
+          prefix = 'futures'
+        } else {
+          prefix = 'spot'
+        }
+
+        return this._dataTypeChannelSuffixMapping[dataType]
+          .filter(c => c.startsWith(prefix))
+          .map(channel => {
+            return {
+              channel,
+              symbols: [symbol]
+            }
+          })
+      })
+      .flatMap(c => c)
+      .reduce(
+        (prev, current) => {
+          const matchingExisting = prev.find(c => c.channel === current.channel)
+          if (matchingExisting !== undefined) {
+            matchingExisting.symbols!.push(current.symbols[0])
+          } else {
+            prev.push(current)
+          }
+
+          return prev
+        },
+        [] as FilterForExchange['okex'][]
       )
-    }
-
-    return symbols.map(symbol => {
-      const isSwap = symbol.endsWith('-SWAP')
-      const isFuture = symbol.match(/[0-9]$/)
-      let prefix
-      if (isSwap) {
-        prefix = 'swap'
-      } else if (isFuture) {
-        prefix = 'futures'
-      } else {
-        prefix = 'spot'
-      }
-
-      return {
-        channel: `${prefix}/${suffix}`,
-        symbols: [symbol]
-      } as FilterForExchange['okex']
-    })
   }
-
-  protected getDataType(message: OkexDataMessage): DataType | undefined {
+  protected detectDataType(message: OkexDataMessage): DataType | undefined {
+    // TODO: tutaj zapisac
     if (!message.table) {
       return
     }
 
     if (message.table.endsWith('depth')) {
-      return 'l2change'
+      return 'book_change'
     }
 
     if (message.table.endsWith('trade')) {
@@ -62,8 +77,17 @@ export class OkexMapper extends Mapper {
     }
 
     if (message.table.endsWith('ticker')) {
-      return 'ticker'
+      return 'derivative_ticker'
     }
+
+    if (message.table === 'swap/funding_rate') {
+      return 'derivative_ticker'
+    }
+
+    if (message.table.endsWith('mark_price')) {
+      return 'derivative_ticker'
+    }
+
     return
   }
 
@@ -71,45 +95,53 @@ export class OkexMapper extends Mapper {
     for (const okexTrade of okexTradesMessage.data) {
       yield {
         type: 'trade',
-        id: okexTrade.trade_id,
         symbol: okexTrade.instrument_id,
+        id: okexTrade.trade_id,
         price: Number(okexTrade.price),
         amount: Number(okexTrade.qty || okexTrade.size),
         side: okexTrade.side,
         timestamp: new Date(okexTrade.timestamp),
-        localTimestamp
+        localTimestamp: localTimestamp
       }
     }
   }
 
-  protected mapQuotes(): IterableIterator<Quote> {
-    throw new Error('normalized quotes not supported.')
-  }
-
-  protected *mapL2OrderBookChanges(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<L2Change> {
+  protected *mapOrderBookChanges(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
     for (const message of okexDepthDataMessage.data) {
       yield {
-        type: 'l2change',
-        changeType: okexDepthDataMessage.action == 'partial' ? 'snapshot' : 'update',
+        type: 'book_change',
         symbol: message.instrument_id,
+        isSnapshot: okexDepthDataMessage.action == 'partial',
         bids: message.bids.map(this._mapBookLevel),
         asks: message.asks.map(this._mapBookLevel),
         timestamp: new Date(message.timestamp),
-        localTimestamp
+        localTimestamp: localTimestamp
       }
     }
   }
 
-  protected *mapTickers(okexTickersMessage: OkexTickersMessage, localTimestamp: Date): IterableIterator<Ticker> {
-    for (const okexTicker of okexTickersMessage.data) {
-      yield {
-        type: 'ticker',
-        symbol: okexTicker.instrument_id,
-        bestBidPrice: Number(okexTicker.best_bid),
-        bestAskPrice: Number(okexTicker.best_ask),
-        lastPrice: Number(okexTicker.last),
-        timestamp: new Date(okexTicker.timestamp),
-        localTimestamp
+  protected *mapDerivativeTickerInfo(
+    message: OkexTickersMessage | OkexFundingRateMessage | OkexMarkPriceMessage,
+    localTimestamp: Date
+  ): IterableIterator<DerivativeTicker> {
+    for (const okexMessage of message.data) {
+      const pendingTickerInfo = this.getPendingTickerInfo(okexMessage.instrument_id)
+      if ('funding_rate' in okexMessage) {
+        pendingTickerInfo.updateFundingRate(Number(okexMessage.funding_rate))
+      }
+
+      if ('mark_price' in okexMessage) {
+        pendingTickerInfo.updateMarkPrice(Number(okexMessage.mark_price))
+      }
+      if ('open_interest' in okexMessage) {
+        pendingTickerInfo.updateOpenInterest(Number(okexMessage.open_interest))
+      }
+
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(
+          okexMessage.timestamp !== undefined ? new Date(okexMessage.timestamp) : localTimestamp,
+          localTimestamp
+        )
       }
     }
   }
@@ -143,7 +175,24 @@ type OkexTickersMessage = {
     last: string | number
     best_bid: string | number
     best_ask: string | number
+    open_interest: string | undefined
     instrument_id: string
+    timestamp: string
+  }[]
+}
+
+type OkexFundingRateMessage = {
+  data: {
+    funding_rate: string
+    instrument_id: string
+    timestamp: undefined
+  }[]
+}
+
+type OkexMarkPriceMessage = {
+  data: {
+    instrument_id: string
+    mark_price: string
     timestamp: string
   }[]
 }
