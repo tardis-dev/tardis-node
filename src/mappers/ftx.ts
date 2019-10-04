@@ -1,6 +1,8 @@
 import { MapperBase } from './mapper'
 import { DataType, FilterForExchange, Trade, BookChange } from '../types'
 
+// https://docs.ftx.com/#websocket-api
+
 export class FtxMapper extends MapperBase {
   public supportedDataTypes = ['trade', 'book_change'] as const
 
