@@ -7,6 +7,12 @@ import { BinanceMapper, BinanceFuturesMapper } from './binance'
 import { BinanceDexMapper } from './binancedex'
 import { Exchange } from '../types'
 import { CoinbaseMapper } from './coinbase'
+import { BitflyerMapper } from './bitflyer'
+import { BitstampMapper } from './bitstamp'
+import { CryptofacilitiesMapper } from './cryptofacilities'
+import { FtxMapper } from './ftx'
+import { GeminiMapper } from './gemini'
+import { KrakenMapper } from './kraken'
 
 export { Mapper } from './mapper'
 
@@ -23,7 +29,13 @@ const exchangeMapperMap: {
   'binance-jersey': BinanceMapper,
   'binance-dex': BinanceDexMapper,
   'binance-futures': BinanceFuturesMapper,
-  coinbase: CoinbaseMapper
+  coinbase: CoinbaseMapper,
+  bitflyer: BitflyerMapper,
+  bitstamp: BitstampMapper,
+  cryptofacilities: CryptofacilitiesMapper,
+  ftx: FtxMapper,
+  gemini: GeminiMapper,
+  kraken: KrakenMapper
 }
 
 export function getMapperFactory(exchange: Exchange): new () => Mapper {

@@ -28,16 +28,16 @@ export class BitmexMapper extends MapperBase {
       return
     }
 
-    if (message.table === 'orderBookL2') {
+    if (message.table === this._dataTypeChannelMapping.book_change) {
       return 'book_change'
     }
 
     // trades are insert only, let's skip partials as otherwise we'd end up with potential duplicates
-    if (message.table === 'trade' && message.action === 'insert') {
+    if (message.table === this._dataTypeChannelMapping.trade && message.action === 'insert') {
       return 'trade'
     }
 
-    if (message.table === 'instrument') {
+    if (message.table === this._dataTypeChannelMapping.derivative_ticker) {
       return 'derivative_ticker'
     }
 
@@ -132,6 +132,7 @@ export class BitmexMapper extends MapperBase {
       pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)
       pendingTickerInfo.updateMarkPrice(bitmexInstrument.markPrice)
       pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
+      pendingTickerInfo.updateLastPrice(bitmexInstrument.lastPrice)
 
       if (pendingTickerInfo.hasChanged()) {
         yield pendingTickerInfo.getSnapshot(new Date(bitmexInstrument.timestamp), localTimestamp)
@@ -156,6 +157,7 @@ type BitmexInstrument = {
   openInterest?: number | null
   fundingRate?: number | null
   markPrice?: number | null
+  lastPrice?: number | null
   indicativeSettlePrice?: number | null
   timestamp: string
 }

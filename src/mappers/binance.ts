@@ -157,7 +157,7 @@ export class BinanceFuturesMapper extends BinanceMapper {
   private readonly _channelsMapping: { [key in DataType]?: FilterForExchange['binance-futures']['channel'][] } = {
     book_change: ['depth', 'depthSnapshot'],
     trade: ['aggTrade'],
-    derivative_ticker: ['markPrice']
+    derivative_ticker: ['markPrice', 'ticker']
   }
 
   protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
@@ -176,6 +176,10 @@ export class BinanceFuturesMapper extends BinanceMapper {
 
   protected detectDataType(message: BinanceResponse<any>): DataType | undefined {
     if (message.stream.endsWith('@markPrice')) {
+      return 'derivative_ticker'
+    }
+
+    if (message.stream.endsWith('@ticker')) {
       return 'derivative_ticker'
     }
 
@@ -206,17 +210,21 @@ export class BinanceFuturesMapper extends BinanceMapper {
   }
 
   protected *mapDerivativeTickerInfo(
-    binanceFuturesMarkPrice: BinanceResponse<BinanceFuturesMarkPriceData>,
+    message: BinanceResponse<BinanceFuturesMarkPriceData | BinanceFuturesTickerData>,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
-    const markPriceInfo = binanceFuturesMarkPrice.data
-    const pendingTickerInfo = this.getPendingTickerInfo(markPriceInfo.s)
+    const pendingTickerInfo = this.getPendingTickerInfo(message.data.s)
 
-    pendingTickerInfo.updateFundingRate(Number(markPriceInfo.r))
-    pendingTickerInfo.updateMarkPrice(Number(markPriceInfo.p))
+    if ('r' in message.data) {
+      pendingTickerInfo.updateFundingRate(Number(message.data.r))
+      pendingTickerInfo.updateMarkPrice(Number(message.data.p))
+    }
+    if ('c' in message.data) {
+      pendingTickerInfo.updateLastPrice(Number(message.data.c))
+    }
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(markPriceInfo.E), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(new Date(message.data.E), localTimestamp)
     }
   }
 }
@@ -275,4 +283,10 @@ type BinanceFuturesMarkPriceData = {
   E: number // Event time
   p: string // Mark price
   r: string // Funding rate
+}
+
+type BinanceFuturesTickerData = {
+  E: number // Event time
+  s: string // Symbol
+  c: string // Last price
 }

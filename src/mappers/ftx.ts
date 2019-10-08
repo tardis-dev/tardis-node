@@ -43,7 +43,7 @@ export class FtxMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: ftxTrades.market,
-        id: String(ftxTrade.id),
+        id: ftxTrade.id !== null ? String(ftxTrade.id) : undefined,
         price: ftxTrade.price,
         amount: ftxTrade.size,
         side: ftxTrade.side,
@@ -78,7 +78,7 @@ type FtxTrades = {
   market: string
   type: 'update'
   data: {
-    id: number | undefined
+    id: number | null
     price: number
     size: number
     side: 'buy' | 'sell'

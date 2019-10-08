@@ -29,15 +29,15 @@ export class DeribitMapper extends MapperBase {
       return
     }
 
-    if (channel.startsWith('trades')) {
+    if (channel.startsWith(this._dataTypeChannelMapping.trade)) {
       return 'trade'
     }
 
-    if (channel.startsWith('book')) {
+    if (channel.startsWith(this._dataTypeChannelMapping.book_change)) {
       return 'book_change'
     }
 
-    if (channel.startsWith('ticker')) {
+    if (channel.startsWith(this._dataTypeChannelMapping.derivative_ticker)) {
       return 'derivative_ticker'
     }
 
@@ -67,6 +67,7 @@ export class DeribitMapper extends MapperBase {
     pendingTickerInfo.updateIndexPrice(deribitTicker.index_price)
     pendingTickerInfo.updateMarkPrice(deribitTicker.mark_price)
     pendingTickerInfo.updateOpenInterest(deribitTicker.open_interest)
+    pendingTickerInfo.updateLastPrice(deribitTicker.last_price)
 
     if (pendingTickerInfo.hasChanged()) {
       yield pendingTickerInfo.getSnapshot(new Date(deribitTicker.timestamp), localTimestamp)
@@ -75,7 +76,8 @@ export class DeribitMapper extends MapperBase {
 
   protected *mapOrderBookChanges(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const deribitBookChange = message.params.data
-    const isSnapshot = deribitBookChange.bids.every(e => e[0] === 'new') && deribitBookChange.asks.every(e => e[0] === 'new')
+    // snapshots do not have prev_change_id set
+    const isSnapshot = deribitBookChange.prev_change_id === undefined
 
     yield {
       type: 'book_change',
@@ -123,6 +125,7 @@ type DeribitBookMessage = DeribitMessage & {
     data: {
       timestamp: number
       instrument_name: string
+      prev_change_id?: number
       bids: DeribitBookLevel[]
       asks: DeribitBookLevel[]
     }
@@ -134,6 +137,7 @@ type DeribitTickerMessage = DeribitMessage & {
     data: {
       timestamp: number
       open_interest: number
+      last_price: number
       mark_price: number
       instrument_name: string
       index_price: number

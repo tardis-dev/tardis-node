@@ -1,4 +1,4 @@
-import { getMapper } from '../src'
+import { createMapper } from '../src'
 
 describe('Mapper.map(message, localTimestamp)', () => {
   test('maps deribit messages', () => {
@@ -103,12 +103,39 @@ describe('Mapper.map(message, localTimestamp)', () => {
             best_ask_amount: 250.0
           }
         }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-PERPETUAL.raw',
+          data: {
+            timestamp: 1569888003897,
+            stats: { volume: 43610.27177267, low: 7684.0, high: 8353.0 },
+            state: 'open',
+            settlement_price: 7792.17,
+            open_interest: 84844461,
+            min_price: 8179.57,
+            max_price: 8428.7,
+            mark_price: 8304.39,
+            last_price: 8304.5,
+            instrument_name: 'BTC-PERPETUAL',
+            index_price: 8305.94,
+            funding_8h: -0.00008477,
+            current_funding: 0.0,
+            best_bid_price: 8304.0,
+            best_bid_amount: 267900.0,
+            best_ask_price: 8304.5,
+            best_ask_amount: 5260.0
+          }
+        }
       }
     ]
-    const deribitMapper = getMapper('deribit')
+    const deribitMapper = createMapper('deribit')
     for (const message of messages) {
-      const mappedMessages = Array.from(deribitMapper.map(message, new Date('2019-09-01T00:00:22.5789670Z'))!)
-      expect(mappedMessages).toMatchSnapshot()
+      const mappedMessages = deribitMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }
   })
 
@@ -361,7 +388,7 @@ describe('Mapper.map(message, localTimestamp)', () => {
         data: [
           {
             symbol: 'ETHM19',
-            lastPriceProtected: 267.75,
+            lastPrice: 267.75,
             bidPrice: 267.7,
             midPrice: 267.725,
             askPrice: 267.75,
@@ -396,7 +423,7 @@ describe('Mapper.map(message, localTimestamp)', () => {
       }
     ]
 
-    const bitmexMapper = getMapper('bitmex')
+    const bitmexMapper = createMapper('bitmex')
     for (const message of messages) {
       const mappedMessages = bitmexMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
@@ -502,9 +529,44 @@ describe('Mapper.map(message, localTimestamp)', () => {
             volume_24h: '2099540'
           }
         ]
+      },
+      {
+        table: 'swap/funding_rate',
+        data: [
+          {
+            estimated_rate: '0.00037',
+            funding_rate: '0.00023534',
+            funding_time: '2019-08-01T04:00:00.000Z',
+            instrument_id: 'BCH-USD-SWAP',
+            interest_rate: '0'
+          }
+        ]
+      },
+      { table: 'swap/mark_price', data: [{ instrument_id: 'BCH-USD-SWAP', mark_price: '329.3', timestamp: '2019-08-01T00:00:20.773Z' }] },
+      {
+        table: 'futures/mark_price',
+        data: [{ instrument_id: 'BTC-USD-190927', mark_price: '10218.61', timestamp: '2019-08-01T00:00:20.869Z' }]
+      },
+      {
+        table: 'futures/ticker',
+        data: [
+          {
+            last: '0.02249',
+            best_bid: '0.0225',
+            high_24h: '0.02275',
+            low_24h: '0.02208',
+            volume_24h: '41666',
+            open_interest: '24419',
+            best_ask: '0.02255',
+            instrument_id: 'TRX-USD-190802',
+            open_24h: '0.02206',
+            timestamp: '2019-08-01T00:02:00.429Z',
+            volume_token_24h: '18526456.20275678'
+          }
+        ]
       }
     ]
-    const okexMapper = getMapper('okex')
+    const okexMapper = createMapper('okex')
 
     for (const message of messages) {
       const mappedMessages = Array.from(okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))!)
@@ -528,7 +590,7 @@ describe('Mapper.map(message, localTimestamp)', () => {
       [6959, [218.03, 0, 1], 430, 1564617602483],
       [6959, 'hb', 3603, 1569715249702]
     ]
-    const bitfinex = getMapper('bitfinex')
+    const bitfinex = createMapper('bitfinex')
     for (const message of messages) {
       const mappedMessages = bitfinex.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
@@ -546,10 +608,76 @@ describe('Mapper.map(message, localTimestamp)', () => {
         [1569801649000, null, 8090.5, 8051.45, null, 101052.31005666, null, 1569830400000, 0.00000843, 16, null, 0.00196337],
         3256,
         1569801652225
+      ],
+      [
+        127758,
+        [
+          1570492830000,
+          null,
+          8192.7,
+          8197.3,
+          null,
+          101120.80328179,
+          null,
+          1570521600000,
+          -1.4e-7,
+          9,
+          null,
+          0,
+          null,
+          null,
+          8196.973333333333
+        ],
+        1116,
+        1570492832311
+      ],
+      [
+        127758,
+        [
+          1570493698000,
+          null,
+          8210.5,
+          8208.45,
+          null,
+          101120.80328179,
+          null,
+          1570521600000,
+          0.00000725,
+          296,
+          null,
+          0,
+          null,
+          null,
+          8208.893333333333
+        ],
+        243027,
+        1570493699520
+      ],
+      [
+        12778,
+        [
+          1570493698000,
+          null,
+          8210.5,
+          8208.45,
+          null,
+          101120.80328179,
+          null,
+          1570521600000,
+          0.00000725,
+          296,
+          null,
+          0,
+          null,
+          null,
+          8208.893333333333
+        ],
+        243027,
+        1570493699520
       ]
     ]
 
-    const bitfinexDerivativesMapper = getMapper('bitfinex-derivatives')
+    const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
     for (const message of messages) {
       const mappedMessages = bitfinexDerivativesMapper.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
@@ -704,7 +832,7 @@ describe('Mapper.map(message, localTimestamp)', () => {
       }
     ]
 
-    const binanceMapper = getMapper('binance')
+    const binanceMapper = createMapper('binance')
     for (const message of messages) {
       const mappedMessages = binanceMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
@@ -715,25 +843,23 @@ describe('Mapper.map(message, localTimestamp)', () => {
   test('maps binance dex messages', () => {
     const messages = [
       {
+        stream: 'depthSnapshot',
+        generated: true,
+        data: {
+          symbol: 'BLINK-9C6_BNB',
+          bids: [['0.00003212', '7000.00000000']],
+          asks: [['0.00005325', '29900.00000000']],
+          height: 16926984
+        }
+      },
+      {
         stream: 'marketDiff',
         data: {
           e: 'depthUpdate',
           E: 1561939201,
-          s: 'VRAB-B56_BNB',
+          s: 'BLINK-9C6_BNB',
           b: [['0.00000400', '0.00000000'], ['0.00000005', '350000.00000000']],
-          a: [
-            ['0.00005253', '0.00000000'],
-            ['0.02246000', '0.00000000'],
-            ['0.00002399', '0.00000000'],
-            ['0.00002404', '0.00000000'],
-            ['0.00002578', '0.00000000'],
-            ['0.00002590', '0.00000000'],
-            ['0.00002606', '0.00000000'],
-            ['0.00002733', '0.00000000'],
-            ['0.00002738', '0.00000000'],
-            ['0.00002633', '0.00000000'],
-            ['0.00004800', '1900.00000000']
-          ]
+          a: [['0.00005253', '0.00000000']]
         }
       },
       {
@@ -797,7 +923,7 @@ describe('Mapper.map(message, localTimestamp)', () => {
       }
     ]
 
-    const binanceDexMapper = getMapper('binance-dex')
+    const binanceDexMapper = createMapper('binance-dex')
     for (const message of messages) {
       const mappedMessages = binanceDexMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
@@ -864,9 +990,409 @@ describe('Mapper.map(message, localTimestamp)', () => {
       }
     ]
 
-    const binanceFuturesMapper = getMapper('binance-futures')
+    const binanceFuturesMapper = createMapper('binance-futures')
     for (const message of messages) {
       const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps cryptofacilities messages', () => {
+    const messages = [
+      { feed: 'book', product_id: 'FI_LTCUSD_190426', side: 'sell', seq: 2139287, price: 60.58, qty: 0.0 },
+      {
+        feed: 'ticker',
+        product_id: 'FI_LTCUSD_190628',
+        bid: 60.57,
+        ask: 60.62,
+        bid_size: 10000.0,
+        ask_size: 150.0,
+        volume: 66428.0,
+        dtm: 88,
+        leverage: '50x',
+        index: 60.31,
+        premium: 0.5,
+        last: 60.69,
+        time: 1554076800684,
+        change: 0.4,
+        suspended: false,
+        tag: 'quarter',
+        pair: 'LTC:USD',
+        openInterest: 1692330.0,
+        markPrice: 60.61,
+        maturityTime: 1561734000000
+      },
+      {
+        feed: 'ticker',
+        product_id: 'PI_LTCUSD',
+        bid: 60.35,
+        ask: 60.38,
+        bid_size: 10000.0,
+        ask_size: 20000.0,
+        volume: 182179.0,
+        dtm: -17987,
+        leverage: '50x',
+        index: 60.31,
+        premium: 0.1,
+        last: 60.35,
+        time: 1554076800695,
+        change: 0.1,
+        funding_rate: 1.739491032443e-6,
+        funding_rate_prediction: 1.739491032443e-6,
+        suspended: false,
+        tag: 'perpetual',
+        pair: 'LTC:USD',
+        openInterest: 631360.0,
+        markPrice: 60.38,
+        maturityTime: 0,
+        relative_funding_rate: 1.04908704166667e-4,
+        relative_funding_rate_prediction: 1.04908704166667e-4,
+        next_funding_rate_time: 1554091200000
+      },
+      { feed: 'trade', product_id: 'FI_XBTUSD_190426', side: 'buy', type: 'fill', seq: 5271, time: 1554076802518, qty: 3.0, price: 4088.5 },
+      {
+        feed: 'trade',
+        product_id: 'FI_XBTUSD_190927',
+        uid: '06842286-3a57-412c-8cb5-b61db36903d3',
+        side: 'sell',
+        type: 'fill',
+        seq: 374,
+        time: 1567296042739,
+        qty: 166.0,
+        price: 9680.0
+      },
+      {
+        feed: 'ticker',
+        product_id: 'PI_LTCUSD',
+        bid: 64.27,
+        ask: 64.28,
+        bid_size: 2996.0,
+        ask_size: 7.0,
+        volume: 1062907.0,
+        dtm: -18140,
+        leverage: '50x',
+        index: 64.33,
+        premium: -0.1,
+        last: 64.34,
+        time: 1567296052217,
+        change: 0.6570713391739647,
+        funding_rate: -8.92730506785e-7,
+        funding_rate_prediction: -1.509794776119e-6,
+        suspended: false,
+        tag: 'perpetual',
+        pair: 'LTC:USD',
+        openInterest: 2074134.0,
+        markPrice: 64.295,
+        maturityTime: 0,
+        relative_funding_rate: -5.7456135416667e-5,
+        relative_funding_rate_prediction: -9.711e-5,
+        next_funding_rate_time: 1567310400000
+      },
+      {
+        feed: 'book_snapshot',
+        product_id: 'PI_LTCUSD',
+        timestamp: 1567296000518,
+        seq: 360370,
+        bids: [{ price: 64.27, qty: 2978.0 }, { price: 64.26, qty: 5000.0 }],
+        asks: [{ price: 64.28, qty: 1.0 }, { price: 64.31, qty: 9216.0 }],
+        tickSize: null
+      },
+      { feed: 'book', product_id: 'PI_LTCUSD', side: 'sell', seq: 361428, price: 64.41, qty: 14912.0, timestamp: 1567296042122 },
+      { feed: 'book', product_id: 'PI_LTCUSD', side: 'buy', seq: 361432, price: 64.24, qty: 0.0, timestamp: 1567296042131 }
+    ]
+
+    const cryptofacilitiesMapper = createMapper('cryptofacilities')
+
+    for (const message of messages) {
+      const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps bitflyer messages', () => {
+    const messages = [
+      {
+        jsonrpc: '2.0',
+        method: 'channelMessage',
+        params: {
+          channel: 'lightning_board_snapshot_BCH_BTC',
+          message: {
+            mid_price: 0.02891,
+            bids: [{ price: 0.0146, size: 0.022 }],
+            asks: [{ price: 0.02919, size: 0.14 }]
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'channelMessage',
+        params: {
+          channel: 'lightning_board_FX_BTC_JPY',
+          message: {
+            mid_price: 1046397.0,
+            bids: [{ price: 1043400.0, size: 0.05 }],
+            asks: [{ price: 1046603.0, size: 0.0 }]
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'channelMessage',
+        params: {
+          channel: 'lightning_executions_FX_BTC_JPY',
+          message: [
+            {
+              id: 1246449270,
+              side: 'BUY',
+              price: 1046399.0,
+              size: 0.01,
+              exec_date: '2019-09-01T00:00:11.2256814Z',
+              buy_child_order_acceptance_id: 'JRF20190901-000011-748374',
+              sell_child_order_acceptance_id: 'JRF20190901-000011-013715'
+            },
+            {
+              id: 1246449271,
+              side: 'BUY',
+              price: 1046400.0,
+              size: 0.002,
+              exec_date: '2019-09-01T00:00:11.2256814Z',
+              buy_child_order_acceptance_id: 'JRF20190901-000011-748374',
+              sell_child_order_acceptance_id: 'JRF20190901-000006-323731'
+            }
+          ]
+        }
+      }
+    ]
+
+    const bitflyerMapper = createMapper('bitflyer')
+
+    for (const message of messages) {
+      const mappedMessages = bitflyerMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps ftx messages', () => {
+    const messages = [
+      { type: 'subscribed', channel: 'trades', market: 'ALT-PERP' },
+      {
+        channel: 'orderbook',
+        market: 'BTC-1227',
+        type: 'partial',
+        data: {
+          time: 1567296001.3289416,
+          checksum: 2240307563,
+          bids: [[9805.0, 15.5629]],
+          asks: [[9807.75, 20.1695]],
+          action: 'partial'
+        }
+      },
+      {
+        channel: 'orderbook',
+        market: 'BNB-PERP',
+        type: 'update',
+        data: { time: 1567296005.667879, checksum: 1100190433, bids: [], asks: [[21.0125, 0.0]], action: 'update' }
+      },
+      {
+        channel: 'trades',
+        market: 'LTC-PERP',
+        type: 'update',
+        data: [{ id: null, price: 64.33, size: 0.03, side: 'sell', liquidation: false, time: '2019-09-01T00:00:12.659525+00:00' }]
+      },
+      {
+        channel: 'trades',
+        market: 'ETH-PERP',
+        type: 'update',
+        data: [{ id: 1139499, price: 181.86, size: 0.13, side: 'sell', liquidation: false, time: '2019-10-01T00:00:21.260951+00:00' }]
+      }
+    ]
+
+    const ftxMapper = createMapper('ftx')
+
+    for (const message of messages) {
+      const mappedMessages = ftxMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps coinbase messages', () => {
+    const messages = [
+      {
+        type: 'match',
+        trade_id: 216544,
+        maker_order_id: '4c2aa376-4bda-4947-84ee-4dc5a6337cba',
+        taker_order_id: '247a6eb2-b5c1-42db-b0ac-cb74b85bcac8',
+        side: 'buy',
+        size: '0.97133855',
+        price: '4.97800000',
+        product_id: 'ETC-GBP',
+        sequence: 253395153,
+        time: '2019-08-01T00:00:03.816000Z'
+      },
+      { type: 'l2update', product_id: 'BTC-EUR', time: '2019-08-01T00:00:03.818Z', changes: [['sell', '9202.54000000', '0.432']] },
+      { type: 'l2update', product_id: 'ETH-USD', time: '2019-08-01T00:00:03.869Z', changes: [['buy', '218.21000000', '20.79816319']] },
+      {
+        product_id: 'BAT-USDC',
+        type: 'snapshot',
+        bids: [['0.247175', '5299']],
+        asks: [['0.257175', '12']]
+      }
+    ]
+
+    const coinbaseMapper = createMapper('coinbase')
+
+    for (const message of messages) {
+      const mappedMessages = coinbaseMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps gemini messages', () => {
+    const messages = [
+      {
+        type: 'l2_updates',
+        symbol: 'ZECLTC',
+        changes: [['buy', '0.688', '51.55728'], ['buy', '0.686', '1.168083'], ['sell', '15', '0.078285']],
+        auction_events: []
+      },
+      { type: 'trade', symbol: 'BTCUSD', event_id: 8280715334, timestamp: 1569888020080, price: '8325.00', quantity: '0.1', side: 'buy' },
+      {
+        type: 'l2_updates',
+        symbol: 'ETHBTC',
+        changes: [['sell', '0.02189', '88.236'], ['sell', '0.02184', '4'], ['sell', '0.02185', '0'], ['sell', '0.02188', '149.57']]
+      }
+    ]
+
+    const geminiMapper = createMapper('gemini')
+
+    for (const message of messages) {
+      const mappedMessages = geminiMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps bitstamp messages', () => {
+    const messages = [
+      { event: 'bts:subscription_succeeded', channel: 'live_trades_xrpeur', data: {} },
+      {
+        data: {
+          microtimestamp: '1554076803243152',
+          amount: 0.0016429999999999999,
+          buy_order_id: 3056112169,
+          sell_order_id: 3056099349,
+          amount_str: '0.00164300',
+          price_str: '3651.30',
+          timestamp: '1554076803',
+          price: 3651.3000000000002,
+          type: 0,
+          id: 84550458
+        },
+        event: 'trade',
+        channel: 'live_trades_btceur'
+      },
+      {
+        data: { timestamp: '1554076800', microtimestamp: '1554076800436165', bids: [], asks: [['168.75', '2.00000000']] },
+        event: 'data',
+        channel: 'diff_order_book_bchusd'
+      },
+      {
+        data: {
+          timestamp: '1554076800',
+          bids: [['51046.31', '0.04249473'], ['60000.00', '0.00040718']],
+          asks: [['168.75', '2.00000000'], ['168.76', '0.49428809']]
+        },
+        event: 'snapshot',
+        channel: 'diff_order_book_bchusd',
+        generated: true
+      },
+      {
+        data: {
+          timestamp: '1554076801',
+          microtimestamp: '1554076801338397',
+          bids: [],
+          asks: [['169.28', '180.00000000'], ['170.16', '360.00000000']]
+        },
+        event: 'data',
+        channel: 'diff_order_book_bchusd'
+      },
+      {
+        data: {
+          microtimestamp: '1569888000557673',
+          amount: 0.02834,
+          buy_order_id: 4173504870,
+          sell_order_id: 4173504860,
+          amount_str: '0.02834000',
+          price_str: '8304.47',
+          timestamp: '1569888000',
+          price: 8304.47,
+          type: 0,
+          id: 98000129
+        },
+        event: 'trade',
+        channel: 'live_trades_btcusd'
+      }
+    ]
+
+    const bitstampMapper = createMapper('bitstamp')
+
+    for (const message of messages) {
+      const mappedMessages = bitstampMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
+      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+    }
+  })
+
+  test('maps kraken messages', () => {
+    const messages = [
+      [170, [['0.01136500', '2.51146536', '1561939201.587070', 's', 'l', '']], 'trade', 'LTC/XBT'],
+      [
+        14,
+        [['9482.40000', '0.01596347', '1561939258.512503', 's', 'l', ''], ['9488.20000', '0.28522465', '1561939258.557040', 'b', 'l', '']],
+        'trade',
+        'XBT/EUR'
+      ],
+      [468, { b: [['87.60000000', '35.02658459', '1561939258.527900']] }, 'book-1000', 'XMR/USD'],
+      [
+        741,
+        {
+          a: [
+            ['413.900000', '27.71904764', '1561939258.527125'],
+            ['403.500000', '0.00000000', '1561939258.530503'],
+            ['400.300000', '0.00000000', '1561939258.534680']
+          ]
+        },
+        { b: [['400.000000', '3.38983321', '1561939258.526326']] },
+        'book-1000',
+        'BCH/USD'
+      ],
+      [
+        754,
+        { b: [['352.000000', '33.95500000', '1561939258.538807'], ['351.500000', '5.89527900', '1561939258.548498']] },
+        'book-1000',
+        'BCH/EUR'
+      ],
+      [
+        923,
+        {
+          as: [['0.102987', '3.00000000', '1561939199.992830']],
+          bs: [['0.102810', '2.00000000', '1561635364.836639']]
+        },
+        ,
+        'book-1000',
+        'ADA/CAD'
+      ]
+    ]
+
+    const krakenMapper = createMapper('kraken')
+
+    for (const message of messages) {
+      const mappedMessages = krakenMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
       expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
     }
@@ -875,59 +1401,20 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
 describe('Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?)', () => {
   test('for okex', () => {
-    const okexMapper = getMapper('okex')
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('trade')).toEqual([
-      {
-        channel: 'spot/trade'
-      },
-      {
-        channel: 'swap/trade'
-      },
-      {
-        channel: 'futures/trade'
-      }
-    ])
+    const okexMapper = createMapper('okex')
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('trade')).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change')).toEqual([
-      {
-        channel: 'spot/depth'
-      },
-      {
-        channel: 'swap/depth'
-      },
-      {
-        channel: 'futures/depth'
-      }
-    ])
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change')).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toEqual([
-      {
-        channel: 'swap/depth',
-        symbols: ['LTC-USD-SWAP']
-      },
-      {
-        channel: 'futures/depth',
-        symbols: ['TRX-USD-190927']
-      },
-      {
-        channel: 'spot/depth',
-        symbols: ['XRP-OKB']
-      }
-    ])
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change', ['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('l2change', ['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toEqual([
-      {
-        channel: 'swap/depth',
-        symbols: ['LTC-USD-SWAP']
-      },
-      {
-        channel: 'swap/depth',
-        symbols: ['ETH-USD-SWAP']
-      },
-      {
-        channel: 'spot/depth',
-        symbols: ['XRP-OKB']
-      }
-    ])
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker')).toMatchSnapshot()
+
+    expect(okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+
+    expect(
+      okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker', ['LTC-USD-SWAP', 'TRX-USD-190927', 'ETH-USD-SWAP'])
+    ).toMatchSnapshot()
   })
 })

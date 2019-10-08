@@ -22,7 +22,7 @@ export type DataType = keyof MessageForDataType
 export type Trade = Readonly<{
   type: 'trade'
   symbol: string
-  id: string
+  id?: string
   price: number
   amount: number
   side: 'buy' | 'sell' | 'unknown' // liquidity taker side (aggressor)
@@ -50,7 +50,7 @@ export type BookChange = Readonly<{
 export type DerivativeTicker = Readonly<{
   type: 'derivative_ticker'
   symbol: string
-
+  lastPrice?: number
   openInterest?: number
   fundingRate?: number
   indexPrice?: number

@@ -48,7 +48,7 @@ export class CryptofacilitiesMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: trade.product_id,
-      id: trade.uid || '',
+      id: trade.uid,
       price: trade.price,
       amount: trade.qty,
       side: trade.side,
@@ -64,6 +64,7 @@ export class CryptofacilitiesMapper extends MapperBase {
     pendingTickerInfo.updateIndexPrice(ticker.index)
     pendingTickerInfo.updateMarkPrice(ticker.markPrice)
     pendingTickerInfo.updateOpenInterest(ticker.openInterest)
+    pendingTickerInfo.updateLastPrice(ticker.last)
 
     if (pendingTickerInfo.hasChanged()) {
       yield pendingTickerInfo.getSnapshot(new Date(ticker.time), localTimestamp)
@@ -126,6 +127,7 @@ type CryptofacilitiesTicker = {
   event: undefined
   product_id: string
   index: number
+  last: number
   openInterest: number
   markPrice: number
   funding_rate: number | undefined

@@ -220,7 +220,7 @@ export class TardisClient {
     return this.replayNormalized(options, 'derivative_ticker')
   }
 
-  public async *replayNormalized<T extends DataType | DataType[] | undefined, Z extends boolean = false>(
+  public async *replayNormalized<T extends DataType | DataType[], Z extends boolean = false>(
     { exchange, from, to, symbols, returnDisconnectsAsUndefined = undefined }: ReplayNormalizedOptions<Z>,
     dataTypes: T
   ): AsyncIterableIterator<
@@ -235,17 +235,18 @@ export class TardisClient {
       symbols = symbols.map(s => s.toUpperCase())
     }
 
-    if (dataTypes === undefined || dataTypes.length === 0) {
-      dataTypes = mapper.supportedDataTypes as any
-    }
     const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
+    const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
+    const filters = nonFilterableExchanges.includes(exchange)
+      ? []
+      : dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any)
 
     const messages = this.replay({
       exchange,
       from,
       to,
       returnDisconnectsAsUndefined: true,
-      filters: dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any)
+      filters
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)

@@ -6,10 +6,10 @@ import { MapperBase } from './mapper'
 export class OkexMapper extends MapperBase {
   public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
 
-  private readonly _dataTypeChannelSuffixMapping: { [key in DataType]: FilterForExchange['okex']['channel'][] } = {
+  private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['okex']['channel'][] } = {
     book_change: ['spot/depth', 'futures/depth', 'swap/depth'],
     trade: ['spot/trade', 'futures/trade', 'swap/trade'],
-    derivative_ticker: ['spot/ticker', 'futures/ticker', 'swap/ticker', 'futures/mark_price', 'futures/mark_price', 'swap/funding_rate']
+    derivative_ticker: ['spot/ticker', 'futures/ticker', 'swap/ticker', 'futures/mark_price', 'swap/mark_price', 'swap/funding_rate']
   }
 
   protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
@@ -17,7 +17,7 @@ export class OkexMapper extends MapperBase {
     // for ticker symbol we also need data for funding_rate and mark_price when applicable
 
     if (symbols === undefined) {
-      return this._dataTypeChannelSuffixMapping[dataType].map(channel => {
+      return this._dataTypeChannelMapping[dataType].map(channel => {
         return {
           channel
         }
@@ -38,7 +38,7 @@ export class OkexMapper extends MapperBase {
           prefix = 'spot'
         }
 
-        return this._dataTypeChannelSuffixMapping[dataType]
+        return this._dataTypeChannelMapping[dataType]
           .filter(c => c.startsWith(prefix))
           .map(channel => {
             return {
@@ -63,28 +63,19 @@ export class OkexMapper extends MapperBase {
       )
   }
   protected detectDataType(message: OkexDataMessage): DataType | undefined {
-    // TODO: tutaj zapisac
     if (!message.table) {
       return
     }
 
-    if (message.table.endsWith('depth')) {
+    if (this._dataTypeChannelMapping.book_change.includes(message.table)) {
       return 'book_change'
     }
 
-    if (message.table.endsWith('trade')) {
+    if (this._dataTypeChannelMapping.trade.includes(message.table)) {
       return 'trade'
     }
 
-    if (message.table.endsWith('ticker')) {
-      return 'derivative_ticker'
-    }
-
-    if (message.table === 'swap/funding_rate') {
-      return 'derivative_ticker'
-    }
-
-    if (message.table.endsWith('mark_price')) {
+    if (this._dataTypeChannelMapping.derivative_ticker.includes(message.table)) {
       return 'derivative_ticker'
     }
 
@@ -135,6 +126,9 @@ export class OkexMapper extends MapperBase {
       }
       if ('open_interest' in okexMessage) {
         pendingTickerInfo.updateOpenInterest(Number(okexMessage.open_interest))
+      }
+      if ('last' in okexMessage) {
+        pendingTickerInfo.updateLastPrice(Number(okexMessage.last))
       }
 
       if (pendingTickerInfo.hasChanged()) {

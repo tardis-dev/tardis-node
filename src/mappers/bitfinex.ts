@@ -125,7 +125,6 @@ export class BitfinexMapper extends MapperBase {
   }
 
   protected *mapDerivativeTickerInfo(message: BitfinexStatusMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    // TODO:
     const matchingChannel = this._channelIdToSymbolAndDataTypeMap.get(message[0])
 
     // ignore if we don't have matching channel
@@ -137,15 +136,20 @@ export class BitfinexMapper extends MapperBase {
     if (message[1] === 'hb') {
       return
     }
-
+    const statusInfo = message[1]
     // https://docs.bitfinex.com/v2/reference#ws-public-status
-    const fundingRate = message[1][11]
-    const indexPrice = message[1][3]
+
+    const fundingRate = statusInfo[11]
+    const indexPrice = statusInfo[3]
+    const lastPrice = statusInfo[2]
+    const markPrice = statusInfo[14]
 
     const pendingTickerInfo = this.getPendingTickerInfo(matchingChannel.symbol)
 
     pendingTickerInfo.updateFundingRate(fundingRate)
     pendingTickerInfo.updateIndexPrice(indexPrice)
+    pendingTickerInfo.updateLastPrice(lastPrice)
+    pendingTickerInfo.updateMarkPrice(markPrice)
 
     if (pendingTickerInfo.hasChanged()) {
       yield pendingTickerInfo.getSnapshot(new Date(message[3]), localTimestamp)

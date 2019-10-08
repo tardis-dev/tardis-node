@@ -70,6 +70,7 @@ class PendingDerivativeTickerInfo {
     this._pendingTicker = {
       type: 'derivative_ticker',
       symbol,
+      lastPrice: undefined,
       openInterest: undefined,
       fundingRate: undefined,
       indexPrice: undefined,
@@ -78,7 +79,7 @@ class PendingDerivativeTickerInfo {
       localTimestamp: new Date()
     }
 
-    this._hasChanged = true
+    this._hasChanged = false
   }
 
   public updateOpenInterest(openInterest: number | undefined | null) {
@@ -121,6 +122,17 @@ class PendingDerivativeTickerInfo {
 
     if (this._pendingTicker.indexPrice !== indexPrice) {
       this._pendingTicker.indexPrice = indexPrice
+      this._hasChanged = true
+    }
+  }
+
+  public updateLastPrice(lastPrice: number | undefined | null) {
+    if (isNullOrUndefined(lastPrice)) {
+      return
+    }
+
+    if (this._pendingTicker.lastPrice !== lastPrice) {
+      this._pendingTicker.lastPrice = lastPrice
       this._hasChanged = true
     }
   }

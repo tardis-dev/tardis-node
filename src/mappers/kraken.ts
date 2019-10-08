@@ -44,7 +44,7 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol,
-        id: '',
+        id: undefined,
         price: Number(price),
         amount: Number(amount),
         side: side == 'b' ? 'buy' : 'sell',
