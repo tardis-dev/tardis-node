@@ -12,6 +12,7 @@ import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
 import { DataType, MessageForDataType, Message, FilterForExchange, Exchange } from './types'
 import { createMapper } from './mappers'
+import { createRealTimeStream } from './realtimestreams'
 
 const debug = dbg('tardis-client')
 
@@ -66,7 +67,7 @@ export class TardisClient {
     exchange,
     from,
     to,
-    filters = undefined,
+    filters,
     skipDecoding = undefined,
     returnDisconnectsAsUndefined = undefined
   }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
@@ -78,7 +79,8 @@ export class TardisClient {
       ? { localTimestamp: Buffer; message: Buffer }
       : { localTimestamp: Date; message: any }
   > {
-    this._validateInputs(exchange, from, to, filters)
+    this._validateReplayOptions(exchange, from, to, filters)
+
     const fromDate = parseAsUTCDate(from)
     const toDate = parseAsUTCDate(to)
     const cachedSlicePaths = new Map<string, string>()
@@ -209,24 +211,17 @@ export class TardisClient {
     )
   }
 
-  public replayTrades<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this.replayNormalized(options, 'trade')
-  }
-
-  public replayOrderBookChanges<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this.replayNormalized(options, 'book_change')
-  }
-  public replayDerivativeTicker<Z extends boolean = false>(options: ReplayNormalizedOptions<Z>) {
-    return this.replayNormalized(options, 'derivative_ticker')
-  }
-
-  public async *replayNormalized<T extends DataType | DataType[], Z extends boolean = false>(
-    { exchange, from, to, symbols, returnDisconnectsAsUndefined = undefined }: ReplayNormalizedOptions<Z>,
-    dataTypes: T
-  ): AsyncIterableIterator<
+  public async *replayNormalized<T extends DataType | DataType[], U extends boolean = false>({
+    exchange,
+    from,
+    to,
+    symbols,
+    returnDisconnectsAsUndefined = undefined,
+    dataTypes
+  }: ReplayNormalizedOptions<T, U>): AsyncIterableIterator<
     T extends DataType
-      ? (Z extends true ? MessageForDataType[T] | undefined : MessageForDataType[T])
-      : (Z extends true ? Message | undefined : Message)
+      ? (U extends true ? MessageForDataType[T] | undefined : MessageForDataType[T])
+      : (U extends true ? Message | undefined : Message)
   > {
     let mapper = createMapper(exchange)
     // mappers assume that symbols are uppercased by default
@@ -278,12 +273,96 @@ export class TardisClient {
     }
   }
 
-  private _validateInputs<T extends Exchange>(
-    exchange: T,
-    from: string,
-    to: string,
-    filters: FilterForExchange[T][] | undefined = undefined
-  ) {
+  public async *stream<T extends Exchange, U extends boolean = false>({
+    exchange,
+    filters,
+    timeoutIntervalMS = 10000,
+    returnDisconnectsAsUndefined = undefined
+  }: StreamOptions<T, U>): AsyncIterableIterator<
+    U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
+  > {
+    this._validateStreamOptions(exchange, filters)
+
+    const realTimeStream = createRealTimeStream(exchange)
+
+    if (timeoutIntervalMS > 0) {
+      realTimeStream.setTimeoutInterval(timeoutIntervalMS)
+    }
+
+    debug('real-time stream for exchange: %s started, filters: %o', exchange, filters)
+
+    const realTimeMessages = realTimeStream.stream(filters as any)
+
+    for await (const message of realTimeMessages) {
+      if (message !== undefined) {
+        yield {
+          localTimestamp: new Date(),
+          message
+        } as any
+      } else if (returnDisconnectsAsUndefined) {
+        yield undefined as any
+      }
+    }
+  }
+
+  public async *streamNormalized<T extends DataType | DataType[], U extends boolean = false>({
+    exchange,
+    symbols,
+    timeoutIntervalMS = 10000,
+    returnDisconnectsAsUndefined = undefined,
+    dataTypes
+  }: StreamNormalizedOptions<T, U>): AsyncIterableIterator<
+    T extends DataType
+      ? (U extends true ? MessageForDataType[T] | undefined : MessageForDataType[T])
+      : (U extends true ? Message | undefined : Message)
+  > {
+    let mapper = createMapper(exchange)
+    // mappers assume that symbols are uppercased by default
+    // if user by mistake provide lowercase one let's automatically fix it
+    if (symbols !== undefined) {
+      symbols = symbols.map(s => s.toUpperCase())
+    }
+
+    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
+
+    const filters = dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(
+      dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any
+    )
+
+    const messages = this.stream({
+      exchange,
+      returnDisconnectsAsUndefined: true,
+      timeoutIntervalMS,
+      filters
+    })
+
+    for await (const messageWithTimestamp of messages) {
+      if (messageWithTimestamp === undefined) {
+        // we received undefined meaning Websocket disconnection when recording the data
+        // lets create new mapper with clean state for 'new connection'
+        mapper = createMapper(exchange)
+
+        // if flag returnDisconnectsAsUndefined is set yield undefined
+        if (returnDisconnectsAsUndefined === true) {
+          yield undefined as any
+        }
+
+        continue
+      }
+
+      const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
+
+      if (!mappedMessages) {
+        continue
+      }
+
+      for (const message of mappedMessages) {
+        yield message as any
+      }
+    }
+  }
+
+  private _validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {
     if (!exchange || EXCHANGES.includes(exchange) === false) {
       throw new Error(`Invalid "exchange" argument: ${exchange}. Please provide one of the following exchanges: ${EXCHANGES.join(', ')}.`)
     }
@@ -318,6 +397,24 @@ export class TardisClient {
       }
     }
   }
+
+  private _validateStreamOptions<T extends Exchange>(exchange: T, filters: FilterForExchange[T][]) {
+    if (!exchange || EXCHANGES.includes(exchange) === false) {
+      throw new Error(`Invalid "exchange" argument: ${exchange}. Please provide one of the following exchanges: ${EXCHANGES.join(', ')}.`)
+    }
+
+    if (!filters) {
+      throw new Error(`Invalid "filters" argument. Please provide filters array`)
+    }
+
+    for (let i = 0; i < filters.length; i++) {
+      const filter = filters[i]
+
+      if (filter.symbols && Array.isArray(filter.symbols) === false) {
+        throw new Error(`Invalid "filters[].symbols" argument: ${filter.symbols}. Please provide array of symbol strings`)
+      }
+    }
+  }
 }
 
 type Options = {
@@ -330,17 +427,33 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   exchange: T
   from: string
   to: string
-  filters?: FilterForExchange[T][]
+  filters: FilterForExchange[T][]
   skipDecoding?: U
   returnDisconnectsAsUndefined?: Z
 }
 
-export type ReplayNormalizedOptions<Z extends boolean = false> = {
+export type ReplayNormalizedOptions<T extends DataType | DataType[], U extends boolean = false> = {
   from: string
   to: string
   exchange: Exchange
+  dataTypes: T
   symbols?: string[]
-  returnDisconnectsAsUndefined?: Z
+  returnDisconnectsAsUndefined?: U
+}
+
+export type StreamOptions<T extends Exchange, U extends boolean = false> = {
+  exchange: T
+  filters: FilterForExchange[T][]
+  timeoutIntervalMS?: number
+  returnDisconnectsAsUndefined?: U
+}
+
+export type StreamNormalizedOptions<T extends DataType | DataType[], U extends boolean = false> = {
+  exchange: Exchange
+  dataTypes: T
+  timeoutIntervalMS?: number
+  symbols?: string[]
+  returnDisconnectsAsUndefined?: U
 }
 
 export type ExchangeDetails<T extends Exchange> = {
