@@ -4,7 +4,7 @@ import { Filter } from '../types'
 export class BitmexRealTimeStream extends RealTimeStreamBase {
   protected readonly wssURL = 'wss://www.bitmex.com/realtime'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

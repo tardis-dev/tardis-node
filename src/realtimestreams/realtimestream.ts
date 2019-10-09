@@ -31,7 +31,7 @@ export abstract class RealTimeStreamBase implements RealTimeStream {
 
         const ws = new WebSocket(address)
 
-        const snapshotsToReturn: any[] = []
+        let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
         ws.once('open', async () => {
           debug('estabilished connection to %s', address)
@@ -42,7 +42,7 @@ export abstract class RealTimeStreamBase implements RealTimeStream {
             }
           }
           await wait(ONE_SEC_IN_MS)
-          this.provideManualSnapshots(snapshotsToReturn)
+          this.provideManualSnapshots(filters, snapshotsToReturn, () => ws.readyState === WebSocket.CLOSED)
         })
 
         if (this.timeoutIntervalMS !== undefined) {
@@ -50,7 +50,7 @@ export abstract class RealTimeStreamBase implements RealTimeStream {
           timerid = setInterval(() => {
             if (receivedMessagesCount === 0) {
               debug('did not received any messages within %d ms timeout, restarting...', this.timeoutIntervalMS)
-              ws.close()
+              ws.terminate()
               if (timerid !== undefined) {
                 clearInterval(timerid)
                 timerid = undefined
@@ -83,6 +83,7 @@ export abstract class RealTimeStreamBase implements RealTimeStream {
             for (let snapshot of snapshotsToReturn) {
               yield snapshot
             }
+            snapshotsToReturn = []
           }
         }
 
@@ -110,5 +111,8 @@ export abstract class RealTimeStreamBase implements RealTimeStream {
   protected abstract readonly wssURL: string
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): string | any[]
   protected abstract messageIsError(message: any): boolean
-  protected provideManualSnapshots(_: any[]) {}
+
+  protected provideManualSnapshots(filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) {
+    debug('skipping providing manual snapshots for %o, %o, %o', filters, snapshotsBuffer, shouldCancel())
+  }
 }

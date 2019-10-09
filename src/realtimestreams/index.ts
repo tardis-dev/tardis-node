@@ -1,13 +1,17 @@
 import { RealTimeStream } from './realtimestream'
 import { Exchange } from '../types'
 import { BitmexRealTimeStream } from './bitmex'
+import { BinanceRealTimeStream, BinanceJerseyRealTimeStream, BinanceUSRealTimeStream } from './binance'
 
 export * from './realtimestream'
 
 const realTimeStreamsMap: {
   [key in Exchange]?: new () => RealTimeStream
 } = {
-  bitmex: BitmexRealTimeStream
+  bitmex: BitmexRealTimeStream,
+  binance: BinanceRealTimeStream,
+  'binance-jersey': BinanceJerseyRealTimeStream,
+  'binance-us': BinanceUSRealTimeStream
 }
 
 export function getRealTimeStreamFactory(exchange: Exchange): new () => RealTimeStream {
