@@ -1,7 +1,7 @@
-import { RealTimeStreamBase } from './realtimestream'
+import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
 
-export class BitmexRealTimeStream extends RealTimeStreamBase {
+export class BitmexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://www.bitmex.com/realtime'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {

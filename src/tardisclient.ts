@@ -12,7 +12,7 @@ import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
 import { DataType, MessageForDataType, Message, FilterForExchange, Exchange } from './types'
 import { createMapper } from './mappers'
-import { createRealTimeStream } from './realtimestreams'
+import { createRealTimeFeed } from './realtimefeeds'
 
 const debug = dbg('tardis-client')
 
@@ -283,15 +283,15 @@ export class TardisClient {
   > {
     this._validateStreamOptions(exchange, filters)
 
-    const realTimeStream = createRealTimeStream(exchange)
+    const realTimeFeed = createRealTimeFeed(exchange)
 
     if (timeoutIntervalMS > 0) {
-      realTimeStream.setTimeoutInterval(timeoutIntervalMS)
+      realTimeFeed.setTimeoutInterval(timeoutIntervalMS)
     }
 
-    debug('real-time stream for exchange: %s started, filters: %o', exchange, filters)
+    debug('real-time feed for exchange: %s started, filters: %o', exchange, filters)
 
-    const realTimeMessages = realTimeStream.stream(filters as any)
+    const realTimeMessages = realTimeFeed.stream(filters as any)
 
     for await (const message of realTimeMessages) {
       if (message !== undefined) {

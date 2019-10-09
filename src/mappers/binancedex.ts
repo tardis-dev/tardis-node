@@ -14,9 +14,6 @@ export class BinanceDexMapper extends MapperBase {
   protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
     const matchingChannels = this._dataTypeChannelsMapping[dataType]!
 
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
     return matchingChannels.map(channel => {
       return {
         channel,

@@ -5,12 +5,12 @@ import { wait, ONE_SEC_IN_MS } from '../handy'
 
 const debug = dbg('tardis-client')
 
-export type RealTimeStream = {
+export type RealTimeFeed = {
   stream(filters: Filter<string>[]): AsyncIterableIterator<object | undefined>
   setTimeoutInterval(timeoutIntervalMS: number): void
 }
 
-export abstract class RealTimeStreamBase implements RealTimeStream {
+export abstract class RealTimeFeedBase implements RealTimeFeed {
   private timeoutIntervalMS?: number
   public setTimeoutInterval(timeoutIntervalMS: number): void {
     this.timeoutIntervalMS = timeoutIntervalMS
