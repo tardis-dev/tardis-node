@@ -12,7 +12,7 @@ export class OrderBook {
     // clear everything up, when snapshot received so we don't have stale levels by accident
     if (bookChange.isSnapshot) {
       this._bids.clear()
-      this._bids.clear()
+      this._asks.clear()
       this._receivedInitialSnapshot = true
     }
     // process updates as long as we've received initial snapshot, otherwise ignore such messages
