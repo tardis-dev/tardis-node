@@ -8,7 +8,7 @@ export class CryptofacilitiesMapper extends MapperBase {
 
   private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['cryptofacilities']['channel'][] } = {
     book_change: ['book', 'book_snapshot'],
-    trade: ['book'],
+    trade: ['trade'],
     derivative_ticker: ['ticker']
   }
 
