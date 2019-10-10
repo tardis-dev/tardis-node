@@ -52,6 +52,6 @@ export function createMapper(exchange: Exchange) {
   return new MapperClass()
 }
 
-export function setMapperFactory(exchange: Exchange, mapper: new () => Mapper) {
-  exchangeMapperMap[exchange] = mapper
+export function setMapperFactory(exchange: Exchange, mapperFactory: new () => Mapper) {
+  exchangeMapperMap[exchange] = mapperFactory
 }

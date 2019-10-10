@@ -41,8 +41,11 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
               ws.send(JSON.stringify(message))
             }
           }
-          await wait(ONE_SEC_IN_MS)
-          this.provideManualSnapshots(filters, snapshotsToReturn, () => ws.readyState === WebSocket.CLOSED)
+
+          if (this.provideManualSnapshots !== undefined) {
+            await wait(ONE_SEC_IN_MS)
+            this.provideManualSnapshots(filters, snapshotsToReturn, () => ws.readyState === WebSocket.CLOSED)
+          }
         })
 
         if (this.timeoutIntervalMS !== undefined) {
@@ -70,6 +73,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
           if (this.messageIsError(messageDeserialized)) {
             throw new Error(`Received error message:${message}`)
+          }
+
+          if (this.onMessage !== undefined) {
+            this.onMessage(messageDeserialized, ws)
           }
 
           yield messageDeserialized
@@ -112,7 +119,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): string | any[]
   protected abstract messageIsError(message: any): boolean
 
-  protected provideManualSnapshots(filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) {
-    debug('skipping providing manual snapshots for %o, %o, %o', filters, snapshotsBuffer, shouldCancel())
-  }
+  protected provideManualSnapshots?: (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => void
+  protected onMessage?: (msg: any, ws: WebSocket) => void
 }

@@ -37,7 +37,7 @@ export class BinanceRealTimeFeed extends RealTimeFeedBase {
     return false
   }
 
-  protected async provideManualSnapshots(filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) {
+  protected provideManualSnapshots = async (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => {
     const depthSnapshotFilter = filters.find(f => f.channel === 'depthSnapshot')
     if (!depthSnapshotFilter) {
       return

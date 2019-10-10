@@ -3,6 +3,9 @@ import { Exchange } from '../types'
 import { BitmexRealTimeFeed } from './bitmex'
 import { BinanceRealTimeFeed, BinanceJerseyRealTimeFeed, BinanceUSRealTimeFeed, BinanceFuturesRealTimeFeed } from './binance'
 import { BinanceDexRealTimeFeed } from './binancedex'
+import { BitfinexRealTimeFeed } from './bitfinex'
+import { BitflyerRealTimeFeed } from './bitflyer'
+import { BitstampRealTimeFeed } from './bitstamp'
 
 export * from './realtimefeed'
 
@@ -14,7 +17,11 @@ const realTimeFeedsMap: {
   'binance-jersey': BinanceJerseyRealTimeFeed,
   'binance-us': BinanceUSRealTimeFeed,
   'binance-dex': BinanceDexRealTimeFeed,
-  'binance-futures': BinanceFuturesRealTimeFeed
+  'binance-futures': BinanceFuturesRealTimeFeed,
+  bitfinex: BitfinexRealTimeFeed,
+  'bitfinex-derivatives': BitfinexRealTimeFeed,
+  bitflyer: BitflyerRealTimeFeed,
+  bitstamp: BitstampRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): new () => RealTimeFeed {
