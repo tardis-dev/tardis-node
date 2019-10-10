@@ -357,7 +357,9 @@ export class TardisClient {
       }
 
       for (const message of mappedMessages) {
-        yield message as any
+        if (dataTypes.includes(message.type)) {
+          yield message as any
+        }
       }
     }
   }

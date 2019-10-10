@@ -1,9 +1,13 @@
 import WebSocket from 'ws'
 import dbg from 'debug'
+import zlib from 'zlib'
+import { promisify } from 'util'
 import { Filter } from '../types'
 import { wait, ONE_SEC_IN_MS } from '../handy'
+const inflateRaw = promisify(zlib.inflateRaw)
 
 const debug = dbg('tardis-client')
+const pongBuffer = Buffer.from('pong')
 
 export type RealTimeFeed = {
   stream(filters: Filter<string>[]): AsyncIterableIterator<object | undefined>
@@ -64,12 +68,19 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
           }, this.timeoutIntervalMS)
         }
 
-        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(ws, { encoding: 'utf8' }) as AsyncIterableIterator<string>
+        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(ws) as AsyncIterableIterator<Buffer>
 
-        for await (const message of realtimeMessagesStream) {
+        for await (let message of realtimeMessagesStream) {
           receivedMessagesCount++
 
-          const messageDeserialized = JSON.parse(message)
+          if (this.messagesNeedDecompression) {
+            message = (await inflateRaw(message)) as Buffer
+            if (message.equals(pongBuffer)) {
+              continue
+            }
+          }
+
+          const messageDeserialized = JSON.parse(message as any)
 
           if (this.messageIsError(messageDeserialized)) {
             throw new Error(`Received error message:${message}`)
@@ -98,7 +109,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         yield undefined
       } catch (error) {
         retries++
-        debug('received error: %o, retries %d', error, retries)
+        debug('real-time feed error: %o, retries %d', error, retries)
 
         yield undefined
         const isRateLimited = error.message.includes('429')
@@ -121,4 +132,5 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
   protected provideManualSnapshots?: (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => void
   protected onMessage?: (msg: any, ws: WebSocket) => void
+  protected messagesNeedDecompression = false
 }

@@ -9,6 +9,10 @@ import { BitstampRealTimeFeed } from './bitstamp'
 import { CoinbaseRealTimeFeed } from './coinbase'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities'
 import { DeribitRealTimeDataFeed } from './deribit'
+import { FtxRealTimeFeed } from './ftx'
+import { GeminiRealTimeFeed } from './gemini'
+import { KrakenRealTimeFeed } from './kraken'
+import { OkexRealTimeFeed } from './okex'
 
 export * from './realtimefeed'
 
@@ -27,7 +31,11 @@ const realTimeFeedsMap: {
   bitstamp: BitstampRealTimeFeed,
   coinbase: CoinbaseRealTimeFeed,
   cryptofacilities: CryptofacilitiesRealTimeFeed,
-  deribit: DeribitRealTimeDataFeed
+  deribit: DeribitRealTimeDataFeed,
+  ftx: FtxRealTimeFeed,
+  gemini: GeminiRealTimeFeed,
+  kraken: KrakenRealTimeFeed,
+  okex: OkexRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): new () => RealTimeFeed {
