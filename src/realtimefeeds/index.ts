@@ -6,6 +6,7 @@ import { BinanceDexRealTimeFeed } from './binancedex'
 import { BitfinexRealTimeFeed } from './bitfinex'
 import { BitflyerRealTimeFeed } from './bitflyer'
 import { BitstampRealTimeFeed } from './bitstamp'
+import { CoinbaseRealTimeFeed } from './coinbase'
 
 export * from './realtimefeed'
 
@@ -21,7 +22,8 @@ const realTimeFeedsMap: {
   bitfinex: BitfinexRealTimeFeed,
   'bitfinex-derivatives': BitfinexRealTimeFeed,
   bitflyer: BitflyerRealTimeFeed,
-  bitstamp: BitstampRealTimeFeed
+  bitstamp: BitstampRealTimeFeed,
+  coinbase: CoinbaseRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): new () => RealTimeFeed {
