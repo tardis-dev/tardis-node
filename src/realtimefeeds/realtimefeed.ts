@@ -68,7 +68,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
           }, this.timeoutIntervalMS)
         }
 
-        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(ws) as AsyncIterableIterator<Buffer>
+        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(ws, {
+          readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
+          readableHighWaterMark: 1024 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
+        }) as AsyncIterableIterator<Buffer>
 
         for await (let message of realtimeMessagesStream) {
           receivedMessagesCount++
