@@ -32,7 +32,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   // deduplicate filters (if the channel was provided multiple times)
   const filters = payload.filters.reduce(
     (prev, current) => {
-      const matchingExisting = prev.find(c => c.channel == current.channel)
+      const matchingExisting = prev.find(c => c.channel === current.channel)
 
       if (matchingExisting) {
         // both previous and current have symbols let's merge them
@@ -143,7 +143,7 @@ async function reliablyFetchAndCacheSlice(
       const badOrUnauthorizedRequest = error instanceof HttpError && (error.status === 400 || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       // do not retry when we've got bad or unauthorized request or enough attempts
-      if (badOrUnauthorizedRequest || attempts == MAX_ATTEMPTS) {
+      if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
@@ -176,7 +176,7 @@ async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCac
       const req = https
         .get(url, options, res => {
           const { statusCode } = res
-          if (statusCode != 200) {
+          if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
             res.setEncoding('utf8')
             let body = ''

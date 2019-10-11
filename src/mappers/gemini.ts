@@ -38,6 +38,7 @@ export class GeminiMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: geminiTrade.symbol,
+      exchange: this.exchange,
       id: String(geminiTrade.event_id),
       price: Number(geminiTrade.price),
       amount: Number(geminiTrade.quantity),
@@ -51,6 +52,7 @@ export class GeminiMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol: geminiL2Updates.symbol,
+      exchange: this.exchange,
       isSnapshot: geminiL2Updates.auction_events !== undefined,
       bids: geminiL2Updates.changes.filter(c => c[0] === 'buy').map(this._mapBookLevel),
       asks: geminiL2Updates.changes.filter(c => c[0] === 'sell').map(this._mapBookLevel),

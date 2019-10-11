@@ -1,7 +1,7 @@
 import SortedSet from 'collections/sorted-set'
 import { BookPriceLevel, BookChange } from './types'
 
-const isBookLevelEqual = (first: BookPriceLevel, second: BookPriceLevel) => first.price == second.price
+const isBookLevelEqual = (first: BookPriceLevel, second: BookPriceLevel) => first.price === second.price
 
 export class OrderBook {
   private readonly _bids = new SortedSet<BookPriceLevel>([], isBookLevelEqual, (first, second) => second.price - first.price)
@@ -51,7 +51,7 @@ function applyPriceLevelChanges(levels: SortedSet<BookPriceLevel>, priceLevelCha
   for (const priceLevel of priceLevelChanges) {
     const priceLevelToApply = { ...priceLevel }
     const node = levels.findValue(priceLevelToApply)
-    const levelNeedsToBeRemoved = priceLevelToApply.amount == 0
+    const levelNeedsToBeRemoved = priceLevelToApply.amount === 0
 
     if (node && levelNeedsToBeRemoved) {
       levels.delete(priceLevelToApply)

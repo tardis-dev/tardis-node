@@ -186,6 +186,7 @@ Array [
         "price": 0.00003212,
       },
     ],
+    "exchange": "binance-dex",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BLINK-9C6_BNB",
@@ -214,6 +215,7 @@ Array [
         "price": 5e-8,
       },
     ],
+    "exchange": "binance-dex",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BLINK-9C6_BNB",
@@ -227,6 +229,7 @@ exports[`Mapper.map(message, localTimestamp) maps binance dex messages 3`] = `
 Array [
   Object {
     "amount": 2070,
+    "exchange": "binance-dex",
     "id": "16927042-0",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 0.00042701,
@@ -237,6 +240,7 @@ Array [
   },
   Object {
     "amount": 2930,
+    "exchange": "binance-dex",
     "id": "16927042-1",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 0.00042701,
@@ -254,6 +258,7 @@ exports[`Mapper.map(message, localTimestamp) maps binance futures messages 1`] =
 Array [
   Object {
     "amount": 0.236,
+    "exchange": "binance-futures",
     "id": "181349",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 10223.74,
@@ -268,6 +273,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps binance futures messages 2`] = `
 Array [
   Object {
+    "exchange": "binance-futures",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": 10223.74,
@@ -284,6 +290,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps binance futures messages 3`] = `
 Array [
   Object {
+    "exchange": "binance-futures",
     "fundingRate": 0.0001,
     "indexPrice": undefined,
     "lastPrice": 10223.74,
@@ -303,6 +310,7 @@ exports[`Mapper.map(message, localTimestamp) maps binance messages 1`] = `
 Array [
   Object {
     "amount": 33.82,
+    "exchange": "binance",
     "id": "40756030",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 0.0042699,
@@ -318,6 +326,7 @@ exports[`Mapper.map(message, localTimestamp) maps binance messages 2`] = `
 Array [
   Object {
     "amount": 6.48,
+    "exchange": "binance",
     "id": "60276726",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 0.0021965,
@@ -356,6 +365,7 @@ Array [
         "price": 4089.09,
       },
     ],
+    "exchange": "binance",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSDC",
@@ -380,6 +390,7 @@ Array [
         "price": 4084.88,
       },
     ],
+    "exchange": "binance",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSDC",
@@ -432,6 +443,7 @@ Array [
         "price": 0.00002243,
       },
     ],
+    "exchange": "binance",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "GNTBTC",
@@ -455,6 +467,7 @@ Array [
         "price": 0.00002246,
       },
     ],
+    "exchange": "binance",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "GNTBTC",
@@ -478,6 +491,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "binance",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "GNTBTC",
@@ -492,6 +506,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 
 exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 2`] = `
 Array [
   Object {
+    "exchange": "bitfinex-derivatives",
     "fundingRate": undefined,
     "indexPrice": 173.57,
     "lastPrice": 173.535,
@@ -510,6 +525,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 
 exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 4`] = `
 Array [
   Object {
+    "exchange": "bitfinex-derivatives",
     "fundingRate": 0.00196337,
     "indexPrice": 8051.45,
     "lastPrice": 8090.5,
@@ -526,6 +542,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 5`] = `
 Array [
   Object {
+    "exchange": "bitfinex-derivatives",
     "fundingRate": 0,
     "indexPrice": 8197.3,
     "lastPrice": 8192.7,
@@ -542,6 +559,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 6`] = `
 Array [
   Object {
+    "exchange": "bitfinex-derivatives",
     "fundingRate": 0,
     "indexPrice": 8208.45,
     "lastPrice": 8210.5,
@@ -567,6 +585,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 4`] = `
 Array [
   Object {
     "amount": 0.00705845,
+    "exchange": "bitfinex",
     "id": "382489563",
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "price": 10087.98969503,
@@ -601,6 +620,7 @@ Array [
         "price": 216,
       },
     ],
+    "exchange": "bitfinex",
     "isSnapshot": true,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "symbol": "ETHUSD",
@@ -620,6 +640,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitfinex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "symbol": "ETHUSD",
@@ -639,6 +660,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitfinex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "symbol": "ETHUSD",
@@ -658,6 +680,7 @@ Array [
         "price": 218.03,
       },
     ],
+    "exchange": "bitfinex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "symbol": "ETHUSD",
@@ -684,6 +707,7 @@ Array [
         "price": 0.0146,
       },
     ],
+    "exchange": "bitflyer",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH_BTC",
@@ -708,6 +732,7 @@ Array [
         "price": 1043400,
       },
     ],
+    "exchange": "bitflyer",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "FX_BTC_JPY",
@@ -721,6 +746,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 3`] = `
 Array [
   Object {
     "amount": 0.01,
+    "exchange": "bitflyer",
     "id": "1246449270",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 1046399,
@@ -731,6 +757,7 @@ Array [
   },
   Object {
     "amount": 0.002,
+    "exchange": "bitflyer",
     "id": "1246449271",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 1046400,
@@ -746,6 +773,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitmex messages 1`] = `
 Array [
   Object {
     "amount": 1000,
+    "exchange": "bitmex",
     "id": "f73b6f28-075a-3548-a81c-8c843afd2746",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "price": 8544.5,
@@ -764,6 +792,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitmex messages 3`] = `Array [
 exports[`Mapper.map(message, localTimestamp) maps bitmex messages 4`] = `
 Array [
   Object {
+    "exchange": "bitmex",
     "fundingRate": undefined,
     "indexPrice": 0.03131,
     "lastPrice": 0.03161,
@@ -775,6 +804,7 @@ Array [
     "type": "derivative_ticker",
   },
   Object {
+    "exchange": "bitmex",
     "fundingRate": undefined,
     "indexPrice": 0.013382,
     "lastPrice": 0.01354,
@@ -791,6 +821,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps bitmex messages 5`] = `
 Array [
   Object {
+    "exchange": "bitmex",
     "fundingRate": undefined,
     "indexPrice": 0.03131,
     "lastPrice": 267.75,
@@ -824,6 +855,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitmex",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
@@ -838,6 +870,7 @@ Array [
         "price": 0.0010102,
       },
     ],
+    "exchange": "bitmex",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "EOSM19",
@@ -857,6 +890,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitmex",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
@@ -876,6 +910,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitmex",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "XBTUSD",
@@ -895,6 +930,7 @@ Array [
         "price": 0.0010102,
       },
     ],
+    "exchange": "bitmex",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "EOSM19",
@@ -910,6 +946,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 2`] = `
 Array [
   Object {
     "amount": 0.001643,
+    "exchange": "bitstamp",
     "id": "84550458",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 3651.3,
@@ -946,6 +983,7 @@ Array [
         "price": 60000,
       },
     ],
+    "exchange": "bitstamp",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "bchusd",
@@ -960,6 +998,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitstamp",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "bchusd",
@@ -983,6 +1022,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "bitstamp",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "bchusd",
@@ -996,6 +1036,7 @@ exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 6`] = `
 Array [
   Object {
     "amount": 0.02834,
+    "exchange": "bitstamp",
     "id": "98000129",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 8304.47,
@@ -1011,6 +1052,7 @@ exports[`Mapper.map(message, localTimestamp) maps coinbase messages 1`] = `
 Array [
   Object {
     "amount": 0.97133855,
+    "exchange": "coinbase",
     "id": "216544",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 4.978,
@@ -1032,6 +1074,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "coinbase",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-EUR",
@@ -1051,6 +1094,7 @@ Array [
         "price": 218.21,
       },
     ],
+    "exchange": "coinbase",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ETH-USD",
@@ -1075,6 +1119,7 @@ Array [
         "price": 0.247175,
       },
     ],
+    "exchange": "coinbase",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BAT-USDC",
@@ -1094,6 +1139,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "cryptofacilities",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "FI_LTCUSD_190426",
@@ -1106,6 +1152,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 2`] = `
 Array [
   Object {
+    "exchange": "cryptofacilities",
     "fundingRate": undefined,
     "indexPrice": 60.31,
     "lastPrice": 60.69,
@@ -1122,6 +1169,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 3`] = `
 Array [
   Object {
+    "exchange": "cryptofacilities",
     "fundingRate": 0.000001739491032443,
     "indexPrice": 60.31,
     "lastPrice": 60.35,
@@ -1139,6 +1187,7 @@ exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 4`] 
 Array [
   Object {
     "amount": 3,
+    "exchange": "cryptofacilities",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 4088.5,
@@ -1154,6 +1203,7 @@ exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 5`] 
 Array [
   Object {
     "amount": 166,
+    "exchange": "cryptofacilities",
     "id": "06842286-3a57-412c-8cb5-b61db36903d3",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 9680,
@@ -1168,6 +1218,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 6`] = `
 Array [
   Object {
+    "exchange": "cryptofacilities",
     "fundingRate": -8.92730506785e-7,
     "indexPrice": 64.33,
     "lastPrice": 64.34,
@@ -1204,6 +1255,7 @@ Array [
         "price": 64.26,
       },
     ],
+    "exchange": "cryptofacilities",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "PI_LTCUSD",
@@ -1223,6 +1275,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "cryptofacilities",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "PI_LTCUSD",
@@ -1242,6 +1295,7 @@ Array [
         "price": 64.24,
       },
     ],
+    "exchange": "cryptofacilities",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "PI_LTCUSD",
@@ -1255,6 +1309,7 @@ exports[`Mapper.map(message, localTimestamp) maps deribit messages 1`] = `
 Array [
   Object {
     "amount": 2000,
+    "exchange": "deribit",
     "id": "39355898",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "price": 9598.5,
@@ -1265,6 +1320,7 @@ Array [
   },
   Object {
     "amount": 50,
+    "exchange": "deribit",
     "id": "39355899",
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "price": 9598.5,
@@ -1301,6 +1357,7 @@ Array [
         "price": 217.75,
       },
     ],
+    "exchange": "deribit",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "ETH-PERPETUAL",
@@ -1329,6 +1386,7 @@ Array [
         "price": 217.8,
       },
     ],
+    "exchange": "deribit",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "ETH-PERPETUAL",
@@ -1341,6 +1399,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps deribit messages 5`] = `
 Array [
   Object {
+    "exchange": "deribit",
     "fundingRate": 0.00016281,
     "indexPrice": 10091.15,
     "lastPrice": 10095.5,
@@ -1357,6 +1416,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps deribit messages 6`] = `
 Array [
   Object {
+    "exchange": "deribit",
     "fundingRate": -0.00008477,
     "indexPrice": 8305.94,
     "lastPrice": 8304.5,
@@ -1387,6 +1447,7 @@ Array [
         "price": 9805,
       },
     ],
+    "exchange": "ftx",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-1227",
@@ -1406,6 +1467,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "ftx",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BNB-PERP",
@@ -1419,6 +1481,7 @@ exports[`Mapper.map(message, localTimestamp) maps ftx messages 4`] = `
 Array [
   Object {
     "amount": 0.03,
+    "exchange": "ftx",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 64.33,
@@ -1434,6 +1497,7 @@ exports[`Mapper.map(message, localTimestamp) maps ftx messages 5`] = `
 Array [
   Object {
     "amount": 0.13,
+    "exchange": "ftx",
     "id": "1139499",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 181.86,
@@ -1464,6 +1528,7 @@ Array [
         "price": 0.686,
       },
     ],
+    "exchange": "gemini",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ZECLTC",
@@ -1477,6 +1542,7 @@ exports[`Mapper.map(message, localTimestamp) maps gemini messages 2`] = `
 Array [
   Object {
     "amount": 0.1,
+    "exchange": "gemini",
     "id": "8280715334",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 8325,
@@ -1510,6 +1576,7 @@ Array [
       },
     ],
     "bids": Array [],
+    "exchange": "gemini",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ETHBTC",
@@ -1523,6 +1590,7 @@ exports[`Mapper.map(message, localTimestamp) maps kraken messages 1`] = `
 Array [
   Object {
     "amount": 2.51146536,
+    "exchange": "kraken",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 0.011365,
@@ -1538,6 +1606,7 @@ exports[`Mapper.map(message, localTimestamp) maps kraken messages 2`] = `
 Array [
   Object {
     "amount": 0.01596347,
+    "exchange": "kraken",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 9482.4,
@@ -1548,6 +1617,7 @@ Array [
   },
   Object {
     "amount": 0.28522465,
+    "exchange": "kraken",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "price": 9488.2,
@@ -1569,6 +1639,7 @@ Array [
         "price": 87.6,
       },
     ],
+    "exchange": "kraken",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "XMR/USD",
@@ -1601,6 +1672,7 @@ Array [
         "price": 400,
       },
     ],
+    "exchange": "kraken",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/USD",
@@ -1624,6 +1696,7 @@ Array [
         "price": 351.5,
       },
     ],
+    "exchange": "kraken",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/EUR",
@@ -1648,6 +1721,7 @@ Array [
         "price": 0.10281,
       },
     ],
+    "exchange": "kraken",
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "book-1000",
@@ -1661,6 +1735,7 @@ exports[`Mapper.map(message, localTimestamp) maps okex messages 1`] = `
 Array [
   Object {
     "amount": 4,
+    "exchange": "okex",
     "id": "2578238628528131",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "price": 4061.94,
@@ -1676,6 +1751,7 @@ exports[`Mapper.map(message, localTimestamp) maps okex messages 2`] = `
 Array [
   Object {
     "amount": 5,
+    "exchange": "okex",
     "id": "3269040623943685",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "price": 10209.43,
@@ -1691,6 +1767,7 @@ exports[`Mapper.map(message, localTimestamp) maps okex messages 3`] = `
 Array [
   Object {
     "amount": 0.12,
+    "exchange": "okex",
     "id": "423886239",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "price": 328.74,
@@ -1729,6 +1806,7 @@ Array [
         "price": 0.3195,
       },
     ],
+    "exchange": "okex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "symbol": "XRP-USD-SWAP",
@@ -1761,6 +1839,7 @@ Array [
         "price": 4084.5,
       },
     ],
+    "exchange": "okex",
     "isSnapshot": true,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "symbol": "BTC-USD-190405",
@@ -1773,6 +1852,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 6`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": 0.0001659,
@@ -1789,6 +1869,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 7`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -1805,6 +1886,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 8`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": 0.00023534,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -1821,6 +1903,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 9`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": 0.00023534,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -1837,6 +1920,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 10`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": undefined,
@@ -1853,6 +1937,7 @@ Array [
 exports[`Mapper.map(message, localTimestamp) maps okex messages 11`] = `
 Array [
   Object {
+    "exchange": "okex",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": 0.02249,

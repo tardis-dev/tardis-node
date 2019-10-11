@@ -51,6 +51,7 @@ export class BitstampMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: symbol,
+      exchange: this.exchange,
       id: String(bitstampTrade.id),
       price: Number(bitstampTrade.price),
       amount: Number(bitstampTrade.amount),
@@ -81,6 +82,7 @@ export class BitstampMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol,
+        exchange: this.exchange,
         isSnapshot: true,
         bids: message.data.bids.map(this._mapBookLevel),
         asks: message.data.asks.map(this._mapBookLevel),
@@ -127,6 +129,7 @@ export class BitstampMapper extends MapperBase {
     return {
       type: 'book_change',
       symbol,
+      exchange: this.exchange,
       isSnapshot: false,
 
       bids: bitstampBookUpdate.data.bids.map(this._mapBookLevel),

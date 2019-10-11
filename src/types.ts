@@ -22,6 +22,7 @@ export type DataType = keyof MessageForDataType
 export type Trade = Readonly<{
   type: 'trade'
   symbol: string
+  exchange: Exchange
   id?: string
   price: number
   amount: number
@@ -38,7 +39,7 @@ export type BookPriceLevel = Readonly<{
 export type BookChange = Readonly<{
   type: 'book_change'
   symbol: string
-
+  exchange: Exchange
   isSnapshot: boolean
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]
@@ -50,6 +51,7 @@ export type BookChange = Readonly<{
 export type DerivativeTicker = Readonly<{
   type: 'derivative_ticker'
   symbol: string
+  exchange: Exchange
   lastPrice?: number
   openInterest?: number
   fundingRate?: number

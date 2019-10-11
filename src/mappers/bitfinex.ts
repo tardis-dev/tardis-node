@@ -86,6 +86,7 @@ export class BitfinexMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: matchingChannel.symbol,
+      exchange: this.exchange,
       id: String(id),
       price,
       amount: Math.abs(amount),
@@ -115,6 +116,7 @@ export class BitfinexMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol: matchingChannel.symbol,
+      exchange: this.exchange,
       isSnapshot,
 
       bids: bids.map(this._mapBookLevel),

@@ -245,7 +245,7 @@ export class TardisClient {
     })
 
     // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
-    const symbolsInclude = (symbol: string) => symbols === undefined || symbols.length == 0 || symbols.includes(symbol)
+    const symbolsInclude = (symbol: string) => symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
 
     for await (const messageWithTimestamp of messages) {
       if (messageWithTimestamp === undefined) {

@@ -43,6 +43,7 @@ export class BinanceDexMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.data.symbol,
+        exchange: this.exchange,
         isSnapshot: true,
         bids: message.data.bids.map(this._mapBookLevel),
         asks: message.data.asks.map(this._mapBookLevel),
@@ -54,6 +55,7 @@ export class BinanceDexMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.data.s,
+        exchange: this.exchange,
         isSnapshot: false,
         bids: message.data.b.map(this._mapBookLevel),
         asks: message.data.a.map(this._mapBookLevel),
@@ -68,10 +70,11 @@ export class BinanceDexMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: binanceDexTrade.s,
+        exchange: this.exchange,
         id: binanceDexTrade.t,
         price: Number(binanceDexTrade.p),
         amount: Number(binanceDexTrade.q),
-        side: binanceDexTrade.tt == 2 ? 'sell' : 'buy',
+        side: binanceDexTrade.tt === 2 ? 'sell' : 'buy',
         timestamp: new Date(Math.floor(binanceDexTrade.T / 1000000)),
         localTimestamp: localTimestamp
       }

@@ -1,13 +1,16 @@
-import { Trade, BookChange, DerivativeTicker, Message, DataType, Filter } from '../types'
+import { Trade, BookChange, DerivativeTicker, Message, DataType, Filter, Exchange } from '../types'
 
 export type Mapper = {
   map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined
   getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
   supportedDataTypes: readonly DataType[]
+  readonly exchange: Exchange
 }
 
 export abstract class MapperBase implements Mapper {
   private readonly _pendingTickers: Map<string, PendingDerivativeTickerInfo> = new Map()
+
+  constructor(public readonly exchange: Exchange) {}
 
   public map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined {
     const dataType = this.detectDataType(message)
@@ -30,7 +33,7 @@ export abstract class MapperBase implements Mapper {
   protected getPendingTickerInfo(symbol: string) {
     let pendingTickerInfo = this._pendingTickers.get(symbol)
     if (pendingTickerInfo === undefined) {
-      pendingTickerInfo = new PendingDerivativeTickerInfo(symbol)
+      pendingTickerInfo = new PendingDerivativeTickerInfo(symbol, this.exchange)
       this._pendingTickers.set(symbol, pendingTickerInfo)
     }
 
@@ -45,7 +48,7 @@ export abstract class MapperBase implements Mapper {
     return this.mapDataTypeAndSymbolsToFilters(dataType, symbols)
   }
 
-  public abstract supportedDataTypes: readonly DataType[]
+  public abstract readonly supportedDataTypes: readonly DataType[]
 
   protected abstract mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[]
 
@@ -66,10 +69,11 @@ class PendingDerivativeTickerInfo {
   private _pendingTicker: Writeable<DerivativeTicker>
   private _hasChanged: boolean
 
-  constructor(symbol: string) {
+  constructor(symbol: string, exchange: Exchange) {
     this._pendingTicker = {
       type: 'derivative_ticker',
       symbol,
+      exchange,
       lastPrice: undefined,
       openInterest: undefined,
       fundingRate: undefined,

@@ -44,6 +44,7 @@ export class BitflyerMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol,
+        exchange: this.exchange,
         id: String(execution.id),
         price: execution.price,
         amount: execution.size,
@@ -62,6 +63,7 @@ export class BitflyerMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol,
+      exchange: this.exchange,
       isSnapshot,
       bids: bitflyerBoard.params.message.bids.map(this._mapBookLevel),
       asks: bitflyerBoard.params.message.asks.map(this._mapBookLevel),

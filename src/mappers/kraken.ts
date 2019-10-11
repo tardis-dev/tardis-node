@@ -44,10 +44,11 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol,
+        exchange: this.exchange,
         id: undefined,
         price: Number(price),
         amount: Number(amount),
-        side: side == 'b' ? 'buy' : 'sell',
+        side: side === 'b' ? 'buy' : 'sell',
         timestamp: new Date(Number(time) * 1000),
         localTimestamp: localTimestamp
       }
@@ -62,6 +63,7 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: symbol,
+        exchange: this.exchange,
         isSnapshot: true,
 
         bids: bs.map(this._mapBookLevel),
@@ -78,6 +80,7 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol,
+        exchange: this.exchange,
         isSnapshot: false,
 
         bids: bids.map(this._mapBookLevel),

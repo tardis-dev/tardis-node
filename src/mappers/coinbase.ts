@@ -38,6 +38,7 @@ export class CoinbaseMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: message.product_id,
+      exchange: this.exchange,
       id: String(message.trade_id),
       price: Number(message.price),
       amount: Number(message.size),
@@ -55,6 +56,7 @@ export class CoinbaseMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.product_id,
+        exchange: this.exchange,
         isSnapshot: true,
         bids: message.bids.map(this._mapSnapshotBookLevel),
         asks: message.asks.map(this._mapSnapshotBookLevel),
@@ -65,6 +67,7 @@ export class CoinbaseMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.product_id,
+        exchange: this.exchange,
         isSnapshot: false,
         bids: message.changes.filter(c => c[0] === 'buy').map(this._mapUpdateBookLevel),
         asks: message.changes.filter(c => c[0] === 'sell').map(this._mapUpdateBookLevel),

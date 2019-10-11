@@ -49,6 +49,7 @@ export class DeribitMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: deribitTrade.instrument_name,
+        exchange: this.exchange,
         id: deribitTrade.trade_id,
         price: deribitTrade.price,
         amount: deribitTrade.amount,
@@ -82,6 +83,7 @@ export class DeribitMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol: deribitBookChange.instrument_name,
+      exchange: this.exchange,
       isSnapshot,
       bids: deribitBookChange.bids.map(this._mapBookLevel),
       asks: deribitBookChange.asks.map(this._mapBookLevel),

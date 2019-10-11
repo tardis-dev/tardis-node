@@ -43,6 +43,7 @@ export class FtxMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: ftxTrades.market,
+        exchange: this.exchange,
         id: ftxTrade.id !== null ? String(ftxTrade.id) : undefined,
         price: ftxTrade.price,
         amount: ftxTrade.size,
@@ -57,6 +58,7 @@ export class FtxMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol: ftxOrderBook.market,
+      exchange: this.exchange,
       isSnapshot: ftxOrderBook.type === 'partial',
       bids: ftxOrderBook.data.bids.map(this._mapBookLevel),
       asks: ftxOrderBook.data.asks.map(this._mapBookLevel),

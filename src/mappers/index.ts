@@ -17,28 +17,28 @@ import { KrakenMapper } from './kraken'
 export { Mapper } from './mapper'
 
 const exchangeMapperMap: {
-  [key in Exchange]?: new () => Mapper
+  [key in Exchange]?: () => Mapper
 } = {
-  deribit: DeribitMapper,
-  bitmex: BitmexMapper,
-  okex: OkexMapper,
-  bitfinex: BitfinexMapper,
-  'bitfinex-derivatives': BitfinexDerivativesMapper,
-  binance: BinanceMapper,
-  'binance-us': BinanceMapper,
-  'binance-jersey': BinanceMapper,
-  'binance-dex': BinanceDexMapper,
-  'binance-futures': BinanceFuturesMapper,
-  coinbase: CoinbaseMapper,
-  bitflyer: BitflyerMapper,
-  bitstamp: BitstampMapper,
-  cryptofacilities: CryptofacilitiesMapper,
-  ftx: FtxMapper,
-  gemini: GeminiMapper,
-  kraken: KrakenMapper
+  deribit: () => new DeribitMapper('deribit'),
+  bitmex: () => new BitmexMapper('bitmex'),
+  okex: () => new OkexMapper('okex'),
+  bitfinex: () => new BitfinexMapper('bitfinex'),
+  'bitfinex-derivatives': () => new BitfinexDerivativesMapper('bitfinex-derivatives'),
+  binance: () => new BinanceMapper('binance'),
+  'binance-us': () => new BinanceMapper('binance-us'),
+  'binance-jersey': () => new BinanceMapper('binance-jersey'),
+  'binance-dex': () => new BinanceDexMapper('binance-dex'),
+  'binance-futures': () => new BinanceFuturesMapper('binance-futures'),
+  coinbase: () => new CoinbaseMapper('coinbase'),
+  bitflyer: () => new BitflyerMapper('bitflyer'),
+  bitstamp: () => new BitstampMapper('bitstamp'),
+  cryptofacilities: () => new CryptofacilitiesMapper('cryptofacilities'),
+  ftx: () => new FtxMapper('ftx'),
+  gemini: () => new GeminiMapper('gemini'),
+  kraken: () => new KrakenMapper('kraken')
 }
 
-export function getMapperFactory(exchange: Exchange): new () => Mapper {
+export function getMapperFactory(exchange: Exchange): () => Mapper {
   if (exchangeMapperMap[exchange]) {
     return exchangeMapperMap[exchange]!
   }
@@ -47,11 +47,11 @@ export function getMapperFactory(exchange: Exchange): new () => Mapper {
 }
 
 export function createMapper(exchange: Exchange) {
-  const MapperClass = getMapperFactory(exchange)
+  const MapperFactory = getMapperFactory(exchange)
 
-  return new MapperClass()
+  return MapperFactory()
 }
 
-export function setMapperFactory(exchange: Exchange, mapperFactory: new () => Mapper) {
+export function setMapperFactory(exchange: Exchange, mapperFactory: () => Mapper) {
   exchangeMapperMap[exchange] = mapperFactory
 }

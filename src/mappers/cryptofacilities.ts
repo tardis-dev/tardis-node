@@ -48,6 +48,7 @@ export class CryptofacilitiesMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: trade.product_id,
+      exchange: this.exchange,
       id: trade.uid,
       price: trade.price,
       amount: trade.qty,
@@ -79,6 +80,7 @@ export class CryptofacilitiesMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.product_id,
+        exchange: this.exchange,
         isSnapshot: true,
         bids: message.bids.map(this._mapBookLevel),
         asks: message.asks.map(this._mapBookLevel),
@@ -97,6 +99,7 @@ export class CryptofacilitiesMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.product_id,
+        exchange: this.exchange,
         isSnapshot: false,
         bids: isAsk ? [] : update,
         asks: isAsk ? update : [],

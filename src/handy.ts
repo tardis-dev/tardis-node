@@ -2,7 +2,7 @@ import { createHash } from 'crypto'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
-  if (val.endsWith('Z') == false) {
+  if (val.endsWith('Z') === false) {
     val += 'Z'
   }
   var date = new Date(val)

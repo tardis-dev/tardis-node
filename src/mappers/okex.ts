@@ -87,6 +87,7 @@ export class OkexMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: okexTrade.instrument_id,
+        exchange: this.exchange,
         id: okexTrade.trade_id,
         price: Number(okexTrade.price),
         amount: Number(okexTrade.qty || okexTrade.size),
@@ -102,7 +103,8 @@ export class OkexMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: message.instrument_id,
-        isSnapshot: okexDepthDataMessage.action == 'partial',
+        exchange: this.exchange,
+        isSnapshot: okexDepthDataMessage.action === 'partial',
         bids: message.bids.map(this._mapBookLevel),
         asks: message.asks.map(this._mapBookLevel),
         timestamp: new Date(message.timestamp),

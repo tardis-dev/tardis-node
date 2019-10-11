@@ -49,6 +49,7 @@ export class BitmexMapper extends MapperBase {
       yield {
         type: 'trade',
         symbol: bitmexTrade.symbol,
+        exchange: this.exchange,
         id: bitmexTrade.trdMatchID,
         price: bitmexTrade.price,
         amount: bitmexTrade.size,
@@ -112,6 +113,7 @@ export class BitmexMapper extends MapperBase {
         const bookChange: BookChange = {
           type: 'book_change',
           symbol,
+          exchange: this.exchange,
           isSnapshot: bitmexOrderBookL2Message.action === 'partial',
           bids,
           asks,

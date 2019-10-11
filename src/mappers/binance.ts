@@ -43,6 +43,7 @@ export class BinanceMapper extends MapperBase {
     yield {
       type: 'trade',
       symbol: binanceTrade.s,
+      exchange: this.exchange,
       id: String(binanceTrade.t),
       price: Number(binanceTrade.p),
       amount: Number(binanceTrade.q),
@@ -78,6 +79,7 @@ export class BinanceMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol,
+        exchange: this.exchange,
         isSnapshot: true,
         bids: binanceDepthSnapshotData.bids.map(this._mapBookLevel),
         asks: binanceDepthSnapshotData.asks.map(this._mapBookLevel),
@@ -134,6 +136,7 @@ export class BinanceMapper extends MapperBase {
     return {
       type: 'book_change',
       symbol: binanceDepthUpdateData.s,
+      exchange: this.exchange,
       isSnapshot: false,
 
       bids: binanceDepthUpdateData.b.map(this._mapBookLevel),
@@ -200,6 +203,7 @@ export class BinanceFuturesMapper extends BinanceMapper {
     yield {
       type: 'trade',
       symbol: binanceTrade.s,
+      exchange: this.exchange,
       id: String(binanceTrade.l),
       price: Number(binanceTrade.p),
       amount: Number(binanceTrade.q),
