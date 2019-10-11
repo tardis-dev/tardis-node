@@ -61,3 +61,35 @@ export type DerivativeTicker = Readonly<{
   timestamp: Date
   localTimestamp: Date
 }>
+
+export type TradeBin = Readonly<{
+  type: string
+  symbol: string
+  exchange: Exchange
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+  buyVolume: number
+  sellVolume: number
+
+  trades: number
+  vwap: number
+  openTimestamp: Date
+  closeTimestamp: Date
+
+  binTimestamp: Date
+  localTimestamp: Date
+}>
+
+export type BookSnapshot = {
+  type: string
+  symbol: string
+  exchange: Exchange
+  bids: BookPriceLevel[]
+  asks: BookPriceLevel[]
+
+  timestamp: Date
+  localTimestamp: Date
+}
