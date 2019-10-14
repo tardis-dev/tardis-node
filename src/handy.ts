@@ -56,3 +56,17 @@ export class HttpError extends Error {
     super(`HttpError: status code ${status}`)
   }
 }
+
+export function* take(iterable: Iterable<any>, length: number) {
+  if (length === 0) {
+    return
+  }
+  for (const item of iterable) {
+    yield item
+    length--
+
+    if (length === 0) {
+      return
+    }
+  }
+}

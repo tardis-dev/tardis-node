@@ -16,9 +16,17 @@ export class OrderBook {
       this._receivedInitialSnapshot = true
     }
     // process updates as long as we've received initial snapshot, otherwise ignore such messages
+    let lowestUpdatedAskDepthIndex
+    let lowestUpdatedBidDepthIndex
+
     if (this._receivedInitialSnapshot) {
-      applyPriceLevelChanges(this._asks, bookChange.asks)
-      applyPriceLevelChanges(this._bids, bookChange.bids)
+      lowestUpdatedAskDepthIndex = applyPriceLevelChanges(this._asks, bookChange.asks)
+      lowestUpdatedBidDepthIndex = applyPriceLevelChanges(this._bids, bookChange.bids)
+    }
+
+    return {
+      lowestUpdatedAskDepthIndex,
+      lowestUpdatedBidDepthIndex
     }
   }
 
@@ -30,7 +38,7 @@ export class OrderBook {
     return findNearestLevel(this._asks)
   }
 
-  public bids() {
+  public bids(): Iterable<BookPriceLevel> {
     return new LevelsIterableIterator(this._bids)
   }
 
@@ -48,19 +56,37 @@ function findNearestLevel(levels: SortedSet<BookPriceLevel>): BookPriceLevel | u
 }
 
 function applyPriceLevelChanges(levels: SortedSet<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
+  let lowestUpdatedDepthIndex
+
   for (const priceLevel of priceLevelChanges) {
     const priceLevelToApply = { ...priceLevel }
     const node = levels.findValue(priceLevelToApply)
-    const levelNeedsToBeRemoved = priceLevelToApply.amount === 0
 
-    if (node && levelNeedsToBeRemoved) {
-      levels.delete(priceLevelToApply)
-    } else if (node) {
-      node.value = priceLevelToApply
+    if (node !== undefined) {
+      const amountHasChanged = node.value.amount !== priceLevelToApply.amount
+      const levelNeedsToBeRemoved = priceLevelToApply.amount === 0
+      const indexOfNewLevel = levels.indexOf(priceLevelToApply)
+
+      if (amountHasChanged && (lowestUpdatedDepthIndex === undefined || indexOfNewLevel < lowestUpdatedDepthIndex)) {
+        lowestUpdatedDepthIndex = indexOfNewLevel
+      }
+
+      if (levelNeedsToBeRemoved) {
+        levels.delete(priceLevelToApply)
+      } else if (amountHasChanged) {
+        node.value = priceLevelToApply
+      }
     } else {
       levels.add(priceLevelToApply)
+
+      const indexOfNewLevel = levels.indexOf(priceLevelToApply)
+      if (lowestUpdatedDepthIndex === undefined || indexOfNewLevel < lowestUpdatedDepthIndex) {
+        lowestUpdatedDepthIndex = indexOfNewLevel
+      }
     }
   }
+
+  return lowestUpdatedDepthIndex
 }
 
 class LevelsIterableIterator implements IterableIterator<BookPriceLevel> {
@@ -72,13 +98,13 @@ class LevelsIterableIterator implements IterableIterator<BookPriceLevel> {
 
   public next(): IteratorResult<BookPriceLevel> {
     let next
-    if (this._previousLevel) {
+    if (this._previousLevel !== undefined) {
       next = this._levels.findLeastGreaterThan(this._previousLevel)
     } else {
       next = this._levels.findLeast()
     }
 
-    if (!next) {
+    if (next === undefined) {
       return {
         done: true,
         value: undefined
@@ -86,6 +112,7 @@ class LevelsIterableIterator implements IterableIterator<BookPriceLevel> {
     } else {
       const value = (next as any).value
       this._previousLevel = value
+
       return {
         done: false,
         value

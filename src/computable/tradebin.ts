@@ -3,20 +3,48 @@ import { TradeBin, Trade } from '../types'
 
 const DATE_MIN = new Date(-1)
 
-export abstract class TradeBinComputable implements Computable<TradeBin, 'trade'> {
+export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
   public readonly sourceDataType = 'trade'
 
   protected inProgressBin: Writeable<TradeBin>
 
-  constructor(public readonly name: string) {
+  constructor(private readonly _name: string, private readonly _binSize: number, private readonly _binBy: 'time' | 'volume' | 'ticks') {
     this.inProgressBin = {} as any
     this._reset()
   }
 
-  public abstract hasNewSample(timestamp: Date): boolean
+  public hasNewSample(currentTimestamp: Date): boolean {
+    if (this.inProgressBin.trades === 0) {
+      return false
+    }
+
+    if (this._binBy === 'time') {
+      const currentTimestampTimeBucket = this._getTimeBucket(currentTimestamp)
+      const closeTimestampTimeBucket = this._getTimeBucket(this.inProgressBin.closeTimestamp)
+      if (currentTimestampTimeBucket > closeTimestampTimeBucket) {
+        // set bin timestamp to end of 'binSize/interval' rounded
+        this.inProgressBin.binTimestamp = new Date(currentTimestampTimeBucket * this._binSize)
+
+        return true
+      }
+
+      return false
+    }
+
+    if (this._binBy === 'volume') {
+      return this.inProgressBin.volume >= this._binSize
+    }
+
+    if (this._binBy === 'ticks') {
+      return this.inProgressBin.trades >= this._binSize
+    }
+
+    return false
+  }
 
   public getSample(localTimestamp: Date) {
     this.inProgressBin.localTimestamp = localTimestamp
+
     const sample = { ...this.inProgressBin }
     this._reset()
 
@@ -54,7 +82,10 @@ export abstract class TradeBinComputable implements Computable<TradeBin, 'trade'
 
   private _reset() {
     const binToReset = this.inProgressBin
-    binToReset.type = this.name
+    binToReset.type = 'trade_bin'
+    binToReset.name = this._name
+    binToReset.binSize = this._binSize
+    binToReset.binBy = this._binBy
     binToReset.symbol = ''
     binToReset.open = 0
     binToReset.high = Number.MIN_SAFE_INTEGER
@@ -72,69 +103,9 @@ export abstract class TradeBinComputable implements Computable<TradeBin, 'trade'
     binToReset.localTimestamp = DATE_MIN
     binToReset.binTimestamp = DATE_MIN
   }
-}
-
-export class TimeTradeBinComputable extends TradeBinComputable {
-  private _timeIntervalMS: number
-
-  constructor(name: string, intervalMS: number) {
-    super(name)
-    this._timeIntervalMS = intervalMS
-  }
-
-  public hasNewSample(currentTimestamp: Date): boolean {
-    if (this.inProgressBin.trades === 0) {
-      return false
-    }
-
-    const currentTimestampTimeBucket = this._getTimeBucket(currentTimestamp)
-    const closeTimestampTimeBucket = this._getTimeBucket(this.inProgressBin.closeTimestamp)
-    if (currentTimestampTimeBucket > closeTimestampTimeBucket) {
-      // set bin timestamp to end of 'interval' rounded
-      this.inProgressBin.binTimestamp = new Date(currentTimestampTimeBucket * this._timeIntervalMS)
-
-      return true
-    }
-
-    return false
-  }
 
   private _getTimeBucket(timestamp: Date) {
-    return Math.floor(timestamp.valueOf() / this._timeIntervalMS)
-  }
-}
-
-export class TickTradeBinComputable extends TradeBinComputable {
-  private readonly _tickCountThreshold: number
-
-  constructor(name: string, tickCount: number) {
-    super(name)
-    this._tickCountThreshold = tickCount
-  }
-
-  public hasNewSample() {
-    if (this.inProgressBin.trades === 0) {
-      return false
-    }
-
-    return this.inProgressBin.trades >= this._tickCountThreshold
-  }
-}
-
-export class VolumeTradeBinComputable extends TradeBinComputable {
-  private readonly _volumeThreshold: number
-
-  constructor(name: string, volumeThreshold: number) {
-    super(name)
-    this._volumeThreshold = volumeThreshold
-  }
-
-  public hasNewSample() {
-    if (this.inProgressBin.trades === 0) {
-      return false
-    }
-
-    return this.inProgressBin.volume >= this._volumeThreshold
+    return Math.floor(timestamp.valueOf() / this._binSize)
   }
 }
 

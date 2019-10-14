@@ -1,21 +1,21 @@
-import { TardisClient, ReplayOptions } from '../dist'
+import { TardisClient, ReplayOptions, EXCHANGES, createMapper, DataType } from '../dist'
 
 const tardisClient = new TardisClient()
 
 describe('client', () => {
   test('invalid args validation', async () => {
-    await expect(tardisClient.replay({ exchange: 'binance', from: 'sdf', to: 'dsf' }).next()).rejects.toThrowError()
+    await expect(tardisClient.replay({ exchange: 'binance', from: 'sdf', to: 'dsf', filters: [] }).next()).rejects.toThrowError()
 
     await expect(
-      tardisClient.replay({ exchange: 'binances' as any, from: '2019-05-05 00:00', to: '2019-05-05 00:05' }).next()
+      tardisClient.replay({ exchange: 'binances' as any, from: '2019-05-05 00:00', to: '2019-05-05 00:05', filters: [] }).next()
     ).rejects.toThrowError()
 
     await expect(
-      tardisClient.replay({ exchange: 'binance', from: '2019-06-05 00:00', to: '2019-05-05 00:05' }).next()
+      tardisClient.replay({ exchange: 'binance', from: '2019-06-05 00:00', to: '2019-05-05 00:05', filters: [] }).next()
     ).rejects.toThrowError()
 
     await expect(
-      tardisClient.replay({ exchange: 'binance', from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z' }).next()
+      tardisClient.replay({ exchange: 'binance', from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z', filters: [] }).next()
     ).rejects.toThrowError()
 
     await expect(
@@ -24,39 +24,46 @@ describe('client', () => {
         .next()
     ).rejects.toThrowError()
 
-    await expect(tardisClient.replayRaw({ exchange: 'binance', from: 'sdf', to: 'dsf' }).next()).rejects.toThrowError()
-
     await expect(
-      tardisClient.replayRaw({ exchange: 'binances' as any, from: '2019-05-05 00:00', to: '2019-05-05 00:05' }).next()
-    ).rejects.toThrowError()
-
-    await expect(
-      tardisClient.replayRaw({ exchange: 'binance', from: '2019-06-05 00:00', to: '2019-05-05 00:05' }).next()
-    ).rejects.toThrowError()
-
-    await expect(
-      tardisClient.replayRaw({ exchange: 'binance', from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z' }).next()
+      tardisClient.replay({ exchange: 'binance', from: 'sdf', to: 'dsf', filters: [], skipDecoding: true }).next()
     ).rejects.toThrowError()
 
     await expect(
       tardisClient
-        .replayRaw({
+        .replay({ exchange: 'binances' as any, from: '2019-05-05 00:00', to: '2019-05-05 00:05', skipDecoding: true, filters: [] })
+        .next()
+    ).rejects.toThrowError()
+
+    await expect(
+      tardisClient.replay({ exchange: 'binance', from: '2019-06-05 00:00', to: '2019-05-05 00:05', skipDecoding: true, filters: [] }).next()
+    ).rejects.toThrowError()
+
+    await expect(
+      tardisClient
+        .replay({ exchange: 'binance', from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z', skipDecoding: true, filters: [] })
+        .next()
+    ).rejects.toThrowError()
+
+    await expect(
+      tardisClient
+        .replay({
           exchange: 'binance',
           from: '2019-04-05 00:00Z',
           to: '2019-05-05 00:05Z',
-          filters: [{ channel: 'trades' as any }]
+          filters: [{ channel: 'trades' as any }],
+          skipDecoding: true
         })
         .next()
     ).rejects.toThrowError()
   })
 
   test(
-    'replays Bitmex data feed (ETHUSD trades) for 1st of April 2019 and compares with raw sample',
+    'replays raw Bitmex data feed (ETHUSD trades) for 1st of April 2019 and compares with not decoded sample',
     async () => {
       const replayOptions: ReplayOptions<'bitmex'> = {
         exchange: 'bitmex',
         from: '2019-05-01 00:00',
-        to: '2019-05-01 10:05',
+        to: '2019-05-01 01:05',
         filters: [
           {
             channel: 'trade',
@@ -78,7 +85,7 @@ describe('client', () => {
       expect(receivedTimestamps).toMatchSnapshot('bitmex-received-timestamps')
 
       // perfrom the same test but get raw feed and decode here manually
-      const bitmexDataFeedRawMessages = tardisClient.replayRaw(replayOptions)
+      const bitmexDataFeedRawMessages = tardisClient.replay({ ...replayOptions, skipDecoding: true })
       const receivedMessagesOfRawFeed = []
       const receivedTimestampsOfRawFeed = []
 
@@ -94,12 +101,12 @@ describe('client', () => {
   )
 
   test(
-    'replays Coinbase data feed for 1st of Jun 2019 (ZEC-USDC trades)',
+    'replays raw Coinbase data feed for 1st of Jun 2019 (ZEC-USDC trades)',
     async () => {
       const coinbaseDataFeedMessages = tardisClient.replay({
         exchange: 'coinbase',
         from: '2019-06-01',
-        to: '2019-06-02',
+        to: '2019-06-01 02:00',
         filters: [
           {
             channel: 'match',
@@ -123,12 +130,12 @@ describe('client', () => {
   )
 
   test(
-    'replays Binance data feed for 1st of Jun 2019 (batpax trades)',
+    'replays raw Binance data feed for 1st of Jun 2019 (batpax trades)',
     async () => {
       const binanceDataFeedMessages = tardisClient.replay({
         exchange: 'binance',
         from: '2019-06-01',
-        to: '2019-06-02 00:00',
+        to: '2019-06-01 02:00',
         filters: [
           {
             channel: 'trade',
@@ -173,6 +180,42 @@ describe('client', () => {
 
     expect(receivedCount).toBe(0)
   })
+
+  test(
+    'replays normalized data for each supported exchange',
+    async () => {
+      for (const exchange of EXCHANGES) {
+        const exchangeDetails = await tardisClient.getExchangeDetails(exchange)
+        const from = new Date(exchangeDetails.availableSymbols[0].availableSince)
+        from.setUTCMonth(from.getUTCMonth() + 1)
+        from.setUTCDate(1)
+        const to = new Date(from)
+        to.setUTCDate(2)
+        const dataTypes: DataType[] = createMapper(exchange).supportedDataTypes as any
+
+        const messages = tardisClient.replayNormalized({
+          exchange,
+          from: from.toISOString(),
+          to: to.toISOString(),
+          dataTypes,
+          symbols: exchangeDetails.availableSymbols.slice(0, 2).map(s => s.id)
+        })
+
+        let count = 0
+        const bufferedMessages = []
+        for await (const message of messages) {
+          bufferedMessages.push(message)
+          count++
+          if (count >= 100) {
+            break
+          }
+        }
+
+        expect(bufferedMessages).toMatchSnapshot(exchange)
+      }
+    },
+    1000 * 60 * 10
+  )
 
   test.skip(
     'clears cache dir',

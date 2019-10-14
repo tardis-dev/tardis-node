@@ -63,9 +63,12 @@ export type DerivativeTicker = Readonly<{
 }>
 
 export type TradeBin = Readonly<{
-  type: string
+  type: 'trade_bin'
   symbol: string
   exchange: Exchange
+  name: string
+  binSize: number
+  binBy: 'time' | 'volume' | 'ticks'
   open: number
   high: number
   low: number
@@ -84,9 +87,13 @@ export type TradeBin = Readonly<{
 }>
 
 export type BookSnapshot = {
-  type: string
+  type: 'book_snapshot'
   symbol: string
   exchange: Exchange
+  name: string
+  depth: number
+  interval: number
+
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]
 

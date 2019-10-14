@@ -50,7 +50,7 @@ export class BitstampMapper extends MapperBase {
     const symbol = bitstampTradeResponse.channel.slice(bitstampTradeResponse.channel.lastIndexOf('_') + 1)
     yield {
       type: 'trade',
-      symbol: symbol,
+      symbol: symbol.toUpperCase(),
       exchange: this.exchange,
       id: String(bitstampTrade.id),
       price: Number(bitstampTrade.price),
@@ -65,7 +65,7 @@ export class BitstampMapper extends MapperBase {
     message: BitstampDiffOrderBookSnapshot | BitstampDiffOrderBook,
     localTimestamp: Date
   ): IterableIterator<BookChange> {
-    const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1)
+    const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
 
     if (this._symbolToDepthInfoMapping[symbol] === undefined) {
       this._symbolToDepthInfoMapping[symbol] = {

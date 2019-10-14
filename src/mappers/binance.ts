@@ -129,7 +129,9 @@ export class BinanceMapper extends MapperBase {
       if (binanceDepthUpdateData.U <= lastUpdateId + 1 && binanceDepthUpdateData.u >= lastUpdateId + 1) {
         depthContext.validatedFirstUpdate = true
       } else {
-        throw new Error(`Book depth snaphot has no overlap with first update, update ${JSON.stringify(binanceDepthUpdateData)}`)
+        throw new Error(
+          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(binanceDepthUpdateData)}, exchange ${this.exchange}`
+        )
       }
     }
 
