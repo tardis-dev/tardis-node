@@ -33,7 +33,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         const address = subscribeViaURL ? `${this.wssURL}${subscribeMessages}` : this.wssURL
         debug('estabilishing connection to %s', address)
 
-        const ws = new WebSocket(address)
+        const ws = new WebSocket(address, { perMessageDeflate: false })
 
         let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
