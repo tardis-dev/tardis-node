@@ -10,16 +10,15 @@ export const EXCHANGES = [
   'bitfinex',
   'bitfinex-derivatives',
   'okex',
-  'binance-jersey',
-  'binance-dex',
+  'bitflyer',
   'ftx',
   'gemini',
-  'bitflyer'
+  'binance-us',
+  'binance-jersey',
+  'binance-dex'
 ] as const
 
-export type Exchange = typeof EXCHANGES[number]
-
-const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'miniTicker', 'depthSnapshot'] as const
+const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'miniTicker', 'depthSnapshot', 'bookTicker'] as const
 
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'kline_1m', 'ticker', 'depthSnapshot'] as const
 
@@ -94,7 +93,8 @@ const OKEX_CHANNELS = [
   'futures/depth',
   'futures/price_range',
   'futures/mark_price',
-  'futures/estimated_price'
+  'futures/estimated_price',
+  'index/ticker'
 ] as const
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
@@ -119,6 +119,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   okex: OKEX_CHANNELS,
   binance: BINANCE_CHANNELS,
   'binance-jersey': BINANCE_CHANNELS,
+  'binance-us': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
@@ -126,11 +127,4 @@ export const EXCHANGE_CHANNELS_INFO = {
   bitflyer: BITFLYER_CHANNELS,
   'binance-futures': BINANCE_FUTURES_CHANNELS,
   'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS
-}
-
-export type FilterForExchange = { [key in Exchange]: Filter<typeof EXCHANGE_CHANNELS_INFO[key][number]> }
-
-export type Filter<T> = {
-  channel: T
-  symbols?: string[]
 }

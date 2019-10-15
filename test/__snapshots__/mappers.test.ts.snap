@@ -1,0 +1,1952 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 1`] = `
+Array [
+  Object {
+    "channel": "spot/trade",
+  },
+  Object {
+    "channel": "futures/trade",
+  },
+  Object {
+    "channel": "swap/trade",
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 2`] = `
+Array [
+  Object {
+    "channel": "spot/depth",
+  },
+  Object {
+    "channel": "futures/depth",
+  },
+  Object {
+    "channel": "swap/depth",
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 3`] = `
+Array [
+  Object {
+    "channel": "swap/depth",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "futures/depth",
+    "symbols": Array [
+      "TRX-USD-190927",
+    ],
+  },
+  Object {
+    "channel": "spot/depth",
+    "symbols": Array [
+      "XRP-OKB",
+    ],
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 4`] = `
+Array [
+  Object {
+    "channel": "swap/depth",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+      "ETH-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "spot/depth",
+    "symbols": Array [
+      "XRP-OKB",
+    ],
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 5`] = `
+Array [
+  Object {
+    "channel": "spot/ticker",
+  },
+  Object {
+    "channel": "futures/ticker",
+  },
+  Object {
+    "channel": "swap/ticker",
+  },
+  Object {
+    "channel": "futures/mark_price",
+  },
+  Object {
+    "channel": "swap/mark_price",
+  },
+  Object {
+    "channel": "swap/funding_rate",
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 6`] = `
+Array [
+  Object {
+    "channel": "swap/ticker",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "swap/mark_price",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "swap/funding_rate",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "futures/ticker",
+    "symbols": Array [
+      "TRX-USD-190927",
+    ],
+  },
+  Object {
+    "channel": "futures/mark_price",
+    "symbols": Array [
+      "TRX-USD-190927",
+    ],
+  },
+  Object {
+    "channel": "spot/ticker",
+    "symbols": Array [
+      "XRP-OKB",
+    ],
+  },
+]
+`;
+
+exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 7`] = `
+Array [
+  Object {
+    "channel": "swap/ticker",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+      "ETH-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "swap/mark_price",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+      "ETH-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "swap/funding_rate",
+    "symbols": Array [
+      "LTC-USD-SWAP",
+      "ETH-USD-SWAP",
+    ],
+  },
+  Object {
+    "channel": "futures/ticker",
+    "symbols": Array [
+      "TRX-USD-190927",
+    ],
+  },
+  Object {
+    "channel": "futures/mark_price",
+    "symbols": Array [
+      "TRX-USD-190927",
+    ],
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 29900,
+        "price": 0.00005325,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 7000,
+        "price": 0.00003212,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BLINK-9C6_BNB",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.00005253,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.000004,
+      },
+      Object {
+        "amount": 350000,
+        "price": 5e-8,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BLINK-9C6_BNB",
+    "timestamp": 1970-01-19T01:52:19.201Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 3`] = `
+Array [
+  Object {
+    "amount": 2070,
+    "exchange": "binance-dex",
+    "id": "16927042-0",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.00042701,
+    "side": "buy",
+    "symbol": "PHB-2DF_BNB",
+    "timestamp": 2019-07-01T00:00:22.635Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 2930,
+    "exchange": "binance-dex",
+    "id": "16927042-1",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.00042701,
+    "side": "buy",
+    "symbol": "PHB-2DF_BNB",
+    "timestamp": 2019-07-01T00:00:22.635Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance dex messages 4`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 1`] = `
+Array [
+  Object {
+    "amount": 0.236,
+    "exchange": "binance-futures",
+    "id": "181349",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 10223.74,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-17T04:05:03.463Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 2`] = `
+Array [
+  Object {
+    "exchange": "binance-futures",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-17T04:05:03.467Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 3`] = `
+Array [
+  Object {
+    "exchange": "binance-futures",
+    "fundingRate": 0.0001,
+    "indexPrice": undefined,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 8291.34697815,
+    "openInterest": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:03.001Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance futures messages 4`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 1`] = `
+Array [
+  Object {
+    "amount": 33.82,
+    "exchange": "binance",
+    "id": "40756030",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.0042699,
+    "side": "buy",
+    "symbol": "BNBBTC",
+    "timestamp": 2019-04-01T00:00:00.940Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 2`] = `
+Array [
+  Object {
+    "amount": 6.48,
+    "exchange": "binance",
+    "id": "60276726",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.0021965,
+    "side": "sell",
+    "symbol": "BNBBTC",
+    "timestamp": 2019-09-01T00:00:01.034Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 3`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 4`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.31652,
+        "price": 4095.99,
+      },
+      Object {
+        "amount": 1.425419,
+        "price": 4096,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.009765,
+        "price": 4091.92,
+      },
+      Object {
+        "amount": 0.763931,
+        "price": 4089.09,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 4111.84,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 4084.88,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDC",
+    "timestamp": 2019-04-01T00:00:01.699Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 7`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 8`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3945,
+        "price": 0.00002253,
+      },
+      Object {
+        "amount": 50641,
+        "price": 0.00002256,
+      },
+      Object {
+        "amount": 1777,
+        "price": 0.00002258,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 114,
+        "price": 0.00002248,
+      },
+      Object {
+        "amount": 370,
+        "price": 0.00002246,
+      },
+      Object {
+        "amount": 2673,
+        "price": 0.00002245,
+      },
+      Object {
+        "amount": 390,
+        "price": 0.00002244,
+      },
+      Object {
+        "amount": 3425,
+        "price": 0.00002243,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3945,
+        "price": 0.00002253,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 114,
+        "price": 0.00002248,
+      },
+      Object {
+        "amount": 370,
+        "price": 0.00002246,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-04-01T00:00:08.698Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps binance messages 10`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.00002257,
+      },
+      Object {
+        "amount": 6080,
+        "price": 0.00002262,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "GNTBTC",
+    "timestamp": 2019-04-01T00:00:09.699Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 2`] = `
+Array [
+  Object {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": undefined,
+    "indexPrice": 173.57,
+    "lastPrice": 173.535,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-09-29T00:00:01.369Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 4`] = `
+Array [
+  Object {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": 0.00196337,
+    "indexPrice": 8051.45,
+    "lastPrice": 8090.5,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-09-30T00:00:52.225Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 5`] = `
+Array [
+  Object {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": 0,
+    "indexPrice": 8197.3,
+    "lastPrice": 8192.7,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "markPrice": 8196.973333333333,
+    "openInterest": undefined,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-08T00:00:32.311Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 6`] = `
+Array [
+  Object {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": 0,
+    "indexPrice": 8208.45,
+    "lastPrice": 8210.5,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "markPrice": 8208.893333333333,
+    "openInterest": undefined,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-08T00:14:59.520Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 7`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 2`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 4`] = `
+Array [
+  Object {
+    "amount": 0.00705845,
+    "exchange": "bitfinex",
+    "id": "382489563",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "price": 10087.98969503,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-08-01T00:00:00.709Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 5`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 6`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 13.33333333,
+        "price": 218.75,
+      },
+      Object {
+        "amount": 2,
+        "price": 218.76,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 31.52,
+        "price": 216,
+      },
+    ],
+    "exchange": "bitfinex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:00.541Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 18.10913638,
+        "price": 219.11,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:01.214Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 218.99,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:01.769Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 10`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 218.03,
+      },
+    ],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-08-01T00:00:02.483Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 11`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.14,
+        "price": 0.02919,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.022,
+        "price": 0.0146,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCH_BTC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 1046603,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.05,
+        "price": 1043400,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "FX_BTC_JPY",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 3`] = `
+Array [
+  Object {
+    "amount": 0.01,
+    "exchange": "bitflyer",
+    "id": "1246449270",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 1046399,
+    "side": "buy",
+    "symbol": "FX_BTC_JPY",
+    "timestamp": 2019-09-01T00:00:11.225Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.002,
+    "exchange": "bitflyer",
+    "id": "1246449271",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 1046400,
+    "side": "buy",
+    "symbol": "FX_BTC_JPY",
+    "timestamp": 2019-09-01T00:00:11.225Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 1`] = `
+Array [
+  Object {
+    "amount": 1000,
+    "exchange": "bitmex",
+    "id": "f73b6f28-075a-3548-a81c-8c843afd2746",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 8544.5,
+    "side": "sell",
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:19.163Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 2`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 4`] = `
+Array [
+  Object {
+    "exchange": "bitmex",
+    "fundingRate": undefined,
+    "indexPrice": 0.03131,
+    "lastPrice": 0.03161,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.03162,
+    "openInterest": 150499,
+    "symbol": "ETHM19",
+    "timestamp": 2019-05-31T23:59:30.000Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "exchange": "bitmex",
+    "fundingRate": undefined,
+    "indexPrice": 0.013382,
+    "lastPrice": 0.01354,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.013533,
+    "openInterest": 204654,
+    "symbol": "LTCM19",
+    "timestamp": 2019-05-31T23:59:55.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 5`] = `
+Array [
+  Object {
+    "exchange": "bitmex",
+    "fundingRate": undefined,
+    "indexPrice": 0.03131,
+    "lastPrice": 267.75,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.03162,
+    "openInterest": 150499,
+    "symbol": "ETHM19",
+    "timestamp": 2019-05-31T23:59:58.022Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 6`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 501,
+        "price": 88846.5,
+      },
+      Object {
+        "amount": 40,
+        "price": 9780.5,
+      },
+      Object {
+        "amount": 61227,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 417,
+        "price": 0.0010102,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "EOSM19",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 91227,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 8586,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitmex messages 10`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 416,
+        "price": 0.0010102,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "EOSM19",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 2`] = `
+Array [
+  Object {
+    "amount": 0.001643,
+    "exchange": "bitstamp",
+    "id": "84550458",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 3651.3,
+    "side": "buy",
+    "symbol": "BTCEUR",
+    "timestamp": 2019-04-01T00:00:03.243Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 3`] = `Array []`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2,
+        "price": 168.75,
+      },
+      Object {
+        "amount": 0.49428809,
+        "price": 168.76,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.04249473,
+        "price": 51046.31,
+      },
+      Object {
+        "amount": 0.00040718,
+        "price": 60000,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCHUSD",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2,
+        "price": 168.75,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCHUSD",
+    "timestamp": 2019-04-01T00:00:00.436Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 180,
+        "price": 169.28,
+      },
+      Object {
+        "amount": 360,
+        "price": 170.16,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCHUSD",
+    "timestamp": 2019-04-01T00:00:01.338Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 6`] = `
+Array [
+  Object {
+    "amount": 0.02834,
+    "exchange": "bitstamp",
+    "id": "98000129",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 8304.47,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:00.557Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps coinbase messages 1`] = `
+Array [
+  Object {
+    "amount": 0.97133855,
+    "exchange": "coinbase",
+    "id": "216544",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 4.978,
+    "side": "sell",
+    "symbol": "ETC-GBP",
+    "timestamp": 2019-08-01T00:00:03.816Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps coinbase messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.432,
+        "price": 9202.54,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-EUR",
+    "timestamp": 2019-08-01T00:00:03.818Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps coinbase messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 20.79816319,
+        "price": 218.21,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ETH-USD",
+    "timestamp": 2019-08-01T00:00:03.869Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps coinbase messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 12,
+        "price": 0.257175,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 5299,
+        "price": 0.247175,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BAT-USDC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 60.58,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "FI_LTCUSD_190426",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 2`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": undefined,
+    "indexPrice": 60.31,
+    "lastPrice": 60.69,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 60.61,
+    "openInterest": 1692330,
+    "symbol": "FI_LTCUSD_190628",
+    "timestamp": 2019-04-01T00:00:00.684Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 3`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": 0.000001739491032443,
+    "indexPrice": 60.31,
+    "lastPrice": 60.35,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 60.38,
+    "openInterest": 631360,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-04-01T00:00:00.695Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 4`] = `
+Array [
+  Object {
+    "amount": 3,
+    "exchange": "cryptofacilities",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 4088.5,
+    "side": "buy",
+    "symbol": "FI_XBTUSD_190426",
+    "timestamp": 2019-04-01T00:00:02.518Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 5`] = `
+Array [
+  Object {
+    "amount": 166,
+    "exchange": "cryptofacilities",
+    "id": "06842286-3a57-412c-8cb5-b61db36903d3",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9680,
+    "side": "sell",
+    "symbol": "FI_XBTUSD_190927",
+    "timestamp": 2019-09-01T00:00:42.739Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 6`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": -8.92730506785e-7,
+    "indexPrice": 64.33,
+    "lastPrice": 64.34,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 64.295,
+    "openInterest": 2074134,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-09-01T00:00:52.217Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1,
+        "price": 64.28,
+      },
+      Object {
+        "amount": 9216,
+        "price": 64.31,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2978,
+        "price": 64.27,
+      },
+      Object {
+        "amount": 5000,
+        "price": 64.26,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-09-01T00:00:00.518Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 14912,
+        "price": 64.41,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-09-01T00:00:42.122Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 9`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 64.24,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-09-01T00:00:42.131Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 1`] = `
+Array [
+  Object {
+    "amount": 2000,
+    "exchange": "deribit",
+    "id": "39355898",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 50,
+    "exchange": "deribit",
+    "id": "39355899",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 9598.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-09-01T00:00:22.565Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 2`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 179803,
+        "price": 218.6,
+      },
+      Object {
+        "amount": 7887,
+        "price": 218.65,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1895,
+        "price": 217.8,
+      },
+      Object {
+        "amount": 712,
+        "price": 217.75,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETH-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:00.273Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 64903,
+        "price": 219.2,
+      },
+      Object {
+        "amount": 19343,
+        "price": 219.1,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 217.8,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETH-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:54.272Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 5`] = `
+Array [
+  Object {
+    "exchange": "deribit",
+    "fundingRate": 0.00016281,
+    "indexPrice": 10091.15,
+    "lastPrice": 10095.5,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 10094.1,
+    "openInterest": 66128281,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:04.229Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps deribit messages 6`] = `
+Array [
+  Object {
+    "exchange": "deribit",
+    "fundingRate": -0.00008477,
+    "indexPrice": 8305.94,
+    "lastPrice": 8304.5,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 8304.39,
+    "openInterest": 84844461,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-10-01T00:00:03.897Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps ftx messages 1`] = `undefined`;
+
+exports[`Mapper.map(message, localTimestamp) maps ftx messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 20.1695,
+        "price": 9807.75,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 15.5629,
+        "price": 9805,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-1227",
+    "timestamp": 2019-09-01T00:00:01.328Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps ftx messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 21.0125,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BNB-PERP",
+    "timestamp": 2019-09-01T00:00:05.667Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps ftx messages 4`] = `
+Array [
+  Object {
+    "amount": 0.03,
+    "exchange": "ftx",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 64.33,
+    "side": "sell",
+    "symbol": "LTC-PERP",
+    "timestamp": 2019-09-01T00:00:12.659Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps ftx messages 5`] = `
+Array [
+  Object {
+    "amount": 0.13,
+    "exchange": "ftx",
+    "id": "1139499",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 181.86,
+    "side": "sell",
+    "symbol": "ETH-PERP",
+    "timestamp": 2019-10-01T00:00:21.260Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps gemini messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.078285,
+        "price": 15,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 51.55728,
+        "price": 0.688,
+      },
+      Object {
+        "amount": 1.168083,
+        "price": 0.686,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ZECLTC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps gemini messages 2`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "gemini",
+    "id": "8280715334",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 8325,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:20.080Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps gemini messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 88.236,
+        "price": 0.02189,
+      },
+      Object {
+        "amount": 4,
+        "price": 0.02184,
+      },
+      Object {
+        "amount": 0,
+        "price": 0.02185,
+      },
+      Object {
+        "amount": 149.57,
+        "price": 0.02188,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ETHBTC",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 1`] = `
+Array [
+  Object {
+    "amount": 2.51146536,
+    "exchange": "kraken",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.011365,
+    "side": "sell",
+    "symbol": "LTC/XBT",
+    "timestamp": 2019-07-01T00:00:01.587Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 2`] = `
+Array [
+  Object {
+    "amount": 0.01596347,
+    "exchange": "kraken",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9482.4,
+    "side": "sell",
+    "symbol": "XBT/EUR",
+    "timestamp": 2019-07-01T00:00:58.512Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.28522465,
+    "exchange": "kraken",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9488.2,
+    "side": "buy",
+    "symbol": "XBT/EUR",
+    "timestamp": 2019-07-01T00:00:58.557Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 35.02658459,
+        "price": 87.6,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "XMR/USD",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 27.71904764,
+        "price": 413.9,
+      },
+      Object {
+        "amount": 0,
+        "price": 403.5,
+      },
+      Object {
+        "amount": 0,
+        "price": 400.3,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 3.38983321,
+        "price": 400,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCH/USD",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 5`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 33.955,
+        "price": 352,
+      },
+      Object {
+        "amount": 5.895279,
+        "price": 351.5,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BCH/EUR",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps kraken messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3,
+        "price": 0.102987,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2,
+        "price": 0.10281,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "book-1000",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 1`] = `
+Array [
+  Object {
+    "amount": 4,
+    "exchange": "okex",
+    "id": "2578238628528131",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 4061.94,
+    "side": "sell",
+    "symbol": "BTC-USD-190628",
+    "timestamp": 2019-03-31T23:59:59.388Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 2`] = `
+Array [
+  Object {
+    "amount": 5,
+    "exchange": "okex",
+    "id": "3269040623943685",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 10209.43,
+    "side": "buy",
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:01.320Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 3`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "exchange": "okex",
+    "id": "423886239",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.806Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 264,
+        "price": 0.3198,
+      },
+      Object {
+        "amount": 222,
+        "price": 0.3199,
+      },
+      Object {
+        "amount": 2014,
+        "price": 0.3219,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1646,
+        "price": 0.3196,
+      },
+      Object {
+        "amount": 1672,
+        "price": 0.3195,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "XRP-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 38,
+        "price": 4084.57,
+      },
+      Object {
+        "amount": 20,
+        "price": 4085,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4,
+        "price": 4084.56,
+      },
+      Object {
+        "amount": 29,
+        "price": 4084.5,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 6`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.0001659,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "TRX-ETH",
+    "timestamp": 2019-04-01T00:00:27.106Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 7`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 329.3,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BCH-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:02.483Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 8`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": 0.00023534,
+    "indexPrice": undefined,
+    "lastPrice": 329.3,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BCH-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:02.997Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 9`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": 0.00023534,
+    "indexPrice": undefined,
+    "lastPrice": 329.3,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": 329.3,
+    "openInterest": undefined,
+    "symbol": "BCH-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:20.773Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 10`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": 10218.61,
+    "openInterest": undefined,
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:20.869Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`Mapper.map(message, localTimestamp) maps okex messages 11`] = `
+Array [
+  Object {
+    "exchange": "okex",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.02249,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 24419,
+    "symbol": "TRX-USD-190802",
+    "timestamp": 2019-08-01T00:02:00.429Z,
+    "type": "derivative_ticker",
+  },
+]
+`;

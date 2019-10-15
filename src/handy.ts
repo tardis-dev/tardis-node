@@ -2,7 +2,7 @@ import { createHash } from 'crypto'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
-  if (val.endsWith('Z') == false) {
+  if (val.endsWith('Z') === false) {
     val += 'Z'
   }
   var date = new Date(val)
@@ -54,5 +54,19 @@ export const ONE_SEC_IN_MS = 1000
 export class HttpError extends Error {
   constructor(public readonly status: number, public readonly responseText: string, public readonly url: string) {
     super(`HttpError: status code ${status}`)
+  }
+}
+
+export function* take(iterable: Iterable<any>, length: number) {
+  if (length === 0) {
+    return
+  }
+  for (const item of iterable) {
+    yield item
+    length--
+
+    if (length === 0) {
+      return
+    }
   }
 }

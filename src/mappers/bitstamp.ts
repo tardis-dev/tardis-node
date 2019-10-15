@@ -1,0 +1,187 @@
+import { DataType, Trade, BookChange, FilterForExchange, Filter } from '../types'
+import { MapperBase } from './mapper'
+
+// https://www.bitstamp.net/websocket/v2/
+
+export class BitstampMapper extends MapperBase {
+  public supportedDataTypes: DataType[] = ['trade', 'book_change']
+
+  private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+
+  private readonly _dataTypeChannelsMapping: { [key in DataType]?: FilterForExchange['bitstamp']['channel'] } = {
+    book_change: 'diff_order_book',
+    trade: 'live_trades'
+  }
+
+  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[] {
+    const channel = this._dataTypeChannelsMapping[dataType]!
+    if (symbols !== undefined) {
+      symbols = symbols.map(s => s.toLocaleLowerCase())
+    }
+    return [
+      {
+        channel,
+        symbols
+      }
+    ]
+  }
+
+  protected detectDataType(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot): DataType | undefined {
+    if (message.data === undefined) {
+      return
+    }
+
+    if (message.channel.startsWith(this._dataTypeChannelsMapping.trade!) && message.event === 'trade') {
+      return 'trade'
+    }
+
+    if (
+      (message.channel.startsWith(this._dataTypeChannelsMapping.book_change!) && message.event === 'data') ||
+      message.event === 'snapshot'
+    ) {
+      return 'book_change'
+    }
+
+    return
+  }
+
+  protected *mapTrades(bitstampTradeResponse: BitstampTrade, localTimestamp: Date): IterableIterator<Trade> {
+    const bitstampTrade = bitstampTradeResponse.data
+    const symbol = bitstampTradeResponse.channel.slice(bitstampTradeResponse.channel.lastIndexOf('_') + 1)
+    yield {
+      type: 'trade',
+      symbol: symbol.toUpperCase(),
+      exchange: this.exchange,
+      id: String(bitstampTrade.id),
+      price: Number(bitstampTrade.price),
+      amount: Number(bitstampTrade.amount),
+      side: bitstampTrade.type === 0 ? 'buy' : 'sell',
+      timestamp: new Date(Number(bitstampTrade.microtimestamp) / 1000),
+      localTimestamp: localTimestamp
+    }
+  }
+
+  protected *mapOrderBookChanges(
+    message: BitstampDiffOrderBookSnapshot | BitstampDiffOrderBook,
+    localTimestamp: Date
+  ): IterableIterator<BookChange> {
+    const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
+
+    if (this._symbolToDepthInfoMapping[symbol] === undefined) {
+      this._symbolToDepthInfoMapping[symbol] = {
+        bufferedUpdates: []
+      }
+    }
+
+    const symbolDepthInfo = this._symbolToDepthInfoMapping[symbol]
+    const snapshotAlreadyProcessed = symbolDepthInfo.snapshotProcessed
+
+    // first check if received message is snapshot and process it as such if it is
+    if (message.event === 'snapshot') {
+      // produce snapshot book_change
+      yield {
+        type: 'book_change',
+        symbol,
+        exchange: this.exchange,
+        isSnapshot: true,
+        bids: message.data.bids.map(this._mapBookLevel),
+        asks: message.data.asks.map(this._mapBookLevel),
+        timestamp: localTimestamp,
+        localTimestamp
+      }
+
+      //  mark given symbol depth info that has snapshot processed
+      symbolDepthInfo.lastUpdateTimestamp = Number(message.data.timestamp)
+      symbolDepthInfo.snapshotProcessed = true
+
+      // if there were any depth updates buffered, let's proccess those
+      for (const update of symbolDepthInfo.bufferedUpdates) {
+        const bookChange = this._mapBookDepthUpdate(update, localTimestamp, symbolDepthInfo, symbol)
+        if (bookChange !== undefined) {
+          yield bookChange
+        }
+      }
+      // remove all buffered updates
+      symbolDepthInfo.bufferedUpdates = []
+    } else if (snapshotAlreadyProcessed) {
+      // snapshot was already processed let's map the message as normal book_change
+      const bookChange = this._mapBookDepthUpdate(message, localTimestamp, symbolDepthInfo, symbol)
+      if (bookChange !== undefined) {
+        yield bookChange
+      }
+    } else {
+      // if snapshot hasn't been yet processed and we've got depthUpdate message, let's buffer it for later processing
+      symbolDepthInfo.bufferedUpdates.push(message)
+    }
+  }
+
+  private _mapBookDepthUpdate(
+    bitstampBookUpdate: BitstampDiffOrderBook,
+    localTimestamp: Date,
+    depthInfo: LocalDepthInfo,
+    symbol: string
+  ): BookChange | undefined {
+    // skip all book updates that preceed book snapshot
+    if (Number(bitstampBookUpdate.data.timestamp) < depthInfo.lastUpdateTimestamp!) {
+      return
+    }
+
+    return {
+      type: 'book_change',
+      symbol,
+      exchange: this.exchange,
+      isSnapshot: false,
+
+      bids: bitstampBookUpdate.data.bids.map(this._mapBookLevel),
+      asks: bitstampBookUpdate.data.asks.map(this._mapBookLevel),
+      timestamp: new Date(Number(bitstampBookUpdate.data.microtimestamp) / 1000),
+      localTimestamp: localTimestamp
+    }
+  }
+
+  private _mapBookLevel(level: BitstampBookLevel) {
+    const price = Number(level[0])
+    const amount = Number(level[1])
+    return { price, amount }
+  }
+}
+
+type BitstampTrade = {
+  event: 'trade'
+  channel: string
+  data: {
+    microtimestamp: string
+    amount: number
+    price: number
+    type: number
+    id: number
+  }
+}
+type BitstampBookLevel = [string, string]
+
+type BitstampDiffOrderBook = {
+  data: {
+    microtimestamp: string
+    timestamp: string
+    bids: BitstampBookLevel[]
+    asks: BitstampBookLevel[]
+  }
+  event: 'data'
+  channel: string
+}
+
+type BitstampDiffOrderBookSnapshot = {
+  event: 'snapshot'
+  channel: string
+  data: {
+    timestamp: string
+    bids: BitstampBookLevel[]
+    asks: BitstampBookLevel[]
+  }
+}
+
+type LocalDepthInfo = {
+  bufferedUpdates: BitstampDiffOrderBook[]
+  snapshotProcessed?: boolean
+  lastUpdateTimestamp?: number
+}

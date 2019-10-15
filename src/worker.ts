@@ -5,7 +5,7 @@ import { parentPort, isMainThread, workerData } from 'worker_threads'
 import dbg from 'debug'
 import pMap from 'p-map'
 import { existsSync, ensureDirSync, createWriteStream, rename } from 'fs-extra'
-import { Exchange, Filter } from './consts'
+import { Exchange, Filter } from './types'
 import { wait, sha256, formatDateToPath, addMinutes, ONE_SEC_IN_MS, HttpError, sequence } from './handy'
 
 const httpsAgent = new https.Agent({
@@ -13,7 +13,7 @@ const httpsAgent = new https.Agent({
   keepAliveMsecs: 10 * ONE_SEC_IN_MS
 })
 
-const debug = dbg('tardis-client')
+const debug = dbg('tardis')
 
 if (isMainThread) {
   debug('existing, worker is not meant to run in main thread')
@@ -32,7 +32,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   // deduplicate filters (if the channel was provided multiple times)
   const filters = payload.filters.reduce(
     (prev, current) => {
-      const matchingExisting = prev.find(c => c.channel == current.channel)
+      const matchingExisting = prev.find(c => c.channel === current.channel)
 
       if (matchingExisting) {
         // both previous and current have symbols let's merge them
@@ -118,7 +118,7 @@ async function reliablyFetchAndCacheSlice(
 ) {
   let url = `${endpoint}/v1/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}`
 
-  if (filters) {
+  if (filters.length > 0) {
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
   }
 
@@ -143,7 +143,7 @@ async function reliablyFetchAndCacheSlice(
       const badOrUnauthorizedRequest = error instanceof HttpError && (error.status === 400 || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       // do not retry when we've got bad or unauthorized request or enough attempts
-      if (badOrUnauthorizedRequest || attempts == MAX_ATTEMPTS) {
+      if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
@@ -176,7 +176,7 @@ async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCac
       const req = https
         .get(url, options, res => {
           const { statusCode } = res
-          if (statusCode != 200) {
+          if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
             res.setEncoding('utf8')
             let body = ''

@@ -1,0 +1,205 @@
+import { Tardis, compute, Trade, Message } from '../dist'
+const tardis = new Tardis()
+
+describe('compute(messages, types)', () => {
+  test('should compute requested types based on replayNormalized iterables', async () => {
+    const bitmexMessages = tardis.replayNormalized({
+      exchange: 'bitmex',
+      from: '2019-04-01',
+      to: '2019-04-01 00:01',
+      dataTypes: ['trade', 'book_change'],
+      symbols: ['XBTUSD'],
+      withDisconnectMessages: true
+    })
+
+    const bufferedMessages = []
+
+    const withComputedTypes = compute(
+      bitmexMessages,
+      { type: 'book_snapshot', depth: 10, interval: 1000 },
+      { type: 'trade_bin', binBy: 'time', binSize: 1000 },
+      { type: 'trade_bin', binBy: 'ticks', binSize: 100 }
+    )
+
+    for await (const message of withComputedTypes) {
+      bufferedMessages.push(message)
+    }
+
+    expect(bufferedMessages).toMatchSnapshot()
+  })
+
+  test('should compute correct trade binds based on provided messages', async () => {
+    let tradesMessages = async function*(): AsyncIterableIterator<Trade> {
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 200,
+        symbol: 'XBTUSD',
+        id: 'asd',
+        price: 1000,
+        side: 'buy',
+        timestamp: new Date('2019-08-01T00:00:00.132Z'),
+        localTimestamp: new Date('2019-08-01T00:00:00.132Z')
+      }
+
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 2000,
+        symbol: 'XBTUSD',
+        id: 'sadasd',
+        price: 1000,
+        side: 'buy',
+        timestamp: new Date('2019-08-01T00:01:00.000Z'),
+        localTimestamp: new Date('2019-08-01T00:01:00.132Z')
+      }
+
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 200,
+        symbol: 'XBTUSD',
+        id: 'asdssd',
+        price: 1005,
+        side: 'sell',
+        timestamp: new Date('2019-08-01T00:01:01.000Z'),
+        localTimestamp: new Date('2019-08-01T00:01:01.132Z')
+      }
+
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 2000,
+        symbol: 'XBTUSD',
+        id: 'asddfssd',
+        price: 1015,
+        side: 'buy',
+        timestamp: new Date('2019-08-01T00:01:02.000Z'),
+        localTimestamp: new Date('2019-08-01T00:01:02.132Z')
+      }
+
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 200,
+        symbol: 'XBTUSD',
+        id: 'sdfc',
+        price: 1013,
+        side: 'buy',
+        timestamp: new Date('2019-08-01T00:04:00.120Z'),
+        localTimestamp: new Date('2019-08-01T00:04:01.132Z')
+      }
+
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 2000,
+        symbol: 'XBTUSD',
+        id: 'sdfsdfc',
+        price: 1010,
+        side: 'sell',
+        timestamp: new Date('2019-08-01T00:06:00.100Z'),
+        localTimestamp: new Date('2019-08-01T00:06:01.132Z')
+      }
+    }
+
+    const withComputedTypes = compute(
+      tradesMessages(),
+      { type: 'trade_bin', binBy: 'time', binSize: 60 * 1000, name: 'trade_bin_1_minute' },
+      { type: 'trade_bin', binBy: 'ticks', binSize: 2, name: 'trade_bin_2ticks' },
+      { type: 'trade_bin', binBy: 'volume', binSize: 2000, name: 'trade_bin_2kvol' }
+    )
+    const bufferedMessages = []
+
+    for await (const message of withComputedTypes) {
+      bufferedMessages.push(message)
+    }
+
+    expect(bufferedMessages).toMatchSnapshot()
+  })
+
+  test('should produce correct book snapshots based on provided messages', async () => {
+    let messages = async function*(): AsyncIterableIterator<Message> {
+      yield {
+        type: 'trade',
+        exchange: 'bitmex',
+        amount: 200,
+        symbol: 'XBTUSD',
+        id: 'asd',
+        price: 1000,
+        side: 'buy',
+        timestamp: new Date('2019-08-01T00:00:00.132Z'),
+        localTimestamp: new Date('2019-08-01T00:00:00.132Z')
+      }
+
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: true,
+        asks: [{ price: 200, amount: 20 }, { price: 120, amount: 1 }],
+        bids: [{ price: 119, amount: 20 }],
+        localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
+        timestamp: new Date('2019-08-01T00:00:00.132Z'),
+        symbol: 'XBTUSD'
+      }
+
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: false,
+        asks: [{ price: 120, amount: 10 }],
+        bids: [],
+        localTimestamp: new Date('2019-08-01T00:00:10.132Z'),
+        timestamp: new Date('2019-08-01T00:00:10.132Z'),
+        symbol: 'XBTUSD'
+      }
+
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: false,
+        asks: [{ price: 201, amount: 10 }],
+        bids: [],
+        localTimestamp: new Date('2019-08-01T00:00:12.132Z'),
+        timestamp: new Date('2019-08-01T00:00:12.132Z'),
+        symbol: 'XBTUSD'
+      }
+
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: false,
+        asks: [{ price: 200, amount: 220 }],
+        bids: [],
+        localTimestamp: new Date('2019-08-01T00:00:12.132Z'),
+        timestamp: new Date('2019-08-01T00:00:12.132Z'),
+        symbol: 'XBTUSD'
+      }
+
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: false,
+        asks: [],
+        bids: [{ price: 120, amount: 20 }],
+        localTimestamp: new Date('2019-08-01T00:00:13.132Z'),
+        timestamp: new Date('2019-08-01T00:00:13.132Z'),
+        symbol: 'XBTUSD'
+      }
+    }
+
+    const withComputedTypes = compute(
+      messages(),
+      { type: 'book_snapshot', depth: 2, interval: 1000 },
+      { type: 'book_snapshot', depth: 1, interval: 0, name: 'quotes' }
+    )
+
+    const bufferedMessages = []
+
+    for await (const message of withComputedTypes) {
+      bufferedMessages.push(message)
+    }
+
+    expect(bufferedMessages).toMatchSnapshot()
+  })
+})
