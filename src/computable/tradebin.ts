@@ -57,6 +57,7 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
 
     if (isNotOpenedYet) {
       inProgressBin.symbol = trade.symbol
+      inProgressBin.exchange = trade.exchange
       inProgressBin.open = trade.price
       inProgressBin.openTimestamp = trade.timestamp
     }
@@ -83,10 +84,11 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
   private _reset() {
     const binToReset = this.inProgressBin
     binToReset.type = 'trade_bin'
+    binToReset.symbol = ''
     binToReset.name = this._name
     binToReset.binSize = this._binSize
     binToReset.binBy = this._binBy
-    binToReset.symbol = ''
+
     binToReset.open = 0
     binToReset.high = Number.MIN_SAFE_INTEGER
     binToReset.low = Number.MAX_SAFE_INTEGER
