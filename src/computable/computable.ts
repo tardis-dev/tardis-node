@@ -1,4 +1,4 @@
-import { DataType, MessageForDataType, Message, TradeBin, BookSnapshot } from '../types'
+import { DataType, MessageForDataType, Message, TradeBin, BookSnapshot, Disconnect, Exchange } from '../types'
 import { TradeBinComputable } from './tradebin'
 import { BookSnapshotComputable } from './booksnapshot'
 
@@ -16,14 +16,21 @@ type ComputableType =
       interval: number
     }
 
-export async function* compute(messages: AsyncIterableIterator<Message>, ...types: ComputableType[]) {
+export async function* compute(messages: AsyncIterableIterator<Message | Disconnect>, ...types: ComputableType[]) {
   const factory = new Computables(types)
 
   for await (const message of messages) {
     // always pass through source message
     yield message
 
-    const computables = factory.getOrCreate(message.symbol)
+    if (message.type === 'disconnect') {
+      // reset all computables for given exchange if we've received disconnect for it
+      factory.reset(message.exchange)
+      continue
+    }
+
+    const computables = factory.getOrCreate(message.exchange, message.symbol)
+
     for (const computable of computables) {
       // any time new message arrives check if given computable has
       // new sample for such message timestamp, eg: time based trade bars
@@ -54,8 +61,10 @@ export type Computable<T, U extends DataType> = {
 }
 
 class Computables {
-  private _computablesForSymbol: {
-    [key: string]: Computable<TradeBin | BookSnapshot, any>[]
+  private _computables: {
+    [ex in Exchange]?: {
+      [key: string]: Computable<TradeBin | BookSnapshot, any>[]
+    }
   } = {}
 
   _computablesFactories: (() => Computable<TradeBin | BookSnapshot, any>)[]
@@ -86,10 +95,19 @@ class Computables {
     throw new Error(`Unknown computable type ${type}`)
   }
 
-  getOrCreate(symbol: string) {
-    if (this._computablesForSymbol[symbol] === undefined) {
-      this._computablesForSymbol[symbol] = this._computablesFactories.map(c => c())
+  getOrCreate(exchange: Exchange, symbol: string) {
+    if (this._computables[exchange] === undefined) {
+      this._computables[exchange] = {}
     }
-    return this._computablesForSymbol[symbol]
+
+    if (this._computables[exchange]![symbol] === undefined) {
+      this._computables[exchange]![symbol] = this._computablesFactories.map(c => c())
+    }
+
+    return this._computables[exchange]![symbol]!
+  }
+
+  reset(exchange: Exchange) {
+    this._computables[exchange] = undefined
   }
 }

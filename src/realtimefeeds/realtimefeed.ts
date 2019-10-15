@@ -6,7 +6,7 @@ import { Filter } from '../types'
 import { wait, ONE_SEC_IN_MS } from '../handy'
 const inflateRaw = promisify(zlib.inflateRaw)
 
-const debug = dbg('tardis-client')
+const debug = dbg('tardis')
 const pongBuffer = Buffer.from('pong')
 
 export type RealTimeFeed = {

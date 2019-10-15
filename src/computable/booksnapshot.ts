@@ -8,6 +8,7 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
   private _bookChanged = false
   private _symbol: string = ''
   private _exchange: string = ''
+  private _updatesCount: number = 0
   private _timestamp: Date = new Date(-1)
 
   private readonly orderBook = new OrderBook()
@@ -28,6 +29,9 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
     const snapshotTimestampBucket = this._getTimeBucket(this._timestamp)
 
     if (currentTimestampTimeBucket > snapshotTimestampBucket) {
+      // set  timestamp to end of snapshot 'interval' period
+      this._timestamp = new Date((snapshotTimestampBucket + 1) * this._interval)
+
       return true
     }
 
@@ -36,6 +40,7 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
 
   public update(bookChange: BookChange) {
     const updateInfo = this.orderBook.update(bookChange)
+    this._updatesCount++
 
     const bidWithinDepthHasChanged =
       updateInfo.lowestUpdatedBidDepthIndex !== undefined && updateInfo.lowestUpdatedBidDepthIndex < this._depth
@@ -66,6 +71,7 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
       name: this._name,
       depth: this._depth,
       interval: this._interval,
+      updatesCount: this._updatesCount,
       bids: Array.from(take(this.orderBook.bids(), this._depth)),
       asks: Array.from(take(this.orderBook.asks(), this._depth)),
       timestamp: this._timestamp,
@@ -73,6 +79,7 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
     }
 
     this._bookChanged = false
+    this._updatesCount = 0
 
     return snapshot
   }

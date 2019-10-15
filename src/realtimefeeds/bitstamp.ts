@@ -3,7 +3,7 @@ import got from 'got'
 import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
 
-const debug = dbg('tardis-client')
+const debug = dbg('tardis')
 
 export class BitstampRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.bitstamp.net'
@@ -33,8 +33,10 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected provideManualSnapshots = async (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => {
+    // does not work currently due to https://github.com/nodejs/node/issues/27711
+    const doesNotWorkInNode12 = true
     const orderBookFilter = filters.find(f => f.channel === 'diff_order_book')
-    if (!orderBookFilter) {
+    if (!orderBookFilter || doesNotWorkInNode12) {
       return
     }
 

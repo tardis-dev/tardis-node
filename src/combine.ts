@@ -2,14 +2,14 @@ import { ONE_SEC_IN_MS } from './handy'
 
 type NextMessageResultWitIndex = {
   index: number
-  result: IteratorResult<LocallyTimestamped, LocallyTimestamped>
+  result: IteratorResult<Combinable, Combinable>
 }
 
-type LocallyTimestamped = { localTimestamp: Date }
+type Combinable = { localTimestamp: Date }
 
 const DATE_MAX = new Date(8640000000000000)
 
-async function nextWithIndex(iterator: AsyncIterableIterator<LocallyTimestamped>, index: number): Promise<NextMessageResultWitIndex> {
+async function nextWithIndex(iterator: AsyncIterableIterator<Combinable>, index: number): Promise<NextMessageResultWitIndex> {
   const result = await iterator.next()
 
   return {
@@ -35,7 +35,7 @@ function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessag
 
 // combines multiple iterators with Messages from for example multiple exchanges
 // works both for real-time and historical data
-export async function* combine<T extends LocallyTimestamped>(...iterators: AsyncIterableIterator<T>[]): AsyncIterableIterator<T> {
+export async function* combine<T extends Combinable>(...iterators: AsyncIterableIterator<T>[]): AsyncIterableIterator<T> {
   if (iterators.length === 0) {
     return
   }

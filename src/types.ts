@@ -62,6 +62,12 @@ export type DerivativeTicker = Readonly<{
   localTimestamp: Date
 }>
 
+export type Disconnect = Readonly<{
+  type: 'disconnect'
+  exchange: Exchange
+  localTimestamp: Date
+}>
+
 export type TradeBin = Readonly<{
   type: 'trade_bin'
   symbol: string
@@ -93,7 +99,7 @@ export type BookSnapshot = {
   name: string
   depth: number
   interval: number
-
+  updatesCount: number
   bids: BookPriceLevel[]
   asks: BookPriceLevel[]
 

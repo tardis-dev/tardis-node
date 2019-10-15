@@ -1,4 +1,4 @@
-export * from './tardisclient'
+export * from './tardis'
 export * from './mappers'
 export * from './consts'
 export * from './orderbook'

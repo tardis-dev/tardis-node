@@ -1,6 +1,6 @@
 import got from 'got'
 import dbg from 'debug'
-const debug = dbg('tardis-client')
+const debug = dbg('tardis')
 
 import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'

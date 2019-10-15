@@ -6,7 +6,7 @@ import { MapperBase } from './mapper'
 export class BinanceMapper extends MapperBase {
   public supportedDataTypes: DataType[] = ['trade', 'book_change']
 
-  private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+  protected readonly symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
 
   private readonly _dataTypeChannelsMapping: { [key in DataType]?: FilterForExchange['binance']['channel'][] } = {
     book_change: ['depth', 'depthSnapshot'],
@@ -59,13 +59,13 @@ export class BinanceMapper extends MapperBase {
   ): IterableIterator<BookChange> {
     const symbol = message.stream.split('@')[0].toUpperCase()
 
-    if (this._symbolToDepthInfoMapping[symbol] === undefined) {
-      this._symbolToDepthInfoMapping[symbol] = {
+    if (this.symbolToDepthInfoMapping[symbol] === undefined) {
+      this.symbolToDepthInfoMapping[symbol] = {
         bufferedUpdates: []
       }
     }
 
-    const symbolDepthInfo = this._symbolToDepthInfoMapping[symbol]
+    const symbolDepthInfo = this.symbolToDepthInfoMapping[symbol]
     const snapshotAlreadyProcessed = symbolDepthInfo.snapshotProcessed
 
     // first check if received message is snapshot and process it as such if it is
@@ -81,8 +81,8 @@ export class BinanceMapper extends MapperBase {
         symbol,
         exchange: this.exchange,
         isSnapshot: true,
-        bids: binanceDepthSnapshotData.bids.map(this._mapBookLevel),
-        asks: binanceDepthSnapshotData.asks.map(this._mapBookLevel),
+        bids: binanceDepthSnapshotData.bids.map(this.mapBookLevel),
+        asks: binanceDepthSnapshotData.asks.map(this.mapBookLevel),
         timestamp: localTimestamp,
         localTimestamp
       }
@@ -93,7 +93,7 @@ export class BinanceMapper extends MapperBase {
 
       // if there were any depth updates buffered, let's proccess those
       for (const update of symbolDepthInfo.bufferedUpdates) {
-        const bookChange = this._mapBookDepthUpdate(update, localTimestamp)
+        const bookChange = this.mapBookDepthUpdate(update, localTimestamp)
         if (bookChange !== undefined) {
           yield bookChange
         }
@@ -102,7 +102,7 @@ export class BinanceMapper extends MapperBase {
       symbolDepthInfo.bufferedUpdates = []
     } else if (snapshotAlreadyProcessed) {
       // snapshot was already processed let's map the message as normal book_change
-      const bookChange = this._mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
+      const bookChange = this.mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
       if (bookChange !== undefined) {
         yield bookChange
       }
@@ -113,10 +113,10 @@ export class BinanceMapper extends MapperBase {
     }
   }
 
-  private _mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): BookChange | undefined {
+  protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): BookChange | undefined {
     // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
     // when we've already processed the snapshot
-    const depthContext = this._symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
+    const depthContext = this.symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
     const lastUpdateId = depthContext.lastUpdateId!
 
     // Drop any event where u is <= lastUpdateId in the snapshot
@@ -130,7 +130,9 @@ export class BinanceMapper extends MapperBase {
         depthContext.validatedFirstUpdate = true
       } else {
         throw new Error(
-          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(binanceDepthUpdateData)}, exchange ${this.exchange}`
+          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
+            binanceDepthUpdateData
+          )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
         )
       }
     }
@@ -141,14 +143,14 @@ export class BinanceMapper extends MapperBase {
       exchange: this.exchange,
       isSnapshot: false,
 
-      bids: binanceDepthUpdateData.b.map(this._mapBookLevel),
-      asks: binanceDepthUpdateData.a.map(this._mapBookLevel),
+      bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
+      asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
       timestamp: new Date(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
   }
 
-  private _mapBookLevel(level: BinanceBookLevel) {
+  protected mapBookLevel(level: BinanceBookLevel) {
     const price = Number(level[0])
     const amount = Number(level[1])
     return { price, amount }
@@ -231,6 +233,43 @@ export class BinanceFuturesMapper extends BinanceMapper {
 
     if (pendingTickerInfo.hasChanged()) {
       yield pendingTickerInfo.getSnapshot(new Date(message.data.E), localTimestamp)
+    }
+  }
+
+  protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): BookChange | undefined {
+    // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
+    // when we've already processed the snapshot
+    const depthContext = this.symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
+    const lastUpdateId = depthContext.lastUpdateId!
+    // based on https://binanceapitest.github.io/Binance-Futures-API-doc/wss/#how-to-manage-a-local-order-book-correctly
+    // Drop any event where u is < lastUpdateId in the snapshot
+    if (binanceDepthUpdateData.u < lastUpdateId) {
+      return
+    }
+
+    // The first processed should have U <= lastUpdateId AND u >= lastUpdateId
+    if (!depthContext.validatedFirstUpdate) {
+      if (binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) {
+        depthContext.validatedFirstUpdate = true
+      } else {
+        throw new Error(
+          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
+            binanceDepthUpdateData
+          )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
+        )
+      }
+    }
+
+    return {
+      type: 'book_change',
+      symbol: binanceDepthUpdateData.s,
+      exchange: this.exchange,
+      isSnapshot: false,
+
+      bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
+      asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
+      timestamp: new Date(binanceDepthUpdateData.E),
+      localTimestamp: localTimestamp
     }
   }
 }

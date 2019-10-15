@@ -20,10 +20,10 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
 
     if (this._binBy === 'time') {
       const currentTimestampTimeBucket = this._getTimeBucket(currentTimestamp)
-      const closeTimestampTimeBucket = this._getTimeBucket(this.inProgressBin.closeTimestamp)
-      if (currentTimestampTimeBucket > closeTimestampTimeBucket) {
-        // set bin timestamp to end of 'binSize/interval' rounded
-        this.inProgressBin.binTimestamp = new Date(currentTimestampTimeBucket * this._binSize)
+      const openTimestampTimeBucket = this._getTimeBucket(this.inProgressBin.openTimestamp)
+      if (currentTimestampTimeBucket > openTimestampTimeBucket) {
+        // set the bin timestamp to the end of the period of given bucket
+        this.inProgressBin.binTimestamp = new Date((openTimestampTimeBucket + 1) * this._binSize)
 
         return true
       }
