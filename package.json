@@ -1,6 +1,6 @@
 {
   "name": "tardis-node",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0",
   "engines": {
     "node": ">=12"
   },
@@ -32,7 +32,14 @@
     "historical cryptocurrency prices",
     "cryptocurrency api",
     "real-time normalized WebSocket cryptocurrency markets data",
-    "normalized cryptocurrency market data API"
+    "normalized cryptocurrency market data API",
+    "cryptocurrency",
+    "exchange",
+    "websocket",
+    "realtime",
+    "bitmex",
+    "binance",
+    "trading"
   ],
   "license": "MPL-2.0",
   "dependencies": {
