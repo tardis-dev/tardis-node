@@ -1,15 +1,15 @@
 {
-  "name": "tardis-client",
-  "version": "1.2.4",
+  "name": "tardis-node",
+  "version": "2.0.0-alpha.1",
   "engines": {
     "node": ">=12"
   },
-  "description": "Node.js client for tardis.dev - historical tick-level cryptocurrency market data replay API.",
+  "description": "tardis-node library provides fast and convenient access to tick-level real-time and historical cryptocurrency market data.",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
-  "repository": "tardis-dev/node-client",
-  "homepage": "https://github.com/tardis-dev/node-client",
+  "repository": "tardis-dev/tardis-node",
+  "homepage": "https://docs.tardis.dev/api/tardis-node",
   "scripts": {
     "build": "tsc",
     "precommit": "lint-staged",
@@ -28,8 +28,11 @@
     "api client",
     "crypto markets data replay",
     "historical data",
+    "real-time cryptocurrency market data feed",
     "historical cryptocurrency prices",
-    "cryptocurrency api"
+    "cryptocurrency api",
+    "real-time normalized WebSocket cryptocurrency markets data",
+    "normalized cryptocurrency market data API"
   ],
   "license": "MPL-2.0",
   "dependencies": {
