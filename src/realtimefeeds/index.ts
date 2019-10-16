@@ -17,28 +17,28 @@ import { OkexRealTimeFeed } from './okex'
 export * from './realtimefeed'
 
 const realTimeFeedsMap: {
-  [key in Exchange]?: new () => RealTimeFeed
+  [key in Exchange]?: () => RealTimeFeed
 } = {
-  bitmex: BitmexRealTimeFeed,
-  binance: BinanceRealTimeFeed,
-  'binance-jersey': BinanceJerseyRealTimeFeed,
-  'binance-us': BinanceUSRealTimeFeed,
-  'binance-dex': BinanceDexRealTimeFeed,
-  'binance-futures': BinanceFuturesRealTimeFeed,
-  bitfinex: BitfinexRealTimeFeed,
-  'bitfinex-derivatives': BitfinexRealTimeFeed,
-  bitflyer: BitflyerRealTimeFeed,
-  bitstamp: BitstampRealTimeFeed,
-  coinbase: CoinbaseRealTimeFeed,
-  cryptofacilities: CryptofacilitiesRealTimeFeed,
-  deribit: DeribitRealTimeDataFeed,
-  ftx: FtxRealTimeFeed,
-  gemini: GeminiRealTimeFeed,
-  kraken: KrakenRealTimeFeed,
-  okex: OkexRealTimeFeed
+  bitmex: () => new BitmexRealTimeFeed('bitmex'),
+  binance: () => new BinanceRealTimeFeed('binance'),
+  'binance-jersey': () => new BinanceJerseyRealTimeFeed('binance-jersey'),
+  'binance-us': () => new BinanceUSRealTimeFeed('binance-us'),
+  'binance-dex': () => new BinanceDexRealTimeFeed('binance-dex'),
+  'binance-futures': () => new BinanceFuturesRealTimeFeed('binance-futures'),
+  bitfinex: () => new BitfinexRealTimeFeed('bitfinex'),
+  'bitfinex-derivatives': () => new BitfinexRealTimeFeed('bitfinex-derivatives'),
+  bitflyer: () => new BitflyerRealTimeFeed('bitflyer'),
+  bitstamp: () => new BitstampRealTimeFeed('bitstamp'),
+  coinbase: () => new CoinbaseRealTimeFeed('coinbase'),
+  cryptofacilities: () => new CryptofacilitiesRealTimeFeed('cryptofacilities'),
+  deribit: () => new DeribitRealTimeDataFeed('deribit'),
+  ftx: () => new FtxRealTimeFeed('ftx'),
+  gemini: () => new GeminiRealTimeFeed('gemini'),
+  kraken: () => new KrakenRealTimeFeed('kraken'),
+  okex: () => new OkexRealTimeFeed('okex')
 }
 
-export function getRealTimeFeedFactory(exchange: Exchange): new () => RealTimeFeed {
+export function getRealTimeFeedFactory(exchange: Exchange): () => RealTimeFeed {
   if (realTimeFeedsMap[exchange]) {
     return realTimeFeedsMap[exchange]!
   }
@@ -47,11 +47,11 @@ export function getRealTimeFeedFactory(exchange: Exchange): new () => RealTimeFe
 }
 
 export function createRealTimeFeed(exchange: Exchange) {
-  const RealTimeFeedClass = getRealTimeFeedFactory(exchange)
+  const realTimeFeedFactory = getRealTimeFeedFactory(exchange)
 
-  return new RealTimeFeedClass()
+  return realTimeFeedFactory()
 }
 
-export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeedFactory: new () => RealTimeFeed) {
+export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeedFactory: () => RealTimeFeed) {
   realTimeFeedsMap[exchange] = realTimeFeedFactory
 }

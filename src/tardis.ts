@@ -14,7 +14,7 @@ import { DataType, MessageForDataType, Message, FilterForExchange, Exchange, Dis
 import { createMapper } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 
-const debug = dbg('tardis')
+const debug = dbg('tardis-node')
 
 export class Tardis {
   private static _defaultOptions: Options = {
@@ -295,8 +295,6 @@ export class Tardis {
     if (timeoutIntervalMS > 0) {
       realTimeFeed.setTimeoutInterval(timeoutIntervalMS)
     }
-
-    debug('real-time feed for exchange: %s started, filters: %o', exchange, filters)
 
     const realTimeMessages = realTimeFeed.stream(filters as any)
 

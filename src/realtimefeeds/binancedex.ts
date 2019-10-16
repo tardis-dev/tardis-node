@@ -1,6 +1,4 @@
 import got from 'got'
-import dbg from 'debug'
-const debug = dbg('tardis')
 
 import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
@@ -43,7 +41,8 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
       if (shouldCancel()) {
         return
       }
-      debug('requesting manual snapshot for: %s', symbol)
+
+      this.debug('requesting manual snapshot for: %s', symbol)
 
       const depthSnapshotResponse = await got.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()
 

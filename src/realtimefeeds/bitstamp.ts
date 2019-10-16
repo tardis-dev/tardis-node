@@ -1,9 +1,6 @@
-import dbg from 'debug'
 import got from 'got'
 import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
-
-const debug = dbg('tardis')
 
 export class BitstampRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.bitstamp.net'
@@ -45,7 +42,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      debug('requesting manual snapshot for: %s', symbol)
+      this.debug('requesting manual snapshot for: %s', symbol)
 
       const depthSnapshotResponse = await got.get(`${this.httpURL}/order_book/${symbol}?group=1`).json()
 

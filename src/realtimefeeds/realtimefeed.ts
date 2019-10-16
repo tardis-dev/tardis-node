@@ -2,27 +2,33 @@ import WebSocket from 'ws'
 import dbg from 'debug'
 import zlib from 'zlib'
 import { promisify } from 'util'
-import { Filter } from '../types'
+import { Filter, Exchange } from '../types'
 import { wait, ONE_SEC_IN_MS } from '../handy'
 const inflateRaw = promisify(zlib.inflateRaw)
 
-const debug = dbg('tardis')
 const pongBuffer = Buffer.from('pong')
 
 export type RealTimeFeed = {
   stream(filters: Filter<string>[]): AsyncIterableIterator<object | undefined>
   setTimeoutInterval(timeoutIntervalMS: number): void
+  readonly exchange: Exchange
 }
 
 export abstract class RealTimeFeedBase implements RealTimeFeed {
   private timeoutIntervalMS?: number
+  protected readonly debug: dbg.Debugger
+
+  constructor(public readonly exchange: Exchange) {
+    this.debug = dbg(`tardis-node:realtime:${exchange}`)
+  }
+
   public setTimeoutInterval(timeoutIntervalMS: number): void {
     this.timeoutIntervalMS = timeoutIntervalMS
   }
 
   public async *stream(filters: Filter<string>[]) {
     const subscribeMessages = this.mapToSubscribeMessages(filters)
-    debug('mapped filters: %o to subscribe messages: %o', filters, subscribeMessages)
+    this.debug('starting streaming: %o filters, subscribe messages: %o', filters, subscribeMessages)
 
     const subscribeViaURL = typeof subscribeMessages === 'string'
     let retries = 0
@@ -31,17 +37,17 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
       let timerid: NodeJS.Timeout | undefined
       try {
         const address = subscribeViaURL ? `${this.wssURL}${subscribeMessages}` : this.wssURL
-        debug('estabilishing connection to %s', address)
+        this.debug('estabilishing connection to %s', address)
 
         const ws = new WebSocket(address, { perMessageDeflate: false })
 
         let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
         ws.once('open', async () => {
-          debug('estabilished connection to %s', address)
+          this.debug('estabilished connection to %s', address)
           if (!subscribeViaURL) {
             for (const message of subscribeMessages) {
-              debug('subscribing to %o', message)
+              this.debug('subscribing to %o', message)
               ws.send(JSON.stringify(message))
             }
           }
@@ -56,7 +62,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
           // set up timer that checks against open, but stale connections that do not return any data
           timerid = setInterval(() => {
             if (receivedMessagesCount === 0) {
-              debug('did not received any messages within %d ms timeout, restarting...', this.timeoutIntervalMS)
+              this.debug('did not received any messages within %d ms timeout, restarting...', this.timeoutIntervalMS)
               ws.terminate()
               if (timerid !== undefined) {
                 clearInterval(timerid)
@@ -107,12 +113,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
             snapshotsToReturn = []
           }
         }
-
+        this.debug('connection closed, restarting...')
         // websocket connection has been closed notify about it by yielding undefined
         yield undefined
       } catch (error) {
         retries++
-        debug('real-time feed error: %o, retries %d', error, retries)
+        this.debug('real-time feed error: %o, retries %d', error, retries)
 
         yield undefined
         const isRateLimited = error.message.includes('429')

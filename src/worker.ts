@@ -13,7 +13,7 @@ const httpsAgent = new https.Agent({
   keepAliveMsecs: 10 * ONE_SEC_IN_MS
 })
 
-const debug = dbg('tardis')
+const debug = dbg('tardis-node')
 
 if (isMainThread) {
   debug('existing, worker is not meant to run in main thread')
