@@ -1,5 +1,4 @@
-import { Tardis, compute, Trade, Message } from '../dist'
-const tardis = new Tardis()
+import { tardis, compute, Trade, Message } from '../dist'
 
 describe('compute(messages, types)', () => {
   test('should compute requested types based on replayNormalized iterables', async () => {

@@ -16,18 +16,17 @@ import { createRealTimeFeed } from './realtimefeeds'
 
 const debug = dbg('tardis-node')
 
-export class Tardis {
+class Tardis {
   private static _defaultOptions: Options = {
     endpoint: 'https://tardis.dev/api',
     cacheDir: path.join(os.tmpdir(), '.tardis-cache'),
     apiKey: ''
   }
 
-  private _options: Options
+  private _options: Options = { ...Tardis._defaultOptions }
 
-  constructor(options: Partial<Omit<Options, 'endpoint'>> = {}) {
+  public init(options: Partial<Omit<Options, 'endpoint'>> = {}) {
     this._options = { ...Tardis._defaultOptions, ...options }
-
     debug('initialized with: %o', this._options)
   }
 
@@ -430,6 +429,8 @@ export class Tardis {
     }
   }
 }
+
+export const tardis = new Tardis()
 
 type Options = {
   endpoint: string

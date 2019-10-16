@@ -1,5 +1,4 @@
-const { Tardis, combine } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis, combine } = require('tardis-node')
 
 async function replayCombined() {
   const bitmexMessages = tardis.replayNormalized({

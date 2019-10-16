@@ -36,8 +36,7 @@ See the [tardis-node docs](https://docs.tardis.dev/api/tardis-node).
 ### Stream real-time market data in exchange native data format
 
 ```js
-const { Tardis } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis } = require('tardis-node')
 
 async function stream() {
   const messages = tardis.stream({
@@ -56,8 +55,7 @@ stream()
 ### Replay historical market data in exchange native data format
 
 ```js
-const { Tardis } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis } = require('tardis-node')
 
 async function replay() {
   const messages = tardis.replay({
@@ -78,8 +76,7 @@ replay()
 ### Stream real-time market data in normalized data format
 
 ```js
-const { Tardis } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis } = require('tardis-node')
 
 async function streamNormalized() {
   const messages = tardis.streamNormalized({
@@ -99,8 +96,7 @@ streamNormalized()
 ### Replay historical market data in normalized data format
 
 ```js
-const { Tardis } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis } = require('tardis-node')
 
 async function replayNormalized() {
   const messages = tardis.replayNormalized({
@@ -125,8 +121,7 @@ Returns single messages 'stream' that is ordered by `localTimestamp`.
 It works the same way for real-time market data as well, but messages are returned in FIFO manner.
 
 ```js
-const { Tardis, combine } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis, combine } = require('tardis-node')
 
 async function replayCombined() {
   const bitmexMessages = tardis.replayNormalized({
@@ -158,8 +153,7 @@ replayCombined()
 ### Compute 10 seconds trade bins and top 5 levels book snapshots every 2 seconds for real-time market data stream
 
 ```js
-const { Tardis, compute } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis, compute } = require('tardis-node')
 
 async function streamComputed() {
   const bitmexMessages = tardis.streamNormalized({
@@ -189,8 +183,7 @@ streamComputed()
 It works in the same way for real-time market data.
 
 ```js
-const { Tardis, OrderBook } = require('tardis-node')
-const tardis = new Tardis()
+const { tardis, OrderBook } = require('tardis-node')
 
 async function reconstructLOB() {
   const bitmexXBTMessages = tardis.replayNormalized({

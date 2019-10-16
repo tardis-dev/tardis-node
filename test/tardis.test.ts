@@ -1,6 +1,4 @@
-import { Tardis, ReplayOptions, EXCHANGES, createMapper, DataType } from '../dist'
-
-const tardis = new Tardis()
+import { tardis, ReplayOptions, EXCHANGES, createMapper, DataType } from '../dist'
 
 describe('tardis', () => {
   test('invalid args validation', async () => {

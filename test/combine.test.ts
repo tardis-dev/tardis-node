@@ -1,6 +1,4 @@
-import { Tardis, combine } from '../dist'
-
-const tardis = new Tardis()
+import { tardis, combine } from '../dist'
 
 describe('combine(...asyncIterators)', () => {
   test('should produce combined iterable from two replayNormalized iterables', async () => {
