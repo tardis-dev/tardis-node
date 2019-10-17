@@ -1,4 +1,4 @@
-import { tardis, compute, Trade, Message } from '../dist'
+import { tardis, compute, Trade, Message, bookSnapshotComputable, tradeBinComputable } from '../dist'
 
 describe('compute(messages, types)', () => {
   test('should compute requested types based on replayNormalized iterables', async () => {
@@ -15,9 +15,9 @@ describe('compute(messages, types)', () => {
 
     const withComputedTypes = compute(
       bitmexMessages,
-      { type: 'book_snapshot', depth: 10, interval: 1000 },
-      { type: 'trade_bin', binBy: 'time', binSize: 1000 },
-      { type: 'trade_bin', binBy: 'ticks', binSize: 100 }
+      bookSnapshotComputable({ depth: 10, interval: 1000 }),
+      tradeBinComputable({ binBy: 'time', binSize: 1000 }),
+      tradeBinComputable({ binBy: 'ticks', binSize: 100 })
     )
 
     for await (const message of withComputedTypes) {
@@ -104,9 +104,9 @@ describe('compute(messages, types)', () => {
 
     const withComputedTypes = compute(
       tradesMessages(),
-      { type: 'trade_bin', binBy: 'time', binSize: 60 * 1000, name: 'trade_bin_1_minute' },
-      { type: 'trade_bin', binBy: 'ticks', binSize: 2, name: 'trade_bin_2ticks' },
-      { type: 'trade_bin', binBy: 'volume', binSize: 2000, name: 'trade_bin_2kvol' }
+      tradeBinComputable({ binBy: 'time', binSize: 60 * 1000, name: 'trade_bin_1_minute' }),
+      tradeBinComputable({ binBy: 'ticks', binSize: 2, name: 'trade_bin_2ticks' }),
+      tradeBinComputable({ binBy: 'volume', binSize: 2000, name: 'trade_bin_2kvol' })
     )
     const bufferedMessages = []
 
@@ -189,8 +189,8 @@ describe('compute(messages, types)', () => {
 
     const withComputedTypes = compute(
       messages(),
-      { type: 'book_snapshot', depth: 2, interval: 1000 },
-      { type: 'book_snapshot', depth: 1, interval: 0, name: 'quotes' }
+      bookSnapshotComputable({ depth: 2, interval: 1000 }),
+      bookSnapshotComputable({ depth: 1, interval: 0, name: 'quotes' })
     )
 
     const bufferedMessages = []

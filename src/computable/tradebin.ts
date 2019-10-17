@@ -1,29 +1,49 @@
 import { Computable } from './computable'
-import { TradeBin, Trade } from '../types'
+import { TradeBin, DataType, Trade } from '../types'
 
 const DATE_MIN = new Date(-1)
+type BinBy = 'time' | 'volume' | 'ticks'
 
-export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
-  public readonly sourceDataType = 'trade'
+type TradeBinComputableOptions = { binBy: BinBy; binSize: number; name?: string }
+
+export const tradeBinComputable = (options: TradeBinComputableOptions) => () => new TradeBinComputable(options)
+
+class TradeBinComputable implements Computable<TradeBin> {
+  public readonly sourceDataTypes: DataType[] = ['trade']
 
   protected inProgressBin: Writeable<TradeBin>
+  private readonly _binBy: BinBy
+  private readonly _binSize: number
+  private readonly _name: string
+  private readonly _type = 'trade_bin'
 
-  constructor(private readonly _name: string, private readonly _binSize: number, private readonly _binBy: 'time' | 'volume' | 'ticks') {
+  constructor({ binBy, binSize, name }: TradeBinComputableOptions) {
+    this._binBy = binBy
+    this._binSize = binSize
+
+    if (name === undefined) {
+      this._name = `${this._type}_${binSize}${binBy === 'time' ? 'ms' : binBy}`
+    } else {
+      this._name = name
+    }
+
     this.inProgressBin = {} as any
     this._reset()
   }
 
-  public hasNewSample(currentTimestamp: Date): boolean {
+  public hasNewSample(timestamp: Date): boolean {
+    // privided timestamp is an exchange trade timestamp in that case
+    // we bucket based on exchange timestamps when bucketing by time not by localTimestamp
     if (this.inProgressBin.trades === 0) {
       return false
     }
 
     if (this._binBy === 'time') {
-      const currentTimestampTimeBucket = this._getTimeBucket(currentTimestamp)
+      const currentTimestampTimeBucket = this._getTimeBucket(timestamp)
       const openTimestampTimeBucket = this._getTimeBucket(this.inProgressBin.openTimestamp)
       if (currentTimestampTimeBucket > openTimestampTimeBucket) {
         // set the bin timestamp to the end of the period of given bucket
-        this.inProgressBin.binTimestamp = new Date((openTimestampTimeBucket + 1) * this._binSize)
+        this.inProgressBin.timestamp = new Date((openTimestampTimeBucket + 1) * this._binSize)
 
         return true
       }
@@ -45,7 +65,7 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
   public getSample(localTimestamp: Date) {
     this.inProgressBin.localTimestamp = localTimestamp
 
-    const sample = { ...this.inProgressBin }
+    const sample: TradeBin = { ...this.inProgressBin }
     this._reset()
 
     return sample
@@ -78,12 +98,12 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
     inProgressBin.vwap = (inProgressBin.vwap * inProgressBin.volume + trade.price * trade.amount) / (inProgressBin.volume + trade.amount)
     // volume needs to be updated after vwap otherwise vwap calc will go wrong
     inProgressBin.volume += trade.amount
-    inProgressBin.binTimestamp = trade.timestamp
+    inProgressBin.timestamp = trade.timestamp
   }
 
   private _reset() {
     const binToReset = this.inProgressBin
-    binToReset.type = 'trade_bin'
+    binToReset.type = this._type
     binToReset.symbol = ''
     binToReset.name = this._name
     binToReset.binSize = this._binSize
@@ -103,7 +123,7 @@ export class TradeBinComputable implements Computable<TradeBin, 'trade'> {
     binToReset.openTimestamp = DATE_MIN
     binToReset.closeTimestamp = DATE_MIN
     binToReset.localTimestamp = DATE_MIN
-    binToReset.binTimestamp = DATE_MIN
+    binToReset.timestamp = DATE_MIN
   }
 
   private _getTimeBucket(timestamp: Date) {

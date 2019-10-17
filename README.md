@@ -153,7 +153,7 @@ replayCombined()
 ### Compute 10 seconds trade bins and top 5 levels book snapshots every 2 seconds for real-time market data stream
 
 ```js
-const { tardis, compute } = require('tardis-node')
+const { tardis, compute, bookSnapshotComputable, tradeBinComputable } = require('tardis-node')
 
 async function streamComputed() {
   const bitmexMessages = tardis.streamNormalized({
@@ -164,8 +164,8 @@ async function streamComputed() {
 
   const messagesWithComputedTypes = compute(
     bitmexMessages,
-    { type: 'trade_bin', binBy: 'time', binSize: 10 * 1000 },
-    { type: 'book_snapshot', depth: 5, interval: 2 * 1000 }
+    tradeBinComputable({ binBy: 'time', binSize: 10 * 1000 }),
+    bookSnapshotComputable({ depth: 5, interval: 2 * 1000 })
   )
 
   for await (const message of messagesWithComputedTypes) {

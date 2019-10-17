@@ -1,21 +1,36 @@
 import { Computable } from './computable'
-import { BookSnapshot, BookChange } from '../types'
+import { BookSnapshot, BookChange, DataType } from '../types'
 import { OrderBook } from '../orderbook'
 import { take } from '../handy'
 
-export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_change'> {
-  public readonly sourceDataType = 'book_change'
+type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number }
+
+export const bookSnapshotComputable = (options: BookSnapshotComputableOptions) => () => new BookSnapshotComputable(options)
+
+class BookSnapshotComputable implements Computable<BookSnapshot> {
+  public readonly sourceDataTypes: DataType[] = ['book_change']
   private _bookChanged = false
   private _symbol: string = ''
   private _exchange: string = ''
   private _updatesCount: number = 0
   private _timestamp: Date = new Date(-1)
-
+  private _type = 'book_snapshot'
   private readonly orderBook = new OrderBook()
+  private readonly _depth: number
+  private readonly _interval: number
+  private readonly _name: string
 
-  constructor(private readonly _name: string, private readonly _depth: number, private readonly _interval: number) {}
+  constructor({ depth, name, interval }: BookSnapshotComputableOptions) {
+    this._depth = depth
+    this._interval = interval
+    if (name === undefined) {
+      this._name = `${this._type}_${depth}_${interval}ms`
+    } else {
+      this._name = name
+    }
+  }
 
-  public hasNewSample(currentTimestamp: Date): boolean {
+  public hasNewSample(timestamp: Date): boolean {
     if (this._bookChanged === false) {
       return false
     }
@@ -25,7 +40,7 @@ export class BookSnapshotComputable implements Computable<BookSnapshot, 'book_ch
       return true
     }
 
-    const currentTimestampTimeBucket = this._getTimeBucket(currentTimestamp)
+    const currentTimestampTimeBucket = this._getTimeBucket(timestamp)
     const snapshotTimestampBucket = this._getTimeBucket(this._timestamp)
 
     if (currentTimestampTimeBucket > snapshotTimestampBucket) {

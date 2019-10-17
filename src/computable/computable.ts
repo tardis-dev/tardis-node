@@ -1,99 +1,68 @@
-import { DataType, MessageForDataType, Message, TradeBin, BookSnapshot, Disconnect, Exchange } from '../types'
-import { TradeBinComputable } from './tradebin'
-import { BookSnapshotComputable } from './booksnapshot'
+import { Exchange, NormalizedData, Disconnect } from '../types'
 
-type ComputableType =
-  | {
-      type: 'trade_bin'
-      binBy: 'time' | 'volume' | 'ticks'
-      binSize: number
-      name?: string
-    }
-  | {
-      type: 'book_snapshot'
-      name?: string
-      depth: number
-      interval: number
-    }
+export type Computable<T extends NormalizedData> = {
+  readonly sourceDataTypes: string[]
 
-export async function* compute(messages: AsyncIterableIterator<Message | Disconnect>, ...types: ComputableType[]) {
-  const factory = new Computables(types)
+  update(message: NormalizedData): void
+
+  hasNewSample(timestamp: Date): boolean
+
+  getSample(localTimestamp: Date): T
+}
+
+export type ComputableFactory<T extends NormalizedData> = () => Computable<T>
+
+function isDisconnect(message: any): message is Disconnect {
+  return message.type === 'disconnect'
+}
+
+export async function* compute<T extends ComputableFactory<any>[], U extends NormalizedData>(
+  messages: AsyncIterableIterator<U | Disconnect>,
+  ...computables: T
+): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? U | Z | Disconnect : never> {
+  const factory = new Computables(computables)
 
   for await (const message of messages) {
     // always pass through source message
-    yield message
+    yield message as any
 
-    if (message.type === 'disconnect') {
+    if (isDisconnect(message)) {
       // reset all computables for given exchange if we've received disconnect for it
       factory.reset(message.exchange)
       continue
     }
 
     const computables = factory.getOrCreate(message.exchange, message.symbol)
+    const { localTimestamp, timestamp } = message
 
     for (const computable of computables) {
       // any time new message arrives check if given computable has
       // new sample for such message timestamp, eg: time based trade bars
-      if (computable.hasNewSample(message.timestamp)) {
-        yield computable.getSample(message.localTimestamp)
+
+      if (computable.hasNewSample(timestamp)) {
+        yield computable.getSample(localTimestamp)
       }
 
       // update computable with new data if data types match
       // and check if such computable after update has new sample as well
-      if (message.type === computable.sourceDataType) {
+      if (computable.sourceDataTypes.includes(message.type)) {
         computable.update(message)
-        if (computable.hasNewSample(message.timestamp)) {
-          yield computable.getSample(message.localTimestamp)
+        if (computable.hasNewSample(timestamp)) {
+          yield computable.getSample(localTimestamp)
         }
       }
     }
   }
 }
 
-export type Computable<T, U extends DataType> = {
-  readonly sourceDataType: U
-
-  update(message: MessageForDataType[U]): void
-
-  hasNewSample(timestamp: Date): boolean
-
-  getSample(timestamp: Date): T
-}
-
 class Computables {
   private _computables: {
     [ex in Exchange]?: {
-      [key: string]: Computable<TradeBin | BookSnapshot, any>[]
+      [key: string]: Computable<any>[]
     }
   } = {}
 
-  _computablesFactories: (() => Computable<TradeBin | BookSnapshot, any>)[]
-
-  constructor(types: ComputableType[]) {
-    this._computablesFactories = types.map(this._getFactory)
-  }
-
-  private _getFactory(type: ComputableType) {
-    if (type.type === 'trade_bin') {
-      let name = type.name
-      if (name === undefined) {
-        name = `${type.type}_${type.binSize}${type.binBy === 'time' ? 'ms' : type.binBy}`
-      }
-
-      return () => new TradeBinComputable(name!, type.binSize, type.binBy)
-    }
-
-    if (type.type === 'book_snapshot') {
-      let name = type.name
-      if (name === undefined) {
-        name = `${type.type}_${type.depth}_${type.interval}ms`
-      }
-
-      return () => new BookSnapshotComputable(name!, type.depth, type.interval)
-    }
-
-    throw new Error(`Unknown computable type ${type}`)
-  }
+  constructor(private readonly _computablesFactories: ComputableFactory<any>[]) {}
 
   getOrCreate(exchange: Exchange, symbol: string) {
     if (this._computables[exchange] === undefined) {
