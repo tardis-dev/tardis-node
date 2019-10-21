@@ -1,76 +1,28 @@
-import { DataType, BookChange, Trade, FilterForExchange } from '../types'
-import { MapperBase } from './mapper'
+import { BookChange, Trade } from '../types'
+import { Mapper } from './mapper'
 
 // https://docs.binance.org/api-reference/dex-api/ws-streams.html
 
-export class BinanceDexMapper extends MapperBase {
-  public supportedDataTypes = ['trade', 'book_change'] as const
+export const binanceDexTradesMapper: Mapper<'binance-dex', Trade> = {
+  canHandle(message: BinanceDexResponse<any>) {
+    return message.stream === 'trades'
+  },
 
-  private readonly _dataTypeChannelsMapping: { [key in DataType]?: FilterForExchange['binance-dex']['channel'][] } = {
-    trade: ['trades'],
-    book_change: ['depthSnapshot', 'marketDiff']
-  }
-
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
-    const matchingChannels = this._dataTypeChannelsMapping[dataType]!
-
-    return matchingChannels.map(channel => {
-      return {
-        channel,
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trades',
         symbols
       }
-    })
-  }
+    ]
+  },
 
-  public detectDataType(message: BinanceDexResponse<any>): DataType | undefined {
-    if (message.stream === 'marketDiff' || message.stream === 'depthSnapshot') {
-      return 'book_change'
-    }
-
-    if (message.stream === 'trades') {
-      return 'trade'
-    }
-
-    return
-  }
-
-  protected *mapOrderBookChanges(
-    message: BinanceDexResponse<BinanceDexDepthSnapshotData | BinanceDexMarketDiffData>,
-    localTimestamp: Date
-  ): IterableIterator<BookChange> {
-    if ('symbol' in message.data) {
-      // we've got snapshot message
-      yield {
-        type: 'book_change',
-        symbol: message.data.symbol,
-        exchange: this.exchange,
-        isSnapshot: true,
-        bids: message.data.bids.map(this._mapBookLevel),
-        asks: message.data.asks.map(this._mapBookLevel),
-        timestamp: localTimestamp,
-        localTimestamp
-      }
-    } else {
-      // we've got update
-      yield {
-        type: 'book_change',
-        symbol: message.data.s,
-        exchange: this.exchange,
-        isSnapshot: false,
-        bids: message.data.b.map(this._mapBookLevel),
-        asks: message.data.a.map(this._mapBookLevel),
-        timestamp: new Date(message.data.E),
-        localTimestamp
-      }
-    }
-  }
-
-  protected *mapTrades(binanceDexTradeResponse: BinanceDexResponse<BinanceDexTradeData>, localTimestamp: Date): IterableIterator<Trade> {
+  *map(binanceDexTradeResponse: BinanceDexResponse<BinanceDexTradeData>, localTimestamp: Date): IterableIterator<Trade> {
     for (const binanceDexTrade of binanceDexTradeResponse.data) {
       yield {
         type: 'trade',
         symbol: binanceDexTrade.s,
-        exchange: this.exchange,
+        exchange: 'binance-dex',
         id: binanceDexTrade.t,
         price: Number(binanceDexTrade.p),
         amount: Number(binanceDexTrade.q),
@@ -80,11 +32,61 @@ export class BinanceDexMapper extends MapperBase {
       }
     }
   }
+}
 
-  private _mapBookLevel(level: BinanceDexBookLevel) {
-    const price = Number(level[0])
-    const amount = Number(level[1])
-    return { price, amount }
+const mapBookLevel = (level: BinanceDexBookLevel) => {
+  const price = Number(level[0])
+  const amount = Number(level[1])
+  return { price, amount }
+}
+
+export const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
+  canHandle(message: BinanceDexResponse<any>) {
+    return message.stream === 'marketDiff' || message.stream === 'depthSnapshot'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'depthSnapshot',
+        symbols
+      },
+      {
+        channel: 'marketDiff',
+        symbols
+      }
+    ]
+  },
+
+  *map(
+    message: BinanceDexResponse<BinanceDexDepthSnapshotData | BinanceDexMarketDiffData>,
+    localTimestamp: Date
+  ): IterableIterator<BookChange> {
+    if ('symbol' in message.data) {
+      // we've got snapshot message
+      yield {
+        type: 'book_change',
+        symbol: message.data.symbol,
+        exchange: 'binance-dex',
+        isSnapshot: true,
+        bids: message.data.bids.map(mapBookLevel),
+        asks: message.data.asks.map(mapBookLevel),
+        timestamp: localTimestamp,
+        localTimestamp
+      }
+    } else {
+      // we've got update
+      yield {
+        type: 'book_change',
+        symbol: message.data.s,
+        exchange: 'binance-dex',
+        isSnapshot: false,
+        bids: message.data.b.map(mapBookLevel),
+        asks: message.data.a.map(mapBookLevel),
+        timestamp: localTimestamp,
+        localTimestamp
+      }
+    }
   }
 }
 

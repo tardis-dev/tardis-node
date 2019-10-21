@@ -1,49 +1,32 @@
-import { MapperBase } from './mapper'
-import { DataType, FilterForExchange, Trade, BookChange } from '../types'
+import { Mapper } from './mapper'
+import { Trade, BookChange } from '../types'
 
 // https://docs.ftx.com/#websocket-api
 
-export class FtxMapper extends MapperBase {
-  public supportedDataTypes = ['trade', 'book_change'] as const
+export const ftxTradesMapper: Mapper<'ftx', Trade> = {
+  canHandle(message: FtxTrades | FtxOrderBook) {
+    if (message.data == undefined) {
+      return false
+    }
 
-  private readonly _dataTypeChannelMapping: { [key in DataType]?: FilterForExchange['ftx']['channel'] } = {
-    book_change: 'orderbook',
-    trade: 'trades'
-  }
+    return message.channel === 'trades'
+  },
 
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
-    const channel = this._dataTypeChannelMapping[dataType]!
-
+  getFilters(symbols?: string[]) {
     return [
       {
-        channel,
+        channel: 'trades',
         symbols
       }
     ]
-  }
+  },
 
-  protected detectDataType(message: FtxTrades | FtxOrderBook): DataType | undefined {
-    if (message.data === undefined) {
-      return
-    }
-
-    if (message.channel === 'trades') {
-      return 'trade'
-    }
-
-    if (message.channel === 'orderbook') {
-      return 'book_change'
-    }
-
-    return
-  }
-
-  protected *mapTrades(ftxTrades: FtxTrades, localTimestamp: Date): IterableIterator<Trade> {
+  *map(ftxTrades: FtxTrades, localTimestamp: Date): IterableIterator<Trade> {
     for (const ftxTrade of ftxTrades.data) {
       yield {
         type: 'trade',
         symbol: ftxTrades.market,
-        exchange: this.exchange,
+        exchange: 'ftx',
         id: ftxTrade.id !== null ? String(ftxTrade.id) : undefined,
         price: ftxTrade.price,
         amount: ftxTrade.size,
@@ -53,25 +36,44 @@ export class FtxMapper extends MapperBase {
       }
     }
   }
+}
 
-  protected *mapOrderBookChanges(ftxOrderBook: FtxOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
+export const mapBookLevel = (level: FtxBookLevel) => {
+  const price = level[0]
+  const amount = level[1]
+
+  return { price, amount }
+}
+
+export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
+  canHandle(message: FtxTrades | FtxOrderBook) {
+    if (message.data == undefined) {
+      return false
+    }
+
+    return message.channel === 'orderbook'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'orderbook',
+        symbols
+      }
+    ]
+  },
+
+  *map(ftxOrderBook: FtxOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
     yield {
       type: 'book_change',
       symbol: ftxOrderBook.market,
-      exchange: this.exchange,
+      exchange: 'ftx',
       isSnapshot: ftxOrderBook.type === 'partial',
-      bids: ftxOrderBook.data.bids.map(this._mapBookLevel),
-      asks: ftxOrderBook.data.asks.map(this._mapBookLevel),
+      bids: ftxOrderBook.data.bids.map(mapBookLevel),
+      asks: ftxOrderBook.data.asks.map(mapBookLevel),
       timestamp: new Date(Math.floor(ftxOrderBook.data.time * 1000)),
       localTimestamp
     }
-  }
-
-  private _mapBookLevel(level: FtxBookLevel) {
-    const price = level[0]
-    const amount = level[1]
-
-    return { price, amount }
   }
 }
 

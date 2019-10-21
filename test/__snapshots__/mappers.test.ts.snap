@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 1`] = `
+exports[`getFilters(symbols) for okex 1`] = `
 Array [
   Object {
     "channel": "spot/trade",
@@ -14,7 +14,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 2`] = `
+exports[`getFilters(symbols) for okex 2`] = `
 Array [
   Object {
     "channel": "spot/depth",
@@ -28,7 +28,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 3`] = `
+exports[`getFilters(symbols) for okex 3`] = `
 Array [
   Object {
     "channel": "swap/depth",
@@ -51,7 +51,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 4`] = `
+exports[`getFilters(symbols) for okex 4`] = `
 Array [
   Object {
     "channel": "swap/depth",
@@ -69,7 +69,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 5`] = `
+exports[`getFilters(symbols) for okex 5`] = `
 Array [
   Object {
     "channel": "spot/ticker",
@@ -92,7 +92,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 6`] = `
+exports[`getFilters(symbols) for okex 6`] = `
 Array [
   Object {
     "channel": "swap/ticker",
@@ -133,7 +133,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?) for okex 7`] = `
+exports[`getFilters(symbols) for okex 7`] = `
 Array [
   Object {
     "channel": "swap/ticker",
@@ -171,7 +171,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance dex messages 1`] = `
+exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
     "asks": Array [
@@ -196,7 +196,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance dex messages 2`] = `
+exports[`mappers map binance dex messages 2`] = `
 Array [
   Object {
     "asks": Array [
@@ -225,7 +225,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance dex messages 3`] = `
+exports[`mappers map binance dex messages 3`] = `
 Array [
   Object {
     "amount": 2070,
@@ -252,9 +252,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance dex messages 4`] = `undefined`;
+exports[`mappers map binance dex messages 4`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance futures messages 1`] = `
+exports[`mappers map binance futures messages 1`] = `
 Array [
   Object {
     "amount": 0.236,
@@ -270,7 +270,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance futures messages 2`] = `
+exports[`mappers map binance futures messages 2`] = `
 Array [
   Object {
     "exchange": "binance-futures",
@@ -287,7 +287,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance futures messages 3`] = `
+exports[`mappers map binance futures messages 3`] = `
 Array [
   Object {
     "exchange": "binance-futures",
@@ -304,9 +304,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance futures messages 4`] = `Array []`;
+exports[`mappers map binance futures messages 4`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 1`] = `
+exports[`mappers map binance messages 1`] = `
 Array [
   Object {
     "amount": 33.82,
@@ -322,7 +322,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 2`] = `
+exports[`mappers map binance messages 2`] = `
 Array [
   Object {
     "amount": 6.48,
@@ -338,11 +338,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 3`] = `undefined`;
+exports[`mappers map binance messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 4`] = `undefined`;
+exports[`mappers map binance messages 4`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 5`] = `
+exports[`mappers map binance messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -375,7 +375,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 6`] = `
+exports[`mappers map binance messages 6`] = `
 Array [
   Object {
     "asks": Array [
@@ -400,11 +400,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 7`] = `Array []`;
+exports[`mappers map binance messages 7`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 8`] = `Array []`;
+exports[`mappers map binance messages 8`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 9`] = `
+exports[`mappers map binance messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -477,7 +477,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps binance messages 10`] = `
+exports[`mappers map binance messages 10`] = `
 Array [
   Object {
     "asks": Array [
@@ -501,9 +501,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 1`] = `undefined`;
+exports[`mappers map bitfinex derivatives messages 1`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 2`] = `
+exports[`mappers map bitfinex derivatives messages 2`] = `
 Array [
   Object {
     "exchange": "bitfinex-derivatives",
@@ -520,9 +520,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 3`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 4`] = `
+exports[`mappers map bitfinex derivatives messages 4`] = `
 Array [
   Object {
     "exchange": "bitfinex-derivatives",
@@ -539,7 +539,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 5`] = `
+exports[`mappers map bitfinex derivatives messages 5`] = `
 Array [
   Object {
     "exchange": "bitfinex-derivatives",
@@ -556,7 +556,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 6`] = `
+exports[`mappers map bitfinex derivatives messages 6`] = `
 Array [
   Object {
     "exchange": "bitfinex-derivatives",
@@ -573,15 +573,15 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex derivatives messages 7`] = `undefined`;
+exports[`mappers map bitfinex derivatives messages 7`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 1`] = `undefined`;
+exports[`mappers map bitfinex messages 1`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 2`] = `undefined`;
+exports[`mappers map bitfinex messages 2`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 3`] = `Array []`;
+exports[`mappers map bitfinex messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 4`] = `
+exports[`mappers map bitfinex messages 4`] = `
 Array [
   Object {
     "amount": 0.00705845,
@@ -597,11 +597,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 5`] = `Array []`;
+exports[`mappers map bitfinex messages 5`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 6`] = `undefined`;
+exports[`mappers map bitfinex messages 6`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 7`] = `
+exports[`mappers map bitfinex messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -630,7 +630,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 8`] = `
+exports[`mappers map bitfinex messages 8`] = `
 Array [
   Object {
     "asks": Array [
@@ -650,7 +650,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 9`] = `
+exports[`mappers map bitfinex messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -670,7 +670,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 10`] = `
+exports[`mappers map bitfinex messages 10`] = `
 Array [
   Object {
     "asks": Array [],
@@ -690,9 +690,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitfinex messages 11`] = `Array []`;
+exports[`mappers map bitfinex messages 11`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 1`] = `
+exports[`mappers map bitflyer messages 1`] = `
 Array [
   Object {
     "asks": Array [
@@ -717,7 +717,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 2`] = `
+exports[`mappers map bitflyer messages 2`] = `
 Array [
   Object {
     "asks": Array [
@@ -742,7 +742,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitflyer messages 3`] = `
+exports[`mappers map bitflyer messages 3`] = `
 Array [
   Object {
     "amount": 0.01,
@@ -769,7 +769,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 1`] = `
+exports[`mappers map bitmex messages 1`] = `
 Array [
   Object {
     "amount": 1000,
@@ -785,11 +785,11 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 2`] = `Array []`;
+exports[`mappers map bitmex messages 2`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 3`] = `Array []`;
+exports[`mappers map bitmex messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 4`] = `
+exports[`mappers map bitmex messages 4`] = `
 Array [
   Object {
     "exchange": "bitmex",
@@ -818,7 +818,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 5`] = `
+exports[`mappers map bitmex messages 5`] = `
 Array [
   Object {
     "exchange": "bitmex",
@@ -835,9 +835,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 6`] = `undefined`;
+exports[`mappers map bitmex messages 6`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 7`] = `
+exports[`mappers map bitmex messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -880,7 +880,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 8`] = `
+exports[`mappers map bitmex messages 8`] = `
 Array [
   Object {
     "asks": Array [
@@ -900,7 +900,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 9`] = `
+exports[`mappers map bitmex messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -920,7 +920,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitmex messages 10`] = `
+exports[`mappers map bitmex messages 10`] = `
 Array [
   Object {
     "asks": Array [],
@@ -940,9 +940,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 1`] = `undefined`;
+exports[`mappers map bitstamp messages 1`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 2`] = `
+exports[`mappers map bitstamp messages 2`] = `
 Array [
   Object {
     "amount": 0.001643,
@@ -958,9 +958,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 3`] = `Array []`;
+exports[`mappers map bitstamp messages 3`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 4`] = `
+exports[`mappers map bitstamp messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -1008,7 +1008,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 5`] = `
+exports[`mappers map bitstamp messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -1032,7 +1032,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps bitstamp messages 6`] = `
+exports[`mappers map bitstamp messages 6`] = `
 Array [
   Object {
     "amount": 0.02834,
@@ -1048,7 +1048,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps coinbase messages 1`] = `
+exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {
     "amount": 0.97133855,
@@ -1064,7 +1064,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps coinbase messages 2`] = `
+exports[`mappers map coinbase messages 2`] = `
 Array [
   Object {
     "asks": Array [
@@ -1084,7 +1084,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps coinbase messages 3`] = `
+exports[`mappers map coinbase messages 3`] = `
 Array [
   Object {
     "asks": Array [],
@@ -1104,7 +1104,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps coinbase messages 4`] = `
+exports[`mappers map coinbase messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -1129,7 +1129,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 1`] = `
+exports[`mappers map cryptofacilities messages 1`] = `
 Array [
   Object {
     "asks": Array [
@@ -1149,7 +1149,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 2`] = `
+exports[`mappers map cryptofacilities messages 2`] = `
 Array [
   Object {
     "exchange": "cryptofacilities",
@@ -1166,7 +1166,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 3`] = `
+exports[`mappers map cryptofacilities messages 3`] = `
 Array [
   Object {
     "exchange": "cryptofacilities",
@@ -1183,7 +1183,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 4`] = `
+exports[`mappers map cryptofacilities messages 4`] = `
 Array [
   Object {
     "amount": 3,
@@ -1199,7 +1199,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 5`] = `
+exports[`mappers map cryptofacilities messages 5`] = `
 Array [
   Object {
     "amount": 166,
@@ -1215,7 +1215,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 6`] = `
+exports[`mappers map cryptofacilities messages 6`] = `
 Array [
   Object {
     "exchange": "cryptofacilities",
@@ -1232,7 +1232,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 7`] = `
+exports[`mappers map cryptofacilities messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -1265,7 +1265,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 8`] = `
+exports[`mappers map cryptofacilities messages 8`] = `
 Array [
   Object {
     "asks": Array [
@@ -1285,7 +1285,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps cryptofacilities messages 9`] = `
+exports[`mappers map cryptofacilities messages 9`] = `
 Array [
   Object {
     "asks": Array [],
@@ -1305,7 +1305,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 1`] = `
+exports[`mappers map deribit messages 1`] = `
 Array [
   Object {
     "amount": 2000,
@@ -1332,9 +1332,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 2`] = `undefined`;
+exports[`mappers map deribit messages 2`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 3`] = `
+exports[`mappers map deribit messages 3`] = `
 Array [
   Object {
     "asks": Array [
@@ -1367,7 +1367,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 4`] = `
+exports[`mappers map deribit messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -1396,7 +1396,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 5`] = `
+exports[`mappers map deribit messages 5`] = `
 Array [
   Object {
     "exchange": "deribit",
@@ -1413,7 +1413,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps deribit messages 6`] = `
+exports[`mappers map deribit messages 6`] = `
 Array [
   Object {
     "exchange": "deribit",
@@ -1430,9 +1430,9 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps ftx messages 1`] = `undefined`;
+exports[`mappers map ftx messages 1`] = `Array []`;
 
-exports[`Mapper.map(message, localTimestamp) maps ftx messages 2`] = `
+exports[`mappers map ftx messages 2`] = `
 Array [
   Object {
     "asks": Array [
@@ -1457,7 +1457,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps ftx messages 3`] = `
+exports[`mappers map ftx messages 3`] = `
 Array [
   Object {
     "asks": Array [
@@ -1477,7 +1477,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps ftx messages 4`] = `
+exports[`mappers map ftx messages 4`] = `
 Array [
   Object {
     "amount": 0.03,
@@ -1493,7 +1493,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps ftx messages 5`] = `
+exports[`mappers map ftx messages 5`] = `
 Array [
   Object {
     "amount": 0.13,
@@ -1509,7 +1509,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps gemini messages 1`] = `
+exports[`mappers map gemini messages 1`] = `
 Array [
   Object {
     "asks": Array [
@@ -1538,7 +1538,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps gemini messages 2`] = `
+exports[`mappers map gemini messages 2`] = `
 Array [
   Object {
     "amount": 0.1,
@@ -1554,7 +1554,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps gemini messages 3`] = `
+exports[`mappers map gemini messages 3`] = `
 Array [
   Object {
     "asks": Array [
@@ -1586,7 +1586,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 1`] = `
+exports[`mappers map kraken messages 1`] = `
 Array [
   Object {
     "amount": 2.51146536,
@@ -1602,7 +1602,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 2`] = `
+exports[`mappers map kraken messages 2`] = `
 Array [
   Object {
     "amount": 0.01596347,
@@ -1629,7 +1629,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 3`] = `
+exports[`mappers map kraken messages 3`] = `
 Array [
   Object {
     "asks": Array [],
@@ -1649,7 +1649,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 4`] = `
+exports[`mappers map kraken messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -1682,7 +1682,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 5`] = `
+exports[`mappers map kraken messages 5`] = `
 Array [
   Object {
     "asks": Array [],
@@ -1706,7 +1706,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps kraken messages 6`] = `
+exports[`mappers map kraken messages 6`] = `
 Array [
   Object {
     "asks": Array [
@@ -1731,7 +1731,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 1`] = `
+exports[`mappers map okex messages 1`] = `
 Array [
   Object {
     "amount": 4,
@@ -1747,7 +1747,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 2`] = `
+exports[`mappers map okex messages 2`] = `
 Array [
   Object {
     "amount": 5,
@@ -1763,7 +1763,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 3`] = `
+exports[`mappers map okex messages 3`] = `
 Array [
   Object {
     "amount": 0.12,
@@ -1779,7 +1779,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 4`] = `
+exports[`mappers map okex messages 4`] = `
 Array [
   Object {
     "asks": Array [
@@ -1816,7 +1816,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 5`] = `
+exports[`mappers map okex messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -1849,7 +1849,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 6`] = `
+exports[`mappers map okex messages 6`] = `
 Array [
   Object {
     "exchange": "okex",
@@ -1866,7 +1866,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 7`] = `
+exports[`mappers map okex messages 7`] = `
 Array [
   Object {
     "exchange": "okex",
@@ -1883,7 +1883,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 8`] = `
+exports[`mappers map okex messages 8`] = `
 Array [
   Object {
     "exchange": "okex",
@@ -1900,7 +1900,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 9`] = `
+exports[`mappers map okex messages 9`] = `
 Array [
   Object {
     "exchange": "okex",
@@ -1917,7 +1917,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 10`] = `
+exports[`mappers map okex messages 10`] = `
 Array [
   Object {
     "exchange": "okex",
@@ -1934,7 +1934,7 @@ Array [
 ]
 `;
 
-exports[`Mapper.map(message, localTimestamp) maps okex messages 11`] = `
+exports[`mappers map okex messages 11`] = `
 Array [
   Object {
     "exchange": "okex",

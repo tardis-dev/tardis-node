@@ -1,57 +1,37 @@
-import { DataType, Trade, BookChange, FilterForExchange, Filter } from '../types'
-import { MapperBase } from './mapper'
+import { Trade, BookChange } from '../types'
+import { Mapper } from './mapper'
 
 // https://www.bitstamp.net/websocket/v2/
 
-export class BitstampMapper extends MapperBase {
-  public supportedDataTypes: DataType[] = ['trade', 'book_change']
+export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
+  canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {
+    if (message.data === undefined) {
+      return false
+    }
 
-  private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+    return message.channel.startsWith('live_trades') && message.event === 'trade'
+  },
 
-  private readonly _dataTypeChannelsMapping: { [key in DataType]?: FilterForExchange['bitstamp']['channel'] } = {
-    book_change: 'diff_order_book',
-    trade: 'live_trades'
-  }
-
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[] {
-    const channel = this._dataTypeChannelsMapping[dataType]!
+  getFilters(symbols?: string[]) {
     if (symbols !== undefined) {
       symbols = symbols.map(s => s.toLocaleLowerCase())
     }
+
     return [
       {
-        channel,
+        channel: 'live_trades',
         symbols
       }
     ]
-  }
+  },
 
-  protected detectDataType(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot): DataType | undefined {
-    if (message.data === undefined) {
-      return
-    }
-
-    if (message.channel.startsWith(this._dataTypeChannelsMapping.trade!) && message.event === 'trade') {
-      return 'trade'
-    }
-
-    if (
-      (message.channel.startsWith(this._dataTypeChannelsMapping.book_change!) && message.event === 'data') ||
-      message.event === 'snapshot'
-    ) {
-      return 'book_change'
-    }
-
-    return
-  }
-
-  protected *mapTrades(bitstampTradeResponse: BitstampTrade, localTimestamp: Date): IterableIterator<Trade> {
+  *map(bitstampTradeResponse: BitstampTrade, localTimestamp: Date): IterableIterator<Trade> {
     const bitstampTrade = bitstampTradeResponse.data
     const symbol = bitstampTradeResponse.channel.slice(bitstampTradeResponse.channel.lastIndexOf('_') + 1)
     yield {
       type: 'trade',
       symbol: symbol.toUpperCase(),
-      exchange: this.exchange,
+      exchange: 'bitstamp',
       id: String(bitstampTrade.id),
       price: Number(bitstampTrade.price),
       amount: Number(bitstampTrade.amount),
@@ -60,11 +40,33 @@ export class BitstampMapper extends MapperBase {
       localTimestamp: localTimestamp
     }
   }
+}
 
-  protected *mapOrderBookChanges(
-    message: BitstampDiffOrderBookSnapshot | BitstampDiffOrderBook,
-    localTimestamp: Date
-  ): IterableIterator<BookChange> {
+export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
+  private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+
+  canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {
+    if (message.data === undefined) {
+      return false
+    }
+
+    return message.channel.startsWith('diff_order_book') && (message.event === 'data' || message.event === 'snapshot')
+  }
+
+  getFilters(symbols?: string[]) {
+    if (symbols !== undefined) {
+      symbols = symbols.map(s => s.toLocaleLowerCase())
+    }
+
+    return [
+      {
+        channel: 'diff_order_book',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BitstampDiffOrderBookSnapshot | BitstampDiffOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
     const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
 
     if (this._symbolToDepthInfoMapping[symbol] === undefined) {
@@ -82,7 +84,7 @@ export class BitstampMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol,
-        exchange: this.exchange,
+        exchange: 'bitstamp',
         isSnapshot: true,
         bids: message.data.bids.map(this._mapBookLevel),
         asks: message.data.asks.map(this._mapBookLevel),
@@ -129,7 +131,7 @@ export class BitstampMapper extends MapperBase {
     return {
       type: 'book_change',
       symbol,
-      exchange: this.exchange,
+      exchange: 'bitstamp',
       isSnapshot: false,
 
       bids: bitstampBookUpdate.data.bids.map(this._mapBookLevel),

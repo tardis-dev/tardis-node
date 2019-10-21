@@ -4,6 +4,11 @@ export type Exchange = typeof EXCHANGES[number]
 
 export type FilterForExchange = { [key in Exchange]: Filter<typeof EXCHANGE_CHANNELS_INFO[key][number]> }
 
+export type Filter<T> = {
+  channel: T
+  symbols?: string[]
+}
+
 export type NormalizedData = {
   readonly type: string
   readonly symbol: string
@@ -11,21 +16,6 @@ export type NormalizedData = {
   readonly timestamp: Date
   readonly localTimestamp: Date
 }
-
-export type Filter<T> = {
-  channel: T
-  symbols?: string[]
-}
-
-export type Message = Trade | BookChange | DerivativeTicker
-
-export type MessageForDataType = {
-  trade: Trade
-  book_change: BookChange
-  derivative_ticker: DerivativeTicker
-}
-
-export type DataType = keyof MessageForDataType
 
 export type Trade = {
   readonly type: 'trade'
@@ -76,13 +66,13 @@ export type Disconnect = {
   readonly localTimestamp: Date
 }
 
-export type TradeBin = {
-  readonly type: 'trade_bin'
+export type TradeBar = {
+  readonly type: 'trade_bar'
   readonly symbol: string
   readonly exchange: Exchange
   readonly name: string
-  readonly binSize: number
-  readonly binBy: 'time' | 'volume' | 'ticks'
+  readonly interval: number
+  readonly kind: 'time' | 'volume' | 'tick'
   readonly open: number
   readonly high: number
   readonly low: number

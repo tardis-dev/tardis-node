@@ -10,11 +10,14 @@ import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { parseAsUTCDate, wait } from './handy'
 import { WorkerMessage, WorkerJobPayload } from './worker'
 import { BinarySplitStream } from './binarysplit'
-import { DataType, MessageForDataType, Message, FilterForExchange, Exchange, Disconnect } from './types'
-import { createMapper } from './mappers'
+import { FilterForExchange, Exchange, Disconnect, Filter } from './types'
+import { Mapper, MapperFactory } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 
 const debug = dbg('tardis-node')
+
+const symbolsInclude = (symbols: string[] | undefined, symbol: string) =>
+  symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
 
 class Tardis {
   private static _defaultOptions: Options = {
@@ -210,30 +213,30 @@ class Tardis {
     )
   }
 
-  public async *replayNormalized<T extends DataType | DataType[], U extends boolean = false>({
-    exchange,
-    from,
-    to,
-    symbols,
-    withDisconnectMessages = undefined,
-    dataTypes
-  }: ReplayNormalizedOptions<T, U>): AsyncIterableIterator<
-    T extends DataType
-      ? (U extends true ? MessageForDataType[T] | Disconnect : MessageForDataType[T])
-      : (U extends true ? Message | Disconnect : Message)
+  public replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+    {
+      exchange,
+      symbols,
+      from,
+      to,
+
+      withDisconnectMessages = undefined
+    }: ReplayNormalizedOptions<T, Z>,
+    ...normalizers: U
+  ): AsyncIterableIterator<
+    Z extends true
+      ? (U extends MapperFactory<infer _, infer X>[] ? X | Disconnect : never)
+      : (U extends MapperFactory<infer _, infer X>[] ? X : never)
   > {
-    let mapper = createMapper(exchange)
     // mappers assume that symbols are uppercased by default
     // if user by mistake provide lowercase one let's automatically fix it
     if (symbols !== undefined) {
       symbols = symbols.map(s => s.toUpperCase())
     }
 
-    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
+    const createMappers = () => normalizers.map(m => m(exchange))
     const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
-    const filters = nonFilterableExchanges.includes(exchange)
-      ? []
-      : dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any)
+    const filters = nonFilterableExchanges.includes(exchange) ? [] : createMappers().flatMap(mapper => mapper.getFilters(symbols))
 
     const messages = this.replay({
       exchange,
@@ -243,40 +246,7 @@ class Tardis {
       filters
     })
 
-    // we need to apply filtering on the client as well as some of the exchanges may not provide server-side filtering (eg.bitfinex)
-    const symbolsInclude = (symbol: string) => symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
-    let previousLocalTimestamp: Date | undefined
-
-    for await (const messageWithTimestamp of messages) {
-      if (messageWithTimestamp === undefined) {
-        // we received undefined meaning Websocket disconnection when recording the data
-        // lets create new mapper with clean state for 'new connection'
-        mapper = createMapper(exchange)
-
-        // if flag withDisconnectMessages is set, yield disconnect message
-        if (withDisconnectMessages === true && previousLocalTimestamp !== undefined) {
-          yield {
-            type: 'disconnect',
-            exchange,
-            localTimestamp: previousLocalTimestamp
-          } as any
-        }
-        continue
-      }
-
-      previousLocalTimestamp = messageWithTimestamp.localTimestamp
-
-      const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
-      if (!mappedMessages) {
-        continue
-      }
-
-      for (const message of mappedMessages) {
-        if (symbolsInclude(message.symbol)) {
-          yield message as any
-        }
-      }
-    }
+    return this._normalize(exchange, messages, createMappers, symbols, withDisconnectMessages)
   }
 
   public async *stream<T extends Exchange, U extends boolean = false>({
@@ -287,7 +257,7 @@ class Tardis {
   }: StreamOptions<T, U>): AsyncIterableIterator<
     U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
   > {
-    this._validateStreamOptions(exchange, filters)
+    this._validateStreamOptions(filters)
 
     const realTimeFeed = createRealTimeFeed(exchange)
 
@@ -309,29 +279,22 @@ class Tardis {
     }
   }
 
-  public async *streamNormalized<T extends DataType | DataType[], U extends boolean = false>({
-    exchange,
-    symbols,
-    timeoutIntervalMS = 10000,
-    withDisconnectMessages = undefined,
-    dataTypes
-  }: StreamNormalizedOptions<T, U>): AsyncIterableIterator<
-    T extends DataType
-      ? (U extends true ? MessageForDataType[T] | Disconnect : MessageForDataType[T])
-      : (U extends true ? Message | Disconnect : Message)
+  public streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+    { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined }: StreamNormalizedOptions<T, Z>,
+    ...normalizers: U
+  ): AsyncIterableIterator<
+    Z extends true
+      ? (U extends MapperFactory<infer _, infer X>[] ? X | Disconnect : never)
+      : (U extends MapperFactory<infer _, infer X>[] ? X : never)
   > {
-    let mapper = createMapper(exchange)
     // mappers assume that symbols are uppercased by default
     // if user by mistake provide lowercase one let's automatically fix it
     if (symbols !== undefined) {
       symbols = symbols.map(s => s.toUpperCase())
     }
 
-    const dateTypesToMap = (Array.isArray(dataTypes) ? dataTypes : [dataTypes]) as DataType[]
-
-    const filters = dateTypesToMap.flatMap<FilterForExchange[typeof exchange]>(
-      dt => mapper.getFiltersForDataTypeAndSymbols(dt, symbols) as any
-    )
+    const createMappers = () => normalizers.map(m => m(exchange))
+    const filters = createMappers().flatMap(mapper => mapper.getFilters(symbols))
 
     const messages = this.stream({
       exchange,
@@ -340,36 +303,56 @@ class Tardis {
       filters
     })
 
+    return this._normalize(exchange, messages, createMappers, symbols, withDisconnectMessages)
+  }
+
+  private async *_normalize(
+    exchange: Exchange,
+    messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
+    createMappers: () => Mapper<any, any>[],
+    symbols: string[] | undefined,
+    withDisconnectMessages: boolean | undefined
+  ) {
     let previousLocalTimestamp: Date | undefined
+    let mappersForExchange = createMappers()
+
+    if (mappersForExchange.length === 0) {
+      throw new Error(`Can't normalize data without any normalizers provided`)
+    }
 
     for await (const messageWithTimestamp of messages) {
       if (messageWithTimestamp === undefined) {
         // we received undefined meaning Websocket disconnection
-        // lets create new mapper with clean state for 'new connection'
-        mapper = createMapper(exchange)
+        // lets create new mappers with clean state for 'new connection'
+        mappersForExchange = createMappers()
 
         // if flag withDisconnectMessages is set, yield disconnect message
         if (withDisconnectMessages === true && previousLocalTimestamp !== undefined) {
-          yield {
+          const disconnect: Disconnect = {
             type: 'disconnect',
             exchange,
             localTimestamp: previousLocalTimestamp
-          } as any
+          }
+          yield disconnect as any
         }
+
         continue
       }
 
       previousLocalTimestamp = messageWithTimestamp.localTimestamp
 
-      const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
+      for (const mapper of mappersForExchange) {
+        if (mapper.canHandle(messageWithTimestamp.message)) {
+          const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
+          if (!mappedMessages) {
+            continue
+          }
 
-      if (!mappedMessages) {
-        continue
-      }
-
-      for (const message of mappedMessages) {
-        if (dataTypes.includes(message.type)) {
-          yield message as any
+          for (const message of mappedMessages) {
+            if (symbolsInclude(symbols, message.symbol)) {
+              yield message
+            }
+          }
         }
       }
     }
@@ -411,11 +394,7 @@ class Tardis {
     }
   }
 
-  private _validateStreamOptions<T extends Exchange>(exchange: T, filters: FilterForExchange[T][]) {
-    if (!exchange || EXCHANGES.includes(exchange) === false) {
-      throw new Error(`Invalid "exchange" argument: ${exchange}. Please provide one of the following exchanges: ${EXCHANGES.join(', ')}.`)
-    }
-
+  private _validateStreamOptions(filters: Filter<string>[]) {
     if (!filters) {
       throw new Error(`Invalid "filters" argument. Please provide filters array`)
     }
@@ -447,13 +426,12 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   returnDisconnectsAsUndefined?: Z
 }
 
-export type ReplayNormalizedOptions<T extends DataType | DataType[], U extends boolean = false> = {
-  from: string
-  to: string
-  exchange: Exchange
-  dataTypes: T
-  symbols?: string[]
-  withDisconnectMessages?: U
+export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
+  readonly exchange: T
+  readonly symbols?: string[]
+  readonly from: string
+  readonly to: string
+  readonly withDisconnectMessages?: U
 }
 
 export type StreamOptions<T extends Exchange, U extends boolean = false> = {
@@ -463,11 +441,10 @@ export type StreamOptions<T extends Exchange, U extends boolean = false> = {
   returnDisconnectsAsUndefined?: U
 }
 
-export type StreamNormalizedOptions<T extends DataType | DataType[], U extends boolean = false> = {
-  exchange: Exchange
-  dataTypes: T
-  timeoutIntervalMS?: number
+export type StreamNormalizedOptions<T extends Exchange, U extends boolean = false> = {
+  exchange: T
   symbols?: string[]
+  timeoutIntervalMS?: number
   withDisconnectMessages?: U
 }
 

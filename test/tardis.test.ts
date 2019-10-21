@@ -1,4 +1,5 @@
-import { tardis, ReplayOptions, EXCHANGES, createMapper, DataType } from '../dist'
+import { tardis, ReplayOptions, EXCHANGES, Exchange, normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers } from '../dist'
+const exchangesWithDerivativeInfo: Exchange[] = ['bitmex', 'binance-futures', 'bitfinex-derivatives', 'cryptofacilities', 'deribit', 'okex']
 
 describe('tardis', () => {
   test('invalid args validation', async () => {
@@ -194,16 +195,21 @@ describe('tardis', () => {
         from.setUTCDate(1)
         const to = new Date(from)
         to.setUTCDate(2)
-        const dataTypes: DataType[] = createMapper(exchange).supportedDataTypes as any
 
-        const messages = tardis.replayNormalized({
-          exchange,
-          from: from.toISOString(),
-          to: to.toISOString(),
-          dataTypes,
-          symbols: availableSymbols.slice(0, 2).map(s => s.id),
-          withDisconnectMessages: true
-        })
+        const normalizers = exchangesWithDerivativeInfo.includes(exchange)
+          ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
+          : [normalizeTrades, normalizeBookChanges]
+
+        const messages = tardis.replayNormalized(
+          {
+            exchange,
+            from: from.toISOString(),
+            to: to.toISOString(),
+            symbols: availableSymbols.slice(0, 2).map(s => s.id),
+            withDisconnectMessages: true
+          },
+          ...(normalizers as any)
+        )
 
         let count = 0
         const bufferedMessages = []
@@ -232,19 +238,24 @@ describe('tardis', () => {
         }
 
         const exchangeDetails = await tardis.getExchangeDetails(exchange)
-        const dataTypes: DataType[] = createMapper(exchange).supportedDataTypes as any
+        const normalizers = exchangesWithDerivativeInfo.includes(exchange)
+          ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
+          : [normalizeTrades, normalizeBookChanges]
+
         const validPrefixes = ['btc', 'xbt', 'pi_']
         const availableSymbols = exchangeDetails.availableSymbols.filter(s =>
           validPrefixes.some(p => s.id.toLocaleLowerCase().startsWith(p))
         )
-        const messages = tardis.streamNormalized({
-          exchange,
-          dataTypes,
-          symbols: availableSymbols
-            .filter(s => s.availableTo === undefined)
-            .slice(0, 2)
-            .map(s => s.id)
-        })
+        const messages = tardis.streamNormalized(
+          {
+            exchange,
+            symbols: availableSymbols
+              .filter(s => s.availableTo === undefined)
+              .slice(0, 2)
+              .map(s => s.id)
+          },
+          ...(normalizers as any)
+        )
 
         let count = 0
         for await (const _ of messages) {

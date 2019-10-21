@@ -1,24 +1,29 @@
-import { tardis, combine } from '../dist'
+import { tardis, combine, normalizeTrades, normalizeBookChanges } from '../dist'
 
 describe('combine(...asyncIterators)', () => {
   test('should produce combined iterable from two replayNormalized iterables', async () => {
-    const bitmexMessages = tardis.replayNormalized({
-      exchange: 'bitmex',
-      from: '2019-04-01',
-      to: '2019-04-01 00:01',
-      dataTypes: ['trade', 'book_change'],
-      symbols: ['XBTUSD']
-    })
+    const normalizers = [normalizeTrades, normalizeBookChanges]
+    const bitmexMessages = tardis.replayNormalized(
+      {
+        exchange: 'bitmex',
+        from: '2019-04-01',
+        to: '2019-04-01 00:01',
+        symbols: ['XBTUSD']
+      },
+      ...normalizers
+    )
 
-    const deribitMessages = tardis.replayNormalized({
-      exchange: 'deribit',
-      dataTypes: ['trade', 'book_change'],
-      from: '2019-04-01',
-      to: '2019-04-01 00:01',
-      symbols: ['BTC-PERPETUAL']
-    })
+    const deribitMessages = tardis.replayNormalized(
+      {
+        exchange: 'deribit',
+        from: '2019-04-01',
+        to: '2019-04-01 00:01',
+        symbols: ['BTC-PERPETUAL']
+      },
+      ...normalizers
+    )
 
-    const bufferedMessages = []
+    const bufferedMessages: any[] = []
     for await (const message of combine(bitmexMessages, deribitMessages)) {
       bufferedMessages.push(message)
     }

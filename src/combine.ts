@@ -33,9 +33,11 @@ function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessag
   return oldest
 }
 
-// combines multiple iterators with Messages from for example multiple exchanges
+// combines multiple iterators from for example multiple exchanges
 // works both for real-time and historical data
-export async function* combine<T extends Combinable>(...iterators: AsyncIterableIterator<T>[]): AsyncIterableIterator<T> {
+export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
+  ...iterators: T
+): AsyncIterableIterator<T extends AsyncIterableIterator<infer U>[] ? U : never> {
   if (iterators.length === 0) {
     return
   }
@@ -57,7 +59,7 @@ export async function* combine<T extends Combinable>(...iterators: AsyncIterable
       // as we'd have to handle case when result.done is set to true
       // but in practice real-time streams are infinite
       const { index, result } = await Promise.race(nextResults)
-      yield result.value as T
+      yield result.value as any
       nextResults[index] = nextWithIndex(iterators[index], index)
     }
   } else {
@@ -82,7 +84,7 @@ export async function* combine<T extends Combinable>(...iterators: AsyncIterable
         }
       } else {
         // yield oldest value and replace with next value from iterable for given index
-        yield result.value as T
+        yield result.value as any
         results[index] = await nextWithIndex(iterators[index], index)
       }
     } while (aliveIteratorsCount > 0)

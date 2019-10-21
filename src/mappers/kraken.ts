@@ -1,50 +1,35 @@
-import { DataType, Trade, BookChange, FilterForExchange } from '../types'
-import { MapperBase } from './mapper'
+import { Trade, BookChange } from '../types'
+import { Mapper } from './mapper'
 
 // https://www.kraken.com/features/websocket-api
 
-export class KrakenMapper extends MapperBase {
-  public supportedDataTypes: DataType[] = ['trade', 'book_change']
-
-  private readonly _dataTypeChannelMapping: { [key in DataType]?: FilterForExchange['kraken']['channel'] } = {
-    book_change: 'book',
-    trade: 'trade'
-  }
-
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
-    const channel = this._dataTypeChannelMapping[dataType]!
-
-    return [
-      {
-        channel,
-        symbols
-      }
-    ]
-  }
-
-  protected detectDataType(message: KrakenTrades | KrakenBookSnapshot | KrakenBookUpdate): DataType | undefined {
+export const krakenTradesMapper: Mapper<'kraken', Trade> = {
+  canHandle(message: Trade) {
     if (!Array.isArray(message)) {
-      return
+      return false
     }
 
     const channel = message[message.length - 2] as string
-    if (channel === 'trade') {
-      return 'trade'
-    }
-    if (channel.startsWith('book')) {
-      return 'book_change'
-    }
+    return channel === 'trade'
+  },
 
-    return
-  }
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trade',
+        symbols
+      }
+    ]
+  },
 
-  protected *mapTrades(message: KrakenTrades, localTimestamp: Date): IterableIterator<Trade> {
+  *map(message: KrakenTrades, localTimestamp: Date): IterableIterator<Trade> {
     const [_, trades, __, symbol] = message
+
     for (const [price, amount, time, side] of trades) {
       yield {
         type: 'trade',
         symbol,
-        exchange: this.exchange,
+        exchange: 'kraken',
         id: undefined,
         price: Number(price),
         amount: Number(amount),
@@ -54,8 +39,34 @@ export class KrakenMapper extends MapperBase {
       }
     }
   }
+}
 
-  protected *mapOrderBookChanges(message: KrakenBookSnapshot | KrakenBookUpdate, localTimestamp: Date): IterableIterator<BookChange> {
+const mapBookLevel = (level: KrakenBookLevel) => {
+  const [price, amount] = level
+
+  return { price: Number(price), amount: Number(amount) }
+}
+
+export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
+  canHandle(message: Trade) {
+    if (!Array.isArray(message)) {
+      return false
+    }
+
+    const channel = message[message.length - 2] as string
+    return channel.startsWith('book')
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'book',
+        symbols
+      }
+    ]
+  },
+
+  *map(message: KrakenBookSnapshot | KrakenBookUpdate, localTimestamp: Date): IterableIterator<BookChange> {
     if ('as' in message[1]) {
       // we've got snapshot message
       const [_, { as, bs }, __, symbol] = message
@@ -63,11 +74,11 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol: symbol,
-        exchange: this.exchange,
+        exchange: 'kraken',
         isSnapshot: true,
 
-        bids: bs.map(this._mapBookLevel),
-        asks: as.map(this._mapBookLevel),
+        bids: bs.map(mapBookLevel),
+        asks: as.map(mapBookLevel),
         timestamp: localTimestamp,
         localTimestamp: localTimestamp
       }
@@ -80,21 +91,15 @@ export class KrakenMapper extends MapperBase {
       yield {
         type: 'book_change',
         symbol,
-        exchange: this.exchange,
+        exchange: 'kraken',
         isSnapshot: false,
 
-        bids: bids.map(this._mapBookLevel),
-        asks: asks.map(this._mapBookLevel),
+        bids: bids.map(mapBookLevel),
+        asks: asks.map(mapBookLevel),
         timestamp: localTimestamp,
         localTimestamp: localTimestamp
       }
     }
-  }
-
-  private _mapBookLevel(level: KrakenBookLevel) {
-    const [price, amount] = level
-
-    return { price: Number(price), amount: Number(amount) }
   }
 }
 

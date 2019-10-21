@@ -1,69 +1,32 @@
-import { Trade, BookChange, DerivativeTicker, Message, DataType, Filter, Exchange } from '../types'
+import { DerivativeTicker, Exchange, NormalizedData, FilterForExchange } from '../types'
 
-export type Mapper = {
-  map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined
-  getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]): Filter<string>[]
-  supportedDataTypes: readonly DataType[]
-  readonly exchange: Exchange
+export type Mapper<T extends Exchange, U extends NormalizedData> = {
+  canHandle: (message: any) => boolean
+
+  map(message: any, localTimestamp: Date): IterableIterator<U> | undefined
+
+  getFilters: (symbols?: string[]) => FilterForExchange[T][]
 }
 
-export abstract class MapperBase implements Mapper {
+export type MapperFactory<T extends Exchange, U extends NormalizedData> = (exchange: T) => Mapper<T, U>
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] }
+
+const isNullOrUndefined = (input: number | undefined | null): input is null | undefined => input === undefined || input === null
+
+export class PendingTickerInfoHelper {
   private readonly _pendingTickers: Map<string, PendingDerivativeTickerInfo> = new Map()
 
-  constructor(public readonly exchange: Exchange) {}
-
-  public map(message: any, localTimestamp: Date): IterableIterator<Message> | undefined {
-    const dataType = this.detectDataType(message)
-    if (dataType === undefined) {
-      return
-    }
-
-    switch (dataType) {
-      case 'book_change':
-        return this.mapOrderBookChanges(message, localTimestamp)
-      case 'trade':
-        return this.mapTrades(message, localTimestamp)
-      case 'derivative_ticker':
-        return this.mapDerivativeTickerInfo(message, localTimestamp)
-      default:
-        return
-    }
-  }
-
-  protected getPendingTickerInfo(symbol: string) {
+  public getPendingTickerInfo(symbol: string, exchange: Exchange) {
     let pendingTickerInfo = this._pendingTickers.get(symbol)
     if (pendingTickerInfo === undefined) {
-      pendingTickerInfo = new PendingDerivativeTickerInfo(symbol, this.exchange)
+      pendingTickerInfo = new PendingDerivativeTickerInfo(symbol, exchange)
       this._pendingTickers.set(symbol, pendingTickerInfo)
     }
 
     return pendingTickerInfo
   }
-
-  public getFiltersForDataTypeAndSymbols(dataType: DataType, symbols?: string[]) {
-    if (!this.supportedDataTypes.includes(dataType)) {
-      throw new Error(`${(this as {}).constructor.name} does not support ${dataType} data type`)
-    }
-
-    return this.mapDataTypeAndSymbolsToFilters(dataType, symbols)
-  }
-
-  public abstract readonly supportedDataTypes: readonly DataType[]
-
-  protected abstract mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): Filter<string>[]
-
-  protected abstract detectDataType(message: any): DataType | undefined
-
-  protected abstract mapTrades(message: any, localTimestamp: Date): IterableIterator<Trade>
-
-  protected abstract mapOrderBookChanges(message: any, localTimestamp: Date): IterableIterator<BookChange>
-
-  protected mapDerivativeTickerInfo(_: any, __: Date): IterableIterator<DerivativeTicker> {
-    throw new Error('mapDerivativeTickerInfo not implemented for mapper')
-  }
 }
-
-const isNullOrUndefined = (input: number | undefined | null): input is null | undefined => input === undefined || input === null
 
 class PendingDerivativeTickerInfo {
   private _pendingTicker: Writeable<DerivativeTicker>
@@ -153,5 +116,3 @@ class PendingDerivativeTickerInfo {
     return { ...this._pendingTicker }
   }
 }
-
-type Writeable<T> = { -readonly [P in keyof T]: T[P] }

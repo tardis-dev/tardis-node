@@ -1,55 +1,28 @@
-import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange, BookPriceLevel } from '../types'
-import { MapperBase } from './mapper'
+import { DerivativeTicker, Trade, BookChange, FilterForExchange, BookPriceLevel } from '../types'
+import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
 
-export class BitmexMapper extends MapperBase {
-  public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
+export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
+  canHandle(message: BitmexDataMessage) {
+    return message.table === 'trade' && message.action === 'insert'
+  },
 
-  private readonly _idToPriceLevelMap: Map<number, number> = new Map()
-
-  private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['bitmex']['channel'] } = {
-    book_change: 'orderBookL2',
-    trade: 'trade',
-    derivative_ticker: 'instrument'
-  }
-
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
+  getFilters(symbols?: string[]) {
     return [
       {
-        channel: this._dataTypeChannelMapping[dataType],
+        channel: 'trade',
         symbols
       }
     ]
-  }
+  },
 
-  protected detectDataType(message: BitmexDataMessage): DataType | undefined {
-    if (message.table === undefined) {
-      return
-    }
-
-    if (message.table === this._dataTypeChannelMapping.book_change) {
-      return 'book_change'
-    }
-
-    // trades are insert only, let's skip partials as otherwise we'd end up with potential duplicates
-    if (message.table === this._dataTypeChannelMapping.trade && message.action === 'insert') {
-      return 'trade'
-    }
-
-    if (message.table === this._dataTypeChannelMapping.derivative_ticker) {
-      return 'derivative_ticker'
-    }
-
-    return
-  }
-
-  protected *mapTrades(bitmexTradesMessage: BitmexTradesMessage, localTimestamp: Date): IterableIterator<Trade> {
+  *map(bitmexTradesMessage: BitmexTradesMessage, localTimestamp: Date) {
     for (const bitmexTrade of bitmexTradesMessage.data) {
       yield {
         type: 'trade',
         symbol: bitmexTrade.symbol,
-        exchange: this.exchange,
+        exchange: 'bitmex',
         id: bitmexTrade.trdMatchID,
         price: bitmexTrade.price,
         amount: bitmexTrade.size,
@@ -59,8 +32,25 @@ export class BitmexMapper extends MapperBase {
       }
     }
   }
+}
 
-  protected *mapOrderBookChanges(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<BookChange> {
+export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
+  private readonly _idToPriceLevelMap: Map<number, number> = new Map()
+
+  canHandle(message: BitmexDataMessage) {
+    return message.table === 'orderBookL2'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'orderBookL2',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(bitmexOrderBookL2Message: BitmexOrderBookL2Message, localTimestamp: Date): IterableIterator<BookChange> {
     let bitmexBookMessagesGrouppedBySymbol
     // only partial messages can contain different symbols (when subscribed via {"op": "subscribe", "args": ["orderBookL2"]} for example)
     if (bitmexOrderBookL2Message.action === 'partial') {
@@ -113,7 +103,7 @@ export class BitmexMapper extends MapperBase {
         const bookChange: BookChange = {
           type: 'book_change',
           symbol,
-          exchange: this.exchange,
+          exchange: 'bitmex',
           isSnapshot: bitmexOrderBookL2Message.action === 'partial',
           bids,
           asks,
@@ -125,10 +115,27 @@ export class BitmexMapper extends MapperBase {
       }
     }
   }
+}
 
-  protected *mapDerivativeTickerInfo(message: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  canHandle(message: BitmexDataMessage) {
+    return message.table === 'instrument'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'instrument',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const bitmexInstrument of message.data) {
-      const pendingTickerInfo = this.getPendingTickerInfo(bitmexInstrument.symbol)
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(bitmexInstrument.symbol, 'bitmex')
 
       pendingTickerInfo.updateFundingRate(bitmexInstrument.fundingRate)
       pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)

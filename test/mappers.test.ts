@@ -1,7 +1,37 @@
-import { createMapper } from '../src'
+import { Exchange, normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers, Mapper } from '../src'
 
-describe('Mapper.map(message, localTimestamp)', () => {
-  test('maps deribit messages', () => {
+const exchangesWithDerivativeInfo: Exchange[] = ['bitmex', 'binance-futures', 'bitfinex-derivatives', 'cryptofacilities', 'deribit', 'okex']
+
+const createMapper = (exchange: Exchange) => {
+  const normalizers = exchangesWithDerivativeInfo.includes(exchange)
+    ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
+    : [normalizeTrades, normalizeBookChanges]
+
+  const mappersForExchange = normalizers.map((m: any) => m(exchange)) as Mapper<any, any>[]
+
+  return {
+    map(message: any, localTimestamp: Date) {
+      const responses = []
+      for (const mapper of mappersForExchange) {
+        if (mapper.canHandle(message)) {
+          const mappedMessages = mapper.map(message, localTimestamp)
+          if (!mappedMessages) {
+            continue
+          }
+
+          for (const message of mappedMessages) {
+            responses.push(message)
+          }
+        }
+      }
+
+      return responses
+    }
+  }
+}
+
+describe('mappers', () => {
+  test('map deribit messages', () => {
     const messages = [
       {
         jsonrpc: '2.0',
@@ -134,12 +164,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const deribitMapper = createMapper('deribit')
     for (const message of messages) {
       const mappedMessages = deribitMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps bitmex messages', () => {
+  test('map bitmex messages', () => {
     const messages = [
       {
         table: 'trade',
@@ -426,12 +455,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const bitmexMapper = createMapper('bitmex')
     for (const message of messages) {
       const mappedMessages = bitmexMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps okex messages', () => {
+  test('map okex messages', () => {
     const messages = [
       {
         table: 'futures/trade',
@@ -569,12 +597,12 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const okexMapper = createMapper('okex')
 
     for (const message of messages) {
-      const mappedMessages = Array.from(okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))!)
+      const mappedMessages = okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps bitfinex messages', () => {
+  test('map bitfinex messages', () => {
     const messages = [
       [6957, 'tu', [382490248, 1564617600489, 0.43426, 218.74], 11, 1564617600570],
       { event: 'subscribed', channel: 'trades', chanId: 89, symbol: 'tBTCUSD', pair: 'BTCUSD' },
@@ -593,12 +621,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const bitfinex = createMapper('bitfinex')
     for (const message of messages) {
       const mappedMessages = bitfinex.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps bitfinex derivatives messages', () => {
+  test('map bitfinex derivatives messages', () => {
     const messages = [
       { event: 'subscribed', channel: 'status', chanId: 127758, key: 'deriv:tBTCF0:USTF0' },
       [127758, [1569715201000, null, 173.535, 173.57, null, 101052.04082882, null, 1569744000000, 0, 0, null, null], 7, 1569715201369],
@@ -680,12 +707,12 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
     for (const message of messages) {
       const mappedMessages = bitfinexDerivativesMapper.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps binance messages', () => {
+  test('map binance messages', () => {
     const messages = [
       {
         stream: 'bnbbtc@trade',
@@ -835,12 +862,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const binanceMapper = createMapper('binance')
     for (const message of messages) {
       const mappedMessages = binanceMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps binance dex messages', () => {
+  test('map binance dex messages', () => {
     const messages = [
       {
         stream: 'depthSnapshot',
@@ -926,12 +952,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const binanceDexMapper = createMapper('binance-dex')
     for (const message of messages) {
       const mappedMessages = binanceDexMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps binance futures messages', () => {
+  test('map binance futures messages', () => {
     const messages = [
       {
         stream: 'btcusdt@aggTrade',
@@ -993,12 +1018,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
     const binanceFuturesMapper = createMapper('binance-futures')
     for (const message of messages) {
       const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps cryptofacilities messages', () => {
+  test('map cryptofacilities messages', () => {
     const messages = [
       { feed: 'book', product_id: 'FI_LTCUSD_190426', side: 'sell', seq: 2139287, price: 60.58, qty: 0.0 },
       {
@@ -1106,12 +1130,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps bitflyer messages', () => {
+  test('map bitflyer messages', () => {
     const messages = [
       {
         jsonrpc: '2.0',
@@ -1170,12 +1193,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = bitflyerMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps ftx messages', () => {
+  test('map ftx messages', () => {
     const messages = [
       { type: 'subscribed', channel: 'trades', market: 'ALT-PERP' },
       {
@@ -1214,12 +1236,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = ftxMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps coinbase messages', () => {
+  test('map coinbase messages', () => {
     const messages = [
       {
         type: 'match',
@@ -1247,12 +1268,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = coinbaseMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps gemini messages', () => {
+  test('map gemini messages', () => {
     const messages = [
       {
         type: 'l2_updates',
@@ -1272,12 +1292,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = geminiMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps bitstamp messages', () => {
+  test('map bitstamp messages', () => {
     const messages = [
       { event: 'bts:subscription_succeeded', channel: 'live_trades_xrpeur', data: {} },
       {
@@ -1343,12 +1362,11 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = bitstampMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('maps kraken messages', () => {
+  test('map kraken messages', () => {
     const messages = [
       [170, [['0.01136500', '2.51146536', '1561939201.587070', 's', 'l', '']], 'trade', 'LTC/XBT'],
       [
@@ -1393,28 +1411,25 @@ describe('Mapper.map(message, localTimestamp)', () => {
 
     for (const message of messages) {
       const mappedMessages = krakenMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      const mappedMessagesArrayOrUndefined = mappedMessages && Array.from(mappedMessages)
-      expect(mappedMessagesArrayOrUndefined).toMatchSnapshot()
+      expect(mappedMessages).toMatchSnapshot()
     }
   })
 })
 
-describe('Mapper.getFiltersForDataTypeAndSymbols(dataType, symbols?)', () => {
+describe('getFilters(symbols)', () => {
   test('for okex', () => {
-    const okexMapper = createMapper('okex')
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('trade')).toMatchSnapshot()
+    expect(normalizeTrades('okex').getFilters(undefined)).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change')).toMatchSnapshot()
+    expect(normalizeBookChanges('okex').getFilters(undefined)).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('book_change', ['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toMatchSnapshot()
+    expect(normalizeBookChanges('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker')).toMatchSnapshot()
+    expect(normalizeBookChanges('okex').getFilters(['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker', ['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+    expect(normalizeDerivativeTickers('okex').getFilters(undefined)).toMatchSnapshot()
 
-    expect(
-      okexMapper.getFiltersForDataTypeAndSymbols('derivative_ticker', ['LTC-USD-SWAP', 'TRX-USD-190927', 'ETH-USD-SWAP'])
-    ).toMatchSnapshot()
+    expect(normalizeDerivativeTickers('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+
+    expect(normalizeDerivativeTickers('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'ETH-USD-SWAP'])).toMatchSnapshot()
   })
 })

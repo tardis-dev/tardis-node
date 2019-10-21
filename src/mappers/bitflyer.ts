@@ -1,50 +1,28 @@
-import { MapperBase } from './mapper'
-import { DataType, FilterForExchange, Trade, BookChange } from '../types'
+import { Mapper } from './mapper'
+import { Trade, BookChange } from '../types'
 
-export class BitflyerMapper extends MapperBase {
-  public supportedDataTypes = ['trade', 'book_change'] as const
+export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
+  canHandle(message: BitflyerExecutions | BitflyerBoard) {
+    return message.params.channel.startsWith('lightning_executions')
+  },
 
-  private readonly _dataTypeChannelMapping: { [key in DataType]?: FilterForExchange['bitflyer']['channel'][] } = {
-    book_change: ['lightning_board_snapshot', 'lightning_board'],
-    trade: ['lightning_executions']
-  }
-
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]) {
-    const channels = this._dataTypeChannelMapping[dataType]!
-
-    return channels.map(channel => {
-      return {
-        channel,
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'lightning_executions',
         symbols
       }
-    })
-  }
+    ]
+  },
 
-  protected detectDataType(message: BitflyerExecutions | BitflyerBoard): DataType | undefined {
-    if (message.method !== 'channelMessage') {
-      return
-    }
-
-    const channel = message.params.channel
-
-    if (channel.startsWith('lightning_board')) {
-      return 'book_change'
-    }
-    if (channel.startsWith('lightning_executions')) {
-      return 'trade'
-    }
-
-    return
-  }
-
-  protected *mapTrades(bitflyerExecutions: BitflyerExecutions, localTimestamp: Date): IterableIterator<Trade> {
+  *map(bitflyerExecutions: BitflyerExecutions, localTimestamp: Date) {
     const symbol = bitflyerExecutions.params.channel.replace('lightning_executions_', '')
 
     for (const execution of bitflyerExecutions.params.message) {
       yield {
         type: 'trade',
         symbol,
-        exchange: this.exchange,
+        exchange: 'bitflyer',
         id: String(execution.id),
         price: execution.price,
         amount: execution.size,
@@ -54,8 +32,31 @@ export class BitflyerMapper extends MapperBase {
       }
     }
   }
+}
 
-  protected *mapOrderBookChanges(bitflyerBoard: BitflyerBoard, localTimestamp: Date): IterableIterator<BookChange> {
+const mapBookLevel = ({ price, size }: BitflyerBookLevel) => {
+  return { price, amount: size }
+}
+
+export const bitflyerBookChangeMapper: Mapper<'bitflyer', BookChange> = {
+  canHandle(message: BitflyerExecutions | BitflyerBoard) {
+    return message.params.channel.startsWith('lightning_board')
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'lightning_board_snapshot',
+        symbols
+      },
+      {
+        channel: 'lightning_board',
+        symbols
+      }
+    ]
+  },
+
+  *map(bitflyerBoard: BitflyerBoard, localTimestamp: Date): IterableIterator<BookChange> {
     const channel = bitflyerBoard.params.channel
     const isSnapshot = channel.startsWith('lightning_board_snapshot_')
     const symbol = isSnapshot ? channel.replace('lightning_board_snapshot_', '') : channel.replace('lightning_board_', '')
@@ -63,17 +64,13 @@ export class BitflyerMapper extends MapperBase {
     yield {
       type: 'book_change',
       symbol,
-      exchange: this.exchange,
+      exchange: 'bitflyer',
       isSnapshot,
-      bids: bitflyerBoard.params.message.bids.map(this._mapBookLevel),
-      asks: bitflyerBoard.params.message.asks.map(this._mapBookLevel),
+      bids: bitflyerBoard.params.message.bids.map(mapBookLevel),
+      asks: bitflyerBoard.params.message.asks.map(mapBookLevel),
       timestamp: localTimestamp,
       localTimestamp
     }
-  }
-
-  private _mapBookLevel({ price, size }: BitflyerBookLevel) {
-    return { price, amount: size }
   }
 }
 

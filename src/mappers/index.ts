@@ -1,57 +1,102 @@
+import { bitmexTradesMapper, BitmexBookChangeMapper, BitmexDerivativeTickerMapper } from './bitmex'
+import {
+  BinanceTradesMapper,
+  BinanceBookChangeMapper,
+  binanceFuturesTradesMapper,
+  BinanceFuturesBookChangeMapper,
+  BinanceFuturesDerivativeTickerMapper
+} from './binance'
+import { binanceDexTradesMapper, binanceDexBookChangeMapper } from './binancedex'
+import { BitfinexTradesMapper, BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper } from './bitfinex'
+import { bitflyerTradesMapper, bitflyerBookChangeMapper } from './bitflyer'
+import { bitstampTradesMapper, BitstampBookChangeMapper } from './bitstamp'
+import { coinbaseTradesMapper, coinbaseBookChangMapper } from './coinbase'
+import { cryptofacilitiesTradesMapper, cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper } from './cryptofacilities'
+import { deribitTradesMapper, deribitBookChangeMapper, DeribitDerivativeTickerMapper } from './deribit'
+import { ftxTradesMapper, ftxBookChangeMapper } from './ftx'
+import { geminiTradesMapper, geminiBookChangeMapper } from './gemini'
+import { krakenTradesMapper, krakenBookChangeMapper } from './kraken'
+import { okexTradesMapper, okexBookChangeMapper, OkexDerivativeTickerMapper } from './okex'
 import { Mapper } from './mapper'
-import { DeribitMapper } from './deribit'
-import { BitmexMapper } from './bitmex'
-import { OkexMapper } from './okex'
-import { BitfinexMapper, BitfinexDerivativesMapper } from './bitfinex'
-import { BinanceMapper, BinanceFuturesMapper } from './binance'
-import { BinanceDexMapper } from './binancedex'
-import { Exchange } from '../types'
-import { CoinbaseMapper } from './coinbase'
-import { BitflyerMapper } from './bitflyer'
-import { BitstampMapper } from './bitstamp'
-import { CryptofacilitiesMapper } from './cryptofacilities'
-import { FtxMapper } from './ftx'
-import { GeminiMapper } from './gemini'
-import { KrakenMapper } from './kraken'
+import { Trade, BookChange, DerivativeTicker } from '../types'
 
-export { Mapper } from './mapper'
+export * from './mapper'
 
-const exchangeMapperMap: {
-  [key in Exchange]?: () => Mapper
-} = {
-  deribit: () => new DeribitMapper('deribit'),
-  bitmex: () => new BitmexMapper('bitmex'),
-  okex: () => new OkexMapper('okex'),
-  bitfinex: () => new BitfinexMapper('bitfinex'),
-  'bitfinex-derivatives': () => new BitfinexDerivativesMapper('bitfinex-derivatives'),
-  binance: () => new BinanceMapper('binance'),
-  'binance-us': () => new BinanceMapper('binance-us'),
-  'binance-jersey': () => new BinanceMapper('binance-jersey'),
-  'binance-dex': () => new BinanceDexMapper('binance-dex'),
-  'binance-futures': () => new BinanceFuturesMapper('binance-futures'),
-  coinbase: () => new CoinbaseMapper('coinbase'),
-  bitflyer: () => new BitflyerMapper('bitflyer'),
-  bitstamp: () => new BitstampMapper('bitstamp'),
-  cryptofacilities: () => new CryptofacilitiesMapper('cryptofacilities'),
-  ftx: () => new FtxMapper('ftx'),
-  gemini: () => new GeminiMapper('gemini'),
-  kraken: () => new KrakenMapper('kraken')
+const tradesMappers = {
+  bitmex: () => bitmexTradesMapper,
+  binance: () => new BinanceTradesMapper('binance'),
+  'binance-us': () => new BinanceTradesMapper('binance-us'),
+  'binance-jersey': () => new BinanceTradesMapper('binance-jersey'),
+  'binance-futures': () => binanceFuturesTradesMapper,
+  'binance-dex': () => binanceDexTradesMapper,
+  bitfinex: () => new BitfinexTradesMapper('bitfinex'),
+  'bitfinex-derivatives': () => new BitfinexTradesMapper('bitfinex-derivatives'),
+  bitflyer: () => bitflyerTradesMapper,
+  bitstamp: () => bitstampTradesMapper,
+  coinbase: () => coinbaseTradesMapper,
+  cryptofacilities: () => cryptofacilitiesTradesMapper,
+  deribit: () => deribitTradesMapper,
+  ftx: () => ftxTradesMapper,
+  gemini: () => geminiTradesMapper,
+  kraken: () => krakenTradesMapper,
+  okex: () => okexTradesMapper
 }
 
-export function getMapperFactory(exchange: Exchange): () => Mapper {
-  if (exchangeMapperMap[exchange]) {
-    return exchangeMapperMap[exchange]!
+const bookChangeMappers = {
+  bitmex: () => new BitmexBookChangeMapper(),
+  binance: () => new BinanceBookChangeMapper('binance'),
+  'binance-us': () => new BinanceBookChangeMapper('binance-us'),
+  'binance-jersey': () => new BinanceBookChangeMapper('binance-jersey'),
+  'binance-futures': () => new BinanceFuturesBookChangeMapper(),
+  'binance-dex': () => binanceDexBookChangeMapper,
+  bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
+  'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
+  bitflyer: () => bitflyerBookChangeMapper,
+  bitstamp: () => new BitstampBookChangeMapper(),
+  coinbase: () => coinbaseBookChangMapper,
+  cryptofacilities: () => cryptofacilitiesBookChangeMapper,
+  deribit: () => deribitBookChangeMapper,
+  ftx: () => ftxBookChangeMapper,
+  gemini: () => geminiBookChangeMapper,
+  kraken: () => krakenBookChangeMapper,
+  okex: () => okexBookChangeMapper
+}
+
+const derivativeTickersMappers = {
+  bitmex: () => new BitmexDerivativeTickerMapper(),
+  'binance-futures': () => new BinanceFuturesDerivativeTickerMapper(),
+  'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
+  cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
+  deribit: () => new DeribitDerivativeTickerMapper(),
+  okex: () => new OkexDerivativeTickerMapper()
+}
+
+export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T): Mapper<T, Trade> => {
+  const createTradesMapper = tradesMappers[exchange]
+
+  if (createTradesMapper === undefined) {
+    throw new Error(`normalizeTrades: ${exchange} not supported`)
   }
 
-  throw new Error(`not supported exchange ${exchange}`)
+  return createTradesMapper() as Mapper<T, Trade>
 }
 
-export function createMapper(exchange: Exchange) {
-  const MapperFactory = getMapperFactory(exchange)
+export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(exchange: T): Mapper<T, BookChange> => {
+  const createBookChangesMapper = bookChangeMappers[exchange]
 
-  return MapperFactory()
+  if (createBookChangesMapper === undefined) {
+    throw new Error(`normalizeBookChanges: ${exchange} not supported`)
+  }
+
+  return createBookChangesMapper() as Mapper<T, BookChange>
 }
 
-export function setMapperFactory(exchange: Exchange, mapperFactory: () => Mapper) {
-  exchangeMapperMap[exchange] = mapperFactory
+export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(exchange: T): Mapper<T, DerivativeTicker> => {
+  const createDerivativeTickerMapper = derivativeTickersMappers[exchange]
+
+  if (createDerivativeTickerMapper === undefined) {
+    throw new Error(`normalizeDerivativeTickers: ${exchange} not supported`)
+  }
+
+  return createDerivativeTickerMapper() as any
 }

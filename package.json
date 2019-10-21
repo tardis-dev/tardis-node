@@ -48,7 +48,7 @@
     "fs-extra": "^8.1.0",
     "got": "^10.0.0-alpha.2",
     "p-map": "^3.0.0",
-    "ws": "websockets/ws#master"
+    "ws": "^7.2.0"
   },
   "devDependencies": {
     "@types/collections": "^5.0.0",

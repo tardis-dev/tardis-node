@@ -1,23 +1,25 @@
-import { tardis, compute, Trade, Message, bookSnapshotComputable, tradeBinComputable } from '../dist'
+import { tardis, compute, Trade, normalizeTrades, computeBookSnapshots, computeTradeBars, normalizeBookChanges, BookChange } from '../dist'
 
 describe('compute(messages, types)', () => {
   test('should compute requested types based on replayNormalized iterables', async () => {
-    const bitmexMessages = tardis.replayNormalized({
-      exchange: 'bitmex',
-      from: '2019-04-01',
-      to: '2019-04-01 00:01',
-      dataTypes: ['trade', 'book_change'],
-      symbols: ['XBTUSD'],
-      withDisconnectMessages: true
-    })
+    const normalizers = [normalizeTrades, normalizeBookChanges]
+    const bitmexMessages = tardis.replayNormalized(
+      {
+        exchange: 'bitmex',
+        from: '2019-04-01',
+        to: '2019-04-01 00:01',
+        symbols: ['XBTUSD'],
+        withDisconnectMessages: true
+      },
+      ...normalizers
+    )
 
     const bufferedMessages = []
-
     const withComputedTypes = compute(
       bitmexMessages,
-      bookSnapshotComputable({ depth: 10, interval: 1000 }),
-      tradeBinComputable({ binBy: 'time', binSize: 1000 }),
-      tradeBinComputable({ binBy: 'ticks', binSize: 100 })
+      computeBookSnapshots({ depth: 10, interval: 1000 }),
+      computeTradeBars({ kind: 'time', interval: 1000 }),
+      computeTradeBars({ kind: 'tick', interval: 100 })
     )
 
     for await (const message of withComputedTypes) {
@@ -27,7 +29,7 @@ describe('compute(messages, types)', () => {
     expect(bufferedMessages).toMatchSnapshot()
   })
 
-  test('should compute correct trade binds based on provided messages', async () => {
+  test('should compute correct trade bars based on provided messages', async () => {
     let tradesMessages = async function*(): AsyncIterableIterator<Trade> {
       yield {
         type: 'trade',
@@ -104,9 +106,9 @@ describe('compute(messages, types)', () => {
 
     const withComputedTypes = compute(
       tradesMessages(),
-      tradeBinComputable({ binBy: 'time', binSize: 60 * 1000, name: 'trade_bin_1_minute' }),
-      tradeBinComputable({ binBy: 'ticks', binSize: 2, name: 'trade_bin_2ticks' }),
-      tradeBinComputable({ binBy: 'volume', binSize: 2000, name: 'trade_bin_2kvol' })
+      computeTradeBars({ kind: 'time', interval: 60 * 1000, name: 'trade_bar_1_minute' }),
+      computeTradeBars({ kind: 'tick', interval: 2, name: 'trade_bar_2ticks' }),
+      computeTradeBars({ kind: 'volume', interval: 2000, name: 'trade_bar_2kvol' })
     )
     const bufferedMessages = []
 
@@ -118,7 +120,7 @@ describe('compute(messages, types)', () => {
   })
 
   test('should produce correct book snapshots based on provided messages', async () => {
-    let messages = async function*(): AsyncIterableIterator<Message> {
+    let messages = async function*(): AsyncIterableIterator<Trade | BookChange> {
       yield {
         type: 'trade',
         exchange: 'bitmex',
@@ -189,8 +191,8 @@ describe('compute(messages, types)', () => {
 
     const withComputedTypes = compute(
       messages(),
-      bookSnapshotComputable({ depth: 2, interval: 1000 }),
-      bookSnapshotComputable({ depth: 1, interval: 0, name: 'quotes' })
+      computeBookSnapshots({ depth: 2, interval: 1000 }),
+      computeBookSnapshots({ depth: 1, interval: 0, name: 'quotes' })
     )
 
     const bufferedMessages = []

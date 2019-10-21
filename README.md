@@ -76,14 +76,17 @@ replay()
 ### Stream real-time market data in normalized data format
 
 ```js
-const { tardis } = require('tardis-node')
+const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
 
 async function streamNormalized() {
-  const messages = tardis.streamNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD']
-  })
+  const messages = tardis.streamNormalized(
+    {
+      exchange: 'bitmex',
+      symbols: ['XBTUSD']
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
 
   for await (const message of messages) {
     console.log(message)
@@ -96,16 +99,19 @@ streamNormalized()
 ### Replay historical market data in normalized data format
 
 ```js
-const { tardis } = require('tardis-node')
+const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
 
 async function replayNormalized() {
-  const messages = tardis.replayNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD'],
-    from: '2019-05-01',
-    to: '2019-05-02'
-  })
+  const messages = tardis.replayNormalized(
+    {
+      exchange: 'bitmex',
+      symbols: ['XBTUSD'],
+      from: '2019-05-01',
+      to: '2019-05-02'
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
 
   for await (const message of messages) {
     console.log(message)
@@ -121,24 +127,30 @@ Returns single messages 'stream' that is ordered by `localTimestamp`.
 It works the same way for real-time market data as well, but messages are returned in FIFO manner.
 
 ```js
-const { tardis, combine } = require('tardis-node')
+const { tardis, normalizeTrades, normalizeBookChanges, combine } = require('tardis-node')
 
 async function replayCombined() {
-  const bitmexMessages = tardis.replayNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD'],
-    from: '2019-05-01',
-    to: '2019-05-02'
-  })
+  const bitmexMessages = tardis.replayNormalized(
+    {
+      exchange: 'bitmex',
+      symbols: ['XBTUSD'],
+      from: '2019-05-01',
+      to: '2019-05-02'
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
 
-  const deribitMessages = tardis.replayNormalized({
-    exchange: 'deribit',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['BTC-PERPETUAL'],
-    from: '2019-05-01',
-    to: '2019-05-02'
-  })
+  const deribitMessages = tardis.replayNormalized(
+    {
+      exchange: 'deribit',
+      symbols: ['BTC-PERPETUAL'],
+      from: '2019-05-01',
+      to: '2019-05-02'
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
 
   const combinedStream = combine(bitmexMessages, deribitMessages)
 
@@ -153,23 +165,26 @@ replayCombined()
 ### Compute 10 seconds trade bins and top 5 levels book snapshots every 2 seconds for real-time market data stream
 
 ```js
-const { tardis, compute, bookSnapshotComputable, tradeBinComputable } = require('tardis-node')
+const { tardis, normalizeTrades, normalizeBookChanges, compute, computeTradeBars, computeBookSnapshots } = require('tardis-node')
 
 async function streamComputed() {
-  const bitmexMessages = tardis.streamNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD']
-  })
+  const bitmexMessages = tardis.streamNormalized(
+    {
+      exchange: 'bitmex',
+      symbols: ['XBTUSD']
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
 
   const messagesWithComputedTypes = compute(
     bitmexMessages,
-    tradeBinComputable({ binBy: 'time', binSize: 10 * 1000 }),
-    bookSnapshotComputable({ depth: 5, interval: 2 * 1000 })
+    computeTradeBars({ kind: 'time', interval: 10 * 1000 }),
+    computeBookSnapshots({ depth: 5, interval: 2 * 1000 })
   )
 
   for await (const message of messagesWithComputedTypes) {
-    if (message.type === 'book_snapshot' || message.type === 'trade_bin') {
+    if (message.type === 'book_snapshot' || message.type === 'trade_bar') {
       console.log(message)
     }
   }
@@ -183,16 +198,19 @@ streamComputed()
 It works in the same way for real-time market data.
 
 ```js
-const { tardis, OrderBook } = require('tardis-node')
+const { tardis, normalizeTrades, normalizeBookChanges, OrderBook } = require('tardis-node')
 
 async function reconstructLOB() {
-  const bitmexXBTMessages = tardis.replayNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD'],
-    from: '2019-05-01',
-    to: '2019-05-02'
-  })
+  const bitmexXBTMessages = tardis.replayNormalized(
+    {
+      exchange: 'bitmex',
+      symbols: ['XBTUSD'],
+      from: '2019-05-01',
+      to: '2019-05-02'
+    },
+    normalizeTrades,
+    normalizeBookChanges
+  )
   const orderBook = new OrderBook()
 
   for await (const message of bitmexXBTMessages) {

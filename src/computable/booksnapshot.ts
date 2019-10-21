@@ -1,14 +1,14 @@
 import { Computable } from './computable'
-import { BookSnapshot, BookChange, DataType } from '../types'
+import { BookSnapshot, BookChange } from '../types'
 import { OrderBook } from '../orderbook'
 import { take } from '../handy'
 
 type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number }
 
-export const bookSnapshotComputable = (options: BookSnapshotComputableOptions) => () => new BookSnapshotComputable(options)
+export const computeBookSnapshots = (options: BookSnapshotComputableOptions) => () => new BookSnapshotComputable(options)
 
 class BookSnapshotComputable implements Computable<BookSnapshot> {
-  public readonly sourceDataTypes: DataType[] = ['book_change']
+  public readonly sourceDataTypes = ['book_change']
   private _bookChanged = false
   private _symbol: string = ''
   private _exchange: string = ''

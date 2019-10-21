@@ -1,93 +1,85 @@
-import { DataType, DerivativeTicker, Trade, BookChange, FilterForExchange } from '../types'
-import { MapperBase } from './mapper'
+import { DerivativeTicker, Trade, BookChange, FilterForExchange } from '../types'
+import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
 
-export class OkexMapper extends MapperBase {
-  public supportedDataTypes = ['trade', 'book_change', 'derivative_ticker'] as const
+const tradeChannels: FilterForExchange['okex']['channel'][] = ['spot/trade', 'futures/trade', 'swap/trade']
+const bookChangeChannels: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth', 'swap/depth']
+const derivativeTickerChannels: FilterForExchange['okex']['channel'][] = [
+  'spot/ticker',
+  'futures/ticker',
+  'swap/ticker',
+  'futures/mark_price',
+  'swap/mark_price',
+  'swap/funding_rate'
+]
 
-  private readonly _dataTypeChannelMapping: { [key in DataType]: FilterForExchange['okex']['channel'][] } = {
-    book_change: ['spot/depth', 'futures/depth', 'swap/depth'],
-    trade: ['spot/trade', 'futures/trade', 'swap/trade'],
-    derivative_ticker: ['spot/ticker', 'futures/ticker', 'swap/ticker', 'futures/mark_price', 'swap/mark_price', 'swap/funding_rate']
+const mapToFilters = (mapping: FilterForExchange['okex']['channel'][], symbols?: string[]): FilterForExchange['okex'][] => {
+  // depending if symbols is for spot/swap/futures it needs different underlying channel
+  // for ticker symbol we also need data for funding_rate and mark_price when applicable
+
+  if (symbols === undefined) {
+    return mapping.map(channel => {
+      return {
+        channel
+      }
+    })
   }
 
-  protected mapDataTypeAndSymbolsToFilters(dataType: DataType, symbols?: string[]): FilterForExchange['okex'][] {
-    // depending if symbols is for spot/swap/futures it needs different underlying channel
-    // for ticker symbol we also need data for funding_rate and mark_price when applicable
+  return symbols
+    .map(symbol => {
+      const isSwap = symbol.endsWith('-SWAP')
+      const isFuture = symbol.match(/[0-9]$/)
 
-    if (symbols === undefined) {
-      return this._dataTypeChannelMapping[dataType].map(channel => {
-        return {
-          channel
-        }
-      })
-    }
+      let prefix: string
+      if (isSwap) {
+        prefix = 'swap'
+      } else if (isFuture) {
+        prefix = 'futures'
+      } else {
+        prefix = 'spot'
+      }
 
-    return symbols
-      .map(symbol => {
-        const isSwap = symbol.endsWith('-SWAP')
-        const isFuture = symbol.match(/[0-9]$/)
-
-        let prefix: string
-        if (isSwap) {
-          prefix = 'swap'
-        } else if (isFuture) {
-          prefix = 'futures'
-        } else {
-          prefix = 'spot'
-        }
-
-        return this._dataTypeChannelMapping[dataType]
-          .filter(c => c.startsWith(prefix))
-          .map(channel => {
-            return {
-              channel,
-              symbols: [symbol]
-            }
-          })
-      })
-      .flatMap(c => c)
-      .reduce(
-        (prev, current) => {
-          const matchingExisting = prev.find(c => c.channel === current.channel)
-          if (matchingExisting !== undefined) {
-            matchingExisting.symbols!.push(current.symbols[0])
-          } else {
-            prev.push(current)
+      return mapping
+        .filter(c => c.startsWith(prefix))
+        .map(channel => {
+          return {
+            channel,
+            symbols: [symbol]
           }
+        })
+    })
+    .flatMap(c => c)
+    .reduce(
+      (prev, current) => {
+        const matchingExisting = prev.find(c => c.channel === current.channel)
+        if (matchingExisting !== undefined) {
+          matchingExisting.symbols!.push(current.symbols[0])
+        } else {
+          prev.push(current)
+        }
 
-          return prev
-        },
-        [] as FilterForExchange['okex'][]
-      )
-  }
-  protected detectDataType(message: OkexDataMessage): DataType | undefined {
-    if (!message.table) {
-      return
-    }
+        return prev
+      },
+      [] as FilterForExchange['okex'][]
+    )
+}
 
-    if (this._dataTypeChannelMapping.book_change.includes(message.table)) {
-      return 'book_change'
-    }
+export const okexTradesMapper: Mapper<'okex', Trade> = {
+  canHandle(message: OkexDataMessage) {
+    return tradeChannels.includes(message.table)
+  },
 
-    if (this._dataTypeChannelMapping.trade.includes(message.table)) {
-      return 'trade'
-    }
+  getFilters(symbols?: string[]) {
+    return mapToFilters(tradeChannels, symbols)
+  },
 
-    if (this._dataTypeChannelMapping.derivative_ticker.includes(message.table)) {
-      return 'derivative_ticker'
-    }
-
-    return
-  }
-
-  protected *mapTrades(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
+  *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const okexTrade of okexTradesMessage.data) {
       yield {
         type: 'trade',
         symbol: okexTrade.instrument_id,
-        exchange: this.exchange,
+        exchange: 'okex',
         id: okexTrade.trade_id,
         price: Number(okexTrade.price),
         amount: Number(okexTrade.qty || okexTrade.size),
@@ -97,28 +89,55 @@ export class OkexMapper extends MapperBase {
       }
     }
   }
+}
+const mapBookLevel = (level: OkexBookLevel) => {
+  const price = Number(level[0])
+  const amount = Number(level[1])
 
-  protected *mapOrderBookChanges(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
+  return { price, amount }
+}
+
+export const okexBookChangeMapper: Mapper<'okex', BookChange> = {
+  canHandle(message: OkexDataMessage) {
+    return bookChangeChannels.includes(message.table)
+  },
+
+  getFilters(symbols?: string[]) {
+    return mapToFilters(bookChangeChannels, symbols)
+  },
+
+  *map(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
     for (const message of okexDepthDataMessage.data) {
       yield {
         type: 'book_change',
         symbol: message.instrument_id,
-        exchange: this.exchange,
+        exchange: 'okex',
         isSnapshot: okexDepthDataMessage.action === 'partial',
-        bids: message.bids.map(this._mapBookLevel),
-        asks: message.asks.map(this._mapBookLevel),
+        bids: message.bids.map(mapBookLevel),
+        asks: message.asks.map(mapBookLevel),
         timestamp: new Date(message.timestamp),
         localTimestamp: localTimestamp
       }
     }
   }
+}
 
-  protected *mapDerivativeTickerInfo(
+export class OkexDerivativeTickerMapper implements Mapper<'okex', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  canHandle(message: OkexDataMessage) {
+    return derivativeTickerChannels.includes(message.table)
+  }
+
+  getFilters(symbols?: string[]) {
+    return mapToFilters(derivativeTickerChannels, symbols)
+  }
+
+  *map(
     message: OkexTickersMessage | OkexFundingRateMessage | OkexMarkPriceMessage,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
     for (const okexMessage of message.data) {
-      const pendingTickerInfo = this.getPendingTickerInfo(okexMessage.instrument_id)
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(okexMessage.instrument_id, 'okex')
       if ('funding_rate' in okexMessage) {
         pendingTickerInfo.updateFundingRate(Number(okexMessage.funding_rate))
       }
@@ -140,13 +159,6 @@ export class OkexMapper extends MapperBase {
         )
       }
     }
-  }
-
-  private _mapBookLevel(level: OkexBookLevel) {
-    const price = Number(level[0])
-    const amount = Number(level[1])
-
-    return { price, amount }
   }
 }
 
