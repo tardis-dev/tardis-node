@@ -71,7 +71,7 @@ class Tardis {
     to,
     filters,
     skipDecoding = undefined,
-    returnDisconnectsAsUndefined = undefined
+    withDisconnects = undefined
   }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
     Z extends true
       ? U extends true
@@ -182,16 +182,16 @@ class Tardis {
               message: JSON.parse(messageBuffer as any)
             } as any
           }
-          // ignore empty lines unless returnDisconnectsAsUndefined is set to true
+          // ignore empty lines unless withDisconnects is set to true
           // do not yield subsequent undefined messages
-        } else if (returnDisconnectsAsUndefined === true && lastMessageWasUndefined === false) {
+        } else if (withDisconnects === true && lastMessageWasUndefined === false) {
           lastMessageWasUndefined = true
           yield undefined as any
         }
       }
       // if slice was empty (no lines at all) yield undefined if flag is set
       // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
-      if (linesCount === 0 && returnDisconnectsAsUndefined === true && lastMessageWasUndefined === false) {
+      if (linesCount === 0 && withDisconnects === true && lastMessageWasUndefined === false) {
         lastMessageWasUndefined = true
         yield undefined as any
       }
@@ -236,13 +236,13 @@ class Tardis {
 
     const createMappers = () => normalizers.map(m => m(exchange))
     const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
-    const filters = nonFilterableExchanges.includes(exchange) ? [] : createMappers().flatMap(mapper => mapper.getFilters(symbols))
+    const filters = nonFilterableExchanges.includes(exchange) ? [] : this._getFilters(createMappers(), symbols)
 
     const messages = this.replay({
       exchange,
       from,
       to,
-      returnDisconnectsAsUndefined: true,
+      withDisconnects: true,
       filters
     })
 
@@ -253,7 +253,7 @@ class Tardis {
     exchange,
     filters,
     timeoutIntervalMS = 10000,
-    returnDisconnectsAsUndefined = undefined
+    withDisconnects = undefined
   }: StreamOptions<T, U>): AsyncIterableIterator<
     U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
   > {
@@ -273,7 +273,7 @@ class Tardis {
           localTimestamp: new Date(),
           message
         } as any
-      } else if (returnDisconnectsAsUndefined) {
+      } else if (withDisconnects) {
         yield undefined as any
       }
     }
@@ -294,11 +294,11 @@ class Tardis {
     }
 
     const createMappers = () => normalizers.map(m => m(exchange))
-    const filters = createMappers().flatMap(mapper => mapper.getFilters(symbols))
+    const filters = this._getFilters(createMappers(), symbols)
 
     const messages = this.stream({
       exchange,
-      returnDisconnectsAsUndefined: true,
+      withDisconnects: true,
       timeoutIntervalMS,
       filters
     })
@@ -356,6 +356,34 @@ class Tardis {
         }
       }
     }
+  }
+
+  private _getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
+    const filters = mappers.flatMap(mapper => mapper.getFilters(symbols))
+
+    const deduplicatedFilters = filters.reduce(
+      (prev, current) => {
+        const matchingExisting = prev.find(c => c.channel === current.channel)
+        if (matchingExisting !== undefined) {
+          if (matchingExisting.symbols !== undefined && current.symbols) {
+            for (let symbol of current.symbols) {
+              if (matchingExisting.symbols.includes(symbol) === false) {
+                matchingExisting.symbols.push(symbol)
+              }
+            }
+          } else if (current.symbols) {
+            matchingExisting.symbols = [...current.symbols]
+          }
+        } else {
+          prev.push(current)
+        }
+
+        return prev
+      },
+      [] as FilterForExchange[T][]
+    )
+
+    return deduplicatedFilters
   }
 
   private _validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {
@@ -423,7 +451,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   to: string
   filters: FilterForExchange[T][]
   skipDecoding?: U
-  returnDisconnectsAsUndefined?: Z
+  withDisconnects?: Z
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -438,7 +466,7 @@ export type StreamOptions<T extends Exchange, U extends boolean = false> = {
   exchange: T
   filters: FilterForExchange[T][]
   timeoutIntervalMS?: number
-  returnDisconnectsAsUndefined?: U
+  withDisconnects?: U
 }
 
 export type StreamNormalizedOptions<T extends Exchange, U extends boolean = false> = {
