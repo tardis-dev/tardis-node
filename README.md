@@ -3,10 +3,11 @@
 [![Version](https://img.shields.io/npm/v/tardis-node.svg)](https://www.npmjs.org/package/tardis-node)
 [![Try on RunKit](https://badge.runkitcdn.com/tardis-node.svg)](https://runkit.com/npm/tardis-node)
 
-## Introduction
 
 `Tardis-node` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of using callbacks it uses [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) that can be iterated via [`for await ...of`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) loop and that enables composability features like [seamless switching between real-time data streaming and historical data replay](node-js.md#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](node-js.md#computing-derived-data-locally).
-
+<br/>
+<br/>
+<br/>
 ```diff
 const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
 
@@ -27,7 +28,14 @@ for await (const message of messages) {
 }
 ```
 
+<br/>
+
 [![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-node-replay-market-data-normalized)
+
+
+<br/>
+<br/>
+<br/>
 
 ## Features
 
@@ -45,6 +53,10 @@ for await (const message of messages) {
 - [extensible mapping logic](node-js.md#modifying-built-in-and-adding-custom-normalizers) that allows adjusting normalized formats for specific needs
 - built-in TypeScript support
 
+<br/>
+<br/>
+<br/>
+
 ## Installation
 
 Requires Node.js v12+ installed.
@@ -53,13 +65,25 @@ Requires Node.js v12+ installed.
 npm install tardis-node --save
 ```
 
+<br/>
+<br/>
+<br/>
+
 ## Debugging and logging
 
 `tardis-node` lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-node*`.
 
+<br/>
+<br/>
+<br/>
+
 ## Documentation
 
-See the [tardis-node docs](https://docs.tardis.dev/api/tardis-node).
+See the official [tardis-node docs](https://docs.tardis.dev/api/tardis-node).
+
+<br/>
+<br/>
+<br/>
 
 ## Examples
 
