@@ -5,7 +5,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 export const deribitTradesMapper: Mapper<'deribit', Trade> = {
   canHandle(message: any) {
-    const channel = message.params && (message.params.channel as string | undefined)
+    const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
     if (channel === undefined) {
       return false
     }

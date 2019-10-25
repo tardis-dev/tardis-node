@@ -36,16 +36,16 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
     const { localTimestamp, timestamp } = message
 
     for (const computable of computables) {
-      // any time new message arrives check if given computable has
-      // new sample for such message timestamp, eg: time based trade bars
-
-      if (computable.hasNewSample(timestamp)) {
-        yield computable.getSample(localTimestamp)
-      }
-
-      // update computable with new data if data types match
-      // and check if such computable after update has new sample as well
+      // any time new message arrives check if given computable
+      // source data types include message type and
+      // has new sample for such message timestamp, eg: time based trade bars
       if (computable.sourceDataTypes.includes(message.type)) {
+        if (computable.hasNewSample(timestamp)) {
+          yield computable.getSample(localTimestamp)
+        }
+
+        // update computable with new data
+        // and check if such computable after update has new sample as well
         computable.update(message)
         if (computable.hasNewSample(timestamp)) {
           yield computable.getSample(localTimestamp)
