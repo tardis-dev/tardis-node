@@ -4,12 +4,12 @@
   "engines": {
     "node": ">=12"
   },
-  "description": "tardis-node library provides fast and convenient access to tick-level real-time and historical cryptocurrency market data.",
+  "description": "Fast and convenient access to tick-level historical and real-time cryptocurrency market data via Node.js",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "repository": "tardis-dev/tardis-node",
-  "homepage": "https://docs.tardis.dev/api/tardis-node",
+  "homepage": "https://docs.tardis.dev/api/node-js",
   "scripts": {
     "build": "tsc",
     "precommit": "lint-staged",
@@ -33,6 +33,9 @@
     "cryptocurrency api",
     "real-time normalized WebSocket cryptocurrency markets data",
     "normalized cryptocurrency market data API",
+    "order book reconstruction",
+    "market data normalization",
+    "cryptocurrency api",
     "cryptocurrency",
     "exchange",
     "websocket",
@@ -78,5 +81,8 @@
     },
     "testEnvironment": "node"
   },
-  "runkitExampleFilename": "example.js"
+  "runkitExampleFilename": "example.js",
+  "optionalDependencies": {
+    "bufferutil": "^4.0.1"
+  }
 }

@@ -3,35 +3,65 @@
 [![Version](https://img.shields.io/npm/v/tardis-node.svg)](https://www.npmjs.org/package/tardis-node)
 [![Try on RunKit](https://badge.runkitcdn.com/tardis-node.svg)](https://runkit.com/npm/tardis-node)
 
-Tardis Node library provides fast and convenient access to tick-level real-time and historical cryptocurrency market data.
+## Introduction
 
-Built-in support for:
+`Tardis-node` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of using callbacks it uses [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) that can be iterated via [`for await ...of`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) loop and that enables composability features like [seamless switching between real-time data streaming and historical data replay](node-js.md#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](node-js.md#computing-derived-data-locally).
 
-- real-time streaming market data with unified interface for connecting to public exchanges WebSocket APIs
-- historical market data replay backed by [tardis.dev](https://tardis.dev) API
-- both exchange native and normalized\* market data format
-- top cryptocurrency exchanges
-- automatic reconnection and stale connections detection logic for real-time streams
-- combining multiple exchanges feeds into single one
-- computing custom trade bins/bars and book snapshots client-side (eg: volume based bars, top 20 levels 100ms order book snapshots etc.)
-- full limit order book reconstruction, both for real-time and historical data
+```diff
+const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
+
+-const messages = tardis.replayNormalized(
++const messages = tardis.streamNormalized(
+  {
+    exchange: 'bitmex',
+    symbols: ['XBTUSD', 'ETHUSD'],
+-    from: '2019-05-01',
+-    to: '2019-05-02'
+  },
+  normalizeTrades,
+  normalizeBookChanges
+)
+
+for await (const message of messages) {
+  console.log(message)
+}
+```
+
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-node-replay-market-data-normalized)
+
+## Features
+
+- [real-time streaming](node-js.md#tardis-streamnormalized-options-normalizers) of tick-level market data with unified API for connecting directly to exchanges public WebSocket APIs without any intermediary/3rd party proxy
+- historical tick-level [market data replay](node-js.md#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](http.md#data-feeds-exchange)
+- support for both exchange native and [normalized market data](node-js.md#data-normalization) formats \(consistent format for accessing market data across multiple exchanges — normalized trades, order book and ticker data\)
+- [seamless switching between real-time streaming and historical market data replay](node-js.md#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) thanks to [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) providing unified way of consuming data messages
+- transparent historical local data caching \(cached data is stored on disk in compressed GZIP format and decompressed on demand when reading the data\)
+- support for top cryptocurrency exchanges: BitMEX, Binance, Binance Futures, Deribit, Bitfinex, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, FTX, Kraken and OKEx.
+- automatic closed connections and stale connections reconnection logic for real-time streams
+- [combining multiple exchanges feeds into single one](node-js.md#combining-data-streams) via [`combine`](node-js.md#combine-iterators) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
+- [computing derived data locally](node-js.md#computing-derived-data-locally) like trade bars and book snapshots via [`compute`](node-js.md#compute-iterator-computables) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
+- [full limit order book reconstruction](node-js.md#limit-order-book-reconstruction) both for real-time and historical data via `OrderBook` object
+- fast and lightweight architecture — low memory footprint and no heavy in-memory buffering
+- [extensible mapping logic](node-js.md#modifying-built-in-and-adding-custom-normalizers) that allows adjusting normalized formats for specific needs
 - built-in TypeScript support
-
-\* normalized: consistent format for accessing market data across multiple exchanges -normalized trade, order book L2 and ticker data
 
 ## Installation
 
 Requires Node.js v12+ installed.
 
-```sh
+```bash
 npm install tardis-node --save
 ```
+
+## Debugging and logging
+
+`tardis-node` lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-node*`.
 
 ## Documentation
 
 See the [tardis-node docs](https://docs.tardis.dev/api/tardis-node).
 
-## Usage
+## Examples
 
 ### Stream real-time market data in exchange native data format
 
@@ -73,154 +103,4 @@ async function replay() {
 replay()
 ```
 
-### Stream real-time market data in normalized data format
-
-```js
-const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
-
-async function streamNormalized() {
-  const messages = tardis.streamNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['XBTUSD']
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-
-  for await (const message of messages) {
-    console.log(message)
-  }
-}
-
-streamNormalized()
-```
-
-### Replay historical market data in normalized data format
-
-```js
-const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
-
-async function replayNormalized() {
-  const messages = tardis.replayNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['XBTUSD'],
-      from: '2019-05-01',
-      to: '2019-05-02'
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-
-  for await (const message of messages) {
-    console.log(message)
-  }
-}
-
-replayNormalized()
-```
-
-### Combine two historical exchange market data feeds
-
-Returns single messages 'stream' that is ordered by `localTimestamp`.
-It works the same way for real-time market data as well, but messages are returned in FIFO manner.
-
-```js
-const { tardis, normalizeTrades, normalizeBookChanges, combine } = require('tardis-node')
-
-async function replayCombined() {
-  const bitmexMessages = tardis.replayNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['XBTUSD'],
-      from: '2019-05-01',
-      to: '2019-05-02'
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-
-  const deribitMessages = tardis.replayNormalized(
-    {
-      exchange: 'deribit',
-      symbols: ['BTC-PERPETUAL'],
-      from: '2019-05-01',
-      to: '2019-05-02'
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-
-  const combinedStream = combine(bitmexMessages, deribitMessages)
-
-  for await (const message of combinedStream) {
-    console.log(message)
-  }
-}
-
-replayCombined()
-```
-
-### Compute 10 seconds trade bins and top 5 levels book snapshots every 2 seconds for real-time market data stream
-
-```js
-const { tardis, normalizeTrades, normalizeBookChanges, compute, computeTradeBars, computeBookSnapshots } = require('tardis-node')
-
-async function streamComputed() {
-  const bitmexMessages = tardis.streamNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['XBTUSD']
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-
-  const messagesWithComputedTypes = compute(
-    bitmexMessages,
-    computeTradeBars({ kind: 'time', interval: 10 * 1000 }),
-    computeBookSnapshots({ depth: 5, interval: 2 * 1000 })
-  )
-
-  for await (const message of messagesWithComputedTypes) {
-    if (message.type === 'book_snapshot' || message.type === 'trade_bar') {
-      console.log(message)
-    }
-  }
-}
-
-streamComputed()
-```
-
-### Reconstruct historical limit order book at any point in time
-
-It works in the same way for real-time market data.
-
-```js
-const { tardis, normalizeTrades, normalizeBookChanges, OrderBook } = require('tardis-node')
-
-async function reconstructLOB() {
-  const bitmexXBTMessages = tardis.replayNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['XBTUSD'],
-      from: '2019-05-01',
-      to: '2019-05-02'
-    },
-    normalizeTrades,
-    normalizeBookChanges
-  )
-  const orderBook = new OrderBook()
-
-  for await (const message of bitmexXBTMessages) {
-    if (message.type === 'book_change') {
-      orderBook.update(message)
-    }
-    console.log(message.localTimestamp.toISOString(), orderBook.bestAsk(), orderBook.bestBid())
-    // or orderBook.bids(), orderBook.asks() to get all levels at any given point in time
-  }
-}
-
-reconstructLOB()
-```
+See the [tardis-node docs](https://docs.tardis.dev/api/tardis-node).

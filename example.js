@@ -1,27 +1,32 @@
-const { tardis, combine } = require('tardis-node')
+const { tardis, normalizeTrades, compute, computeTradeBars } = require('tardis-node')
 
-async function replayCombined() {
-  const bitmexMessages = tardis.replayNormalized({
-    exchange: 'bitmex',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['XBTUSD'],
-    from: '2019-05-01',
-    to: '2019-05-01 03:00'
-  })
+async function produceVolumeBasedTradeBars(messages) {
+  const withVolumeTradeBars = compute(
+    messages,
+    computeTradeBars({
+      kind: 'volume',
+      interval: 100 * 1000 // aggregate by 100k contracts volume
+    })
+  )
 
-  const deribitMessages = tardis.replayNormalized({
-    exchange: 'deribit',
-    dataTypes: ['trade', 'book_change'],
-    symbols: ['BTC-PERPETUAL'],
-    from: '2019-05-01',
-    to: '2019-05-01 03:00'
-  })
-
-  const combinedStream = combine(bitmexMessages, deribitMessages)
-
-  for await (const message of combinedStream) {
-    console.log(message)
+  for await (const message of withVolumeTradeBars) {
+    if (message.type === 'trade_bar') {
+      console.log(message.name, message)
+    }
   }
 }
 
-await replayCombined()
+const historicalMessages = tardis.replayNormalized(
+  { exchange: 'bitmex', symbols: ['XBTUSD'], from: '2019-08-01', to: '2019-08-02' },
+  normalizeTrades
+)
+
+const realTimeMessages = tardis.streamNormalized(
+  { exchange: 'bitmex', symbols: ['XBTUSD'] },
+  normalizeTrades
+)
+
+await produceVolumeBasedTradeBars(historicalMessages)
+
+// or for real time data
+//  await produceVolumeBasedTradeBars(realTimeMessages)
