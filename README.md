@@ -77,7 +77,7 @@ See the official [tardis-node docs](https://docs.tardis.dev/api/node-js).
 
 ### Real-time spread across multiple exchanges
 
-Example showing how to quickly display real-time spread and best bid/ask info across multiple exchanges at once. It can be easily adapted to do the same for historical data \([`replayNormalized`](node-js.md#tardis-replaynormalized-options-normalizers) instead of [`streamNormalized`](node-js.md#tardis-streamnormalized-options-normalizers)\).
+Example showing how to quickly display real-time spread and best bid/ask info across multiple exchanges at once. It can be easily adapted to do the same for historical data \(`replayNormalized` instead of `streamNormalized`).
 
 ```javascript
 const { tardis, normalizeBookChanges, combine, compute,
