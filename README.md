@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/npm/v/tardis-node.svg)](https://www.npmjs.org/package/tardis-node)
 [![Try on RunKit](https://badge.runkitcdn.com/tardis-node.svg)](https://runkit.com/npm/tardis-node)
 
-`Tardis-node` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of using callbacks it uses [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) that can be iterated via [`for await ...of`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) loop and that enables composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
+`Tardis-node` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) which also enables composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
 
 <br/>
 
@@ -161,7 +161,10 @@ const historicalMessages = tardis.replayNormalized(
   normalizeTrades
 )
 
-const realTimeMessages = tardis.streamNormalized({ exchange: 'bitmex', symbols: ['XBTUSD'] }, normalizeTrades)
+const realTimeMessages = tardis.streamNormalized(
+  { exchange: 'bitmex', symbols: ['XBTUSD'] },
+  normalizeTrades
+)
 
 await produceVolumeBasedTradeBars(historicalMessages)
 
