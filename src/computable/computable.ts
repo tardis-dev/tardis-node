@@ -31,8 +31,8 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
       factory.reset(message.exchange)
       continue
     }
-
-    const computables = factory.getOrCreate(message.exchange, message.symbol)
+    const id = message.name !== undefined ? `${message.symbol}:${message.name}` : message.symbol
+    const computables = factory.getOrCreate(message.exchange, id)
     const { localTimestamp, timestamp } = message
 
     for (const computable of computables) {
@@ -64,16 +64,16 @@ class Computables {
 
   constructor(private readonly _computablesFactories: ComputableFactory<any>[]) {}
 
-  getOrCreate(exchange: Exchange, symbol: string) {
+  getOrCreate(exchange: Exchange, id: string) {
     if (this._computables[exchange] === undefined) {
       this._computables[exchange] = {}
     }
 
-    if (this._computables[exchange]![symbol] === undefined) {
-      this._computables[exchange]![symbol] = this._computablesFactories.map(c => c())
+    if (this._computables[exchange]![id] === undefined) {
+      this._computables[exchange]![id] = this._computablesFactories.map(c => c())
     }
 
-    return this._computables[exchange]![symbol]!
+    return this._computables[exchange]![id]!
   }
 
   reset(exchange: Exchange) {

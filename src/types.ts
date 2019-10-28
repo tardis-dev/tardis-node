@@ -15,6 +15,7 @@ export type NormalizedData = {
   readonly exchange: Exchange
   readonly timestamp: Date
   readonly localTimestamp: Date
+  readonly name?: string
 }
 
 export type Trade = {
