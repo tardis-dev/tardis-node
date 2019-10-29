@@ -2,12 +2,7 @@ import { Exchange, NormalizedData, Disconnect } from '../types'
 
 export type Computable<T extends NormalizedData> = {
   readonly sourceDataTypes: string[]
-
-  update(message: NormalizedData): void
-
-  hasNewSample(timestamp: Date): boolean
-
-  getSample(localTimestamp: Date): T
+  compute(message: NormalizedData): IterableIterator<T>
 }
 
 export type ComputableFactory<T extends NormalizedData> = () => Computable<T>
@@ -31,24 +26,17 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
       factory.reset(message.exchange)
       continue
     }
+
     const id = message.name !== undefined ? `${message.symbol}:${message.name}` : message.symbol
     const computables = factory.getOrCreate(message.exchange, id)
-    const { localTimestamp, timestamp } = message
 
     for (const computable of computables) {
       // any time new message arrives check if given computable
       // source data types include message type and
       // has new sample for such message timestamp, eg: time based trade bars
       if (computable.sourceDataTypes.includes(message.type)) {
-        if (computable.hasNewSample(timestamp)) {
-          yield computable.getSample(localTimestamp)
-        }
-
-        // update computable with new data
-        // and check if such computable after update has new sample as well
-        computable.update(message)
-        if (computable.hasNewSample(timestamp)) {
-          yield computable.getSample(localTimestamp)
+        for (const computed of computable.compute(message)) {
+          yield computed
         }
       }
     }

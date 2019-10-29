@@ -1,5 +1,5 @@
 import { Computable } from './computable'
-import { TradeBar, Trade } from '../types'
+import { TradeBar, Trade, Writeable } from '../types'
 
 const DATE_MIN = new Date(-1)
 
@@ -14,10 +14,11 @@ const kindSuffix: { [key in BarKind]: string } = {
   time: 'ms',
   volume: 'vol'
 }
+
 class TradeBarComputable implements Computable<TradeBar> {
   public readonly sourceDataTypes = ['trade']
 
-  protected inProgressBar: Writeable<TradeBar>
+  private _inProgressBar: Writeable<TradeBar>
   private readonly _kind: BarKind
   private readonly _interval: number
   private readonly _name: string
@@ -33,23 +34,50 @@ class TradeBarComputable implements Computable<TradeBar> {
       this._name = name
     }
 
-    this.inProgressBar = {} as any
+    this._inProgressBar = {} as any
     this._reset()
   }
 
-  public hasNewSample(timestamp: Date): boolean {
+  public *compute(trade: Trade) {
+    // first check if there is a new trade bar for new timestamp for time based trade bars
+    if (this._hasNewBar(trade.timestamp)) {
+      yield this._computeBar(trade)
+    }
+
+    // update in progress trade bar with new data
+    this._update(trade)
+
+    // and check again if there is a new trade bar after the update (volume/tick based trade bars)
+    if (this._hasNewBar(trade.timestamp)) {
+      yield this._computeBar(trade)
+    }
+  }
+
+  private _computeBar(trade: Trade) {
+    this._inProgressBar.localTimestamp = trade.localTimestamp
+    this._inProgressBar.symbol = trade.symbol
+    this._inProgressBar.exchange = trade.exchange
+
+    const tradeBar: TradeBar = { ...this._inProgressBar }
+
+    this._reset()
+
+    return tradeBar
+  }
+
+  private _hasNewBar(timestamp: Date): boolean {
     // privided timestamp is an exchange trade timestamp in that case
     // we bucket based on exchange timestamps when bucketing by time not by localTimestamp
-    if (this.inProgressBar.trades === 0) {
+    if (this._inProgressBar.trades === 0) {
       return false
     }
 
     if (this._kind === 'time') {
       const currentTimestampTimeBucket = this._getTimeBucket(timestamp)
-      const openTimestampTimeBucket = this._getTimeBucket(this.inProgressBar.openTimestamp)
+      const openTimestampTimeBucket = this._getTimeBucket(this._inProgressBar.openTimestamp)
       if (currentTimestampTimeBucket > openTimestampTimeBucket) {
         // set the timestamp to the end of the period of given bucket
-        this.inProgressBar.timestamp = new Date((openTimestampTimeBucket + 1) * this._interval)
+        this._inProgressBar.timestamp = new Date((openTimestampTimeBucket + 1) * this._interval)
 
         return true
       }
@@ -58,32 +86,21 @@ class TradeBarComputable implements Computable<TradeBar> {
     }
 
     if (this._kind === 'volume') {
-      return this.inProgressBar.volume >= this._interval
+      return this._inProgressBar.volume >= this._interval
     }
 
     if (this._kind === 'tick') {
-      return this.inProgressBar.trades >= this._interval
+      return this._inProgressBar.trades >= this._interval
     }
 
     return false
   }
 
-  public getSample(localTimestamp: Date) {
-    this.inProgressBar.localTimestamp = localTimestamp
-
-    const sample: TradeBar = { ...this.inProgressBar }
-    this._reset()
-
-    return sample
-  }
-
-  public update(trade: Trade) {
-    const inProgressBar = this.inProgressBar
+  private _update(trade: Trade) {
+    const inProgressBar = this._inProgressBar
     const isNotOpenedYet = inProgressBar.trades === 0
 
     if (isNotOpenedYet) {
-      inProgressBar.symbol = trade.symbol
-      inProgressBar.exchange = trade.exchange
       inProgressBar.open = trade.price
       inProgressBar.openTimestamp = trade.timestamp
     }
@@ -108,9 +125,10 @@ class TradeBarComputable implements Computable<TradeBar> {
   }
 
   private _reset() {
-    const barToReset = this.inProgressBar
+    const barToReset = this._inProgressBar
     barToReset.type = this._type
     barToReset.symbol = ''
+    barToReset.exchange = '' as any
     barToReset.name = this._name
     barToReset.interval = this._interval
     barToReset.kind = this._kind
@@ -136,5 +154,3 @@ class TradeBarComputable implements Computable<TradeBar> {
     return Math.floor(timestamp.valueOf() / this._interval)
   }
 }
-
-type Writeable<T> = { -readonly [P in keyof T]: T[P] }

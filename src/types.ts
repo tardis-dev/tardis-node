@@ -9,6 +9,8 @@ export type Filter<T> = {
   symbols?: string[]
 }
 
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
+
 export type NormalizedData = {
   readonly type: string
   readonly symbol: string
