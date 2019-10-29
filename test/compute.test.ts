@@ -18,6 +18,8 @@ describe('compute(messages, types)', () => {
     const withComputedTypes = compute(
       bitmexMessages,
       computeBookSnapshots({ depth: 10, interval: 1000 }),
+      computeBookSnapshots({ depth: 5, interval: 0 }),
+      computeBookSnapshots({ depth: 3, interval: 100 }),
       computeTradeBars({ kind: 'time', interval: 1000 }),
       computeTradeBars({ kind: 'tick', interval: 100 })
     )

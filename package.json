@@ -37,6 +37,7 @@
     "market data normalization",
     "cryptocurrency api",
     "cryptocurrency",
+    "orderbook",
     "exchange",
     "websocket",
     "realtime",
@@ -46,15 +47,14 @@
   ],
   "license": "MPL-2.0",
   "dependencies": {
-    "collections": "2.0.3",
     "debug": "^4.1.1",
     "fs-extra": "^8.1.0",
     "got": "^10.0.0-alpha.2",
     "p-map": "^3.0.0",
+    "sorted-btree": "^1.2.1",
     "ws": "^7.2.0"
   },
   "devDependencies": {
-    "@types/collections": "^5.0.0",
     "@types/ws": "^6.0.3",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",

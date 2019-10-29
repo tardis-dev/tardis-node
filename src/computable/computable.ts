@@ -31,9 +31,6 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
     const computables = factory.getOrCreate(message.exchange, id)
 
     for (const computable of computables) {
-      // any time new message arrives check if given computable
-      // source data types include message type and
-      // has new sample for such message timestamp, eg: time based trade bars
       if (computable.sourceDataTypes.includes(message.type)) {
         for (const computed of computable.compute(message)) {
           yield computed
