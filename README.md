@@ -37,7 +37,7 @@ for await (const message of messages) {
 
 <br/>
 
-- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) - includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
+- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
 
 <br/>
 
