@@ -1,0 +1,25 @@
+import got from 'got'
+import { getOptions } from './options'
+import { Exchange } from './types'
+
+export async function getApiKeyAccessInfo(apiKey?: string) {
+  const options = getOptions()
+  const apiKeyToCheck = apiKey || options.apiKey
+
+  const apiKeyAccessInfo = await got
+    .get(`${options.endpoint}/v1/api-key-info`, {
+      headers: {
+        Authorization: `Bearer ${apiKeyToCheck}`
+      }
+    })
+    .json()
+
+  return apiKeyAccessInfo as ApiKeyAccessInfo
+}
+
+export type ApiKeyAccessInfo = {
+  exchange: Exchange
+  from: string
+  to: string
+  symbols: string[]
+}[]

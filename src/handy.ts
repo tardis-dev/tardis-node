@@ -1,4 +1,6 @@
 import { createHash } from 'crypto'
+import { Mapper } from './mappers'
+import { Disconnect, Exchange, FilterForExchange } from './types'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
@@ -69,4 +71,88 @@ export function* take(iterable: Iterable<any>, length: number) {
       return
     }
   }
+}
+
+export async function* normalizeMessages(
+  exchange: Exchange,
+  messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
+  createMappers: () => Mapper<any, any>[],
+  symbols: string[] | undefined,
+  withDisconnectMessages: boolean | undefined
+) {
+  let previousLocalTimestamp: Date | undefined
+  let mappersForExchange = createMappers()
+
+  if (mappersForExchange.length === 0) {
+    throw new Error(`Can't normalize data without any normalizers provided`)
+  }
+
+  for await (const messageWithTimestamp of messages) {
+    if (messageWithTimestamp === undefined) {
+      // we received undefined meaning Websocket disconnection
+      // lets create new mappers with clean state for 'new connection'
+      mappersForExchange = createMappers()
+
+      // if flag withDisconnectMessages is set, yield disconnect message
+      if (withDisconnectMessages === true && previousLocalTimestamp !== undefined) {
+        const disconnect: Disconnect = {
+          type: 'disconnect',
+          exchange,
+          localTimestamp: previousLocalTimestamp
+        }
+        yield disconnect as any
+      }
+
+      continue
+    }
+
+    previousLocalTimestamp = messageWithTimestamp.localTimestamp
+
+    for (const mapper of mappersForExchange) {
+      if (mapper.canHandle(messageWithTimestamp.message)) {
+        const mappedMessages = mapper.map(messageWithTimestamp.message, messageWithTimestamp.localTimestamp)
+        if (!mappedMessages) {
+          continue
+        }
+
+        for (const message of mappedMessages) {
+          if (symbolsInclude(symbols, message.symbol)) {
+            yield message
+          }
+        }
+      }
+    }
+  }
+}
+
+export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
+  const filters = mappers.flatMap(mapper => mapper.getFilters(symbols))
+
+  const deduplicatedFilters = filters.reduce(
+    (prev, current) => {
+      const matchingExisting = prev.find(c => c.channel === current.channel)
+      if (matchingExisting !== undefined) {
+        if (matchingExisting.symbols !== undefined && current.symbols) {
+          for (let symbol of current.symbols) {
+            if (matchingExisting.symbols.includes(symbol) === false) {
+              matchingExisting.symbols.push(symbol)
+            }
+          }
+        } else if (current.symbols) {
+          matchingExisting.symbols = [...current.symbols]
+        }
+      } else {
+        prev.push(current)
+      }
+
+      return prev
+    },
+    [] as FilterForExchange[T][]
+  )
+
+  return deduplicatedFilters
+}
+
+function symbolsInclude(symbols: string[] | undefined, symbol: string) {
+  return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
 }

@@ -1,9 +1,18 @@
-import { tardis, compute, Trade, normalizeTrades, computeBookSnapshots, computeTradeBars, normalizeBookChanges, BookChange } from '../dist'
+import {
+  replayNormalized,
+  compute,
+  Trade,
+  normalizeTrades,
+  computeBookSnapshots,
+  computeTradeBars,
+  normalizeBookChanges,
+  BookChange
+} from '../dist'
 
 describe('compute(messages, types)', () => {
   test('should compute requested types based on replayNormalized iterables', async () => {
     const normalizers = [normalizeTrades, normalizeBookChanges]
-    const bitmexMessages = tardis.replayNormalized(
+    const bitmexMessages = replayNormalized(
       {
         exchange: 'bitmex',
         from: '2019-04-01',

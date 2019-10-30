@@ -1,9 +1,9 @@
-import { tardis, combine, normalizeTrades, normalizeBookChanges } from '../dist'
+import { replayNormalized, combine, normalizeTrades, normalizeBookChanges } from '../dist'
 
 describe('combine(...asyncIterators)', () => {
   test('should produce combined iterable from two replayNormalized iterables', async () => {
     const normalizers = [normalizeTrades, normalizeBookChanges]
-    const bitmexMessages = tardis.replayNormalized(
+    const bitmexMessages = replayNormalized(
       {
         exchange: 'bitmex',
         from: '2019-04-01',
@@ -13,7 +13,7 @@ describe('combine(...asyncIterators)', () => {
       ...normalizers
     )
 
-    const deribitMessages = tardis.replayNormalized(
+    const deribitMessages = replayNormalized(
       {
         exchange: 'deribit',
         from: '2019-04-01',
