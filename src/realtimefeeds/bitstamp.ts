@@ -30,10 +30,10 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected provideManualSnapshots = async (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => {
-    // does not work currently due to https://github.com/nodejs/node/issues/27711
-    const doesNotWorkInNode12 = true
+    // does not work currently on node v12 due to https://github.com/nodejs/node/issues/27711
+
     const orderBookFilter = filters.find(f => f.channel === 'diff_order_book')
-    if (!orderBookFilter || doesNotWorkInNode12) {
+    if (!orderBookFilter) {
       return
     }
 
