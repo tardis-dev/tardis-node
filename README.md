@@ -34,7 +34,7 @@ for await (const message of messages) {
 ## Features
 
 - [real-time streaming](https://docs.tardis.dev/api/node-js#tardis-streamnormalized-options-normalizers) of tick-level market data with unified API for connecting directly to exchanges public WebSocket APIs without any intermediary/3rd party proxy
-- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange)
+- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) - includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
 - support for both exchange native and [normalized market data](https://docs.tardis.dev/api/node-js#data-normalization) formats \(consistent format for accessing market data across multiple exchanges — normalized trades, order book and ticker data\)
 - [seamless switching between real-time streaming and historical market data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) thanks to [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) providing unified way of consuming data messages
 - transparent historical local data caching \(cached data is stored on disk in compressed GZIP format and decompressed on demand when reading the data\)
