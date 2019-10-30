@@ -7,33 +7,47 @@ export type Computable<T extends NormalizedData> = {
 
 export type ComputableFactory<T extends NormalizedData> = () => Computable<T>
 
-function isDisconnect(message: any): message is Disconnect {
-  return message.type === 'disconnect'
-}
-
-export async function* compute<T extends ComputableFactory<any>[], U extends NormalizedData>(
-  messages: AsyncIterableIterator<U | Disconnect>,
+export async function* compute<T extends ComputableFactory<any>[], U extends NormalizedData | Disconnect>(
+  messages: AsyncIterableIterator<U>,
   ...computables: T
-): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? U | Z | Disconnect : never> {
+): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? (U | Z | Disconnect) : U | Z) : never> {
   const factory = new Computables(computables)
 
   for await (const message of messages) {
     // always pass through source message
     yield message as any
 
-    if (isDisconnect(message)) {
+    if (message.type === 'disconnect') {
       // reset all computables for given exchange if we've received disconnect for it
       factory.reset(message.exchange)
       continue
     }
+    const normalizedMessage = message as NormalizedData
+    const id = normalizedMessage.name !== undefined ? `${normalizedMessage.symbol}:${normalizedMessage.name}` : normalizedMessage.symbol
 
-    const id = message.name !== undefined ? `${message.symbol}:${message.name}` : message.symbol
-    const computables = factory.getOrCreate(message.exchange, id)
+    const computables = factory.getOrCreate(normalizedMessage.exchange, id)
+
+    const sourceDataForSubsequentComputables: NormalizedData[] = []
 
     for (const computable of computables) {
-      if (computable.sourceDataTypes.includes(message.type)) {
-        for (const computed of computable.compute(message)) {
-          yield computed
+      if (computable.sourceDataTypes.includes(normalizedMessage.type)) {
+        for (const computedMessage of computable.compute(normalizedMessage)) {
+          sourceDataForSubsequentComputables.push(computedMessage)
+          yield computedMessage
+        }
+      }
+
+      // as long as previous computables computed new messages we need to pass those to subsequent ones as those may relay
+      // on previously computed computables as a source of their own computation
+      // for example order book impbalance computable may relay on book_snapshot computable as it's source
+      if (sourceDataForSubsequentComputables.length > 0) {
+        for (const sourceComputable of sourceDataForSubsequentComputables) {
+          if (computable.sourceDataTypes.includes(sourceComputable.type)) {
+            for (const computedMessage of computable.compute(sourceComputable)) {
+              sourceDataForSubsequentComputables.push(computedMessage)
+              yield computedMessage
+            }
+          }
         }
       }
     }
