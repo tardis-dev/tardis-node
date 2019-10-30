@@ -38,16 +38,49 @@ for await (const message of messages) {
 <br/>
 
 - historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) - includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
+
+<br/>
+
 - support for both exchange native and [normalized market data](https://docs.tardis.dev/api/node-js#data-normalization) formats \(consistent format for accessing market data across multiple exchanges — normalized trades, order book and ticker data\)
+
+<br/>
+
 - [seamless switching between real-time streaming and historical market data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) thanks to [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) providing unified way of consuming data messages
+
+<br/>
+
 - transparent historical local data caching \(cached data is stored on disk in compressed GZIP format and decompressed on demand when reading the data\)
+
+<br/>
+
 - support for top cryptocurrency exchanges: BitMEX, Binance, Binance Futures, Deribit, Bitfinex, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, FTX, Kraken and OKEx.
+
+<br/>
+
 - automatic closed connections and stale connections reconnection logic for real-time streams
+
+<br/>
+
 - [combining multiple exchanges feeds into single one](https://docs.tardis.dev/api/node-js#combining-data-streams) via [`combine`](https://docs.tardis.dev/api/node-js#combine-iterators) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
+
+<br/>
+
 - [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) like trade bars and book snapshots via [`compute`](https://docs.tardis.dev/api/node-js#compute-iterator-computables) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
+
+<br/>
+
 - [full limit order book reconstruction](https://docs.tardis.dev/api/node-js#limit-order-book-reconstruction) both for real-time and historical data via `OrderBook` object
+
+<br/>
+
 - fast and lightweight architecture — low memory footprint and no heavy in-memory buffering
+
+<br/>
+
 - [extensible mapping logic](https://docs.tardis.dev/api/node-js#modifying-built-in-and-adding-custom-normalizers) that allows adjusting normalized formats for specific needs
+
+<br/>
+
 - built-in TypeScript support
 
 <br/>
