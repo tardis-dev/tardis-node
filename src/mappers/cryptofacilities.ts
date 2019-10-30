@@ -1,4 +1,4 @@
-import { DerivativeTicker, Trade, BookChange } from '../types'
+import { BookChange, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API

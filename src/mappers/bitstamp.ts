@@ -1,4 +1,4 @@
-import { Trade, BookChange } from '../types'
+import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
 
 // https://www.bitstamp.net/websocket/v2/

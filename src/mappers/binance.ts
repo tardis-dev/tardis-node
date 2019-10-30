@@ -1,4 +1,4 @@
-import { Trade, BookChange, DerivativeTicker, FilterForExchange, Exchange } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md

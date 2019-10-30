@@ -1,5 +1,5 @@
+import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
-import { Trade, BookChange } from '../types'
 
 // https://docs.pro.coinbase.com/#websocket-feed
 

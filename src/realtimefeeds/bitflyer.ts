@@ -1,5 +1,5 @@
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 import WebSocket = require('ws')
 
 export class BitflyerRealTimeFeed extends RealTimeFeedBase {

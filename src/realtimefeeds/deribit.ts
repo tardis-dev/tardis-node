@@ -1,5 +1,5 @@
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter, FilterForExchange } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://www.deribit.com/ws/api/v2'

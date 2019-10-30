@@ -1,4 +1,4 @@
-import { DerivativeTicker, Trade, BookChange, FilterForExchange, BookPriceLevel } from '../types'
+import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI

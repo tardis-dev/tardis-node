@@ -1,5 +1,5 @@
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class BitmexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://www.bitmex.com/realtime'

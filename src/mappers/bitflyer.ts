@@ -1,5 +1,5 @@
+import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
-import { Trade, BookChange } from '../types'
 
 export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   canHandle(message: BitflyerExecutions | BitflyerBoard) {

@@ -1,6 +1,6 @@
-import { Computable } from './computable'
-import { BookSnapshot, BookChange, BookPriceLevel } from '../types'
 import { OrderBook } from '../orderbook'
+import { BookChange, BookPriceLevel, BookSnapshot } from '../types'
+import { Computable } from './computable'
 
 type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number }
 

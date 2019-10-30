@@ -1,4 +1,4 @@
-import { DerivativeTicker, Trade, BookChange } from '../types'
+import { BookChange, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions

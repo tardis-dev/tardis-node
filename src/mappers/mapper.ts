@@ -1,4 +1,4 @@
-import { DerivativeTicker, Exchange, NormalizedData, FilterForExchange } from '../types'
+import { DerivativeTicker, Exchange, FilterForExchange, NormalizedData } from '../types'
 
 export type Mapper<T extends Exchange, U extends NormalizedData> = {
   canHandle: (message: any) => boolean

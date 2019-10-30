@@ -1,5 +1,5 @@
 import BTree from 'sorted-btree'
-import { BookPriceLevel, BookChange } from './types'
+import { BookChange, BookPriceLevel } from './types'
 
 export class OrderBook {
   private readonly _bids = new BTree<BookPriceLevel, undefined>(

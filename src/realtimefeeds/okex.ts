@@ -1,5 +1,5 @@
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class OkexRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://real.okex.com:8443/ws/v3'

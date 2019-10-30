@@ -1,7 +1,6 @@
 import got from 'got'
-
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://dex.binance.org/api/ws'

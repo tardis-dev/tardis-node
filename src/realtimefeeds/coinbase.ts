@@ -1,5 +1,5 @@
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws-feed.pro.coinbase.com'

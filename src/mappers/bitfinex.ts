@@ -1,4 +1,4 @@
-import { DerivativeTicker, Trade, BookChange, FilterForExchange, Exchange } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general

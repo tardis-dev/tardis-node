@@ -1,5 +1,5 @@
+import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
-import { Trade, BookChange } from '../types'
 
 // https://docs.gemini.com/websocket-api/#market-data-version-2
 

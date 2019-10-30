@@ -1,5 +1,5 @@
+import { Trade, TradeBar, Writeable } from '../types'
 import { Computable } from './computable'
-import { TradeBar, Trade, Writeable } from '../types'
 
 const DATE_MIN = new Date(-1)
 

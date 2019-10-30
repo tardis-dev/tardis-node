@@ -1,24 +1,24 @@
-import { bitmexTradesMapper, BitmexBookChangeMapper, BitmexDerivativeTickerMapper } from './bitmex'
+import { BookChange, DerivativeTicker, Trade } from '../types'
 import {
-  BinanceTradesMapper,
   BinanceBookChangeMapper,
-  binanceFuturesTradesMapper,
   BinanceFuturesBookChangeMapper,
-  BinanceFuturesDerivativeTickerMapper
+  BinanceFuturesDerivativeTickerMapper,
+  binanceFuturesTradesMapper,
+  BinanceTradesMapper
 } from './binance'
-import { binanceDexTradesMapper, binanceDexBookChangeMapper } from './binancedex'
-import { BitfinexTradesMapper, BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper } from './bitfinex'
-import { bitflyerTradesMapper, bitflyerBookChangeMapper } from './bitflyer'
-import { bitstampTradesMapper, BitstampBookChangeMapper } from './bitstamp'
-import { coinbaseTradesMapper, coinbaseBookChangMapper } from './coinbase'
-import { cryptofacilitiesTradesMapper, cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper } from './cryptofacilities'
-import { deribitTradesMapper, deribitBookChangeMapper, DeribitDerivativeTickerMapper } from './deribit'
-import { ftxTradesMapper, ftxBookChangeMapper } from './ftx'
-import { geminiTradesMapper, geminiBookChangeMapper } from './gemini'
-import { krakenTradesMapper, krakenBookChangeMapper } from './kraken'
-import { okexTradesMapper, okexBookChangeMapper, OkexDerivativeTickerMapper } from './okex'
+import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
+import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexTradesMapper } from './bitfinex'
+import { bitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
+import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexTradesMapper } from './bitmex'
+import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
+import { coinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
+import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
+import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper } from './deribit'
+import { ftxBookChangeMapper, ftxTradesMapper } from './ftx'
+import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
+import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
-import { Trade, BookChange, DerivativeTicker } from '../types'
+import { okexBookChangeMapper, OkexDerivativeTickerMapper, okexTradesMapper } from './okex'
 
 export * from './mapper'
 

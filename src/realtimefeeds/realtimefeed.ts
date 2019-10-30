@@ -1,9 +1,9 @@
-import WebSocket from 'ws'
 import dbg from 'debug'
-import zlib from 'zlib'
 import { promisify } from 'util'
-import { Filter, Exchange } from '../types'
-import { wait, ONE_SEC_IN_MS } from '../handy'
+import WebSocket from 'ws'
+import zlib from 'zlib'
+import { ONE_SEC_IN_MS, wait } from '../handy'
+import { Exchange, Filter } from '../types'
 const inflateRaw = promisify(zlib.inflateRaw)
 
 const pongBuffer = Buffer.from('pong')

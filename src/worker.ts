@@ -1,12 +1,12 @@
 import crypto from 'crypto'
-import https, { RequestOptions } from 'https'
-import path from 'path'
-import { parentPort, isMainThread, workerData } from 'worker_threads'
 import dbg from 'debug'
+import { createWriteStream, ensureDirSync, existsSync, rename } from 'fs-extra'
+import https, { RequestOptions } from 'https'
 import pMap from 'p-map'
-import { existsSync, ensureDirSync, createWriteStream, rename } from 'fs-extra'
+import path from 'path'
+import { isMainThread, parentPort, workerData } from 'worker_threads'
+import { addMinutes, formatDateToPath, HttpError, ONE_SEC_IN_MS, sequence, sha256, wait } from './handy'
 import { Exchange, Filter } from './types'
-import { wait, sha256, formatDateToPath, addMinutes, ONE_SEC_IN_MS, HttpError, sequence } from './handy'
 
 const httpsAgent = new https.Agent({
   keepAlive: true,

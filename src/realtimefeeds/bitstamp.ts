@@ -1,6 +1,6 @@
 import got from 'got'
-import { RealTimeFeedBase } from './realtimefeed'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 export class BitstampRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.bitstamp.net'
