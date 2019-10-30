@@ -33,11 +33,11 @@ for await (const message of messages) {
 
 ## Features
 
-- [real-time streaming](https://docs.tardis.dev/api/node-js#tardis-streamnormalized-options-normalizers) of tick-level market data with unified API for connecting directly to exchanges public WebSocket APIs without any intermediary/3rd party proxy
+- [real-time streaming](https://docs.tardis.dev/api/node-js#streaming-real-time-market-data) of tick-level market data with unified API for connecting directly to exchanges public WebSocket APIs without any intermediary/3rd party proxy
 
 <br/>
 
-- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#tardis-replaynormalized-options-normalizers) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
+- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#replaying-historical-market-data) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
 
 <br/>
 
