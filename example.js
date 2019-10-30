@@ -1,4 +1,4 @@
-const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = require('tardis-node')
+const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = require('tardis-dev')
 
 const historicalMessages = replayNormalized(
   {

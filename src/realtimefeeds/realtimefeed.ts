@@ -19,7 +19,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
   protected readonly debug: dbg.Debugger
 
   constructor(public readonly exchange: Exchange) {
-    this.debug = dbg(`tardis-node:realtime:${exchange}`)
+    this.debug = dbg(`tardis-dev:realtime:${exchange}`)
   }
 
   public setTimeoutInterval(timeoutIntervalMS: number): void {

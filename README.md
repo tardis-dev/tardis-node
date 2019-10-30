@@ -1,18 +1,18 @@
-# tardis-node
+# tardis-dev
 
-[![Version](https://img.shields.io/npm/v/tardis-node.svg)](https://www.npmjs.org/package/tardis-node)
-[![Try on RunKit](https://badge.runkitcdn.com/tardis-node.svg)](https://runkit.com/npm/tardis-node)
+[![Version](https://img.shields.io/npm/v/tardis-dev.svg)](https://www.npmjs.org/package/tardis-dev)
+[![Try on RunKit](https://badge.runkitcdn.com/tardis-dev.svg)](https://runkit.com/npm/tardis-dev)
 
 <br/>
 
-`Tardis-node` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) which also enables composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
+Node.js `tardis-dev` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) which also enables composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
 
 <br/>
 
 ```javascript
-const { tardis, normalizeTrades, normalizeBookChanges } = require('tardis-node')
+const { streamNormalized, normalizeTrades, normalizeBookChanges } = require('tardis-dev')
 
-const messages = tardis.streamNormalized(
+const messages = streamNormalized(
   {
     exchange: 'bitmex',
     symbols: ['XBTUSD', 'ETHUSD']
@@ -26,7 +26,7 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-node-stream-real-time-market-data)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-stream-real-time-market-data)
 
 <br/>
 <br/>
@@ -55,7 +55,7 @@ for await (const message of messages) {
 Requires Node.js v12+ installed.
 
 ```bash
-npm install tardis-node --save
+npm install tardis-dev --save
 ```
 
 <br/>
@@ -63,14 +63,14 @@ npm install tardis-node --save
 
 ## Debugging and logging
 
-`tardis-node` lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-node*`.
+`tardis-dev` lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-dev*`.
 
 <br/>
 <br/>
 
 ## Documentation
 
-See the official [tardis-node docs](https://docs.tardis.dev/api/node-js).
+### [See official docs](https://docs.tardis.dev/api/node-js).
 
 <br/>
 <br/>
@@ -82,8 +82,7 @@ See the official [tardis-node docs](https://docs.tardis.dev/api/node-js).
 Example showing how to quickly display real-time spread and best bid/ask info across multiple exchanges at once. It can be easily adapted to do the same for historical data \(`replayNormalized` instead of `streamNormalized`).
 
 ```javascript
-const { tardis, normalizeBookChanges, combine, compute,
-computeBookSnapshots } = require('tardis-node')
+const { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } = require('tardis-dev')
 
 const exchangesToStream = [
   { exchange: 'bitmex', symbols: ['XBTUSD'] },
@@ -93,7 +92,7 @@ const exchangesToStream = [
 // for each specified exchange call streamNormalized for it
 // so we have multiple real-time streams for all specified exchanges
 const realTimeStreams = exchangesToStream.map(e => {
-  return tardis.streamNormalized(e, normalizeBookChanges)
+  return streamNormalized(e, normalizeBookChanges)
 })
 
 // combine all real-time message streams into one
@@ -131,7 +130,7 @@ for await (const message of messagesWithQuotes) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-node-real-time-spread-for-multiple-exchanges)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-real-time-spread-for-multiple-exchanges)
 
 <br/>
 
@@ -140,7 +139,7 @@ for await (const message of messagesWithQuotes) {
 Example showing simple pattern of providing `async iterable` of market data messages to the function that process them no matter if it's is real-time or historical market data. This allows having the same logic for example for both back-testing and live trading.
 
 ```javascript
-const { tardis, normalizeTrades, compute, computeTradeBars } = require('tardis-node')
+const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = require('tardis-dev')
 
 async function produceVolumeBasedTradeBars(messages) {
   const withVolumeTradeBars = compute(
@@ -158,13 +157,21 @@ async function produceVolumeBasedTradeBars(messages) {
   }
 }
 
-const historicalMessages = tardis.replayNormalized(
-  { exchange: 'bitmex', symbols: ['XBTUSD'], from: '2019-08-01', to: '2019-08-02' },
+const historicalMessages = replayNormalized(
+  {
+    exchange: 'bitmex',
+    symbols: ['XBTUSD'],
+    from: '2019-08-01',
+    to: '2019-08-02'
+  },
   normalizeTrades
 )
 
-const realTimeMessages = tardis.streamNormalized(
-  { exchange: 'bitmex', symbols: ['XBTUSD'] },
+const realTimeMessages = streamNormalized(
+  {
+    exchange: 'bitmex',
+    symbols: ['XBTUSD']
+  },
   normalizeTrades
 )
 
@@ -174,14 +181,16 @@ await produceVolumeBasedTradeBars(historicalMessages)
 //  await produceVolumeBasedTradeBars(realTimeMessages)
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-node-seamless-switching-between-real-time-streaming-and-historical-market-data-replay)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-seamless-switching-between-real-time-streaming-and-historical-market-data-replay)
 
 <br/>
 
 ### Stream real-time market data in exchange native data format
 
 ```javascript
-const messages = tardis.stream({
+const { stream } = require('tardis-dev')
+
+const messages = stream({
   exchange: 'bitmex',
   filters: [
     { channel: 'trade', symbols: ['XBTUSD'] },
@@ -194,14 +203,16 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-node-stream-market-data)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-dev-stream-market-data)
 
 <br/>
 
 ### Replay historical market data in exchange native data format
 
 ```javascript
-const messages = tardis.replay({
+const { replay } = require('tardis-dev')
+
+const messages = replay({
   exchange: 'bitmex',
   filters: [
     { channel: 'trade', symbols: ['XBTUSD'] },
@@ -216,9 +227,9 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-node-replay-market-data)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-dev-replay-market-data)
 
 <br/>
 <br/>
 
-## See the [tardis-node docs](https://docs.tardis.dev/api/node-js) for more examples.
+## See the [tardis-dev docs](https://docs.tardis.dev/api/node-js) for more examples.
