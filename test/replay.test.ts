@@ -16,7 +16,7 @@ const exchangesWithDerivativeInfo: Exchange[] = ['bitmex', 'binance-futures', 'b
 describe('replay', () => {
   beforeEach(() => {
     return clearCache()
-  })
+  }, 1000 * 60 * 10)
 
   test(
     'invalid args validation',
