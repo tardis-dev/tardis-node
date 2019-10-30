@@ -26,7 +26,7 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-stream-real-time-market-data)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-stream-market-data-normalized)
 
 <br/>
 <br/>
