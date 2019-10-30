@@ -65,7 +65,7 @@ for await (const message of messages) {
 
 <br/>
 
-- [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) like trade bars and book snapshots via [`compute`](https://docs.tardis.dev/api/node-js#compute-iterator-computables) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
+- [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) like order book imbalance, custom trade bars, book snapshots and more via [`compute`](https://docs.tardis.dev/api/node-js#compute-iterator-computables) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
 
 <br/>
 
@@ -83,6 +83,7 @@ for await (const message of messages) {
 
 - built-in TypeScript support
 
+<br/>
 <br/>
 <br/>
 
@@ -179,22 +180,6 @@ Example showing simple pattern of providing `async iterable` of market data mess
 const tardis = require('tardis-dev')
 const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = tardis
 
-async function produceVolumeBasedTradeBars(messages) {
-  const withVolumeTradeBars = compute(
-    messages,
-    computeTradeBars({
-      kind: 'volume',
-      interval: 100 * 1000 // aggregate by 100k contracts volume
-    })
-  )
-
-  for await (const message of withVolumeTradeBars) {
-    if (message.type === 'trade_bar') {
-      console.log(message.name, message)
-    }
-  }
-}
-
 const historicalMessages = replayNormalized(
   {
     exchange: 'bitmex',
@@ -212,6 +197,22 @@ const realTimeMessages = streamNormalized(
   },
   normalizeTrades
 )
+
+async function produceVolumeBasedTradeBars(messages) {
+  const withVolumeTradeBars = compute(
+    messages,
+    computeTradeBars({
+      kind: 'volume',
+      interval: 100 * 1000 // aggregate by 100k contracts volume
+    })
+  )
+
+  for await (const message of withVolumeTradeBars) {
+    if (message.type === 'trade_bar') {
+      console.log(message.name, message)
+    }
+  }
+}
 
 await produceVolumeBasedTradeBars(historicalMessages)
 
