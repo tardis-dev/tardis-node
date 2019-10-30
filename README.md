@@ -5,7 +5,7 @@
 
 <br/>
 
-Node.js `tardis-dev` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) which also enables composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
+Node.js `tardis-dev` library provides convenient access to tick-level historical and real-time cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) enabling composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally).
 
 <br/>
 
@@ -82,7 +82,8 @@ npm install tardis-dev --save
 Example showing how to quickly display real-time spread and best bid/ask info across multiple exchanges at once. It can be easily adapted to do the same for historical data \(`replayNormalized` instead of `streamNormalized`).
 
 ```javascript
-const { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } = require('tardis-dev')
+const tardis = require('tardis-dev')
+const { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } = tardis
 
 const exchangesToStream = [
   { exchange: 'bitmex', symbols: ['XBTUSD'] },
@@ -136,10 +137,11 @@ for await (const message of messagesWithQuotes) {
 
 ### Seamless switching between real-time streaming and historical market data replay
 
-Example showing simple pattern of providing `async iterable` of market data messages to the function that process them no matter if it's is real-time or historical market data. This allows having the same logic for example for both back-testing and live trading.
+Example showing simple pattern of providing `async iterable` of market data messages to the function that can process them no matter if it's is real-time or historical market data. That effectively enables having the same 'data pipeline' for backtesting and live trading.
 
 ```javascript
-const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = require('tardis-dev')
+const tardis = require('tardis-dev')
+const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = tardis
 
 async function produceVolumeBasedTradeBars(messages) {
   const withVolumeTradeBars = compute(
