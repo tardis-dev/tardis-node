@@ -100,7 +100,6 @@ export type BookSnapshot = {
   readonly name: string
   readonly depth: number
   readonly interval: number
-  readonly updatesCount: number
   readonly bids: BookPriceLevel[]
   readonly asks: BookPriceLevel[]
 

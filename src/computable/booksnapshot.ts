@@ -33,7 +33,6 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private readonly _interval: number
   private readonly _name: string
 
-  private _updatesCount: number = 0
   private _lastUpdateTimestamp: Date = new Date(-1)
   private _bids: BookPriceLevel[] = []
   private _asks: BookPriceLevel[] = []
@@ -93,7 +92,6 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
 
   public _update(bookChange: BookChange) {
     this._orderBook.update(bookChange)
-    this._updatesCount++
 
     const bidsIterable = this._orderBook.bids()
     const asksIterable = this._orderBook.asks()
@@ -129,7 +127,6 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       name: this._name,
       depth: this._depth,
       interval: this._interval,
-      updatesCount: this._updatesCount,
       bids: [...this._bids],
       asks: [...this._asks],
       timestamp: this._lastUpdateTimestamp,
@@ -137,7 +134,6 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     }
 
     this._bookChanged = false
-    this._updatesCount = 0
 
     return snapshot
   }
