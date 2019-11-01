@@ -81,7 +81,7 @@ for await (const message of messages) {
 
 <br/>
 
-- built-in TypeScript support
+- [built-in TypeScript support](https://docs.tardis.dev/api/node-js#usage-with-typescript)
 
 <br/>
 <br/>
