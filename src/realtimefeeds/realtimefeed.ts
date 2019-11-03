@@ -105,7 +105,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
             for (let snapshot of snapshotsToReturn) {
               yield snapshot
             }
-            snapshotsToReturn = []
+
+            snapshotsToReturn.length = 0
           }
         }
         this.debug('connection closed, restarting...')
