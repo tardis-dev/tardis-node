@@ -1,12 +1,7 @@
 import dbg from 'debug'
-import { promisify } from 'util'
 import WebSocket from 'ws'
-import zlib from 'zlib'
 import { ONE_SEC_IN_MS, wait } from '../handy'
 import { Exchange, Filter } from '../types'
-const inflateRaw = promisify(zlib.inflateRaw)
-
-const pongBuffer = Buffer.from('pong')
 
 export type RealTimeFeed = {
   stream(filters: Filter<string>[]): AsyncIterableIterator<object | undefined>
@@ -82,9 +77,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         for await (let message of realtimeMessagesStream) {
           receivedMessagesCount++
 
-          if (this.messagesNeedDecompression) {
-            message = (await inflateRaw(message)) as Buffer
-            if (message.equals(pongBuffer)) {
+          if (this.decompress !== undefined) {
+            message = await this.decompress(message)
+            if (message === undefined) {
               continue
             }
           }
@@ -141,5 +136,5 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
   protected provideManualSnapshots?: (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => void
   protected onMessage?: (msg: any, ws: WebSocket) => void
-  protected messagesNeedDecompression = false
+  protected decompress?: (msg: any) => Promise<any>
 }

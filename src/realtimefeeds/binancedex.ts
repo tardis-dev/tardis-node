@@ -54,6 +54,8 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         }
       }
 
+      this.debug('requested manual snapshot for: %s successfully', symbol)
+
       snapshotsBuffer.push(snapshot)
     }
   }

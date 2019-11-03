@@ -54,6 +54,7 @@ export class BinanceRealTimeFeed extends RealTimeFeedBase {
         generated: true,
         data: depthSnapshotResponse
       }
+      this.debug('requested manual snapshot for: %s successfully', symbol)
 
       snapshotsBuffer.push(snapshot)
     }

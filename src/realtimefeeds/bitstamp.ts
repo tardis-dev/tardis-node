@@ -31,6 +31,9 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
 
   protected provideManualSnapshots = async (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => {
     // does not work currently on node v12 due to https://github.com/nodejs/node/issues/27711
+    console.warn(`Due to Node 12 updated http parser and not spec compliant headers being returned by Bitstamp,
+       book snapshots do not work currently for Bitstamp real-time stream.
+       As a workaround try running node with -http-parser=legacy flag`)
 
     const orderBookFilter = filters.find(f => f.channel === 'diff_order_book')
     if (!orderBookFilter) {
@@ -52,6 +55,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         channel: `diff_order_book_${symbol}`,
         generated: true
       }
+      this.debug('requested manual snapshot for: %s successfully', symbol)
 
       snapshotsBuffer.push(snapshot)
     }
