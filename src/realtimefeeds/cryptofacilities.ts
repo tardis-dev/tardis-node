@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class CryptofacilitiesRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://api.cryptofacilities.com/ws/v1'
+  protected wssURL = 'wss://www.cryptofacilities.com/ws/v1'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
     return filters
