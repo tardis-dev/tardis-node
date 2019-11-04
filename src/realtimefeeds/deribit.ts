@@ -37,7 +37,7 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
     return message.error !== undefined
   }
 
-  protected onConnected = (ws: WebSocket) => {
+  protected onConnected(ws: WebSocket) {
     // set heartbeat so deribit won't close connection prematurely
     // https://docs.deribit.com/v2/#public-set_heartbeat
     ws.send(
@@ -52,7 +52,11 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
     )
   }
 
-  protected onMessage = (msg: any, ws: WebSocket) => {
+  protected messageIsHeartbeat(msg: any) {
+    return msg.method === 'heartbeat'
+  }
+
+  protected onMessage(msg: any, ws: WebSocket) {
     // respond with public/test message to keep connection alive
     if (msg.params !== undefined && msg.params.type === 'test_request') {
       ws.send(

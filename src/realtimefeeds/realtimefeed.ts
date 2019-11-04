@@ -25,13 +25,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
     const subscribeMessages = this.mapToSubscribeMessages(filters)
     this.debug('starting streaming: %o filters, subscribe messages: %o', filters, subscribeMessages)
 
-    const subscribeViaURL = typeof subscribeMessages === 'string'
     let retries = 0
 
     while (true) {
-      let timerid: NodeJS.Timeout | undefined
+      let staleConnectionCheckTID: NodeJS.Timeout | undefined
       try {
-        const address = subscribeViaURL ? `${this.wssURL}${subscribeMessages}` : this.wssURL
+        const address = typeof subscribeMessages === 'string' ? `${this.wssURL}${subscribeMessages}` : this.wssURL
         this.debug('estabilishing connection to %s', address)
 
         const ws = new WebSocket(address, { perMessageDeflate: false })
@@ -39,33 +38,22 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
 
-        ws.once('open', async () => {
-          this.debug('estabilished connection to %s', address)
-          if (!subscribeViaURL) {
-            for (const message of subscribeMessages) {
-              this.debug('subscribing to %o', message)
-              ws.send(JSON.stringify(message))
-            }
-          }
-
-          if (this.provideManualSnapshots !== undefined) {
-            await wait(ONE_SEC_IN_MS)
-            this.provideManualSnapshots(filters, snapshotsToReturn, () => ws.readyState === WebSocket.CLOSED)
-          }
-          if (this.onConnected !== undefined) {
-            this.onConnected(ws)
-          }
+        ws.onopen = this._onConnectionOpen({
+          address,
+          subscribeMessages,
+          snapshotsToReturn,
+          filters
         })
 
         if (this.timeoutIntervalMS !== undefined) {
           // set up timer that checks against open, but stale connections that do not return any data
-          timerid = setInterval(() => {
+          staleConnectionCheckTID = setInterval(() => {
             if (receivedMessagesCount === 0) {
               this.debug('did not received any messages within %d ms timeout, restarting...', this.timeoutIntervalMS)
               ws.terminate()
-              if (timerid !== undefined) {
-                clearInterval(timerid)
-                timerid = undefined
+              if (staleConnectionCheckTID !== undefined) {
+                clearInterval(staleConnectionCheckTID)
+                staleConnectionCheckTID = undefined
               }
             }
             // reset counter which we'll check again after timeout
@@ -79,8 +67,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         }) as AsyncIterableIterator<Buffer>
 
         for await (let message of realtimeMessagesStream) {
-          receivedMessagesCount++
-
           if (this.decompress !== undefined) {
             message = await this.decompress(message)
             if (message === undefined) {
@@ -94,9 +80,13 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
             throw new Error(`Received error message:${message}`)
           }
 
-          if (this.onMessage !== undefined) {
-            this.onMessage(messageDeserialized, ws)
+          // exclude heaartbeat messages from  received messages counter
+          // connection could still be stale even if only heartbeats are provided without any data
+          if (this.messageIsHeartbeat(messageDeserialized) === false) {
+            receivedMessagesCount++
           }
+
+          this.onMessage(messageDeserialized, ws)
 
           yield messageDeserialized
 
@@ -128,10 +118,42 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
         await wait(delay)
       } finally {
-        if (timerid !== undefined) {
-          clearInterval(timerid)
-          timerid = undefined
+        if (staleConnectionCheckTID !== undefined) {
+          clearInterval(staleConnectionCheckTID)
+          staleConnectionCheckTID = undefined
         }
+      }
+    }
+  }
+
+  private _onConnectionOpen({
+    address,
+    filters,
+    snapshotsToReturn,
+    subscribeMessages
+  }: {
+    address: string
+    subscribeMessages: string | any[]
+    filters: Filter<string>[]
+    snapshotsToReturn: any[]
+  }) {
+    return async ({ target }: WebSocket.OpenEvent) => {
+      this.debug('estabilished connection to %s', address)
+
+      if (Array.isArray(subscribeMessages)) {
+        for (const message of subscribeMessages) {
+          this.debug('subscribing to %o', message)
+          target.send(JSON.stringify(message))
+        }
+      }
+
+      this.onConnected(target)
+
+      try {
+        await wait(ONE_SEC_IN_MS)
+        await this.provideManualSnapshots(filters, snapshotsToReturn, () => target.readyState === WebSocket.CLOSED)
+      } catch (e) {
+        this.debug('providing manual snapshots error: %o, closing connection...', e)
       }
     }
   }
@@ -140,8 +162,15 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): string | any[]
   protected abstract messageIsError(message: any): boolean
 
-  protected provideManualSnapshots?: (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => void
-  protected onMessage?: (msg: any, ws: WebSocket) => void
-  protected onConnected?: (ws: WebSocket) => void
+  protected messageIsHeartbeat(_msg: any) {
+    return false
+  }
+
+  protected async provideManualSnapshots(_filters: Filter<string>[], _snapshotsBuffer: any[], _shouldCancel: () => boolean) {}
+
+  protected onMessage(_msg: any, _ws: WebSocket) {}
+
+  protected onConnected(_ws: WebSocket) {}
+
   protected decompress?: (msg: any) => Promise<any>
 }
