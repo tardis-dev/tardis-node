@@ -38,6 +38,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
         let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
+
         ws.once('open', async () => {
           this.debug('estabilished connection to %s', address)
           if (!subscribeViaURL) {
@@ -50,6 +51,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
           if (this.provideManualSnapshots !== undefined) {
             await wait(ONE_SEC_IN_MS)
             this.provideManualSnapshots(filters, snapshotsToReturn, () => ws.readyState === WebSocket.CLOSED)
+          }
+          if (this.onConnected !== undefined) {
+            this.onConnected(ws)
           }
         })
 
@@ -109,6 +113,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
             snapshotsToReturn.length = 0
           }
         }
+
         this.debug('connection closed, restarting...')
         // websocket connection has been closed notify about it by yielding undefined
         yield undefined
@@ -137,5 +142,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
   protected provideManualSnapshots?: (filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) => void
   protected onMessage?: (msg: any, ws: WebSocket) => void
+  protected onConnected?: (ws: WebSocket) => void
   protected decompress?: (msg: any) => Promise<any>
 }
