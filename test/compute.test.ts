@@ -10,35 +10,39 @@ import {
 } from '../dist'
 
 describe('compute(messages, types)', () => {
-  test('should compute requested types based on replayNormalized iterables', async () => {
-    const normalizers = [normalizeTrades, normalizeBookChanges]
-    const bitmexMessages = replayNormalized(
-      {
-        exchange: 'bitmex',
-        from: '2019-04-01',
-        to: '2019-04-01 00:01',
-        symbols: ['XBTUSD'],
-        withDisconnectMessages: true
-      },
-      ...normalizers
-    )
+  test(
+    'should compute requested types based on replayNormalized iterables',
+    async () => {
+      const normalizers = [normalizeTrades, normalizeBookChanges]
+      const bitmexMessages = replayNormalized(
+        {
+          exchange: 'bitmex',
+          from: '2019-04-01',
+          to: '2019-04-01 00:01',
+          symbols: ['XBTUSD'],
+          withDisconnectMessages: true
+        },
+        ...normalizers
+      )
 
-    const bufferedMessages = []
-    const withComputedTypes = compute(
-      bitmexMessages,
-      computeBookSnapshots({ depth: 10, interval: 1000 }),
-      computeBookSnapshots({ depth: 5, interval: 0 }),
-      computeBookSnapshots({ depth: 3, interval: 100 }),
-      computeTradeBars({ kind: 'time', interval: 1000 }),
-      computeTradeBars({ kind: 'tick', interval: 100 })
-    )
+      const bufferedMessages = []
+      const withComputedTypes = compute(
+        bitmexMessages,
+        computeBookSnapshots({ depth: 10, interval: 1000 }),
+        computeBookSnapshots({ depth: 5, interval: 0 }),
+        computeBookSnapshots({ depth: 3, interval: 100 }),
+        computeTradeBars({ kind: 'time', interval: 1000 }),
+        computeTradeBars({ kind: 'tick', interval: 100 })
+      )
 
-    for await (const message of withComputedTypes) {
-      bufferedMessages.push(message)
-    }
+      for await (const message of withComputedTypes) {
+        bufferedMessages.push(message)
+      }
 
-    expect(bufferedMessages).toMatchSnapshot()
-  })
+      expect(bufferedMessages).toMatchSnapshot()
+    },
+    1000 * 60
+  )
 
   test('should compute correct trade bars based on provided messages', async () => {
     let tradesMessages = async function*(): AsyncIterableIterator<Trade> {

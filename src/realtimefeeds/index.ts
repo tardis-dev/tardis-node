@@ -13,6 +13,7 @@ import { GeminiRealTimeFeed } from './gemini'
 import { KrakenRealTimeFeed } from './kraken'
 import { OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
+import { HuobiRealTimeFeed, HuobiDMRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
 
 export * from './realtimefeed'
 
@@ -35,7 +36,10 @@ const realTimeFeedsMap: {
   ftx: () => new FtxRealTimeFeed('ftx'),
   gemini: () => new GeminiRealTimeFeed('gemini'),
   kraken: () => new KrakenRealTimeFeed('kraken'),
-  okex: () => new OkexRealTimeFeed('okex')
+  okex: () => new OkexRealTimeFeed('okex'),
+  'huobi-dm': () => new HuobiDMRealTimeFeed('huobi-dm'),
+  'huobi-us': () => new HuobiUSRealTimeFeed('huobi-us'),
+  huobi: () => new HuobiRealTimeFeed('huobi')
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): () => RealTimeFeed {

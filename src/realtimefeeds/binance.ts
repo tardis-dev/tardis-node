@@ -2,9 +2,9 @@ import got from 'got'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
-export class BinanceRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://stream.binance.com:9443'
-  protected httpURL = 'https://api.binance.com/api/v1'
+abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
+  protected abstract wssURL: string
+  protected abstract httpURL: string
   protected bookUpdateSpeed = '@100ms'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
@@ -61,17 +61,22 @@ export class BinanceRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
-export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeed {
+export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
+  protected wssURL = 'wss://stream.binance.com:9443'
+  protected httpURL = 'https://api.binance.com/api/v1'
+}
+
+export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://stream.binance.je:9443'
   protected httpURL = 'https://api.binance.je/api/v1'
 }
 
-export class BinanceUSRealTimeFeed extends BinanceRealTimeFeed {
+export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://stream.binance.us:9443'
   protected httpURL = 'https://api.binance.us/api/v1'
 }
 
-export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeed {
+export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://fstream.binance.com'
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
   protected bookUpdateSpeed = ''

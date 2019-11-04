@@ -13,9 +13,7 @@ export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -54,9 +52,7 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
   }
 
   getFilters(symbols?: string[]) {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -146,6 +142,13 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
     const amount = Number(level[1])
     return { price, amount }
   }
+}
+
+function lowerCaseSymbols(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map(s => s.toLocaleLowerCase())
+  }
+  return
 }
 
 type BitstampTrade = {

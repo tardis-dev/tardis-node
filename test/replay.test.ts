@@ -194,6 +194,11 @@ describe('replay', () => {
     'replays normalized data for each supported exchange',
     async () => {
       for (const exchange of EXCHANGES) {
+        // let's wait till 1st of Dec 2019 to enable it so we have free data sample available
+        if (exchange.startsWith('huobi')) {
+          continue
+        }
+
         const exchangeDetails = await getExchangeDetails(exchange)
 
         exchangeDetails.availableSymbols.sort((a, b) => (a.id < b.id ? 1 : -1))

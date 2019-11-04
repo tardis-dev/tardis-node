@@ -1,21 +1,24 @@
 export const EXCHANGES = [
   'bitmex',
+  'deribit',
   'binance',
   'binance-futures',
-  'deribit',
+  'ftx',
+  'okex',
+  'huobi',
+  'huobi-dm',
+  'bitflyer',
   'bitstamp',
   'coinbase',
   'cryptofacilities',
+  'gemini',
   'kraken',
   'bitfinex',
   'bitfinex-derivatives',
-  'okex',
-  'bitflyer',
-  'ftx',
-  'gemini',
-  'binance-us',
+  'binance-dex',
   'binance-jersey',
-  'binance-dex'
+  'binance-us',
+  'huobi-us'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'miniTicker', 'depthSnapshot', 'bookTicker'] as const
@@ -109,6 +112,12 @@ const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'd
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
+const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo'] as const
+
+const HUOBI_US_CHANNELS = ['depth', 'detail', 'trade'] as const
+
+const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -126,5 +135,8 @@ export const EXCHANGE_CHANNELS_INFO = {
   gemini: GEMINI_CHANNELS,
   bitflyer: BITFLYER_CHANNELS,
   'binance-futures': BINANCE_FUTURES_CHANNELS,
-  'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS
+  'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS,
+  huobi: HUOBI_CHANNELS,
+  'huobi-dm': HUOBI_DM_CHANNELS,
+  'huobi-us': HUOBI_US_CHANNELS
 }

@@ -11,9 +11,7 @@ export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' 
   }
 
   getFilters(symbols?: string[]) {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -52,9 +50,7 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
   }
 
   getFilters(symbols?: string[]) {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -177,9 +173,7 @@ export const binanceFuturesTradesMapper: Mapper<'binance-futures', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -257,9 +251,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
   }
 
   getFilters(symbols?: string[]): FilterForExchange['binance-futures'][] {
-    if (symbols !== undefined) {
-      symbols = symbols.map(s => s.toLocaleLowerCase())
-    }
+    symbols = lowerCaseSymbols(symbols)
 
     return [
       {
@@ -291,6 +283,13 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       yield pendingTickerInfo.getSnapshot(new Date(message.data.E), localTimestamp)
     }
   }
+}
+
+function lowerCaseSymbols(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map(s => s.toLocaleLowerCase())
+  }
+  return
 }
 
 type BinanceResponse<T> = {

@@ -19,6 +19,7 @@ import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { okexBookChangeMapper, OkexDerivativeTickerMapper, okexTradesMapper } from './okex'
+import { HuobiTradesMapper, HuobiBookChangeMapper } from './huobi'
 
 export * from './mapper'
 
@@ -39,7 +40,10 @@ const tradesMappers = {
   ftx: () => ftxTradesMapper,
   gemini: () => geminiTradesMapper,
   kraken: () => krakenTradesMapper,
-  okex: () => okexTradesMapper
+  okex: () => okexTradesMapper,
+  huobi: () => new HuobiTradesMapper('huobi'),
+  'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
+  'huobi-us': () => new HuobiTradesMapper('huobi-us')
 }
 
 const bookChangeMappers = {
@@ -59,7 +63,10 @@ const bookChangeMappers = {
   ftx: () => ftxBookChangeMapper,
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
-  okex: () => okexBookChangeMapper
+  okex: () => okexBookChangeMapper,
+  huobi: () => new HuobiBookChangeMapper('huobi'),
+  'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
+  'huobi-us': () => new HuobiBookChangeMapper('huobi-us')
 }
 
 const derivativeTickersMappers = {
