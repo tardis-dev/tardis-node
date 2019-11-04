@@ -4,7 +4,7 @@ import { Exchange, FilterForExchange } from './types'
 
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   const options = getOptions()
-  const exchangeDetails = await got.get(`${options.endpoint}/v1/exchanges/${exchange}`).json()
+  const exchangeDetails = await got.get(`${options.endpoint}/exchanges/${exchange}`).json()
 
   return exchangeDetails as ExchangeDetails<T>
 }

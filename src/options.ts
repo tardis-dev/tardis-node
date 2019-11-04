@@ -3,7 +3,7 @@ import path from 'path'
 import { debug } from './debug'
 
 const defaultOptions: Options = {
-  endpoint: 'https://tardis.dev/api',
+  endpoint: 'https://tardis.dev/api/v1',
   cacheDir: path.join(os.tmpdir(), '.tardis-cache'),
   apiKey: ''
 }

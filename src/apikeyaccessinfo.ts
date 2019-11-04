@@ -7,7 +7,7 @@ export async function getApiKeyAccessInfo(apiKey?: string) {
   const apiKeyToCheck = apiKey || options.apiKey
 
   const apiKeyAccessInfo = await got
-    .get(`${options.endpoint}/v1/api-key-info`, {
+    .get(`${options.endpoint}/api-key-info`, {
       headers: {
         Authorization: `Bearer ${apiKeyToCheck}`
       }
