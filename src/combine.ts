@@ -53,6 +53,9 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   if (isRealTime) {
     // return messages in FIFO order thanks to using Promise.race
     // based on https://github.com/fraxken/combine-async-iterators
+    console.warn(
+      'Important! using combine for real-time streams may cause memory leaks due to Node.js issue with Promise.race handling - https://github.com/nodejs/node/issues/29385'
+    )
 
     while (true) {
       // this does not handle iterators that are finite,
