@@ -57,7 +57,7 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
     filters
   })
 
-  return normalizeMessages(exchange, messages, createMappers, symbols, withDisconnectMessages)
+  return normalizeMessages(exchange, messages, createMappers, withDisconnectMessages)
 }
 
 function validateStreamOptions(filters: Filter<string>[]) {

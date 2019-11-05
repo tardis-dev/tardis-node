@@ -178,7 +178,13 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     apiKey
   })
 
-  return normalizeMessages(exchange, messages, createMappers, symbols, withDisconnectMessages)
+  // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
+  // for symbols we've not requested for
+  const filter = (symbol: string) => {
+    return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
+  }
+
+  return normalizeMessages(exchange, messages, createMappers, withDisconnectMessages, filter)
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {

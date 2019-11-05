@@ -77,8 +77,8 @@ export async function* normalizeMessages(
   exchange: Exchange,
   messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
   createMappers: () => Mapper<any, any>[],
-  symbols: string[] | undefined,
-  withDisconnectMessages: boolean | undefined
+  withDisconnectMessages: boolean | undefined,
+  filter?: (symbol: string) => boolean
 ) {
   let previousLocalTimestamp: Date | undefined
   let mappersForExchange = createMappers()
@@ -116,7 +116,9 @@ export async function* normalizeMessages(
         }
 
         for (const message of mappedMessages) {
-          if (symbolsInclude(symbols, message.symbol)) {
+          if (filter === undefined) {
+            yield message
+          } else if (filter(message.symbol)) {
             yield message
           }
         }
@@ -151,8 +153,4 @@ export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbol
   )
 
   return deduplicatedFilters
-}
-
-function symbolsInclude(symbols: string[] | undefined, symbol: string) {
-  return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
 }
