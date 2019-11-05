@@ -1,35 +1,39 @@
 import { replayNormalized, combine, normalizeTrades, normalizeBookChanges } from '../dist'
 
 describe('combine(...asyncIterators)', () => {
-  test('should produce combined iterable from two replayNormalized iterables', async () => {
-    const normalizers = [normalizeTrades, normalizeBookChanges]
-    const bitmexMessages = replayNormalized(
-      {
-        exchange: 'bitmex',
-        from: '2019-04-01',
-        to: '2019-04-01 00:01',
-        symbols: ['XBTUSD']
-      },
-      ...normalizers
-    )
+  test(
+    'should produce combined iterable from two replayNormalized iterables',
+    async () => {
+      const normalizers = [normalizeTrades, normalizeBookChanges]
+      const bitmexMessages = replayNormalized(
+        {
+          exchange: 'bitmex',
+          from: '2019-04-01',
+          to: '2019-04-01 00:01',
+          symbols: ['XBTUSD']
+        },
+        ...normalizers
+      )
 
-    const deribitMessages = replayNormalized(
-      {
-        exchange: 'deribit',
-        from: '2019-04-01',
-        to: '2019-04-01 00:01',
-        symbols: ['BTC-PERPETUAL']
-      },
-      ...normalizers
-    )
+      const deribitMessages = replayNormalized(
+        {
+          exchange: 'deribit',
+          from: '2019-04-01',
+          to: '2019-04-01 00:01',
+          symbols: ['BTC-PERPETUAL']
+        },
+        ...normalizers
+      )
 
-    const bufferedMessages: any[] = []
-    for await (const message of combine(bitmexMessages, deribitMessages)) {
-      bufferedMessages.push(message)
-    }
+      const bufferedMessages: any[] = []
+      for await (const message of combine(bitmexMessages, deribitMessages)) {
+        bufferedMessages.push(message)
+      }
 
-    expect(bufferedMessages).toMatchSnapshot()
-  })
+      expect(bufferedMessages).toMatchSnapshot()
+    },
+    2 * 60 * 1000
+  )
 
   test('should correctly combine iterables based on localTimestamp value', async () => {
     let iter1 = async function*() {
