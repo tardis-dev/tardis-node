@@ -53,7 +53,7 @@ for await (const message of messages) {
 
 <br/>
 
-- support for top cryptocurrency exchanges: BitMEX, Binance, Binance Futures, Deribit, Bitfinex, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, FTX, Kraken and OKEx.
+- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, Binance Futures, FTX, OKEx, Huobi Global, Huobi DM, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, Kraken, Bitfinex and Huobi US.
 
 <br/>
 
