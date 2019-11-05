@@ -78,7 +78,7 @@ const derivativeTickersMappers = {
   okex: () => new OkexDerivativeTickerMapper()
 }
 
-export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T): Mapper<T, Trade> => {
+export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {
   const createTradesMapper = tradesMappers[exchange]
 
   if (createTradesMapper === undefined) {
@@ -88,7 +88,10 @@ export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: 
   return createTradesMapper() as Mapper<T, Trade>
 }
 
-export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(exchange: T): Mapper<T, BookChange> => {
+export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
+  exchange: T,
+  _localTimestamp: Date
+): Mapper<T, BookChange> => {
   const createBookChangesMapper = bookChangeMappers[exchange]
 
   if (createBookChangesMapper === undefined) {
@@ -98,7 +101,10 @@ export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(e
   return createBookChangesMapper() as Mapper<T, BookChange>
 }
 
-export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(exchange: T): Mapper<T, DerivativeTicker> => {
+export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(
+  exchange: T,
+  _localTimestamp: Date
+): Mapper<T, DerivativeTicker> => {
   const createDerivativeTickerMapper = derivativeTickersMappers[exchange]
 
   if (createDerivativeTickerMapper === undefined) {

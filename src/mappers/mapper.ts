@@ -8,7 +8,7 @@ export type Mapper<T extends Exchange, U extends NormalizedData> = {
   getFilters: (symbols?: string[]) => FilterForExchange[T][]
 }
 
-export type MapperFactory<T extends Exchange, U extends NormalizedData> = (exchange: T) => Mapper<T, U>
+export type MapperFactory<T extends Exchange, U extends NormalizedData> = (exchange: T, localTimestamp: Date) => Mapper<T, U>
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 

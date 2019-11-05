@@ -76,13 +76,13 @@ export function* take(iterable: Iterable<any>, length: number) {
 export async function* normalizeMessages(
   exchange: Exchange,
   messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
-  createMappers: () => Mapper<any, any>[],
+  mappers: Mapper<any, any>[],
+  createMappers: (localTimestamp: Date) => Mapper<any, any>[],
   withDisconnectMessages: boolean | undefined,
   filter?: (symbol: string) => boolean
 ) {
   let previousLocalTimestamp: Date | undefined
-  let mappersForExchange = createMappers()
-
+  let mappersForExchange: Mapper<any, any>[] | undefined = mappers
   if (mappersForExchange.length === 0) {
     throw new Error(`Can't normalize data without any normalizers provided`)
   }
@@ -91,7 +91,7 @@ export async function* normalizeMessages(
     if (messageWithTimestamp === undefined) {
       // we received undefined meaning Websocket disconnection
       // lets create new mappers with clean state for 'new connection'
-      mappersForExchange = createMappers()
+      mappersForExchange = undefined
 
       // if flag withDisconnectMessages is set, yield disconnect message
       if (withDisconnectMessages === true && previousLocalTimestamp !== undefined) {
@@ -104,6 +104,10 @@ export async function* normalizeMessages(
       }
 
       continue
+    }
+
+    if (mappersForExchange === undefined) {
+      mappersForExchange = createMappers(messageWithTimestamp.localTimestamp)
     }
 
     previousLocalTimestamp = messageWithTimestamp.localTimestamp

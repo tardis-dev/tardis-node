@@ -47,8 +47,9 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
     symbols = symbols.map(s => s.toUpperCase())
   }
 
-  const createMappers = () => normalizers.map(m => m(exchange))
-  const filters = getFilters(createMappers(), symbols)
+  const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
+  const mappers = createMappers(new Date())
+  const filters = getFilters(mappers, symbols)
 
   const messages = stream({
     exchange,
@@ -57,7 +58,7 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
     filters
   })
 
-  return normalizeMessages(exchange, messages, createMappers, withDisconnectMessages)
+  return normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
 }
 
 function validateStreamOptions(filters: Filter<string>[]) {

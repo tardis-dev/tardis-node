@@ -165,9 +165,11 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     symbols = symbols.map(s => s.toUpperCase())
   }
 
-  const createMappers = () => normalizers.map(m => m(exchange))
+  const fromDate = parseAsUTCDate(from)
+  const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
   const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
-  const filters = nonFilterableExchanges.includes(exchange) ? [] : getFilters(createMappers(), symbols)
+  const mappers = createMappers(fromDate)
+  const filters = nonFilterableExchanges.includes(exchange) ? [] : getFilters(mappers, symbols)
 
   const messages = replay({
     exchange,
@@ -184,7 +186,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
   }
 
-  return normalizeMessages(exchange, messages, createMappers, withDisconnectMessages, filter)
+  return normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter)
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {
