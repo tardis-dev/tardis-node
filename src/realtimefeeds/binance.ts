@@ -79,5 +79,4 @@ export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
 export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://fstream.binance.com'
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
-  protected bookUpdateSpeed = ''
 }
