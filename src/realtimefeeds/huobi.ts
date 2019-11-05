@@ -1,5 +1,7 @@
-import { RealTimeFeedBase } from '.'
+import WebSocket from 'ws'
+import { unzipSync } from 'zlib'
 import { Filter } from '../types'
+import { RealTimeFeedBase } from './realtimefeed'
 
 abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
   protected abstract wssURL: string
@@ -27,11 +29,27 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
       .flatMap(s => s)
   }
 
+  protected decompress = (message: any) => {
+    message = unzipSync(message)
+
+    return message as Buffer
+  }
+
   protected messageIsError(message: any): boolean {
-    if (message.stream === undefined) {
+    if (message.status === 'error') {
       return true
     }
     return false
+  }
+
+  protected onMessage(msg: any, ws: WebSocket) {
+    if (msg.ping !== undefined) {
+      ws.send(
+        JSON.stringify({
+          pong: msg.ping
+        })
+      )
+    }
   }
 }
 

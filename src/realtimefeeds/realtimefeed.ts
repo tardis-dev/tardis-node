@@ -68,7 +68,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
         for await (let message of realtimeMessagesStream) {
           if (this.decompress !== undefined) {
-            message = await this.decompress(message)
+            message = this.decompress(message)
             if (message === undefined) {
               continue
             }
@@ -150,7 +150,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
       this.onConnected(target)
 
       try {
-        await wait(ONE_SEC_IN_MS)
+        await wait(2 * ONE_SEC_IN_MS)
         await this.provideManualSnapshots(filters, snapshotsToReturn, () => target.readyState === WebSocket.CLOSED)
       } catch (e) {
         this.debug('providing manual snapshots error: %o, closing connection...', e)
@@ -172,5 +172,5 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
 
   protected onConnected(_ws: WebSocket) {}
 
-  protected decompress?: (msg: any) => Promise<any>
+  protected decompress?: (msg: any) => any
 }

@@ -1,4 +1,4 @@
-import { BookChange, Trade, Exchange } from '../types'
+import { BookChange, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
@@ -8,6 +8,9 @@ import { Mapper } from './mapper'
 export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-us', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
+    if (message.ch === undefined) {
+      return false
+    }
     return message.ch.endsWith('.trade.detail')
   }
 
@@ -45,6 +48,10 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {
+    if (message.ch === undefined) {
+      return false
+    }
+
     return message.ch.endsWith('.depth.step0')
   }
 
