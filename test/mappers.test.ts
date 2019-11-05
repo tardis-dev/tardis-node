@@ -1414,6 +1414,130 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('map huobi messages', () => {
+    const messages = [
+      { id: null, subbed: 'market.BTC_CW.trade.detail', ts: 1572912001262, status: 'ok' },
+      {
+        ch: 'market.BTC_CW.detail',
+        ts: 1572912000995,
+        tick: {
+          id: 1572912000,
+          mrid: 25102925110,
+          open: 9323.85,
+          close: 9435.15,
+          high: 9650,
+          low: 9273.49,
+          amount: 45646.1037938786755718562979596368747611432,
+          vol: 4260726,
+          count: 85611
+        }
+      },
+
+      {
+        ch: 'market.BTC_NW.depth.step0',
+        ts: 1572912001193,
+        tick: {
+          mrid: 25102925648,
+          id: 1572912001,
+          bids: [[9467.21, 35], [9467.2, 132]],
+          asks: [[9469.88, 20], [9470.38, 8]],
+          ts: 1572912001180,
+          version: 1572912001,
+          ch: 'market.BTC_NW.depth.step0'
+        }
+      },
+      {
+        ch: 'market.ETH_CQ.trade.detail',
+        ts: 1572912028352,
+        tick: {
+          id: 25102975022,
+          ts: 1572912028237,
+          data: [{ amount: 62, ts: 1572912028237, id: 251029750220000, price: 190.031, direction: 'sell' }]
+        }
+      },
+      {
+        ch: 'market.BCH_CQ.depth.step0',
+        ts: 1572912028401,
+        update: true,
+        tick: {
+          mrid: 25102974989,
+          id: 1572912028,
+          bids: [[290.864, 1], [290.966, 0]],
+          asks: [[299.375, 734]],
+          ts: 1572912028381,
+          version: 1572912028,
+          ch: 'market.BCH_CQ.depth.step0'
+        }
+      },
+
+      {
+        ch: 'market.mexbtc.depth.step0',
+        ts: 1572911920067,
+        tick: {
+          bids: [[6.22e-8, 45542.05], [6.21e-8, 663504.55]],
+          asks: [[6.35e-8, 1033141.41], [6.4e-8, 269808.94]],
+          version: 100033171703,
+          ts: 1572911920032
+        }
+      },
+
+      {
+        ch: 'market.mexbtc.trade.detail',
+        ts: 1572911088789,
+        tick: {
+          id: 100033171587,
+          ts: 1572911088761,
+          data: [
+            { id: 10003317158754670853281, ts: 1572911088761, tradeId: 100027416191, amount: 1569.86, price: 6.37e-8, direction: 'buy' }
+          ]
+        }
+      },
+      {
+        ch: 'market.waxpbtc.depth.step0',
+        ts: 1572912002010,
+        update: true,
+        tick: { bids: [], asks: [], ts: 1572912002001, version: 100052331172 }
+      },
+      {
+        ch: 'market.ontusdt.depth.step0',
+        ts: 1572912001077,
+        tick: {
+          bids: [[0.9073, 1877.1994]],
+          asks: [[0.9087, 1.07], [0.9088, 1760.6161]],
+          ts: 1572912001027,
+          version: 100305412446
+        }
+      },
+      {
+        ch: 'market.xmrbtc.trade.detail',
+        ts: 1572879775938,
+        tick: {
+          id: 100201717928,
+          ts: 1571238239378,
+          data: [{ id: '10020171792852100010452', amount: 6.5286, price: 0.006663, direction: 'buy', ts: 1571238239378 }]
+        }
+      },
+      {
+        ch: 'market.dtabtc.depth.step0',
+        ts: 1572912002012,
+        update: true,
+        tick: {
+          bids: [[4.37e-8, 731389.72]],
+          asks: [[1.55e-7, 437407.32], [4.75e-8, 0]],
+          ts: 1572912002002,
+          version: 100058542239
+        }
+      }
+    ]
+
+    const huobi = createMapper('huobi')
+
+    for (const message of messages) {
+      const mappedMessages = huobi.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
 })
 
 describe('getFilters(symbols)', () => {

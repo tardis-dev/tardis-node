@@ -1586,6 +1586,226 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi messages 1`] = `Array []`;
+
+exports[`mappers map huobi messages 2`] = `Array []`;
+
+exports[`mappers map huobi messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 20,
+        "price": 9469.88,
+      },
+      Object {
+        "amount": 8,
+        "price": 9470.38,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 35,
+        "price": 9467.21,
+      },
+      Object {
+        "amount": 132,
+        "price": 9467.2,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC_NW",
+    "timestamp": 2019-11-05T00:00:01.193Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 4`] = `
+Array [
+  Object {
+    "amount": 62,
+    "exchange": "huobi",
+    "id": "251029750220000",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 190.031,
+    "side": "sell",
+    "symbol": "ETH_CQ",
+    "timestamp": 2019-11-05T00:00:28.237Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 734,
+        "price": 299.375,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1,
+        "price": 290.864,
+      },
+      Object {
+        "amount": 0,
+        "price": 290.966,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BCH_CQ",
+    "timestamp": 2019-11-05T00:00:28.401Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1033141.41,
+        "price": 6.35e-8,
+      },
+      Object {
+        "amount": 269808.94,
+        "price": 6.4e-8,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 45542.05,
+        "price": 6.22e-8,
+      },
+      Object {
+        "amount": 663504.55,
+        "price": 6.21e-8,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "mexbtc",
+    "timestamp": 2019-11-04T23:58:40.067Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 7`] = `
+Array [
+  Object {
+    "amount": 1569.86,
+    "exchange": "huobi",
+    "id": "100027416191",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 6.37e-8,
+    "side": "buy",
+    "symbol": "mexbtc",
+    "timestamp": 2019-11-04T23:44:48.761Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 8`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [],
+    "exchange": "huobi",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "waxpbtc",
+    "timestamp": 2019-11-05T00:00:02.010Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1.07,
+        "price": 0.9087,
+      },
+      Object {
+        "amount": 1760.6161,
+        "price": 0.9088,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1877.1994,
+        "price": 0.9073,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "ontusdt",
+    "timestamp": 2019-11-05T00:00:01.077Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 10`] = `
+Array [
+  Object {
+    "amount": 6.5286,
+    "exchange": "huobi",
+    "id": "10020171792852100010452",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 0.006663,
+    "side": "buy",
+    "symbol": "xmrbtc",
+    "timestamp": 2019-10-16T15:03:59.378Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 437407.32,
+        "price": 1.55e-7,
+      },
+      Object {
+        "amount": 0,
+        "price": 4.75e-8,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 731389.72,
+        "price": 4.37e-8,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "dtabtc",
+    "timestamp": 2019-11-05T00:00:02.012Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map kraken messages 1`] = `
 Array [
   Object {
