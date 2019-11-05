@@ -2,7 +2,6 @@ import {
   clearCache,
   Exchange,
   EXCHANGES,
-  getExchangeDetails,
   normalizeBookChanges,
   normalizeDerivativeTickers,
   normalizeTrades,
@@ -193,25 +192,34 @@ describe('replay', () => {
   test(
     'replays normalized data for each supported exchange',
     async () => {
+      const replayOptions = {
+        bitmex: { symbols: ['XBTZ19', 'XBTUSD'], from: '2019-07-01T00:00:00.000Z', to: '2019-07-02T00:00:00.000Z' },
+        deribit: { symbols: ['BTC-PERPETUAL', 'BTC-9AUG19-9500-P'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        binance: { symbols: ['btcusdt', 'btcusds'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        'binance-futures': { symbols: ['btcusdt'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
+        ftx: { symbols: ['BTC/USD', 'BTC-PERP'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
+        okex: { symbols: ['BTC-USDT'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        bitflyer: { symbols: ['BTC_JPY', 'BTCJPY30AUG2019'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
+        bitstamp: { symbols: ['btcusd', 'btceur'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        coinbase: { symbols: ['BTC-USDC', 'BTC-USD'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        cryptofacilities: { symbols: ['PI_XRPUSD', 'PI_XBTUSD'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        gemini: { symbols: ['btcusd'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
+        kraken: { symbols: ['XBT/USD', 'XBT/JPY'], from: '2019-07-01T00:00:00.000Z', to: '2019-07-02T00:00:00.000Z' },
+        bitfinex: { symbols: ['BTCUST', 'BTCUSD'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
+        'bitfinex-derivatives': { symbols: ['BTCF0:USTF0'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
+        'binance-dex': {
+          symbols: ['BTCB-1DE_USDSB-1AC', 'BTCB-1DE_TUSDB-888'],
+          from: '2019-07-01T00:00:00.000Z',
+          to: '2019-07-02T00:00:00.000Z'
+        },
+        'binance-jersey': { symbols: ['btcgbp', 'btceur'], from: '2019-05-01T00:00:00.000Z', to: '2019-05-02T00:00:00.000Z' },
+        'binance-us': { symbols: ['btcusdt', 'btcusd'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' }
+      } as any
+
       for (const exchange of EXCHANGES) {
-        // let's wait till 1st of Dec 2019 to enable it so we have free data sample available
-        if (exchange.startsWith('huobi')) {
+        if (replayOptions[exchange] === undefined) {
           continue
         }
-
-        const exchangeDetails = await getExchangeDetails(exchange)
-
-        exchangeDetails.availableSymbols.sort((a, b) => (a.id < b.id ? 1 : -1))
-        const validPrefixes = ['btc', 'xbt', 'pi_']
-        const availableSymbols = exchangeDetails.availableSymbols.filter(s =>
-          validPrefixes.some(p => s.id.toLocaleLowerCase().startsWith(p))
-        )
-
-        const from = new Date(availableSymbols[0].availableSince)
-        from.setUTCMonth(from.getUTCMonth() + 1)
-        from.setUTCDate(1)
-        const to = new Date(from)
-        to.setUTCDate(2)
 
         const normalizers = exchangesWithDerivativeInfo.includes(exchange)
           ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
@@ -220,10 +228,8 @@ describe('replay', () => {
         const messages = replayNormalized(
           {
             exchange,
-            from: from.toISOString(),
-            to: to.toISOString(),
-            symbols: availableSymbols.slice(0, 2).map(s => s.id),
-            withDisconnectMessages: true
+            withDisconnectMessages: true,
+            ...replayOptions[exchange]
           },
           ...(normalizers as any)
         )

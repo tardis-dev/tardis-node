@@ -29,7 +29,7 @@ describe('stream', () => {
         }
 
         var symbols = exchangeDetails.availableSymbols
-          .filter(s => s.availableTo === undefined)
+          .filter(s => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
           .slice(0, 100)
           .map(s => s.id)
 
@@ -66,7 +66,7 @@ describe('stream', () => {
             }
           }
 
-          if (snapshots === symbols.length) {
+          if (snapshots >= symbols.length) {
             count++
             if (count >= 200) {
               break
@@ -75,6 +75,6 @@ describe('stream', () => {
         }
       }
     },
-    1000 * 60 * 10
+    1000 * 60 * 15
   )
 })
