@@ -22,7 +22,7 @@ export const EXCHANGES = [
   'bybit'
 ] as const
 
-const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'miniTicker', 'depthSnapshot', 'bookTicker'] as const
+const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
 
@@ -109,7 +109,7 @@ const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicat
 
 const BITFLYER_CHANNELS = ['lightning_board_snapshot', 'lightning_board', 'lightning_ticker', 'lightning_executions'] as const
 
-const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot'] as const
+const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker'] as const
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
