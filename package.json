@@ -1,6 +1,6 @@
 {
   "name": "tardis-dev",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "engines": {
     "node": ">=12"
   },
@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc",
     "precommit": "lint-staged",
-    "test": "npm run build && jest --runInBand",
+    "test": "npm run build && jest --runInBand --forceExit",
     "prepare": "npm run build",
     "release": "cross-var \"npm run test && npm run build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish --access=public\""
   },
