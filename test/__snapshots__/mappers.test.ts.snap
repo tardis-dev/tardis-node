@@ -1048,6 +1048,134 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 1`] = `Array []`;
+
+exports[`mappers map bybit messages 2`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": 0.0001,
+    "indexPrice": 190.49,
+    "lastPrice": 190.65,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": 190.5,
+    "openInterest": 13793020,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-11-06T12:49:56.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 704729,
+        "price": 9366,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 58486,
+        "price": 9353.5,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-11-06T12:50:48.627Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 674462,
+        "price": 9367,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-11-06T12:50:50.028Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 5`] = `
+Array [
+  Object {
+    "amount": 6000,
+    "exchange": "bybit",
+    "id": "8c53dd53-2df5-563d-8e3b-e0dbba7c55a0",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 9366,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-11-06T12:50:52.000Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.3013,
+      },
+      Object {
+        "amount": 41761,
+        "price": 0.3038,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 224986,
+        "price": 0.301,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "XRPUSD",
+    "timestamp": 2019-11-06T12:59:01.027Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 7`] = `Array []`;
+
+exports[`mappers map bybit messages 8`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 9291.5,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-11-06T20:03:01.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {

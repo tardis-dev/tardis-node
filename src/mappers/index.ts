@@ -11,15 +11,16 @@ import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexTrade
 import { bitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
 import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexTradesMapper } from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
+import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
 import { coinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
 import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper } from './deribit'
 import { ftxBookChangeMapper, ftxTradesMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
+import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { okexBookChangeMapper, OkexDerivativeTickerMapper, okexTradesMapper } from './okex'
-import { HuobiTradesMapper, HuobiBookChangeMapper } from './huobi'
 
 export * from './mapper'
 
@@ -43,7 +44,8 @@ const tradesMappers = {
   okex: () => okexTradesMapper,
   huobi: () => new HuobiTradesMapper('huobi'),
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
-  'huobi-us': () => new HuobiTradesMapper('huobi-us')
+  'huobi-us': () => new HuobiTradesMapper('huobi-us'),
+  bybit: () => new BybitTradesMapper('bybit')
 }
 
 const bookChangeMappers = {
@@ -66,7 +68,8 @@ const bookChangeMappers = {
   okex: () => okexBookChangeMapper,
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
-  'huobi-us': () => new HuobiBookChangeMapper('huobi-us')
+  'huobi-us': () => new HuobiBookChangeMapper('huobi-us'),
+  bybit: () => new BybitBookChangeMapper('bybit')
 }
 
 const derivativeTickersMappers = {
@@ -75,7 +78,8 @@ const derivativeTickersMappers = {
   'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
   cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
   deribit: () => new DeribitDerivativeTickerMapper(),
-  okex: () => new OkexDerivativeTickerMapper()
+  okex: () => new OkexDerivativeTickerMapper(),
+  bybit: () => new BybitDerivativeTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

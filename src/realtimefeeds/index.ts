@@ -5,15 +5,16 @@ import { BitfinexRealTimeFeed } from './bitfinex'
 import { BitflyerRealTimeFeed } from './bitflyer'
 import { BitmexRealTimeFeed } from './bitmex'
 import { BitstampRealTimeFeed } from './bitstamp'
+import { BybitRealTimeDataFeed } from './bybit'
 import { CoinbaseRealTimeFeed } from './coinbase'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities'
 import { DeribitRealTimeDataFeed } from './deribit'
 import { FtxRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
+import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
 import { KrakenRealTimeFeed } from './kraken'
 import { OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
-import { HuobiRealTimeFeed, HuobiDMRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
 
 export * from './realtimefeed'
 
@@ -39,7 +40,8 @@ const realTimeFeedsMap: {
   okex: () => new OkexRealTimeFeed('okex'),
   'huobi-dm': () => new HuobiDMRealTimeFeed('huobi-dm'),
   'huobi-us': () => new HuobiUSRealTimeFeed('huobi-us'),
-  huobi: () => new HuobiRealTimeFeed('huobi')
+  huobi: () => new HuobiRealTimeFeed('huobi'),
+  bybit: () => new BybitRealTimeDataFeed('bybit')
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): () => RealTimeFeed {

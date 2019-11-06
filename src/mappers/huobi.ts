@@ -102,7 +102,7 @@ function normalizeSymbols(symbols?: string[]) {
 }
 
 type HuobiDataMessage = {
-  ch: 'string'
+  ch: string
 }
 
 type HuobiTradeDataMessage = HuobiDataMessage & {

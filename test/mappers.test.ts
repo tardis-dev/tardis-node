@@ -1,13 +1,21 @@
 import { Exchange, normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers, Mapper } from '../src'
 
-const exchangesWithDerivativeInfo: Exchange[] = ['bitmex', 'binance-futures', 'bitfinex-derivatives', 'cryptofacilities', 'deribit', 'okex']
+const exchangesWithDerivativeInfo: Exchange[] = [
+  'bitmex',
+  'binance-futures',
+  'bitfinex-derivatives',
+  'cryptofacilities',
+  'deribit',
+  'okex',
+  'bybit'
+]
 
-const createMapper = (exchange: Exchange) => {
+const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   const normalizers = exchangesWithDerivativeInfo.includes(exchange)
     ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
     : [normalizeTrades, normalizeBookChanges]
 
-  const mappersForExchange = normalizers.map((m: any) => m(exchange)) as Mapper<any, any>[]
+  const mappersForExchange = normalizers.map((m: any) => m(exchange, localTimestamp)) as Mapper<any, any>[]
 
   return {
     map(message: any, localTimestamp: Date) {
@@ -1538,22 +1546,175 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('map bybit messages', () => {
+    const messages = [
+      {
+        success: true,
+        ret_msg: '',
+        conn_id: 'f428f979-3fd2-4b1e-aa12-f42ef3bc4a66',
+        request: {
+          op: 'subscribe',
+          args: ['trade.BTCUSD']
+        }
+      },
+      {
+        topic: 'instrument_info.100ms.ETHUSD',
+        type: 'snapshot',
+        data: {
+          id: 2,
+          symbol: 'ETHUSD',
+          last_price_e4: 1906500,
+          last_tick_direction: 'MinusTick',
+          prev_price_24h_e4: 1875000,
+          price_24h_pcnt_e6: 16800,
+          high_price_24h_e4: 1950000,
+          low_price_24h_e4: 1864500,
+          prev_price_1h_e4: 1915000,
+          price_1h_pcnt_e6: -4438,
+          mark_price_e4: 1905000,
+          index_price_e4: 1904900,
+          open_interest: 13793020,
+          open_value_e8: 7302549080059,
+          total_turnover_e8: 8510047221366513,
+          turnover_24h_e8: 33613080478038,
+          total_volume: 17203142911,
+          volume_24h: 64058841,
+          funding_rate_e6: 100,
+          predicted_funding_rate_e6: 100,
+          cross_seq: 311869653,
+          created_at: '2019-01-25T09:12:06Z',
+          updated_at: '2019-11-06T12:49:56Z',
+          next_funding_time: '2019-11-06T16:00:00Z',
+          countdown_hour: 4
+        },
+        cross_seq: 311872222,
+        timestamp_e6: 1573044649041458
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'snapshot',
+        data: [
+          { price: '9353.50', symbol: 'BTCUSD', id: 93535000, side: 'Buy', size: 58486 },
+          { price: '9366.00', symbol: 'BTCUSD', id: 93660000, side: 'Sell', size: 704729 }
+        ],
+        cross_seq: 794201904,
+        timestamp_e6: 1573044648627110
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [{ price: '9367.00', symbol: 'BTCUSD', id: 93670000, side: 'Sell', size: 674462 }],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 794201917,
+        timestamp_e6: 1573044650028026
+      },
+      {
+        topic: 'trade.BTCUSD',
+        data: [
+          {
+            timestamp: '2019-11-06T12:50:52.000Z',
+            symbol: 'BTCUSD',
+            side: 'Buy',
+            size: 6000,
+            price: 9366,
+            tick_direction: 'ZeroPlusTick',
+            trade_id: '8c53dd53-2df5-563d-8e3b-e0dbba7c55a0',
+            cross_seq: 794201989
+          }
+        ]
+      },
+      {
+        topic: 'orderBookL2_25.XRPUSD',
+        type: 'delta',
+        data: {
+          delete: [{ price: '0.3013', symbol: 'XRPUSD', id: 3013, side: 'Sell' }],
+          update: [{ price: '0.3010', symbol: 'XRPUSD', id: 3010, side: 'Buy', size: 224986 }],
+          insert: [{ price: '0.3038', symbol: 'XRPUSD', id: 3038, side: 'Sell', size: 41761 }],
+          transactTimeE6: 0
+        },
+        cross_seq: 322932462,
+        timestamp_e6: 1573045141027590
+      },
+      {
+        topic: 'instrument_info.100ms.EOSUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            {
+              id: 4,
+              symbol: 'EOSUSD',
+              last_tick_direction: 'ZeroMinusTick',
+              total_turnover_e8: 220614611978549345,
+              turnover_24h_e8: 1804511683074981,
+              total_volume: 8223153999,
+              volume_24h: 65324494,
+              cross_seq: 344634644,
+              created_at: '2018-10-17T11:53:15Z',
+              updated_at: '2019-11-06T12:59:58Z'
+            }
+          ],
+          insert: []
+        },
+        cross_seq: 344634644,
+        timestamp_e6: 1573045198449619
+      },
+      {
+        topic: 'instrument_info.100ms.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            {
+              id: 1,
+              symbol: 'BTCUSD',
+              last_price_e4: 92915000,
+              last_tick_direction: 'PlusTick',
+              price_24h_pcnt_e6: -13222,
+              price_1h_pcnt_e6: -2201,
+              total_turnover_e8: 1264996883399380,
+              turnover_24h_e8: 4918593756702,
+              total_volume: 118238483891,
+              volume_24h: 459925565,
+              cross_seq: 795142862,
+              created_at: '2018-11-14T16:33:26Z',
+              updated_at: '2019-11-06T20:03:01Z'
+            }
+          ],
+          insert: []
+        },
+        cross_seq: 795142862,
+        timestamp_e6: 1573070581891131
+      }
+    ]
+    const huobi = createMapper('bybit')
+
+    for (const message of messages) {
+      const mappedMessages = huobi.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
 })
 
 describe('getFilters(symbols)', () => {
   test('for okex', () => {
-    expect(normalizeTrades('okex').getFilters(undefined)).toMatchSnapshot()
+    expect(normalizeTrades('okex', new Date()).getFilters(undefined)).toMatchSnapshot()
 
-    expect(normalizeBookChanges('okex').getFilters(undefined)).toMatchSnapshot()
+    expect(normalizeBookChanges('okex', new Date()).getFilters(undefined)).toMatchSnapshot()
 
-    expect(normalizeBookChanges('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+    expect(normalizeBookChanges('okex', new Date()).getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(normalizeBookChanges('okex').getFilters(['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toMatchSnapshot()
+    expect(normalizeBookChanges('okex', new Date()).getFilters(['LTC-USD-SWAP', 'ETH-USD-SWAP', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(normalizeDerivativeTickers('okex').getFilters(undefined)).toMatchSnapshot()
+    expect(normalizeDerivativeTickers('okex', new Date()).getFilters(undefined)).toMatchSnapshot()
 
-    expect(normalizeDerivativeTickers('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
+    expect(normalizeDerivativeTickers('okex', new Date()).getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'XRP-OKB'])).toMatchSnapshot()
 
-    expect(normalizeDerivativeTickers('okex').getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'ETH-USD-SWAP'])).toMatchSnapshot()
+    expect(normalizeDerivativeTickers('okex', new Date()).getFilters(['LTC-USD-SWAP', 'TRX-USD-190927', 'ETH-USD-SWAP'])).toMatchSnapshot()
   })
 })
