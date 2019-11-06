@@ -38,11 +38,23 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
         let snapshotsToReturn: any[] = []
         let receivedMessagesCount = 0
 
+        let symbolsCount = filters.reduce((prev, curr) => {
+          if (curr.symbols !== undefined) {
+            for (const symbol of curr.symbols) {
+              prev.add(symbol)
+            }
+          }
+          return prev
+        }, new Set<string>()).size
+
         ws.onopen = this._onConnectionOpen({
           address,
           subscribeMessages,
           snapshotsToReturn,
-          filters
+          filters,
+          connectionConfirmed: () => {
+            return receivedMessagesCount > symbolsCount * 2
+          }
         })
 
         if (this.timeoutIntervalMS !== undefined) {
@@ -130,30 +142,44 @@ export abstract class RealTimeFeedBase implements RealTimeFeed {
     address,
     filters,
     snapshotsToReturn,
-    subscribeMessages
+    subscribeMessages,
+    connectionConfirmed
   }: {
     address: string
     subscribeMessages: string | any[]
     filters: Filter<string>[]
     snapshotsToReturn: any[]
+    connectionConfirmed: () => boolean
   }) {
     return async ({ target }: WebSocket.OpenEvent) => {
       this.debug('estabilished connection to %s', address)
 
       if (Array.isArray(subscribeMessages)) {
         for (const message of subscribeMessages) {
-          this.debug('subscribing to %o', message)
           target.send(JSON.stringify(message))
         }
       }
 
+      this.debug('subscribed successfully')
+
       this.onConnected(target)
 
       try {
-        await wait(2 * ONE_SEC_IN_MS)
+        //wait before fetching snapshots until we're sure we've got proper connection estabilished (received some messages)
+        while (connectionConfirmed() == false) {
+          await wait(100)
+        }
+        // wait a second just in case before starting fetching the snapshots
+        await wait(1 * ONE_SEC_IN_MS)
+
+        if (target.readyState === WebSocket.CLOSED) {
+          return
+        }
+
         await this.provideManualSnapshots(filters, snapshotsToReturn, () => target.readyState === WebSocket.CLOSED)
       } catch (e) {
         this.debug('providing manual snapshots error: %o, closing connection...', e)
+        target.terminate()
       }
     }
   }
