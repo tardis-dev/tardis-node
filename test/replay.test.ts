@@ -10,7 +10,15 @@ import {
   ReplayOptions
 } from '../dist'
 
-const exchangesWithDerivativeInfo: Exchange[] = ['bitmex', 'binance-futures', 'bitfinex-derivatives', 'cryptofacilities', 'deribit', 'okex']
+const exchangesWithDerivativeInfo: Exchange[] = [
+  'bitmex',
+  'binance-futures',
+  'bitfinex-derivatives',
+  'cryptofacilities',
+  'deribit',
+  'okex',
+  'bybit'
+]
 
 describe('replay', () => {
   beforeEach(() => {
