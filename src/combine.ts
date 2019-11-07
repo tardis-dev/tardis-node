@@ -1,3 +1,5 @@
+import { once } from 'events'
+import { PassThrough } from 'stream'
 import { ONE_SEC_IN_MS } from './handy'
 
 type NextMessageResultWitIndex = {
@@ -41,31 +43,39 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   if (iterators.length === 0) {
     return
   }
-  const nextResults = iterators.map(nextWithIndex)
-  let { result } = await Promise.race(nextResults)
-  const firstReceivedMessage = result.value
+
+  const firstReceivedMessage = await iterators[0].next()
   const now = new Date()
   const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
+
   // based on local timestamp of first message decide if iterators provide is real time data
   // if first message is less than three minutes 'old' in comparison to current time
-  const isRealTime = firstReceivedMessage.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
+  // alternative would be to provide it via param to combine fn
+  const isRealTime = firstReceivedMessage.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
 
   if (isRealTime) {
-    // return messages in FIFO order thanks to using Promise.race
-    // based on https://github.com/fraxken/combine-async-iterators
-    console.warn(
-      'Important! using combine for real-time streams may cause memory leaks due to Node.js issue with Promise.race handling - https://github.com/nodejs/node/issues/29385'
-    )
+    yield firstReceivedMessage.value as any
 
-    while (true) {
-      // this does not handle iterators that are finite,
-      // as we'd have to handle case when result.done is set to true
-      // but in practice real-time streams are infinite
-      const { index, result } = await Promise.race(nextResults)
-      yield result.value as any
-      nextResults[index] = nextWithIndex(iterators[index], index)
+    const buffer = new PassThrough({
+      objectMode: true,
+      highWaterMark: 1024
+    })
+
+    const writeMessagesToBuffer = iterators.map(async messages => {
+      for await (const message of messages) {
+        if (!buffer.write(message))
+          //Handle backpressure on write
+          await once(buffer, 'drain')
+      }
+    })
+
+    for await (const message of buffer as any) {
+      yield message
     }
+
+    await writeMessagesToBuffer
   } else {
+    const nextResults = iterators.map(nextWithIndex)
     const results = await Promise.all(nextResults)
     let aliveIteratorsCount = results.length
     do {
@@ -77,9 +87,9 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
 
       if (result.done) {
         aliveIteratorsCount--
+
         // we don't want finished iterators to every be considered 'oldest' again
         // hence provide them with result that has local timestamp set to DATE_MAX
-
         results[index].result = {
           value: {
             localTimestamp: DATE_MAX
