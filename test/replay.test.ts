@@ -220,7 +220,7 @@ describe('replay', () => {
           from: '2019-07-01T00:00:00.000Z',
           to: '2019-07-02T00:00:00.000Z'
         },
-        'binance-jersey': { symbols: ['btcgbp', 'btceur'], from: '2019-05-01T00:00:00.000Z', to: '2019-05-02T00:00:00.000Z' },
+        'binance-jersey': { symbols: ['btcgbp', 'btceur'], from: '2019-11-01T00:00:00.000Z', to: '2019-11-02T00:00:00.000Z' },
         'binance-us': { symbols: ['btcusdt', 'btcusd'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' }
       } as any
 
