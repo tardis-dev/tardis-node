@@ -136,7 +136,10 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 
     // The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
     if (!depthContext.validatedFirstUpdate) {
-      if (binanceDepthUpdateData.U <= lastUpdateId + 1 && binanceDepthUpdateData.u >= lastUpdateId + 1) {
+      // if there is new instrument added it can have empty book at first and that's normal
+      const bookSnapshotIsEmpty = lastUpdateId == -1
+
+      if ((binanceDepthUpdateData.U <= lastUpdateId + 1 && binanceDepthUpdateData.u >= lastUpdateId + 1) || bookSnapshotIsEmpty) {
         depthContext.validatedFirstUpdate = true
       } else {
         throw new Error(
@@ -205,11 +208,13 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
     super('binance-futures')
   }
 
-  protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceDepthData, localTimestamp: Date): BookChange | undefined {
+  protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceFuturesDepthData, localTimestamp: Date): BookChange | undefined {
     // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
     // when we've already processed the snapshot
     const depthContext = this.symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
     const lastUpdateId = depthContext.lastUpdateId!
+    // if update has pu set to -1, it means server provided book snapshot
+    const isSnapshot = binanceDepthUpdateData.pu === -1
     // based on https://binanceapitest.github.io/Binance-Futures-API-doc/wss/#how-to-manage-a-local-order-book-correctly
     // Drop any event where u is < lastUpdateId in the snapshot
     if (binanceDepthUpdateData.u < lastUpdateId) {
@@ -218,7 +223,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
 
     // The first processed should have U <= lastUpdateId AND u >= lastUpdateId
     if (!depthContext.validatedFirstUpdate) {
-      if (binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) {
+      if ((binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) || isSnapshot) {
         depthContext.validatedFirstUpdate = true
       } else {
         throw new Error(
@@ -233,7 +238,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
       type: 'book_change',
       symbol: binanceDepthUpdateData.s,
       exchange: this.exchange,
-      isSnapshot: false,
+      isSnapshot,
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
@@ -316,6 +321,10 @@ type BinanceDepthData = {
   u: number
   b: BinanceBookLevel[]
   a: BinanceBookLevel[]
+}
+
+type BinanceFuturesDepthData = BinanceDepthData & {
+  pu: number
 }
 
 type BinanceDepthSnapshotData = {
