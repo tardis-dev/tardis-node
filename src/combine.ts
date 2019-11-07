@@ -32,6 +32,7 @@ function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessag
   if (current.result.value.localTimestamp < oldest.result.value.localTimestamp) {
     return current
   }
+
   return oldest
 }
 
@@ -44,17 +45,17 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
     return
   }
 
-  const firstReceivedMessage = await iterators[0].next()
+  const firstReceivedResult = await iterators[0].next()
   const now = new Date()
   const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
-
   // based on local timestamp of first message decide if iterators provide is real time data
   // if first message is less than three minutes 'old' in comparison to current time
-  // alternative would be to provide it via param to combine fn
-  const isRealTime = firstReceivedMessage.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
+  // alternative would be to provide isRealtime via param to combine fn, perhaps less magic?...
+
+  const isRealTime = firstReceivedResult.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
 
   if (isRealTime) {
-    yield firstReceivedMessage.value as any
+    yield firstReceivedResult.value as any
 
     const buffer = new PassThrough({
       objectMode: true,
@@ -75,13 +76,27 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
 
     await writeMessagesToBuffer
   } else {
-    const nextResults = iterators.map(nextWithIndex)
+    // first item was already read so we need to 'put it back' as if it wasn't
+    const nextResults = [
+      Promise.resolve({
+        index: 0,
+        result: firstReceivedResult
+      })
+    ]
+
+    // add rest of the items to array we're work with later on
+    for (var i = 1; i < iterators.length; i++) {
+      nextResults[i] = nextWithIndex(iterators[i], i)
+    }
+
+    // wait for all results to resolve
     const results = await Promise.all(nextResults)
     let aliveIteratorsCount = results.length
     do {
       // if we're deailing with historical data replay
       // and need to return combined messages iterable sorted by local timestamp in acending order
 
+      // find resolved one that is the 'oldest'
       const oldestResult = results.reduce(findOldestResult, results[0])
       const { result, index } = oldestResult
 
@@ -90,7 +105,10 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
 
         // we don't want finished iterators to every be considered 'oldest' again
         // hence provide them with result that has local timestamp set to DATE_MAX
+        // and that is not done
+
         results[index].result = {
+          done: false,
           value: {
             localTimestamp: DATE_MAX
           }
