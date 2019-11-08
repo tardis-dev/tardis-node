@@ -52,24 +52,27 @@ export class OrderBook {
     return undefined
   }
 
-  public bids(): IterableIterator<BookPriceLevel> {
-    return this._bids.keys()
+  public *bids(): IterableIterator<BookPriceLevel> {
+    for (const level of this._bids.keys()) {
+      // skip empty levels
+      if (level.amount !== 0) {
+        yield level
+      }
+    }
   }
 
-  public asks(): IterableIterator<BookPriceLevel> {
-    return this._asks.keys()
+  public *asks(): IterableIterator<BookPriceLevel> {
+    for (const level of this._asks.keys()) {
+      // skip empty levels
+      if (level.amount !== 0) {
+        yield level
+      }
+    }
   }
 }
 
 function applyPriceLevelChanges(levels: BTree<BookPriceLevel, undefined>, priceLevelChanges: BookPriceLevel[]) {
   for (const priceLevel of priceLevelChanges) {
-    const priceLevelToApply = { ...priceLevel }
-    const levelNeedsToBeDeleted = priceLevelToApply.amount === 0
-
-    if (levelNeedsToBeDeleted) {
-      levels.delete(priceLevelToApply)
-    } else {
-      levels.set(priceLevelToApply, undefined)
-    }
+    levels.set({ ...priceLevel }, undefined)
   }
 }
