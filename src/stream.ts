@@ -90,9 +90,8 @@ export async function* streamNormalized<T extends Exchange, U extends MapperFact
       })
 
       const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
-      for await (const message of normalizedMessages) {
-        yield message
-      }
+
+      yield* normalizedMessages
     } catch (error) {
       debug('%s normalize messages error: %o, retrying with new connection...', exchange, error)
       if (withDisconnectMessages) {

@@ -119,11 +119,13 @@ export async function* normalizeMessages(
           continue
         }
 
-        for (const message of mappedMessages) {
-          if (filter === undefined) {
-            yield message
-          } else if (filter(message.symbol)) {
-            yield message
+        if (filter === undefined) {
+          yield* messages
+        } else {
+          for (const message of mappedMessages) {
+            if (filter(message.symbol)) {
+              yield message
+            }
           }
         }
       }
