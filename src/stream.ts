@@ -8,7 +8,8 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
   exchange,
   filters,
   timeoutIntervalMS = 10000,
-  withDisconnects = undefined
+  withDisconnects = undefined,
+  onError = undefined
 }: StreamOptions<T, U>): AsyncIterableIterator<
   U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
 > {
@@ -36,6 +37,10 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
         yield undefined as any
       }
     } catch (error) {
+      if (onError !== undefined) {
+        onError(error)
+      }
+
       retries++
       const isRateLimited = error.message.includes('429')
       const expontent = isRateLimited ? retries + 4 : retries - 1
@@ -63,7 +68,7 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
 }
 
 export async function* streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
-  { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined }: StreamNormalizedOptions<T, Z>,
+  { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
   Z extends true
@@ -86,13 +91,19 @@ export async function* streamNormalized<T extends Exchange, U extends MapperFact
         exchange,
         withDisconnects: true,
         timeoutIntervalMS,
-        filters
+        filters,
+        onError
       })
 
       const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
 
-      yield* normalizedMessages
+      for await (const message of normalizedMessages) {
+        yield message
+      }
     } catch (error) {
+      if (onError !== undefined) {
+        onError(error)
+      }
       debug('%s normalize messages error: %o, retrying with new connection...', exchange, error)
       if (withDisconnectMessages) {
         // yield it as disconnect as well if flag is set
@@ -127,6 +138,7 @@ export type StreamOptions<T extends Exchange, U extends boolean = false> = {
   filters: FilterForExchange[T][]
   timeoutIntervalMS?: number
   withDisconnects?: U
+  onError?: (error: Error) => void
 }
 
 export type StreamNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -134,4 +146,5 @@ export type StreamNormalizedOptions<T extends Exchange, U extends boolean = fals
   symbols?: string[]
   timeoutIntervalMS?: number
   withDisconnectMessages?: U
+  onError?: (error: Error) => void
 }
