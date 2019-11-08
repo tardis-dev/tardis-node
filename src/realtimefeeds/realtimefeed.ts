@@ -18,7 +18,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected abstract readonly wssURL: string
   protected readonly manualSnapshotsBuffer: any[] = []
   private _receivedMessagesCount = 0
-  private _staleConnectionCheckIntervalId?: NodeJS.Timeout
   private _ws?: WebSocket
   private static _connectionId = 0
 
@@ -32,6 +31,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   }
 
   private async *_stream() {
+    let timerId
     try {
       const subscribeMessages = this.mapToSubscribeMessages(this._filters)
       const address = typeof subscribeMessages === 'string' ? `${this.wssURL}${subscribeMessages}` : this.wssURL
@@ -46,6 +46,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       this._ws.onopen = this._onConnectionEstabilished
       this._ws.onclose = this._onConnectionClosed
+
+      timerId = this._monitorConnectionIfStale()
 
       const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
         readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
@@ -85,8 +87,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         }
       }
     } finally {
-      if (this._staleConnectionCheckIntervalId !== undefined) {
-        clearInterval(this._staleConnectionCheckIntervalId)
+      if (timerId !== undefined) {
+        clearInterval(timerId)
       }
     }
   }
@@ -123,7 +125,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     }
 
     // set up timer that checks against open, but stale connections that do not return any data
-    this._staleConnectionCheckIntervalId = setInterval(() => {
+    return setInterval(() => {
       if (this._ws === undefined) {
         return
       }
@@ -138,8 +140,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   private _onConnectionEstabilished = async () => {
     try {
-      this._monitorConnectionIfStale()
-
       const subscribeMessages = this.mapToSubscribeMessages(this._filters)
 
       let symbolsCount = this._filters.reduce((prev, curr) => {
