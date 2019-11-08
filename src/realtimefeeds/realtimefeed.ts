@@ -174,8 +174,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       await this.provideManualSnapshots(this._filters, () => this._ws!.readyState === WebSocket.CLOSED)
     } catch (e) {
-      this.debug('providing manual snapshots error: %o, closing connection...', e)
-      this._ws!.terminate()
+      this.debug('providing manual snapshots error: %o', e)
+      this._ws!.emit('error', e)
     }
   }
 
