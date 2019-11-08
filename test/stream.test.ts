@@ -5,7 +5,10 @@ import {
   normalizeBookChanges,
   normalizeDerivativeTickers,
   normalizeTrades,
-  streamNormalized
+  streamNormalized,
+  compute,
+  computeBookSnapshots,
+  computeTradeBars
 } from '../dist'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -39,6 +42,7 @@ describe('stream', () => {
 
           var symbols = exchangeDetails.availableSymbols
             .filter(s => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
+            .filter(s => s.type !== 'option')
             .slice(0, 10)
             .map(s => s.id)
 
@@ -51,12 +55,18 @@ describe('stream', () => {
             ...normalizers
           )
 
+          const messagesWithComputables = compute(
+            messages,
+            computeTradeBars({ interval: 10, kind: 'time' }),
+            computeBookSnapshots({ interval: 0, depth: 3 })
+          )
+
           let count = 0
           let snapshots = 0
           // check if each symbol received book snapshot
           // and then there was at least 200 messages received after
 
-          for await (const msg of messages) {
+          for await (const msg of messagesWithComputables) {
             // reset counters if we've received disconnect
             if (msg.type === 'disconnect') {
               count = 0
@@ -85,6 +95,6 @@ describe('stream', () => {
         })
       )
     },
-    1000 * 60 * 15
+    1000 * 60 * 3
   )
 })
