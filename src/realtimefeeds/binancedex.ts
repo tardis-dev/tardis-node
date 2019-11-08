@@ -30,7 +30,7 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
     return false
   }
 
-  protected async provideManualSnapshots(filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) {
+  protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
     const depthSnapshotFilter = filters.find(f => f.channel === 'depthSnapshot')
     if (!depthSnapshotFilter) {
       return
@@ -53,7 +53,7 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         }
       }
 
-      snapshotsBuffer.push(snapshot)
+      this.manualSnapshotsBuffer.push(snapshot)
     }
 
     this.debug('requested manual snapshots successfully for: %s ', depthSnapshotFilter.symbols!)

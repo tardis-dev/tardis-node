@@ -1,4 +1,3 @@
-import WebSocket from 'ws'
 import { unzipSync } from 'zlib'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
@@ -42,13 +41,11 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
     return false
   }
 
-  protected onMessage(msg: any, ws: WebSocket) {
+  protected onMessage(msg: any) {
     if (msg.ping !== undefined) {
-      ws.send(
-        JSON.stringify({
-          pong: msg.ping
-        })
-      )
+      this.send({
+        pong: msg.ping
+      })
     }
   }
 }

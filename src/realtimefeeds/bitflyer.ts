@@ -1,6 +1,5 @@
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
-import WebSocket = require('ws')
 
 export class BitflyerRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.lightstream.bitflyer.com/json-rpc'
@@ -28,17 +27,15 @@ export class BitflyerRealTimeFeed extends RealTimeFeedBase {
     return message.method !== 'channelMessage'
   }
 
-  protected onMessage = (msg: any, ws: WebSocket) => {
+  protected onMessage = (msg: any) => {
     // once we've received book snapshot, let's unsubscribe from it
     if ((msg.params.channel as string).startsWith('lightning_board_snapshot')) {
-      ws.send(
-        JSON.stringify({
-          method: 'unsubscribe',
-          params: {
-            channel: msg.params.channel
-          }
-        })
-      )
+      this.send({
+        method: 'unsubscribe',
+        params: {
+          channel: msg.params.channel
+        }
+      })
     }
   }
 }

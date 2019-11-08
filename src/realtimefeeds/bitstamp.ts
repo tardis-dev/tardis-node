@@ -29,7 +29,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
     return message.channel === undefined
   }
 
-  protected async provideManualSnapshots(filters: Filter<string>[], snapshotsBuffer: any[], shouldCancel: () => boolean) {
+  protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
     const orderBookFilter = filters.find(f => f.channel === 'diff_order_book')
     if (!orderBookFilter) {
       return
@@ -56,7 +56,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         generated: true
       }
 
-      snapshotsBuffer.push(snapshot)
+      this.manualSnapshotsBuffer.push(snapshot)
     }
 
     this.debug('requested manual snapshots successfully for: %s ', orderBookFilter.symbols!)

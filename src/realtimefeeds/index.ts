@@ -1,4 +1,4 @@
-import { Exchange } from '../types'
+import { Exchange, Filter } from '../types'
 import { BinanceFuturesRealTimeFeed, BinanceJerseyRealTimeFeed, BinanceRealTimeFeed, BinanceUSRealTimeFeed } from './binance'
 import { BinanceDexRealTimeFeed } from './binancedex'
 import { BitfinexRealTimeFeed } from './bitfinex'
@@ -19,32 +19,33 @@ import { RealTimeFeed } from './realtimefeed'
 export * from './realtimefeed'
 
 const realTimeFeedsMap: {
-  [key in Exchange]?: () => RealTimeFeed
+  [key in Exchange]?: RealTimeFeed
 } = {
-  bitmex: () => new BitmexRealTimeFeed('bitmex'),
-  binance: () => new BinanceRealTimeFeed('binance'),
-  'binance-jersey': () => new BinanceJerseyRealTimeFeed('binance-jersey'),
-  'binance-us': () => new BinanceUSRealTimeFeed('binance-us'),
-  'binance-dex': () => new BinanceDexRealTimeFeed('binance-dex'),
-  'binance-futures': () => new BinanceFuturesRealTimeFeed('binance-futures'),
-  bitfinex: () => new BitfinexRealTimeFeed('bitfinex'),
-  'bitfinex-derivatives': () => new BitfinexRealTimeFeed('bitfinex-derivatives'),
-  bitflyer: () => new BitflyerRealTimeFeed('bitflyer'),
-  bitstamp: () => new BitstampRealTimeFeed('bitstamp'),
-  coinbase: () => new CoinbaseRealTimeFeed('coinbase'),
-  cryptofacilities: () => new CryptofacilitiesRealTimeFeed('cryptofacilities'),
-  deribit: () => new DeribitRealTimeDataFeed('deribit'),
-  ftx: () => new FtxRealTimeFeed('ftx'),
-  gemini: () => new GeminiRealTimeFeed('gemini'),
-  kraken: () => new KrakenRealTimeFeed('kraken'),
-  okex: () => new OkexRealTimeFeed('okex'),
-  'huobi-dm': () => new HuobiDMRealTimeFeed('huobi-dm'),
-  'huobi-us': () => new HuobiUSRealTimeFeed('huobi-us'),
-  huobi: () => new HuobiRealTimeFeed('huobi'),
-  bybit: () => new BybitRealTimeDataFeed('bybit')
+  bitmex: BitmexRealTimeFeed,
+  binance: BinanceRealTimeFeed,
+  'binance-jersey': BinanceJerseyRealTimeFeed,
+  'binance-us': BinanceUSRealTimeFeed,
+  'binance-dex': BinanceDexRealTimeFeed,
+  'binance-futures': BinanceFuturesRealTimeFeed,
+  bitfinex: BitfinexRealTimeFeed,
+
+  'bitfinex-derivatives': BitfinexRealTimeFeed,
+  bitflyer: BitflyerRealTimeFeed,
+  bitstamp: BitstampRealTimeFeed,
+  coinbase: CoinbaseRealTimeFeed,
+  cryptofacilities: CryptofacilitiesRealTimeFeed,
+  deribit: DeribitRealTimeDataFeed,
+  ftx: FtxRealTimeFeed,
+  gemini: GeminiRealTimeFeed,
+  kraken: KrakenRealTimeFeed,
+  okex: OkexRealTimeFeed,
+  'huobi-dm': HuobiDMRealTimeFeed,
+  'huobi-us': HuobiUSRealTimeFeed,
+  huobi: HuobiRealTimeFeed,
+  bybit: BybitRealTimeDataFeed
 }
 
-export function getRealTimeFeedFactory(exchange: Exchange): () => RealTimeFeed {
+export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
   if (realTimeFeedsMap[exchange]) {
     return realTimeFeedsMap[exchange]!
   }
@@ -52,12 +53,12 @@ export function getRealTimeFeedFactory(exchange: Exchange): () => RealTimeFeed {
   throw new Error(`not supported exchange ${exchange}`)
 }
 
-export function createRealTimeFeed(exchange: Exchange) {
-  const realTimeFeedFactory = getRealTimeFeedFactory(exchange)
+export function createRealTimeFeed(exchange: Exchange, filters: Filter<string>[], timeoutIntervalMS: number | undefined) {
+  const RealTimeFeedFactory = getRealTimeFeedFactory(exchange)
 
-  return realTimeFeedFactory()
+  return new RealTimeFeedFactory(exchange, filters, timeoutIntervalMS)
 }
 
-export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeedFactory: () => RealTimeFeed) {
-  realTimeFeedsMap[exchange] = realTimeFeedFactory
+export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeed: RealTimeFeed) {
+  realTimeFeedsMap[exchange] = realTimeFeed
 }

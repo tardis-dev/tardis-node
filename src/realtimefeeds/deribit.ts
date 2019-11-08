@@ -1,6 +1,5 @@
 import { Filter, FilterForExchange } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
-import WebSocket from 'ws'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://www.deribit.com/ws/api/v2'
@@ -37,36 +36,33 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
     return message.error !== undefined
   }
 
-  protected onConnected(ws: WebSocket) {
+  protected onConnected() {
     // set heartbeat so deribit won't close connection prematurely
     // https://docs.deribit.com/v2/#public-set_heartbeat
-    ws.send(
-      JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'public/set_heartbeat',
-        id: 0,
-        params: {
-          interval: 10
-        }
-      })
-    )
+
+    this.send({
+      jsonrpc: '2.0',
+      method: 'public/set_heartbeat',
+      id: 0,
+      params: {
+        interval: 10
+      }
+    })
   }
 
   protected messageIsHeartbeat(msg: any) {
     return msg.method === 'heartbeat'
   }
 
-  protected onMessage(msg: any, ws: WebSocket) {
+  protected onMessage(msg: any) {
     // respond with public/test message to keep connection alive
     if (msg.params !== undefined && msg.params.type === 'test_request') {
-      ws.send(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'public/test',
-          id: 0,
-          params: {}
-        })
-      )
+      this.send({
+        jsonrpc: '2.0',
+        method: 'public/test',
+        id: 0,
+        params: {}
+      })
     }
   }
 }

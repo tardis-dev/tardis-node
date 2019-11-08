@@ -1,4 +1,5 @@
-import { getFilters, normalizeMessages } from './handy'
+import { debug } from './debug'
+import { getFilters, normalizeMessages, wait } from './handy'
 import { MapperFactory } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
@@ -13,27 +14,45 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
 > {
   validateStreamOptions(filters)
 
-  const realTimeFeed = createRealTimeFeed(exchange)
+  let retries = 0
+  while (true) {
+    try {
+      const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS)
 
-  if (timeoutIntervalMS > 0) {
-    realTimeFeed.setTimeoutInterval(timeoutIntervalMS)
-  }
+      for await (const message of realTimeFeed) {
+        yield {
+          localTimestamp: new Date(),
+          message
+        } as any
+        if (retries > 0) {
+          // reset retries counter as we've received correct message from the connection
+          retries = 0
+        }
+      }
 
-  const realTimeMessages = realTimeFeed.stream(filters as any)
+      if (withDisconnects) {
+        // if loop has ended it means that websocket connection has been closed
+        //  so notify about it by yielding undefined if flag is set
+        yield undefined as any
+      }
+    } catch (error) {
+      retries++
+      debug('%s real-time feed connection error: %o, retries %d', exchange, error, retries)
 
-  for await (const message of realTimeMessages) {
-    if (message !== undefined) {
-      yield {
-        localTimestamp: new Date(),
-        message
-      } as any
-    } else if (withDisconnects) {
-      yield undefined as any
+      if (withDisconnects) {
+        yield undefined as any
+      }
+
+      const isRateLimited = error.message.includes('429')
+      const expontent = isRateLimited ? retries + 4 : retries
+      const delay = Math.pow(2, expontent) * 1000
+
+      await wait(delay)
     }
   }
 }
 
-export function streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+export async function* streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
@@ -47,18 +66,37 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
     symbols = symbols.map(s => s.toUpperCase())
   }
 
-  const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
-  const mappers = createMappers(new Date())
-  const filters = getFilters(mappers, symbols)
+  while (true) {
+    try {
+      const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
+      const mappers = createMappers(new Date())
+      const filters = getFilters(mappers, symbols)
 
-  const messages = stream({
-    exchange,
-    withDisconnects: true,
-    timeoutIntervalMS,
-    filters
-  })
+      const messages = stream({
+        exchange,
+        withDisconnects: true,
+        timeoutIntervalMS,
+        filters
+      })
 
-  return normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
+      const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
+      for await (const message of normalizedMessages) {
+        yield message
+      }
+    } catch (error) {
+      debug('%s normalize messages error: %o, retrying with new connection...', exchange, error)
+      if (withDisconnectMessages) {
+        // yield it as disconnect as well if flag is set
+        const disconnect: Disconnect = {
+          type: 'disconnect',
+          exchange,
+          localTimestamp: new Date()
+        }
+
+        yield disconnect as any
+      }
+    }
+  }
 }
 
 function validateStreamOptions(filters: Filter<string>[]) {
