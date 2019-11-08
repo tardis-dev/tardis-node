@@ -14,35 +14,38 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     return this._stream()
   }
 
-  private timeoutIntervalMS?: number
   protected readonly debug: dbg.Debugger
   protected abstract readonly wssURL: string
   protected readonly manualSnapshotsBuffer: any[] = []
   private _receivedMessagesCount = 0
   private _staleConnectionCheckIntervalId?: NodeJS.Timeout
   private _ws?: WebSocket
+  private static _connectionId = 0
 
   constructor(
     public readonly exchange: string,
     private readonly _filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined
   ) {
-    this.debug = dbg(`tardis-dev:realtime:${exchange}`)
+    RealTimeFeedBase._connectionId++
+    this.debug = dbg(`tardis-dev:realtime:${exchange}:${RealTimeFeedBase._connectionId}`)
   }
 
   private async *_stream() {
     try {
       const subscribeMessages = this.mapToSubscribeMessages(this._filters)
       const address = typeof subscribeMessages === 'string' ? `${this.wssURL}${subscribeMessages}` : this.wssURL
-      if ((typeof subscribeMessages === 'string') === false) {
-        this.debug('mapped filters: %o to subscribe messages: %o', this._filters, subscribeMessages)
-      }
 
-      this.debug('estabilishing connection to %s')
+      this.debug('estabilishing connection to %s', address)
+
+      if ((typeof subscribeMessages === 'string') === false) {
+        this.debug('provided filters: %o mapped to subscribe messages: %o', this._filters, subscribeMessages)
+      }
 
       this._ws = new WebSocket(address, { perMessageDeflate: false })
 
       this._ws.onopen = this._onConnectionEstabilished
+      this._ws.onclose = this._onConnectionClosed
 
       const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
         readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
@@ -81,8 +84,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           this.manualSnapshotsBuffer.length = 0
         }
       }
-
-      this.debug('connection closed')
     } finally {
       if (this._staleConnectionCheckIntervalId !== undefined) {
         clearInterval(this._staleConnectionCheckIntervalId)
@@ -128,9 +129,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       }
 
       if (this._receivedMessagesCount === 0) {
-        this.debug('did not received any messages within %d ms timeout, terminating connection...', this.timeoutIntervalMS)
+        this.debug('did not received any messages within %d ms timeout, terminating connection...', this._timeoutIntervalMS)
         this._ws!.terminate()
       }
+      this._receivedMessagesCount = 0
     }, this._timeoutIntervalMS)
   }
 
@@ -175,5 +177,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       this.debug('providing manual snapshots error: %o, closing connection...', e)
       this._ws!.terminate()
     }
+  }
+
+  private _onConnectionClosed = () => {
+    this.debug('connection closed')
   }
 }

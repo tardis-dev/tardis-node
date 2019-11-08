@@ -37,15 +37,25 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
       }
     } catch (error) {
       retries++
-      debug('%s real-time feed connection error: %o, retries %d', exchange, error, retries)
+      const isRateLimited = error.message.includes('429')
+      const expontent = isRateLimited ? retries + 4 : retries - 1
+      let delay = Math.pow(2, expontent) * 1000
+      const MAX_DELAY = 32 * 1000
+      if (delay > MAX_DELAY) {
+        delay = MAX_DELAY
+      }
+
+      debug(
+        '%s real-time feed connection error, retries count: %d, next retry delay: %dms, error message: %o',
+        exchange,
+        retries,
+        delay,
+        error
+      )
 
       if (withDisconnects) {
         yield undefined as any
       }
-
-      const isRateLimited = error.message.includes('429')
-      const expontent = isRateLimited ? retries + 4 : retries
-      const delay = Math.pow(2, expontent) * 1000
 
       await wait(delay)
     }
