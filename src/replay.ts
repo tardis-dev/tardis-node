@@ -67,88 +67,98 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     debug('worker finished with code: %d', code)
   })
 
-  // helper flag that helps us not yielding two subsequent undefined/disconnect messages
-  let lastMessageWasUndefined = false
+  try {
+    // helper flag that helps us not yielding two subsequent undefined/disconnect messages
+    let lastMessageWasUndefined = false
 
-  let currentSliceDate = new Date(fromDate)
-  // iterate over every minute in <=from,to> date range
-  // get cached slice paths, read them as file streams, decompress, split by new lines and yield as messages
-  while (currentSliceDate < toDate) {
-    const sliceKey = currentSliceDate.toISOString()
+    let currentSliceDate = new Date(fromDate)
+    // iterate over every minute in <=from,to> date range
+    // get cached slice paths, read them as file streams, decompress, split by new lines and yield as messages
+    while (currentSliceDate < toDate) {
+      const sliceKey = currentSliceDate.toISOString()
 
-    debug('getting slice: %s, exchange: %s', sliceKey, exchange)
+      debug('getting slice: %s, exchange: %s', sliceKey, exchange)
 
-    let cachedSlicePath
-    while (cachedSlicePath === undefined) {
-      cachedSlicePath = cachedSlicePaths.get(sliceKey)
+      let cachedSlicePath
+      while (cachedSlicePath === undefined) {
+        cachedSlicePath = cachedSlicePaths.get(sliceKey)
 
-      // if something went wrong with worker throw error it has returned (network issue, auth issue etc)
-      if (workerError !== undefined) {
-        throw workerError
-      }
-
-      if (cachedSlicePath === undefined) {
-        // if response for requested date is not ready yet wait 100ms and try again
-        debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
-        await wait(100)
-      }
-    }
-
-    // response is a path to file on disk let' read it as stream
-    const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
-      // unzip it
-      .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
-      // and split by new line
-      .pipe(new BinarySplitStream())
-
-    let linesCount = 0
-    // date is always formatted to have lendth of 28 so we can skip looking for first space in line and use it
-    // as hardcoded value
-    const DATE_MESSAGE_SPLIT_INDEX = 28
-
-    for await (const line of linesStream) {
-      const bufferLine = line as Buffer
-      linesCount++
-      if (bufferLine.length > 0) {
-        lastMessageWasUndefined = false
-        const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
-        const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
-        // as any due to https://github.com/Microsoft/TypeScript/issues/24929
-        if (skipDecoding === true) {
-          yield {
-            localTimestamp: localTimestampBuffer,
-            message: messageBuffer
-          } as any
-        } else {
-          yield {
-            // when skipDecoding is not set, decode timestamp to Date and message to object
-            localTimestamp: new Date(localTimestampBuffer.toString()),
-            message: JSON.parse(messageBuffer as any)
-          } as any
+        // if something went wrong with worker throw error it has returned (network issue, auth issue etc)
+        if (workerError !== undefined) {
+          throw workerError
         }
-        // ignore empty lines unless withDisconnects is set to true
-        // do not yield subsequent undefined messages
-      } else if (withDisconnects === true && lastMessageWasUndefined === false) {
+
+        if (cachedSlicePath === undefined) {
+          // if response for requested date is not ready yet wait 100ms and try again
+          debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
+          await wait(100)
+        }
+      }
+
+      // response is a path to file on disk let' read it as stream
+      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
+        // unzip it
+        .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
+        // and split by new line
+        .pipe(new BinarySplitStream())
+
+      let linesCount = 0
+      // date is always formatted to have lendth of 28 so we can skip looking for first space in line and use it
+      // as hardcoded value
+      const DATE_MESSAGE_SPLIT_INDEX = 28
+
+      for await (const line of linesStream) {
+        const bufferLine = line as Buffer
+        linesCount++
+        if (bufferLine.length > 0) {
+          lastMessageWasUndefined = false
+          const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
+          const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
+          // as any due to https://github.com/Microsoft/TypeScript/issues/24929
+          if (skipDecoding === true) {
+            yield {
+              localTimestamp: localTimestampBuffer,
+              message: messageBuffer
+            } as any
+          } else {
+            yield {
+              // when skipDecoding is not set, decode timestamp to Date and message to object
+              localTimestamp: new Date(localTimestampBuffer.toString()),
+              message: JSON.parse(messageBuffer as any)
+            } as any
+          }
+          // ignore empty lines unless withDisconnects is set to true
+          // do not yield subsequent undefined messages
+        } else if (withDisconnects === true && lastMessageWasUndefined === false) {
+          lastMessageWasUndefined = true
+          yield undefined as any
+        }
+      }
+      // if slice was empty (no lines at all) yield undefined if flag is set
+      // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
+      if (linesCount === 0 && withDisconnects === true && lastMessageWasUndefined === false) {
         lastMessageWasUndefined = true
         yield undefined as any
       }
-    }
-    // if slice was empty (no lines at all) yield undefined if flag is set
-    // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
-    if (linesCount === 0 && withDisconnects === true && lastMessageWasUndefined === false) {
-      lastMessageWasUndefined = true
-      yield undefined as any
+
+      debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
+
+      // remove slice key from the map as it's already processed
+      cachedSlicePaths.delete(sliceKey)
+      // move one minute forward
+      currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
     }
 
-    debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
-
-    // remove slice key from the map as it's already processed
-    cachedSlicePaths.delete(sliceKey)
-    // move one minute forward
-    currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
+    debug(
+      'replay for exchange: %s finished - from: %s, to: %s, filters: %o',
+      exchange,
+      fromDate.toISOString(),
+      toDate.toISOString(),
+      filters
+    )
+  } finally {
+    await worker.terminate()
   }
-
-  debug('replay for exchange: %s finished - from: %s, to: %s, filters: %o', exchange, fromDate.toISOString(), toDate.toISOString(), filters)
 }
 
 export function replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
