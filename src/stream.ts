@@ -42,12 +42,19 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
       }
 
       retries++
+
+      const MAX_DELAY = 16 * 1000
       const isRateLimited = error.message.includes('429')
-      const expontent = isRateLimited ? retries + 4 : retries - 1
-      let delay = Math.pow(2, expontent) * 1000
-      const MAX_DELAY = 32 * 1000
-      if (delay > MAX_DELAY) {
-        delay = MAX_DELAY
+
+      let delay
+      if (isRateLimited) {
+        delay = MAX_DELAY * retries
+      } else {
+        delay = Math.pow(2, retries - 1) * 1000
+
+        if (delay > MAX_DELAY) {
+          delay = MAX_DELAY
+        }
       }
 
       debug(
