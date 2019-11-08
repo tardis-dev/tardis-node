@@ -39,13 +39,11 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
     if (!depthSnapshotFilter) {
       return
     }
-
+    this.debug('requesting manual snapshots for: %s', depthSnapshotFilter.symbols)
     for (let symbol of depthSnapshotFilter.symbols!) {
       if (shouldCancel()) {
         return
       }
-
-      this.debug('requesting manual snapshot for: %s', symbol)
 
       let depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`).json()) as any
       const snapshotIsStale = new Date(depthSnapshotResponse.T).getUTCSeconds() !== new Date(depthSnapshotResponse.E).getUTCSeconds()
@@ -58,10 +56,11 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
         generated: true,
         data: depthSnapshotResponse
       }
-      this.debug('requested manual snapshot for: %s successfully', symbol)
 
       snapshotsBuffer.push(snapshot)
     }
+
+    this.debug('requested manual snapshots successfully for: %s ', depthSnapshotFilter.symbols)
   }
 }
 

@@ -35,13 +35,12 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
     if (!depthSnapshotFilter) {
       return
     }
+    this.debug('requesting manual snapshots for: %s', depthSnapshotFilter.symbols!)
 
     for (let symbol of depthSnapshotFilter.symbols!) {
       if (shouldCancel()) {
         return
       }
-
-      this.debug('requesting manual snapshot for: %s', symbol)
 
       const depthSnapshotResponse = await got.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()
 
@@ -54,9 +53,9 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         }
       }
 
-      this.debug('requested manual snapshot for: %s successfully', symbol)
-
       snapshotsBuffer.push(snapshot)
     }
+
+    this.debug('requested manual snapshots successfully for: %s ', depthSnapshotFilter.symbols!)
   }
 }

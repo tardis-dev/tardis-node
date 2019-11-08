@@ -40,12 +40,12 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
        book snapshots do not work currently for Bitstamp real-time stream.
        As a workaround try running node with -http-parser=legacy flag`)
 
+    this.debug('requesting manual snapshots for: %s', orderBookFilter.symbols!)
+
     for (let symbol of orderBookFilter.symbols!) {
       if (shouldCancel()) {
         return
       }
-
-      this.debug('requesting manual snapshot for: %s', symbol)
 
       const depthSnapshotResponse = await got.get(`${this.httpURL}/order_book/${symbol}?group=1`).json()
 
@@ -55,9 +55,10 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         channel: `diff_order_book_${symbol}`,
         generated: true
       }
-      this.debug('requested manual snapshot for: %s successfully', symbol)
 
       snapshotsBuffer.push(snapshot)
     }
+
+    this.debug('requested manual snapshots successfully for: %s ', orderBookFilter.symbols!)
   }
 }
