@@ -50,7 +50,11 @@ describe('stream', () => {
             {
               exchange,
               symbols,
-              withDisconnectMessages: true
+              withDisconnectMessages: true,
+              timeoutIntervalMS: 20 * 1000,
+              onError: err => {
+                console.log('Error', err)
+              }
             },
             ...normalizers
           )
@@ -95,6 +99,6 @@ describe('stream', () => {
         })
       )
     },
-    1000 * 60 * 3
+    1000 * 60 * 4
   )
 })
