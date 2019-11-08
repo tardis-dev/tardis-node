@@ -45,11 +45,7 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
         return
       }
 
-      let depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`).json()) as any
-      const snapshotIsStale = new Date(depthSnapshotResponse.T).getUTCSeconds() !== new Date(depthSnapshotResponse.E).getUTCSeconds()
-      if (snapshotIsStale) {
-        depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`).json()) as any
-      }
+      const depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`).json()) as any
 
       const snapshot = {
         stream: `${symbol}@depthSnapshot`,
