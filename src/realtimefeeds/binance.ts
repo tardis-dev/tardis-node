@@ -7,27 +7,34 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
   protected abstract httpURL: string
   protected bookUpdateSpeed = '@100ms'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters
       .filter(f => f.channel !== 'depthSnapshot')
-      .map(filter => {
+      .map((filter, index) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BinanceRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map(s => {
+        return filter.symbols.map((s, sIndex) => {
           const channel = filter.channel === 'depth' ? `depth${this.bookUpdateSpeed}` : filter.channel
-
-          return `${s}@${channel}`
+          return {
+            method: 'SUBSCRIBE',
+            params: [`${s}@${channel}`],
+            id: index + sIndex + 1
+          }
         })
       })
       .flatMap(s => s)
-      .join('/')
 
-    return `/stream?streams=${payload}`
+    return payload
   }
 
   protected messageIsError(message: any): boolean {
+    // subscription confirmation message
+    if (message.result === null) {
+      return false
+    }
+
     if (message.stream === undefined) {
       return true
     }
@@ -61,21 +68,21 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
 }
 
 export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://stream.binance.com:9443'
+  protected wssURL = 'wss://stream.binance.com:9443/stream'
   protected httpURL = 'https://api.binance.com/api/v1'
 }
 
 export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://stream.binance.je:9443'
+  protected wssURL = 'wss://stream.binance.je:9443/stream'
   protected httpURL = 'https://api.binance.je/api/v1'
 }
 
 export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://stream.binance.us:9443'
+  protected wssURL = 'wss://stream.binance.us:9443/stream'
   protected httpURL = 'https://api.binance.us/api/v1'
 }
 
 export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://fstream.binance.com'
+  protected wssURL = 'wss://fstream.binance.com/stream'
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
 }

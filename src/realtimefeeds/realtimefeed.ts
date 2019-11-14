@@ -34,15 +34,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     let timerId
     try {
       const subscribeMessages = this.mapToSubscribeMessages(this._filters)
-      const address = typeof subscribeMessages === 'string' ? `${this.wssURL}${subscribeMessages}` : this.wssURL
 
-      this.debug('estabilishing connection to %s', address)
+      this.debug('estabilishing connection to %s', this.wssURL)
 
-      if ((typeof subscribeMessages === 'string') === false) {
-        this.debug('provided filters: %o mapped to subscribe messages: %o', this._filters, subscribeMessages)
-      }
+      this.debug('provided filters: %o mapped to subscribe messages: %o', this._filters, subscribeMessages)
 
-      this._ws = new WebSocket(address, { perMessageDeflate: false, handshakeTimeout: 5 * ONE_SEC_IN_MS })
+      this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 5 * ONE_SEC_IN_MS })
 
       this._ws.onopen = this._onConnectionEstabilished
       this._ws.onclose = this._onConnectionClosed
@@ -103,7 +100,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     this._ws.send(JSON.stringify(msg))
   }
 
-  protected abstract mapToSubscribeMessages(filters: Filter<string>[]): string | any[]
+  protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
 
@@ -151,10 +148,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         return prev
       }, new Set<string>()).size
 
-      if (Array.isArray(subscribeMessages)) {
-        for (const message of subscribeMessages) {
-          this.send(message)
-        }
+      for (const message of subscribeMessages) {
+        this.send(message)
       }
 
       this.debug('estabilished connection')

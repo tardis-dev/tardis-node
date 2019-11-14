@@ -7,6 +7,10 @@ export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' 
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
     return message.stream.endsWith('@trade')
   }
 
@@ -46,6 +50,10 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
   constructor(protected readonly exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
     return message.stream.includes('@depth')
   }
 
@@ -172,6 +180,10 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 
 export const binanceFuturesTradesMapper: Mapper<'binance-futures', Trade> = {
   canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
     return message.stream.endsWith('@aggTrade')
   },
 
@@ -252,6 +264,10 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
     return message.stream.endsWith('@markPrice') || message.stream.endsWith('@ticker')
   }
 

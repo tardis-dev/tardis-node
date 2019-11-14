@@ -13,7 +13,7 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
     ticker: ['ticker']
   }
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const channelsToSubscribe = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

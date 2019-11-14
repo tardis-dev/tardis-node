@@ -9,7 +9,7 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
     depth: '.step0'
   } as any
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
       .map((filter, index) => {
         if (!filter.symbols || filter.symbols.length === 0) {

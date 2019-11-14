@@ -4,7 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 export class FtxRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ftexchange.com/ws/'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

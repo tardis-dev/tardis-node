@@ -4,7 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 export class CryptofacilitiesRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://www.cryptofacilities.com/ws/v1'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
       .filter(filter => filter.channel.endsWith('_snapshot') === false)
       .map(filter => {

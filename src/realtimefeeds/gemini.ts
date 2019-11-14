@@ -4,7 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 export class GeminiRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://api.gemini.com/v2/marketdata'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const symbols = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

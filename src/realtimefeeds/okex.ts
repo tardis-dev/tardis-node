@@ -16,7 +16,7 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
     return message
   }
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

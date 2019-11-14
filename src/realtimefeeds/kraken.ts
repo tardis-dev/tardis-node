@@ -4,7 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 export class KrakenRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.kraken.com'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters.map(filter => {
       if (!filter.symbols || filter.symbols.length === 0) {
         throw new Error('KrakenRealTimeFeed requires explicitly specified symbols when subscribing to live feed')

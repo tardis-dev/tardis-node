@@ -4,7 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 export class BybitRealTimeDataFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://stream.bybit.com/realtime'
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {

@@ -6,7 +6,7 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
 
   protected channelsWithIntervals: FilterForExchange['deribit']['channel'][] = ['book', 'perpetual', 'trades', 'ticker']
 
-  protected mapToSubscribeMessages(filters: Filter<string>[]): string | any[] {
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const channels = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {
