@@ -254,21 +254,7 @@ Array [
 
 exports[`mappers map binance dex messages 4`] = `Array []`;
 
-exports[`mappers map binance futures messages 1`] = `
-Array [
-  Object {
-    "amount": 0.236,
-    "exchange": "binance-futures",
-    "id": "181349",
-    "localTimestamp": 2019-09-01T00:00:01.275Z,
-    "price": 10223.74,
-    "side": "buy",
-    "symbol": "BTCUSDT",
-    "timestamp": 2019-09-17T04:05:03.463Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map binance futures messages 1`] = `Array []`;
 
 exports[`mappers map binance futures messages 2`] = `
 Array [
@@ -305,6 +291,22 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 4`] = `Array []`;
+
+exports[`mappers map binance futures messages 5`] = `
+Array [
+  Object {
+    "amount": 0.044,
+    "exchange": "binance-futures",
+    "id": "10934580",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 7627.6,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-11-22T00:06:04.086Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map binance messages 1`] = `
 Array [

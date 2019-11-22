@@ -3,7 +3,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
-export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us', Trade> {
+export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -178,43 +178,6 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
   }
 }
 
-export const binanceFuturesTradesMapper: Mapper<'binance-futures', Trade> = {
-  canHandle(message: BinanceResponse<any>) {
-    if (message.stream === undefined) {
-      return false
-    }
-
-    return message.stream.endsWith('@aggTrade')
-  },
-
-  getFilters(symbols?: string[]) {
-    symbols = lowerCaseSymbols(symbols)
-
-    return [
-      {
-        channel: 'aggTrade',
-        symbols
-      } as const
-    ]
-  },
-
-  *map(binanceFuturesAggTrade: BinanceResponse<BinanceFuturesAggTradeData>, localTimestamp: Date) {
-    const binanceTrade = binanceFuturesAggTrade.data
-
-    yield {
-      type: 'trade',
-      symbol: binanceTrade.s,
-      exchange: 'binance-futures',
-      id: String(binanceTrade.l),
-      price: Number(binanceTrade.p),
-      amount: Number(binanceTrade.q),
-      side: binanceTrade.m ? 'sell' : 'buy',
-      timestamp: new Date(binanceTrade.T),
-      localTimestamp: localTimestamp
-    }
-  }
-}
-
 export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper implements Mapper<'binance-futures', BookChange> {
   constructor() {
     super('binance-futures')
@@ -354,16 +317,6 @@ type LocalDepthInfo = {
   snapshotProcessed?: boolean
   lastUpdateId?: number
   validatedFirstUpdate?: boolean
-}
-
-type BinanceFuturesAggTradeData = {
-  s: string // Symbol
-  p: string // Price
-  q: string // Quantity
-  f: number // First trade ID
-  l: number // Last trade ID
-  T: number // Trade time
-  m: boolean // Is the buyer the market maker?
 }
 
 type BinanceFuturesMarkPriceData = {

@@ -3,7 +3,6 @@ import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
   BinanceFuturesDerivativeTickerMapper,
-  binanceFuturesTradesMapper,
   BinanceTradesMapper
 } from './binance'
 import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
@@ -30,7 +29,7 @@ const tradesMappers = {
   binance: () => new BinanceTradesMapper('binance'),
   'binance-us': () => new BinanceTradesMapper('binance-us'),
   'binance-jersey': () => new BinanceTradesMapper('binance-jersey'),
-  'binance-futures': () => binanceFuturesTradesMapper,
+  'binance-futures': () => new BinanceTradesMapper('binance-futures'),
   'binance-dex': () => binanceDexTradesMapper,
   bitfinex: () => new BitfinexTradesMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexTradesMapper('bitfinex-derivatives'),

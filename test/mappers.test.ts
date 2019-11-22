@@ -1073,6 +1073,10 @@ describe('mappers', () => {
           L: 181349,
           n: 32423
         }
+      },
+      {
+        stream: 'btcusdt@trade',
+        data: { e: 'trade', E: 1574381164089, T: 1574381164086, s: 'BTCUSDT', t: 10934580, p: '7627.60', q: '0.044', m: false }
       }
     ]
 

@@ -38,6 +38,11 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
     if (message.stream === undefined) {
       return true
     }
+
+    if (message.error !== undefined) {
+      return true
+    }
+
     return false
   }
 
