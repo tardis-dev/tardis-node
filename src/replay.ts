@@ -134,12 +134,6 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
           yield undefined as any
         }
       }
-      // if slice was empty (no lines at all) yield undefined if flag is set
-      // do not yield subsequent undefined messages eg: two empty slices produce single undefined/disconnect message
-      if (linesCount === 0 && withDisconnects === true && lastMessageWasUndefined === false) {
-        lastMessageWasUndefined = true
-        yield undefined as any
-      }
 
       debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
 
