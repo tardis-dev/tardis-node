@@ -13,8 +13,9 @@ import { FtxRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
 import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
 import { KrakenRealTimeFeed } from './kraken'
-import { OkexRealTimeFeed } from './okex'
+import { OkexRealTimeFeed, OKCoinRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
+import { HitBtcRealTimeFeed } from './hitbtc'
 
 export * from './realtimefeed'
 
@@ -42,7 +43,9 @@ const realTimeFeedsMap: {
   'huobi-dm': HuobiDMRealTimeFeed,
   'huobi-us': HuobiUSRealTimeFeed,
   huobi: HuobiRealTimeFeed,
-  bybit: BybitRealTimeDataFeed
+  bybit: BybitRealTimeDataFeed,
+  okcoin: OKCoinRealTimeFeed,
+  hitbtc: HitBtcRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

@@ -1714,6 +1714,75 @@ Array [
 ]
 `;
 
+exports[`mappers map hitbtc messages 1`] = `Array []`;
+
+exports[`mappers map hitbtc messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 31400,
+        "price": 4.255e-8,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2200,
+        "price": 4.245e-8,
+      },
+    ],
+    "exchange": "hitbtc",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BCNBTC",
+    "timestamp": 2019-11-22T00:00:00.040Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map hitbtc messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.000104487,
+      },
+      Object {
+        "amount": 8865,
+        "price": 0.000073314,
+      },
+    ],
+    "exchange": "hitbtc",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "POAETH",
+    "timestamp": 2019-11-22T00:00:40.148Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map hitbtc messages 4`] = `Array []`;
+
+exports[`mappers map hitbtc messages 5`] = `
+Array [
+  Object {
+    "amount": 0.03,
+    "exchange": "hitbtc",
+    "id": "712213931",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 0.33559,
+    "side": "sell",
+    "symbol": "XMRETH",
+    "timestamp": 2019-11-22T00:00:40.462Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map huobi messages 1`] = `Array []`;
 
 exports[`mappers map huobi messages 2`] = `Array []`;
@@ -2075,6 +2144,71 @@ Array [
     "symbol": "book-1000",
     "timestamp": 2019-09-01T00:00:01.275Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okcoin messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.0425,
+        "price": 7624.75,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1.359,
+        "price": 766,
+      },
+    ],
+    "exchange": "okcoin",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-11-22T00:00:01.547Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okcoin messages 2`] = `Array []`;
+
+exports[`mappers map okcoin messages 3`] = `Array []`;
+
+exports[`mappers map okcoin messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.5985,
+        "price": 6914.33,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "okcoin",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC-EUR",
+    "timestamp": 2019-11-22T00:00:30.968Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okcoin messages 5`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "okcoin",
+    "id": "459",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 20.38,
+    "side": "buy",
+    "symbol": "DCR-USD",
+    "timestamp": 2019-11-09T07:53:40.478Z,
+    "type": "trade",
   },
 ]
 `;

@@ -1,10 +1,11 @@
-import { BookChange, DerivativeTicker, FilterForExchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, FilterForExchange, Trade, Exchange } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
 
 const tradeChannels: FilterForExchange['okex']['channel'][] = ['spot/trade', 'futures/trade', 'swap/trade']
 const bookChangeChannels: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth', 'swap/depth']
+
 const derivativeTickerChannels: FilterForExchange['okex']['channel'][] = [
   'spot/ticker',
   'futures/ticker',
@@ -50,36 +51,35 @@ const mapToFilters = (mapping: FilterForExchange['okex']['channel'][], symbols?:
         })
     })
     .flatMap(c => c)
-    .reduce(
-      (prev, current) => {
-        const matchingExisting = prev.find(c => c.channel === current.channel)
-        if (matchingExisting !== undefined) {
-          matchingExisting.symbols!.push(current.symbols[0])
-        } else {
-          prev.push(current)
-        }
+    .reduce((prev, current) => {
+      const matchingExisting = prev.find(c => c.channel === current.channel)
+      if (matchingExisting !== undefined) {
+        matchingExisting.symbols!.push(current.symbols[0])
+      } else {
+        prev.push(current)
+      }
 
-        return prev
-      },
-      [] as FilterForExchange['okex'][]
-    )
+      return prev
+    }, [] as FilterForExchange['okex'][])
 }
 
-export const okexTradesMapper: Mapper<'okex', Trade> = {
+export class OkexTradesMapper implements Mapper<'okex' | 'okcoin', Trade> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: OkexDataMessage) {
     return tradeChannels.includes(message.table)
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return mapToFilters(tradeChannels, symbols)
-  },
+  }
 
   *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const okexTrade of okexTradesMessage.data) {
       yield {
         type: 'trade',
         symbol: okexTrade.instrument_id,
-        exchange: 'okex',
+        exchange: this._exchange,
         id: okexTrade.trade_id,
         price: Number(okexTrade.price),
         amount: Number(okexTrade.qty || okexTrade.size),
@@ -90,6 +90,7 @@ export const okexTradesMapper: Mapper<'okex', Trade> = {
     }
   }
 }
+
 const mapBookLevel = (level: OkexBookLevel) => {
   const price = Number(level[0])
   const amount = Number(level[1])
@@ -97,21 +98,23 @@ const mapBookLevel = (level: OkexBookLevel) => {
   return { price, amount }
 }
 
-export const okexBookChangeMapper: Mapper<'okex', BookChange> = {
+export class OkexBookChangeMapper implements Mapper<'okex' | 'okcoin', BookChange> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: OkexDataMessage) {
     return bookChangeChannels.includes(message.table)
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return mapToFilters(bookChangeChannels, symbols)
-  },
+  }
 
   *map(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
     for (const message of okexDepthDataMessage.data) {
       yield {
         type: 'book_change',
         symbol: message.instrument_id,
-        exchange: 'okex',
+        exchange: this._exchange,
         isSnapshot: okexDepthDataMessage.action === 'partial',
         bids: message.bids.map(mapBookLevel),
         asks: message.asks.map(mapBookLevel),

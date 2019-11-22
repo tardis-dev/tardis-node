@@ -11,18 +11,20 @@ export const EXCHANGES = [
   'bitstamp',
   'coinbase',
   'cryptofacilities',
-  'gemini',
   'kraken',
+  'gemini',
   'bitfinex',
   'bitfinex-derivatives',
   'binance-dex',
   'binance-jersey',
   'binance-us',
   'huobi-us',
-  'bybit'
+  'bybit',
+  'okcoin',
+  'hitbtc'
 ] as const
 
-const BINANCE_CHANNELS = ['trade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
+const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
 
@@ -83,17 +85,17 @@ const DERIBIT_CHANNELS = [
 const KRAKEN_CHANNELS = ['ticker', 'trade', 'book', 'spread'] as const
 
 const OKEX_CHANNELS = [
-  'spot/ticker',
   'spot/trade',
+  'spot/ticker',
   'spot/depth',
-  'swap/ticker',
   'swap/trade',
+  'swap/ticker',
   'swap/depth',
   'swap/funding_rate',
   'swap/price_range',
   'swap/mark_price',
-  'futures/ticker',
   'futures/trade',
+  'futures/ticker',
   'futures/depth',
   'futures/price_range',
   'futures/mark_price',
@@ -109,7 +111,7 @@ const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicat
 
 const BITFLYER_CHANNELS = ['lightning_board_snapshot', 'lightning_board', 'lightning_ticker', 'lightning_executions'] as const
 
-const BINANCE_FUTURES_CHANNELS = ['aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker'] as const
+const BINANCE_FUTURES_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker']
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
@@ -120,6 +122,10 @@ const HUOBI_US_CHANNELS = ['depth', 'detail', 'trade'] as const
 const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance'] as const
+
+const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/ticker'] as const
+
+const HITBTC_CHANNELS = ['snapshotTrades', 'updateTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
@@ -142,5 +148,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   huobi: HUOBI_CHANNELS,
   'huobi-dm': HUOBI_DM_CHANNELS,
   'huobi-us': HUOBI_US_CHANNELS,
-  bybit: BYBIT_CHANNELS
+  bybit: BYBIT_CHANNELS,
+  okcoin: OKCOIN_CHANNELS,
+  hitbtc: HITBTC_CHANNELS
 }

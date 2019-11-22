@@ -15,8 +15,9 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
     const args = filters
       .map(filter => {
         if (!filter.symbols || filter.symbols.length === 0) {
-          throw new Error('OkexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+          throw new Error(`${this.exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
         }
+
         return filter.symbols.map(symbol => {
           return `${filter.channel}:${symbol}`
         })
@@ -34,4 +35,8 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.event === 'error'
   }
+}
+
+export class OKCoinRealTimeFeed extends OkexRealTimeFeed {
+  protected wssURL = 'wss://real.okcoin.com:10442/ws/v3'
 }
