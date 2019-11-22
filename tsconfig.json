@@ -8,7 +8,7 @@
     "declarationMap": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "esnext",
+    "target": "es2019",
     "pretty": true,
     "strict": true,
     "outDir": "dist",

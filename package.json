@@ -56,18 +56,18 @@
   },
   "devDependencies": {
     "@types/ws": "^6.0.3",
-    "@types/debug": "^4.1.4",
-    "@types/fs-extra": "^7.0.0",
-    "@types/jest": "^24.0.13",
-    "@types/node": "^12.12.6",
+    "@types/debug": "^4.1.5",
+    "@types/fs-extra": "^8.0.1",
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.11",
     "cross-var": "^1.1.0",
-    "husky": "^3.0.5",
+    "husky": "^3.1.0",
     "jest": "^24.9.0",
-    "lint-staged": "^9.3.0",
-    "prettier": "^1.18.2",
-    "source-map-support": "^0.5.13",
+    "lint-staged": "^9.4.3",
+    "prettier": "^1.19.1",
+    "source-map-support": "^0.5.16",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.2"
   },
   "lint-staged": {
     "*.{ts}": [
