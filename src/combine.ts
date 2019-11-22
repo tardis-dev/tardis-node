@@ -44,80 +44,97 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   if (iterators.length === 0) {
     return
   }
+  let buffer: PassThrough | undefined = undefined
 
-  const firstReceivedResult = await iterators[0].next()
-  const now = new Date()
-  const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
-  // based on local timestamp of first message decide if iterators provide is real time data
-  // if first message is less than three minutes 'old' in comparison to current time
-  // alternative would be to provide isRealtime via param to combine fn, perhaps less magic?...
+  try {
+    const firstReceivedResult = await iterators[0].next()
+    const now = new Date()
+    const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
 
-  const isRealTime = firstReceivedResult.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
+    // based on local timestamp of first message decide if iterators provide is real time data
+    // if first message is less than three minutes 'old' in comparison to current time
+    // alternative would be to provide isRealtime via param to combine fn, perhaps less magic?...
+    const isRealTime = firstReceivedResult.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
 
-  if (isRealTime) {
-    yield firstReceivedResult.value as any
+    if (isRealTime) {
+      yield firstReceivedResult.value as any
 
-    const buffer = new PassThrough({
-      objectMode: true,
-      highWaterMark: 1024
-    })
-
-    const writeMessagesToBuffer = iterators.map(async messages => {
-      for await (const message of messages) {
-        if (!buffer.write(message))
-          //Handle backpressure on write
-          await once(buffer, 'drain')
-      }
-    })
-
-    for await (const message of buffer as any) {
-      yield message
-    }
-
-    await writeMessagesToBuffer
-  } else {
-    // first item was already read so we need to 'put it back' as if it wasn't
-    const nextResults = [
-      Promise.resolve({
-        index: 0,
-        result: firstReceivedResult
+      buffer = new PassThrough({
+        objectMode: true,
+        highWaterMark: 1024
       })
-    ]
 
-    // add rest of the items to array we're work with later on
-    for (var i = 1; i < iterators.length; i++) {
-      nextResults[i] = nextWithIndex(iterators[i], i)
-    }
-
-    // wait for all results to resolve
-    const results = await Promise.all(nextResults)
-    let aliveIteratorsCount = results.length
-    do {
-      // if we're deailing with historical data replay
-      // and need to return combined messages iterable sorted by local timestamp in acending order
-
-      // find resolved one that is the 'oldest'
-      const oldestResult = results.reduce(findOldestResult, results[0])
-      const { result, index } = oldestResult
-
-      if (result.done) {
-        aliveIteratorsCount--
-
-        // we don't want finished iterators to every be considered 'oldest' again
-        // hence provide them with result that has local timestamp set to DATE_MAX
-        // and that is not done
-
-        results[index].result = {
-          done: false,
-          value: {
-            localTimestamp: DATE_MAX
-          }
+      iterators.forEach(async messages => {
+        for await (const message of messages) {
+          if (!buffer!.write(message))
+            //Handle backpressure on write
+            await once(buffer!, 'drain')
         }
-      } else {
-        // yield oldest value and replace with next value from iterable for given index
-        yield result.value as any
-        results[index] = await nextWithIndex(iterators[index], index)
+      })
+
+      for await (const message of buffer as any) {
+        yield message
       }
-    } while (aliveIteratorsCount > 0)
+    } else {
+      // first item was already read so we need to 'put it back' as if it wasn't
+      const nextResults = [
+        Promise.resolve({
+          index: 0,
+          result: firstReceivedResult
+        })
+      ]
+
+      // add rest of the items to array we're work with later on
+      for (var i = 1; i < iterators.length; i++) {
+        nextResults[i] = nextWithIndex(iterators[i], i)
+      }
+
+      return yield* combineHistorical(iterators, nextResults) as any
+    }
+  } finally {
+    buffer?.end()
+
+    // clean up - this will close open real-time connections
+    for (const iterator of iterators) {
+      if (iterator.return !== undefined) {
+        iterator.return!()
+      }
+    }
   }
+}
+
+async function* combineHistorical(
+  iterators: AsyncIterableIterator<Combinable>[],
+  nextResults: Promise<{ index: number; result: IteratorResult<Combinable, any> }>[]
+) {
+  // wait for all results to resolve
+  const results = await Promise.all(nextResults)
+  let aliveIteratorsCount = results.length
+  do {
+    // if we're deailing with historical data replay
+    // and need to return combined messages iterable sorted by local timestamp in acending order
+
+    // find resolved one that is the 'oldest'
+    const oldestResult = results.reduce(findOldestResult, results[0])
+    const { result, index } = oldestResult
+
+    if (result.done) {
+      aliveIteratorsCount--
+
+      // we don't want finished iterators to every be considered 'oldest' again
+      // hence provide them with result that has local timestamp set to DATE_MAX
+      // and that is not done
+
+      results[index].result = {
+        done: false,
+        value: {
+          localTimestamp: DATE_MAX
+        }
+      }
+    } else {
+      // yield oldest value and replace with next value from iterable for given index
+      yield result.value
+      results[index] = await nextWithIndex(iterators[index], index)
+    }
+  } while (aliveIteratorsCount > 0)
 }
