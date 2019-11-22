@@ -2,16 +2,11 @@ import { inflateRawSync } from 'zlib'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
-const pongBuffer = Buffer.from('pong')
-
 export class OkexRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://real.okex.com:8443/ws/v3'
 
   protected decompress = (message: any) => {
     message = inflateRawSync(message) as Buffer
-    if (message.equals(pongBuffer)) {
-      return
-    }
 
     return message
   }

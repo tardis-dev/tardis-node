@@ -54,9 +54,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       for await (let message of realtimeMessagesStream) {
         if (this.decompress !== undefined) {
           message = this.decompress(message)
-          if (message === undefined) {
-            continue
-          }
         }
 
         const messageDeserialized = JSON.parse(message as any)
@@ -114,7 +111,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected onConnected() {}
 
-  protected decompress?: (msg: any) => any
+  protected decompress?: (msg: any) => Buffer
 
   private _monitorConnectionIfStale() {
     if (this._timeoutIntervalMS === undefined || this._timeoutIntervalMS === 0) {
