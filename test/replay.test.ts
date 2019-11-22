@@ -204,7 +204,6 @@ describe('replay', () => {
         bitmex: { symbols: ['XBTZ19', 'XBTUSD'], from: '2019-07-01T00:00:00.000Z', to: '2019-07-02T00:00:00.000Z' },
         deribit: { symbols: ['BTC-PERPETUAL', 'BTC-9AUG19-9500-P'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         binance: { symbols: ['btcusdt', 'btcusds'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
-        'binance-futures': { symbols: ['btcusdt'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
         ftx: { symbols: ['BTC/USD', 'BTC-PERP'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
         okex: { symbols: ['BTC-USDT'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         bitflyer: { symbols: ['BTC_JPY', 'BTCJPY30AUG2019'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
