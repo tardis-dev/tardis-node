@@ -30,25 +30,22 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   const MILLISECONDS_IN_MINUTE = 60 * 1000
   const CONCURRENCY_LIMIT = 60
   // deduplicate filters (if the channel was provided multiple times)
-  const filters = payload.filters.reduce(
-    (prev, current) => {
-      const matchingExisting = prev.find(c => c.channel === current.channel)
+  const filters = payload.filters.reduce((prev, current) => {
+    const matchingExisting = prev.find(c => c.channel === current.channel)
 
-      if (matchingExisting) {
-        // both previous and current have symbols let's merge them
-        if (matchingExisting.symbols && current.symbols) {
-          matchingExisting.symbols.push(...current.symbols)
-        } else if (current.symbols) {
-          matchingExisting.symbols = [...current.symbols]
-        }
-      } else {
-        prev.push(current)
+    if (matchingExisting) {
+      // both previous and current have symbols let's merge them
+      if (matchingExisting.symbols && current.symbols) {
+        matchingExisting.symbols.push(...current.symbols)
+      } else if (current.symbols) {
+        matchingExisting.symbols = [...current.symbols]
       }
+    } else {
+      prev.push(current)
+    }
 
-      return prev
-    },
-    [] as Filter<any>[]
-  )
+    return prev
+  }, [] as Filter<any>[])
 
   // sort filters in place to improve local disk cache ratio (no matter filters order if the same filters are provided will hit the cache)
   filters.sort((f1, f2) => {

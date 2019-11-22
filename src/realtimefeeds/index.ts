@@ -11,11 +11,11 @@ import { CryptofacilitiesRealTimeFeed } from './cryptofacilities'
 import { DeribitRealTimeDataFeed } from './deribit'
 import { FtxRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
+import { HitBtcRealTimeFeed } from './hitbtc'
 import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
 import { KrakenRealTimeFeed } from './kraken'
-import { OkexRealTimeFeed, OKCoinRealTimeFeed } from './okex'
+import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
-import { HitBtcRealTimeFeed } from './hitbtc'
 
 export * from './realtimefeed'
 

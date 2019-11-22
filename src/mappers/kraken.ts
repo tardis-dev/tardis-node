@@ -119,13 +119,14 @@ type KrakenBookUpdate =
   | [
       number,
 
-
+      (
         | {
             a: KrakenBookLevel[]
           }
         | {
             b: KrakenBookLevel[]
-          },
+          }
+      ),
       string,
       string
     ]

@@ -16,11 +16,11 @@ import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMappe
 import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper } from './deribit'
 import { ftxBookChangeMapper, ftxTradesMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
+import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
 import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexTradesMapper } from './okex'
-import { hitBtcTradesMapper, hitBtcBookChangeMapper } from './hitbtc'
 
 export * from './mapper'
 

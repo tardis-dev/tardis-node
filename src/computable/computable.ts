@@ -10,7 +10,7 @@ export type ComputableFactory<T extends NormalizedData> = () => Computable<T>
 export async function* compute<T extends ComputableFactory<any>[], U extends NormalizedData | Disconnect>(
   messages: AsyncIterableIterator<U>,
   ...computables: T
-): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? (U | Z | Disconnect) : U | Z) : never> {
+): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? U | Z | Disconnect : U | Z) : never> {
   const factory = new Computables(computables)
 
   for await (const message of messages) {

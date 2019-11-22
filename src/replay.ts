@@ -160,8 +160,12 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   ...normalizers: U
 ): AsyncIterableIterator<
   Z extends true
-    ? (U extends MapperFactory<infer _, infer X>[] ? X | Disconnect : never)
-    : (U extends MapperFactory<infer _, infer X>[] ? X : never)
+    ? U extends MapperFactory<infer _, infer X>[]
+      ? X | Disconnect
+      : never
+    : U extends MapperFactory<infer _, infer X>[]
+    ? X
+    : never
 > {
   // mappers assume that symbols are uppercased by default
   // if user by mistake provide lowercase one let's automatically fix it

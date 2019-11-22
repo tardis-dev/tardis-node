@@ -152,7 +152,10 @@ describe('compute(messages, types)', () => {
         type: 'book_change',
         exchange: 'bitmex',
         isSnapshot: true,
-        asks: [{ price: 200, amount: 20 }, { price: 120, amount: 1 }],
+        asks: [
+          { price: 200, amount: 20 },
+          { price: 120, amount: 1 }
+        ],
         bids: [{ price: 119, amount: 20 }],
         localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
         timestamp: new Date('2019-08-01T00:00:00.132Z'),

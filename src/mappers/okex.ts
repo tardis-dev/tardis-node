@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, FilterForExchange, Trade, Exchange } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README

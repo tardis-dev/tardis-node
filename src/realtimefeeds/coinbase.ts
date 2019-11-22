@@ -41,23 +41,20 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
           product_ids: filter.symbols
         }
       })
-      .reduce(
-        (prev, current) => {
-          const matchingExisting = prev.find(c => c.name === current.name)
-          if (matchingExisting !== undefined) {
-            for (const symbol of current.product_ids) {
-              if (matchingExisting.product_ids.includes(symbol) === false) {
-                matchingExisting.product_ids.push(symbol)
-              }
+      .reduce((prev, current) => {
+        const matchingExisting = prev.find(c => c.name === current.name)
+        if (matchingExisting !== undefined) {
+          for (const symbol of current.product_ids) {
+            if (matchingExisting.product_ids.includes(symbol) === false) {
+              matchingExisting.product_ids.push(symbol)
             }
-          } else {
-            prev.push(current)
           }
+        } else {
+          prev.push(current)
+        }
 
-          return prev
-        },
-        [] as { name: string; product_ids: string[] }[]
-      )
+        return prev
+      }, [] as { name: string; product_ids: string[] }[])
 
     return [
       {
