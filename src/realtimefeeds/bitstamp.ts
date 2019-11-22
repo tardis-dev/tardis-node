@@ -26,7 +26,15 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected messageIsError(message: any): boolean {
-    return message.channel === undefined
+    if (message.channel === undefined) {
+      return true
+    }
+
+    if (message.event === 'bts:request_reconnect') {
+      return true
+    }
+
+    return false
   }
 
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {

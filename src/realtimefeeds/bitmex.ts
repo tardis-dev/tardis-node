@@ -1,3 +1,4 @@
+import { batch } from '../handy'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
@@ -37,11 +38,5 @@ export class BitmexRealTimeFeed extends RealTimeFeedBase {
       return true
     }
     return false
-  }
-}
-
-function* batch(symbols: string[], batchSize: number) {
-  for (let i = 0; i < symbols.length; i += batchSize) {
-    yield symbols.slice(i, i + batchSize)
   }
 }

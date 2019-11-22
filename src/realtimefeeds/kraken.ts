@@ -30,4 +30,8 @@ export class KrakenRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.errorMessage !== undefined
   }
+
+  protected messageIsHeartbeat(message: any): boolean {
+    return message.event === 'heartbeat'
+  }
 }

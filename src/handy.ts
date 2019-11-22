@@ -134,27 +134,30 @@ export async function* normalizeMessages(
 export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
   const filters = mappers.flatMap(mapper => mapper.getFilters(symbols))
 
-  const deduplicatedFilters = filters.reduce(
-    (prev, current) => {
-      const matchingExisting = prev.find(c => c.channel === current.channel)
-      if (matchingExisting !== undefined) {
-        if (matchingExisting.symbols !== undefined && current.symbols) {
-          for (let symbol of current.symbols) {
-            if (matchingExisting.symbols.includes(symbol) === false) {
-              matchingExisting.symbols.push(symbol)
-            }
+  const deduplicatedFilters = filters.reduce((prev, current) => {
+    const matchingExisting = prev.find(c => c.channel === current.channel)
+    if (matchingExisting !== undefined) {
+      if (matchingExisting.symbols !== undefined && current.symbols) {
+        for (let symbol of current.symbols) {
+          if (matchingExisting.symbols.includes(symbol) === false) {
+            matchingExisting.symbols.push(symbol)
           }
-        } else if (current.symbols) {
-          matchingExisting.symbols = [...current.symbols]
         }
-      } else {
-        prev.push(current)
+      } else if (current.symbols) {
+        matchingExisting.symbols = [...current.symbols]
       }
+    } else {
+      prev.push(current)
+    }
 
-      return prev
-    },
-    [] as FilterForExchange[T][]
-  )
+    return prev
+  }, [] as FilterForExchange[T][])
 
   return deduplicatedFilters
+}
+
+export function* batch(symbols: string[], batchSize: number) {
+  for (let i = 0; i < symbols.length; i += batchSize) {
+    yield symbols.slice(i, i + batchSize)
+  }
 }

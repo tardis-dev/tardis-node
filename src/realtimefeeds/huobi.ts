@@ -41,12 +41,16 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
     return false
   }
 
-  protected onMessage(msg: any) {
-    if (msg.ping !== undefined) {
+  protected onMessage(message: any) {
+    if (message.ping !== undefined) {
       this.send({
-        pong: msg.ping
+        pong: message.ping
       })
     }
+  }
+
+  protected messageIsHeartbeat(message: any) {
+    return message.ping !== undefined
   }
 }
 

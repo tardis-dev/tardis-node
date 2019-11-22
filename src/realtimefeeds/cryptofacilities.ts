@@ -23,4 +23,8 @@ export class CryptofacilitiesRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.event === 'error'
   }
+
+  protected messageIsHeartbeat(message: any): boolean {
+    return message.feed === 'heartbeat'
+  }
 }

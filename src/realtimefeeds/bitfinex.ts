@@ -55,4 +55,8 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any) {
     return message.event === 'error'
   }
+
+  protected messageIsHeartbeat(message: any) {
+    return Array.isArray(message) && message.length > 1 && message[1] === 'hb'
+  }
 }
