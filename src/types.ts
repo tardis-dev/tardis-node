@@ -24,7 +24,7 @@ export type Trade = {
   readonly type: 'trade'
   readonly symbol: string
   readonly exchange: Exchange
-  readonly id?: string
+  readonly id: string | undefined
   readonly price: number
   readonly amount: number
   readonly side: 'buy' | 'sell' | 'unknown' // liquidity taker side (aggressor)
@@ -53,11 +53,11 @@ export type DerivativeTicker = {
   readonly type: 'derivative_ticker'
   readonly symbol: string
   readonly exchange: Exchange
-  readonly lastPrice?: number
-  readonly openInterest?: number
-  readonly fundingRate?: number
-  readonly indexPrice?: number
-  readonly markPrice?: number
+  readonly lastPrice: number | undefined
+  readonly openInterest: number | undefined
+  readonly fundingRate: number | undefined
+  readonly indexPrice: number | undefined
+  readonly markPrice: number | undefined
 
   readonly timestamp: Date
   readonly localTimestamp: Date
