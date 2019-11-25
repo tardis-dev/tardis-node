@@ -1,22 +1,9 @@
-import BTree from 'sorted-btree'
-import { BookChange, BookPriceLevel } from './types'
+import { RBTree } from 'bintrees'
+import { BookChange, BookPriceLevel, Writeable } from './types'
 
 export class OrderBook {
-  private readonly _bids = new BTree<BookPriceLevel, undefined>(
-    undefined,
-    (a, b) => {
-      return b.price - a.price
-    },
-    64
-  )
-
-  private readonly _asks = new BTree<BookPriceLevel, undefined>(
-    undefined,
-    (a, b) => {
-      return a.price - b.price
-    },
-    64
-  )
+  private readonly _bids = new RBTree<BookPriceLevel>((nodeA, nodeB) => nodeB.price - nodeA.price)
+  private readonly _asks = new RBTree<BookPriceLevel>((nodeA, nodeB) => nodeA.price - nodeB.price)
 
   private _receivedInitialSnapshot = false
 
@@ -53,26 +40,37 @@ export class OrderBook {
   }
 
   public *bids(): IterableIterator<BookPriceLevel> {
-    for (const level of this._bids.keys()) {
-      // skip empty levels
-      if (level.amount !== 0) {
-        yield level
-      }
+    const iterator = this._bids.iterator()
+    let level = iterator.next()
+
+    while (level !== null) {
+      yield level
+      level = iterator.next()
     }
   }
 
   public *asks(): IterableIterator<BookPriceLevel> {
-    for (const level of this._asks.keys()) {
-      // skip empty levels
-      if (level.amount !== 0) {
-        yield level
-      }
+    const iterator = this._asks.iterator()
+    let level = iterator.next()
+
+    while (level !== null) {
+      yield level
+      level = iterator.next()
     }
   }
 }
 
-function applyPriceLevelChanges(levels: BTree<BookPriceLevel, undefined>, priceLevelChanges: BookPriceLevel[]) {
+function applyPriceLevelChanges(tree: RBTree<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
   for (const priceLevel of priceLevelChanges) {
-    levels.set({ ...priceLevel }, undefined)
+    const node = tree.find(priceLevel) as Writeable<BookPriceLevel>
+    const levelShouldBeRemoved = node !== null && priceLevel.amount === 0
+
+    if (levelShouldBeRemoved) {
+      tree.remove(priceLevel)
+    } else if (node !== null) {
+      node.amount = priceLevel.amount
+    } else {
+      tree.insert({ ...priceLevel })
+    }
   }
 }

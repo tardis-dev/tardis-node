@@ -100,20 +100,18 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       const bidLevelResult = bidsIterable.next()
       const newBid = bidLevelResult.done ? emptyBookLevel : bidLevelResult.value
 
-      if (this._bookChanged === false && levelsChanged(this._bids[i], newBid)) {
+      if (levelsChanged(this._bids[i], newBid)) {
+        this._bids[i] = { ...newBid }
         this._bookChanged = true
       }
-
-      this._bids[i] = newBid
 
       const askLevelResult = asksIterable.next()
       const newAsk = askLevelResult.done ? emptyBookLevel : askLevelResult.value
 
-      if (this._bookChanged === false && levelsChanged(this._asks[i], newAsk)) {
+      if (levelsChanged(this._asks[i], newAsk)) {
+        this._asks[i] = { ...newAsk }
         this._bookChanged = true
       }
-
-      this._asks[i] = newAsk
     }
 
     this._lastUpdateTimestamp = bookChange.timestamp

@@ -66,9 +66,10 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
 
       iterators.forEach(async messages => {
         for await (const message of messages) {
-          if (!buffer!.write(message))
+          if (!buffer!.write(message)) {
             //Handle backpressure on write
             await once(buffer!, 'drain')
+          }
         }
       })
 
