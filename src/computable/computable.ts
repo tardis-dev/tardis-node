@@ -22,32 +22,16 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
       factory.reset(message.exchange)
       continue
     }
+
     const normalizedMessage = message as NormalizedData
     const id = normalizedMessage.name !== undefined ? `${normalizedMessage.symbol}:${normalizedMessage.name}` : normalizedMessage.symbol
 
     const computables = factory.getOrCreate(normalizedMessage.exchange, id)
 
-    const sourceDataForSubsequentComputables: NormalizedData[] = []
-
     for (const computable of computables) {
       if (computable.sourceDataTypes.includes(normalizedMessage.type)) {
         for (const computedMessage of computable.compute(normalizedMessage)) {
-          sourceDataForSubsequentComputables.push(computedMessage)
           yield computedMessage
-        }
-      }
-
-      // as long as previous computables computed new messages we need to pass those to subsequent ones as those may relay
-      // on previously computed computables as a source of their own computation
-      // for example order book impbalance computable may relay on book_snapshot computable as it's source
-      if (sourceDataForSubsequentComputables.length > 0) {
-        for (const sourceComputable of sourceDataForSubsequentComputables) {
-          if (computable.sourceDataTypes.includes(sourceComputable.type)) {
-            for (const computedMessage of computable.compute(sourceComputable)) {
-              sourceDataForSubsequentComputables.push(computedMessage)
-              yield computedMessage
-            }
-          }
         }
       }
     }
