@@ -39,7 +39,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       this.debug('provided filters: %o mapped to subscribe messages: %o', this._filters, subscribeMessages)
 
-      this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 5 * ONE_SEC_IN_MS })
+      this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
 
       this._ws.onopen = this._onConnectionEstabilished
       this._ws.onclose = this._onConnectionClosed
