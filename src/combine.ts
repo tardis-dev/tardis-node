@@ -1,5 +1,3 @@
-import { once } from 'events'
-import { PassThrough } from 'stream'
 import { ONE_SEC_IN_MS } from './handy'
 
 type NextMessageResultWitIndex = {
@@ -8,6 +6,8 @@ type NextMessageResultWitIndex = {
 }
 
 type Combinable = { localTimestamp: Date }
+
+const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0])
 
 const DATE_MAX = new Date(8640000000000000)
 
@@ -44,57 +44,39 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   if (iterators.length === 0) {
     return
   }
-  let buffer: PassThrough | undefined = undefined
 
   try {
-    const firstReceivedResult = await iterators[0].next()
+    const nextResults = iterators.map(nextWithIndex)
+    const { result } = await Promise.race(nextResults)
+    const firstReceivedMessage = result.value
+
     const now = new Date()
     const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
 
     // based on local timestamp of first message decide if iterators provide is real time data
     // if first message is less than three minutes 'old' in comparison to current time
     // alternative would be to provide isRealtime via param to combine fn, perhaps less magic?...
-    const isRealTime = firstReceivedResult.value.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
+    const isRealTime = firstReceivedMessage.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
 
     if (isRealTime) {
-      yield firstReceivedResult.value as any
+      if (NODE_MAJOR_VERSION < 13) {
+        console.warn(
+          'Important! using combine for real-time streams may cause memory leaks due to Node.js issue with Promise.race handling - https://github.com/nodejs/node/issues/29385. Try installing Node v13 which seems to have this issue fixed.'
+        )
+      }
 
-      buffer = new PassThrough({
-        objectMode: true,
-        highWaterMark: 1024
-      })
+      while (true) {
+        // return messages in FIFO order thanks to using Promise.race
+        // based on https://github.com/fraxken/combine-async-iterators
+        const { index, result } = await Promise.race(nextResults)
 
-      iterators.forEach(async messages => {
-        for await (const message of messages) {
-          if (!buffer!.write(message)) {
-            //Handle backpressure on write
-            await once(buffer!, 'drain')
-          }
-        }
-      })
-
-      for await (const message of buffer as any) {
-        yield message
+        yield result.value as any
+        nextResults[index] = nextWithIndex(iterators[index], index)
       }
     } else {
-      // first item was already read so we need to 'put it back' as if it wasn't
-      const nextResults = [
-        Promise.resolve({
-          index: 0,
-          result: firstReceivedResult
-        })
-      ]
-
-      // add rest of the items to array we're work with later on
-      for (var i = 1; i < iterators.length; i++) {
-        nextResults[i] = nextWithIndex(iterators[i], i)
-      }
-
       return yield* combineHistorical(iterators, nextResults) as any
     }
   } finally {
-    buffer?.end()
-
     // clean up - this will close open real-time connections
     for (const iterator of iterators) {
       if (iterator.return !== undefined) {
