@@ -6,7 +6,7 @@ import { BinarySplitStream } from './binarysplit'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
 import { getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy'
-import { MapperFactory } from './mappers'
+import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
 import { WorkerJobPayload, WorkerMessage } from './worker'
@@ -175,6 +175,9 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   }
 
   const fromDate = parseAsUTCDate(from)
+
+  validateReplayNormalizedOptions(fromDate, normalizers)
+
   const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
   const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
   const mappers = createMappers(fromDate)
@@ -231,6 +234,17 @@ function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to
         throw new Error(`Invalid "filters[].symbols" argument: ${filter.symbols}. Please provide array of symbol strings`)
       }
     }
+  }
+}
+
+function validateReplayNormalizedOptions(fromDate: Date, normalizers: MapperFactory<any, any>[]) {
+  const hasBookChangeNormalizer = normalizers.some(n => n === normalizeBookChanges)
+  const dateDoesNotStartAtTheBeginningOfTheDay = fromDate.getUTCHours() !== 0 || fromDate.getUTCMinutes() !== 0
+
+  if (hasBookChangeNormalizer && dateDoesNotStartAtTheBeginningOfTheDay) {
+    throw new Error(
+      `Invalid "from" argument: ${fromDate.toISOString()}. Please provide date string starting at 00:00 UTC as otherwise initial book snapshots won't be available.`
+    )
   }
 }
 
