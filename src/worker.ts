@@ -108,7 +108,7 @@ async function getDataFeedSlice(payload: WorkerJobPayload, offset: number, filte
 }
 
 async function reliablyFetchAndCacheSlice(
-  { exchange, fromDate, endpoint, apiKey }: WorkerJobPayload,
+  { exchange, fromDate, endpoint, apiKey, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
   sliceCachePath: string
@@ -124,6 +124,7 @@ async function reliablyFetchAndCacheSlice(
     timeout: 45 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': 'gzip',
+      'User-Agent': userAgent,
       Authorization: apiKey ? `Bearer ${apiKey}` : ''
     }
   }
@@ -215,6 +216,7 @@ export type WorkerJobPayload = {
   cacheDir: string
   endpoint: string
   apiKey: string
+  userAgent: string
   fromDate: Date
   toDate: Date
   exchange: Exchange

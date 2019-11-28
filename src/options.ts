@@ -1,19 +1,18 @@
 import os from 'os'
 import path from 'path'
-import { debug } from './debug'
+const pkg = require('../package.json')
 
 const defaultOptions: Options = {
   endpoint: 'https://api.tardis.dev/v1',
   cacheDir: path.join(os.tmpdir(), '.tardis-cache'),
-  apiKey: ''
+  apiKey: '',
+  _userAgent: `tardis-dev/${pkg.version} (+https://github.com/tardis-dev/tardis-node)`
 }
 
 let options: Options = { ...defaultOptions }
 
 export function init(initOptions: Partial<Options> = {}) {
   options = { ...defaultOptions, ...initOptions }
-
-  debug('initialized with: %o', options)
 }
 
 export function getOptions() {
@@ -24,4 +23,5 @@ type Options = {
   endpoint: string
   cacheDir: string
   apiKey: string
+  _userAgent: string
 }
