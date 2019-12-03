@@ -59,12 +59,6 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
     const isRealTime = firstReceivedMessage.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
 
     if (isRealTime) {
-      if (NODE_MAJOR_VERSION < 13) {
-        console.warn(
-          'Important! using combine for real-time streams may cause memory leaks due to Node.js issue with Promise.race handling - https://github.com/nodejs/node/issues/29385. Try installing Node v13 which seems to have this issue fixed.'
-        )
-      }
-
       while (true) {
         // return messages in FIFO order thanks to using Promise.race
         // based on https://github.com/fraxken/combine-async-iterators
