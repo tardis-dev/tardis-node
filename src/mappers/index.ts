@@ -50,6 +50,8 @@ const tradesMappers = {
   hitbtc: () => hitBtcTradesMapper
 }
 
+const OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-04').valueOf()
+
 const bookChangeMappers = {
   bitmex: () => new BitmexBookChangeMapper(),
   binance: () => new BinanceBookChangeMapper('binance'),
@@ -67,12 +69,13 @@ const bookChangeMappers = {
   ftx: () => ftxBookChangeMapper,
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
-  okex: () => new OkexBookChangeMapper('okex'),
+  okex: (localTimestamp: Date) =>
+    new OkexBookChangeMapper('okex', localTimestamp.valueOf() >= OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP),
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-us': () => new HuobiBookChangeMapper('huobi-us'),
   bybit: () => new BybitBookChangeMapper('bybit'),
-  okcoin: () => new OkexBookChangeMapper('okcoin'),
+  okcoin: () => new OkexBookChangeMapper('okcoin', false),
   hitbtc: () => hitBtcBookChangeMapper
 }
 
@@ -98,7 +101,7 @@ export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: 
 
 export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
   exchange: T,
-  _localTimestamp: Date
+  localTimestamp: Date
 ): Mapper<T, BookChange> => {
   const createBookChangesMapper = bookChangeMappers[exchange]
 
@@ -106,7 +109,7 @@ export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
     throw new Error(`normalizeBookChanges: ${exchange} not supported`)
   }
 
-  return createBookChangesMapper() as Mapper<T, BookChange>
+  return createBookChangesMapper(localTimestamp) as Mapper<T, BookChange>
 }
 
 export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(

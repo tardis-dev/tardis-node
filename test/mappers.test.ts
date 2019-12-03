@@ -622,11 +622,60 @@ describe('mappers', () => {
             volume_token_24h: '18526456.20275678'
           }
         ]
+      },
+      {
+        table: 'futures/depth_l2_tbt',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'EOS-USD-191206',
+            asks: [],
+            bids: [['2.25', '1459', '0', '1']],
+            timestamp: '2019-12-03T15:14:59.904Z',
+            checksum: 1099728614
+          }
+        ]
       }
     ]
-    const okexMapper = createMapper('okex')
+    let okexMapper = createMapper('okex', new Date('2019-12-03'))
 
     for (const message of messages) {
+      const mappedMessages = okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const messagesTickByTick = [
+      {
+        table: 'futures/depth_l2_tbt',
+        action: 'partial',
+        data: [
+          {
+            instrument_id: 'BTC-USD-191018',
+            asks: [['8581.44', '74', '0', '74']],
+            bids: [['8581.38', '37', '0', '37']],
+            timestamp: '2019-10-10T08:50:14.528Z',
+            checksum: -182860440
+          }
+        ]
+      },
+      {
+        table: 'futures/depth_l2_tbt',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'EOS-USD-191206',
+            asks: [],
+            bids: [['2.25', '1459', '0', '1']],
+            timestamp: '2019-12-03T15:14:59.904Z',
+            checksum: 1099728614
+          }
+        ]
+      }
+    ]
+
+    okexMapper = createMapper('okex', new Date('2019-12-04'))
+
+    for (const message of messagesTickByTick) {
       const mappedMessages = okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
       expect(mappedMessages).toMatchSnapshot()
     }

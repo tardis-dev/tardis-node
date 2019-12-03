@@ -97,6 +97,7 @@ const OKEX_CHANNELS = [
   'futures/trade',
   'futures/ticker',
   'futures/depth',
+  'futures/depth_l2_tbt',
   'futures/price_range',
   'futures/mark_price',
   'futures/estimated_price',

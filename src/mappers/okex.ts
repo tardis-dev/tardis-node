@@ -5,6 +5,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 const tradeChannels: FilterForExchange['okex']['channel'][] = ['spot/trade', 'futures/trade', 'swap/trade']
 const bookChangeChannels: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth', 'swap/depth']
+const bookChangeChannelsWithTickByTickSource: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth_l2_tbt', 'swap/depth']
 
 const derivativeTickerChannels: FilterForExchange['okex']['channel'][] = [
   'spot/ticker',
@@ -99,14 +100,18 @@ const mapBookLevel = (level: OkexBookLevel) => {
 }
 
 export class OkexBookChangeMapper implements Mapper<'okex' | 'okcoin', BookChange> {
-  constructor(private readonly _exchange: Exchange) {}
+  private readonly _channels: FilterForExchange['okex']['channel'][]
+
+  constructor(private readonly _exchange: Exchange, useTickByTickChannel: boolean) {
+    this._channels = useTickByTickChannel ? bookChangeChannelsWithTickByTickSource : bookChangeChannels
+  }
 
   canHandle(message: OkexDataMessage) {
-    return bookChangeChannels.includes(message.table)
+    return this._channels.includes(message.table)
   }
 
   getFilters(symbols?: string[]) {
-    return mapToFilters(bookChangeChannels, symbols)
+    return mapToFilters(this._channels, symbols)
   }
 
   *map(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {

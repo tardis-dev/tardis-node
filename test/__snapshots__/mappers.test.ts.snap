@@ -2434,3 +2434,50 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map okex messages 12`] = `Array []`;
+
+exports[`mappers map okex messages 13`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 74,
+        "price": 8581.44,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 37,
+        "price": 8581.38,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-191018",
+    "timestamp": 2019-10-10T08:50:14.528Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex messages 14`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 1459,
+        "price": 2.25,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "EOS-USD-191206",
+    "timestamp": 2019-12-03T15:14:59.904Z,
+    "type": "book_change",
+  },
+]
+`;
