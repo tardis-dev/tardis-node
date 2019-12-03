@@ -129,7 +129,7 @@ async function reliablyFetchAndCacheSlice(
     }
   }
 
-  const MAX_ATTEMPTS = 6
+  const MAX_ATTEMPTS = 7
   let attempts = 0
 
   while (true) {
@@ -145,7 +145,7 @@ async function reliablyFetchAndCacheSlice(
         throw error
       }
 
-      const randomIngridient = Math.random() * 300
+      const randomIngridient = Math.random() * 500
       const attemptsDelayMS = Math.pow(2, attempts) * ONE_SEC_IN_MS
       let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
 
