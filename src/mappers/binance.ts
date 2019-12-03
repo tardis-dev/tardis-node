@@ -86,8 +86,9 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 
     // first check if received message is snapshot and process it as such if it is
     if (message.data.lastUpdateId !== undefined) {
+      // if we've already received 'manual' snapshot, ignore if there is another one
       if (snapshotAlreadyProcessed) {
-        throw new Error(`Received snapshot when already processed one, ${localTimestamp.toISOString()}`)
+        return
       }
 
       const binanceDepthSnapshotData = message.data
