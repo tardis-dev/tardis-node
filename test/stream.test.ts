@@ -17,7 +17,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bitfinex-derivatives',
   'cryptofacilities',
   'deribit',
-  'okex',
+  'okex-futures',
+  'okex-swap',
   'bybit'
 ]
 

@@ -3,76 +3,20 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
 
-const tradeChannels: FilterForExchange['okex']['channel'][] = ['spot/trade', 'futures/trade', 'swap/trade']
-const bookChangeChannels: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth', 'swap/depth']
-const bookChangeChannelsWithTickByTickSource: FilterForExchange['okex']['channel'][] = ['spot/depth', 'futures/depth_l2_tbt', 'swap/depth']
-
-const derivativeTickerChannels: FilterForExchange['okex']['channel'][] = [
-  'spot/ticker',
-  'futures/ticker',
-  'swap/ticker',
-  'futures/mark_price',
-  'swap/mark_price',
-  'swap/funding_rate'
-]
-
-const mapToFilters = (mapping: FilterForExchange['okex']['channel'][], symbols?: string[]): FilterForExchange['okex'][] => {
-  // depending if symbols is for spot/swap/futures it needs different underlying channel
-  // for ticker symbol we also need data for funding_rate and mark_price when applicable
-
-  if (symbols === undefined) {
-    return mapping.map(channel => {
-      return {
-        channel
-      }
-    })
-  }
-
-  return symbols
-    .map(symbol => {
-      const isSwap = symbol.endsWith('-SWAP')
-      const isFuture = symbol.match(/[0-9]$/)
-
-      let prefix: string
-      if (isSwap) {
-        prefix = 'swap'
-      } else if (isFuture) {
-        prefix = 'futures'
-      } else {
-        prefix = 'spot'
-      }
-
-      return mapping
-        .filter(c => c.startsWith(prefix))
-        .map(channel => {
-          return {
-            channel,
-            symbols: [symbol]
-          }
-        })
-    })
-    .flatMap(c => c)
-    .reduce((prev, current) => {
-      const matchingExisting = prev.find(c => c.channel === current.channel)
-      if (matchingExisting !== undefined) {
-        matchingExisting.symbols!.push(current.symbols[0])
-      } else {
-        prev.push(current)
-      }
-
-      return prev
-    }, [] as FilterForExchange['okex'][])
-}
-
-export class OkexTradesMapper implements Mapper<'okex' | 'okcoin', Trade> {
-  constructor(private readonly _exchange: Exchange) {}
+export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
+  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
 
   canHandle(message: OkexDataMessage) {
-    return tradeChannels.includes(message.table)
+    return message.table === `${this._market}/trade`
   }
 
   getFilters(symbols?: string[]) {
-    return mapToFilters(tradeChannels, symbols)
+    return [
+      {
+        channel: `${this._market}/trade`,
+        symbols
+      }
+    ]
   }
 
   *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
@@ -99,19 +43,27 @@ const mapBookLevel = (level: OkexBookLevel) => {
   return { price, amount }
 }
 
-export class OkexBookChangeMapper implements Mapper<'okex' | 'okcoin', BookChange> {
-  private readonly _channels: FilterForExchange['okex']['channel'][]
-
-  constructor(private readonly _exchange: Exchange, useTickByTickChannel: boolean) {
-    this._channels = useTickByTickChannel ? bookChangeChannelsWithTickByTickSource : bookChangeChannels
-  }
+export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _market: OKEX_MARKETS,
+    private readonly _useTickByTickChannel: boolean
+  ) {}
 
   canHandle(message: OkexDataMessage) {
-    return this._channels.includes(message.table)
+    const channelSuffix = this._useTickByTickChannel ? 'depth_l2_tbt' : 'depth'
+
+    return message.table === `${this._market}/${channelSuffix}`
   }
 
   getFilters(symbols?: string[]) {
-    return mapToFilters(this._channels, symbols)
+    const channelSuffix = this._useTickByTickChannel ? 'depth_l2_tbt' : 'depth'
+    return [
+      {
+        channel: `${this._market}/${channelSuffix}`,
+        symbols
+      }
+    ]
   }
 
   *map(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
@@ -130,14 +82,27 @@ export class OkexBookChangeMapper implements Mapper<'okex' | 'okcoin', BookChang
   }
 }
 
-export class OkexDerivativeTickerMapper implements Mapper<'okex', DerivativeTicker> {
+export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  private _futuresChannels = ['futures/ticker', 'futures/mark_price']
+  private _swapChannels = ['swap/ticker', 'swap/mark_price', 'swap/funding_rate']
+
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: OkexDataMessage) {
-    return derivativeTickerChannels.includes(message.table)
+    const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
+
+    return channels.includes(message.table)
   }
 
   getFilters(symbols?: string[]) {
-    return mapToFilters(derivativeTickerChannels, symbols)
+    const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
+    return channels.map(channel => {
+      return {
+        channel,
+        symbols
+      }
+    })
   }
 
   *map(
@@ -145,7 +110,7 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex', DerivativeTick
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
     for (const okexMessage of message.data) {
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(okexMessage.instrument_id, 'okex')
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(okexMessage.instrument_id, this._exchange)
       if ('funding_rate' in okexMessage) {
         pendingTickerInfo.updateFundingRate(Number(okexMessage.funding_rate))
       }
@@ -224,3 +189,7 @@ type OkexDepthDataMessage = {
 }
 
 type OkexBookLevel = [number | string, number | string, number | string, number | string]
+
+type OKEX_EXCHANGES = 'okex' | 'okcoin' | 'okex-futures' | 'okex-swap'
+
+type OKEX_MARKETS = 'spot' | 'swap' | 'futures'

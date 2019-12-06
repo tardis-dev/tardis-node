@@ -5,6 +5,8 @@ export const EXCHANGES = [
   'binance-futures',
   'ftx',
   'okex',
+  'okex-futures',
+  'okex-swap',
   'huobi',
   'huobi-dm',
   'bitflyer',
@@ -25,9 +27,7 @@ export const EXCHANGES = [
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
-
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
-
 const BITFINEX_CHANNELS = ['trades', 'book'] as const
 
 const BITMEX_CHANNELS = [
@@ -84,25 +84,30 @@ const DERIBIT_CHANNELS = [
 
 const KRAKEN_CHANNELS = ['ticker', 'trade', 'book', 'spread'] as const
 
-const OKEX_CHANNELS = [
-  'spot/trade',
-  'spot/ticker',
-  'spot/depth',
-  'swap/trade',
-  'swap/ticker',
-  'swap/depth',
-  'swap/funding_rate',
-  'swap/price_range',
-  'swap/mark_price',
+const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/ticker'] as const
+
+const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/ticker'] as const
+
+const OKEX_FUTURES_CHANNELS = [
   'futures/trade',
-  'futures/ticker',
   'futures/depth',
   'futures/depth_l2_tbt',
+  'futures/ticker',
   'futures/price_range',
   'futures/mark_price',
   'futures/estimated_price',
   'index/ticker'
-] as const
+]
+
+const OKEX_SWAP_CHANNELS = [
+  'swap/trade',
+  'swap/depth',
+  'swap/ticker',
+  'swap/funding_rate',
+  'swap/price_range',
+  'swap/mark_price',
+  'index/ticker'
+]
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
@@ -112,7 +117,7 @@ const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicat
 
 const BITFLYER_CHANNELS = ['lightning_board_snapshot', 'lightning_board', 'lightning_ticker', 'lightning_executions'] as const
 
-const BINANCE_FUTURES_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker']
+const BINANCE_FUTURES_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker', 'forceOrder']
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
@@ -124,8 +129,6 @@ const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance'] as const
 
-const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/ticker'] as const
-
 const HITBTC_CHANNELS = ['snapshotTrades', 'updateTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
@@ -136,10 +139,12 @@ export const EXCHANGE_CHANNELS_INFO = {
   bitstamp: BITSTAMP_CHANNELS,
   kraken: KRAKEN_CHANNELS,
   okex: OKEX_CHANNELS,
+  'okex-swap': OKEX_SWAP_CHANNELS,
+  'okex-futures': OKEX_FUTURES_CHANNELS,
   binance: BINANCE_CHANNELS,
   'binance-jersey': BINANCE_CHANNELS,
-  'binance-us': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
+  'binance-us': BINANCE_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
   gemini: GEMINI_CHANNELS,

@@ -40,6 +40,8 @@ const realTimeFeedsMap: {
   gemini: GeminiRealTimeFeed,
   kraken: KrakenRealTimeFeed,
   okex: OkexRealTimeFeed,
+  'okex-futures': OkexRealTimeFeed,
+  'okex-swap': OkexRealTimeFeed,
   'huobi-dm': HuobiDMRealTimeFeed,
   'huobi-us': HuobiUSRealTimeFeed,
   huobi: HuobiRealTimeFeed,

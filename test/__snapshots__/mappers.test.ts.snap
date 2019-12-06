@@ -1,176 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getFilters(symbols) for okex 1`] = `
-Array [
-  Object {
-    "channel": "spot/trade",
-  },
-  Object {
-    "channel": "futures/trade",
-  },
-  Object {
-    "channel": "swap/trade",
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 2`] = `
-Array [
-  Object {
-    "channel": "spot/depth",
-  },
-  Object {
-    "channel": "futures/depth",
-  },
-  Object {
-    "channel": "swap/depth",
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 3`] = `
-Array [
-  Object {
-    "channel": "swap/depth",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "futures/depth",
-    "symbols": Array [
-      "TRX-USD-190927",
-    ],
-  },
-  Object {
-    "channel": "spot/depth",
-    "symbols": Array [
-      "XRP-OKB",
-    ],
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 4`] = `
-Array [
-  Object {
-    "channel": "swap/depth",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-      "ETH-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "spot/depth",
-    "symbols": Array [
-      "XRP-OKB",
-    ],
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 5`] = `
-Array [
-  Object {
-    "channel": "spot/ticker",
-  },
-  Object {
-    "channel": "futures/ticker",
-  },
-  Object {
-    "channel": "swap/ticker",
-  },
-  Object {
-    "channel": "futures/mark_price",
-  },
-  Object {
-    "channel": "swap/mark_price",
-  },
-  Object {
-    "channel": "swap/funding_rate",
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 6`] = `
-Array [
-  Object {
-    "channel": "swap/ticker",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "swap/mark_price",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "swap/funding_rate",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "futures/ticker",
-    "symbols": Array [
-      "TRX-USD-190927",
-    ],
-  },
-  Object {
-    "channel": "futures/mark_price",
-    "symbols": Array [
-      "TRX-USD-190927",
-    ],
-  },
-  Object {
-    "channel": "spot/ticker",
-    "symbols": Array [
-      "XRP-OKB",
-    ],
-  },
-]
-`;
-
-exports[`getFilters(symbols) for okex 7`] = `
-Array [
-  Object {
-    "channel": "swap/ticker",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-      "ETH-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "swap/mark_price",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-      "ETH-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "swap/funding_rate",
-    "symbols": Array [
-      "LTC-USD-SWAP",
-      "ETH-USD-SWAP",
-    ],
-  },
-  Object {
-    "channel": "futures/ticker",
-    "symbols": Array [
-      "TRX-USD-190927",
-    ],
-  },
-  Object {
-    "channel": "futures/mark_price",
-    "symbols": Array [
-      "TRX-USD-190927",
-    ],
-  },
-]
-`;
-
 exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
@@ -2218,38 +2047,6 @@ Array [
 exports[`mappers map okex messages 1`] = `
 Array [
   Object {
-    "amount": 4,
-    "exchange": "okex",
-    "id": "2578238628528131",
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 4061.94,
-    "side": "sell",
-    "symbol": "BTC-USD-190628",
-    "timestamp": 2019-03-31T23:59:59.388Z,
-    "type": "trade",
-  },
-]
-`;
-
-exports[`mappers map okex messages 2`] = `
-Array [
-  Object {
-    "amount": 5,
-    "exchange": "okex",
-    "id": "3269040623943685",
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 10209.43,
-    "side": "buy",
-    "symbol": "BTC-USD-190927",
-    "timestamp": 2019-08-01T00:00:01.320Z,
-    "type": "trade",
-  },
-]
-`;
-
-exports[`mappers map okex messages 3`] = `
-Array [
-  Object {
     "amount": 0.12,
     "exchange": "okex",
     "id": "423886239",
@@ -2263,7 +2060,208 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 4`] = `
+exports[`mappers map okex messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 38,
+        "price": 4084.57,
+      },
+      Object {
+        "amount": 20,
+        "price": 4085,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4,
+        "price": 4084.56,
+      },
+      Object {
+        "amount": 29,
+        "price": 4084.5,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex messages 3`] = `Array []`;
+
+exports[`mappers map okex messages 4`] = `Array []`;
+
+exports[`mappers map okex-futures messages 1`] = `
+Array [
+  Object {
+    "amount": 4,
+    "exchange": "okex-futures",
+    "id": "2578238628528131",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 4061.94,
+    "side": "sell",
+    "symbol": "BTC-USD-190628",
+    "timestamp": 2019-03-31T23:59:59.388Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 2`] = `
+Array [
+  Object {
+    "amount": 5,
+    "exchange": "okex-futures",
+    "id": "3269040623943685",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 10209.43,
+    "side": "buy",
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:01.320Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 38,
+        "price": 4084.57,
+      },
+      Object {
+        "amount": 20,
+        "price": 4085,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4,
+        "price": 4084.56,
+      },
+      Object {
+        "amount": 29,
+        "price": 4084.5,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-08-01T00:00:08.930Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 4`] = `Array []`;
+
+exports[`mappers map okex-futures messages 5`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": 10218.61,
+    "openInterest": undefined,
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:20.869Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 6`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.02249,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 24419,
+    "symbol": "TRX-USD-190802",
+    "timestamp": 2019-08-01T00:02:00.429Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 7`] = `Array []`;
+
+exports[`mappers map okex-futures messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 74,
+        "price": 8581.44,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 37,
+        "price": 8581.38,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-191018",
+    "timestamp": 2019-10-10T08:50:14.528Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 9`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 1459,
+        "price": 2.25,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "EOS-USD-191206",
+    "timestamp": 2019-12-03T15:14:59.904Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 1`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "exchange": "okex-swap",
+    "id": "423886239",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.806Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 2`] = `
 Array [
   Object {
     "asks": Array [
@@ -2290,7 +2288,7 @@ Array [
         "price": 0.3195,
       },
     ],
-    "exchange": "okex",
+    "exchange": "okex-swap",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "symbol": "XRP-USD-SWAP",
@@ -2300,60 +2298,10 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 5`] = `
+exports[`mappers map okex-swap messages 3`] = `
 Array [
   Object {
-    "asks": Array [
-      Object {
-        "amount": 38,
-        "price": 4084.57,
-      },
-      Object {
-        "amount": 20,
-        "price": 4085,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 4,
-        "price": 4084.56,
-      },
-      Object {
-        "amount": 29,
-        "price": 4084.5,
-      },
-    ],
-    "exchange": "okex",
-    "isSnapshot": true,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "symbol": "BTC-USD-190405",
-    "timestamp": 2019-08-01T00:00:08.930Z,
-    "type": "book_change",
-  },
-]
-`;
-
-exports[`mappers map okex messages 6`] = `
-Array [
-  Object {
-    "exchange": "okex",
-    "fundingRate": undefined,
-    "indexPrice": undefined,
-    "lastPrice": 0.0001659,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "markPrice": undefined,
-    "openInterest": undefined,
-    "symbol": "TRX-ETH",
-    "timestamp": 2019-04-01T00:00:27.106Z,
-    "type": "derivative_ticker",
-  },
-]
-`;
-
-exports[`mappers map okex messages 7`] = `
-Array [
-  Object {
-    "exchange": "okex",
+    "exchange": "okex-swap",
     "fundingRate": undefined,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -2367,10 +2315,10 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 8`] = `
+exports[`mappers map okex-swap messages 4`] = `
 Array [
   Object {
-    "exchange": "okex",
+    "exchange": "okex-swap",
     "fundingRate": 0.00023534,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -2384,10 +2332,10 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 9`] = `
+exports[`mappers map okex-swap messages 5`] = `
 Array [
   Object {
-    "exchange": "okex",
+    "exchange": "okex-swap",
     "fundingRate": 0.00023534,
     "indexPrice": undefined,
     "lastPrice": 329.3,
@@ -2401,83 +2349,4 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 10`] = `
-Array [
-  Object {
-    "exchange": "okex",
-    "fundingRate": undefined,
-    "indexPrice": undefined,
-    "lastPrice": undefined,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "markPrice": 10218.61,
-    "openInterest": undefined,
-    "symbol": "BTC-USD-190927",
-    "timestamp": 2019-08-01T00:00:20.869Z,
-    "type": "derivative_ticker",
-  },
-]
-`;
-
-exports[`mappers map okex messages 11`] = `
-Array [
-  Object {
-    "exchange": "okex",
-    "fundingRate": undefined,
-    "indexPrice": undefined,
-    "lastPrice": 0.02249,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "markPrice": undefined,
-    "openInterest": 24419,
-    "symbol": "TRX-USD-190802",
-    "timestamp": 2019-08-01T00:02:00.429Z,
-    "type": "derivative_ticker",
-  },
-]
-`;
-
-exports[`mappers map okex messages 12`] = `Array []`;
-
-exports[`mappers map okex messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 74,
-        "price": 8581.44,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 37,
-        "price": 8581.38,
-      },
-    ],
-    "exchange": "okex",
-    "isSnapshot": true,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "symbol": "BTC-USD-191018",
-    "timestamp": 2019-10-10T08:50:14.528Z,
-    "type": "book_change",
-  },
-]
-`;
-
-exports[`mappers map okex messages 14`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 1459,
-        "price": 2.25,
-      },
-    ],
-    "exchange": "okex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "symbol": "EOS-USD-191206",
-    "timestamp": 2019-12-03T15:14:59.904Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`mappers map okex-swap messages 6`] = `Array []`;

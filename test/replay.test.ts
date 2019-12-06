@@ -16,7 +16,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bitfinex-derivatives',
   'cryptofacilities',
   'deribit',
-  'okex',
+  'okex-futures',
+  'okex-swap',
   'bybit'
 ]
 
@@ -220,7 +221,9 @@ describe('replay', () => {
           to: '2019-07-02T00:00:00.000Z'
         },
         'binance-jersey': { symbols: ['btcgbp', 'btceur'], from: '2019-11-01T00:00:00.000Z', to: '2019-11-02T00:00:00.000Z' },
-        'binance-us': { symbols: ['btcusdt', 'btcusd'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' }
+        'binance-us': { symbols: ['btcusdt', 'btcusd'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
+        'okex-futures': { symbols: ['BTC-USD-190405'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        'okex-swap': { symbols: ['BTC-USD-SWAP'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' }
       } as any
 
       for (const exchange of EXCHANGES) {

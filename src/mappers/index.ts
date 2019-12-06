@@ -41,16 +41,18 @@ const tradesMappers = {
   ftx: () => ftxTradesMapper,
   gemini: () => geminiTradesMapper,
   kraken: () => krakenTradesMapper,
-  okex: () => new OkexTradesMapper('okex'),
+  okex: () => new OkexTradesMapper('okex', 'spot'),
+  'okex-futures': () => new OkexTradesMapper('okex-futures', 'futures'),
+  'okex-swap': () => new OkexTradesMapper('okex-swap', 'swap'),
   huobi: () => new HuobiTradesMapper('huobi'),
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
   'huobi-us': () => new HuobiTradesMapper('huobi-us'),
   bybit: () => new BybitTradesMapper('bybit'),
-  okcoin: () => new OkexTradesMapper('okcoin'),
+  okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper
 }
 
-const OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-04').valueOf()
+const OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-05').valueOf()
 
 const bookChangeMappers = {
   bitmex: () => new BitmexBookChangeMapper(),
@@ -69,13 +71,15 @@ const bookChangeMappers = {
   ftx: () => ftxBookChangeMapper,
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
-  okex: (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okex', localTimestamp.valueOf() >= OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP),
+  okex: () => new OkexBookChangeMapper('okex', 'spot', false),
+  'okex-futures': (localTimestamp: Date) =>
+    new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP),
+  'okex-swap': () => new OkexBookChangeMapper('okex-swap', 'swap', false),
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-us': () => new HuobiBookChangeMapper('huobi-us'),
   bybit: () => new BybitBookChangeMapper('bybit'),
-  okcoin: () => new OkexBookChangeMapper('okcoin', false),
+  okcoin: () => new OkexBookChangeMapper('okcoin', 'spot', false),
   hitbtc: () => hitBtcBookChangeMapper
 }
 
@@ -85,7 +89,8 @@ const derivativeTickersMappers = {
   'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
   cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
   deribit: () => new DeribitDerivativeTickerMapper(),
-  okex: () => new OkexDerivativeTickerMapper(),
+  'okex-futures': () => new OkexDerivativeTickerMapper('okex-futures'),
+  'okex-swap': () => new OkexDerivativeTickerMapper('okex-swap'),
   bybit: () => new BybitDerivativeTickerMapper()
 }
 
