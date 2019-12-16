@@ -110,9 +110,10 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
     pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price_e4 !== undefined ? instrumentInfo.mark_price_e4 / 10000 : undefined)
     pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest)
     pendingTickerInfo.updateLastPrice(instrumentInfo.last_price_e4 !== undefined ? instrumentInfo.last_price_e4 / 10000 : undefined)
+    pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(instrumentInfo.updated_at), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
 }

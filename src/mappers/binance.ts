@@ -259,13 +259,15 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
     if ('r' in message.data) {
       pendingTickerInfo.updateFundingRate(Number(message.data.r))
       pendingTickerInfo.updateMarkPrice(Number(message.data.p))
+      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
     }
     if ('c' in message.data) {
       pendingTickerInfo.updateLastPrice(Number(message.data.c))
+      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
     }
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(message.data.E), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
 }

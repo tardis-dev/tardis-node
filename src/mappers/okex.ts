@@ -125,11 +125,12 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
         pendingTickerInfo.updateLastPrice(Number(okexMessage.last))
       }
 
+      if (okexMessage.timestamp !== undefined) {
+        pendingTickerInfo.updateTimestamp(new Date(okexMessage.timestamp))
+      }
+
       if (pendingTickerInfo.hasChanged()) {
-        yield pendingTickerInfo.getSnapshot(
-          okexMessage.timestamp !== undefined ? new Date(okexMessage.timestamp) : localTimestamp,
-          localTimestamp
-        )
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
       }
     }
   }

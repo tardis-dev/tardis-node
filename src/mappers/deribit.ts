@@ -113,9 +113,10 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
     pendingTickerInfo.updateMarkPrice(deribitTicker.mark_price)
     pendingTickerInfo.updateOpenInterest(deribitTicker.open_interest)
     pendingTickerInfo.updateLastPrice(deribitTicker.last_price)
+    pendingTickerInfo.updateTimestamp(new Date(deribitTicker.timestamp))
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(deribitTicker.timestamp), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
 }

@@ -29,13 +29,7 @@ describe('stream', () => {
       await Promise.all(
         EXCHANGES.map(async exchange => {
           const exchangeDetails = await getExchangeDetails(exchange)
-
-          const normalizers: any[] = [normalizeTrades]
-          // bitstamp issue under node 12 (invalid headers)
-          // let's skip book snapshots for it
-          if (exchange !== 'bitstamp') {
-            normalizers.push(normalizeBookChanges)
-          }
+          const normalizers: any[] = [normalizeTrades, normalizeBookChanges]
 
           if (exchangesWithDerivativeInfo.includes(exchange)) {
             normalizers.push(normalizeDerivativeTickers)
@@ -68,8 +62,6 @@ describe('stream', () => {
 
           let count = 0
           let snapshots = 0
-          // check if each symbol received book snapshot
-          // and then there was at least 200 messages received after
 
           for await (const msg of messagesWithComputables) {
             // reset counters if we've received disconnect
@@ -82,15 +74,14 @@ describe('stream', () => {
               snapshots++
             }
 
-            // bitstamp and binance dex do not produce many messages
-            if (exchange === 'bitstamp' || exchange === 'binance-dex') {
+            if (exchange === 'binance-dex') {
               count++
-              if (count >= 5) {
+              if (count >= 2) {
                 break
               }
             }
 
-            if (snapshots >= symbols.length) {
+            if (snapshots >= symbols.length - 1) {
               count++
               if (count >= 50) {
                 break
@@ -100,6 +91,6 @@ describe('stream', () => {
         })
       )
     },
-    1000 * 60 * 4
+    1000 * 60 * 2
   )
 })

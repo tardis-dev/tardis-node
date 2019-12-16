@@ -204,9 +204,10 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
     pendingTickerInfo.updateLastPrice(lastPrice)
     pendingTickerInfo.updateMarkPrice(markPrice)
     pendingTickerInfo.updateOpenInterest(openInterest)
+    pendingTickerInfo.updateTimestamp(new Date(message[3]))
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(message[3]), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
 }

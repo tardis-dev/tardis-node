@@ -771,6 +771,23 @@ Array [
 ]
 `;
 
+exports[`mappers map bitmex messages 11`] = `
+Array [
+  Object {
+    "exchange": "bitmex",
+    "fundingRate": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": undefined,
+    "openInterest": 58922153,
+    "symbol": "ETHUSD",
+    "timestamp": undefined,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
 exports[`mappers map bitstamp messages 2`] = `
@@ -2326,7 +2343,7 @@ Array [
     "markPrice": undefined,
     "openInterest": undefined,
     "symbol": "BCH-USD-SWAP",
-    "timestamp": 2019-08-01T00:00:02.997Z,
+    "timestamp": 2019-08-01T00:00:02.483Z,
     "type": "derivative_ticker",
   },
 ]

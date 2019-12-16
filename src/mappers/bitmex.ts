@@ -143,8 +143,12 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
       pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
       pendingTickerInfo.updateLastPrice(bitmexInstrument.lastPrice)
 
+      if (bitmexInstrument.timestamp !== undefined) {
+        pendingTickerInfo.updateTimestamp(new Date(bitmexInstrument.timestamp))
+      }
+
       if (pendingTickerInfo.hasChanged()) {
-        yield pendingTickerInfo.getSnapshot(new Date(bitmexInstrument.timestamp), localTimestamp)
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
       }
     }
   }
@@ -168,7 +172,7 @@ type BitmexInstrument = {
   markPrice?: number | null
   lastPrice?: number | null
   indicativeSettlePrice?: number | null
-  timestamp: string
+  timestamp?: string
 }
 
 type BitmexInstrumentsMessage = BitmexDataMessage & {

@@ -42,7 +42,7 @@ class PendingDerivativeTickerInfo {
       fundingRate: undefined,
       indexPrice: undefined,
       markPrice: undefined,
-      timestamp: new Date(),
+      timestamp: undefined as any,
       localTimestamp: new Date()
     }
 
@@ -104,13 +104,16 @@ class PendingDerivativeTickerInfo {
     }
   }
 
+  public updateTimestamp(timestamp: Date) {
+    this._pendingTicker.timestamp = timestamp
+  }
+
   public hasChanged() {
     return this._hasChanged
   }
 
-  public getSnapshot(timestamp: Date, localTimestamp: Date): DerivativeTicker {
+  public getSnapshot(localTimestamp: Date): DerivativeTicker {
     this._hasChanged = false
-    this._pendingTicker.timestamp = timestamp
     this._pendingTicker.localTimestamp = localTimestamp
 
     return { ...this._pendingTicker }

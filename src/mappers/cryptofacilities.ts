@@ -112,9 +112,10 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
     pendingTickerInfo.updateMarkPrice(ticker.markPrice)
     pendingTickerInfo.updateOpenInterest(ticker.openInterest)
     pendingTickerInfo.updateLastPrice(ticker.last)
+    pendingTickerInfo.updateTimestamp(new Date(ticker.time))
 
     if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(new Date(ticker.time), localTimestamp)
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
 }

@@ -467,6 +467,16 @@ describe('mappers', () => {
         table: 'orderBookL2',
         action: 'insert',
         data: [{ symbol: 'EOSM19', id: 33199989898, side: 'Buy', size: 416, price: 0.0010102 }]
+      },
+      {
+        table: 'instrument',
+        action: 'update',
+        data: [
+          {
+            symbol: 'ETHUSD',
+            openInterest: 58922153
+          }
+        ]
       }
     ]
 
