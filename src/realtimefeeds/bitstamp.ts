@@ -43,11 +43,6 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
-    // does not work currently on node v12 due to https://github.com/nodejs/node/issues/27711
-    console.warn(`Due to Node 12 updated http parser and not spec compliant headers being returned by Bitstamp,
-       book snapshots do not work currently for Bitstamp real-time stream.
-       As a workaround try running node with -http-parser=legacy flag`)
-
     this.debug('requesting manual snapshots for: %s', orderBookFilter.symbols!)
 
     for (let symbol of orderBookFilter.symbols!) {
