@@ -63,13 +63,14 @@ export class OrderBook {
 function applyPriceLevelChanges(tree: RBTree<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
   for (const priceLevel of priceLevelChanges) {
     const node = tree.find(priceLevel) as Writeable<BookPriceLevel>
-    const levelShouldBeRemoved = node !== null && priceLevel.amount === 0
+    const nodeExists = node !== null
+    const levelShouldBeRemoved = priceLevel.amount === 0
 
-    if (levelShouldBeRemoved) {
+    if (nodeExists && levelShouldBeRemoved) {
       tree.remove(priceLevel)
-    } else if (node !== null) {
+    } else if (nodeExists) {
       node.amount = priceLevel.amount
-    } else {
+    } else if (levelShouldBeRemoved === false) {
       tree.insert({ ...priceLevel })
     }
   }

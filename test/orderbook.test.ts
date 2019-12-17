@@ -185,5 +185,32 @@ describe('orderbook', () => {
       { price: 200, amount: 200 }
     ])
     expect(Array.from(orderBook.bids())).toEqual([{ price: 119, amount: 200 }])
+
+    // delete for non existing level
+    orderBook.update({
+      asks: [{ price: 3000, amount: 0 }],
+      bids: [],
+      isSnapshot: false,
+      localTimestamp: new Date(),
+      timestamp: new Date(),
+      exchange: 'binance',
+      symbol: 'BTCUSD',
+      type: 'book_change'
+    })
+
+    expect(orderBook.bestAsk()).toEqual({
+      price: 120,
+      amount: 100
+    })
+    expect(orderBook.bestBid()).toEqual({
+      price: 119,
+      amount: 200
+    })
+
+    expect(Array.from(orderBook.asks())).toEqual([
+      { price: 120, amount: 100 },
+      { price: 200, amount: 200 }
+    ])
+    expect(Array.from(orderBook.bids())).toEqual([{ price: 119, amount: 200 }])
   })
 })
