@@ -79,7 +79,8 @@ const DERIBIT_CHANNELS = [
   'perpetual',
   'trades',
   'ticker',
-  'quote'
+  'quote',
+  'platform_state'
 ] as const
 
 const KRAKEN_CHANNELS = ['ticker', 'trade', 'book', 'spread'] as const
@@ -127,7 +128,7 @@ const HUOBI_US_CHANNELS = ['depth', 'detail', 'trade'] as const
 
 const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
-const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance'] as const
+const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200'] as const
 
 const HITBTC_CHANNELS = ['snapshotTrades', 'updateTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
