@@ -51,7 +51,7 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm', BookC
       return false
     }
 
-    return message.ch.endsWith('.depth.step0')
+    return message.ch.includes('.depth.')
   }
 
   getFilters(symbols?: string[]) {
@@ -67,13 +67,13 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm', BookC
 
   *map(message: HuobiDepthDataMessage, localTimestamp: Date) {
     const symbol = message.ch.split('.')[1]
+    const isSnapshot = 'event' in message.tick ? message.tick.event === 'snapshot' : 'update' in message ? false : true
     const data = message.tick
-
     yield {
       type: 'book_change',
       symbol,
       exchange: this._exchange,
-      isSnapshot: message.update === undefined,
+      isSnapshot,
       bids: data.bids.map(this._mapBookLevel),
       asks: data.asks.map(this._mapBookLevel),
       timestamp: new Date(message.ts),
@@ -119,11 +119,22 @@ type HuobiTradeDataMessage = HuobiDataMessage & {
 
 type HuobiBookLevel = [number, number]
 
-type HuobiDepthDataMessage = HuobiDataMessage & {
-  update?: boolean
-  ts: number
-  tick: {
-    bids: HuobiBookLevel[]
-    asks: HuobiBookLevel[]
-  }
-}
+type HuobiDepthDataMessage = HuobiDataMessage &
+  (
+    | {
+        update?: boolean
+        ts: number
+        tick: {
+          bids: HuobiBookLevel[]
+          asks: HuobiBookLevel[]
+        }
+      }
+    | {
+        ts: number
+        tick: {
+          bids: HuobiBookLevel[]
+          asks: HuobiBookLevel[]
+          event: 'snapshot' | 'update'
+        }
+      }
+  )

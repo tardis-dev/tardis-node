@@ -1799,6 +1799,45 @@ describe('mappers', () => {
           ts: 1572912002002,
           version: 100058542239
         }
+      },
+      {
+        ch: 'market.BTC_CQ.depth.size_150.high_freq',
+        tick: {
+          asks: [
+            [10866.01, 137],
+
+            [10900.06, 35]
+          ],
+          bids: [
+            [10866, 3166],
+
+            [10847.44, 30]
+          ],
+          ch: 'market.BTC_CQ.depth.size_150.high_freq',
+          event: 'snapshot',
+          id: 45961927810,
+          mrid: 45961927810,
+          ts: 1581552001187,
+          version: 25630954
+        },
+        ts: 1581552001189
+      },
+      {
+        ch: 'market.BTC_NW.depth.size_150.high_freq',
+        tick: {
+          asks: [],
+          bids: [
+            [10489.55, 0],
+            [10361.14, 385]
+          ],
+          ch: 'market.BTC_NW.depth.size_150.high_freq',
+          event: 'update',
+          id: 45961928082,
+          mrid: 45961928082,
+          ts: 1581552001275,
+          version: 23596415
+        },
+        ts: 1581552001277
       }
     ]
 

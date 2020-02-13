@@ -1851,6 +1851,63 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi messages 12`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 137,
+        "price": 10866.01,
+      },
+      Object {
+        "amount": 35,
+        "price": 10900.06,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 3166,
+        "price": 10866,
+      },
+      Object {
+        "amount": 30,
+        "price": 10847.44,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC_CQ",
+    "timestamp": 2020-02-13T00:00:01.189Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 13`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 10489.55,
+      },
+      Object {
+        "amount": 385,
+        "price": 10361.14,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC_NW",
+    "timestamp": 2020-02-13T00:00:01.277Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map kraken messages 1`] = `
 Array [
   Object {
