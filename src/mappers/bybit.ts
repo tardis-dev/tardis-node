@@ -39,28 +39,56 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
   }
 }
 
+const ORDER_BOOK_200_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-24').valueOf()
+
 export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
-  constructor(protected readonly _exchange: Exchange) {}
+  private _canUseBook200Channel: boolean
+
+  constructor(protected readonly _exchange: Exchange, _startTimestamp: number) {
+    this._canUseBook200Channel = _startTimestamp >= ORDER_BOOK_200_CHANNEL_AVAILABILITY_TIMESTAMP
+  }
 
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
       return false
     }
 
-    return message.topic.startsWith('orderBookL2_25.')
+    if (this._canUseBook200Channel) {
+      return message.topic.startsWith('orderBook_200.')
+    } else {
+      return message.topic.startsWith('orderBookL2_25.')
+    }
   }
 
   getFilters(symbols?: string[]) {
+    if (this._canUseBook200Channel) {
+      return [
+        {
+          channel: 'orderBook_200',
+          symbols
+        } as const
+      ]
+    }
+
+    // subscribe to both book channels and in canHandle decide which one to use
+    // as one can subscribe to date range period that overlaps both when only orderBookL2_25 has been available
+    // and when both were available
+
     return [
       {
         channel: 'orderBookL2_25',
+        symbols
+      } as const,
+      {
+        channel: 'orderBook_200',
         symbols
       } as const
     ]
   }
 
   *map(message: BybitBookSnapshotDataMessage | BybitBookSnapshotUpdateMessage, localTimestamp: Date) {
-    const symbol = message.topic.split('.')[1]
+    const topicArray = message.topic.split('.')
+    const symbol = topicArray[topicArray.length - 1]
     const data = message.type === 'snapshot' ? message.data : [...message.data.delete, ...message.data.update, ...message.data.insert]
 
     yield {

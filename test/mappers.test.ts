@@ -1992,12 +1992,62 @@ describe('mappers', () => {
         },
         cross_seq: 795142862,
         timestamp_e6: 1573070581891131
+      },
+      {
+        topic: 'orderBook_200.100ms.EOSUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            { price: '4.159', symbol: 'EOSUSD', id: 41590, side: 'Sell', size: 94085 },
+            { price: '4.136', symbol: 'EOSUSD', id: 41360, side: 'Buy', size: 112459 }
+          ],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 534365684,
+        timestamp_e6: 1580515259599816
       }
     ]
-    const bybit = createMapper('bybit')
+
+    let bybit = createMapper('bybit', new Date('2019-12-23'))
 
     for (const message of messages) {
       const mappedMessages = bybit.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    bybit = createMapper('bybit', new Date('2019-12-24'))
+
+    const messagesIncludingOrderBook200 = [
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [{ price: '9360.00', symbol: 'BTCUSD', id: 93600000, side: 'Sell', size: 43624 }],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 1116030773,
+        timestamp_e6: 1580515259707361
+      },
+      {
+        topic: 'orderBook_200.100ms.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [{ price: '9352.50', symbol: 'BTCUSD', id: 93525000, side: 'Sell', size: 238589 }],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 1116030776,
+        timestamp_e6: 1580515259758557
+      }
+    ]
+
+    for (const message of messagesIncludingOrderBook200) {
+      const mappedMessages = bybit.map(message, new Date('2019-12-14T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

@@ -80,7 +80,7 @@ const bookChangeMappers = {
   'okex-options': () => new OkexBookChangeMapper('okex-options', 'option', false),
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
-  bybit: () => new BybitBookChangeMapper('bybit'),
+  bybit: (localTimestamp: Date) => new BybitBookChangeMapper('bybit', localTimestamp.valueOf()),
   okcoin: () => new OkexBookChangeMapper('okcoin', 'spot', false),
   hitbtc: () => hitBtcBookChangeMapper
 }

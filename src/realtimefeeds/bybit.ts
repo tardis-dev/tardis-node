@@ -12,7 +12,7 @@ export class BybitRealTimeDataFeed extends RealTimeFeedBase {
         }
 
         return filter.symbols.map(symbol => {
-          const suffix = filter.channel === 'instrument_info' ? '.100ms' : ''
+          const suffix = filter.channel === 'instrument_info' || filter.channel === 'orderBook_200' ? '.100ms' : ''
           return `${filter.channel}${suffix}.${symbol}`
         })
       })

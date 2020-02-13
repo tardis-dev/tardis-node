@@ -1024,6 +1024,30 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 9`] = `Array []`;
+
+exports[`mappers map bybit messages 10`] = `Array []`;
+
+exports[`mappers map bybit messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 238589,
+        "price": 9352.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-02-01T00:00:59.758Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {
