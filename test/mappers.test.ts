@@ -688,6 +688,24 @@ describe('mappers', () => {
             checksum: 1099728614
           }
         ]
+      },
+      {
+        table: 'futures/depth',
+        action: 'partial',
+        data: [
+          {
+            instrument_id: 'BTC-USD-190405',
+            asks: [
+              [4084.57, 38, 0, 3],
+              [4085.0, 20, 0, 1]
+            ],
+            bids: [
+              [4084.56, 4, 0, 1],
+              [4084.5, 29, 0, 1]
+            ],
+            timestamp: '2019-08-01T00:00:08.930Z'
+          }
+        ]
       }
     ]
 
@@ -777,10 +795,94 @@ describe('mappers', () => {
       }
     ]
 
-    const okexSwap = createMapper('okex-swap', new Date('2019-12-04'))
+    let okexSwap = createMapper('okex-swap', new Date('2020-02-07'))
 
     for (const message of messages) {
       const mappedMessages = okexSwap.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    let messagesWithTickByTickBook = [
+      {
+        table: 'swap/depth_l2_tbt',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'ETC-USDT-SWAP',
+            asks: [['11.749', '0', '0', '0']],
+            bids: [],
+            timestamp: '2020-02-08T00:01:00.022Z',
+            checksum: -229520224
+          }
+        ]
+      },
+      {
+        table: 'swap/depth',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'ETC-USDT-SWAP',
+            asks: [['11.761', '0', '0', '0']],
+            bids: [['11.66', '160', '0', '2']],
+            timestamp: '2020-02-08T00:01:00.035Z',
+            checksum: -229520224
+          }
+        ]
+      }
+    ]
+
+    okexSwap = createMapper('okex-swap', new Date('2020-02-08'))
+
+    for (const message of messagesWithTickByTickBook) {
+      const mappedMessages = okexSwap.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map okex-options messages', () => {
+    const messages = [
+      {
+        table: 'option/depth',
+        action: 'partial',
+        data: [
+          {
+            instrument_id: 'BTC-USD-200207-8500-P',
+            asks: [['0.0005', '305', '0', '1']],
+            bids: [],
+            timestamp: '2020-02-06T23:42:51.121Z',
+            checksum: 1274182169
+          }
+        ]
+      },
+      {
+        table: 'option/depth_l2_tbt',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'BTC-USD-200327-12000-P',
+            asks: [
+              ['0.234', '0', '0', '0'],
+              ['0.2345', '100', '0', '1']
+            ],
+            bids: [],
+            timestamp: '2020-02-08T00:00:28.101Z',
+            checksum: 1704544030
+          }
+        ]
+      }
+    ]
+
+    let okexOptions = createMapper('okex-options', new Date('2020-02-07'))
+
+    for (const message of messages) {
+      const mappedMessages = okexOptions.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    okexOptions = createMapper('okex-options', new Date('2020-02-08'))
+
+    for (const message of messages) {
+      const mappedMessages = okexOptions.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
@@ -2104,7 +2206,7 @@ describe('mappers', () => {
         ]
       }
     ]
-    const okcoin = createMapper('okcoin')
+    const okcoin = createMapper('okcoin', new Date('2020-01-01'))
 
     for (const message of messages) {
       const mappedMessages = okcoin.map(message, new Date('2019-12-01T00:00:01.2750543Z'))

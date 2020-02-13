@@ -47,22 +47,47 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
   constructor(
     private readonly _exchange: Exchange,
     private readonly _market: OKEX_MARKETS,
-    private readonly _useTickByTickChannel: boolean
+    private readonly _canUseTickByTickChannel: boolean
   ) {}
 
   canHandle(message: OkexDataMessage) {
-    const channelSuffix = this._useTickByTickChannel ? 'depth_l2_tbt' : 'depth'
+    const channelSuffix = this._canUseTickByTickChannel ? 'depth_l2_tbt' : 'depth'
 
     return message.table === `${this._market}/${channelSuffix}`
   }
 
   getFilters(symbols?: string[]) {
-    const channelSuffix = this._useTickByTickChannel ? 'depth_l2_tbt' : 'depth'
+    if (this._canUseTickByTickChannel) {
+      return [
+        {
+          channel: `${this._market}/depth_l2_tbt`,
+          symbols
+        } as const
+      ]
+    }
+
+    // spot market historical data doesn't currently provide tick by tick channel
+    if (this._market === 'spot') {
+      return [
+        {
+          channel: `${this._market}/depth`,
+          symbols
+        } as const
+      ]
+    }
+
+    // subscribe to both book channels and in canHandle decide which one to use
+    // as one can subscribe to date range period that overlaps both when only depth channel has been available
+    // and when both were available (both depth and depth_l2_tbt)
     return [
       {
-        channel: `${this._market}/${channelSuffix}`,
+        channel: `${this._market}/depth_l2_tbt`,
         symbols
-      }
+      } as const,
+      {
+        channel: `${this._market}/depth`,
+        symbols
+      } as const
     ]
   }
 

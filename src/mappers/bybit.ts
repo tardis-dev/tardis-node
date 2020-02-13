@@ -39,14 +39,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
   }
 }
 
-const ORDER_BOOK_200_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-24').valueOf()
-
 export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
-  private _canUseBook200Channel: boolean
-
-  constructor(protected readonly _exchange: Exchange, _startTimestamp: number) {
-    this._canUseBook200Channel = _startTimestamp >= ORDER_BOOK_200_CHANNEL_AVAILABILITY_TIMESTAMP
-  }
+  constructor(protected readonly _exchange: Exchange, private readonly _canUseBook200Channel: boolean) {}
 
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {

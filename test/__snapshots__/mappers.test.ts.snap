@@ -2343,6 +2343,56 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-futures messages 10`] = `Array []`;
+
+exports[`mappers map okex-options messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 305,
+        "price": 0.0005,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "okex-options",
+    "isSnapshot": true,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-200207-8500-P",
+    "timestamp": 2020-02-06T23:42:51.121Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 2`] = `Array []`;
+
+exports[`mappers map okex-options messages 3`] = `Array []`;
+
+exports[`mappers map okex-options messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.234,
+      },
+      Object {
+        "amount": 100,
+        "price": 0.2345,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "okex-options",
+    "isSnapshot": false,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "symbol": "BTC-USD-200327-12000-P",
+    "timestamp": 2020-02-08T00:00:28.101Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map okex-swap messages 1`] = `
 Array [
   Object {
@@ -2448,3 +2498,25 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 6`] = `Array []`;
+
+exports[`mappers map okex-swap messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 11.749,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "symbol": "ETC-USDT-SWAP",
+    "timestamp": 2020-02-08T00:01:00.022Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 8`] = `Array []`;

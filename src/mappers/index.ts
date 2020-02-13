@@ -53,8 +53,6 @@ const tradesMappers = {
   hitbtc: () => hitBtcTradesMapper
 }
 
-const OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP = new Date('2019-12-05').valueOf()
-
 const bookChangeMappers = {
   bitmex: () => new BitmexBookChangeMapper(),
   binance: () => new BinanceBookChangeMapper('binance'),
@@ -75,13 +73,17 @@ const bookChangeMappers = {
   kraken: () => krakenBookChangeMapper,
   okex: () => new OkexBookChangeMapper('okex', 'spot', false),
   'okex-futures': (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= OKEX_TICK_BY_TICK_CHANNEL_AVAILABILITY_TIMESTAMP),
-  'okex-swap': () => new OkexBookChangeMapper('okex-swap', 'swap', false),
-  'okex-options': () => new OkexBookChangeMapper('okex-options', 'option', false),
+    new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
+
+  'okex-swap': (localTimestamp: Date) =>
+    new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
+  'okex-options': (localTimestamp: Date) =>
+    new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
-  bybit: (localTimestamp: Date) => new BybitBookChangeMapper('bybit', localTimestamp.valueOf()),
-  okcoin: () => new OkexBookChangeMapper('okcoin', 'spot', false),
+  bybit: (localTimestamp: Date) => new BybitBookChangeMapper('bybit', localTimestamp.valueOf() >= new Date('2019-12-24').valueOf()),
+  okcoin: (localTimestamp: Date) =>
+    new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper
 }
 
