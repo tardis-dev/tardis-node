@@ -3,9 +3,8 @@ import { Mapper } from './mapper'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
-// https://huobius.readme.io/reference#ws-api-reference-1
 
-export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-us', Trade> {
+export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -44,7 +43,7 @@ export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-u
   }
 }
 
-export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-us', BookChange> {
+export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm', BookChange> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {

@@ -20,7 +20,6 @@ export const EXCHANGES = [
   'binance-dex',
   'binance-jersey',
   'binance-us',
-  'huobi-us',
   'bybit',
   'okcoin',
   'hitbtc'
@@ -154,7 +153,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS,
   huobi: HUOBI_CHANNELS,
   'huobi-dm': HUOBI_DM_CHANNELS,
-  'huobi-us': HUOBI_US_CHANNELS,
   bybit: BYBIT_CHANNELS,
   okcoin: OKCOIN_CHANNELS,
   hitbtc: HITBTC_CHANNELS
