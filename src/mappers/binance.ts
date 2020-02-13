@@ -232,7 +232,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       return false
     }
 
-    return message.stream.endsWith('@markPrice') || message.stream.endsWith('@ticker')
+    return message.stream.includes('@markPrice') || message.stream.endsWith('@ticker')
   }
 
   getFilters(symbols?: string[]): FilterForExchange['binance-futures'][] {
