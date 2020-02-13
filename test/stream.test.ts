@@ -28,6 +28,9 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async exchange => {
+          if (exchange === 'coinflex') {
+            return
+          }
           const exchangeDetails = await getExchangeDetails(exchange)
           const normalizers: any[] = [normalizeTrades, normalizeBookChanges]
 
@@ -37,7 +40,6 @@ describe('stream', () => {
 
           var symbols = exchangeDetails.availableSymbols
             .filter(s => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
-            .filter(s => s.type !== 'option')
             .slice(0, 10)
             .map(s => s.id)
 
@@ -74,7 +76,7 @@ describe('stream', () => {
               snapshots++
             }
 
-            if (exchange === 'binance-dex') {
+            if (exchange === 'binance-dex' || exchange === 'okcoin') {
               count++
               if (count >= 2) {
                 break
