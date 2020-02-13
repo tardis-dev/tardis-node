@@ -24,7 +24,8 @@ export const EXCHANGES = [
   'binance-us',
   'bybit',
   'okcoin',
-  'hitbtc'
+  'hitbtc',
+  'coinflex'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
@@ -120,6 +121,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'option/instruments'
 ]
 
+const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'OrderClosed', 'TickerChanged']
+
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
 const FTX_CHANNELS = ['orderbook', 'trades'] as const
@@ -168,5 +171,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm': HUOBI_DM_CHANNELS,
   bybit: BYBIT_CHANNELS,
   okcoin: OKCOIN_CHANNELS,
-  hitbtc: HITBTC_CHANNELS
+  hitbtc: HITBTC_CHANNELS,
+  coinflex: COINFLEX_CHANNELS
 }
