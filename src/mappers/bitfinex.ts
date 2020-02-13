@@ -3,7 +3,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
 
-export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', Trade> {
+export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives' | 'bitfinex-alts', Trade> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -70,7 +70,7 @@ export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-deriv
   }
 }
 
-export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookChange> {
+export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives' | 'bitfinex-alts', BookChange> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   constructor(private readonly _exchange: Exchange) {}
