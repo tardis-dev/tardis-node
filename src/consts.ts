@@ -7,6 +7,7 @@ export const EXCHANGES = [
   'okex',
   'okex-futures',
   'okex-swap',
+  'okex-options',
   'huobi',
   'huobi-dm',
   'bitflyer',
@@ -109,6 +110,15 @@ const OKEX_SWAP_CHANNELS = [
   'index/ticker'
 ]
 
+const OKEX_OPTIONS_CHANNELS = [
+  'option/trade',
+  'option/depth',
+  'option/depth_l2_tbt',
+  'option/ticker',
+  'option/summary',
+  'option/instruments'
+]
+
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
 const FTX_CHANNELS = ['orderbook', 'trades'] as const
@@ -141,6 +151,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   okex: OKEX_CHANNELS,
   'okex-swap': OKEX_SWAP_CHANNELS,
   'okex-futures': OKEX_FUTURES_CHANNELS,
+  'okex-options': OKEX_OPTIONS_CHANNELS,
   binance: BINANCE_CHANNELS,
   'binance-jersey': BINANCE_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,

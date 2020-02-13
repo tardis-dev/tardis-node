@@ -191,6 +191,6 @@ type OkexDepthDataMessage = {
 
 type OkexBookLevel = [number | string, number | string, number | string, number | string]
 
-type OKEX_EXCHANGES = 'okex' | 'okcoin' | 'okex-futures' | 'okex-swap'
+type OKEX_EXCHANGES = 'okex' | 'okcoin' | 'okex-futures' | 'okex-swap' | 'okex-options'
 
-type OKEX_MARKETS = 'spot' | 'swap' | 'futures'
+type OKEX_MARKETS = 'spot' | 'swap' | 'futures' | 'option'
