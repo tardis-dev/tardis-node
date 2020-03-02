@@ -42,7 +42,7 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = await got.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()
+      const depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()) as any
 
       const snapshot = {
         stream: `depthSnapshot`,
