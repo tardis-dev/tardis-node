@@ -38,5 +38,5 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
 }
 
 export class OKCoinRealTimeFeed extends OkexRealTimeFeed {
-  protected wssURL = 'wss://real.okcoin.com:10442/ws/v3'
+  protected wssURL = 'wss://real.okcoin.com:8443/ws/v3'
 }
