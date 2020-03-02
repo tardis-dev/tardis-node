@@ -1,5 +1,6 @@
 import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { debug } from '../debug'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
@@ -44,10 +45,44 @@ export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' 
   }
 }
 
+class CircularBuffer<T> {
+  private _buffer: T[] = []
+  private _index: number = 0
+  constructor(private readonly _bufferSize: number) {}
+
+  append(value: T) {
+    const isFull = this._buffer.length === this._bufferSize
+    let poppedValue
+    if (isFull) {
+      poppedValue = this._buffer[this._index]
+    }
+    this._buffer[this._index] = value
+    this._index = (this._index + 1) % this._bufferSize
+
+    return poppedValue
+  }
+
+  *items() {
+    for (let i = 0; i < this._buffer.length; i++) {
+      const index = (this._index + i) % this._buffer.length
+      yield this._buffer[index]
+    }
+  }
+
+  get count() {
+    return this._buffer.length
+  }
+
+  clear() {
+    this._buffer = []
+    this._index = 0
+  }
+}
+
 export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures', BookChange> {
   protected readonly symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
 
-  constructor(protected readonly exchange: Exchange) {}
+  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -77,7 +112,7 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 
     if (this.symbolToDepthInfoMapping[symbol] === undefined) {
       this.symbolToDepthInfoMapping[symbol] = {
-        bufferedUpdates: []
+        bufferedUpdates: new CircularBuffer(200)
       }
     }
 
@@ -111,14 +146,15 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
       symbolDepthInfo.snapshotProcessed = true
 
       // if there were any depth updates buffered, let's proccess those
-      for (const update of symbolDepthInfo.bufferedUpdates) {
+      for (const update of symbolDepthInfo.bufferedUpdates.items()) {
         const bookChange = this.mapBookDepthUpdate(update, localTimestamp)
         if (bookChange !== undefined) {
           yield bookChange
         }
       }
+
       // remove all buffered updates
-      symbolDepthInfo.bufferedUpdates = []
+      symbolDepthInfo.bufferedUpdates.clear()
     } else if (snapshotAlreadyProcessed) {
       // snapshot was already processed let's map the message as normal book_change
       const bookChange = this.mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
@@ -126,9 +162,9 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
         yield bookChange
       }
     } else {
-      // if snapshot hasn't been yet processed and we've got depthUpdate message, let's buffer it for later processing
       const binanceDepthUpdateData = message.data as BinanceDepthData
-      symbolDepthInfo.bufferedUpdates.push(binanceDepthUpdateData)
+
+      symbolDepthInfo.bufferedUpdates.append(binanceDepthUpdateData)
     }
   }
 
@@ -151,11 +187,15 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
       if ((binanceDepthUpdateData.U <= lastUpdateId + 1 && binanceDepthUpdateData.u >= lastUpdateId + 1) || bookSnapshotIsEmpty) {
         depthContext.validatedFirstUpdate = true
       } else {
-        throw new Error(
-          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
-            binanceDepthUpdateData
-          )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
-        )
+        const message = `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
+          binanceDepthUpdateData
+        )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthContext.validatedFirstUpdate = true
+          debug(message)
+        } else {
+          throw new Error(message)
+        }
       }
     }
 
@@ -180,8 +220,8 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 }
 
 export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper implements Mapper<'binance-futures', BookChange> {
-  constructor() {
-    super('binance-futures')
+  constructor(protected readonly ignoreBookSnapshotOverlapError: boolean) {
+    super('binance-futures', ignoreBookSnapshotOverlapError)
   }
 
   protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceFuturesDepthData, localTimestamp: Date): BookChange | undefined {
@@ -202,11 +242,16 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
       if ((binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) || isSnapshot) {
         depthContext.validatedFirstUpdate = true
       } else {
-        throw new Error(
-          `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
-            binanceDepthUpdateData
-          )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
-        )
+        const message = `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
+          binanceDepthUpdateData
+        )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
+
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthContext.validatedFirstUpdate = true
+          debug(message)
+        } else {
+          throw new Error(message)
+        }
       }
     }
 
@@ -316,7 +361,7 @@ type BinanceDepthSnapshotData = {
 }
 
 type LocalDepthInfo = {
-  bufferedUpdates: BinanceDepthData[]
+  bufferedUpdates: CircularBuffer<any>
   snapshotProcessed?: boolean
   lastUpdateId?: number
   validatedFirstUpdate?: boolean

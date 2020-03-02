@@ -21,8 +21,15 @@ import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexTradesMapper } from './okex'
+import { ONE_SEC_IN_MS } from '../handy'
 
 export * from './mapper'
+
+const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
+
+const isRealTime = (date: Date) => {
+  return date.valueOf() + THREE_MINUTES_IN_MS > new Date().valueOf()
+}
 
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
@@ -55,10 +62,10 @@ const tradesMappers = {
 
 const bookChangeMappers = {
   bitmex: () => new BitmexBookChangeMapper(),
-  binance: () => new BinanceBookChangeMapper('binance'),
-  'binance-us': () => new BinanceBookChangeMapper('binance-us'),
-  'binance-jersey': () => new BinanceBookChangeMapper('binance-jersey'),
-  'binance-futures': () => new BinanceFuturesBookChangeMapper(),
+  binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', isRealTime(localTimestamp) === false),
+  'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', isRealTime(localTimestamp) === false),
+  'binance-jersey': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-jersey', isRealTime(localTimestamp) === false),
+  'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper(isRealTime(localTimestamp) === false),
   'binance-dex': () => binanceDexBookChangeMapper,
   bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
