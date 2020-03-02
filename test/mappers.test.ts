@@ -1172,7 +1172,7 @@ describe('mappers', () => {
       }
     ]
 
-    const binanceMapper = createMapper('binance')
+    const binanceMapper = createMapper('binance', new Date())
     for (const message of messages) {
       const mappedMessages = binanceMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
@@ -1335,7 +1335,7 @@ describe('mappers', () => {
       }
     ]
 
-    const binanceFuturesMapper = createMapper('binance-futures')
+    const binanceFuturesMapper = createMapper('binance-futures', new Date())
     for (const message of messages) {
       const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
