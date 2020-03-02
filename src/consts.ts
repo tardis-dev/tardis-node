@@ -96,9 +96,7 @@ const OKEX_FUTURES_CHANNELS = [
   'futures/depth',
   'futures/depth_l2_tbt',
   'futures/ticker',
-  'futures/price_range',
   'futures/mark_price',
-  'futures/estimated_price',
   'index/ticker'
 ]
 
@@ -108,7 +106,6 @@ const OKEX_SWAP_CHANNELS = [
   'swap/depth_l2_tbt',
   'swap/ticker',
   'swap/funding_rate',
-  'swap/price_range',
   'swap/mark_price',
   'index/ticker'
 ]
