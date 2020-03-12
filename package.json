@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=12"
   },
-  "description": "Fast and convenient access to tick-level real-time and historical cryptocurrency market data via Node.js",
+  "description": "Convenient access to tick-level historical and real-time cryptocurrency market data via Node.js",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
@@ -43,7 +43,8 @@
     "realtime",
     "bitmex",
     "binance",
-    "trading"
+    "trading",
+    "high granularity order book data"
   ],
   "license": "MPL-2.0",
   "dependencies": {
@@ -82,8 +83,5 @@
     },
     "testEnvironment": "node"
   },
-  "runkitExampleFilename": "example.js",
-  "optionalDependencies": {
-    "bufferutil": "^4.0.1"
-  }
+  "runkitExampleFilename": "example.js"
 }

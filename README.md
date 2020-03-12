@@ -10,12 +10,14 @@ Node.js `tardis-dev` library provides convenient access to tick-level real-time 
 <br/>
 
 ```javascript
-const { streamNormalized, normalizeTrades, normalizeBookChanges } = require('tardis-dev')
+const { replayNormalized, normalizeTrades, normalizeBookChanges } = require('tardis-dev')
 
-const messages = streamNormalized(
+const messages = replayNormalized(
   {
     exchange: 'bitmex',
-    symbols: ['XBTUSD', 'ETHUSD']
+    symbols: ['XBTUSD', 'ETHUSD'],
+    from: '2019-05-01',
+    to: '2019-05-02'
   },
   normalizeTrades,
   normalizeBookChanges
@@ -26,22 +28,22 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-stream-market-data-normalized)
+[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-replay-market-data-normalized)
 
 <br/>
 <br/>
 
 ## Features
 
-- [real-time streaming](https://docs.tardis.dev/api/node-js#streaming-real-time-market-data) of tick-level market data with unified API for connecting directly to exchanges public WebSocket APIs without any intermediary/3rd party proxy
-
-<br/>
-
 - historical tick-level [market data replay](https://docs.tardis.dev/api/node-js#replaying-historical-market-data) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
 
+  <br/>
+
+- consolidated [real-time data streaming API](https://docs.tardis.dev/api/node-js#streaming-real-time-market-data) connecting directly to exchanges' public WebSocket APIs
+
 <br/>
 
-- support for both exchange native and [normalized market data](https://docs.tardis.dev/api/node-js#data-normalization) formats \(consistent format for accessing market data across multiple exchanges — normalized trades, order book and ticker data\)
+- support for both [exchange-native](https://docs.tardis.dev/faq/data#what-is-a-difference-between-exchange-native-and-normalized-data-format) and [normalized market data](https://docs.tardis.dev/faq/data#what-is-a-difference-between-exchange-native-and-normalized-data-format) formats (unified format for accessing market data across all supported exchanges — normalized trades, order book and ticker data)
 
 <br/>
 
@@ -53,7 +55,7 @@ for await (const message of messages) {
 
 <br/>
 
-- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, Binance Futures, FTX, OKEx, Huobi Global, Huobi DM, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, Kraken, Bitfinex, Bybit, OKCoin, CoinFLEX and more.
+- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, Binance Futures, FTX, OKEx, Huobi Global, Huobi DM, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, Kraken, Bitfinex, Bybit, OKCoin, CoinFLEX and more
 
 <br/>
 
@@ -94,13 +96,6 @@ Requires Node.js v12+ installed.
 ```bash
 npm install tardis-dev --save
 ```
-
-<br/>
-<br/>
-
-## Debugging and logging
-
-`tardis-dev` lib uses [debug](https://github.com/visionmedia/debug) package for verbose logging and debugging purposes that can be enabled via `DEBUG` environment variable set to `tardis-dev*`.
 
 <br/>
 <br/>
