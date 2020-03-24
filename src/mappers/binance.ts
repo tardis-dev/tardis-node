@@ -229,8 +229,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
     // when we've already processed the snapshot
     const depthContext = this.symbolToDepthInfoMapping[binanceDepthUpdateData.s]!
     const lastUpdateId = depthContext.lastUpdateId!
-    // if update has pu set to -1, it means server provided book snapshot
-    const isSnapshot = binanceDepthUpdateData.pu === -1
+
     // based on https://binanceapitest.github.io/Binance-Futures-API-doc/wss/#how-to-manage-a-local-order-book-correctly
     // Drop any event where u is < lastUpdateId in the snapshot
     if (binanceDepthUpdateData.u < lastUpdateId) {
@@ -239,7 +238,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
 
     // The first processed should have U <= lastUpdateId AND u >= lastUpdateId
     if (!depthContext.validatedFirstUpdate) {
-      if ((binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) || isSnapshot) {
+      if (binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) {
         depthContext.validatedFirstUpdate = true
       } else {
         const message = `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
@@ -259,7 +258,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
       type: 'book_change',
       symbol: binanceDepthUpdateData.s,
       exchange: this.exchange,
-      isSnapshot,
+      isSnapshot: false,
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
