@@ -25,7 +25,7 @@ export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm', Trade> {
   }
 
   *map(message: HuobiTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
-    const symbol = message.ch.split('.')[1]
+    const symbol = message.ch.split('.')[1].toUpperCase()
 
     for (const huobiTrade of message.tick.data) {
       yield {
@@ -66,7 +66,7 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm', BookC
   }
 
   *map(message: HuobiDepthDataMessage, localTimestamp: Date) {
-    const symbol = message.ch.split('.')[1]
+    const symbol = message.ch.split('.')[1].toUpperCase()
     const isSnapshot = 'event' in message.tick ? message.tick.event === 'snapshot' : 'update' in message ? false : true
     const data = message.tick
     yield {
@@ -94,7 +94,7 @@ function normalizeSymbols(symbols?: string[]) {
         return s
       }
       // huobi-com and us expects lower cased symbols
-      return s.toLocaleLowerCase()
+      return s.toLowerCase()
     })
   }
   return

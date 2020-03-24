@@ -319,7 +319,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
 
 function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
-    return symbols.map(s => s.toLocaleLowerCase())
+    return symbols.map(s => s.toLowerCase())
   }
   return
 }
