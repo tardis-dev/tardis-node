@@ -138,6 +138,8 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(okexMessage.instrument_id, this._exchange)
       if ('funding_rate' in okexMessage) {
         pendingTickerInfo.updateFundingRate(Number(okexMessage.funding_rate))
+        pendingTickerInfo.updatePredictedFundingRate(Number(okexMessage.estimated_rate))
+        pendingTickerInfo.updateFundingTimestamp(new Date(okexMessage.funding_time))
       }
 
       if ('mark_price' in okexMessage) {
@@ -191,6 +193,8 @@ type OkexTickersMessage = {
 type OkexFundingRateMessage = {
   data: {
     funding_rate: string
+    funding_time: string
+    estimated_rate: string
     instrument_id: string
     timestamp: undefined
   }[]

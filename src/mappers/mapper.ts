@@ -12,7 +12,7 @@ export type MapperFactory<T extends Exchange, U extends NormalizedData> = (excha
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
-const isNullOrUndefined = (input: number | undefined | null): input is null | undefined => input === undefined || input === null
+const isNullOrUndefined = (input: number | Date | undefined | null): input is null | undefined => input === undefined || input === null
 
 export class PendingTickerInfoHelper {
   private readonly _pendingTickers: Map<string, PendingDerivativeTickerInfo> = new Map()
@@ -40,6 +40,8 @@ class PendingDerivativeTickerInfo {
       lastPrice: undefined,
       openInterest: undefined,
       fundingRate: undefined,
+      fundingTimestamp: undefined,
+      predictedFundingRate: undefined,
       indexPrice: undefined,
       markPrice: undefined,
       timestamp: undefined as any,
@@ -78,6 +80,28 @@ class PendingDerivativeTickerInfo {
 
     if (this._pendingTicker.fundingRate !== fundingRate) {
       this._pendingTicker.fundingRate = fundingRate
+      this._hasChanged = true
+    }
+  }
+
+  public updatePredictedFundingRate(predictedFundingRate: number | undefined | null) {
+    if (isNullOrUndefined(predictedFundingRate)) {
+      return
+    }
+
+    if (this._pendingTicker.predictedFundingRate !== predictedFundingRate) {
+      this._pendingTicker.predictedFundingRate = predictedFundingRate
+      this._hasChanged = true
+    }
+  }
+
+  public updateFundingTimestamp(fundingTimestamp: Date | undefined | null) {
+    if (isNullOrUndefined(fundingTimestamp)) {
+      return
+    }
+
+    if (this._pendingTicker.fundingTimestamp !== fundingTimestamp) {
+      this._pendingTicker.fundingTimestamp = fundingTimestamp
       this._hasChanged = true
     }
   }

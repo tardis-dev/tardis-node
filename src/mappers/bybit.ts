@@ -128,6 +128,12 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(instrumentInfo.symbol, 'bybit')
 
     pendingTickerInfo.updateFundingRate(instrumentInfo.funding_rate_e6 !== undefined ? instrumentInfo.funding_rate_e6 / 1000000 : undefined)
+    pendingTickerInfo.updatePredictedFundingRate(
+      instrumentInfo.predicted_funding_rate_e6 !== undefined ? instrumentInfo.predicted_funding_rate_e6 / 1000000 : undefined
+    )
+    pendingTickerInfo.updateFundingTimestamp(
+      instrumentInfo.next_funding_time !== undefined ? new Date(instrumentInfo.next_funding_time) : undefined
+    )
     pendingTickerInfo.updateIndexPrice(instrumentInfo.index_price_e4 !== undefined ? instrumentInfo.index_price_e4 / 10000 : undefined)
     pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price_e4 !== undefined ? instrumentInfo.mark_price_e4 / 10000 : undefined)
     pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest)
@@ -183,6 +189,8 @@ type BybitInstrumentUpdate = {
   index_price_e4?: number
   open_interest?: number
   funding_rate_e6?: number
+  predicted_funding_rate_e6?: number
+  next_funding_time?: string
   last_price_e4?: number
   updated_at: string
 }

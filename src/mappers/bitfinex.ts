@@ -196,14 +196,20 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
     const lastPrice = statusInfo[2]
     const markPrice = statusInfo[14]
     const openInterest = statusInfo[17]
+    const nextFundingTimestamp = statusInfo[7]
+    const predictedFundingRate = statusInfo[8]
 
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bitfinex-derivatives')
 
     pendingTickerInfo.updateFundingRate(fundingRate)
+    pendingTickerInfo.updateFundingTimestamp(nextFundingTimestamp !== undefined ? new Date(nextFundingTimestamp) : undefined)
+    pendingTickerInfo.updatePredictedFundingRate(predictedFundingRate)
+
     pendingTickerInfo.updateIndexPrice(indexPrice)
     pendingTickerInfo.updateLastPrice(lastPrice)
     pendingTickerInfo.updateMarkPrice(markPrice)
     pendingTickerInfo.updateOpenInterest(openInterest)
+
     pendingTickerInfo.updateTimestamp(new Date(message[3]))
 
     if (pendingTickerInfo.hasChanged()) {

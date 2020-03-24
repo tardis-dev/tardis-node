@@ -108,6 +108,10 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(ticker.product_id, 'cryptofacilities')
 
     pendingTickerInfo.updateFundingRate(ticker.funding_rate)
+    pendingTickerInfo.updatePredictedFundingRate(ticker.funding_rate_prediction)
+    pendingTickerInfo.updateFundingTimestamp(
+      ticker.next_funding_rate_time !== undefined ? new Date(ticker.next_funding_rate_time) : undefined
+    )
     pendingTickerInfo.updateIndexPrice(ticker.index)
     pendingTickerInfo.updateMarkPrice(ticker.markPrice)
     pendingTickerInfo.updateOpenInterest(ticker.openInterest)
@@ -140,6 +144,8 @@ type CryptofacilitiesTicker = {
   openInterest: number
   markPrice: number
   funding_rate: number | undefined
+  funding_rate_prediction: number | undefined
+  next_funding_rate_time: number | undefined
   time: number
 }
 

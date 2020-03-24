@@ -56,6 +56,8 @@ export type DerivativeTicker = {
   readonly lastPrice: number | undefined
   readonly openInterest: number | undefined
   readonly fundingRate: number | undefined
+  readonly fundingTimestamp: Date | undefined
+  readonly predictedFundingRate: number | undefined
   readonly indexPrice: number | undefined
   readonly markPrice: number | undefined
 

@@ -138,6 +138,8 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(bitmexInstrument.symbol, 'bitmex')
 
       pendingTickerInfo.updateFundingRate(bitmexInstrument.fundingRate)
+      pendingTickerInfo.updatePredictedFundingRate(bitmexInstrument.indicativeFundingRate)
+      pendingTickerInfo.updateFundingTimestamp(bitmexInstrument.fundingTimestamp ? new Date(bitmexInstrument.fundingTimestamp) : undefined)
       pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)
       pendingTickerInfo.updateMarkPrice(bitmexInstrument.markPrice)
       pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
@@ -172,6 +174,8 @@ type BitmexInstrument = {
   markPrice?: number | null
   lastPrice?: number | null
   indicativeSettlePrice?: number | null
+  indicativeFundingRate?: number | null
+  fundingTimestamp?: string | null
   timestamp?: string
 }
 
