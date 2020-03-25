@@ -26,6 +26,10 @@ export const krakenTradesMapper: Mapper<'kraken', Trade> = {
     const [_, trades, __, symbol] = message
 
     for (const [price, amount, time, side] of trades) {
+      const timeExchange = Number(time)
+      const timestamp = new Date(timeExchange * 1000)
+      timestamp.μs = Math.floor(timeExchange * 1000000) % 1000
+
       yield {
         type: 'trade',
         symbol,
@@ -34,8 +38,8 @@ export const krakenTradesMapper: Mapper<'kraken', Trade> = {
         price: Number(price),
         amount: Number(amount),
         side: side === 'b' ? 'buy' : 'sell',
-        timestamp: new Date(Number(time) * 1000),
-        localTimestamp: localTimestamp
+        timestamp,
+        localTimestamp
       }
     }
   }

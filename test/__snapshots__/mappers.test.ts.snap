@@ -855,7 +855,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCHUSD",
-    "timestamp": 2019-09-01T00:00:01.275Z,
+    "timestamp": 2019-04-01T00:00:00.000Z,
     "type": "book_change",
   },
   Object {
@@ -881,6 +881,39 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 2,
+        "price": 168.75,
+      },
+      Object {
+        "amount": 0.49428809,
+        "price": 168.76,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.04249473,
+        "price": 51046.31,
+      },
+      Object {
+        "amount": 0.00040718,
+        "price": 60000,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:01.338Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitstamp messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
         "amount": 180,
         "price": 169.28,
       },
@@ -900,7 +933,7 @@ Array [
 ]
 `;
 
-exports[`mappers map bitstamp messages 6`] = `
+exports[`mappers map bitstamp messages 7`] = `
 Array [
   Object {
     "amount": 0.02834,

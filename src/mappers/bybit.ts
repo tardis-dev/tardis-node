@@ -24,6 +24,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 
   *map(message: BybitTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of message.data) {
+      const timestamp = trade.trade_time_ms !== undefined ? new Date(trade.trade_time_ms) : new Date(trade.timestamp)
+
       yield {
         type: 'trade',
         symbol: trade.symbol,
@@ -32,8 +34,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
         price: trade.price,
         amount: trade.size,
         side: trade.side == 'Buy' ? 'buy' : trade.side === 'Sell' ? 'sell' : 'unknown',
-        timestamp: new Date(trade.timestamp),
-        localTimestamp: localTimestamp
+        timestamp,
+        localTimestamp
       }
     }
   }
@@ -84,6 +86,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
     const topicArray = message.topic.split('.')
     const symbol = topicArray[topicArray.length - 1]
     const data = message.type === 'snapshot' ? message.data : [...message.data.delete, ...message.data.update, ...message.data.insert]
+    const timestamp = new Date(message.timestamp_e6 / 1000)
+    timestamp.μs = message.timestamp_e6 % 1000
 
     yield {
       type: 'book_change',
@@ -92,8 +96,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
       isSnapshot: message.type === 'snapshot',
       bids: data.filter(d => d.side === 'Buy').map(this._mapBookLevel),
       asks: data.filter(d => d.side === 'Sell').map(this._mapBookLevel),
-      timestamp: new Date(message.timestamp_e6 / 1000),
-      localTimestamp: localTimestamp
+      timestamp,
+      localTimestamp
     } as const
   }
 
@@ -153,6 +157,7 @@ type BybitDataMessage = {
 type BybitTradeDataMessage = BybitDataMessage & {
   data: {
     timestamp: string
+    trade_time_ms?: number
     symbol: string
     side: 'Buy' | 'Sell'
     size: number

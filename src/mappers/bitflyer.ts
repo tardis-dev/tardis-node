@@ -1,5 +1,6 @@
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
+import { parseμs } from '../handy'
 
 export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
@@ -19,6 +20,9 @@ export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
     const symbol = bitflyerExecutions.params.channel.replace('lightning_executions_', '')
 
     for (const execution of bitflyerExecutions.params.message) {
+      const timestamp = new Date(execution.exec_date)
+      timestamp.μs = parseμs(execution.exec_date)
+
       yield {
         type: 'trade',
         symbol,
@@ -27,7 +31,7 @@ export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
         price: execution.price,
         amount: execution.size,
         side: execution.side === 'BUY' ? 'buy' : execution.side === 'SELL' ? 'sell' : 'unknown',
-        timestamp: new Date(execution.exec_date),
+        timestamp,
         localTimestamp: localTimestamp
       }
     }

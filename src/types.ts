@@ -108,3 +108,9 @@ export type BookSnapshot = {
   readonly timestamp: Date
   readonly localTimestamp: Date
 }
+
+declare global {
+  interface Date {
+    μs?: number
+  }
+}

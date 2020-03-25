@@ -1673,6 +1673,23 @@ describe('mappers', () => {
       },
       {
         data: {
+          timestamp: '1554076800',
+          microtimestamp: '1554076801338397',
+          bids: [
+            ['51046.31', '0.04249473'],
+            ['60000.00', '0.00040718']
+          ],
+          asks: [
+            ['168.75', '2.00000000'],
+            ['168.76', '0.49428809']
+          ]
+        },
+        event: 'snapshot',
+        channel: 'diff_order_book_btcusd',
+        generated: true
+      },
+      {
+        data: {
           timestamp: '1554076801',
           microtimestamp: '1554076801338397',
           bids: [],

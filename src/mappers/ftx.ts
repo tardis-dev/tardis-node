@@ -1,5 +1,6 @@
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
+import { parseμs } from '../handy'
 
 // https://docs.ftx.com/#websocket-api
 
@@ -23,6 +24,9 @@ export const ftxTradesMapper: Mapper<'ftx', Trade> = {
 
   *map(ftxTrades: FtxTrades, localTimestamp: Date): IterableIterator<Trade> {
     for (const ftxTrade of ftxTrades.data) {
+      const timestamp = new Date(ftxTrade.time)
+      timestamp.μs = parseμs(ftxTrade.time)
+
       yield {
         type: 'trade',
         symbol: ftxTrades.market,
@@ -31,8 +35,8 @@ export const ftxTradesMapper: Mapper<'ftx', Trade> = {
         price: ftxTrade.price,
         amount: ftxTrade.size,
         side: ftxTrade.side,
-        timestamp: new Date(ftxTrade.time),
-        localTimestamp: localTimestamp
+        timestamp,
+        localTimestamp
       }
     }
   }
@@ -64,6 +68,9 @@ export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
   },
 
   *map(ftxOrderBook: FtxOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
+    const timestamp = new Date(ftxOrderBook.data.time * 1000)
+    timestamp.μs = Math.floor(ftxOrderBook.data.time * 1000000) % 1000
+
     yield {
       type: 'book_change',
       symbol: ftxOrderBook.market,
@@ -71,7 +78,7 @@ export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
       isSnapshot: ftxOrderBook.type === 'partial',
       bids: ftxOrderBook.data.bids.map(mapBookLevel),
       asks: ftxOrderBook.data.asks.map(mapBookLevel),
-      timestamp: new Date(Math.floor(ftxOrderBook.data.time * 1000)),
+      timestamp,
       localTimestamp
     }
   }

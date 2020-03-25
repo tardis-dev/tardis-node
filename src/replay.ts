@@ -5,7 +5,7 @@ import zlib from 'zlib'
 import { BinarySplitStream } from './binarysplit'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
-import { getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy'
+import { getFilters, normalizeMessages, parseAsUTCDate, wait, parseμs } from './handy'
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
@@ -18,7 +18,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   filters,
   skipDecoding = undefined,
   withDisconnects = undefined,
-  apiKey = undefined
+  apiKey = undefined,
+  withMicroseconds = undefined
 }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
   Z extends true
     ? U extends true
@@ -122,10 +123,19 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
               message: messageBuffer
             } as any
           } else {
+            const message = JSON.parse(messageBuffer as any)
+            const localTimestampString = localTimestampBuffer.toString()
+            const localTimestamp = new Date(localTimestampString)
+            if (withMicroseconds) {
+              // provide additionally fractions of millisecond at microsecond resolution
+              // local timestamp always has format like this 2019-06-01T00:03:03.1238784Z
+              localTimestamp.μs = parseμs(localTimestampString)
+            }
+
             yield {
               // when skipDecoding is not set, decode timestamp to Date and message to object
-              localTimestamp: new Date(localTimestampBuffer.toString()),
-              message: JSON.parse(messageBuffer as any)
+              localTimestamp,
+              message
             } as any
           }
           // ignore empty lines unless withDisconnects is set to true
@@ -189,7 +199,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     to,
     withDisconnects: true,
     filters,
-    apiKey
+    apiKey,
+    withMicroseconds: true
   })
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
@@ -256,6 +267,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   readonly skipDecoding?: U
   readonly withDisconnects?: Z
   readonly apiKey?: string
+  readonly withMicroseconds?: boolean
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {

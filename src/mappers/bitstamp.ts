@@ -26,6 +26,10 @@ export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
   *map(bitstampTradeResponse: BitstampTrade, localTimestamp: Date): IterableIterator<Trade> {
     const bitstampTrade = bitstampTradeResponse.data
     const symbol = bitstampTradeResponse.channel.slice(bitstampTradeResponse.channel.lastIndexOf('_') + 1)
+    const microtimestamp = Number(bitstampTrade.microtimestamp)
+    const timestamp = new Date(microtimestamp / 1000)
+    timestamp.μs = microtimestamp % 1000
+
     yield {
       type: 'trade',
       symbol: symbol.toUpperCase(),
@@ -34,8 +38,8 @@ export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
       price: Number(bitstampTrade.price),
       amount: Number(bitstampTrade.amount),
       side: bitstampTrade.type === 0 ? 'buy' : 'sell',
-      timestamp: new Date(Number(bitstampTrade.microtimestamp) / 1000),
-      localTimestamp: localTimestamp
+      timestamp,
+      localTimestamp
     }
   }
 }
@@ -77,6 +81,16 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
     // first check if received message is snapshot and process it as such if it is
     if (message.event === 'snapshot') {
       // produce snapshot book_change
+
+      let timestamp
+      if (message.data.microtimestamp !== undefined) {
+        const microtimestamp = Number(message.data.microtimestamp)
+        timestamp = new Date(microtimestamp / 1000)
+        timestamp.μs = microtimestamp % 1000
+      } else {
+        timestamp = new Date(Number(message.data.timestamp) * 1000)
+      }
+
       yield {
         type: 'book_change',
         symbol,
@@ -84,12 +98,15 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
         isSnapshot: true,
         bids: message.data.bids.map(this._mapBookLevel),
         asks: message.data.asks.map(this._mapBookLevel),
-        timestamp: localTimestamp,
+        timestamp,
         localTimestamp
       }
 
       //  mark given symbol depth info that has snapshot processed
       symbolDepthInfo.lastUpdateTimestamp = Number(message.data.timestamp)
+      if (message.data.microtimestamp !== undefined) {
+        symbolDepthInfo.lastUpdateMicroTimestamp = Number(message.data.microtimestamp)
+      }
       symbolDepthInfo.snapshotProcessed = true
 
       // if there were any depth updates buffered, let's proccess those
@@ -119,21 +136,28 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
     depthInfo: LocalDepthInfo,
     symbol: string
   ): BookChange | undefined {
+    const microtimestamp = Number(bitstampBookUpdate.data.microtimestamp)
     // skip all book updates that preceed book snapshot
-    if (Number(bitstampBookUpdate.data.timestamp) < depthInfo.lastUpdateTimestamp!) {
+    // REST API not always returned microtimestamps for initial order book snapshots
+    // fallback to timestamp
+    if (depthInfo.lastUpdateMicroTimestamp !== undefined && microtimestamp < depthInfo.lastUpdateMicroTimestamp) {
+      return
+    } else if (Number(bitstampBookUpdate.data.timestamp) < depthInfo.lastUpdateTimestamp!) {
       return
     }
+
+    const timestamp = new Date(microtimestamp / 1000)
+    timestamp.μs = microtimestamp % 1000
 
     return {
       type: 'book_change',
       symbol,
       exchange: 'bitstamp',
       isSnapshot: false,
-
       bids: bitstampBookUpdate.data.bids.map(this._mapBookLevel),
       asks: bitstampBookUpdate.data.asks.map(this._mapBookLevel),
-      timestamp: new Date(Number(bitstampBookUpdate.data.microtimestamp) / 1000),
-      localTimestamp: localTimestamp
+      timestamp: timestamp,
+      localTimestamp
     }
   }
 
@@ -180,6 +204,7 @@ type BitstampDiffOrderBookSnapshot = {
   channel: string
   data: {
     timestamp: string
+    microtimestamp?: string
     bids: BitstampBookLevel[]
     asks: BitstampBookLevel[]
   }
@@ -189,4 +214,5 @@ type LocalDepthInfo = {
   bufferedUpdates: BitstampDiffOrderBook[]
   snapshotProcessed?: boolean
   lastUpdateTimestamp?: number
+  lastUpdateMicroTimestamp?: number
 }
