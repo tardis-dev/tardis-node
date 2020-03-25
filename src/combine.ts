@@ -7,8 +7,6 @@ type NextMessageResultWitIndex = {
 
 type Combinable = { localTimestamp: Date }
 
-const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0])
-
 const DATE_MAX = new Date(8640000000000000)
 
 async function nextWithIndex(iterator: AsyncIterableIterator<Combinable>, index: number): Promise<NextMessageResultWitIndex> {
