@@ -6,12 +6,12 @@ export class BitflyerRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BitflyerRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           return {
             method: 'subscribe',
             params: {
@@ -20,7 +20,7 @@ export class BitflyerRealTimeFeed extends RealTimeFeedBase {
           }
         })
       })
-      .flatMap(c => c)
+      .flatMap((c) => c)
   }
 
   protected messageIsError(message: any): boolean {

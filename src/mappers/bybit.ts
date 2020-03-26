@@ -94,8 +94,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
       symbol,
       exchange: this._exchange,
       isSnapshot: message.type === 'snapshot',
-      bids: data.filter(d => d.side === 'Buy').map(this._mapBookLevel),
-      asks: data.filter(d => d.side === 'Sell').map(this._mapBookLevel),
+      bids: data.filter((d) => d.side === 'Buy').map(this._mapBookLevel),
+      asks: data.filter((d) => d.side === 'Sell').map(this._mapBookLevel),
       timestamp,
       localTimestamp
     } as const

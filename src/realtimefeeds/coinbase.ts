@@ -15,13 +15,13 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const channelsToSubscribe = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('CoinbaseRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
         const subscribeToFullChannel =
-          filters.filter(f => this.channelMappings.full.includes(f.channel) && f.channel !== 'match').length > 0
+          filters.filter((f) => this.channelMappings.full.includes(f.channel) && f.channel !== 'match').length > 0
         const subscribeToLevel2Channel = this.channelMappings.level2.includes(filter.channel)
         const subscribeToMatchesChannel = this.channelMappings.matches.includes(filter.channel)
         let channel
@@ -42,7 +42,7 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
         }
       })
       .reduce((prev, current) => {
-        const matchingExisting = prev.find(c => c.name === current.name)
+        const matchingExisting = prev.find((c) => c.name === current.name)
         if (matchingExisting !== undefined) {
           for (const symbol of current.product_ids) {
             if (matchingExisting.product_ids.includes(symbol) === false) {

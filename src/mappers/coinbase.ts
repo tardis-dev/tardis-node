@@ -82,8 +82,8 @@ export const coinbaseBookChangMapper: Mapper<'coinbase', BookChange> = {
         symbol: message.product_id,
         exchange: 'coinbase',
         isSnapshot: false,
-        bids: message.changes.filter(c => c[0] === 'buy').map(mapUpdateBookLevel),
-        asks: message.changes.filter(c => c[0] === 'sell').map(mapUpdateBookLevel),
+        bids: message.changes.filter((c) => c[0] === 'buy').map(mapUpdateBookLevel),
+        asks: message.changes.filter((c) => c[0] === 'sell').map(mapUpdateBookLevel),
         timestamp: new Date(message.time),
         localTimestamp: localTimestamp
       }

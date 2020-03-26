@@ -117,8 +117,8 @@ export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-d
     const isSnapshot = Array.isArray(message[1][0])
     const bookLevels = (isSnapshot ? message[1] : [message[1]]) as BitfinexBookLevel[]
 
-    const asks = bookLevels.filter(level => level[2] < 0)
-    const bids = bookLevels.filter(level => level[2] > 0)
+    const asks = bookLevels.filter((level) => level[2] < 0)
+    const bids = bookLevels.filter((level) => level[2] > 0)
 
     const bookChange: BookChange = {
       type: 'book_change',

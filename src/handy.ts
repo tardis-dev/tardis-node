@@ -12,7 +12,7 @@ export function parseAsUTCDate(val: string) {
 }
 
 export function wait(delayMS: number) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, delayMS)
   })
 }
@@ -32,9 +32,7 @@ function doubleDigit(input: number) {
 }
 
 export function sha256(obj: object) {
-  return createHash('sha256')
-    .update(JSON.stringify(obj))
-    .digest('hex')
+  return createHash('sha256').update(JSON.stringify(obj)).digest('hex')
 }
 
 export function addMinutes(date: Date, minutes: number) {
@@ -133,10 +131,10 @@ export async function* normalizeMessages(
 }
 
 export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
-  const filters = mappers.flatMap(mapper => mapper.getFilters(symbols))
+  const filters = mappers.flatMap((mapper) => mapper.getFilters(symbols))
 
   const deduplicatedFilters = filters.reduce((prev, current) => {
-    const matchingExisting = prev.find(c => c.channel === current.channel)
+    const matchingExisting = prev.find((c) => c.channel === current.channel)
     if (matchingExisting !== undefined) {
       if (matchingExisting.symbols !== undefined && current.symbols) {
         for (let symbol of current.symbols) {

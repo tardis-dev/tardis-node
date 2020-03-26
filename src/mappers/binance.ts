@@ -1,6 +1,6 @@
+import { debug } from '../debug'
 import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { debug } from '../debug'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
@@ -320,7 +320,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
 
 function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
-    return symbols.map(s => s.toLowerCase())
+    return symbols.map((s) => s.toLowerCase())
   }
   return
 }

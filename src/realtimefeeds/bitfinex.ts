@@ -13,12 +13,12 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
     }
 
     const subscribeMessages = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BitfinexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           if (filter.channel === 'trades') {
             return {
               event: 'subscribe',
@@ -47,7 +47,7 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
           return
         })
       })
-      .flatMap(c => c)
+      .flatMap((c) => c)
 
     return [configMessage, ...subscribeMessages]
   }

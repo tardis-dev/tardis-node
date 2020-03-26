@@ -9,7 +9,7 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters
-      .filter(f => f.channel !== 'depthSnapshot')
+      .filter((f) => f.channel !== 'depthSnapshot')
       .map((filter, index) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BinanceRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
@@ -24,7 +24,7 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
           }
         })
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
 
     return payload
   }
@@ -47,7 +47,7 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
   }
 
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const depthSnapshotFilter = filters.find(f => f.channel === 'depthSnapshot')
+    const depthSnapshotFilter = filters.find((f) => f.channel === 'depthSnapshot')
     if (!depthSnapshotFilter) {
       return
     }

@@ -7,7 +7,7 @@ export class BitmexRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           return [
             {
@@ -20,13 +20,13 @@ export class BitmexRealTimeFeed extends RealTimeFeedBase {
         for (const symbolsBatch of batch(filter.symbols, 10)) {
           subscribeMessages.push({
             op: 'subscribe',
-            args: symbolsBatch.map(s => `${filter.channel}:${s}`)
+            args: symbolsBatch.map((s) => `${filter.channel}:${s}`)
           })
         }
 
         return subscribeMessages
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
   }
 
   protected messageIsError(message: any): boolean {

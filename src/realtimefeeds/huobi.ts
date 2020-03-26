@@ -25,7 +25,7 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
           }
         })
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
   }
 
   protected decompress = (message: any) => {

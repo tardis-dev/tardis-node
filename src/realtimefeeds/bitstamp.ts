@@ -8,12 +8,12 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BitstampRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           return {
             event: 'bts:subscribe',
             data: {
@@ -22,7 +22,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
           }
         })
       })
-      .flatMap(c => c)
+      .flatMap((c) => c)
   }
 
   protected messageIsError(message: any): boolean {
@@ -38,7 +38,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const orderBookFilter = filters.find(f => f.channel === 'diff_order_book')
+    const orderBookFilter = filters.find((f) => f.channel === 'diff_order_book')
     if (!orderBookFilter) {
       return
     }

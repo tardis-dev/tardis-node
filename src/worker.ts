@@ -31,7 +31,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   const CONCURRENCY_LIMIT = 60
   // deduplicate filters (if the channel was provided multiple times)
   const filters = payload.filters.reduce((prev, current) => {
-    const matchingExisting = prev.find(c => c.channel === current.channel)
+    const matchingExisting = prev.find((c) => c.channel === current.channel)
 
     if (matchingExisting) {
       // both previous and current have symbols let's merge them
@@ -61,7 +61,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   })
 
   // sort and deduplicate filters symbols
-  filters.forEach(filter => {
+  filters.forEach((filter) => {
     if (filter.symbols) {
       filter.symbols = [...new Set(filter.symbols)].sort()
     }
@@ -82,7 +82,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
 
   await pMap(
     sequence(minutesCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch - 1 - as we already fetched first and last slice so no need to fetch them again
-    offset => getDataFeedSlice(payload, offset, filters, cacheDir),
+    (offset) => getDataFeedSlice(payload, offset, filters, cacheDir),
     { concurrency: CONCURRENCY_LIMIT }
   )
 }
@@ -172,13 +172,13 @@ async function fetchAndCacheSlice(url: string, options: RequestOptions, sliceCac
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
     await new Promise((resolve, reject) => {
       const req = https
-        .get(url, options, res => {
+        .get(url, options, (res) => {
           const { statusCode } = res
           if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
             res.setEncoding('utf8')
             let body = ''
-            res.on('data', chunk => (body += chunk))
+            res.on('data', (chunk) => (body += chunk))
             res.on('end', () => {
               reject(new HttpError(statusCode!, body, url))
             })

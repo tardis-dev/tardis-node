@@ -88,7 +88,7 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm', BookC
 
 function normalizeSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
-    return symbols.map(s => {
+    return symbols.map((s) => {
       // huobi-dm expects symbols to be upper cases
       if (s.includes('_')) {
         return s

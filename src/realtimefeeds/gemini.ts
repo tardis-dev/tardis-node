@@ -6,14 +6,14 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const symbols = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('GeminiRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
         return filter.symbols
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
       .filter((value, index, self) => {
         return self.indexOf(value) === index
       })

@@ -1,4 +1,4 @@
-import { replayNormalized, combine, normalizeTrades, normalizeBookChanges } from '../dist'
+import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist'
 
 describe('combine(...asyncIterators)', () => {
   test(
@@ -36,12 +36,12 @@ describe('combine(...asyncIterators)', () => {
   )
 
   test('should correctly combine iterables based on localTimestamp value', async () => {
-    let iter1 = async function*() {
+    let iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T08:52:00.132Z') }
       yield { localTimestamp: new Date('2019-08-01T08:53:00.130Z') }
     }
 
-    let iter2 = async function*() {
+    let iter2 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T00:52:00.132Z') }
       yield { localTimestamp: new Date('2019-08-01T00:52:00.133Z') }
       yield { localTimestamp: new Date('2019-08-01T08:53:00.130Z') }
@@ -57,12 +57,12 @@ describe('combine(...asyncIterators)', () => {
 
     expect(bufferedMessages).toMatchSnapshot()
 
-    iter1 = async function*() {
+    iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T00:52:00.102Z') }
       yield { localTimestamp: new Date('2019-08-01T00:53:00.130Z') }
     }
 
-    iter2 = async function*() {
+    iter2 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T00:52:00.132Z') }
       yield { localTimestamp: new Date('2019-08-01T00:52:00.133Z') }
       yield { localTimestamp: new Date('2019-08-01T08:53:00.130Z') }

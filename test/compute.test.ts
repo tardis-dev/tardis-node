@@ -1,12 +1,12 @@
 import {
-  replayNormalized,
+  BookChange,
   compute,
-  Trade,
-  normalizeTrades,
   computeBookSnapshots,
   computeTradeBars,
   normalizeBookChanges,
-  BookChange
+  normalizeTrades,
+  replayNormalized,
+  Trade
 } from '../dist'
 
 describe('compute(messages, types)', () => {
@@ -45,7 +45,7 @@ describe('compute(messages, types)', () => {
   )
 
   test('should compute correct trade bars based on provided messages', async () => {
-    let tradesMessages = async function*(): AsyncIterableIterator<Trade> {
+    let tradesMessages = async function* (): AsyncIterableIterator<Trade> {
       yield {
         type: 'trade',
         exchange: 'bitmex',
@@ -135,7 +135,7 @@ describe('compute(messages, types)', () => {
   })
 
   test('should produce correct book snapshots based on provided messages', async () => {
-    let messages = async function*(): AsyncIterableIterator<Trade | BookChange> {
+    let messages = async function* (): AsyncIterableIterator<Trade | BookChange> {
       yield {
         type: 'trade',
         exchange: 'bitmex',

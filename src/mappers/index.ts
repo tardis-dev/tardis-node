@@ -1,3 +1,4 @@
+import { ONE_SEC_IN_MS } from '../handy'
 import { BookChange, DerivativeTicker, Trade } from '../types'
 import {
   BinanceBookChangeMapper,
@@ -21,7 +22,6 @@ import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexTradesMapper } from './okex'
-import { ONE_SEC_IN_MS } from '../handy'
 
 export * from './mapper'
 

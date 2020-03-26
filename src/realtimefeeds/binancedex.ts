@@ -8,8 +8,8 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters
-      .filter(f => f.channel !== 'depthSnapshot')
-      .map(filter => {
+      .filter((f) => f.channel !== 'depthSnapshot')
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BinanceDexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
@@ -31,7 +31,7 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const depthSnapshotFilter = filters.find(f => f.channel === 'depthSnapshot')
+    const depthSnapshotFilter = filters.find((f) => f.channel === 'depthSnapshot')
     if (!depthSnapshotFilter) {
       return
     }

@@ -1,14 +1,14 @@
 import {
+  compute,
+  computeBookSnapshots,
+  computeTradeBars,
   Exchange,
   EXCHANGES,
   getExchangeDetails,
   normalizeBookChanges,
   normalizeDerivativeTickers,
   normalizeTrades,
-  streamNormalized,
-  compute,
-  computeBookSnapshots,
-  computeTradeBars
+  streamNormalized
 } from '../dist'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -27,7 +27,7 @@ describe('stream', () => {
     'streams normalized real-time messages for each supported exchange',
     async () => {
       await Promise.all(
-        EXCHANGES.map(async exchange => {
+        EXCHANGES.map(async (exchange) => {
           if (exchange === 'coinflex') {
             return
           }
@@ -39,9 +39,9 @@ describe('stream', () => {
           }
 
           var symbols = exchangeDetails.availableSymbols
-            .filter(s => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
+            .filter((s) => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
             .slice(0, 10)
-            .map(s => s.id)
+            .map((s) => s.id)
 
           const messages = streamNormalized(
             {
@@ -49,7 +49,7 @@ describe('stream', () => {
               symbols,
               withDisconnectMessages: true,
               timeoutIntervalMS: 20 * 1000,
-              onError: err => {
+              onError: (err) => {
                 console.log('Error', err)
               }
             },

@@ -122,7 +122,7 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
 
   getFilters(symbols?: string[]) {
     const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
-    return channels.map(channel => {
+    return channels.map((channel) => {
       return {
         channel,
         symbols

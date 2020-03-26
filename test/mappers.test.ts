@@ -1,4 +1,4 @@
-import { Exchange, normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers, Mapper } from '../src'
+import { Exchange, Mapper, normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades } from '../src'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',

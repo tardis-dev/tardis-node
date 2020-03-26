@@ -6,8 +6,8 @@ export class CryptofacilitiesRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
-      .filter(filter => filter.channel.endsWith('_snapshot') === false)
-      .map(filter => {
+      .filter((filter) => filter.channel.endsWith('_snapshot') === false)
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('CryptofacilitiesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }

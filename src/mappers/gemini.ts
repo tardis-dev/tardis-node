@@ -59,8 +59,8 @@ export const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
       symbol: geminiL2Updates.symbol,
       exchange: 'gemini',
       isSnapshot: geminiL2Updates.auction_events !== undefined,
-      bids: geminiL2Updates.changes.filter(c => c[0] === 'buy').map(mapBookLevel),
-      asks: geminiL2Updates.changes.filter(c => c[0] === 'sell').map(mapBookLevel),
+      bids: geminiL2Updates.changes.filter((c) => c[0] === 'buy').map(mapBookLevel),
+      asks: geminiL2Updates.changes.filter((c) => c[0] === 'sell').map(mapBookLevel),
 
       timestamp: localTimestamp,
       localTimestamp

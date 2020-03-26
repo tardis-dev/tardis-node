@@ -5,7 +5,7 @@ import zlib from 'zlib'
 import { BinarySplitStream } from './binarysplit'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
-import { getFilters, normalizeMessages, parseAsUTCDate, wait, parseμs } from './handy'
+import { getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait } from './handy'
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
@@ -59,13 +59,13 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     cachedSlicePaths.set(message.sliceKey, message.slicePath)
   })
 
-  worker.on('error', err => {
+  worker.on('error', (err) => {
     debug('worker error %o', err)
 
     workerError = err
   })
 
-  worker.on('exit', code => {
+  worker.on('exit', (code) => {
     debug('worker finished with code: %d', code)
   })
 
@@ -181,14 +181,14 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   // mappers assume that symbols are uppercased by default
   // if user by mistake provide lowercase one let's automatically fix it
   if (symbols !== undefined) {
-    symbols = symbols.map(s => s.toUpperCase())
+    symbols = symbols.map((s) => s.toUpperCase())
   }
 
   const fromDate = parseAsUTCDate(from)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
 
-  const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
+  const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
   const nonFilterableExchanges = ['bitfinex', 'bitfinex-derivatives']
   const mappers = createMappers(fromDate)
   const filters = nonFilterableExchanges.includes(exchange) ? [] : getFilters(mappers, symbols)
@@ -249,7 +249,7 @@ function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to
 }
 
 function validateReplayNormalizedOptions(fromDate: Date, normalizers: MapperFactory<any, any>[]) {
-  const hasBookChangeNormalizer = normalizers.some(n => n === normalizeBookChanges)
+  const hasBookChangeNormalizer = normalizers.some((n) => n === normalizeBookChanges)
   const dateDoesNotStartAtTheBeginningOfTheDay = fromDate.getUTCHours() !== 0 || fromDate.getUTCMinutes() !== 0
 
   if (hasBookChangeNormalizer && dateDoesNotStartAtTheBeginningOfTheDay) {

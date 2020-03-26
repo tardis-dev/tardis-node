@@ -53,7 +53,7 @@ class Computables {
     }
 
     if (this._computables[exchange]![id] === undefined) {
-      this._computables[exchange]![id] = this._computablesFactories.map(c => c())
+      this._computables[exchange]![id] = this._computablesFactories.map((c) => c())
     }
 
     return this._computables[exchange]![id]!

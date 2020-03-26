@@ -11,7 +11,7 @@ export class HitBtcRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const subscriptions = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('HitBtcRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
@@ -28,16 +28,16 @@ export class HitBtcRealTimeFeed extends RealTimeFeedBase {
           throw new Error(`Invalid channel: ${filter.channel}`)
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           return {
             method,
             symbol
           }
         })
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
       .reduce((prev, current) => {
-        const matchingExisting = prev.find(c => c.method === current.method && c.symbol === current.symbol)
+        const matchingExisting = prev.find((c) => c.method === current.method && c.symbol === current.symbol)
         if (matchingExisting === undefined) {
           prev.push(current)
         }

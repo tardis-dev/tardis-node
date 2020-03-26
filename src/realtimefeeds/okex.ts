@@ -13,16 +13,16 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error(`${this.exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           return `${filter.channel}:${symbol}`
         })
       })
-      .flatMap(s => s)
+      .flatMap((s) => s)
 
     return [
       {

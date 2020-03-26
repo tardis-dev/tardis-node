@@ -170,7 +170,7 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
 
 function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
-    return symbols.map(s => s.toLowerCase())
+    return symbols.map((s) => s.toLowerCase())
   }
   return
 }

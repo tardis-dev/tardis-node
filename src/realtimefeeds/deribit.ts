@@ -8,17 +8,17 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const channels = filters
-      .map(filter => {
+      .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('DeribitRealTimeDataFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map(symbol => {
+        return filter.symbols.map((symbol) => {
           const suffix = this.channelsWithIntervals.includes(filter.channel as any) ? '.raw' : ''
           return `${filter.channel}.${symbol}${suffix}`
         })
       })
-      .flatMap(f => f)
+      .flatMap((f) => f)
 
     return [
       {
