@@ -191,7 +191,11 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       }
 
       if (this._receivedMessagesCount === 0) {
-        this.debug('did not received any messages within %d ms timeout, terminating connection...', this._timeoutIntervalMS)
+        this.debug(
+          '(connection id: %d) did not received any messages within %d ms timeout, terminating connection...',
+          RealTimeFeedBase._connectionId,
+          this._timeoutIntervalMS
+        )
         this._ws!.terminate()
       }
       this._receivedMessagesCount = 0
@@ -215,7 +219,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         this.send(message)
       }
 
-      this.debug('estabilished connection')
+      this.debug('(connection id: %d) estabilished connection', RealTimeFeedBase._connectionId)
 
       this.onConnected()
 
@@ -232,12 +236,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       await this.provideManualSnapshots(this._filters, () => this._ws!.readyState === WebSocket.CLOSED)
     } catch (e) {
-      this.debug('providing manual snapshots error: %o', e)
+      this.debug('(connection id: %d) providing manual snapshots error: %o', RealTimeFeedBase._connectionId, e)
       this._ws!.emit('error', e)
     }
   }
 
   private _onConnectionClosed = () => {
-    this.debug('connection closed')
+    this.debug('(connection id: %d) connection closed', RealTimeFeedBase._connectionId)
   }
 }
