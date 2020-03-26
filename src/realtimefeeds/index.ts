@@ -12,7 +12,7 @@ import { DeribitRealTimeDataFeed } from './deribit'
 import { FtxRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
 import { HitBtcRealTimeFeed } from './hitbtc'
-import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiUSRealTimeFeed } from './huobi'
+import { HuobiDMRealTimeFeed, HuobiRealTimeFeed } from './huobi'
 import { KrakenRealTimeFeed } from './kraken'
 import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
@@ -58,10 +58,15 @@ export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
   throw new Error(`not supported exchange ${exchange}`)
 }
 
-export function createRealTimeFeed(exchange: Exchange, filters: Filter<string>[], timeoutIntervalMS: number | undefined) {
+export function createRealTimeFeed(
+  exchange: Exchange,
+  filters: Filter<string>[],
+  timeoutIntervalMS: number | undefined,
+  onError?: (error: Error) => void
+) {
   const RealTimeFeedFactory = getRealTimeFeedFactory(exchange)
 
-  return new RealTimeFeedFactory(exchange, filters, timeoutIntervalMS)
+  return new RealTimeFeedFactory(exchange, filters, timeoutIntervalMS, onError)
 }
 
 export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeed: RealTimeFeed) {

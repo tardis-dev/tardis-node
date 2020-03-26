@@ -4,7 +4,12 @@ import { ONE_SEC_IN_MS, wait } from '../handy'
 import { Exchange, Filter } from '../types'
 
 export type RealTimeFeed = {
-  new (exchange: Exchange, filters: Filter<string>[], timeoutIntervalMS: number | undefined): RealTimeFeedIterable
+  new (
+    exchange: Exchange,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void
+  ): RealTimeFeedIterable
 }
 
 export type RealTimeFeedIterable = AsyncIterable<any>
@@ -24,65 +29,126 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   constructor(
     public readonly exchange: string,
     private readonly _filters: Filter<string>[],
-    private readonly _timeoutIntervalMS: number | undefined
+    private readonly _timeoutIntervalMS: number | undefined,
+    private readonly _onError?: (error: Error) => void
   ) {
-    RealTimeFeedBase._connectionId++
-    this.debug = dbg(`tardis-dev:realtime:${exchange}:${RealTimeFeedBase._connectionId}`)
+    this.debug = dbg(`tardis-dev:realtime:${exchange}`)
   }
 
   private async *_stream() {
     let timerId
-    try {
-      const subscribeMessages = this.mapToSubscribeMessages(this._filters)
+    let retries = 0
 
-      this.debug('estabilishing connection to %s', this.wssURL)
+    while (true) {
+      RealTimeFeedBase._connectionId++
+      try {
+        const subscribeMessages = this.mapToSubscribeMessages(this._filters)
 
-      this.debug('provided filters: %o mapped to subscribe messages: %o', this._filters, subscribeMessages)
+        this.debug('(connection id: %d) estabilishing connection to %s', RealTimeFeedBase._connectionId, this.wssURL)
 
-      this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
+        this.debug(
+          '(connection id: %d) provided filters: %o mapped to subscribe messages: %o',
+          RealTimeFeedBase._connectionId,
+          this._filters,
+          subscribeMessages
+        )
 
-      this._ws.onopen = this._onConnectionEstabilished
-      this._ws.onclose = this._onConnectionClosed
+        this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
 
-      timerId = this._monitorConnectionIfStale()
+        this._ws.onopen = this._onConnectionEstabilished
+        this._ws.onclose = this._onConnectionClosed
 
-      const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
-        readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
-        readableHighWaterMark: 1024 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
-      }) as AsyncIterableIterator<Buffer>
+        timerId = this._monitorConnectionIfStale()
 
-      for await (let message of realtimeMessagesStream) {
-        if (this.decompress !== undefined) {
-          message = this.decompress(message)
-        }
+        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
+          readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
+          readableHighWaterMark: 1024 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
+        }) as AsyncIterableIterator<Buffer>
 
-        const messageDeserialized = JSON.parse(message as any)
-
-        if (this.messageIsError(messageDeserialized)) {
-          throw new Error(`Received error message:${message.toString()}`)
-        }
-
-        // exclude heaartbeat messages from  received messages counter
-        // connection could still be stale even if only heartbeats are provided without any data
-        if (this.messageIsHeartbeat(messageDeserialized) === false) {
-          this._receivedMessagesCount++
-        }
-
-        this.onMessage(messageDeserialized)
-
-        yield messageDeserialized
-
-        if (this.manualSnapshotsBuffer.length > 0) {
-          for (let snapshot of this.manualSnapshotsBuffer) {
-            yield snapshot
+        for await (let message of realtimeMessagesStream) {
+          if (this.decompress !== undefined) {
+            message = this.decompress(message)
           }
 
-          this.manualSnapshotsBuffer.length = 0
+          const messageDeserialized = JSON.parse(message as any)
+
+          if (this.messageIsError(messageDeserialized)) {
+            throw new Error(`Received error message:${message.toString()}`)
+          }
+
+          // exclude heaartbeat messages from  received messages counter
+          // connection could still be stale even if only heartbeats are provided without any data
+          if (this.messageIsHeartbeat(messageDeserialized) === false) {
+            this._receivedMessagesCount++
+          }
+
+          this.onMessage(messageDeserialized)
+
+          yield messageDeserialized
+
+          if (retries > 0) {
+            // reset retries counter as we've received correct message from the connection
+            retries = 0
+          }
+
+          if (this.manualSnapshotsBuffer.length > 0) {
+            for (let snapshot of this.manualSnapshotsBuffer) {
+              yield snapshot
+            }
+
+            this.manualSnapshotsBuffer.length = 0
+          }
         }
-      }
-    } finally {
-      if (timerId !== undefined) {
-        clearInterval(timerId)
+
+        // clear monitoring connection timer and notify about disconnect
+        if (timerId !== undefined) {
+          clearInterval(timerId)
+        }
+        yield undefined
+      } catch (error) {
+        if (this._onError !== undefined) {
+          this._onError(error)
+        }
+
+        retries++
+
+        const MAX_DELAY = 16 * 1000
+        const isRateLimited = error.message.includes('429')
+
+        let delay
+        if (isRateLimited) {
+          delay = MAX_DELAY * retries
+        } else {
+          delay = Math.pow(2, retries - 1) * 1000
+
+          if (delay > MAX_DELAY) {
+            delay = MAX_DELAY
+          }
+        }
+
+        this.debug(
+          '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
+          RealTimeFeedBase._connectionId,
+          this.exchange,
+          retries,
+          delay,
+          isRateLimited,
+          error
+        )
+
+        // clear monitoring connection timer and notify about disconnect
+        if (timerId !== undefined) {
+          clearInterval(timerId)
+        }
+
+        yield undefined
+
+        await wait(delay)
+      } finally {
+        // clear monitoring connection timer if not cleared yet
+        if (timerId !== undefined) {
+          clearInterval(timerId)
+        }
       }
     }
   }

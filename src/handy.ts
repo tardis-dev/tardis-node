@@ -79,9 +79,10 @@ export async function* normalizeMessages(
   mappers: Mapper<any, any>[],
   createMappers: (localTimestamp: Date) => Mapper<any, any>[],
   withDisconnectMessages: boolean | undefined,
-  filter?: (symbol: string) => boolean
+  filter?: (symbol: string) => boolean,
+  currentTimestamp?: Date | undefined
 ) {
-  let previousLocalTimestamp: Date | undefined
+  let previousLocalTimestamp: Date | undefined = currentTimestamp
   let mappersForExchange: Mapper<any, any>[] | undefined = mappers
   if (mappersForExchange.length === 0) {
     throw new Error(`Can't normalize data without any normalizers provided`)

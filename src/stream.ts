@@ -1,5 +1,5 @@
 import { debug } from './debug'
-import { getFilters, normalizeMessages, wait } from './handy'
+import { getFilters, normalizeMessages } from './handy'
 import { MapperFactory } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
@@ -15,61 +15,20 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
 > {
   validateStreamOptions(filters)
 
-  let retries = 0
-  while (true) {
-    try {
-      const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS)
+  const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, onError)
 
-      for await (const message of realTimeFeed) {
-        yield {
-          localTimestamp: new Date(),
-          message
-        } as any
-        if (retries > 0) {
-          // reset retries counter as we've received correct message from the connection
-          retries = 0
-        }
-      }
-
-      if (withDisconnects) {
-        // if loop has ended it means that websocket connection has been closed
-        //  so notify about it by yielding undefined if flag is set
-        yield undefined as any
-      }
-    } catch (error) {
-      if (onError !== undefined) {
-        onError(error)
-      }
-
-      retries++
-
-      const MAX_DELAY = 16 * 1000
-      const isRateLimited = error.message.includes('429')
-
-      let delay
-      if (isRateLimited) {
-        delay = MAX_DELAY * retries
-      } else {
-        delay = Math.pow(2, retries - 1) * 1000
-
-        if (delay > MAX_DELAY) {
-          delay = MAX_DELAY
-        }
-      }
-
-      debug(
-        '%s real-time feed connection error, retries count: %d, next retry delay: %dms, error message: %o',
-        exchange,
-        retries,
-        delay,
-        error
-      )
-
+  for await (const message of realTimeFeed) {
+    if (message === undefined) {
+      // undefined message means that websocket connection has been closed
+      // notify about it by yielding undefined if flag is set
       if (withDisconnects) {
         yield undefined as any
       }
-
-      await wait(delay)
+    } else {
+      yield {
+        localTimestamp: new Date(),
+        message
+      } as any
     }
   }
 }
@@ -89,12 +48,12 @@ export async function* streamNormalized<T extends Exchange, U extends MapperFact
   // mappers assume that symbols are uppercased by default
   // if user by mistake provide lowercase one let's automatically fix it
   if (symbols !== undefined) {
-    symbols = symbols.map(s => s.toUpperCase())
+    symbols = symbols.map((s) => s.toUpperCase())
   }
 
   while (true) {
     try {
-      const createMappers = (localTimestamp: Date) => normalizers.map(m => m(exchange, localTimestamp))
+      const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
       const mappers = createMappers(new Date())
       const filters = getFilters(mappers, symbols)
 
@@ -106,7 +65,15 @@ export async function* streamNormalized<T extends Exchange, U extends MapperFact
         onError
       })
 
-      const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages)
+      const normalizedMessages = normalizeMessages(
+        exchange,
+        messages,
+        mappers,
+        createMappers,
+        withDisconnectMessages,
+        undefined,
+        new Date()
+      )
 
       for await (const message of normalizedMessages) {
         yield message
