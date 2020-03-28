@@ -63,5 +63,9 @@ export class HuobiUSRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://www.hbdm.com/ws'
+  protected wssURL = 'wss://api.hbdm.com/ws'
+}
+
+export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
+  protected wssURL = 'wss://api.hbdm.com/swap-ws'
 }

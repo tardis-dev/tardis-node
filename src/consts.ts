@@ -1,31 +1,33 @@
 export const EXCHANGES = [
   'bitmex',
   'deribit',
-  'binance',
   'binance-futures',
+  'binance',
   'ftx',
-  'okex',
   'okex-futures',
-  'okex-swap',
   'okex-options',
-  'huobi',
+  'okex-swap',
+  'okex',
   'huobi-dm',
+  'huobi-dm-swap',
+  'huobi',
+  'bitfinex-derivatives',
+  'bitfinex',
+  'bitfinex-alts',
   'bitflyer',
-  'bitstamp',
-  'coinbase',
   'cryptofacilities',
   'kraken',
+  'bitstamp',
+  'coinbase',
   'gemini',
-  'bitfinex',
-  'bitfinex-derivatives',
-  'bitfinex-alts',
-  'binance-dex',
-  'binance-jersey',
-  'binance-us',
+  'coinflex',
   'bybit',
+  'phemex',
   'okcoin',
   'hitbtc',
-  'coinflex'
+  'binance-jersey',
+  'binance-us',
+  'binance-dex'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
@@ -137,6 +139,10 @@ const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo'] as const
 
 const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
+const HUOBI_DM_SWAP_CHANNELS = ['depth', 'detail', 'trade'] as const
+
+const PHEMEX_CHANNELS = ['book', 'trades', 'market24'] as const
+
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200'] as const
 
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
@@ -165,8 +171,10 @@ export const EXCHANGE_CHANNELS_INFO = {
   'bitfinex-derivatives': BITFINEX_DERIV_CHANNELS,
   huobi: HUOBI_CHANNELS,
   'huobi-dm': HUOBI_DM_CHANNELS,
+  'huobi-dm-swap': HUOBI_DM_SWAP_CHANNELS,
   bybit: BYBIT_CHANNELS,
   okcoin: OKCOIN_CHANNELS,
   hitbtc: HITBTC_CHANNELS,
-  coinflex: COINFLEX_CHANNELS
+  coinflex: COINFLEX_CHANNELS,
+  phemex: PHEMEX_CHANNELS
 }
