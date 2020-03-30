@@ -100,7 +100,10 @@ class PendingDerivativeTickerInfo {
       return
     }
 
-    if (this._pendingTicker.fundingTimestamp !== fundingTimestamp) {
+    if (
+      this._pendingTicker.fundingTimestamp === undefined ||
+      this._pendingTicker.fundingTimestamp.valueOf() !== fundingTimestamp.valueOf()
+    ) {
       this._pendingTicker.fundingTimestamp = fundingTimestamp
       this._hasChanged = true
     }
