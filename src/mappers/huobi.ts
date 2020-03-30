@@ -89,11 +89,11 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
 function normalizeSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => {
-      // huobi-dm expects symbols to be upper cases
-      if (s.includes('_')) {
+      // huobi-dm and huobi-dm-swap expects symbols to be upper cases
+      if (s.includes('_') || s.includes('-')) {
         return s
       }
-      // huobi-com and us expects lower cased symbols
+      // huobi global and us expects lower cased symbols
       return s.toLowerCase()
     })
   }
