@@ -8,7 +8,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'deribit',
   'okex-futures',
   'okex-swap',
-  'bybit'
+  'bybit',
+  'phemex'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -2280,6 +2281,69 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = hitbtc.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map phemex messages', () => {
+    const messages = [
+      {
+        market24h: {
+          close: 58820000,
+          fundingRate: -39075,
+          high: 62710000,
+          indexPrice: 58981349,
+          low: 58605000,
+          markPrice: 58958348,
+          open: 62640000,
+          openInterest: 10113855,
+          predFundingRate: -260708,
+          symbol: 'BTCUSD',
+          turnover: 3061842677702,
+          volume: 186213143
+        },
+        timestamp: 1585526459199354689
+      },
+      {
+        book: { asks: [], bids: [[58795000, 46385]] },
+        depth: 30,
+        sequence: 675453625,
+        symbol: 'BTCUSD',
+        timestamp: 1585526459126872850,
+        type: 'incremental'
+      },
+      {
+        book: {
+          asks: [
+            [14730, 62442],
+            [14840, 7957]
+          ],
+          bids: [[14680, 64579]]
+        },
+        depth: 30,
+        sequence: 208228196,
+        symbol: 'XTZUSD',
+        timestamp: 1585526458842641407,
+        type: 'incremental'
+      },
+      { sequence: 251739378, symbol: 'LINKUSD', trades: [[1585526459381695957, 'Buy', 20210, 56]], type: 'incremental' },
+      { sequence: 251739378, symbol: 'LINKUSD', trades: [[1585526459381695957, 'Buy', 20210, 56]], type: 'snapshot' },
+      {
+        book: {
+          asks: [[58690000, 237505]],
+          bids: [[58685000, 328758]]
+        },
+        depth: 30,
+        sequence: 675440727,
+        symbol: 'BTCUSD',
+        timestamp: 1585526400543970299,
+        type: 'snapshot'
+      }
+    ]
+    const phemex = createMapper('phemex')
+
+    for (const message of messages) {
+      const mappedMessages = phemex.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

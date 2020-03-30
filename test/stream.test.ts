@@ -19,7 +19,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'deribit',
   'okex-futures',
   'okex-swap',
-  'bybit'
+  'bybit',
+  'phemex'
 ]
 
 describe('stream', () => {

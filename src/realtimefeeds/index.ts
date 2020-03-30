@@ -16,6 +16,7 @@ import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiDMSwapRealTimeFeed } from 
 import { KrakenRealTimeFeed } from './kraken'
 import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
+import { PhemexRealTimeFeed } from './phemex'
 
 export * from './realtimefeed'
 
@@ -48,7 +49,8 @@ const realTimeFeedsMap: {
   huobi: HuobiRealTimeFeed,
   bybit: BybitRealTimeDataFeed,
   okcoin: OKCoinRealTimeFeed,
-  hitbtc: HitBtcRealTimeFeed
+  hitbtc: HitBtcRealTimeFeed,
+  phemex: PhemexRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

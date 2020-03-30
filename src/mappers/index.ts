@@ -22,6 +22,7 @@ import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexTradesMapper } from './okex'
+import { phemexTradesMapper, phemexBookChangeMapper, PhemexDerivativeTickerMapper } from './phemex'
 
 export * from './mapper'
 
@@ -58,7 +59,8 @@ const tradesMappers = {
   'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
   bybit: () => new BybitTradesMapper('bybit'),
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
-  hitbtc: () => hitBtcTradesMapper
+  hitbtc: () => hitBtcTradesMapper,
+  phemex: () => phemexTradesMapper
 }
 
 const bookChangeMappers = {
@@ -93,7 +95,8 @@ const bookChangeMappers = {
   bybit: (localTimestamp: Date) => new BybitBookChangeMapper('bybit', localTimestamp.valueOf() >= new Date('2019-12-24').valueOf()),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
-  hitbtc: () => hitBtcBookChangeMapper
+  hitbtc: () => hitBtcBookChangeMapper,
+  phemex: () => phemexBookChangeMapper
 }
 
 const derivativeTickersMappers = {
@@ -104,7 +107,8 @@ const derivativeTickersMappers = {
   deribit: () => new DeribitDerivativeTickerMapper(),
   'okex-futures': () => new OkexDerivativeTickerMapper('okex-futures'),
   'okex-swap': () => new OkexDerivativeTickerMapper('okex-swap'),
-  bybit: () => new BybitDerivativeTickerMapper()
+  bybit: () => new BybitDerivativeTickerMapper(),
+  phemex: () => new PhemexDerivativeTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

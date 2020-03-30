@@ -141,7 +141,7 @@ const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
 const HUOBI_DM_SWAP_CHANNELS = ['depth', 'detail', 'trade'] as const
 
-const PHEMEX_CHANNELS = ['book', 'trades', 'market24'] as const
+const PHEMEX_CHANNELS = ['book', 'trades', 'market24h'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200'] as const
 

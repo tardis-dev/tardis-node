@@ -2597,3 +2597,114 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 8`] = `Array []`;
+
+exports[`mappers map phemex messages 1`] = `
+Array [
+  Object {
+    "exchange": "phemex",
+    "fundingRate": -0.00039075,
+    "fundingTimestamp": undefined,
+    "indexPrice": 5898.1349,
+    "lastPrice": 5882,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": 5895.8348,
+    "openInterest": 10113855,
+    "predictedFundingRate": -0.00260708,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-03-30T00:00:59.199Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 2`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 46385,
+        "price": 5879.5,
+      },
+    ],
+    "exchange": "phemex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-03-30T00:00:59.126Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 62442,
+        "price": 1.473,
+      },
+      Object {
+        "amount": 7957,
+        "price": 1.484,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 64579,
+        "price": 1.468,
+      },
+    ],
+    "exchange": "phemex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "XTZUSD",
+    "timestamp": 2020-03-30T00:00:58.842Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 4`] = `
+Array [
+  Object {
+    "amount": 56,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 2.021,
+    "side": "buy",
+    "symbol": "LINKUSD",
+    "timestamp": 2020-03-30T00:00:59.381Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 5`] = `Array []`;
+
+exports[`mappers map phemex messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 237505,
+        "price": 5869,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 328758,
+        "price": 5868.5,
+      },
+    ],
+    "exchange": "phemex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-03-30T00:00:00.543Z,
+    "type": "book_change",
+  },
+]
+`;
