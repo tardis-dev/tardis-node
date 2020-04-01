@@ -39,6 +39,10 @@ export function addMinutes(date: Date, minutes: number) {
   return new Date(date.getTime() + minutes * 60000)
 }
 
+export function addDays(date: Date, days: number) {
+  return new Date(date.getTime() + days * 60000 * 1440)
+}
+
 export function* sequence(end: number, seed = 0) {
   let current = seed
   while (current < end) {

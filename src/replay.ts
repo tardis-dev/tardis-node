@@ -5,11 +5,12 @@ import zlib from 'zlib'
 import { BinarySplitStream } from './binarysplit'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
-import { getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait } from './handy'
+import { getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait, addDays } from './handy'
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
 import { WorkerJobPayload, WorkerMessage } from './worker'
+import { clearCache } from './clearcache'
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -19,7 +20,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   skipDecoding = undefined,
   withDisconnects = undefined,
   apiKey = undefined,
-  withMicroseconds = undefined
+  withMicroseconds = undefined,
+  autoCleanup = undefined
 }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
   Z extends true
     ? U extends true
@@ -154,6 +156,30 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
     }
 
+    if (autoCleanup) {
+      debug(
+        'replay for exchange %s auto cleanup started - from: %s, to: %s, filters: %o',
+        exchange,
+        fromDate.toISOString(),
+        toDate.toISOString(),
+        filters
+      )
+      let startDate = new Date(fromDate)
+      while (startDate < toDate) {
+        await clearCache(exchange, filters, startDate.getUTCFullYear(), startDate.getUTCMonth() + 1, startDate.getUTCDate())
+
+        startDate = addDays(startDate, 1)
+      }
+
+      debug(
+        'replay for exchange %s auto cleanup finished - from: %s, to: %s, filters: %o',
+        exchange,
+        fromDate.toISOString(),
+        toDate.toISOString(),
+        filters
+      )
+    }
+
     debug(
       'replay for exchange: %s finished - from: %s, to: %s, filters: %o',
       exchange,
@@ -167,7 +193,15 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 }
 
 export function replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
-  { exchange, symbols, from, to, withDisconnectMessages = undefined, apiKey = undefined }: ReplayNormalizedOptions<T, Z>,
+  {
+    exchange,
+    symbols,
+    from,
+    to,
+    withDisconnectMessages = undefined,
+    apiKey = undefined,
+    autoCleanup = undefined
+  }: ReplayNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
   Z extends true
@@ -200,7 +234,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     withDisconnects: true,
     filters,
     apiKey,
-    withMicroseconds: true
+    withMicroseconds: true,
+    autoCleanup
   })
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
@@ -268,6 +303,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   readonly withDisconnects?: Z
   readonly apiKey?: string
   readonly withMicroseconds?: boolean
+  readonly autoCleanup?: boolean
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -277,4 +313,5 @@ export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = fals
   readonly to: string
   readonly withDisconnectMessages?: U
   readonly apiKey?: string
+  readonly autoCleanup?: boolean
 }
