@@ -4,7 +4,8 @@ import { Computable } from './computable'
 
 type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number }
 
-export const computeBookSnapshots = (options: BookSnapshotComputableOptions) => () => new BookSnapshotComputable(options)
+export const computeBookSnapshots = (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) => () =>
+  new BookSnapshotComputable(options)
 
 const emptyBookLevel = {
   price: 0,
