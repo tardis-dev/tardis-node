@@ -5,7 +5,7 @@ import https, { RequestOptions } from 'https'
 import pMap from 'p-map'
 import path from 'path'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, formatDateToPath, HttpError, ONE_SEC_IN_MS, sequence, sha256, wait } from './handy'
+import { addMinutes, formatDateToPath, HttpError, ONE_SEC_IN_MS, sequence, sha256, wait, optimizeFilters } from './handy'
 import { Exchange, Filter } from './types'
 
 const httpsAgent = new https.Agent({
@@ -30,42 +30,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   const MILLISECONDS_IN_MINUTE = 60 * 1000
   const CONCURRENCY_LIMIT = 60
   // deduplicate filters (if the channel was provided multiple times)
-  const filters = payload.filters.reduce((prev, current) => {
-    const matchingExisting = prev.find((c) => c.channel === current.channel)
-
-    if (matchingExisting) {
-      // both previous and current have symbols let's merge them
-      if (matchingExisting.symbols && current.symbols) {
-        matchingExisting.symbols.push(...current.symbols)
-      } else if (current.symbols) {
-        matchingExisting.symbols = [...current.symbols]
-      }
-    } else {
-      prev.push(current)
-    }
-
-    return prev
-  }, [] as Filter<any>[])
-
-  // sort filters in place to improve local disk cache ratio (no matter filters order if the same filters are provided will hit the cache)
-  filters.sort((f1, f2) => {
-    if (f1.channel < f2.channel) {
-      return -1
-    }
-
-    if (f1.channel > f2.channel) {
-      return 1
-    }
-
-    return 0
-  })
-
-  // sort and deduplicate filters symbols
-  filters.forEach((filter) => {
-    if (filter.symbols) {
-      filter.symbols = [...new Set(filter.symbols)].sort()
-    }
-  })
+  const filters = optimizeFilters(payload.filters)
 
   // let's calculate number of minutes between "from" and "to" dates as those will give us total number of requests or checks
   // that will have to be performed concurrently with CONCURRENCY_LIMIT

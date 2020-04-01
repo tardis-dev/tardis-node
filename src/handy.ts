@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { Mapper } from './mappers'
-import { Disconnect, Exchange, FilterForExchange } from './types'
+import { Disconnect, Exchange, FilterForExchange, Filter } from './types'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
@@ -27,7 +27,7 @@ export function formatDateToPath(date: Date) {
   return `${year}/${month}/${day}/${hour}/${minute}`
 }
 
-function doubleDigit(input: number) {
+export function doubleDigit(input: number) {
   return input < 10 ? '0' + input : '' + input
 }
 
@@ -169,4 +169,46 @@ export function parseμs(dateString: string): number {
   }
 
   return 0
+}
+
+export function optimizeFilters(filters: Filter<any>[]) {
+  // deduplicate filters (if the channel was provided multiple times)
+  const optimizedFilters = filters.reduce((prev, current) => {
+    const matchingExisting = prev.find((c) => c.channel === current.channel)
+
+    if (matchingExisting) {
+      // both previous and current have symbols let's merge them
+      if (matchingExisting.symbols && current.symbols) {
+        matchingExisting.symbols.push(...current.symbols)
+      } else if (current.symbols) {
+        matchingExisting.symbols = [...current.symbols]
+      }
+    } else {
+      prev.push(current)
+    }
+
+    return prev
+  }, [] as Filter<any>[])
+
+  // sort filters in place to improve local disk cache ratio (no matter filters order if the same filters are provided will hit the cache)
+  optimizedFilters.sort((f1, f2) => {
+    if (f1.channel < f2.channel) {
+      return -1
+    }
+
+    if (f1.channel > f2.channel) {
+      return 1
+    }
+
+    return 0
+  })
+
+  // sort and deduplicate filters symbols
+  optimizedFilters.forEach((filter) => {
+    if (filter.symbols) {
+      filter.symbols = [...new Set(filter.symbols)].sort()
+    }
+  })
+
+  return optimizedFilters
 }
