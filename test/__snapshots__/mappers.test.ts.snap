@@ -578,7 +578,7 @@ Array [
     "exchange": "bitflyer",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
-    "symbol": "FX_BTC_JPY",
+    "symbol": "BCH_BTC",
     "timestamp": 2019-09-01T00:00:01.275Z,
     "type": "book_change",
   },

@@ -42,28 +42,39 @@ const mapBookLevel = ({ price, size }: BitflyerBookLevel) => {
   return { price, amount: size }
 }
 
-export const bitflyerBookChangeMapper: Mapper<'bitflyer', BookChange> = {
+export class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
+  private readonly _snapshotsInfo: Map<string, boolean> = new Map()
+
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
     return message.params.channel.startsWith('lightning_board')
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return [
       {
         channel: 'lightning_board_snapshot',
         symbols
-      },
+      } as const,
       {
         channel: 'lightning_board',
         symbols
-      }
+      } as const
     ]
-  },
+  }
 
   *map(bitflyerBoard: BitflyerBoard, localTimestamp: Date): IterableIterator<BookChange> {
     const channel = bitflyerBoard.params.channel
     const isSnapshot = channel.startsWith('lightning_board_snapshot_')
     const symbol = isSnapshot ? channel.replace('lightning_board_snapshot_', '') : channel.replace('lightning_board_', '')
+
+    if (this._snapshotsInfo.has(symbol) === false) {
+      if (isSnapshot) {
+        this._snapshotsInfo.set(symbol, true)
+      } else {
+        // skip change messages until we've received book snapshot
+        return
+      }
+    }
 
     yield {
       type: 'book_change',
@@ -100,7 +111,7 @@ type BitflyerBookLevel = {
 type BitflyerBoard = {
   method: 'channelMessage'
   params: {
-    channel: 'lightning_board_snapshot_ETH_BTC'
+    channel: string
     message: {
       bids: BitflyerBookLevel[]
       asks: BitflyerBookLevel[]

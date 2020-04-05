@@ -1479,7 +1479,7 @@ describe('mappers', () => {
         jsonrpc: '2.0',
         method: 'channelMessage',
         params: {
-          channel: 'lightning_board_FX_BTC_JPY',
+          channel: 'lightning_board_BCH_BTC',
           message: {
             mid_price: 1046397.0,
             bids: [{ price: 1043400.0, size: 0.05 }],
