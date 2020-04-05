@@ -175,28 +175,32 @@ describe('replay', () => {
     1000 * 60 * 10
   )
 
-  test('unauthorizedAccess', async () => {
-    const dataFeedWithUnautorizedAccesss = replay({
-      exchange: 'binance',
-      from: '2019-05-01 23:00',
-      to: '2019-05-02 00:06',
-      filters: [
-        {
-          channel: 'trade'
+  test(
+    'unauthorizedAccess',
+    async () => {
+      const dataFeedWithUnautorizedAccesss = replay({
+        exchange: 'binance',
+        from: '2019-05-01 23:00',
+        to: '2019-05-02 00:06',
+        filters: [
+          {
+            channel: 'trade'
+          }
+        ]
+      })
+      let receivedCount = 0
+      try {
+        for await (let _ of dataFeedWithUnautorizedAccesss) {
+          receivedCount++
         }
-      ]
-    })
-    let receivedCount = 0
-    try {
-      for await (let _ of dataFeedWithUnautorizedAccesss) {
-        receivedCount++
+      } catch (e) {
+        expect(e).toHaveProperty('status')
       }
-    } catch (e) {
-      expect(e).toHaveProperty('status')
-    }
 
-    expect(receivedCount).toBe(0)
-  })
+      expect(receivedCount).toBe(0)
+    },
+    20 * 1000
+  )
 
   test(
     'replays normalized data for each supported exchange',

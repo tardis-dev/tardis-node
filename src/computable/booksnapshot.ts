@@ -1,5 +1,5 @@
 import { OrderBook } from '../orderbook'
-import { BookChange, BookPriceLevel, BookSnapshot } from '../types'
+import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types'
 import { Computable } from './computable'
 
 type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number }
@@ -8,11 +8,11 @@ export const computeBookSnapshots = (options: BookSnapshotComputableOptions): ((
   new BookSnapshotComputable(options)
 
 const emptyBookLevel = {
-  price: 0,
-  amount: 0
+  price: undefined,
+  amount: undefined
 }
 
-const levelsChanged = (level1: BookPriceLevel, level2: BookPriceLevel) => {
+const levelsChanged = (level1: Optional<BookPriceLevel>, level2: Optional<BookPriceLevel>) => {
   if (level1.amount !== level2.amount) {
     return true
   }
@@ -35,8 +35,8 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private readonly _name: string
 
   private _lastUpdateTimestamp: Date = new Date(-1)
-  private _bids: BookPriceLevel[] = []
-  private _asks: BookPriceLevel[] = []
+  private _bids: Optional<BookPriceLevel>[] = []
+  private _asks: Optional<BookPriceLevel>[] = []
 
   constructor({ depth, name, interval }: BookSnapshotComputableOptions) {
     this._depth = depth

@@ -102,8 +102,8 @@ export type BookSnapshot = {
   readonly name: string
   readonly depth: number
   readonly interval: number
-  readonly bids: BookPriceLevel[]
-  readonly asks: BookPriceLevel[]
+  readonly bids: Optional<BookPriceLevel>[]
+  readonly asks: Optional<BookPriceLevel>[]
 
   readonly timestamp: Date
   readonly localTimestamp: Date
@@ -114,3 +114,5 @@ declare global {
     μs?: number
   }
 }
+
+export type Optional<T> = { [P in keyof T]: T[P] | undefined }
