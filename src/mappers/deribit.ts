@@ -109,7 +109,6 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(deribitTicker.instrument_name, 'deribit')
 
     pendingTickerInfo.updateFundingRate(deribitTicker.current_funding)
-    pendingTickerInfo.updatePredictedFundingRate(deribitTicker.funding_8h)
     pendingTickerInfo.updateIndexPrice(deribitTicker.index_price)
     pendingTickerInfo.updateMarkPrice(deribitTicker.mark_price)
     pendingTickerInfo.updateOpenInterest(deribitTicker.open_interest)
