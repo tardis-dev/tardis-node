@@ -35,7 +35,13 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
 }
 
 export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
-  private readonly _idToPriceLevelMap: Map<number, number> = new Map()
+  private readonly _idToPriceLevelMap: Map<
+    number,
+    {
+      price: number
+      side: 'Buy' | 'Sell'
+    }
+  > = new Map()
 
   canHandle(message: BitmexDataMessage) {
     return message.table === 'orderBookL2'
@@ -82,20 +88,48 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
       for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
         // https://www.bitmex.com/app/restAPI#OrderBookL2
         if (item.price !== undefined) {
-          // store the mapping from id to price level if price is specified
-          this._idToPriceLevelMap.set(item.id, item.price)
+          // store mapping from id to price level and side if price is specified
+          // as update and delete messages do not contain that info
+          this._idToPriceLevelMap.set(item.id, {
+            price: item.price,
+            side: item.side
+          })
         }
-        const price = this._idToPriceLevelMap.get(item.id)
-        const amount = item.size || 0 // delete messages do not contain size specified
-        // if we still don't have a price it means that there was an update before partial message - let's skip it
-        if (price === undefined) {
+
+        const cachedItemInfo = this._idToPriceLevelMap.get(item.id)
+        // if we still don't have a price info it means that there was an update before partial message - let's skip it
+        if (cachedItemInfo === undefined) {
           continue
         }
 
-        if (item.side === 'Buy') {
-          bids.push({ price, amount })
+        const amount = item.size || 0 // delete messages do not contain size field
+
+        const { price, side } = cachedItemInfo
+
+        // if updated level has the same side as cached level simply add it to proper array according to it's side
+        if (side === item.side) {
+          if (item.side === 'Buy') {
+            bids.push({ price, amount })
+          } else {
+            asks.push({ price, amount })
+          }
         } else {
-          asks.push({ price, amount })
+          // sometimes it happens that updated level (action=update) has changed side instead of being deleted from one side (action=delete)
+          // and then added on the opposite side (action=insert)
+          // in such case we need to remove the level from oposite side of the book and add new level
+          if (item.side === 'Buy') {
+            bids.push({ price, amount })
+            asks.push({ price, amount: 0 })
+          } else {
+            bids.push({ price, amount: 0 })
+            asks.push({ price, amount })
+          }
+
+          // update cached info as side has changed
+          this._idToPriceLevelMap.set(item.id, {
+            price,
+            side: item.side
+          })
         }
       }
 
