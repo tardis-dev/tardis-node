@@ -66,16 +66,6 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
       ]
     }
 
-    // spot market historical data doesn't currently provide tick by tick channel
-    if (this._market === 'spot') {
-      return [
-        {
-          channel: `${this._market}/depth`,
-          symbols
-        } as const
-      ]
-    }
-
     // subscribe to both book channels and in canHandle decide which one to use
     // as one can subscribe to date range period that overlaps both when only depth channel has been available
     // and when both were available (both depth and depth_l2_tbt)

@@ -81,7 +81,7 @@ const bookChangeMappers = {
   ftx: () => ftxBookChangeMapper,
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
-  okex: () => new OkexBookChangeMapper('okex', 'spot', false),
+  okex: (localTimestamp: Date) => new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
   'okex-futures': (localTimestamp: Date) =>
     new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
 

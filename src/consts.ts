@@ -89,7 +89,7 @@ const DERIBIT_CHANNELS = [
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
 
-const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/ticker'] as const
+const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker'] as const
 
 const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker'] as const
 

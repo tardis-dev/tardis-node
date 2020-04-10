@@ -40,6 +40,7 @@ describe('stream', () => {
           }
 
           var symbols = exchangeDetails.availableSymbols
+            .filter((s) => s.id !== undefined)
             .filter((s) => s.availableTo === undefined || new Date(s.availableTo).valueOf() > new Date().valueOf())
             .slice(0, 10)
             .map((s) => s.id)
