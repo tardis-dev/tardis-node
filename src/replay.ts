@@ -156,6 +156,14 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
     }
 
+    debug(
+      'replay for exchange: %s finished - from: %s, to: %s, filters: %o',
+      exchange,
+      fromDate.toISOString(),
+      toDate.toISOString(),
+      filters
+    )
+  } finally {
     if (autoCleanup) {
       debug(
         'replay for exchange %s auto cleanup started - from: %s, to: %s, filters: %o',
@@ -180,14 +188,6 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       )
     }
 
-    debug(
-      'replay for exchange: %s finished - from: %s, to: %s, filters: %o',
-      exchange,
-      fromDate.toISOString(),
-      toDate.toISOString(),
-      filters
-    )
-  } finally {
     await worker.terminate()
   }
 }
