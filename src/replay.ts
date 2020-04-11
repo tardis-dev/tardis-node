@@ -288,9 +288,7 @@ function validateReplayNormalizedOptions(fromDate: Date, normalizers: MapperFact
   const dateDoesNotStartAtTheBeginningOfTheDay = fromDate.getUTCHours() !== 0 || fromDate.getUTCMinutes() !== 0
 
   if (hasBookChangeNormalizer && dateDoesNotStartAtTheBeginningOfTheDay) {
-    throw new Error(
-      `Invalid "from" argument: ${fromDate.toISOString()}. Please provide date string starting at 00:00 UTC as otherwise initial book snapshots won't be available.`
-    )
+    debug('Initial order book snapshots are available only at 00:00 UTC')
   }
 }
 
