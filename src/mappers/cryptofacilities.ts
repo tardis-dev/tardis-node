@@ -5,7 +5,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 export const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
-    return message.feed === 'trade'
+    return message.feed === 'trade' && message.event === undefined
   },
 
   getFilters(symbols?: string[]) {
@@ -38,7 +38,7 @@ const mapBookLevel = ({ price, qty }: CryptofacilitiesBookLevel) => {
 
 export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> = {
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
-    return message.feed === 'book' || message.feed === 'book_snapshot'
+    return message.event === undefined && (message.feed === 'book' || message.feed === 'book_snapshot')
   },
 
   getFilters(symbols?: string[]) {
@@ -92,7 +92,7 @@ export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookCh
 export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
-    return message.feed === 'ticker'
+    return message.feed === 'ticker' && message.event === undefined
   }
 
   getFilters(symbols?: string[]) {
