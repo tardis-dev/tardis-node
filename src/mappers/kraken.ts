@@ -51,6 +51,16 @@ const mapBookLevel = (level: KrakenBookLevel) => {
   return { price: Number(price), amount: Number(amount) }
 }
 
+const getLatestTimestamp = (bids: KrakenBookLevel[], asks: KrakenBookLevel[]): Date => {
+  const timestampsSorted = [...bids.map((b) => Number(b[2])), ...asks.map((b) => Number(b[2]))].sort()
+  const lastBookUpdateTime = timestampsSorted[timestampsSorted.length - 1]
+
+  const timestamp = new Date(lastBookUpdateTime * 1000)
+  timestamp.μs = Math.floor(lastBookUpdateTime * 1000000) % 1000
+
+  return timestamp
+}
+
 export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   canHandle(message: Trade) {
     if (!Array.isArray(message)) {
@@ -83,7 +93,7 @@ export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
 
         bids: bs.map(mapBookLevel),
         asks: as.map(mapBookLevel),
-        timestamp: localTimestamp,
+        timestamp: getLatestTimestamp(as, bs),
         localTimestamp: localTimestamp
       }
     } else {
@@ -100,7 +110,7 @@ export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
 
         bids: bids.map(mapBookLevel),
         asks: asks.map(mapBookLevel),
-        timestamp: localTimestamp,
+        timestamp: getLatestTimestamp(asks, bids),
         localTimestamp: localTimestamp
       }
     }

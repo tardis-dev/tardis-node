@@ -2056,7 +2056,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "XMR/USD",
-    "timestamp": 2019-09-01T00:00:01.275Z,
+    "timestamp": 2019-07-01T00:00:58.527Z,
     "type": "book_change",
   },
 ]
@@ -2089,7 +2089,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/USD",
-    "timestamp": 2019-09-01T00:00:01.275Z,
+    "timestamp": 2019-07-01T00:00:58.534Z,
     "type": "book_change",
   },
 ]
@@ -2113,7 +2113,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/EUR",
-    "timestamp": 2019-09-01T00:00:01.275Z,
+    "timestamp": 2019-07-01T00:00:58.548Z,
     "type": "book_change",
   },
 ]
@@ -2138,7 +2138,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "book-1000",
-    "timestamp": 2019-09-01T00:00:01.275Z,
+    "timestamp": 2019-06-30T23:59:59.992Z,
     "type": "book_change",
   },
 ]
