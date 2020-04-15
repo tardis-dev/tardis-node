@@ -6,6 +6,7 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
   protected abstract wssURL: string
   protected abstract httpURL: string
   protected bookUpdateSpeed = '@100ms'
+  protected batchSubscriptions = true
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters
@@ -14,19 +15,28 @@ abstract class BinanceRealTimeFeedBase extends RealTimeFeedBase {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error('BinanceRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
+        const channel = filter.channel === 'depth' ? `depth${this.bookUpdateSpeed}` : filter.channel
 
-        return filter.symbols.map((s, sIndex) => {
-          const channel = filter.channel === 'depth' ? `depth${this.bookUpdateSpeed}` : filter.channel
-          return {
-            method: 'SUBSCRIBE',
-            params: [`${s}@${channel}`],
-            id: index + sIndex + 1
-          }
-        })
+        if (this.batchSubscriptions) {
+          return [
+            {
+              method: 'SUBSCRIBE',
+              params: filter.symbols.map((symbol) => `${symbol}@${channel}`),
+              id: index + 1
+            }
+          ]
+        } else {
+          return filter.symbols.map((s, sIndex) => {
+            return {
+              method: 'SUBSCRIBE',
+              params: [`${s}@${channel}`],
+              id: index + sIndex + 1
+            }
+          })
+        }
       })
-      .flatMap((s) => s)
 
-    return payload
+    return payload.flatMap((p) => p)
   }
 
   protected messageIsError(message: any): boolean {
@@ -80,6 +90,7 @@ export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
 export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://stream.binance.je:9443/stream'
   protected httpURL = 'https://api.binance.je/api/v1'
+  protected batchSubscriptions = false
 }
 
 export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
