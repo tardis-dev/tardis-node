@@ -33,7 +33,7 @@ export const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
 }
 
 const mapBookLevel = ({ price, qty }: CryptofacilitiesBookLevel) => {
-  return { price, amount: qty }
+  return { price, amount: qty < 0 ? 0 : qty }
 }
 
 export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> = {
@@ -71,7 +71,7 @@ export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookCh
       const update = [
         {
           price: message.price,
-          amount: message.qty
+          amount: message.qty < 0 ? 0 : message.qty
         }
       ]
 
