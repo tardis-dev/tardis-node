@@ -2,7 +2,21 @@ import { OrderBook } from '../orderbook'
 import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types'
 import { Computable } from './computable'
 
-type BookSnapshotComputableOptions = { name?: string; depth: number; interval: number; removeCrossedLevels?: boolean }
+type OnLevelRemovedCB = (
+  bookChange: BookChange,
+  bestBidBeforeRemoval: BookPriceLevel | undefined,
+  bestBidAfterRemoval: BookPriceLevel | undefined,
+  bestAskBeforeRemoval: BookPriceLevel | undefined,
+  bestAskAfterRemoval: BookPriceLevel | undefined
+) => void
+
+type BookSnapshotComputableOptions = {
+  name?: string
+  depth: number
+  interval: number
+  removeCrossedLevels?: boolean
+  onCrossedLevelRemoved?: OnLevelRemovedCB
+}
 
 export const computeBookSnapshots = (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) => () =>
   new BookSnapshotComputable(options)
@@ -33,16 +47,18 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private readonly _depth: number
   private readonly _interval: number
   private readonly _name: string
-  private readonly _removeCrossedLevels?: boolean
+  private readonly _removeCrossedLevels: boolean | undefined
+  private readonly _onCrossedLevelRemoved: OnLevelRemovedCB | undefined
 
   private _lastUpdateTimestamp: Date = new Date(-1)
   private _bids: Optional<BookPriceLevel>[] = []
   private _asks: Optional<BookPriceLevel>[] = []
 
-  constructor({ depth, name, interval, removeCrossedLevels }: BookSnapshotComputableOptions) {
+  constructor({ depth, name, interval, removeCrossedLevels, onCrossedLevelRemoved }: BookSnapshotComputableOptions) {
     this._depth = depth
     this._interval = interval
     this._removeCrossedLevels = removeCrossedLevels
+    this._onCrossedLevelRemoved = onCrossedLevelRemoved
 
     // initialize all bids/asks levels to empty ones
     for (let i = 0; i < this._depth; i++) {
@@ -123,9 +139,14 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
           } else {
             this._orderBook.removeBestAsk()
           }
+          const newBestBid = this._orderBook.bestBid()
+          const newBestAsk = this._orderBook.bestAsk()
+          if (this._onCrossedLevelRemoved !== undefined) {
+            this._onCrossedLevelRemoved(bookChange, bestBid, newBestBid, bestAsk, newBestAsk)
+          }
 
-          bestBid = this._orderBook.bestBid()
-          bestAsk = this._orderBook.bestAsk()
+          bestBid = newBestBid
+          bestAsk = newBestAsk
           bookIsCrossed = bestBid !== undefined && bestAsk !== undefined && bestBid.price >= bestAsk.price
         }
       }
