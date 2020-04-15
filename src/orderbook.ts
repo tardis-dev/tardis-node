@@ -39,6 +39,32 @@ export class OrderBook {
     return undefined
   }
 
+  public removeBestAsk() {
+    const bestAsk = this.bestAsk()
+
+    if (bestAsk !== undefined) {
+      applyPriceLevelChanges(this._asks, [
+        {
+          price: bestAsk.price,
+          amount: 0
+        }
+      ])
+    }
+  }
+
+  public removeBestBid() {
+    const bestBid = this.bestBid()
+
+    if (bestBid !== undefined) {
+      applyPriceLevelChanges(this._bids, [
+        {
+          price: bestBid.price,
+          amount: 0
+        }
+      ])
+    }
+  }
+
   public *bids(): IterableIterator<BookPriceLevel> {
     const iterator = this._bids.iterator()
     let level = iterator.next()
