@@ -132,7 +132,9 @@ class PendingDerivativeTickerInfo {
   }
 
   public updateTimestamp(timestamp: Date) {
-    this._pendingTicker.timestamp = timestamp
+    if (this._pendingTicker.timestamp === undefined || this._pendingTicker.timestamp.valueOf() <= timestamp.valueOf()) {
+      this._pendingTicker.timestamp = timestamp
+    }
   }
 
   public hasChanged() {
