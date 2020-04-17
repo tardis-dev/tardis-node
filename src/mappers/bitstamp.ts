@@ -140,7 +140,7 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
     // skip all book updates that preceed book snapshot
     // REST API not always returned microtimestamps for initial order book snapshots
     // fallback to timestamp
-    if (depthInfo.lastUpdateMicroTimestamp !== undefined && microtimestamp < depthInfo.lastUpdateMicroTimestamp) {
+    if (depthInfo.lastUpdateMicroTimestamp !== undefined && microtimestamp <= depthInfo.lastUpdateMicroTimestamp) {
       return
     } else if (Number(bitstampBookUpdate.data.timestamp) < depthInfo.lastUpdateTimestamp!) {
       return
