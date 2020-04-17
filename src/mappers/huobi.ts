@@ -69,13 +69,16 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
     const symbol = message.ch.split('.')[1].toUpperCase()
     const isSnapshot = 'event' in message.tick ? message.tick.event === 'snapshot' : 'update' in message ? false : true
     const data = message.tick
+    const bids = data.bids !== null ? data.bids : []
+    const asks = data.asks !== null ? data.asks : []
+
     yield {
       type: 'book_change',
       symbol,
       exchange: this._exchange,
       isSnapshot,
-      bids: data.bids.map(this._mapBookLevel),
-      asks: data.asks.map(this._mapBookLevel),
+      bids: bids.map(this._mapBookLevel),
+      asks: asks.map(this._mapBookLevel),
       timestamp: new Date(message.ts),
       localTimestamp: localTimestamp
     } as const
@@ -125,15 +128,15 @@ type HuobiDepthDataMessage = HuobiDataMessage &
         update?: boolean
         ts: number
         tick: {
-          bids: HuobiBookLevel[]
-          asks: HuobiBookLevel[]
+          bids: HuobiBookLevel[] | null
+          asks: HuobiBookLevel[] | null
         }
       }
     | {
         ts: number
         tick: {
-          bids: HuobiBookLevel[]
-          asks: HuobiBookLevel[]
+          bids: HuobiBookLevel[] | null
+          asks: HuobiBookLevel[] | null
           event: 'snapshot' | 'update'
         }
       }
