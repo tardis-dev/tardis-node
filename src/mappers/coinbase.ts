@@ -46,23 +46,25 @@ const mapSnapshotBookLevel = (level: CoinbaseSnapshotBookLevel) => {
   return { price, amount }
 }
 
-export const coinbaseBookChangMapper: Mapper<'coinbase', BookChange> = {
+export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
+  private readonly _symbolLastTimestampMap = new Map<string, Date>()
+
   canHandle(message: CoinbaseTrade | CoinbaseLevel2Snapshot | CoinbaseLevel2Update) {
     return message.type === 'l2update' || message.type === 'snapshot'
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return [
       {
         channel: 'snapshot',
         symbols
-      },
+      } as const,
       {
         channel: 'l2update',
         symbols
-      }
+      } as const
     ]
-  },
+  }
 
   *map(message: CoinbaseLevel2Update | CoinbaseLevel2Snapshot, localTimestamp: Date): IterableIterator<BookChange> {
     if (message.type === 'snapshot') {
@@ -77,6 +79,19 @@ export const coinbaseBookChangMapper: Mapper<'coinbase', BookChange> = {
         localTimestamp
       }
     } else {
+      // in very rare cases, Coinbase was returning timestamps that aren't valid, like: "time":"0001-01-01T00:00:00.000000Z"
+      // but l2update message was still valid and we need to process it, in such case use timestamp of previous message
+      let timestamp = new Date(message.time)
+      if (timestamp.valueOf() < 0) {
+        let previousValidTimestamp = this._symbolLastTimestampMap.get(message.product_id)
+        if (previousValidTimestamp === undefined) {
+          return
+        }
+        timestamp = previousValidTimestamp
+      } else {
+        this._symbolLastTimestampMap.set(message.product_id, timestamp)
+      }
+
       yield {
         type: 'book_change',
         symbol: message.product_id,
@@ -84,7 +99,7 @@ export const coinbaseBookChangMapper: Mapper<'coinbase', BookChange> = {
         isSnapshot: false,
         bids: message.changes.filter((c) => c[0] === 'buy').map(mapUpdateBookLevel),
         asks: message.changes.filter((c) => c[0] === 'sell').map(mapUpdateBookLevel),
-        timestamp: new Date(message.time),
+        timestamp,
         localTimestamp: localTimestamp
       }
     }

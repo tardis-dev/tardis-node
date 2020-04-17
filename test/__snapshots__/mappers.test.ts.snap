@@ -1169,6 +1169,31 @@ Array [
 ]
 `;
 
+exports[`mappers map coinbase messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.00459825,
+        "price": 9222.39,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.5866786,
+        "price": 9202.7,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-EUR",
+    "timestamp": 2019-08-01T00:00:03.818Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map cryptofacilities messages 1`] = `
 Array [
   Object {

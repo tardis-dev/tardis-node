@@ -1588,6 +1588,15 @@ describe('mappers', () => {
         type: 'snapshot',
         bids: [['0.247175', '5299']],
         asks: [['0.257175', '12']]
+      },
+      {
+        type: 'l2update',
+        product_id: 'BTC-EUR',
+        changes: [
+          ['buy', '9202.70', '0.58667860'],
+          ['sell', '9222.39', '0.00459825']
+        ],
+        time: '0001-01-01T00:00:00.000000Z'
       }
     ]
 
