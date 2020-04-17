@@ -138,7 +138,10 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
         pendingTickerInfo.updateMarkPrice(Number(okexMessage.mark_price))
       }
       if ('open_interest' in okexMessage) {
-        pendingTickerInfo.updateOpenInterest(Number(okexMessage.open_interest))
+        const openInterest = Number(okexMessage.open_interest)
+        if (openInterest > 0) {
+          pendingTickerInfo.updateOpenInterest(Number(okexMessage.open_interest))
+        }
       }
       if ('last' in okexMessage) {
         pendingTickerInfo.updateLastPrice(Number(okexMessage.last))
