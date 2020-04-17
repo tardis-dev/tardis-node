@@ -26,6 +26,9 @@ export class PendingTickerInfoHelper {
 
     return pendingTickerInfo
   }
+  public hasPendingTickerInfo(symbol: string) {
+    return this._pendingTickers.has(symbol)
+  }
 }
 
 class PendingDerivativeTickerInfo {

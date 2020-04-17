@@ -140,22 +140,33 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
 
   *map(message: BitmexInstrumentsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const bitmexInstrument of message.data) {
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(bitmexInstrument.symbol, 'bitmex')
+      // process instrument messages only if:
+      // - we already have seen their 'partials' or already have 'pending info'
+      // - and instruments aren't settled or unlisted already
+      const isOpen = bitmexInstrument.state === undefined || bitmexInstrument.state === 'Open' || bitmexInstrument.state === 'Closed'
+      const isPartial = message.action === 'partial'
+      const hasPendingInfo = this.pendingTickerInfoHelper.hasPendingTickerInfo(bitmexInstrument.symbol)
 
-      pendingTickerInfo.updateFundingRate(bitmexInstrument.fundingRate)
-      pendingTickerInfo.updatePredictedFundingRate(bitmexInstrument.indicativeFundingRate)
-      pendingTickerInfo.updateFundingTimestamp(bitmexInstrument.fundingTimestamp ? new Date(bitmexInstrument.fundingTimestamp) : undefined)
-      pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)
-      pendingTickerInfo.updateMarkPrice(bitmexInstrument.markPrice)
-      pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
-      pendingTickerInfo.updateLastPrice(bitmexInstrument.lastPrice)
+      if ((isPartial || hasPendingInfo) && isOpen) {
+        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(bitmexInstrument.symbol, 'bitmex')
 
-      if (bitmexInstrument.timestamp !== undefined) {
-        pendingTickerInfo.updateTimestamp(new Date(bitmexInstrument.timestamp))
-      }
+        pendingTickerInfo.updateFundingRate(bitmexInstrument.fundingRate)
+        pendingTickerInfo.updatePredictedFundingRate(bitmexInstrument.indicativeFundingRate)
+        pendingTickerInfo.updateFundingTimestamp(
+          bitmexInstrument.fundingTimestamp ? new Date(bitmexInstrument.fundingTimestamp) : undefined
+        )
+        pendingTickerInfo.updateIndexPrice(bitmexInstrument.indicativeSettlePrice)
+        pendingTickerInfo.updateMarkPrice(bitmexInstrument.markPrice)
+        pendingTickerInfo.updateOpenInterest(bitmexInstrument.openInterest)
+        pendingTickerInfo.updateLastPrice(bitmexInstrument.lastPrice)
 
-      if (pendingTickerInfo.hasChanged()) {
-        yield pendingTickerInfo.getSnapshot(localTimestamp)
+        if (bitmexInstrument.timestamp !== undefined) {
+          pendingTickerInfo.updateTimestamp(new Date(bitmexInstrument.timestamp))
+        }
+
+        if (pendingTickerInfo.hasChanged()) {
+          yield pendingTickerInfo.getSnapshot(localTimestamp)
+        }
       }
     }
   }
@@ -174,6 +185,7 @@ type BitmexTradesMessage = BitmexDataMessage & {
 
 type BitmexInstrument = {
   symbol: string
+  state?: 'Open' | 'Closed' | 'Unlisted' | 'Settled'
   openInterest?: number | null
   fundingRate?: number | null
   markPrice?: number | null

@@ -789,24 +789,7 @@ Array [
 ]
 `;
 
-exports[`mappers map bitmex messages 11`] = `
-Array [
-  Object {
-    "exchange": "bitmex",
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "indexPrice": undefined,
-    "lastPrice": undefined,
-    "localTimestamp": 2019-06-01T00:00:28.619Z,
-    "markPrice": undefined,
-    "openInterest": 58922153,
-    "predictedFundingRate": undefined,
-    "symbol": "ETHUSD",
-    "timestamp": undefined,
-    "type": "derivative_ticker",
-  },
-]
-`;
+exports[`mappers map bitmex messages 11`] = `Array []`;
 
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
