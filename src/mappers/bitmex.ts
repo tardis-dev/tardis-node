@@ -35,13 +35,7 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
 }
 
 export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
-  private readonly _idToPriceLevelMap: Map<
-    number,
-    {
-      price: number
-      side: 'Buy' | 'Sell'
-    }
-  > = new Map()
+  private readonly _idToPriceLevelMap: Map<number, number> = new Map()
 
   canHandle(message: BitmexDataMessage) {
     return message.table === 'orderBookL2'
@@ -87,50 +81,23 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
 
       for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
         // https://www.bitmex.com/app/restAPI#OrderBookL2
-        let levelMeta = this._idToPriceLevelMap.get(item.id)
-
-        // There are cases when bitmex can publish:
-        // a) update for a given level that has also changed side, for example it was a bid now it's an ask but we've got single message (instead of two: insert to asks and delete from bids)
-        // b) insert message to add new level but such level already exists but on the other side of the order book, but still there was no delete message for the other side of the book
-        // We need to detect such cases and in addition to normal processing also remove the level from the opposite side
-        let levelSwitchedSides = levelMeta !== undefined && levelMeta.side !== item.side
-
-        if (item.price !== undefined || levelSwitchedSides) {
-          // as long as price or side has changed we need to update our local meta info
-          const metaToCache = {
-            price: item.price !== undefined ? item.price : levelMeta!.price,
-            side: item.side
-          }
-
-          this._idToPriceLevelMap.set(item.id, metaToCache)
-          levelMeta = metaToCache
+        if (item.price !== undefined) {
+          // store the mapping from id to price level if price is specified
+          // only partials and inserts have price set
+          this._idToPriceLevelMap.set(item.id, item.price)
         }
-
-        // if we still don't have a meta info it means that there was an update before partial message - let's skip it
-        if (levelMeta === undefined) {
+        const price = this._idToPriceLevelMap.get(item.id)
+        const amount = item.size || 0 // delete messages do not have size specified
+        // if we still don't have a price it means that there was an update before partial message - let's skip it
+        if (price === undefined) {
           continue
         }
 
-        const amount = item.size || 0 // delete messages do not contain size field
-
-        const { price } = levelMeta
-
-        // construct book change according to provided item side
         if (item.side === 'Buy') {
           bids.push({ price, amount })
         } else {
           asks.push({ price, amount })
         }
-
-        // as long as item side has changed we need to remove such level from the opposite side
-        if (levelSwitchedSides) {
-          if (item.side === 'Buy') {
-            asks.push({ price, amount: 0 })
-          } else {
-            bids.push({ price, amount: 0 })
-          }
-        }
-
         // remove meta info for deleted level
         if (bitmexOrderBookL2Message.action === 'delete') {
           this._idToPriceLevelMap.delete(item.id)
