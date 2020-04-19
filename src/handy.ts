@@ -1,6 +1,10 @@
-import { createHash } from 'crypto'
+import crypto, { createHash } from 'crypto'
+import { createWriteStream, ensureDirSync, rename } from 'fs-extra'
+import https, { RequestOptions } from 'https'
+import path from 'path'
+import { debug } from './debug'
 import { Mapper } from './mappers'
-import { Disconnect, Exchange, FilterForExchange, Filter } from './types'
+import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
@@ -215,4 +219,109 @@ export function optimizeFilters(filters: Filter<any>[]) {
   })
 
   return optimizedFilters
+}
+
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 10 * ONE_SEC_IN_MS
+})
+
+export async function download({
+  apiKey,
+  downloadPath,
+  url,
+  userAgent
+}: {
+  url: string
+  downloadPath: string
+  userAgent: string
+  apiKey: string
+}) {
+  const httpRequestOptions = {
+    agent: httpsAgent,
+    timeout: 45 * ONE_SEC_IN_MS,
+    headers: {
+      'Accept-Encoding': 'gzip',
+      'User-Agent': userAgent,
+      Authorization: apiKey ? `Bearer ${apiKey}` : ''
+    }
+  }
+
+  const MAX_ATTEMPTS = 5
+  let attempts = 0
+
+  while (true) {
+    // simple retry logic when fetching from the network...
+    attempts++
+    try {
+      return await _downloadFile(httpRequestOptions, url, downloadPath)
+    } catch (error) {
+      const badOrUnauthorizedRequest = error instanceof HttpError && (error.status === 400 || error.status === 401)
+      const tooManyRequests = error instanceof HttpError && error.status === 429
+      // do not retry when we've got bad or unauthorized request or enough attempts
+      if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
+        throw error
+      }
+
+      const randomIngridient = Math.random() * 500
+      const attemptsDelayMS = Math.pow(2, attempts) * ONE_SEC_IN_MS
+      let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
+
+      if (tooManyRequests) {
+        // when too many requests received wait longer
+        nextAttemptDelayMS += 3 * ONE_SEC_IN_MS * attempts
+      }
+
+      debug('download file error: %o, next attempt delay: %d, url %s, path: %s', error, nextAttemptDelayMS, url, downloadPath)
+
+      await wait(nextAttemptDelayMS)
+    }
+  }
+}
+
+async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string) {
+  // first ensure that directory where we want to download file exists
+  ensureDirSync(path.dirname(downloadPath))
+
+  // create write file stream that we'll write data into - first as unconfirmed temp file
+
+  const tmpFilePath = `${downloadPath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
+  const fileWriteStream = createWriteStream(tmpFilePath)
+  try {
+    // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
+    await new Promise((resolve, reject) => {
+      const req = https
+        .get(url, requestOptions, (res) => {
+          const { statusCode } = res
+          if (statusCode !== 200) {
+            // read the error response text and throw it as an HttpError
+            res.setEncoding('utf8')
+            let body = ''
+            res.on('data', (chunk) => (body += chunk))
+            res.on('end', () => {
+              reject(new HttpError(statusCode!, body, url))
+            })
+          } else {
+            // consume the response stream by writing it to the file
+            res
+              .on('error', reject)
+              .on('aborted', () => reject(new Error('Request aborted')))
+              .pipe(fileWriteStream)
+              .on('error', reject)
+              .on('finish', resolve)
+          }
+        })
+        .on('error', reject)
+        .on('timeout', () => {
+          debug('download file request timeout, %s', url)
+          req.abort()
+        })
+    })
+  } finally {
+    fileWriteStream.destroy()
+  }
+
+  // finally when saving from the network to file has succeded, rename tmp file to normal name
+  // then we're sure that responses is 100% saved and also even if different process was doing the same we're good
+  await rename(tmpFilePath, downloadPath)
 }
