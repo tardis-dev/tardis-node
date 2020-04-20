@@ -18,7 +18,10 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
   const format = downloadDatasetsOptions.format !== undefined ? downloadDatasetsOptions.format : 'csv'
   const getFilename = downloadDatasetsOptions.getFilename !== undefined ? downloadDatasetsOptions.getFilename : getFilenameDefault
 
-  for (const symbol of symbols) {
+  // in case someone provided 'api/exchange' symbol, transform it to symbol that is accepted by datasets API
+  const datasetsSymbols = symbols.map((s) => s.replace(/\/|:/g, '-').toUpperCase())
+
+  for (const symbol of datasetsSymbols) {
     for (const dataType of dataTypes) {
       const { daysCountToFetch, startDate } = getDownloadDateRange(downloadDatasetsOptions)
       const startTimestamp = new Date().valueOf()
