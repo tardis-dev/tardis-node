@@ -4,6 +4,7 @@ const pkg = require('../package.json')
 
 const defaultOptions: Options = {
   endpoint: 'https://api.tardis.dev/v1',
+  datasetsEndpoint: 'https://datasets.tardis.dev/v1',
   cacheDir: path.join(os.tmpdir(), '.tardis-cache'),
   apiKey: '',
   _userAgent: `tardis-dev/${pkg.version} (+https://github.com/tardis-dev/tardis-node)`
@@ -21,6 +22,7 @@ export function getOptions() {
 
 type Options = {
   endpoint: string
+  datasetsEndpoint: string
   cacheDir: string
   apiKey: string
   _userAgent: string

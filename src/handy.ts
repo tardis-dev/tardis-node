@@ -1,5 +1,5 @@
 import crypto, { createHash } from 'crypto'
-import { createWriteStream, ensureDirSync, rename } from 'fs-extra'
+import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
 import https, { RequestOptions } from 'https'
 import path from 'path'
 import { debug } from './debug'
@@ -317,11 +317,14 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
           req.abort()
         })
     })
+
+    // finally when saving from the network to file has succeded, rename tmp file to normal name
+    // then we're sure that responses is 100% saved and also even if different process was doing the same we're good
+    await rename(tmpFilePath, downloadPath)
   } finally {
     fileWriteStream.destroy()
+    try {
+      removeSync(tmpFilePath)
+    } catch {}
   }
-
-  // finally when saving from the network to file has succeded, rename tmp file to normal name
-  // then we're sure that responses is 100% saved and also even if different process was doing the same we're good
-  await rename(tmpFilePath, downloadPath)
 }
