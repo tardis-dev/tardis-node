@@ -1333,6 +1333,32 @@ describe('mappers', () => {
       {
         stream: 'btcusdt@trade',
         data: { e: 'trade', E: 1574381164089, T: 1574381164086, s: 'BTCUSDT', t: 10934580, p: '7627.60', q: '0.044', m: false }
+      },
+      {
+        stream: 'btcusdt@depthSnapshot',
+        generated: true,
+        data: {
+          lastUpdateId: 687687945,
+          bids: [['8488.36', '1.501']],
+          asks: [
+            ['4095.99000000', '2.31652000'],
+            ['4096.00000000', '1.42541900']
+          ]
+        }
+      },
+      {
+        stream: 'btcusdt@depth@100ms',
+        data: {
+          e: 'depthUpdate',
+          E: 1573948821952,
+          T: 1573948821948,
+          s: 'BTCUSDT',
+          U: 687687944,
+          u: 687687946,
+          pu: 687690832,
+          b: [['8493.78', '0.162']],
+          a: []
+        }
       }
     ]
 

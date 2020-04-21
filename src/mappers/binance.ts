@@ -262,7 +262,7 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
-      timestamp: new Date(binanceDepthUpdateData.E),
+      timestamp: new Date(binanceDepthUpdateData.T),
       localTimestamp: localTimestamp
     }
   }
@@ -351,8 +351,10 @@ type BinanceDepthData = {
   a: BinanceBookLevel[]
 }
 
+// T is the time that updated in matching engine, while E is when pushing out from ws server
 type BinanceFuturesDepthData = BinanceDepthData & {
   pu: number
+  T: number
 }
 
 type BinanceDepthSnapshotData = {

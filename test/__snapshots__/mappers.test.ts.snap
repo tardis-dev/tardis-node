@@ -141,6 +141,55 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.31652,
+        "price": 4095.99,
+      },
+      Object {
+        "amount": 1.425419,
+        "price": 4096,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1.501,
+        "price": 8488.36,
+      },
+    ],
+    "exchange": "binance-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance futures messages 7`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0.162,
+        "price": 8493.78,
+      },
+    ],
+    "exchange": "binance-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-11-17T00:00:21.948Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {
