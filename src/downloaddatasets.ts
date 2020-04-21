@@ -105,7 +105,7 @@ function getDownloadOptions({
   const month = doubleDigit(date.getUTCMonth() + 1)
   const day = doubleDigit(date.getUTCDate())
 
-  const url = `${options.datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${symbol}.${format}`
+  const url = `${options.datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${symbol}.${format}.gz`
   const filename = getFilename({
     dataType,
     date,
