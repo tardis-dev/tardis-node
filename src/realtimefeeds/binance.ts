@@ -90,7 +90,6 @@ export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
 export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://stream.binance.je:9443/stream'
   protected httpURL = 'https://api.binance.je/api/v1'
-  protected batchSubscriptions = false
 }
 
 export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {

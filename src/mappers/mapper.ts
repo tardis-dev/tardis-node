@@ -148,6 +148,10 @@ class PendingDerivativeTickerInfo {
     this._hasChanged = false
     this._pendingTicker.localTimestamp = localTimestamp
 
+    if (this._pendingTicker.timestamp === undefined) {
+      this._pendingTicker.timestamp = localTimestamp
+    }
+
     return { ...this._pendingTicker }
   }
 }
