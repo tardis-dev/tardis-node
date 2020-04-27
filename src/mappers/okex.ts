@@ -25,7 +25,7 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
         type: 'trade',
         symbol: okexTrade.instrument_id,
         exchange: this._exchange,
-        id: okexTrade.trade_id,
+        id: typeof okexTrade.trade_id === 'string' ? okexTrade.trade_id : undefined,
         price: Number(okexTrade.price),
         amount: Number(okexTrade.qty || okexTrade.size),
         side: okexTrade.side,
@@ -165,7 +165,7 @@ type OkexDataMessage = {
 type OKexTradesDataMessage = {
   data: {
     side: 'buy' | 'sell'
-    trade_id: string
+    trade_id: string | number
     price: string | number
     qty?: string | number
     size?: string | number
