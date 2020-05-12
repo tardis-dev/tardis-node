@@ -80,7 +80,9 @@ class CircularBuffer<T> {
 }
 
 export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures', BookChange> {
-  protected readonly symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+  protected readonly symbolToDepthInfoMapping: {
+    [key: string]: LocalDepthInfo
+  } = {}
 
   constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
 
@@ -276,7 +278,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       return false
     }
 
-    return message.stream.includes('@markPrice') || message.stream.endsWith('@ticker')
+    return message.stream.includes('@markPrice') || message.stream.endsWith('@ticker') || message.stream.endsWith('@openInterest')
   }
 
   getFilters(symbols?: string[]): FilterForExchange['binance-futures'][] {
@@ -290,15 +292,22 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       {
         channel: 'ticker',
         symbols
+      },
+      {
+        channel: 'openInterest',
+        symbols
       }
     ]
   }
 
   *map(
-    message: BinanceResponse<BinanceFuturesMarkPriceData | BinanceFuturesTickerData>,
+    message: BinanceResponse<BinanceFuturesMarkPriceData | BinanceFuturesTickerData | BinanceFuturesOpenInterestData>,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
-    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.data.s, 'binance-futures')
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(
+      's' in message.data ? message.data.s : message.data.symbol,
+      'binance-futures'
+    )
 
     if ('r' in message.data) {
       pendingTickerInfo.updateFundingRate(Number(message.data.r))
@@ -310,6 +319,10 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
     if ('c' in message.data) {
       pendingTickerInfo.updateLastPrice(Number(message.data.c))
       pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+    }
+
+    if ('openInterest' in message.data) {
+      pendingTickerInfo.updateOpenInterest(Number(message.data.openInterest))
     }
 
     if (pendingTickerInfo.hasChanged()) {
@@ -382,4 +395,9 @@ type BinanceFuturesTickerData = {
   E: number // Event time
   s: string // Symbol
   c: string // Last price
+}
+
+type BinanceFuturesOpenInterestData = {
+  symbol: string
+  openInterest: string
 }

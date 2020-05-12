@@ -15,7 +15,7 @@ import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper }
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
 import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper } from './deribit'
-import { ftxBookChangeMapper, ftxTradesMapper } from './ftx'
+import { ftxBookChangeMapper, ftxTradesMapper, FTXDerivativeTickerMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
 import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
@@ -108,7 +108,8 @@ const derivativeTickersMappers = {
   'okex-futures': () => new OkexDerivativeTickerMapper('okex-futures'),
   'okex-swap': () => new OkexDerivativeTickerMapper('okex-swap'),
   bybit: () => new BybitDerivativeTickerMapper(),
-  phemex: () => new PhemexDerivativeTickerMapper()
+  phemex: () => new PhemexDerivativeTickerMapper(),
+  ftx: () => new FTXDerivativeTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

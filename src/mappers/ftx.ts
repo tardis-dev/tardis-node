@@ -1,6 +1,6 @@
 import { parseμs } from '../handy'
-import { BookChange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { BookChange, Trade, DerivativeTicker } from '../types'
+import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.ftx.com/#websocket-api
 
@@ -84,6 +84,47 @@ export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
   }
 }
 
+export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  canHandle(message: FTXInstrument) {
+    if (message.data == undefined) {
+      return false
+    }
+
+    return message.channel === 'instrument'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'instrument',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: FTXInstrument, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.market, 'ftx')
+    const { stats, info } = message.data
+
+    if (stats.nextFundingTime !== undefined) {
+      pendingTickerInfo.updateFundingTimestamp(new Date(stats.nextFundingTime))
+      pendingTickerInfo.updateFundingRate(stats.nextFundingRate)
+    }
+
+    pendingTickerInfo.updateIndexPrice(info.index)
+    pendingTickerInfo.updateMarkPrice(info.mark)
+    pendingTickerInfo.updateLastPrice(info.last)
+    pendingTickerInfo.updateOpenInterest(stats.openInterest)
+    pendingTickerInfo.updateTimestamp(localTimestamp)
+
+    if (pendingTickerInfo.hasChanged()) {
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
+    }
+  }
+}
+
 type FtxTrades = {
   channel: 'trades'
   market: string
@@ -104,4 +145,22 @@ type FtxOrderBook = {
   market: string
   type: 'update' | 'partial'
   data: { time: number; bids: FtxBookLevel[]; asks: FtxBookLevel[] }
+}
+
+type FTXInstrument = {
+  channel: 'instrument'
+  market: string
+  type: 'update'
+  data: {
+    stats: {
+      nextFundingRate?: number
+      nextFundingTime?: string
+      openInterest: number
+    }
+    info: {
+      last: number
+      mark: number
+      index: number
+    }
+  }
 }

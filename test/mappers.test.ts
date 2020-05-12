@@ -9,7 +9,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'okex-futures',
   'okex-swap',
   'bybit',
-  'phemex'
+  'phemex',
+  'ftx'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -1359,7 +1360,8 @@ describe('mappers', () => {
           b: [['8493.78', '0.162']],
           a: []
         }
-      }
+      },
+      { stream: 'btcusdt@openInterest', generated: true, data: { symbol: 'BTCUSDT', openInterest: '26286.181' } }
     ]
 
     const binanceFuturesMapper = createMapper('binance-futures', new Date())
@@ -1582,6 +1584,126 @@ describe('mappers', () => {
         market: 'ETH-PERP',
         type: 'update',
         data: [{ id: 1139499, price: 181.86, size: 0.13, side: 'sell', liquidation: false, time: '2019-10-01T00:00:21.260951+00:00' }]
+      },
+      {
+        channel: 'instrument',
+        generated: true,
+        market: 'BTC-PERP',
+        type: 'update',
+        data: {
+          stats: { nextFundingRate: 0.0, nextFundingTime: '2020-05-12T13:00:00+00:00', openInterest: 11471.4921, volume: 87818.5334 },
+          info: {
+            ask: 8791.5,
+            bid: 8791.0,
+            change1h: 0.0007399396664579658,
+            change24h: -0.015014005602240896,
+            changeBod: 0.025667950064169876,
+            description: 'Bitcoin Perpetual Futures',
+            enabled: true,
+            expired: false,
+            expiryDescription: 'Perpetual',
+            group: 'perpetual',
+            imfFactor: 0.002,
+            index: 8790.512800652727,
+            last: 8791.0,
+            lowerBound: 8351.0,
+            marginPrice: 8791.0,
+            mark: 8791.0,
+            name: 'BTC-PERP',
+            perpetual: true,
+            positionLimitWeight: 1.0,
+            postOnly: false,
+            priceIncrement: 0.5,
+            sizeIncrement: 0.0001,
+            type: 'perpetual',
+            underlying: 'BTC',
+            underlyingDescription: 'Bitcoin',
+            upperBound: 9232.0,
+            volume: 87818.5334,
+            volumeUsd24h: 762549880.0517
+          }
+        }
+      },
+      {
+        channel: 'instrument',
+        generated: true,
+        market: 'BTC-MOVE-0512',
+        type: 'update',
+        data: {
+          stats: { openInterest: 337.1438, predictedExpirationPrice: 174.41695155220606, strikePrice: 8615.432394555066, volume: 746.7197 },
+          info: {
+            ask: 266.5,
+            bid: 257.5,
+            change1h: -0.005597014925373134,
+            change24h: -0.18376722817764166,
+            changeBod: -0.14170692431561996,
+            description: 'Bitcoin MOVE 2020-05-12 Contracts',
+            enabled: true,
+            expired: false,
+            expiry: '2020-05-13T00:00:00+00:00',
+            expiryDescription: 'Today',
+            group: 'daily',
+            imfFactor: 0.002,
+            index: 8790.512800652727,
+            last: 266.5,
+            lowerBound: 0.5,
+            marginPrice: 8790.512800652727,
+            mark: 266.5,
+            moveStart: '2020-05-12T00:00:00+00:00',
+            name: 'BTC-MOVE-0512',
+            perpetual: false,
+            positionLimitWeight: 2.0,
+            postOnly: false,
+            priceIncrement: 0.5,
+            sizeIncrement: 0.0001,
+            type: 'move',
+            underlying: 'BTC',
+            underlyingDescription: 'Bitcoin',
+            upperBound: 1149.5,
+            volume: 746.7197,
+            volumeUsd24h: 227715.1469
+          }
+        }
+      },
+      {
+        channel: 'instrument',
+        generated: true,
+        market: 'BRZ-0626',
+        type: 'update',
+        data: {
+          stats: { openInterest: 608187.0, predictedExpirationPrice: 0.17007, volume: 61892.0 },
+          info: {
+            ask: 0.17137,
+            bid: 0.17058,
+            change1h: 0.0004105331065626649,
+            change24h: -0.005422424348434493,
+            changeBod: 0.0004105331065626649,
+            description: 'Brazilian Digital Token June 2020 Futures',
+            enabled: true,
+            expired: false,
+            expiry: '2020-06-26T03:00:00+00:00',
+            expiryDescription: 'June 2020',
+            group: 'quarterly',
+            imfFactor: 2e-6,
+            index: 0.17007,
+            last: 0.17051,
+            lowerBound: 0.16157,
+            marginPrice: 0.17058,
+            mark: 0.17058,
+            name: 'BRZ-0626',
+            perpetual: false,
+            positionLimitWeight: 10.0,
+            postOnly: false,
+            priceIncrement: 1e-5,
+            sizeIncrement: 1.0,
+            type: 'future',
+            underlying: 'BRZ',
+            underlyingDescription: 'Brazilian Digital Token',
+            upperBound: 0.17957,
+            volume: 61892.0,
+            volumeUsd24h: 10557.55092
+          }
+        }
       }
     ]
 

@@ -190,6 +190,25 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 8`] = `
+Array [
+  Object {
+    "exchange": "binance-futures",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2019-10-01T08:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 8291.34697815,
+    "openInterest": 26286.181,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:03.001Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {
@@ -1629,6 +1648,63 @@ Array [
     "symbol": "ETH-PERP",
     "timestamp": 2019-10-01T00:00:21.260Z,
     "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map ftx messages 6`] = `
+Array [
+  Object {
+    "exchange": "ftx",
+    "fundingRate": 0,
+    "fundingTimestamp": 2020-05-12T13:00:00.000Z,
+    "indexPrice": 8790.512800652727,
+    "lastPrice": 8791,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 8791,
+    "openInterest": 11471.4921,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map ftx messages 7`] = `
+Array [
+  Object {
+    "exchange": "ftx",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 8790.512800652727,
+    "lastPrice": 266.5,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 266.5,
+    "openInterest": 337.1438,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-MOVE-0512",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map ftx messages 8`] = `
+Array [
+  Object {
+    "exchange": "ftx",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 0.17007,
+    "lastPrice": 0.17051,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 0.17058,
+    "openInterest": 608187,
+    "predictedFundingRate": undefined,
+    "symbol": "BRZ-0626",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "derivative_ticker",
   },
 ]
 `;

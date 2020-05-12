@@ -125,13 +125,23 @@ const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'Ord
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
-const FTX_CHANNELS = ['orderbook', 'trades'] as const
+const FTX_CHANNELS = ['orderbook', 'trades', 'instrument'] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
 
 const BITFLYER_CHANNELS = ['lightning_executions', 'lightning_board_snapshot', 'lightning_board', 'lightning_ticker'] as const
 
-const BINANCE_FUTURES_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'markPrice', 'depthSnapshot', 'bookTicker', 'forceOrder']
+const BINANCE_FUTURES_CHANNELS = [
+  'trade',
+  'aggTrade',
+  'ticker',
+  'depth',
+  'markPrice',
+  'depthSnapshot',
+  'bookTicker',
+  'forceOrder',
+  'openInterest'
+]
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
 
