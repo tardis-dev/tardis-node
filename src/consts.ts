@@ -140,7 +140,8 @@ const BINANCE_FUTURES_CHANNELS = [
   'depthSnapshot',
   'bookTicker',
   'forceOrder',
-  'openInterest'
+  'openInterest',
+  'recentTrades'
 ]
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
