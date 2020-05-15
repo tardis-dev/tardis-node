@@ -29,7 +29,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   const minutesCountToFetch = Math.floor((payload.toDate.getTime() - payload.fromDate.getTime()) / MILLISECONDS_IN_MINUTE)
 
   // each filter will have separate sub dir based on it's sha hash
-  const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}/`
+  const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}`
 
   // start with fetching last slice - it will tell quickly if user has access to the end of requested date range
   await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
