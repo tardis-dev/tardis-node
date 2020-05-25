@@ -21,13 +21,16 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
   }
 
   *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
+    let seenSymbol: string | undefined = undefined
     for (const okexTrade of okexTradesMessage.data) {
       // ignore trades that are first time encountered for a given symbol and that have timestamp day different that local timestamp day
       // such trades are duplicates and were already published for a previous day
       const symbol = okexTrade.instrument_id
       const timestamp = new Date(okexTrade.timestamp)
+
       if (this._seenSymbols.has(symbol) === false) {
-        this._seenSymbols.add(symbol)
+        seenSymbol = symbol
+
         if (timestamp.getUTCDate() !== localTimestamp.getUTCDate()) {
           continue
         }
@@ -44,6 +47,10 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
         timestamp,
         localTimestamp: localTimestamp
       }
+    }
+
+    if (seenSymbol !== undefined) {
+      this._seenSymbols.add(seenSymbol)
     }
   }
 }
