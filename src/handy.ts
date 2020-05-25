@@ -61,7 +61,7 @@ export const ONE_SEC_IN_MS = 1000
 
 export class HttpError extends Error {
   constructor(public readonly status: number, public readonly responseText: string, public readonly url: string) {
-    super(`HttpError: status code ${status}`)
+    super(`HttpError: status code: ${status}, response text: ${responseText}`)
   }
 }
 
