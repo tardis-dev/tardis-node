@@ -27,7 +27,7 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
         exchange: this._exchange,
         id: typeof okexTrade.trade_id === 'string' ? okexTrade.trade_id : undefined,
         price: Number(okexTrade.price),
-        amount: Number(okexTrade.qty || okexTrade.size),
+        amount: okexTrade.qty !== undefined ? Number(okexTrade.qty) : Number(okexTrade.size),
         side: okexTrade.side,
         timestamp: new Date(okexTrade.timestamp),
         localTimestamp: localTimestamp
