@@ -141,7 +141,9 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 6`] = `
+exports[`mappers map binance futures messages 6`] = `Array []`;
+
+exports[`mappers map binance futures messages 7`] = `
 Array [
   Object {
     "asks": Array [
@@ -150,7 +152,7 @@ Array [
         "price": 4095.99,
       },
       Object {
-        "amount": 1.425419,
+        "amount": 2.425419,
         "price": 4096,
       },
     ],
@@ -158,6 +160,10 @@ Array [
       Object {
         "amount": 1.501,
         "price": 8488.36,
+      },
+      Object {
+        "amount": 0.162,
+        "price": 8493.78,
       },
     ],
     "exchange": "binance-futures",
@@ -170,7 +176,7 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 7`] = `
+exports[`mappers map binance futures messages 8`] = `
 Array [
   Object {
     "asks": Array [],
@@ -190,7 +196,7 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 8`] = `
+exports[`mappers map binance futures messages 9`] = `
 Array [
   Object {
     "exchange": "binance-futures",
@@ -330,7 +336,7 @@ Array [
         "price": 0.00002248,
       },
       Object {
-        "amount": 370,
+        "amount": 375,
         "price": 0.00002246,
       },
       Object {
@@ -351,30 +357,6 @@ Array [
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "GNTBTC",
     "timestamp": 2019-09-01T00:00:01.275Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 3945,
-        "price": 0.00002253,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 114,
-        "price": 0.00002248,
-      },
-      Object {
-        "amount": 370,
-        "price": 0.00002246,
-      },
-    ],
-    "exchange": "binance",
-    "isSnapshot": false,
-    "localTimestamp": 2019-09-01T00:00:01.275Z,
-    "symbol": "GNTBTC",
-    "timestamp": 2019-04-01T00:00:08.698Z,
     "type": "book_change",
   },
 ]

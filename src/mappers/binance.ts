@@ -114,7 +114,7 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
 
     if (this.symbolToDepthInfoMapping[symbol] === undefined) {
       this.symbolToDepthInfoMapping[symbol] = {
-        bufferedUpdates: new CircularBuffer(200)
+        bufferedUpdates: new CircularBuffer<BinanceDepthData>(200)
       }
     }
 
@@ -127,9 +127,40 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
       if (snapshotAlreadyProcessed) {
         return
       }
-
-      const binanceDepthSnapshotData = message.data
       // produce snapshot book_change
+      const binanceDepthSnapshotData = message.data
+
+      //  mark given symbol depth info that has snapshot processed
+      symbolDepthInfo.lastUpdateId = binanceDepthSnapshotData.lastUpdateId
+      symbolDepthInfo.snapshotProcessed = true
+
+      // if there were any depth updates buffered, let's proccess those by adding to or updating the initial snapshot
+      for (const update of symbolDepthInfo.bufferedUpdates.items()) {
+        const bookChange = this.mapBookDepthUpdate(update, localTimestamp)
+        if (bookChange !== undefined) {
+          for (const bid of update.b) {
+            const matchingBid = binanceDepthSnapshotData.bids.find((b) => b[0] === bid[0])
+            if (matchingBid !== undefined) {
+              matchingBid[1] = bid[1]
+            } else {
+              binanceDepthSnapshotData.bids.push(bid)
+            }
+          }
+
+          for (const ask of update.a) {
+            const matchingAsk = binanceDepthSnapshotData.asks.find((a) => a[0] === ask[0])
+            if (matchingAsk !== undefined) {
+              matchingAsk[1] = ask[1]
+            } else {
+              binanceDepthSnapshotData.asks.push(ask)
+            }
+          }
+        }
+      }
+
+      // remove all buffered updates
+      symbolDepthInfo.bufferedUpdates.clear()
+
       const bookChange: BookChange = {
         type: 'book_change',
         symbol,
@@ -137,26 +168,11 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
         isSnapshot: true,
         bids: binanceDepthSnapshotData.bids.map(this.mapBookLevel),
         asks: binanceDepthSnapshotData.asks.map(this.mapBookLevel),
-        timestamp: localTimestamp,
+        timestamp: binanceDepthSnapshotData.T !== undefined ? new Date(binanceDepthSnapshotData.T) : localTimestamp,
         localTimestamp
       }
 
       yield bookChange
-
-      //  mark given symbol depth info that has snapshot processed
-      symbolDepthInfo.lastUpdateId = binanceDepthSnapshotData.lastUpdateId
-      symbolDepthInfo.snapshotProcessed = true
-
-      // if there were any depth updates buffered, let's proccess those
-      for (const update of symbolDepthInfo.bufferedUpdates.items()) {
-        const bookChange = this.mapBookDepthUpdate(update, localTimestamp)
-        if (bookChange !== undefined) {
-          yield bookChange
-        }
-      }
-
-      // remove all buffered updates
-      symbolDepthInfo.bufferedUpdates.clear()
     } else if (snapshotAlreadyProcessed) {
       // snapshot was already processed let's map the message as normal book_change
       const bookChange = this.mapBookDepthUpdate(message.data as BinanceDepthData, localTimestamp)
@@ -365,6 +381,7 @@ type BinanceDepthData = {
 }
 
 // T is the time that updated in matching engine, while E is when pushing out from ws server
+
 type BinanceFuturesDepthData = BinanceDepthData & {
   pu: number
   T: number
@@ -374,10 +391,11 @@ type BinanceDepthSnapshotData = {
   lastUpdateId: number
   bids: BinanceBookLevel[]
   asks: BinanceBookLevel[]
+  T?: number
 }
 
 type LocalDepthInfo = {
-  bufferedUpdates: CircularBuffer<any>
+  bufferedUpdates: CircularBuffer<BinanceDepthData>
   snapshotProcessed?: boolean
   lastUpdateId?: number
   validatedFirstUpdate?: boolean
