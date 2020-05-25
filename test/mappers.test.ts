@@ -2384,7 +2384,7 @@ describe('mappers', () => {
     const okcoin = createMapper('okcoin', new Date('2020-01-01'))
 
     for (const message of messages) {
-      const mappedMessages = okcoin.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      const mappedMessages = okcoin.map(message, new Date('2019-11-09T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

@@ -2294,7 +2294,7 @@ Array [
     ],
     "exchange": "okcoin",
     "isSnapshot": true,
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "localTimestamp": 2019-11-09T00:00:01.275Z,
     "symbol": "BTC-USD",
     "timestamp": 2019-11-22T00:00:01.547Z,
     "type": "book_change",
@@ -2318,7 +2318,7 @@ Array [
     "bids": Array [],
     "exchange": "okcoin",
     "isSnapshot": false,
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "localTimestamp": 2019-11-09T00:00:01.275Z,
     "symbol": "BTC-EUR",
     "timestamp": 2019-11-22T00:00:30.968Z,
     "type": "book_change",
@@ -2332,7 +2332,7 @@ Array [
     "amount": 0.1,
     "exchange": "okcoin",
     "id": "459",
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "localTimestamp": 2019-11-09T00:00:01.275Z,
     "price": 20.38,
     "side": "buy",
     "symbol": "DCR-USD",
@@ -2395,21 +2395,7 @@ exports[`mappers map okex messages 3`] = `Array []`;
 
 exports[`mappers map okex messages 4`] = `Array []`;
 
-exports[`mappers map okex-futures messages 1`] = `
-Array [
-  Object {
-    "amount": 4,
-    "exchange": "okex-futures",
-    "id": "2578238628528131",
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 4061.94,
-    "side": "sell",
-    "symbol": "BTC-USD-190628",
-    "timestamp": 2019-03-31T23:59:59.388Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map okex-futures messages 1`] = `Array []`;
 
 exports[`mappers map okex-futures messages 2`] = `
 Array [
