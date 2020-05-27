@@ -223,9 +223,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   validateReplayNormalizedOptions(fromDate, normalizers)
 
   const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
-  const nonFilterableExchanges = ['bitfinex', 'bitfinex-alts', 'bitfinex-derivatives']
   const mappers = createMappers(fromDate)
-  const filters = nonFilterableExchanges.includes(exchange) ? [] : getFilters(mappers, symbols)
+  const filters = getFilters(mappers, symbols)
 
   const messages = replay({
     exchange,

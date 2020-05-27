@@ -468,6 +468,67 @@ Array [
 
 exports[`mappers map bitfinex derivatives messages 7`] = `Array []`;
 
+exports[`mappers map bitfinex derivatives messages 8`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 9163.7,
+      },
+    ],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2020-05-27T16:27:00.151Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitfinex derivatives messages 9`] = `Array []`;
+
+exports[`mappers map bitfinex derivatives messages 10`] = `
+Array [
+  Object {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": 0,
+    "fundingTimestamp": 2020-05-28T00:00:00.000Z,
+    "indexPrice": 9169.35,
+    "lastPrice": 9166.30324769,
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "markPrice": 9170.3525,
+    "openInterest": 3005.25851857,
+    "predictedFundingRate": -0.00001415,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2020-05-27T16:27:00.986Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bitfinex derivatives messages 11`] = `Array []`;
+
+exports[`mappers map bitfinex derivatives messages 12`] = `
+Array [
+  Object {
+    "amount": 0.005,
+    "exchange": "bitfinex-derivatives",
+    "id": "452025730",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "price": 9135.5,
+    "side": "buy",
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2020-05-27T15:26:39.934Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bitfinex derivatives messages 13`] = `Array []`;
+
 exports[`mappers map bitfinex messages 1`] = `Array []`;
 
 exports[`mappers map bitfinex messages 2`] = `Array []`;

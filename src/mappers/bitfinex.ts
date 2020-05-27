@@ -11,8 +11,13 @@ export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-deriv
   canHandle(message: BitfinexMessage) {
     // non sub messages are provided as arrays
     if (Array.isArray(message)) {
-      // we need to have matching symbol for channel id
+      // first test if message itself provides channel name and if so if it's trades
+      const channelName = message[message.length - 2]
+      if (typeof channelName === 'string') {
+        return channelName === 'trades'
+      }
 
+      // otherwise use channel to id mapping
       return this._channelIdToSymbolMap.get(message[0]) !== undefined
     }
 
@@ -37,7 +42,9 @@ export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-deriv
   }
 
   *map(message: BitfinexTrades, localTimestamp: Date) {
-    const symbol = this._channelIdToSymbolMap.get(message[0])
+    const symbolFromMessage = message[message.length - 1]
+    const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
+
     // ignore if we don't have matching symbol
     if (symbol === undefined) {
       return
@@ -78,8 +85,13 @@ export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-d
   canHandle(message: BitfinexMessage) {
     // non sub messages are provided as arrays
     if (Array.isArray(message)) {
-      // we need to have matching symbol for channel id
+      // first test if message itself provides channel name and if so if it's a book
+      const channelName = message[message.length - 2]
+      if (typeof channelName === 'string') {
+        return channelName === 'book'
+      }
 
+      // otherwise use channel to id mapping
       return this._channelIdToSymbolMap.get(message[0]) !== undefined
     }
 
@@ -104,7 +116,9 @@ export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-d
   }
 
   *map(message: BitfinexBooks, localTimestamp: Date) {
-    const symbol = this._channelIdToSymbolMap.get(message[0])
+    const symbolFromMessage = message[message.length - 1]
+    const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
+
     // ignore if we don't have matching symbol
     if (symbol === undefined) {
       return
@@ -150,8 +164,13 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
   canHandle(message: BitfinexMessage) {
     // non sub messages are provided as arrays
     if (Array.isArray(message)) {
-      // we need to have matching symbol for channel id
+      // first test if message itself provides channel name and if so if it's a status
+      const channelName = message[message.length - 2]
+      if (typeof channelName === 'string') {
+        return channelName === 'status'
+      }
 
+      // otherwise use channel to id mapping
       return this._channelIdToSymbolMap.get(message[0]) !== undefined
     }
 
@@ -177,7 +196,8 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
   }
 
   *map(message: BitfinexStatusMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    const symbol = this._channelIdToSymbolMap.get(message[0])
+    const symbolFromMessage = message[message.length - 1]
+    const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
 
     // ignore if we don't have matching symbol
     if (symbol === undefined) {
