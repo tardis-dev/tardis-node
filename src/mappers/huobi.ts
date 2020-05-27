@@ -5,6 +5,8 @@ import { Mapper } from './mapper'
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
 export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap', Trade> {
+  private readonly _seenSymbols = new Set<string>()
+
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -26,6 +28,12 @@ export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-d
 
   *map(message: HuobiTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     const symbol = message.ch.split('.')[1].toUpperCase()
+
+    // always ignore first returned trade as it's a 'stale' trade, which has already been published before disconnect
+    if (this._seenSymbols.has(symbol) === false) {
+      this._seenSymbols.add(symbol)
+      return
+    }
 
     for (const huobiTrade of message.tick.data) {
       yield {

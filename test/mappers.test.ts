@@ -552,6 +552,19 @@ describe('mappers', () => {
             checksum: 1099728614
           }
         ]
+      },
+      {
+        table: 'spot/trade',
+        data: [
+          {
+            instrument_id: 'BCH-USDT',
+            price: '328.74',
+            side: 'sell',
+            size: '0.12',
+            timestamp: '2019-08-01T00:00:08.807Z',
+            trade_id: '423886240'
+          }
+        ]
       }
     ]
     let okexMapper = createMapper('okex', new Date('2019-12-05'))
@@ -587,6 +600,32 @@ describe('mappers', () => {
             qty: '5',
             instrument_id: 'BTC-USD-190927',
             timestamp: '2019-08-01T00:00:01.320Z'
+          }
+        ]
+      },
+      {
+        table: 'futures/trade',
+        data: [
+          {
+            side: 'sell',
+            trade_id: '2578238628528132',
+            price: 4061.95,
+            qty: 4,
+            instrument_id: 'BTC-USD-190628',
+            timestamp: '2019-03-31T23:59:59.389Z'
+          }
+        ]
+      },
+      {
+        table: 'futures/trade',
+        data: [
+          {
+            side: 'buy',
+            trade_id: '3269040623943686',
+            price: '10209.43',
+            qty: '5',
+            instrument_id: 'BTC-USD-190927',
+            timestamp: '2019-08-01T00:00:01.321Z'
           }
         ]
       },
@@ -792,6 +831,19 @@ describe('mappers', () => {
             bids: [['2.25', '1459', '0', '1']],
             timestamp: '2019-12-03T15:14:59.904Z',
             checksum: 1099728614
+          }
+        ]
+      },
+      {
+        table: 'swap/trade',
+        data: [
+          {
+            instrument_id: 'BCH-USDT',
+            price: '328.74',
+            side: 'sell',
+            size: '0.12',
+            timestamp: '2019-08-01T00:00:08.816Z',
+            trade_id: '423886240'
           }
         ]
       }
@@ -2051,6 +2103,17 @@ describe('mappers', () => {
         }
       },
       {
+        ch: 'market.mexbtc.trade.detail',
+        ts: 1572911088790,
+        tick: {
+          id: 100033171588,
+          ts: 1572911088761,
+          data: [
+            { id: 10003317158754670853281, ts: 1572911088761, tradeId: 100027416192, amount: 1569.86, price: 6.37e-8, direction: 'buy' }
+          ]
+        }
+      },
+      {
         ch: 'market.waxpbtc.depth.step0',
         ts: 1572912002010,
         update: true,
@@ -2076,6 +2139,15 @@ describe('mappers', () => {
           id: 100201717928,
           ts: 1571238239378,
           data: [{ id: '10020171792852100010452', amount: 6.5286, price: 0.006663, direction: 'buy', ts: 1571238239378 }]
+        }
+      },
+      {
+        ch: 'market.xmrbtc.trade.detail',
+        ts: 1572879775938,
+        tick: {
+          id: 100201717928,
+          ts: 1571238239378,
+          data: [{ id: '100201717928521000104525', amount: 6.5286, price: 0.006663, direction: 'buy', ts: 1571238239379 }]
         }
       },
       {
@@ -2393,6 +2465,12 @@ describe('mappers', () => {
         table: 'spot/trade',
         data: [
           { side: 'buy', trade_id: '459', price: '20.38', size: '0.1', instrument_id: 'DCR-USD', timestamp: '2019-11-09T07:53:40.478Z' }
+        ]
+      },
+      {
+        table: 'spot/trade',
+        data: [
+          { side: 'buy', trade_id: '460', price: '20.38', size: '0.1', instrument_id: 'DCR-USD', timestamp: '2019-11-09T07:53:40.479Z' }
         ]
       }
     ]

@@ -4,6 +4,8 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 // https://www.okex.com/docs/en/#ws_swap-README
 
 export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
+  private readonly _seenSymbols = new Set<string>()
+
   constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
 
   canHandle(message: OkexDataMessage) {
@@ -21,9 +23,17 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
 
   *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const okexTrade of okexTradesMessage.data) {
+      const symbol = okexTrade.instrument_id
+
+      // always ignore first returned trade as it's a 'stale' trade, which has already been published before disconnect
+      if (this._seenSymbols.has(symbol) === false) {
+        this._seenSymbols.add(symbol)
+        break
+      }
+
       yield {
         type: 'trade',
-        symbol: okexTrade.instrument_id,
+        symbol,
         exchange: this._exchange,
         id: typeof okexTrade.trade_id === 'string' ? okexTrade.trade_id : undefined,
         price: Number(okexTrade.price),

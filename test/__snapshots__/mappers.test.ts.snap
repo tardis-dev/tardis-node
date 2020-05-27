@@ -1874,21 +1874,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 4`] = `
-Array [
-  Object {
-    "amount": 62,
-    "exchange": "huobi",
-    "id": "251029750220000",
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
-    "price": 190.031,
-    "side": "sell",
-    "symbol": "ETH_CQ",
-    "timestamp": 2019-11-05T00:00:28.237Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map huobi messages 4`] = `Array []`;
 
 exports[`mappers map huobi messages 5`] = `
 Array [
@@ -1952,12 +1938,14 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 7`] = `
+exports[`mappers map huobi messages 7`] = `Array []`;
+
+exports[`mappers map huobi messages 8`] = `
 Array [
   Object {
     "amount": 1569.86,
     "exchange": "huobi",
-    "id": "100027416191",
+    "id": "100027416192",
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "price": 6.37e-8,
     "side": "buy",
@@ -1968,7 +1956,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 8`] = `
+exports[`mappers map huobi messages 9`] = `
 Array [
   Object {
     "asks": Array [],
@@ -1983,7 +1971,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 9`] = `
+exports[`mappers map huobi messages 10`] = `
 Array [
   Object {
     "asks": Array [
@@ -2012,23 +2000,25 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 10`] = `
+exports[`mappers map huobi messages 11`] = `Array []`;
+
+exports[`mappers map huobi messages 12`] = `
 Array [
   Object {
     "amount": 6.5286,
     "exchange": "huobi",
-    "id": "10020171792852100010452",
+    "id": "100201717928521000104525",
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "price": 0.006663,
     "side": "buy",
     "symbol": "XMRBTC",
-    "timestamp": 2019-10-16T15:03:59.378Z,
+    "timestamp": 2019-10-16T15:03:59.379Z,
     "type": "trade",
   },
 ]
 `;
 
-exports[`mappers map huobi messages 11`] = `
+exports[`mappers map huobi messages 13`] = `
 Array [
   Object {
     "asks": Array [
@@ -2057,7 +2047,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 12`] = `
+exports[`mappers map huobi messages 14`] = `
 Array [
   Object {
     "asks": Array [
@@ -2090,7 +2080,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 13`] = `
+exports[`mappers map huobi messages 15`] = `
 Array [
   Object {
     "asks": Array [],
@@ -2308,37 +2298,25 @@ Array [
 ]
 `;
 
-exports[`mappers map okcoin messages 5`] = `
+exports[`mappers map okcoin messages 5`] = `Array []`;
+
+exports[`mappers map okcoin messages 6`] = `
 Array [
   Object {
     "amount": 0.1,
     "exchange": "okcoin",
-    "id": "459",
+    "id": "460",
     "localTimestamp": 2019-11-09T00:00:01.275Z,
     "price": 20.38,
     "side": "buy",
     "symbol": "DCR-USD",
-    "timestamp": 2019-11-09T07:53:40.478Z,
+    "timestamp": 2019-11-09T07:53:40.479Z,
     "type": "trade",
   },
 ]
 `;
 
-exports[`mappers map okex messages 1`] = `
-Array [
-  Object {
-    "amount": 0.12,
-    "exchange": "okex",
-    "id": "423886239",
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 328.74,
-    "side": "sell",
-    "symbol": "BCH-USDT",
-    "timestamp": 2019-08-01T00:00:08.806Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map okex messages 1`] = `Array []`;
 
 exports[`mappers map okex messages 2`] = `
 Array [
@@ -2377,39 +2355,59 @@ exports[`mappers map okex messages 3`] = `Array []`;
 
 exports[`mappers map okex messages 4`] = `Array []`;
 
-exports[`mappers map okex-futures messages 1`] = `
+exports[`mappers map okex messages 5`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "exchange": "okex",
+    "id": "423886240",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.807Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 1`] = `Array []`;
+
+exports[`mappers map okex-futures messages 2`] = `Array []`;
+
+exports[`mappers map okex-futures messages 3`] = `
 Array [
   Object {
     "amount": 4,
     "exchange": "okex-futures",
-    "id": "2578238628528131",
+    "id": "2578238628528132",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 4061.94,
+    "price": 4061.95,
     "side": "sell",
     "symbol": "BTC-USD-190628",
-    "timestamp": 2019-03-31T23:59:59.388Z,
+    "timestamp": 2019-03-31T23:59:59.389Z,
     "type": "trade",
   },
 ]
 `;
 
-exports[`mappers map okex-futures messages 2`] = `
+exports[`mappers map okex-futures messages 4`] = `
 Array [
   Object {
     "amount": 5,
     "exchange": "okex-futures",
-    "id": "3269040623943685",
+    "id": "3269040623943686",
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "price": 10209.43,
     "side": "buy",
     "symbol": "BTC-USD-190927",
-    "timestamp": 2019-08-01T00:00:01.320Z,
+    "timestamp": 2019-08-01T00:00:01.321Z,
     "type": "trade",
   },
 ]
 `;
 
-exports[`mappers map okex-futures messages 3`] = `
+exports[`mappers map okex-futures messages 5`] = `
 Array [
   Object {
     "asks": Array [
@@ -2442,9 +2440,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 4`] = `Array []`;
+exports[`mappers map okex-futures messages 6`] = `Array []`;
 
-exports[`mappers map okex-futures messages 5`] = `
+exports[`mappers map okex-futures messages 7`] = `
 Array [
   Object {
     "exchange": "okex-futures",
@@ -2463,7 +2461,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 6`] = `
+exports[`mappers map okex-futures messages 8`] = `
 Array [
   Object {
     "exchange": "okex-futures",
@@ -2482,9 +2480,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 7`] = `Array []`;
+exports[`mappers map okex-futures messages 9`] = `Array []`;
 
-exports[`mappers map okex-futures messages 8`] = `
+exports[`mappers map okex-futures messages 10`] = `
 Array [
   Object {
     "asks": Array [
@@ -2509,7 +2507,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 9`] = `
+exports[`mappers map okex-futures messages 11`] = `
 Array [
   Object {
     "asks": Array [],
@@ -2529,7 +2527,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 10`] = `Array []`;
+exports[`mappers map okex-futures messages 12`] = `Array []`;
 
 exports[`mappers map okex-options messages 1`] = `
 Array [
@@ -2579,21 +2577,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 1`] = `
-Array [
-  Object {
-    "amount": 0.12,
-    "exchange": "okex-swap",
-    "id": "423886239",
-    "localTimestamp": 2019-08-01T00:00:02.997Z,
-    "price": 328.74,
-    "side": "sell",
-    "symbol": "BCH-USDT",
-    "timestamp": 2019-08-01T00:00:08.806Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map okex-swap messages 1`] = `Array []`;
 
 exports[`mappers map okex-swap messages 2`] = `
 Array [
@@ -2694,6 +2678,22 @@ exports[`mappers map okex-swap messages 6`] = `Array []`;
 exports[`mappers map okex-swap messages 7`] = `
 Array [
   Object {
+    "amount": 0.12,
+    "exchange": "okex-swap",
+    "id": "423886240",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.816Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 8`] = `
+Array [
+  Object {
     "asks": Array [
       Object {
         "amount": 0,
@@ -2711,7 +2711,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 8`] = `Array []`;
+exports[`mappers map okex-swap messages 9`] = `Array []`;
 
 exports[`mappers map phemex messages 1`] = `
 Array [
