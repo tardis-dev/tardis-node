@@ -2377,7 +2377,21 @@ exports[`mappers map okex messages 3`] = `Array []`;
 
 exports[`mappers map okex messages 4`] = `Array []`;
 
-exports[`mappers map okex-futures messages 1`] = `Array []`;
+exports[`mappers map okex-futures messages 1`] = `
+Array [
+  Object {
+    "amount": 4,
+    "exchange": "okex-futures",
+    "id": "2578238628528131",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 4061.94,
+    "side": "sell",
+    "symbol": "BTC-USD-190628",
+    "timestamp": 2019-03-31T23:59:59.388Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map okex-futures messages 2`] = `
 Array [

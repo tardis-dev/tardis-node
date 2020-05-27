@@ -4,7 +4,6 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 // https://www.okex.com/docs/en/#ws_swap-README
 
 export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  private readonly _seenSymbols = new Set<string>()
   constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
 
   canHandle(message: OkexDataMessage) {
@@ -21,21 +20,7 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
   }
 
   *map(okexTradesMessage: OKexTradesDataMessage, localTimestamp: Date): IterableIterator<Trade> {
-    let seenSymbol: string | undefined = undefined
     for (const okexTrade of okexTradesMessage.data) {
-      // ignore trades that are first time encountered for a given symbol and that have timestamp day different that local timestamp day
-      // such trades are duplicates and were already published for a previous day
-      const symbol = okexTrade.instrument_id
-      const timestamp = new Date(okexTrade.timestamp)
-
-      if (this._seenSymbols.has(symbol) === false) {
-        seenSymbol = symbol
-
-        if (timestamp.getUTCDate() !== localTimestamp.getUTCDate()) {
-          continue
-        }
-      }
-
       yield {
         type: 'trade',
         symbol: okexTrade.instrument_id,
@@ -44,13 +29,9 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
         price: Number(okexTrade.price),
         amount: okexTrade.qty !== undefined ? Number(okexTrade.qty) : Number(okexTrade.size),
         side: okexTrade.side,
-        timestamp,
+        timestamp: new Date(okexTrade.timestamp),
         localTimestamp: localTimestamp
       }
-    }
-
-    if (seenSymbol !== undefined) {
-      this._seenSymbols.add(seenSymbol)
     }
   }
 }
