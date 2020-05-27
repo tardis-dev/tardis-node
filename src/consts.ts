@@ -32,7 +32,7 @@ export const EXCHANGES = [
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
-const BITFINEX_CHANNELS = ['trades', 'book'] as const
+const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book'] as const
 
 const BITMEX_CHANNELS = [
   'trade',
@@ -125,7 +125,7 @@ const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'Ord
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
-const FTX_CHANNELS = ['orderbook', 'trades', 'instrument'] as const
+const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets'] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
 
@@ -144,7 +144,7 @@ const BINANCE_FUTURES_CHANNELS = [
   'recentTrades'
 ]
 
-const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'status'] as const
+const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations'] as const
 
 const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo'] as const
 
