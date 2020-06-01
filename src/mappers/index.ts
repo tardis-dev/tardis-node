@@ -92,7 +92,7 @@ const bookChangeMappers = {
   huobi: () => new HuobiBookChangeMapper('huobi'),
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
-  bybit: (localTimestamp: Date) => new BybitBookChangeMapper('bybit', localTimestamp.valueOf() >= new Date('2019-12-24').valueOf()),
+  bybit: () => new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,

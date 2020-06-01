@@ -66,17 +66,9 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
       ]
     }
 
-    // subscribe to both book channels and in canHandle decide which one to use
-    // as one can subscribe to date range period that overlaps both when only orderBookL2_25 has been available
-    // and when both were available
-
     return [
       {
         channel: 'orderBookL2_25',
-        symbols
-      } as const,
-      {
-        channel: 'orderBook_200',
         symbols
       } as const
     ]
