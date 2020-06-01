@@ -1261,7 +1261,7 @@ Array [
     "exchange": "bybit",
     "id": "b79bae67-1526-5ee6-adee-cf88e8a691a6",
     "localTimestamp": 2019-12-01T00:00:01.275Z,
-    "price": "9452.00",
+    "price": 9452,
     "side": "buy",
     "symbol": "BTCUSDT",
     "timestamp": 2020-05-28T16:31:21.987Z,

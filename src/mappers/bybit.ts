@@ -42,7 +42,7 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
         symbol: trade.symbol,
         exchange: this._exchange,
         id: trade.trade_id,
-        price: trade.price,
+        price: Number(trade.price),
         amount: trade.size,
         side: trade.side == 'Buy' ? 'buy' : trade.side === 'Sell' ? 'sell' : 'unknown',
         timestamp,
@@ -171,7 +171,7 @@ type BybitTradeDataMessage = BybitDataMessage & {
     symbol: string
     side: 'Buy' | 'Sell'
     size: number
-    price: number
+    price: number | string
     trade_id: string
   }[]
 }
