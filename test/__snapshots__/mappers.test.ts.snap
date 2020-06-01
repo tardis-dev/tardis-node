@@ -1197,21 +1197,7 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 11`] = `
-Array [
-  Object {
-    "amount": 0.001,
-    "exchange": "bybit",
-    "id": "bfbbb893-0971-5733-8eb2-aab164d0a552",
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
-    "price": "9452.00",
-    "side": "sell",
-    "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:02.124Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`mappers map bybit messages 11`] = `Array []`;
 
 exports[`mappers map bybit messages 12`] = `
 Array [

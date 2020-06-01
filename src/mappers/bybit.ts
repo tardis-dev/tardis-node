@@ -4,6 +4,8 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/en/websocket.md
 
 export class BybitTradesMapper implements Mapper<'bybit', Trade> {
+  private readonly _seenSymbols = new Set<string>()
+
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -24,6 +26,15 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 
   *map(message: BybitTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of message.data) {
+      const symbol = trade.symbol
+
+      const isLinear = symbol.endsWith('USDT')
+      // for some reason bybit publishes 'stale' trades for it's linear contracts (trades that already been published before disconnect)
+      if (isLinear && this._seenSymbols.has(symbol) === false) {
+        this._seenSymbols.add(symbol)
+        break
+      }
+
       const timestamp = trade.trade_time_ms !== undefined ? new Date(Number(trade.trade_time_ms)) : new Date(trade.timestamp)
 
       yield {
