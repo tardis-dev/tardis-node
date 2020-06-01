@@ -24,7 +24,7 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 
   *map(message: BybitTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of message.data) {
-      const timestamp = trade.trade_time_ms !== undefined ? new Date(trade.trade_time_ms) : new Date(trade.timestamp)
+      const timestamp = trade.trade_time_ms !== undefined ? new Date(Number(trade.trade_time_ms)) : new Date(trade.timestamp)
 
       yield {
         type: 'trade',
@@ -77,9 +77,16 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
   *map(message: BybitBookSnapshotDataMessage | BybitBookSnapshotUpdateMessage, localTimestamp: Date) {
     const topicArray = message.topic.split('.')
     const symbol = topicArray[topicArray.length - 1]
-    const data = message.type === 'snapshot' ? message.data : [...message.data.delete, ...message.data.update, ...message.data.insert]
-    const timestamp = new Date(message.timestamp_e6 / 1000)
-    timestamp.μs = message.timestamp_e6 % 1000
+    const data =
+      message.type === 'snapshot'
+        ? 'order_book' in message.data
+          ? message.data.order_book
+          : message.data
+        : [...message.data.delete, ...message.data.update, ...message.data.insert]
+
+    const timestampBybit = Number(message.timestamp_e6)
+    const timestamp = new Date(timestampBybit / 1000)
+    timestamp.μs = timestampBybit % 1000
 
     yield {
       type: 'book_change',
@@ -149,7 +156,7 @@ type BybitDataMessage = {
 type BybitTradeDataMessage = BybitDataMessage & {
   data: {
     timestamp: string
-    trade_time_ms?: number
+    trade_time_ms?: number | string
     symbol: string
     side: 'Buy' | 'Sell'
     size: number
@@ -166,8 +173,8 @@ type BybitBookLevel = {
 
 type BybitBookSnapshotDataMessage = BybitDataMessage & {
   type: 'snapshot'
-  data: BybitBookLevel[]
-  timestamp_e6: number
+  data: BybitBookLevel[] | { order_book: BybitBookLevel[] }
+  timestamp_e6: number | string
 }
 
 type BybitBookSnapshotUpdateMessage = BybitDataMessage & {
@@ -177,7 +184,7 @@ type BybitBookSnapshotUpdateMessage = BybitDataMessage & {
     update: BybitBookLevel[]
     insert: BybitBookLevel[]
   }
-  timestamp_e6: number
+  timestamp_e6: number | string
 }
 
 type BybitInstrumentUpdate = {

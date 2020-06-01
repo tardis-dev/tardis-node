@@ -1177,15 +1177,258 @@ Array [
 
 exports[`mappers map bybit messages 9`] = `Array []`;
 
-exports[`mappers map bybit messages 10`] = `Array []`;
-
-exports[`mappers map bybit messages 11`] = `
+exports[`mappers map bybit messages 10`] = `
 Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 238589,
-        "price": 9352.5,
+        "amount": 9.95,
+        "price": 9452.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:00.293Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 11`] = `
+Array [
+  Object {
+    "amount": 0.001,
+    "exchange": "bybit",
+    "id": "bfbbb893-0971-5733-8eb2-aab164d0a552",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": "9452.00",
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:02.124Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 12`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 9449.62,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:02.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 13`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "bybit",
+    "id": "52079383-86f0-52bf-ab1f-f943a34a8aeb",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 215.15,
+    "side": "buy",
+    "symbol": "ETHUSD",
+    "timestamp": 2020-05-28T16:31:03.041Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 14`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 183205,
+        "price": 0.1984,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "XRPUSD",
+    "timestamp": 2020-05-28T16:31:03.122Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 15`] = `
+Array [
+  Object {
+    "amount": 0.001,
+    "exchange": "bybit",
+    "id": "b79bae67-1526-5ee6-adee-cf88e8a691a6",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": "9452.00",
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:21.987Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 16`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 9.16,
+        "price": 9483,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:15:03.852Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 17`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 35140,
+        "price": 9462.5,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-05-28T16:15:03.318Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 18`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 121205,
+        "price": 9480.5,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 101535,
+        "price": 9465.5,
+      },
+      Object {
+        "amount": 46177,
+        "price": 9467.5,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-05-28T16:15:04.061Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 19`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 214147,
+        "price": 9474.5,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-05-28T16:15:04.459Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 20`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 22.390999,
+        "price": 9472.5,
+      },
+      Object {
+        "amount": 2.17,
+        "price": 9466,
+      },
+      Object {
+        "amount": 3.331,
+        "price": 9469.5,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:15:28.033Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 21`] = `Array []`;
+
+exports[`mappers map bybit messages 22`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": 0.000093,
+    "fundingTimestamp": undefined,
+    "indexPrice": 9473.94,
+    "lastPrice": 9469.5,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": 9475.13,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.0001,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:02.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 23`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 43624,
+        "price": 9360,
       },
     ],
     "bids": Array [],
@@ -1193,11 +1436,13 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-14T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-02-01T00:00:59.758Z,
+    "timestamp": 2020-02-01T00:00:59.707Z,
     "type": "book_change",
   },
 ]
 `;
+
+exports[`mappers map bybit messages 24`] = `Array []`;
 
 exports[`mappers map coinbase messages 1`] = `
 Array [

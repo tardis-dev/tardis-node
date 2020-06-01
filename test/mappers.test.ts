@@ -2403,6 +2403,194 @@ describe('mappers', () => {
         },
         cross_seq: 534365684,
         timestamp_e6: 1580515259599816
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSDT',
+        type: 'delta',
+        data: { delete: [], update: [{ price: '9452.50', symbol: 'BTCUSDT', id: '94525000', side: 'Sell', size: 9.95 }], insert: [] },
+        cross_seq: '177025198',
+        timestamp_e6: '1590683460293107'
+      },
+      {
+        topic: 'trade.BTCUSDT',
+        data: [
+          {
+            symbol: 'BTCUSDT',
+            tick_direction: 'MinusTick',
+            price: '9452.00',
+            size: 0.001,
+            timestamp: '2020-05-28T16:31:02.000Z',
+            trade_time_ms: '1590683462124',
+            side: 'Sell',
+            trade_id: 'bfbbb893-0971-5733-8eb2-aab164d0a552'
+          }
+        ]
+      },
+      {
+        topic: 'instrument_info.100ms.BTCUSDT',
+        type: 'delta',
+        data: {
+          update: [
+            {
+              id: 1,
+              symbol: 'BTCUSDT',
+              index_price_e4: '94496200',
+              cross_seq: '177025335',
+              created_at: '1970-01-01T00:00:00.000Z',
+              updated_at: '2020-05-28T16:31:02.000Z'
+            }
+          ]
+        },
+        cross_seq: '177025391',
+        timestamp_e6: '1590683462401579'
+      },
+      {
+        topic: 'trade.ETHUSD',
+        data: [
+          {
+            trade_time_ms: 1590683463041,
+            timestamp: '2020-05-28T16:31:03.000Z',
+            symbol: 'ETHUSD',
+            side: 'Buy',
+            size: 1,
+            price: 215.15,
+            tick_direction: 'PlusTick',
+            trade_id: '52079383-86f0-52bf-ab1f-f943a34a8aeb',
+            cross_seq: 736789193
+          }
+        ]
+      },
+      {
+        topic: 'orderBookL2_25.XRPUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [{ price: '0.1984', symbol: 'XRPUSD', id: 1984, side: 'Sell', size: 183205 }],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 584609909,
+        timestamp_e6: 1590683463122042
+      },
+      {
+        topic: 'trade.BTCUSDT',
+        data: [
+          {
+            symbol: 'BTCUSDT',
+            tick_direction: 'PlusTick',
+            price: '9452.00',
+            size: 0.001,
+            timestamp: '2020-05-28T16:31:21.000Z',
+            trade_time_ms: '1590683481987',
+            side: 'Buy',
+            trade_id: 'b79bae67-1526-5ee6-adee-cf88e8a691a6'
+          }
+        ]
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSDT',
+        type: 'snapshot',
+        data: {
+          order_book: [{ price: '9483.00', symbol: 'BTCUSDT', id: '94830000', side: 'Sell', size: 9.16 }]
+        },
+        cross_seq: '176990958',
+        timestamp_e6: '1590682503852140'
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'snapshot',
+        data: [{ price: '9462.50', symbol: 'BTCUSD', id: 94625000, side: 'Buy', size: 35140 }],
+        cross_seq: 1628388493,
+        timestamp_e6: 1590682503318949
+      },
+
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            { price: '9465.50', symbol: 'BTCUSD', id: 94655000, side: 'Buy', size: 101535 },
+            { price: '9480.50', symbol: 'BTCUSD', id: 94805000, side: 'Sell', size: 121205 },
+            { price: '9467.50', symbol: 'BTCUSD', id: 94675000, side: 'Buy', size: 46177 }
+          ],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 1628388501,
+        timestamp_e6: 1590682504061720
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSD',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [{ price: '9474.50', symbol: 'BTCUSD', id: 94745000, side: 'Buy', size: 214147 }],
+          insert: [],
+          transactTimeE6: 0
+        },
+        cross_seq: 1628388509,
+        timestamp_e6: 1590682504459494
+      },
+      {
+        topic: 'orderBookL2_25.BTCUSDT',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            { price: '9472.50', symbol: 'BTCUSDT', id: '94725000', side: 'Buy', size: 22.390999 },
+            { price: '9466.00', symbol: 'BTCUSDT', id: '94660000', side: 'Buy', size: 2.17 },
+            { price: '9469.50', symbol: 'BTCUSDT', id: '94695000', side: 'Buy', size: 3.331 }
+          ],
+          insert: []
+        },
+        cross_seq: '176991944',
+        timestamp_e6: '1590682528033099'
+      },
+      {
+        topic: 'orderBook_200.100ms.BTCUSDT',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            { price: '9472.50', symbol: 'BTCUSDT', id: '94725000', side: 'Buy', size: 22.390999 },
+            { price: '9466.00', symbol: 'BTCUSDT', id: '94660000', side: 'Buy', size: 2.17 },
+            { price: '9469.50', symbol: 'BTCUSDT', id: '94695000', side: 'Buy', size: 3.331 }
+          ],
+          insert: []
+        },
+        cross_seq: '176991944',
+        timestamp_e6: '1590682528035169'
+      },
+      {
+        topic: 'instrument_info.100ms.BTCUSDT',
+        type: 'snapshot',
+        data: {
+          id: 1,
+          symbol: 'BTCUSDT',
+          last_price_e4: '94695000',
+          last_tick_direction: 'PlusTick',
+          prev_price_24h_e4: '91615000',
+          price_24h_pcnt_e6: '33618',
+          high_price_24h_e4: '95330000',
+          low_price_24h_e4: '90515000',
+          prev_price_1h_e4: '94395000',
+          price_1h_pcnt_e6: '3178',
+          mark_price_e4: '94751300',
+          index_price_e4: '94739400',
+          open_interest_e8: '447123000000',
+          total_turnover_e8: '942044488647300000',
+          turnover_24h_e8: '10388254798149995',
+          total_volume_e8: '115158480000000',
+          volume_24h_e8: '1118447100000',
+          funding_rate_e6: '93',
+          predicted_funding_rate_e6: '100',
+          cross_seq: '176990247',
+          created_at: '1970-01-01T00:00:00.000Z',
+          updated_at: '2020-05-28T16:14:34.000Z'
+        },
+        cross_seq: '176990933',
+        timestamp_e6: '1590682502904608'
       }
     ]
 
