@@ -15,6 +15,10 @@ export class PhemexRealTimeFeed extends RealTimeFeedBase {
       .map((filter) => {
         if (filter.symbols !== undefined && filter.channel !== 'market24h') {
           return filter.symbols.map((symbol) => {
+            if (symbol.startsWith('S')) {
+              symbol = symbol.charAt(0).toLocaleLowerCase() + symbol.slice(1)
+            }
+
             return {
               id: id++,
               method: this.channelsMap[filter.channel],
