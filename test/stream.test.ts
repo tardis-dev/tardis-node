@@ -29,7 +29,7 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (exchange === 'coinflex' || exchange === 'okex-futures' || exchange === 'okex-options') {
+          if (exchange === 'coinflex' || exchange === 'okex-futures' || exchange === 'okex-options' || exchange === 'bybit') {
             return
           }
           const exchangeDetails = await getExchangeDetails(exchange)

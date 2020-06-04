@@ -3115,3 +3115,75 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map phemex messages 7`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0.088633,
+        "price": 9545.32,
+      },
+      Object {
+        "amount": 0,
+        "price": 9545.28,
+      },
+    ],
+    "exchange": "phemex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "sBTCUSDT",
+    "timestamp": 2020-06-04T10:57:01.628Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 8`] = `
+Array [
+  Object {
+    "amount": 0.10576,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 240.25,
+    "side": "buy",
+    "symbol": "sETHUSDT",
+    "timestamp": 2020-06-04T10:57:04.163Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 9`] = `
+Array [
+  Object {
+    "amount": 0.002791,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 9544.88,
+    "side": "sell",
+    "symbol": "sBTCUSDT",
+    "timestamp": 2020-06-04T10:57:06.414Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 10`] = `
+Array [
+  Object {
+    "amount": 6,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 4.378,
+    "side": "sell",
+    "symbol": "LINKUSD",
+    "timestamp": 2020-06-04T10:57:10.652Z,
+    "type": "trade",
+  },
+]
+`;

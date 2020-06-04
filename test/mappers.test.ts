@@ -2808,7 +2808,24 @@ describe('mappers', () => {
         symbol: 'BTCUSD',
         timestamp: 1585526400543970299,
         type: 'snapshot'
-      }
+      },
+      {
+        book: {
+          asks: [],
+          bids: [
+            [954532000000, 8863300],
+            [954528000000, 0]
+          ]
+        },
+        depth: 30,
+        sequence: 1067554850,
+        symbol: 'sBTCUSDT',
+        timestamp: 1591268221628126444,
+        type: 'incremental'
+      },
+      { sequence: 1067555713, symbol: 'sETHUSDT', trades: [[1591268224163281134, 'Buy', 24025000000, 10576000]], type: 'incremental' },
+      { sequence: 1067556417, symbol: 'sBTCUSDT', trades: [[1591268226414925245, 'Sell', 954488000000, 279100]], type: 'incremental' },
+      { sequence: 615011372, symbol: 'LINKUSD', trades: [[1591268230652613373, 'Sell', 43780, 6]], type: 'incremental' }
     ]
     const phemex = createMapper('phemex')
 

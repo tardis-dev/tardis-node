@@ -11,6 +11,22 @@ const fromNanoSecondsToDate = (nanos: number) => {
   return timestamp
 }
 
+function getPriceScale(symbol: string) {
+  if (symbol.startsWith('s')) {
+    return 1e8
+  }
+
+  return 1e4
+}
+
+function getQtyScale(symbol: string) {
+  if (symbol.startsWith('s')) {
+    return 1e8
+  }
+
+  return 1
+}
+
 export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   canHandle(message: PhemexTradeMessage) {
     return 'trades' in message && message.type === 'incremental'
@@ -27,13 +43,15 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
 
   *map(message: PhemexTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const [timestamp, side, priceEp, qty] of message.trades) {
+      const symbol = message.symbol
+
       yield {
         type: 'trade',
-        symbol: message.symbol,
+        symbol,
         exchange: 'phemex',
         id: undefined,
-        price: priceEp / 10000,
-        amount: qty,
+        price: priceEp / getPriceScale(symbol),
+        amount: qty / getQtyScale(symbol),
         side: side === 'Buy' ? 'buy' : 'sell',
         timestamp: fromNanoSecondsToDate(timestamp),
         localTimestamp: localTimestamp
@@ -42,10 +60,10 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   }
 }
 
-const mapBookLevel = ([priceEp, qty]: PhemexBookLevel) => {
+const mapBookLevelForSymbol = (symbol: string) => ([priceEp, qty]: PhemexBookLevel) => {
   return {
-    price: priceEp / 10000,
-    amount: qty
+    price: priceEp / getPriceScale(symbol),
+    amount: qty / getQtyScale(symbol)
   }
 }
 
@@ -64,6 +82,8 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   },
 
   *map(message: PhemexBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    const symbol = message.symbol
+    const mapBookLevel = mapBookLevelForSymbol(symbol)
     yield {
       type: 'book_change',
       symbol: message.symbol,

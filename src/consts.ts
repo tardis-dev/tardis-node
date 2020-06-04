@@ -30,7 +30,7 @@ export const EXCHANGES = [
   'binance-dex'
 ] as const
 
-const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
+const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
 const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book'] as const
 
@@ -152,7 +152,7 @@ const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
 
 const HUOBI_DM_SWAP_CHANNELS = ['depth', 'detail', 'trade'] as const
 
-const PHEMEX_CHANNELS = ['book', 'trades', 'market24h'] as const
+const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200'] as const
 
