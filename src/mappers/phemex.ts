@@ -27,6 +27,18 @@ function getQtyScale(symbol: string) {
   return 1
 }
 
+function getSymbols(symbols?: string[]) {
+  if (symbols === undefined) {
+    return
+  }
+  return symbols.map((symbol) => {
+    if (symbol.startsWith('S')) {
+      return symbol.charAt(0).toLowerCase() + symbol.slice(1)
+    }
+    return symbol
+  })
+}
+
 export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   canHandle(message: PhemexTradeMessage) {
     return 'trades' in message && message.type === 'incremental'
@@ -36,7 +48,7 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
     return [
       {
         channel: 'trades',
-        symbols
+        symbols: getSymbols(symbols)
       } as const
     ]
   },
@@ -47,7 +59,7 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
 
       yield {
         type: 'trade',
-        symbol,
+        symbol: symbol.toUpperCase(),
         exchange: 'phemex',
         id: undefined,
         price: priceEp / getPriceScale(symbol),
@@ -76,7 +88,7 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
     return [
       {
         channel: 'book',
-        symbols
+        symbols: getSymbols(symbols)
       } as const
     ]
   },
@@ -86,7 +98,7 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
     const mapBookLevel = mapBookLevelForSymbol(symbol)
     yield {
       type: 'book_change',
-      symbol: message.symbol,
+      symbol: symbol.toUpperCase(),
       exchange: 'phemex',
       isSnapshot: message.type === 'snapshot',
       bids: message.book.bids.map(mapBookLevel),
