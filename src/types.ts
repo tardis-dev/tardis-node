@@ -65,6 +65,37 @@ export type DerivativeTicker = {
   readonly localTimestamp: Date
 }
 
+export type OptionSummary = NormalizedData & {
+  type: 'option_summary'
+  optionType: 'put' | 'call'
+  strikePrice: number
+
+  expirationDate: Date
+
+  bestBidPrice: number | undefined
+  bestBidAmount: number | undefined
+  bestBidIV: number | undefined
+
+  bestAskPrice: number | undefined
+  bestAskAmount: number | undefined
+  bestAskIV: number | undefined
+
+  lastPrice: number | undefined
+  openInterest: number
+
+  markPrice: number
+  markIV: number
+
+  delta: number
+  gamma: number
+  vega: number
+  theta: number
+  rho: number | undefined
+
+  underlyingPrice: number | undefined
+  underlyingIndex: string
+}
+
 export type Disconnect = {
   readonly type: 'disconnect'
   readonly exchange: Exchange

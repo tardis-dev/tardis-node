@@ -1,5 +1,5 @@
 import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, Trade } from '../types'
+import { BookChange, DerivativeTicker, Trade, OptionSummary } from '../types'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -14,7 +14,7 @@ import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
-import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper } from './deribit'
+import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper, DeribitOptionSummaryMapper } from './deribit'
 import { ftxBookChangeMapper, ftxTradesMapper, FTXDerivativeTickerMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
@@ -112,6 +112,10 @@ const derivativeTickersMappers = {
   ftx: () => new FTXDerivativeTickerMapper()
 }
 
+const optionsSummaryMappers = {
+  deribit: () => new DeribitOptionSummaryMapper()
+}
+
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {
   const createTradesMapper = tradesMappers[exchange]
 
@@ -146,4 +150,17 @@ export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTick
   }
 
   return createDerivativeTickerMapper() as any
+}
+
+export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMappers>(
+  exchange: T,
+  _localTimestamp: Date
+): Mapper<T, OptionSummary> => {
+  const createOptionSummaryMapper = optionsSummaryMappers[exchange]
+
+  if (createOptionSummaryMapper === undefined) {
+    throw new Error(`normalizeOptionsSummary: ${exchange} not supported`)
+  }
+
+  return createOptionSummaryMapper() as any
 }

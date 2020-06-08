@@ -1847,6 +1847,134 @@ Array [
 ]
 `;
 
+exports[`mappers map deribit messages 7`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 500,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0,
+    "exchange": "deribit",
+    "expirationDate": 2020-06-08T08:00:00.000Z,
+    "gamma": 0,
+    "lastPrice": 0.0005,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markIV": 70,
+    "markPrice": 0,
+    "openInterest": 0,
+    "optionType": "put",
+    "rho": 0,
+    "strikePrice": 8750,
+    "symbol": "BTC-8JUN20-8750-P",
+    "theta": 0,
+    "timestamp": 2020-06-08T08:00:00.048Z,
+    "type": "option_summary",
+    "underlyingIndex": "SYN.BTC-8JUN20",
+    "underlyingPrice": 9724.48,
+    "vega": 0,
+  },
+]
+`;
+
+exports[`mappers map deribit messages 8`] = `
+Array [
+  Object {
+    "bestAskAmount": 4.8,
+    "bestAskIV": 66.9,
+    "bestAskPrice": 0.04,
+    "bestBidAmount": 15.4,
+    "bestBidIV": 58.39,
+    "bestBidPrice": 0.0365,
+    "delta": 0.62959,
+    "exchange": "deribit",
+    "expirationDate": 2020-06-05T08:00:00.000Z,
+    "gamma": 0.00058,
+    "lastPrice": 0.038,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markIV": 63.21,
+    "markPrice": 0.03847784,
+    "openInterest": 533.2,
+    "optionType": "call",
+    "rho": 0.66242,
+    "strikePrice": 9250,
+    "symbol": "BTC-5JUN20-9250-C",
+    "theta": -28.34113,
+    "timestamp": 2020-06-01T00:00:52.595Z,
+    "type": "option_summary",
+    "underlyingIndex": "SYN.BTC-5JUN20",
+    "underlyingPrice": 9440.73,
+    "vega": 3.88497,
+  },
+]
+`;
+
+exports[`mappers map deribit messages 9`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": -0.98566,
+    "exchange": "deribit",
+    "expirationDate": 2020-06-05T08:00:00.000Z,
+    "gamma": 0.00122,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markIV": 118.63,
+    "markPrice": 0.33859,
+    "openInterest": 0,
+    "optionType": "put",
+    "rho": -0.03643,
+    "strikePrice": 310,
+    "symbol": "ETH-5JUN20-310-P",
+    "theta": -0.12594,
+    "timestamp": 2020-05-31T23:59:57.073Z,
+    "type": "option_summary",
+    "underlyingIndex": "SYN.ETH-5JUN20",
+    "underlyingPrice": 231.7,
+    "vega": 0.0092,
+  },
+]
+`;
+
+exports[`mappers map deribit messages 10`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.03105,
+    "exchange": "deribit",
+    "expirationDate": 2020-06-10T08:00:00.000Z,
+    "gamma": 0.00539,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markIV": 72.96,
+    "markPrice": 0.000632,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": 0.00039,
+    "strikePrice": 270,
+    "symbol": "ETH-10JUN20-270-C",
+    "theta": -0.15436,
+    "timestamp": 2020-06-08T09:24:58.178Z,
+    "type": "option_summary",
+    "underlyingIndex": "SYN.ETH-10JUN20",
+    "underlyingPrice": 244.14,
+    "vega": 0.01246,
+  },
+]
+`;
+
 exports[`mappers map ftx messages 1`] = `Array []`;
 
 exports[`mappers map ftx messages 2`] = `

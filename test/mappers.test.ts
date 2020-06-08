@@ -1,4 +1,4 @@
-import { Exchange, Mapper, normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades } from '../src'
+import { Exchange, Mapper, normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades, normalizeOptionsSummary } from '../src'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -13,10 +13,17 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'ftx'
 ]
 
+const exchangesWithOptionsSummary: Exchange[] = ['deribit']
+
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
-  const normalizers = exchangesWithDerivativeInfo.includes(exchange)
-    ? [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]
-    : [normalizeTrades, normalizeBookChanges]
+  let normalizers: any = [normalizeTrades, normalizeBookChanges]
+  if (exchangesWithDerivativeInfo.includes(exchange)) {
+    normalizers.push(normalizeDerivativeTickers)
+  }
+
+  if (exchangesWithOptionsSummary.includes(exchange)) {
+    normalizers.push(normalizeOptionsSummary)
+  }
 
   const mappersForExchange = normalizers.map((m: any) => m(exchange, localTimestamp)) as Mapper<any, any>[]
 
@@ -177,6 +184,133 @@ describe('mappers', () => {
             best_bid_amount: 267900.0,
             best_ask_price: 8304.5,
             best_ask_amount: 5260.0
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-8JUN20-8750-P.raw',
+          data: {
+            underlying_price: 9724.48,
+            underlying_index: 'SYN.BTC-8JUN20',
+            timestamp: 1591603200048,
+            stats: { volume: 2.5, price_change: 0.0, low: 0.0005, high: 0.0005 },
+            state: 'closed',
+            open_interest: 0.0,
+            min_price: 0.0001,
+            max_price: 0.015,
+            mark_price: 0.0,
+            mark_iv: 70.0,
+            last_price: 0.0005,
+            interest_rate: 0.0,
+            instrument_name: 'BTC-8JUN20-8750-P',
+            index_price: 9729.25,
+            greeks: { vega: 0.0, theta: 0.0, rho: 0.0, gamma: 0.0, delta: 0.0 },
+            estimated_delivery_price: 'expired',
+            delivery_price: 9728.65,
+            bid_iv: 0.0,
+            best_bid_price: 0.0,
+            best_bid_amount: 0.0,
+            best_ask_price: 0.0,
+            best_ask_amount: 0.0,
+            ask_iv: 500.0
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-5JUN20-9250-C.raw',
+          data: {
+            underlying_price: 9440.73,
+            underlying_index: 'SYN.BTC-5JUN20',
+            timestamp: 1590969652595,
+            stats: { volume: 13.4, price_change: -19.1489, low: 0.037, high: 0.047 },
+            state: 'open',
+            settlement_price: 0.05,
+            open_interest: 533.2,
+            min_price: 0.0115,
+            max_price: 0.069,
+            mark_price: 0.03847784,
+            mark_iv: 63.21,
+            last_price: 0.038,
+            interest_rate: 0.0,
+            instrument_name: 'BTC-5JUN20-9250-C',
+            index_price: 9434.36,
+            greeks: { vega: 3.88497, theta: -28.34113, rho: 0.66242, gamma: 0.00058, delta: 0.62959 },
+            estimated_delivery_price: 9434.36,
+            bid_iv: 58.39,
+            best_bid_price: 0.0365,
+            best_bid_amount: 15.4,
+            best_ask_price: 0.04,
+            best_ask_amount: 4.8,
+            ask_iv: 66.9
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.ETH-5JUN20-310-P.raw',
+          data: {
+            underlying_price: 231.7,
+            underlying_index: 'SYN.ETH-5JUN20',
+            timestamp: 1590969597073,
+            stats: { volume: null, price_change: null, low: null, high: null },
+            state: 'open',
+            settlement_price: 0.29,
+            open_interest: 0.0,
+            min_price: 0.299,
+            max_price: 0.383,
+            mark_price: 0.33859,
+            mark_iv: 118.63,
+            last_price: null,
+            interest_rate: 0.0,
+            instrument_name: 'ETH-5JUN20-310-P',
+            index_price: 231.54,
+            greeks: { vega: 0.0092, theta: -0.12594, rho: -0.03643, gamma: 0.00122, delta: -0.98566 },
+            estimated_delivery_price: 231.54,
+            bid_iv: 0.0,
+            best_bid_price: 0.0,
+            best_bid_amount: 0.0,
+            best_ask_price: 0.0,
+            best_ask_amount: 0.0,
+            ask_iv: 0.0
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.ETH-10JUN20-270-C.raw',
+          data: {
+            underlying_price: 244.14,
+            underlying_index: 'SYN.ETH-10JUN20',
+            timestamp: 1591608298178,
+            stats: { volume: null, price_change: null, low: null, high: null },
+            state: 'open',
+            open_interest: 0.0,
+            min_price: 0.0001,
+            max_price: 0.0155,
+            mark_price: 0.000632,
+            mark_iv: 72.96,
+            last_price: null,
+            interest_rate: 0.0,
+            instrument_name: 'ETH-10JUN20-270-C',
+            index_price: 243.98,
+            greeks: { vega: 0.01246, theta: -0.15436, rho: 0.00039, gamma: 0.00539, delta: 0.03105 },
+            estimated_delivery_price: 243.98,
+            bid_iv: 0.0,
+            best_bid_price: 0.0,
+            best_bid_amount: 0.0,
+            best_ask_price: 0.0,
+            best_ask_amount: 0.0,
+            ask_iv: 0.0
           }
         }
       }
