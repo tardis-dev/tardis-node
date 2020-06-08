@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade, OptionSummary } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
@@ -168,8 +168,98 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
   }
 }
 
+export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
+  private readonly _indexPrices = new Map<string, number>()
+  private readonly expiration_regex = /(\d{2})(\d{2})(\d{2})/
+
+  canHandle(message: OkexDataMessage) {
+    return message.table === 'index/ticker' || message.table === 'option/summary'
+  }
+
+  getFilters(symbols?: string[]) {
+    const indexes =
+      symbols !== undefined
+        ? symbols.map((s) => {
+            const symbolParts = s.split('-')
+            return `${symbolParts[0]}-${symbolParts[1]}`
+          })
+        : undefined
+
+    return [
+      {
+        channel: `option/summary`,
+        symbols
+      } as const,
+      {
+        channel: `index/ticker`,
+        indexes
+      } as const
+    ]
+  }
+
+  *map(message: OkexOptionSummaryData | OkexIndexData, localTimestamp: Date): IterableIterator<OptionSummary> | undefined {
+    if (message.table === 'index/ticker') {
+      for (const index of message.data) {
+        const lastIndexPrice = Number(index.last)
+        if (lastIndexPrice > 0) {
+          this._indexPrices.set(index.instrument_id, lastIndexPrice)
+        }
+      }
+      return
+    }
+
+    for (const summary of message.data) {
+      const symbolParts = summary.instrument_id.split('-')
+      const isPut = symbolParts[4] === 'P'
+      const strikePrice = Number(symbolParts[3])
+
+      var dateArray = this.expiration_regex.exec(symbolParts[2])!
+
+      const expirationDate = new Date(Date.UTC(+('20' + dateArray[1]), +dateArray[2] - 1, +dateArray[3], 8, 0, 0, 0))
+      const lastUnderlyingPrice = this._indexPrices.get(summary.underlying)
+
+      const optionSummary: OptionSummary = {
+        type: 'option_summary',
+        symbol: summary.instrument_id,
+        exchange: 'okex-options',
+        optionType: isPut ? 'put' : 'call',
+        strikePrice,
+        expirationDate,
+
+        bestBidPrice: Number(summary.best_bid) === 0 ? undefined : Number(summary.best_bid),
+        bestBidAmount: Number(summary.best_bid_size) === 0 ? undefined : Number(summary.best_bid_size),
+        bestBidIV: Number(summary.bid_vol) === 0 ? undefined : Number(summary.bid_vol),
+
+        bestAskPrice: Number(summary.best_ask) === 0 ? undefined : Number(summary.best_ask),
+        bestAskAmount: Number(summary.best_ask_size) === 0 ? undefined : Number(summary.best_ask_size),
+        bestAskIV: Number(summary.ask_vol) === 0 ? undefined : Number(summary.ask_vol),
+
+        lastPrice: Number(summary.last) === 0 ? undefined : Number(summary.last),
+        openInterest: Number(summary.open_interest),
+
+        markPrice: Number(summary.mark_price),
+        markIV: Number(summary.mark_vol),
+
+        delta: Number(summary.delta),
+        gamma: Number(summary.gamma),
+        vega: Number(summary.vega),
+        theta: Number(summary.theta),
+        rho: undefined,
+
+        underlyingPrice: lastUnderlyingPrice,
+        underlyingIndex: summary.underlying,
+
+        timestamp: new Date(summary.timestamp),
+        localTimestamp: localTimestamp
+      }
+
+      yield optionSummary
+    }
+  }
+}
+
 type OkexDataMessage = {
-  table: FilterForExchange['okex']['channel']
+  table: string
 }
 
 type OKexTradesDataMessage = {
@@ -228,3 +318,40 @@ type OkexBookLevel = [number | string, number | string, number | string, number 
 type OKEX_EXCHANGES = 'okex' | 'okcoin' | 'okex-futures' | 'okex-swap' | 'okex-options'
 
 type OKEX_MARKETS = 'spot' | 'swap' | 'futures' | 'option'
+
+type OkexIndexData = {
+  table: 'index/ticker'
+  data: [
+    {
+      last: number
+      instrument_id: string
+    }
+  ]
+}
+
+type OkexOptionSummaryData = {
+  table: 'option/summary'
+  data: [
+    {
+      instrument_id: string
+      underlying: string
+      best_ask: string
+      best_bid: string
+      best_ask_size: string
+      best_bid_size: string
+      change_rate: string
+      delta: string
+      gamma: string
+      bid_vol: string
+      ask_vol: string
+      mark_vol: string
+      last: string
+      leverage: string
+      mark_price: string
+      theta: string
+      vega: string
+      open_interest: string
+      timestamp: string
+    }
+  ]
+}

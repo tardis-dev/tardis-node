@@ -118,7 +118,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'option/depth_l2_tbt',
   'option/ticker',
   'option/summary',
-  'option/instruments'
+  'option/instruments',
+  'index/ticker'
 ]
 
 const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'OrderClosed', 'TickerChanged']

@@ -13,7 +13,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'ftx'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit']
+const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
@@ -1055,6 +1055,152 @@ describe('mappers', () => {
             bids: [],
             timestamp: '2020-02-08T00:00:28.101Z',
             checksum: 1704544030
+          }
+        ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'ETH-USD-200925-240-P',
+            underlying: 'ETH-USD',
+            best_ask: '0.153',
+            best_bid: '0.1465',
+            best_ask_size: '505',
+            best_bid_size: '505',
+            change_rate: '0',
+            delta: '-0.5402682903',
+            gamma: '1.4602562596',
+            high_24h: '0.153',
+            highest_buy: '0.3565',
+            realized_vol: '0',
+            bid_vol: '0.7495',
+            ask_vol: '0.7813',
+            mark_vol: '0.7637',
+            last: '0.153',
+            leverage: '6.6989',
+            low_24h: '0.153',
+            lowest_sell: '0.0005',
+            mark_price: '0.14927916',
+            theta: '-0.0007332882',
+            vega: '0.002094302',
+            volume_24h: '0',
+            open_interest: '1',
+            estimated_price: '0',
+            timestamp: '2020-06-08T12:52:00.000Z'
+          }
+        ]
+      },
+
+      {
+        table: 'index/ticker',
+        data: [
+          {
+            last: '243.11',
+            open_24h: '237.943',
+            high_24h: '245.43',
+            low_24h: '234.661',
+            instrument_id: 'ETH-USD',
+            timestamp: '2020-06-08T12:52:00.802Z'
+          }
+        ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'ETH-USD-200925-240-P',
+            underlying: 'ETH-USD',
+            best_ask: '0.153',
+            best_bid: '0.1465',
+            best_ask_size: '505',
+            best_bid_size: '505',
+            change_rate: '0',
+            delta: '-0.5401157512',
+            gamma: '1.460028096',
+            high_24h: '0.153',
+            highest_buy: '0.3565',
+            realized_vol: '0',
+            bid_vol: '0.7507',
+            ask_vol: '0.7813',
+            mark_vol: '0.7637',
+            last: '0.153',
+            leverage: '6.7017',
+            low_24h: '0.153',
+            lowest_sell: '0.0005',
+            mark_price: '0.14921543',
+            theta: '-0.0007332464',
+            vega: '0.0020941549',
+            volume_24h: '0',
+            open_interest: '1',
+            estimated_price: '0',
+            timestamp: '2020-06-08T12:52:03.000Z'
+          }
+        ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'ETH-USD-200925-180-C',
+            underlying: 'ETH-USD',
+            best_ask: '0.3325',
+            best_bid: '0.3065',
+            best_ask_size: '55',
+            best_bid_size: '25',
+            change_rate: '0',
+            delta: '0.5085224419',
+            gamma: '0.0821676388',
+            high_24h: '0',
+            highest_buy: '0.514',
+            realized_vol: '0',
+            bid_vol: '0.6934',
+            ask_vol: '0.8814',
+            mark_vol: '0.7875',
+            last: '0',
+            leverage: '3.1339',
+            low_24h: '0',
+            lowest_sell: '0.124',
+            mark_price: '0.31908882',
+            theta: '-0.0004980699',
+            vega: '0.0013866212',
+            volume_24h: '0',
+            open_interest: '0',
+            estimated_price: '0',
+            timestamp: '2020-06-08T12:52:00.000Z'
+          }
+        ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'BTC-USD-200605-9250-P',
+            underlying: 'BTC-USD',
+            best_ask: '0.018',
+            best_bid: '0.0165',
+            best_ask_size: '4',
+            best_bid_size: '50',
+            change_rate: '0.1212',
+            delta: '-0.3860939252',
+            gamma: '5.6271994199',
+            high_24h: '0.019',
+            highest_buy: '0.068',
+            realized_vol: '0',
+            bid_vol: '0.6055',
+            ask_vol: '0.6348',
+            mark_vol: '0.6595',
+            last: '0.0185',
+            leverage: '53.0011',
+            low_24h: '0.0135',
+            lowest_sell: '0.0005',
+            mark_price: '0.01886752',
+            theta: '-0.0031224769',
+            vega: '0.0004103337',
+            volume_24h: '82',
+            open_interest: '486',
+            estimated_price: '0',
+            timestamp: '2020-06-01T00:00:39.117Z'
           }
         ]
       }
