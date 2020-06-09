@@ -16,7 +16,7 @@ export type Stats = {
   bookChanges: number
 }
 
-export type DatasetType = 'trades' | 'incremental_book_L2' | 'quotes' | 'derivative_ticker'
+export type DatasetType = 'trades' | 'incremental_book_L2' | 'quotes' | 'derivative_ticker' | 'options_chain'
 
 type Datasets = {
   dataTypes: DatasetType[]
