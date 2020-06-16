@@ -2525,6 +2525,44 @@ describe('mappers', () => {
     }
   })
 
+  test('map huobi-dm, messages', () => {
+    const messages = [
+      {
+        ch: 'market.BCH_NQ.depth.size_150.high_freq',
+        tick: {
+          ch: 'market.BCH_NQ.depth.size_150.high_freq',
+          event: 'snapshot',
+          id: 73813475013,
+          mrid: 73813475013,
+          ts: 1592130042862,
+          version: 5
+        },
+        ts: 1592130042866
+      },
+      {
+        ch: 'market.BCH_NQ.depth.size_150.high_freq',
+        tick: {
+          asks: [],
+          bids: [[228.191, 7999]],
+          ch: 'market.BCH_NQ.depth.size_150.high_freq',
+          event: 'update',
+          id: 74013930075,
+          mrid: 74013930075,
+          ts: 1592200802699,
+          version: 8
+        },
+        ts: 1592200802700
+      }
+    ]
+
+    const huobiDM = createMapper('huobi-dm')
+
+    for (const message of messages) {
+      const mappedMessages = huobiDM.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
   test('map bybit messages', () => {
     const messages = [
       {

@@ -2524,6 +2524,41 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi-dm, messages 1`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [],
+    "exchange": "huobi-dm",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BCH_NQ",
+    "timestamp": 2020-06-14T10:20:42.866Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm, messages 2`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 7999,
+        "price": 228.191,
+      },
+    ],
+    "exchange": "huobi-dm",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BCH_NQ",
+    "timestamp": 2020-06-15T06:00:02.700Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map kraken messages 1`] = `
 Array [
   Object {
