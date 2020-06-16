@@ -79,7 +79,8 @@ class CircularBuffer<T> {
   }
 }
 
-export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures', BookChange> {
+export class BinanceBookChangeMapper
+  implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', BookChange> {
   protected readonly symbolToDepthInfoMapping: {
     [key: string]: LocalDepthInfo
   } = {}
@@ -237,9 +238,10 @@ export class BinanceBookChangeMapper implements Mapper<'binance' | 'binance-jers
   }
 }
 
-export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper implements Mapper<'binance-futures', BookChange> {
-  constructor(protected readonly ignoreBookSnapshotOverlapError: boolean) {
-    super('binance-futures', ignoreBookSnapshotOverlapError)
+export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper
+  implements Mapper<'binance-futures' | 'binance-delivery', BookChange> {
+  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {
+    super(exchange, ignoreBookSnapshotOverlapError)
   }
 
   protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceFuturesDepthData, localTimestamp: Date): BookChange | undefined {
@@ -286,8 +288,11 @@ export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper impl
   }
 }
 
-export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures', DerivativeTicker> {
+export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures' | 'binance-delivery', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  private readonly _indexPrices = new Map<string, number>()
+
+  constructor(protected readonly exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -297,10 +302,10 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
     return message.stream.includes('@markPrice') || message.stream.endsWith('@ticker') || message.stream.endsWith('@openInterest')
   }
 
-  getFilters(symbols?: string[]): FilterForExchange['binance-futures'][] {
+  getFilters(symbols?: string[]): FilterForExchange['binance-futures' | 'binance-delivery'][] {
     symbols = lowerCaseSymbols(symbols)
 
-    return [
+    const filters = [
       {
         channel: 'markPrice',
         symbols
@@ -314,35 +319,58 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
         symbols
       }
     ]
+
+    if (this.exchange === 'binance-delivery') {
+      // index channel requires index symbol
+      filters.push({
+        channel: 'indexPrice',
+        symbols: symbols !== undefined ? symbols.map((s) => s.split('_')[0]) : undefined
+      })
+    }
+
+    return filters
   }
 
   *map(
-    message: BinanceResponse<BinanceFuturesMarkPriceData | BinanceFuturesTickerData | BinanceFuturesOpenInterestData>,
+    message: BinanceResponse<
+      BinanceFuturesMarkPriceData | BinanceFuturesTickerData | BinanceFuturesOpenInterestData | BinanceFuturesIndexPriceData
+    >,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
-    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(
-      's' in message.data ? message.data.s : message.data.symbol,
-      'binance-futures'
-    )
+    if (message.data.e === 'indexPriceUpdate') {
+      this._indexPrices.set(message.data.i, Number(message.data.p))
+    } else {
+      const symbol = 's' in message.data ? message.data.s : message.data.symbol
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, this.exchange)
 
-    if ('r' in message.data) {
-      pendingTickerInfo.updateFundingRate(Number(message.data.r))
-      pendingTickerInfo.updateFundingTimestamp(new Date(message.data.T))
-      pendingTickerInfo.updateMarkPrice(Number(message.data.p))
-      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
-    }
+      const lastIndexPrice = this._indexPrices.get(symbol.split('_')[0])
+      if (lastIndexPrice !== undefined) {
+        pendingTickerInfo.updateIndexPrice(lastIndexPrice)
+      }
 
-    if ('c' in message.data) {
-      pendingTickerInfo.updateLastPrice(Number(message.data.c))
-      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
-    }
+      if (message.data.e === 'markPriceUpdate') {
+        if ('r' in message.data) {
+          // only perpetual futures have funding rate info in mark price
+          pendingTickerInfo.updateFundingRate(Number(message.data.r))
+          pendingTickerInfo.updateFundingTimestamp(new Date(message.data.T!))
+        }
 
-    if ('openInterest' in message.data) {
-      pendingTickerInfo.updateOpenInterest(Number(message.data.openInterest))
-    }
+        pendingTickerInfo.updateMarkPrice(Number(message.data.p))
+        pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+      }
 
-    if (pendingTickerInfo.hasChanged()) {
-      yield pendingTickerInfo.getSnapshot(localTimestamp)
+      if (message.data.e === '24hrTicker') {
+        pendingTickerInfo.updateLastPrice(Number(message.data.c))
+        pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+      }
+
+      if ('openInterest' in message.data) {
+        pendingTickerInfo.updateOpenInterest(Number(message.data.openInterest))
+      }
+
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
+      }
     }
   }
 }
@@ -402,20 +430,30 @@ type LocalDepthInfo = {
 }
 
 type BinanceFuturesMarkPriceData = {
+  e: 'markPriceUpdate'
   s: string // Symbol
   E: number // Event time
   p: string // Mark price
-  r: string // Funding rate
-  T: number // Next funding time
+  r?: string // Funding rate
+  T?: number // Next funding time
 }
 
 type BinanceFuturesTickerData = {
+  e: '24hrTicker'
   E: number // Event time
   s: string // Symbol
   c: string // Last price
 }
 
 type BinanceFuturesOpenInterestData = {
+  e: undefined
   symbol: string
   openInterest: string
+}
+
+type BinanceFuturesIndexPriceData = {
+  e: 'indexPriceUpdate' // Event type
+  E: 1591261236000 // Event time
+  i: string // Pair
+  p: string // Index Price
 }

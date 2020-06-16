@@ -1,5 +1,11 @@
 import { Exchange, Filter } from '../types'
-import { BinanceFuturesRealTimeFeed, BinanceJerseyRealTimeFeed, BinanceRealTimeFeed, BinanceUSRealTimeFeed } from './binance'
+import {
+  BinanceFuturesRealTimeFeed,
+  BinanceJerseyRealTimeFeed,
+  BinanceRealTimeFeed,
+  BinanceUSRealTimeFeed,
+  BinanceDeliveryRealTimeFeed
+} from './binance'
 import { BinanceDexRealTimeFeed } from './binancedex'
 import { BitfinexRealTimeFeed } from './bitfinex'
 import { BitflyerRealTimeFeed } from './bitflyer'
@@ -29,6 +35,7 @@ const realTimeFeedsMap: {
   'binance-us': BinanceUSRealTimeFeed,
   'binance-dex': BinanceDexRealTimeFeed,
   'binance-futures': BinanceFuturesRealTimeFeed,
+  'binance-delivery': BinanceDeliveryRealTimeFeed,
   bitfinex: BitfinexRealTimeFeed,
   'bitfinex-alts': BitfinexRealTimeFeed,
   'bitfinex-derivatives': BitfinexRealTimeFeed,

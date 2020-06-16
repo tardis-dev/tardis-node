@@ -102,3 +102,9 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
   protected bookUpdateSpeed = '@0ms'
 }
+
+export class BinanceDeliveryRealTimeFeed extends BinanceRealTimeFeedBase {
+  protected wssURL = 'wss://dstream.binance.com/stream'
+  protected httpURL = 'https://dapi.binance.com/dapi/v1'
+  protected bookUpdateSpeed = '@0ms'
+}

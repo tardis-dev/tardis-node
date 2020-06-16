@@ -101,7 +101,8 @@ const bookChangeMappers = {
 
 const derivativeTickersMappers = {
   bitmex: () => new BitmexDerivativeTickerMapper(),
-  'binance-futures': () => new BinanceFuturesDerivativeTickerMapper(),
+  'binance-futures': () => new BinanceFuturesDerivativeTickerMapper('binance-futures'),
+  'binance-delivery': () => new BinanceFuturesDerivativeTickerMapper('binance-delivery'),
   'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
   cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
   deribit: () => new DeribitDerivativeTickerMapper(),
