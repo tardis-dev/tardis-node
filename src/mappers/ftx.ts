@@ -1,26 +1,28 @@
 import { parseμs } from '../handy'
-import { BookChange, Trade, DerivativeTicker } from '../types'
+import { BookChange, Trade, DerivativeTicker, Exchange } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.ftx.com/#websocket-api
 
-export const ftxTradesMapper: Mapper<'ftx', Trade> = {
+export class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: FtxTrades | FtxOrderBook) {
     if (message.data == undefined) {
       return false
     }
 
     return message.channel === 'trades'
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return [
       {
         channel: 'trades',
         symbols
-      }
+      } as const
     ]
-  },
+  }
 
   *map(ftxTrades: FtxTrades, localTimestamp: Date): IterableIterator<Trade> {
     for (const ftxTrade of ftxTrades.data) {
@@ -30,7 +32,7 @@ export const ftxTradesMapper: Mapper<'ftx', Trade> = {
       yield {
         type: 'trade',
         symbol: ftxTrades.market,
-        exchange: 'ftx',
+        exchange: this._exchange,
         id: ftxTrade.id !== null ? String(ftxTrade.id) : undefined,
         price: ftxTrade.price,
         amount: ftxTrade.size,
@@ -49,23 +51,25 @@ export const mapBookLevel = (level: FtxBookLevel) => {
   return { price, amount }
 }
 
-export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
+export class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: FtxTrades | FtxOrderBook) {
     if (message.data == undefined) {
       return false
     }
 
     return message.channel === 'orderbook'
-  },
+  }
 
   getFilters(symbols?: string[]) {
     return [
       {
         channel: 'orderbook',
         symbols
-      }
+      } as const
     ]
-  },
+  }
 
   *map(ftxOrderBook: FtxOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
     const timestamp = new Date(ftxOrderBook.data.time * 1000)
@@ -74,7 +78,7 @@ export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
     yield {
       type: 'book_change',
       symbol: ftxOrderBook.market,
-      exchange: 'ftx',
+      exchange: this._exchange,
       isSnapshot: ftxOrderBook.type === 'partial',
       bids: ftxOrderBook.data.bids.map(mapBookLevel),
       asks: ftxOrderBook.data.asks.map(mapBookLevel),
@@ -86,6 +90,8 @@ export const ftxBookChangeMapper: Mapper<'ftx', BookChange> = {
 
 export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: FTXInstrument) {
     if (message.data == undefined) {
@@ -105,7 +111,7 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
   }
 
   *map(message: FTXInstrument, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.market, 'ftx')
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.market, this._exchange)
     const { stats, info } = message.data
 
     if (stats.nextFundingTime !== undefined) {

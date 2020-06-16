@@ -15,7 +15,6 @@ export const EXCHANGES = [
   'bitfinex-derivatives',
   'bitfinex',
   'bitfinex-alts',
-  'bitflyer',
   'cryptofacilities',
   'kraken',
   'bitstamp',
@@ -24,7 +23,9 @@ export const EXCHANGES = [
   'coinflex',
   'bybit',
   'phemex',
+  'ftx-us',
   'okcoin',
+  'bitflyer',
   'hitbtc',
   'binance-jersey',
   'binance-us',
@@ -174,6 +175,7 @@ const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance
 
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
+const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets'] as const
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -192,6 +194,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   bitfinex: BITFINEX_CHANNELS,
   'bitfinex-alts': BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
+  'ftx-us': FTX_US_CHANNELS,
   gemini: GEMINI_CHANNELS,
   bitflyer: BITFLYER_CHANNELS,
   'binance-futures': BINANCE_FUTURES_CHANNELS,

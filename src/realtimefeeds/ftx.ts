@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class FtxRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ftexchange.com/ws/'
+  protected wssURL = 'wss://ftx.com/ws/'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
@@ -25,4 +25,8 @@ export class FtxRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.type === 'error'
   }
+}
+
+export class FtxUSRealTimeFeed extends FtxRealTimeFeed {
+  protected wssURL = 'wss://ftx.us/ws/'
 }

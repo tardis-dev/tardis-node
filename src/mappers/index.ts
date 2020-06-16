@@ -15,7 +15,7 @@ import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper }
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
 import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper, DeribitOptionSummaryMapper } from './deribit'
-import { ftxBookChangeMapper, ftxTradesMapper, FTXDerivativeTickerMapper } from './ftx'
+import { FTXDerivativeTickerMapper, FTXTradesMapper, FTXBookChangeMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
 import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
@@ -38,6 +38,7 @@ const tradesMappers = {
   'binance-us': () => new BinanceTradesMapper('binance-us'),
   'binance-jersey': () => new BinanceTradesMapper('binance-jersey'),
   'binance-futures': () => new BinanceTradesMapper('binance-futures'),
+  'binance-delivery': () => new BinanceTradesMapper('binance-delivery'),
   'binance-dex': () => binanceDexTradesMapper,
   bitfinex: () => new BitfinexTradesMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexTradesMapper('bitfinex-derivatives'),
@@ -47,7 +48,8 @@ const tradesMappers = {
   coinbase: () => coinbaseTradesMapper,
   cryptofacilities: () => cryptofacilitiesTradesMapper,
   deribit: () => deribitTradesMapper,
-  ftx: () => ftxTradesMapper,
+  ftx: () => new FTXTradesMapper('ftx'),
+  'ftx-us': () => new FTXTradesMapper('ftx-us'),
   gemini: () => geminiTradesMapper,
   kraken: () => krakenTradesMapper,
   okex: () => new OkexTradesMapper('okex', 'spot'),
@@ -68,7 +70,9 @@ const bookChangeMappers = {
   binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', isRealTime(localTimestamp) === false),
   'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', isRealTime(localTimestamp) === false),
   'binance-jersey': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-jersey', isRealTime(localTimestamp) === false),
-  'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper(isRealTime(localTimestamp) === false),
+  'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper('binance-futures', isRealTime(localTimestamp) === false),
+  'binance-delivery': (localTimestamp: Date) =>
+    new BinanceFuturesBookChangeMapper('binance-delivery', isRealTime(localTimestamp) === false),
   'binance-dex': () => binanceDexBookChangeMapper,
   bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
@@ -78,7 +82,8 @@ const bookChangeMappers = {
   coinbase: () => new CoinbaseBookChangMapper(),
   cryptofacilities: () => cryptofacilitiesBookChangeMapper,
   deribit: () => deribitBookChangeMapper,
-  ftx: () => ftxBookChangeMapper,
+  ftx: () => new FTXBookChangeMapper('ftx'),
+  'ftx-us': () => new FTXBookChangeMapper('ftx-us'),
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
   okex: (localTimestamp: Date) => new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
@@ -110,7 +115,7 @@ const derivativeTickersMappers = {
   'okex-swap': () => new OkexDerivativeTickerMapper('okex-swap'),
   bybit: () => new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
-  ftx: () => new FTXDerivativeTickerMapper()
+  ftx: () => new FTXDerivativeTickerMapper('ftx'),
 }
 
 const optionsSummaryMappers = {

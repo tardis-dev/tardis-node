@@ -15,7 +15,7 @@ import { BybitRealTimeDataFeed } from './bybit'
 import { CoinbaseRealTimeFeed } from './coinbase'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities'
 import { DeribitRealTimeDataFeed } from './deribit'
-import { FtxRealTimeFeed } from './ftx'
+import { FtxRealTimeFeed, FtxUSRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
 import { HitBtcRealTimeFeed } from './hitbtc'
 import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiDMSwapRealTimeFeed } from './huobi'
@@ -45,6 +45,7 @@ const realTimeFeedsMap: {
   cryptofacilities: CryptofacilitiesRealTimeFeed,
   deribit: DeribitRealTimeDataFeed,
   ftx: FtxRealTimeFeed,
+  'ftx-us': FtxUSRealTimeFeed,
   gemini: GeminiRealTimeFeed,
   kraken: KrakenRealTimeFeed,
   okex: OkexRealTimeFeed,
