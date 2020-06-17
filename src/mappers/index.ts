@@ -1,5 +1,5 @@
 import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, Trade, OptionSummary } from '../types'
+import { BookChange, DerivativeTicker, OptionSummary, Trade } from '../types'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -14,15 +14,16 @@ import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
-import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, deribitTradesMapper, DeribitOptionSummaryMapper } from './deribit'
-import { FTXDerivativeTickerMapper, FTXTradesMapper, FTXBookChangeMapper } from './ftx'
+import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, deltaTradesMapper } from './delta'
+import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, DeribitOptionSummaryMapper, deribitTradesMapper } from './deribit'
+import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXTradesMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
 import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
-import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexTradesMapper, OkexOptionSummaryMapper } from './okex'
-import { phemexTradesMapper, phemexBookChangeMapper, PhemexDerivativeTickerMapper } from './phemex'
+import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
+import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 
 export * from './mapper'
 
@@ -62,7 +63,8 @@ const tradesMappers = {
   bybit: () => new BybitTradesMapper('bybit'),
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
-  phemex: () => phemexTradesMapper
+  phemex: () => phemexTradesMapper,
+  delta: () => deltaTradesMapper
 }
 
 const bookChangeMappers = {
@@ -101,7 +103,8 @@ const bookChangeMappers = {
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,
-  phemex: () => phemexBookChangeMapper
+  phemex: () => phemexBookChangeMapper,
+  delta: () => deltaBookChangeMapper
 }
 
 const derivativeTickersMappers = {
@@ -116,6 +119,7 @@ const derivativeTickersMappers = {
   bybit: () => new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
+  delta: () => new DeltaDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {

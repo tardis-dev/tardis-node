@@ -23,6 +23,7 @@ import { KrakenRealTimeFeed } from './kraken'
 import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
 import { PhemexRealTimeFeed } from './phemex'
+import { DeltaRealTimeFeed } from './delta'
 
 export * from './realtimefeed'
 
@@ -58,7 +59,8 @@ const realTimeFeedsMap: {
   bybit: BybitRealTimeDataFeed,
   okcoin: OKCoinRealTimeFeed,
   hitbtc: HitBtcRealTimeFeed,
-  phemex: PhemexRealTimeFeed
+  phemex: PhemexRealTimeFeed,
+  delta: DeltaRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

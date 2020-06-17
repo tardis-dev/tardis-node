@@ -27,6 +27,7 @@ export const EXCHANGES = [
   'okcoin',
   'bitflyer',
   'hitbtc',
+  'delta',
   'binance-jersey',
   'binance-us',
   'binance-dex'
@@ -176,6 +177,19 @@ const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
 const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets'] as const
+
+const DELTA_CHANNELS = [
+  'l2_orderbook',
+  'recent_trade',
+  'recent_trade_snapshot',
+  'mark_price',
+  'spot_price',
+  'funding_rate',
+  'funding_rate_8h',
+  'product_updates',
+  'announcements'
+]
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -207,5 +221,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   okcoin: OKCOIN_CHANNELS,
   hitbtc: HITBTC_CHANNELS,
   coinflex: COINFLEX_CHANNELS,
-  phemex: PHEMEX_CHANNELS
+  phemex: PHEMEX_CHANNELS,
+  delta: DELTA_CHANNELS
 }
