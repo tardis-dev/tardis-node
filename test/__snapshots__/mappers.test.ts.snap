@@ -1957,6 +1957,31 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 7`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 8,
+        "price": 12536.5,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1,
+        "price": 85,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {
