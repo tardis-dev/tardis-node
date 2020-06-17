@@ -66,7 +66,7 @@ export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
       isSnapshot: true,
       bids: message.buy.map(mapBookLevel),
       asks: message.sell.map(mapBookLevel),
-      timestamp: fromMicroSecondsToDate(message.timestamp),
+      timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
       localTimestamp
     }
   }
@@ -135,7 +135,7 @@ type DeltaL2OrderBook = {
   buy: DeltaBookLevel[]
   sell: DeltaBookLevel[]
   symbol: string
-  timestamp: number
+  timestamp?: number
   type: 'l2_orderbook'
 }
 

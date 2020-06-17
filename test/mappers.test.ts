@@ -1943,6 +1943,14 @@ describe('mappers', () => {
         symbol: 'BTCUSDT',
         timestamp: 1592352002423123,
         type: 'recent_trade'
+      },
+      {
+        buy: [{ limit_price: '85.0', size: 1 }],
+        sell: [{ limit_price: '12536.5', size: 8 }],
+        last_sequence_no: 96542791,
+        product_id: 27,
+        type: 'l2_orderbook',
+        symbol: 'BTCUSD'
       }
     ]
 
