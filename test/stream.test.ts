@@ -1,3 +1,4 @@
+process.env.DEBUG = 'tardis-dev*'
 import {
   compute,
   computeBookSnapshots,
@@ -14,12 +15,15 @@ import {
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
   'binance-futures',
+  'binance-delivery',
+  'delta',
   'bitfinex-derivatives',
   'cryptofacilities',
   'deribit',
   'okex-futures',
   'okex-swap',
-  'bybit'
+  'bybit',
+  'delta'
 ]
 
 describe('stream', () => {
@@ -28,7 +32,15 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (exchange === 'coinflex' || exchange === 'okex-futures' || exchange === 'okex-options' || exchange === 'bybit') {
+          if (
+            exchange === 'coinflex' ||
+            exchange === 'okex-futures' ||
+            exchange === 'okex-options' ||
+            exchange === 'bybit' ||
+            exchange === 'delta' ||
+            exchange === 'ftx-us' ||
+            exchange === 'binance-delivery'
+          ) {
             return
           }
           const exchangeDetails = await getExchangeDetails(exchange)

@@ -73,8 +73,7 @@ const bookChangeMappers = {
   'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', isRealTime(localTimestamp) === false),
   'binance-jersey': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-jersey', isRealTime(localTimestamp) === false),
   'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper('binance-futures', isRealTime(localTimestamp) === false),
-  'binance-delivery': (localTimestamp: Date) =>
-    new BinanceFuturesBookChangeMapper('binance-delivery', isRealTime(localTimestamp) === false),
+  'binance-delivery': () => new BinanceFuturesBookChangeMapper('binance-delivery', false),
   'binance-dex': () => binanceDexBookChangeMapper,
   bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),

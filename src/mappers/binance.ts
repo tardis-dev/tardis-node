@@ -299,7 +299,12 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       return false
     }
 
-    return message.stream.includes('@markPrice') || message.stream.endsWith('@ticker') || message.stream.endsWith('@openInterest')
+    return (
+      message.stream.includes('@markPrice') ||
+      message.stream.endsWith('@ticker') ||
+      message.stream.endsWith('@openInterest') ||
+      message.stream.includes('@indexPrice')
+    )
   }
 
   getFilters(symbols?: string[]): FilterForExchange['binance-futures' | 'binance-delivery'][] {

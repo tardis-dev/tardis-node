@@ -72,6 +72,11 @@ export class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange>
   }
 
   *map(ftxOrderBook: FtxOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
+    const isEmptyUpdate = ftxOrderBook.type === 'update' && ftxOrderBook.data.bids.length === 0 && ftxOrderBook.data.asks.length === 0
+    if (isEmptyUpdate) {
+      return
+    }
+
     const timestamp = new Date(ftxOrderBook.data.time * 1000)
     timestamp.μs = Math.floor(ftxOrderBook.data.time * 1000000) % 1000
 

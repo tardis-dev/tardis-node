@@ -10,7 +10,9 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'okex-swap',
   'bybit',
   'phemex',
-  'ftx'
+  'ftx',
+  'delta',
+  'binance-delivery'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
@@ -1746,6 +1748,207 @@ describe('mappers', () => {
     const binanceFuturesMapper = createMapper('binance-futures', new Date())
     for (const message of messages) {
       const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map binance delivery messages', () => {
+    const messages = [
+      { id: 1000, result: null },
+      {
+        stream: 'btcusd_200925@depthSnapshot',
+        generated: true,
+        data: {
+          lastUpdateId: 37471290,
+          E: 1592265600231,
+          T: 1592265600229,
+          symbol: 'BTCUSD_200925',
+          pair: 'BTCUSD',
+          bids: [['9504.8', '181']],
+          asks: [['99999.0', '4090']]
+        }
+      },
+      {
+        stream: 'btcusd_200925@depth@0ms',
+        data: {
+          e: 'depthUpdate',
+          E: 1592265600422,
+          T: 1592265600420,
+          s: 'BTCUSD_200925',
+          ps: 'BTCUSD',
+          U: 37471290,
+          u: 37471292,
+          pu: 37471291,
+          b: [['9498.9', '13']],
+          a: []
+        }
+      },
+      {
+        stream: 'btcusd_200925@markPrice@1s',
+        data: { e: 'markPriceUpdate', E: 1592265602000, s: 'BTCUSD_200925', p: '9501.15723333', P: '9429.39675000' }
+      },
+      { stream: 'btcusd@indexPrice@1s', data: { e: 'indexPriceUpdate', E: 1592265601001, i: 'BTCUSD', p: '9429.39675000' } },
+      {
+        stream: 'btcusd_200925@depth@0ms',
+        data: {
+          e: 'depthUpdate',
+          E: 1592265602212,
+          T: 1592265602210,
+          s: 'BTCUSD_200925',
+          ps: 'BTCUSD',
+          U: 37471322,
+          u: 37471322,
+          pu: 37471321,
+          b: [['9504.8', '181']],
+          a: []
+        }
+      },
+      {
+        stream: 'btcusd_200925@ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1592265616654,
+          s: 'BTCUSD_200925',
+          ps: 'BTCUSD',
+          p: '72.9',
+          P: '0.773',
+          w: '9271.96027324',
+          c: '9504.9',
+          Q: '1',
+          o: '9432.0',
+          h: '9769.5',
+          l: '8621.4',
+          v: '1967607',
+          q: '21221.04648872',
+          O: 1592179200000,
+          C: 1592265616653,
+          F: 100191,
+          L: 173906,
+          n: 73715
+        }
+      },
+      {
+        stream: 'btcusd_200925@openInterest',
+        generated: true,
+        data: { symbol: 'BTCUSD_200925', pair: 'BTCUSD', openInterest: '15279', contractType: 'CURRENT_QUARTER', time: 1592265372706 }
+      },
+      {
+        stream: 'btcusd_200925@trade',
+        data: { e: 'trade', E: 1592265616654, T: 1592265616653, s: 'BTCUSD_200925', t: 173906, p: '9504.9', q: '1', X: 'MARKET', m: false }
+      }
+    ]
+
+    const binanceDelivery = createMapper('binance-delivery', new Date())
+    for (const message of messages) {
+      const mappedMessages = binanceDelivery.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map ftx us messages', () => {
+    const messages = [
+      { type: 'subscribed', channel: 'trades', market: 'USDT/USD' },
+      {
+        channel: 'orderbook',
+        market: 'ETH/USD',
+        type: 'partial',
+        data: {
+          time: 1592265601.2727785,
+          checksum: 1225528673,
+          bids: [[231.08, 2.456]],
+          asks: [[231.09, 2.393]],
+          action: 'partial'
+        }
+      },
+      {
+        channel: 'orderbook',
+        market: 'ETH/USD',
+        type: 'update',
+        data: { time: 1592265602.3259132, checksum: 1225528673, bids: [], asks: [], action: 'update' }
+      },
+      {
+        channel: 'orderbook',
+        market: 'BTC/USD',
+        type: 'update',
+        data: { time: 1592271542.2219546, checksum: 1296823591, bids: [[9398.5, 3.4959]], asks: [[9400.0, 3.1373]], action: 'update' }
+      },
+      {
+        channel: 'trades',
+        market: 'BTC/USD',
+        type: 'update',
+        data: [{ id: 1711, price: 9469.0, size: 0.031, side: 'sell', liquidation: false, time: '2020-06-17T06:31:19.399582+00:00' }]
+      }
+    ]
+
+    const ftxUSMapper = createMapper('ftx-us', new Date())
+    for (const message of messages) {
+      const mappedMessages = ftxUSMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map delta messages', () => {
+    const messages = [
+      {
+        type: 'subscriptions',
+        channels: [
+          {
+            name: 'ticker',
+            symbols: ['BTCUSD']
+          }
+        ]
+      },
+      {
+        low: 9388,
+        high: 9585.5,
+        open: 9433.5,
+        close: 9522,
+        volume: 7101726,
+        symbol: 'BTCUSD',
+        timestamp: 1592351998339000,
+        product_id: 27,
+        type: 'ticker'
+      },
+      {
+        buy: [{ limit_price: '9522.0', size: 449313 }],
+        last_sequence_no: 1592351999728324,
+        product_id: 27,
+        sell: [{ limit_price: '9522.5', size: 11100 }],
+        symbol: 'BTCUSD',
+        timestamp: 1592351999719000,
+        type: 'l2_orderbook'
+      },
+      {
+        annualized_basis: '-0.109500000000000000',
+        price: '9524.170821',
+        price_band: { lower_limit: '9286.281029025000000000000000', upper_limit: '9762.500568975000000000000000' },
+        product_id: 139,
+        symbol: 'MARK:BTCUSDT',
+        timestamp: 1592351997873000,
+        type: 'mark_price'
+      },
+      {
+        funding_rate: '-0.01000000000000000000000000000',
+        product_id: 139,
+        symbol: 'BTCUSDT',
+        timestamp: 1592351997873000,
+        type: 'funding_rate'
+      },
+      {
+        buyer_role: 'maker',
+        price: '9522.0',
+        product_id: 27,
+        seller_role: 'taker',
+        size: 4662,
+        symbol: 'BTCUSDT',
+        timestamp: 1592352002423123,
+        type: 'recent_trade'
+      }
+    ]
+
+    const deltaMapper = createMapper('delta', new Date())
+    for (const message of messages) {
+      const mappedMessages = deltaMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

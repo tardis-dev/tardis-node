@@ -1,5 +1,147 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`mappers map binance delivery messages 1`] = `Array []`;
+
+exports[`mappers map binance delivery messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 4090,
+        "price": 99999,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 181,
+        "price": 9504.8,
+      },
+    ],
+    "exchange": "binance-delivery",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:00.229Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 13,
+        "price": 9498.9,
+      },
+    ],
+    "exchange": "binance-delivery",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:00.420Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 4`] = `
+Array [
+  Object {
+    "exchange": "binance-delivery",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9501.15723333,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:02.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 5`] = `Array []`;
+
+exports[`mappers map binance delivery messages 6`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 181,
+        "price": 9504.8,
+      },
+    ],
+    "exchange": "binance-delivery",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:02.210Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 7`] = `
+Array [
+  Object {
+    "exchange": "binance-delivery",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 9429.39675,
+    "lastPrice": 9504.9,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9501.15723333,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:16.654Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 8`] = `
+Array [
+  Object {
+    "exchange": "binance-delivery",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 9429.39675,
+    "lastPrice": 9504.9,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9501.15723333,
+    "openInterest": 15279,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:16.654Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map binance delivery messages 9`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "binance-delivery",
+    "id": "173906",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9504.9,
+    "side": "buy",
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-06-16T00:00:16.653Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
@@ -1718,6 +1860,103 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 1`] = `Array []`;
+
+exports[`mappers map delta messages 2`] = `Array []`;
+
+exports[`mappers map delta messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 11100,
+        "price": 9522.5,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 449313,
+        "price": 9522,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-06-16T23:59:59.719Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map delta messages 4`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9524.170821,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-06-16T23:59:57.873Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 5`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": -0.01,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9524.170821,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-06-16T23:59:57.873Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 6`] = `
+Array [
+  Object {
+    "amount": 4662,
+    "exchange": "delta",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9522,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-06-17T00:00:02.423Z,
+    "type": "trade",
+  },
+  Object {
+    "exchange": "delta",
+    "fundingRate": -0.01,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 9522,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 9524.170821,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-06-17T00:00:02.423Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {
@@ -2107,6 +2346,76 @@ Array [
     "symbol": "BRZ-0626",
     "timestamp": 2019-09-01T00:00:01.275Z,
     "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map ftx us messages 1`] = `Array []`;
+
+exports[`mappers map ftx us messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.393,
+        "price": 231.09,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2.456,
+        "price": 231.08,
+      },
+    ],
+    "exchange": "ftx-us",
+    "isSnapshot": true,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ETH/USD",
+    "timestamp": 2020-06-16T00:00:01.272Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map ftx us messages 3`] = `Array []`;
+
+exports[`mappers map ftx us messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3.1373,
+        "price": 9400,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 3.4959,
+        "price": 9398.5,
+      },
+    ],
+    "exchange": "ftx-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2020-06-16T01:39:02.221Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map ftx us messages 5`] = `
+Array [
+  Object {
+    "amount": 0.031,
+    "exchange": "ftx-us",
+    "id": "1711",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9469,
+    "side": "sell",
+    "symbol": "BTC/USD",
+    "timestamp": 2020-06-17T06:31:19.399Z,
+    "type": "trade",
   },
 ]
 `;
