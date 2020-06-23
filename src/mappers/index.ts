@@ -19,7 +19,7 @@ import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, DeribitOptionSu
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXTradesMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
-import { HuobiBookChangeMapper, HuobiTradesMapper } from './huobi'
+import { HuobiBookChangeMapper, HuobiTradesMapper, HuobiDerivativeTickerMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
@@ -118,7 +118,9 @@ const derivativeTickersMappers = {
   bybit: () => new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
-  delta: () => new DeltaDerivativeTickerMapper()
+  delta: () => new DeltaDerivativeTickerMapper(),
+  'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
+  'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap')
 }
 
 const optionsSummaryMappers = {

@@ -12,7 +12,9 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'phemex',
   'ftx',
   'delta',
-  'binance-delivery'
+  'binance-delivery',
+  'huobi-dm',
+  'huobi-dm-swap'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
@@ -2763,6 +2765,43 @@ describe('mappers', () => {
           version: 8
         },
         ts: 1592200802700
+      },
+      {
+        ch: 'market.ETH_NW.basis.1min.open',
+        ts: 1592915100011,
+        tick: {
+          id: 1592915040,
+          index_price: '243.466431823',
+          contract_price: '244.126',
+          basis: '0.659568177',
+          basis_rate: '0.0027090723434083340276793275670103096'
+        }
+      },
+      {
+        ch: 'market.ETH_NW.open_interest',
+        generated: true,
+        data: [
+          { volume: 648420.0, amount: 26550.216194968553459119, symbol: 'ETH', contract_type: 'next_week', contract_code: 'ETH200703' }
+        ],
+        ts: 1592915103195
+      },
+      {
+        op: 'notify',
+        topic: 'public.BSV.contract_info',
+        ts: 1592915141957,
+        event: 'snapshot',
+        data: [
+          {
+            symbol: 'BSV',
+            contract_code: 'BSV200626',
+            contract_type: 'this_week',
+            contract_size: 10.0,
+            price_tick: 0.001,
+            delivery_date: '20200626',
+            create_date: '20200306',
+            contract_status: 1
+          }
+        ]
       }
     ]
 
@@ -2774,6 +2813,84 @@ describe('mappers', () => {
     }
   })
 
+  test('map huobi-dm-swap, messages', () => {
+    const messages = [
+      { op: 'sub', cid: '14', topic: 'public.BTC-USD.liquidation_orders', ts: 1592904821340, 'err-code': 0 },
+      { id: '1', subbed: 'market.ZEC-USD.trade.detail', ts: 1592904820310, status: 'ok' },
+      {
+        ch: 'market.BSV-USD.trade.detail',
+        ts: 1592904815036,
+        tick: {
+          id: 9530684332,
+          ts: 1592904814962,
+          data: [{ amount: 8, ts: 1592904814962, id: 95306843320000, price: 177.3, direction: 'sell' }]
+        }
+      },
+      {
+        ch: 'market.BSV-USD.trade.detail',
+        ts: 1592904821252,
+        tick: {
+          id: 9530712324,
+          ts: 1592904821209,
+          data: [{ amount: 80, ts: 1592904821209, id: 95307123240000, price: 177.3, direction: 'sell' }]
+        }
+      },
+      {
+        ch: 'market.BCH-USD.depth.size_150.high_freq',
+        tick: {
+          asks: [],
+          bids: [[239.34, 1021]],
+          ch: 'market.BCH-USD.depth.size_150.high_freq',
+          event: 'update',
+          id: 9530712377,
+          mrid: 9530712377,
+          ts: 1592904821308,
+          version: 164176090
+        },
+        ts: 1592904821309
+      },
+      {
+        ch: 'market.BTC-USD.basis.1min.open',
+        ts: 1592904821703,
+        tick: {
+          id: 1592904780,
+          index_price: '9582.975',
+          contract_price: '9590.1',
+          basis: '7.125',
+          basis_rate: '0.0007435060615309963763862474857755551'
+        }
+      },
+      {
+        ch: 'market.BTC-USD.open_interest',
+        generated: true,
+        data: [{ volume: 1711705.0, amount: 17841.411298728371899103, symbol: 'BTC', contract_code: 'BTC-USD' }],
+        ts: 1592904823141
+      },
+      {
+        op: 'notify',
+        topic: 'public.BTC-USD.funding_rate',
+        ts: 1592904820339,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC-USD',
+            fee_asset: 'BTC',
+            funding_time: '1592904780000',
+            funding_rate: '0.000100000000000000',
+            estimated_rate: '0.000113655663368468',
+            settlement_time: '1592913600000'
+          }
+        ]
+      }
+    ]
+
+    const huobiDMSwap = createMapper('huobi-dm-swap')
+
+    for (const message of messages) {
+      const mappedMessages = huobiDMSwap.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
   test('map bybit messages', () => {
     const messages = [
       {

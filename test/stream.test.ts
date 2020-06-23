@@ -1,4 +1,3 @@
-process.env.DEBUG = 'tardis-dev*'
 import {
   compute,
   computeBookSnapshots,

@@ -1,5 +1,5 @@
-import { BookChange, Exchange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
+import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
@@ -111,6 +111,84 @@ function normalizeSymbols(symbols?: string[]) {
   return
 }
 
+export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    if (message.ch !== undefined) {
+      return message.ch.includes('.basis.') || message.ch.endsWith('.open_interest')
+    }
+
+    if (message.op === 'notify' && message.topic !== undefined) {
+      return message.topic.endsWith('.funding_rate')
+    }
+
+    return false
+  }
+
+  getFilters(symbols?: string[]) {
+    const filters: FilterForExchange['huobi-dm-swap'][] = [
+      {
+        channel: 'basis',
+        symbols
+      },
+      {
+        channel: 'open_interest',
+        symbols
+      }
+    ]
+    if (this._exchange === 'huobi-dm-swap') {
+      filters.push({
+        channel: 'funding_rate',
+        symbols
+      })
+    }
+
+    return filters
+  }
+
+  *map(
+    message: HuobiBasisDataMessage | HuobiFundingRateNotification | HuobiOpenInterestDataMessage,
+    localTimestamp: Date
+  ): IterableIterator<DerivativeTicker> {
+    if ('op' in message) {
+      // handle funding_rate notification message
+      const fundingInfo = message.data[0]
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(fundingInfo.contract_code, this._exchange)
+
+      pendingTickerInfo.updateFundingRate(Number(fundingInfo.funding_rate))
+      pendingTickerInfo.updateFundingTimestamp(new Date(Number(fundingInfo.settlement_time)))
+      pendingTickerInfo.updatePredictedFundingRate(Number(fundingInfo.estimated_rate))
+      pendingTickerInfo.updateTimestamp(new Date(message.ts))
+
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
+      }
+    } else {
+      const symbol = message.ch.split('.')[1]
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, this._exchange)
+
+      // basis message
+      if ('tick' in message) {
+        pendingTickerInfo.updateIndexPrice(Number(message.tick.index_price))
+        pendingTickerInfo.updateLastPrice(Number(message.tick.contract_price))
+      } else {
+        // open interest message
+        const openInterest = message.data[0]
+        pendingTickerInfo.updateOpenInterest(Number(openInterest.volume))
+      }
+
+      pendingTickerInfo.updateTimestamp(new Date(message.ts))
+
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
+      }
+    }
+  }
+}
+
 type HuobiDataMessage = {
   ch: string
 }
@@ -149,3 +227,30 @@ type HuobiDepthDataMessage = HuobiDataMessage &
         }
       }
   )
+
+type HuobiBasisDataMessage = HuobiDataMessage & {
+  ts: number
+  tick: {
+    index_price: string
+    contract_price: string
+  }
+}
+
+type HuobiFundingRateNotification = {
+  op: 'notify'
+  topic: string
+  ts: number
+  data: {
+    settlement_time: string
+    funding_rate: string
+    estimated_rate: string
+    contract_code: string
+  }[]
+}
+
+type HuobiOpenInterestDataMessage = HuobiDataMessage & {
+  ts: number
+  data: {
+    volume: number
+  }[]
+}

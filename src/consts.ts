@@ -166,9 +166,18 @@ const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquid
 
 const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo'] as const
 
-const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade'] as const
+const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'basis', 'liquidation_orders', 'contract_info', 'open_interest'] as const
 
-const HUOBI_DM_SWAP_CHANNELS = ['depth', 'detail', 'trade'] as const
+const HUOBI_DM_SWAP_CHANNELS = [
+  'depth',
+  'detail',
+  'trade',
+  'basis',
+  'funding_rate',
+  'liquidation_orders',
+  'contract_info',
+  'open_interest'
+] as const
 
 const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
 
