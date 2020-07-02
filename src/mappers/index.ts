@@ -30,6 +30,9 @@ export * from './mapper'
 const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
 
 const isRealTime = (date: Date) => {
+  if (process.env.__NO_REAL_TIME__) {
+    return false
+  }
   return date.valueOf() + THREE_MINUTES_IN_MS > new Date().valueOf()
 }
 
@@ -73,7 +76,8 @@ const bookChangeMappers = {
   'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', isRealTime(localTimestamp) === false),
   'binance-jersey': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-jersey', isRealTime(localTimestamp) === false),
   'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper('binance-futures', isRealTime(localTimestamp) === false),
-  'binance-delivery': () => new BinanceFuturesBookChangeMapper('binance-delivery', false),
+  'binance-delivery': (localTimestamp: Date) =>
+    new BinanceFuturesBookChangeMapper('binance-delivery', isRealTime(localTimestamp) === false),
   'binance-dex': () => binanceDexBookChangeMapper,
   bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
