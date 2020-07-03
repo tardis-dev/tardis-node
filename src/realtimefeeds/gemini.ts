@@ -31,11 +31,7 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
     ]
   }
 
-  protected messageIsError(): boolean {
-    return false
-  }
-
-  protected messageIsHeartbeat(message: any) {
-    return message.type === 'heartbeat'
+  protected messageIsError(message: any): boolean {
+    return message.result === 'error'
   }
 }
