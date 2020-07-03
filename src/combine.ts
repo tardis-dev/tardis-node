@@ -1,4 +1,5 @@
-import { ONE_SEC_IN_MS } from './handy'
+import { PassThrough } from 'stream'
+import { once } from 'events'
 
 type NextMessageResultWitIndex = {
   index: number
@@ -44,29 +45,28 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   }
 
   try {
-    const nextResults = iterators.map(nextWithIndex)
-    const { result } = await Promise.race(nextResults)
-    const firstReceivedMessage = result.value
+    // decide based on first provided iterator if we're dealing with real-time or historical data streams
+    if ((iterators[0] as any).__realtime__) {
+      const buffer = new PassThrough({
+        objectMode: true,
+        highWaterMark: 1024
+      })
 
-    const now = new Date()
-    const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
+      const writeMessagesToBuffer = iterators.map(async (messages) => {
+        for await (const message of messages) {
+          if (!buffer.write(message))
+            // Handle backpressure on write
+            await once(buffer, 'drain')
+        }
+      })
 
-    // based on local timestamp of first message decide if iterators provide is real time data
-    // if first message is less than three minutes 'old' in comparison to current time
-    // alternative would be to provide isRealtime via param to combine fn, perhaps less magic?...
-    const isRealTime = firstReceivedMessage.localTimestamp.valueOf() + THREE_MINUTES_IN_MS > now.valueOf()
-
-    if (isRealTime) {
-      while (true) {
-        // return messages in FIFO order thanks to using Promise.race
-        // based on https://github.com/fraxken/combine-async-iterators
-        const { index, result } = await Promise.race(nextResults)
-
-        yield result.value as any
-        nextResults[index] = nextWithIndex(iterators[index], index)
+      for await (const message of buffer as any) {
+        yield message
       }
+
+      await writeMessagesToBuffer
     } else {
-      return yield* combineHistorical(iterators, nextResults) as any
+      return yield* combineHistorical(iterators) as any
     }
   } finally {
     // clean up - this will close open real-time connections
@@ -78,12 +78,9 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   }
 }
 
-async function* combineHistorical(
-  iterators: AsyncIterableIterator<Combinable>[],
-  nextResults: Promise<{ index: number; result: IteratorResult<Combinable, any> }>[]
-) {
+async function* combineHistorical(iterators: AsyncIterableIterator<Combinable>[]) {
   // wait for all results to resolve
-  const results = await Promise.all(nextResults)
+  const results = await Promise.all(iterators.map(nextWithIndex))
   let aliveIteratorsCount = results.length
   do {
     // if we're deailing with historical data replay

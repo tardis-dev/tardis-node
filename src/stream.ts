@@ -4,7 +4,7 @@ import { MapperFactory } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
 
-export async function* stream<T extends Exchange, U extends boolean = false>({
+async function* _stream<T extends Exchange, U extends boolean = false>({
   exchange,
   filters,
   timeoutIntervalMS = 10000,
@@ -33,7 +33,23 @@ export async function* stream<T extends Exchange, U extends boolean = false>({
   }
 }
 
-export async function* streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+export function stream<T extends Exchange, U extends boolean = false>({
+  exchange,
+  filters,
+  timeoutIntervalMS = 10000,
+  withDisconnects = undefined,
+  onError = undefined
+}: StreamOptions<T, U>): AsyncIterableIterator<
+  U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
+> {
+  let _iterator = _stream({ exchange, filters, timeoutIntervalMS, withDisconnects, onError })
+
+  ;(_iterator as any).__realtime__ = true
+
+  return _iterator
+}
+
+async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
@@ -57,7 +73,7 @@ export async function* streamNormalized<T extends Exchange, U extends MapperFact
       const mappers = createMappers(new Date())
       const filters = getFilters(mappers, symbols)
 
-      const messages = stream({
+      const messages = _stream({
         exchange,
         withDisconnects: true,
         timeoutIntervalMS,
@@ -125,4 +141,23 @@ export type StreamNormalizedOptions<T extends Exchange, U extends boolean = fals
   timeoutIntervalMS?: number
   withDisconnectMessages?: U
   onError?: (error: Error) => void
+}
+
+export function streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+  { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
+  ...normalizers: U
+): AsyncIterableIterator<
+  Z extends true
+    ? U extends MapperFactory<infer _, infer X>[]
+      ? X | Disconnect
+      : never
+    : U extends MapperFactory<infer _, infer X>[]
+    ? X
+    : never
+> {
+  let _iterator = _streamNormalized({ exchange, symbols, timeoutIntervalMS, withDisconnectMessages, onError }, ...normalizers)
+
+  ;(_iterator as any).__realtime__ = true
+
+  return _iterator
 }
