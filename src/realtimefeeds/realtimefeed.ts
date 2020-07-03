@@ -38,7 +38,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   }
 
   private async *_stream() {
-    let timerId
+    let staleConnectionTimerId
+    let pingTimerId
     let retries = 0
 
     while (true) {
@@ -59,7 +60,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         this._ws.onopen = this._onConnectionEstabilished
         this._ws.onclose = this._onConnectionClosed
 
-        timerId = this._monitorConnectionIfStale()
+        staleConnectionTimerId = this._monitorConnectionIfStale()
+        pingTimerId = this._sendPeriodicPing()
 
         const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
           readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
@@ -102,8 +104,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         }
 
         // clear monitoring connection timer and notify about disconnect
-        if (timerId !== undefined) {
-          clearInterval(timerId)
+        if (staleConnectionTimerId !== undefined) {
+          clearInterval(staleConnectionTimerId)
         }
         yield undefined
       } catch (error) {
@@ -138,17 +140,21 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         )
 
         // clear monitoring connection timer and notify about disconnect
-        if (timerId !== undefined) {
-          clearInterval(timerId)
+        if (staleConnectionTimerId !== undefined) {
+          clearInterval(staleConnectionTimerId)
         }
 
         yield undefined
 
         await wait(delay)
       } finally {
-        // clear monitoring connection timer if not cleared yet
-        if (timerId !== undefined) {
-          clearInterval(timerId)
+        // stop timers
+        if (staleConnectionTimerId !== undefined) {
+          clearInterval(staleConnectionTimerId)
+        }
+
+        if (pingTimerId !== undefined) {
+          clearInterval(pingTimerId)
         }
       }
     }
@@ -201,6 +207,16 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       }
       this._receivedMessagesCount = 0
     }, this._timeoutIntervalMS)
+  }
+
+  private _sendPeriodicPing() {
+    return setInterval(() => {
+      if (this._ws === undefined || this._ws.readyState !== WebSocket.OPEN) {
+        return
+      }
+
+      this._ws.ping()
+    }, 5 * ONE_SEC_IN_MS)
   }
 
   private _onConnectionEstabilished = async () => {
