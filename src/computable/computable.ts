@@ -7,7 +7,7 @@ export type Computable<T extends NormalizedData> = {
 
 export type ComputableFactory<T extends NormalizedData> = () => Computable<T>
 
-export async function* compute<T extends ComputableFactory<any>[], U extends NormalizedData | Disconnect>(
+async function* _compute<T extends ComputableFactory<any>[], U extends NormalizedData | Disconnect>(
   messages: AsyncIterableIterator<U>,
   ...computables: T
 ): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? U | Z | Disconnect : U | Z) : never> {
@@ -36,6 +36,19 @@ export async function* compute<T extends ComputableFactory<any>[], U extends Nor
       }
     }
   }
+}
+
+export function compute<T extends ComputableFactory<any>[], U extends NormalizedData | Disconnect>(
+  messages: AsyncIterableIterator<U>,
+  ...computables: T
+): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? U | Z | Disconnect : U | Z) : never> {
+  let _iterator = _compute(messages, ...computables)
+
+  if ((messages as any).__realtime__ === true) {
+    ;(_iterator as any).__realtime__ = true
+  }
+
+  return _iterator
 }
 
 class Computables {
