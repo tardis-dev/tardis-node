@@ -2710,20 +2710,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 9`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [],
-    "exchange": "huobi",
-    "isSnapshot": false,
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
-    "symbol": "WAXPBTC",
-    "timestamp": 2019-11-05T00:00:02.010Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`mappers map huobi messages 9`] = `Array []`;
 
 exports[`mappers map huobi messages 10`] = `
 Array [
@@ -3010,20 +2997,7 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm, messages 1`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [],
-    "exchange": "huobi-dm",
-    "isSnapshot": true,
-    "localTimestamp": 2019-12-01T00:00:01.275Z,
-    "symbol": "BCH_NQ",
-    "timestamp": 2020-06-14T10:20:42.866Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`mappers map huobi-dm, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm, messages 2`] = `
 Array [

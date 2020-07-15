@@ -80,6 +80,9 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
     const data = message.tick
     const bids = Array.isArray(data.bids) ? data.bids : []
     const asks = Array.isArray(data.asks) ? data.asks : []
+    if (bids.length === 0 && asks.length === 0) {
+      return
+    }
 
     yield {
       type: 'book_change',
