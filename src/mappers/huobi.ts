@@ -1,5 +1,6 @@
 import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { CircularBuffer } from '../handy'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
@@ -85,6 +86,135 @@ export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
       symbol,
       exchange: this._exchange,
       isSnapshot,
+      bids: bids.map(this._mapBookLevel),
+      asks: asks.map(this._mapBookLevel),
+      timestamp: new Date(message.ts),
+      localTimestamp: localTimestamp
+    } as const
+  }
+
+  private _mapBookLevel(level: HuobiBookLevel) {
+    return { price: level[0], amount: level[1] }
+  }
+}
+
+function isSnapshot(message: HuobiMBPDataMessage | HuobiMBPSnapshot): message is HuobiMBPSnapshot {
+  return 'rep' in message
+}
+
+export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
+  protected readonly symbolToMBPInfoMapping: {
+    [key: string]: MBPInfo
+  } = {}
+
+  constructor(protected readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    const channel = message.ch || message.rep
+    if (channel === undefined) {
+      return false
+    }
+
+    return channel.includes('.mbp.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = normalizeSymbols(symbols)
+
+    return [
+      {
+        channel: 'mbp',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: HuobiMBPDataMessage | HuobiMBPSnapshot, localTimestamp: Date) {
+    const symbol = (isSnapshot(message) ? message.rep : message.ch).split('.')[1].toUpperCase()
+
+    if (this.symbolToMBPInfoMapping[symbol] === undefined) {
+      this.symbolToMBPInfoMapping[symbol] = {
+        bufferedUpdates: new CircularBuffer<HuobiMBPDataMessage>(200)
+      }
+    }
+
+    const mbpInfo = this.symbolToMBPInfoMapping[symbol]
+    const snapshotAlreadyProcessed = mbpInfo.snapshotProcessed
+
+    if (isSnapshot(message)) {
+      if (snapshotAlreadyProcessed) {
+        return
+      }
+      const snapshotBids = message.data.bids.map(this._mapBookLevel)
+      const snapshotAsks = message.data.asks.map(this._mapBookLevel)
+
+      // if there were any depth updates buffered, let's proccess those by adding to or updating the initial snapshot
+      // when prevSeqNum >= snapshot seqNum
+      for (const update of mbpInfo.bufferedUpdates.items()) {
+        if (update.tick.prevSeqNum < message.data.seqNum) {
+          continue
+        }
+
+        const bookChange = this._mapMBPUpdate(update, symbol, localTimestamp)
+        if (bookChange !== undefined) {
+          for (const bid of bookChange.bids) {
+            const matchingBid = snapshotBids.find((b) => b.price === bid.price)
+            if (matchingBid !== undefined) {
+              matchingBid.amount = bid.amount
+            } else {
+              snapshotBids.push(bid)
+            }
+          }
+
+          for (const ask of bookChange.asks) {
+            const matchingAsk = snapshotAsks.find((a) => a.price === ask.price)
+            if (matchingAsk !== undefined) {
+              matchingAsk.amount = ask.amount
+            } else {
+              snapshotAsks.push(ask)
+            }
+          }
+        }
+      }
+
+      mbpInfo.snapshotProcessed = true
+      mbpInfo.bufferedUpdates.clear()
+
+      yield {
+        type: 'book_change',
+        symbol,
+        exchange: this._exchange,
+        isSnapshot: true,
+        bids: snapshotBids,
+        asks: snapshotAsks,
+        timestamp: new Date(message.ts),
+        localTimestamp
+      } as const
+    } else if (snapshotAlreadyProcessed) {
+      // snapshot was already processed let's map the mbp message as normal book_change
+      const update = this._mapMBPUpdate(message, symbol, localTimestamp)
+      if (update !== undefined) {
+        yield update
+      }
+    } else {
+      // there was no snapshot yet, let's buffer the update
+      mbpInfo.bufferedUpdates.append(message)
+    }
+  }
+
+  private _mapMBPUpdate(message: HuobiMBPDataMessage, symbol: string, localTimestamp: Date) {
+    const bids = Array.isArray(message.tick.bids) ? message.tick.bids : []
+    const asks = Array.isArray(message.tick.asks) ? message.tick.asks : []
+
+    if (bids.length === 0 && asks.length === 0) {
+      return
+    }
+
+    return {
+      type: 'book_change',
+      symbol,
+      exchange: this._exchange,
+      isSnapshot: false,
       bids: bids.map(this._mapBookLevel),
       asks: asks.map(this._mapBookLevel),
       timestamp: new Date(message.ts),
@@ -221,8 +351,8 @@ type HuobiDepthDataMessage = HuobiDataMessage &
     | {
         ts: number
         tick: {
-          bids: HuobiBookLevel[] | null
-          asks: HuobiBookLevel[] | null
+          bids?: HuobiBookLevel[] | null
+          asks?: HuobiBookLevel[] | null
           event: 'snapshot' | 'update'
         }
       }
@@ -253,4 +383,29 @@ type HuobiOpenInterestDataMessage = HuobiDataMessage & {
   data: {
     volume: number
   }[]
+}
+
+type HuobiMBPDataMessage = HuobiDataMessage & {
+  ts: number
+  tick: {
+    bids?: HuobiBookLevel[] | null
+    asks?: HuobiBookLevel[] | null
+    seqNum: number
+    prevSeqNum: number
+  }
+}
+
+type HuobiMBPSnapshot = {
+  ts: number
+  rep: string
+  data: {
+    bids: HuobiBookLevel[]
+    asks: HuobiBookLevel[]
+    seqNum: number
+  }
+}
+
+type MBPInfo = {
+  bufferedUpdates: CircularBuffer<HuobiMBPDataMessage>
+  snapshotProcessed?: boolean
 }

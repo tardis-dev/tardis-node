@@ -19,7 +19,7 @@ import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, DeribitOptionSu
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXTradesMapper } from './ftx'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
-import { HuobiBookChangeMapper, HuobiTradesMapper, HuobiDerivativeTickerMapper } from './huobi'
+import { HuobiBookChangeMapper, HuobiTradesMapper, HuobiDerivativeTickerMapper, HuobiMBPBookChangeMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
@@ -99,7 +99,11 @@ const bookChangeMappers = {
     new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
   'okex-options': (localTimestamp: Date) =>
     new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
-  huobi: () => new HuobiBookChangeMapper('huobi'),
+  huobi: (localTimestamp: Date) =>
+    localTimestamp.valueOf() >= new Date('2020-07-03').valueOf()
+      ? new HuobiMBPBookChangeMapper('huobi')
+      : new HuobiBookChangeMapper('huobi'),
+
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
   bybit: () => new BybitBookChangeMapper('bybit', false),

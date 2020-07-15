@@ -1,4 +1,5 @@
 import { debug } from '../debug'
+import { CircularBuffer } from '../handy'
 import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
@@ -42,40 +43,6 @@ export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' 
     }
 
     yield trade
-  }
-}
-
-class CircularBuffer<T> {
-  private _buffer: T[] = []
-  private _index: number = 0
-  constructor(private readonly _bufferSize: number) {}
-
-  append(value: T) {
-    const isFull = this._buffer.length === this._bufferSize
-    let poppedValue
-    if (isFull) {
-      poppedValue = this._buffer[this._index]
-    }
-    this._buffer[this._index] = value
-    this._index = (this._index + 1) % this._bufferSize
-
-    return poppedValue
-  }
-
-  *items() {
-    for (let i = 0; i < this._buffer.length; i++) {
-      const index = (this._index + i) % this._buffer.length
-      yield this._buffer[index]
-    }
-  }
-
-  get count() {
-    return this._buffer.length
-  }
-
-  clear() {
-    this._buffer = []
-    this._index = 0
   }
 }
 

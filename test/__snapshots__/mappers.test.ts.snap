@@ -2858,6 +2858,158 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi messages 16`] = `Array []`;
+
+exports[`mappers map huobi messages 17`] = `Array []`;
+
+exports[`mappers map huobi messages 18`] = `Array []`;
+
+exports[`mappers map huobi messages 19`] = `Array []`;
+
+exports[`mappers map huobi messages 20`] = `Array []`;
+
+exports[`mappers map huobi messages 21`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.190075,
+        "price": 9137.68,
+      },
+      Object {
+        "amount": 0.01,
+        "price": 9137.75,
+      },
+      Object {
+        "amount": 0.010945,
+        "price": 9138.23,
+      },
+      Object {
+        "amount": 0.131941,
+        "price": 9138.27,
+      },
+      Object {
+        "amount": 0.003,
+        "price": 9138.47,
+      },
+      Object {
+        "amount": 0,
+        "price": 9138.6,
+      },
+      Object {
+        "amount": 0,
+        "price": 9138.61,
+      },
+      Object {
+        "amount": 0.0074,
+        "price": 9138.62,
+      },
+      Object {
+        "amount": 0.042194,
+        "price": 9138.67,
+      },
+      Object {
+        "amount": 0.069238,
+        "price": 9144,
+      },
+      Object {
+        "amount": 1,
+        "price": 9146.84,
+      },
+      Object {
+        "amount": 0,
+        "price": 9146.9,
+      },
+      Object {
+        "amount": 0.030582,
+        "price": 9145.4,
+      },
+      Object {
+        "amount": 0.132209,
+        "price": 9146.18,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4.683547,
+        "price": 9137.67,
+      },
+      Object {
+        "amount": 0.0089,
+        "price": 9137.35,
+      },
+      Object {
+        "amount": 0.00606,
+        "price": 9137.17,
+      },
+      Object {
+        "amount": 0.11,
+        "price": 9137.06,
+      },
+      Object {
+        "amount": 0.002232,
+        "price": 9134.5,
+      },
+      Object {
+        "amount": 0.164064,
+        "price": 9134.4,
+      },
+      Object {
+        "amount": 0,
+        "price": 9126.94,
+      },
+      Object {
+        "amount": 0.0622,
+        "price": 9135.96,
+      },
+      Object {
+        "amount": 0,
+        "price": 9135.78,
+      },
+      Object {
+        "amount": 0.007665,
+        "price": 9131.7,
+      },
+      Object {
+        "amount": 0,
+        "price": 9127,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-03T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-07-01T00:00:01.666Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi messages 22`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3.691799,
+        "price": 9137.68,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2.389677,
+        "price": 9137.67,
+      },
+    ],
+    "exchange": "huobi",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-03T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-07-01T00:00:01.727Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm, messages 1`] = `
 Array [
   Object {
