@@ -28,8 +28,20 @@ function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessag
     return current
   }
 
-  if (current.result.value.localTimestamp < oldest.result.value.localTimestamp) {
+  const currentTimestamp = current.result.value.localTimestamp.valueOf()
+  const oldestTimestamp = oldest.result.value.localTimestamp.valueOf()
+
+  if (currentTimestamp < oldestTimestamp) {
     return current
+  }
+
+  if (currentTimestamp === oldestTimestamp) {
+    const currentTimestampMicroSeconds = current.result.value.localTimestamp.μs || 0
+    const oldestTimestampMicroSeconds = oldest.result.value.localTimestamp.μs || 0
+
+    if (currentTimestampMicroSeconds < oldestTimestampMicroSeconds) {
+      return current
+    }
   }
 
   return oldest

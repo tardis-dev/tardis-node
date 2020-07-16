@@ -78,5 +78,26 @@ describe('combine(...asyncIterators)', () => {
     }
 
     expect(bufferedMessages).toMatchSnapshot()
+
+    iter1 = async function* () {
+      var localTimestamp = new Date('2019-08-01T00:52:00.102Z')
+      localTimestamp.μs = 202
+      yield { localTimestamp, name: 'iter1' }
+    }
+
+    iter2 = async function* () {
+      var localTimestamp = new Date('2019-08-01T00:52:00.102Z')
+      localTimestamp.μs = 102
+      yield { localTimestamp, name: 'iter2' }
+    }
+
+    combined = combine(iter1(), iter2())
+
+    bufferedMessages = []
+    for await (const message of combined) {
+      bufferedMessages.push(message)
+    }
+
+    expect(bufferedMessages).toMatchSnapshot()
   })
 })

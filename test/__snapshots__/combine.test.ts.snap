@@ -49,6 +49,19 @@ Array [
 ]
 `;
 
+exports[`combine(...asyncIterators) should correctly combine iterables based on localTimestamp value 3`] = `
+Array [
+  Object {
+    "localTimestamp": 2019-08-01T00:52:00.102Z,
+    "name": "iter2",
+  },
+  Object {
+    "localTimestamp": 2019-08-01T00:52:00.102Z,
+    "name": "iter1",
+  },
+]
+`;
+
 exports[`combine(...asyncIterators) should produce combined iterable from two replayNormalized iterables 1`] = `
 Array [
   Object {
@@ -31559,6 +31572,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 78460,
+        "price": 4093.25,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:04.841Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:04.831Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 389652,
         "price": 4106,
       },
@@ -31586,21 +31614,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:04.841Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:04.841Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 78460,
-        "price": 4093.25,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:04.841Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:04.831Z,
     "type": "book_change",
   },
   Object {
@@ -34112,21 +34125,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 889887,
-        "price": 4091.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:05.962Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:05.962Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -34143,6 +34141,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:05.962Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:05.953Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 889887,
+        "price": 4091.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:05.962Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:05.962Z,
     "type": "book_change",
   },
   Object {
@@ -36369,21 +36382,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 1083180,
-        "price": 4035.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:06.883Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:06.883Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 187010,
@@ -36400,6 +36398,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:06.883Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:06.873Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 1083180,
+        "price": 4035.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:06.883Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:06.883Z,
     "type": "book_change",
   },
   Object {
@@ -38030,21 +38043,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 240214,
-        "price": 4093.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.178Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:07.178Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -38064,18 +38062,18 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
+    "asks": Array [
       Object {
-        "amount": 12000,
-        "price": 4089.5,
+        "amount": 240214,
+        "price": 4093.5,
       },
     ],
+    "bids": Array [],
     "exchange": "bitmex",
     "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.180Z,
+    "localTimestamp": 2019-04-01T00:00:07.178Z,
     "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:07.180Z,
+    "timestamp": 2019-04-01T00:00:07.178Z,
     "type": "book_change",
   },
   Object {
@@ -38091,6 +38089,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.180Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:07.170Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 12000,
+        "price": 4089.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.180Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:07.180Z,
     "type": "book_change",
   },
   Object {
@@ -38783,21 +38796,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 765891,
-        "price": 4091.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.260Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:07.260Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -38814,6 +38812,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.260Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:07.245Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 765891,
+        "price": 4091.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.260Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:07.260Z,
     "type": "book_change",
   },
   Object {
@@ -39055,6 +39068,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 162110,
+        "price": 4086.75,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.289Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:07.279Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 730814,
@@ -39071,21 +39099,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.289Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:07.289Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 162110,
-        "price": 4086.75,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.289Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:07.279Z,
     "type": "book_change",
   },
   Object {
@@ -39227,25 +39240,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 866670,
-        "price": 4091,
-      },
-      Object {
-        "amount": 1465397,
-        "price": 4090.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.302Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:07.302Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 0,
         "price": 4112.25,
       },
@@ -39260,6 +39254,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.302Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:07.292Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 866670,
+        "price": 4091,
+      },
+      Object {
+        "amount": 1465397,
+        "price": 4090.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.302Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:07.302Z,
     "type": "book_change",
   },
   Object {
@@ -41126,6 +41139,25 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 111210,
+        "price": 4085.75,
+      },
+      Object {
+        "amount": 33720,
+        "price": 4086,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.608Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:07.598Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 861712,
@@ -41157,25 +41189,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.608Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:07.608Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 111210,
-        "price": 4085.75,
-      },
-      Object {
-        "amount": 33720,
-        "price": 4086,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.608Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:07.598Z,
     "type": "book_change",
   },
   Object {
@@ -41759,25 +41772,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 834158,
-        "price": 4091,
-      },
-      Object {
-        "amount": 2819128,
-        "price": 4090.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:07.819Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:07.819Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -41794,6 +41788,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:07.819Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:07.809Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 834158,
+        "price": 4091,
+      },
+      Object {
+        "amount": 2819128,
+        "price": 4090.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.819Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:07.819Z,
     "type": "book_change",
   },
   Object {
@@ -57739,6 +57752,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 47090,
+        "price": 4092.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:13.518Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:13.508Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 773573,
         "price": 4091,
       },
@@ -57764,21 +57792,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:13.518Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:13.518Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 47090,
-        "price": 4092.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:13.518Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:13.508Z,
     "type": "book_change",
   },
   Object {
@@ -58701,21 +58714,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 774885,
-        "price": 4091,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:13.827Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:13.827Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -58728,6 +58726,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:13.827Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:13.817Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 774885,
+        "price": 4091,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:13.827Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:13.827Z,
     "type": "book_change",
   },
   Object {
@@ -58772,6 +58785,21 @@ Array [
     "type": "trade",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 47060,
+        "price": 4092.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:13.839Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:13.823Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -58789,21 +58817,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 47060,
-        "price": 4092.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:13.839Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:13.823Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 796627,
         "price": 4091,
       },
@@ -58814,6 +58827,36 @@ Array [
     "localTimestamp": 2019-04-01T00:00:13.840Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:13.840Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 234000,
+        "price": 4089.5,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:13.847Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:13.831Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 490550,
+        "price": 4092,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:13.847Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:13.834Z,
     "type": "book_change",
   },
   Object {
@@ -58866,36 +58909,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:13.847Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:13.847Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 234000,
-        "price": 4089.5,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:13.847Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:13.831Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 490550,
-        "price": 4092,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:13.847Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:13.834Z,
     "type": "book_change",
   },
   Object {
@@ -60358,6 +60371,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 40100,
+        "price": 4153,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:14.754Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:14.743Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 2010829,
         "price": 4090.5,
       },
@@ -60862,21 +60890,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:14.754Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:14.754Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 40100,
-        "price": 4153,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:14.754Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:14.743Z,
     "type": "book_change",
   },
   Object {
@@ -63286,21 +63299,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 550443,
-        "price": 4094.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:14.889Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:14.889Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -63313,6 +63311,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:14.889Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:14.879Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 550443,
+        "price": 4094.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:14.889Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:14.889Z,
     "type": "book_change",
   },
   Object {
@@ -63749,25 +63762,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 256476,
-        "price": 4091,
-      },
-      Object {
-        "amount": 2328250,
-        "price": 4090,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:14.978Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:14.978Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 61450,
         "price": 4096.5,
       },
@@ -63782,6 +63776,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:14.978Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:14.968Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 256476,
+        "price": 4091,
+      },
+      Object {
+        "amount": 2328250,
+        "price": 4090,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:14.978Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:14.978Z,
     "type": "book_change",
   },
   Object {
@@ -67509,21 +67522,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 2875811,
-        "price": 4090,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:18.736Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:18.736Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 52700,
         "price": 4099.75,
       },
@@ -67534,6 +67532,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:18.736Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:18.726Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2875811,
+        "price": 4090,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:18.736Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:18.736Z,
     "type": "book_change",
   },
   Object {
@@ -68642,21 +68655,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 815026,
-        "price": 4099,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:18.938Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:18.938Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -68673,6 +68671,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:18.938Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:18.927Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 815026,
+        "price": 4099,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:18.938Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:18.938Z,
     "type": "book_change",
   },
   Object {
@@ -71398,6 +71411,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 173930,
+        "price": 4081.25,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:20.570Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:20.555Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 68159,
@@ -71446,21 +71474,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:20.570Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:20.570Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 173930,
-        "price": 4081.25,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:20.570Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:20.555Z,
     "type": "book_change",
   },
   Object {
@@ -71897,21 +71910,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 369687,
-        "price": 4091.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:20.663Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:20.663Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 26410,
         "price": 4095.5,
       },
@@ -71926,6 +71924,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:20.663Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:20.632Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 369687,
+        "price": 4091.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:20.663Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:20.663Z,
     "type": "book_change",
   },
   Object {
@@ -75452,6 +75465,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 10850,
+        "price": 4090,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.004Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:21.994Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 723632,
@@ -75485,15 +75513,15 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 10850,
-        "price": 4090,
+        "amount": 2100,
+        "price": 4091,
       },
     ],
     "exchange": "deribit",
     "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.004Z,
+    "localTimestamp": 2019-04-01T00:00:22.020Z,
     "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:21.994Z,
+    "timestamp": 2019-04-01T00:00:21.999Z,
     "type": "book_change",
   },
   Object {
@@ -75517,21 +75545,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.020Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:22.020Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 2100,
-        "price": 4091,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.020Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:21.999Z,
     "type": "book_change",
   },
   Object {
@@ -76165,21 +76178,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 109871,
-        "price": 4091,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.154Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.154Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 329540,
         "price": 4093.5,
       },
@@ -76194,6 +76192,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.154Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.143Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 109871,
+        "price": 4091,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.154Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.154Z,
     "type": "book_change",
   },
   Object {
@@ -77296,21 +77309,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 111858,
-        "price": 4089,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.339Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.339Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 97330,
@@ -77323,6 +77321,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.339Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.329Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 111858,
+        "price": 4089,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.339Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.339Z,
     "type": "book_change",
   },
   Object {
@@ -77742,21 +77755,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 367532,
-        "price": 4090,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.459Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.459Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 136140,
         "price": 4092.25,
       },
@@ -77767,6 +77765,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.459Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.450Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 367532,
+        "price": 4090,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.459Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.459Z,
     "type": "book_change",
   },
   Object {
@@ -78182,6 +78195,25 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 24270,
+        "price": 4092.75,
+      },
+      Object {
+        "amount": 45120,
+        "price": 4093.25,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.545Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:22.536Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 377960,
         "price": 4106,
       },
@@ -78209,25 +78241,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.545Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:22.545Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 24270,
-        "price": 4092.75,
-      },
-      Object {
-        "amount": 45120,
-        "price": 4093.25,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.545Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:22.536Z,
     "type": "book_change",
   },
   Object {
@@ -78911,21 +78924,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 65221,
-        "price": 4091,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.713Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.713Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 65490,
         "price": 4092.5,
       },
@@ -78959,6 +78957,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.713Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.703Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 65221,
+        "price": 4091,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.713Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.713Z,
     "type": "book_change",
   },
   Object {
@@ -79426,21 +79439,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 166306,
-        "price": 4092.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.874Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.874Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -79462,16 +79460,16 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 227140,
-        "price": 4090.5,
+        "amount": 166306,
+        "price": 4092.5,
       },
     ],
     "bids": Array [],
     "exchange": "bitmex",
     "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.877Z,
+    "localTimestamp": 2019-04-01T00:00:22.874Z,
     "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.877Z,
+    "timestamp": 2019-04-01T00:00:22.874Z,
     "type": "book_change",
   },
   Object {
@@ -79491,6 +79489,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.877Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.867Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 227140,
+        "price": 4090.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.877Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.877Z,
     "type": "book_change",
   },
   Object {
@@ -79735,21 +79748,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 206705,
-        "price": 4082,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:22.938Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:22.938Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 68190,
@@ -79777,6 +79775,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:22.938Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:22.925Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 206705,
+        "price": 4082,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:22.938Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:22.938Z,
     "type": "book_change",
   },
   Object {
@@ -84042,6 +84055,25 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 151140,
+        "price": 4092.25,
+      },
+      Object {
+        "amount": 81210,
+        "price": 4092.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:23.824Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:23.813Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 238704,
         "price": 4100.5,
       },
@@ -84073,25 +84105,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:23.824Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:23.824Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 151140,
-        "price": 4092.25,
-      },
-      Object {
-        "amount": 81210,
-        "price": 4092.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:23.824Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:23.813Z,
     "type": "book_change",
   },
   Object {
@@ -85930,6 +85943,21 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
+        "amount": 1290,
+        "price": 4091.25,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:24.358Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:24.346Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
         "amount": 266743,
         "price": 4061.5,
       },
@@ -85971,21 +85999,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:24.358Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:24.358Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 1290,
-        "price": 4091.25,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:24.358Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:24.346Z,
     "type": "book_change",
   },
   Object {
@@ -91587,6 +91600,40 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 131750,
+        "price": 4094,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:25.450Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:25.439Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 50550,
+        "price": 4092.5,
+      },
+      Object {
+        "amount": 238190,
+        "price": 4093,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:25.450Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:25.440Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 376899,
         "price": 4106,
       },
@@ -91868,40 +91915,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:25.450Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:25.450Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 131750,
-        "price": 4094,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:25.450Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:25.439Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 50550,
-        "price": 4092.5,
-      },
-      Object {
-        "amount": 238190,
-        "price": 4093,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:25.450Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:25.440Z,
     "type": "book_change",
   },
   Object {
@@ -93034,6 +93047,21 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
+        "amount": 48550,
+        "price": 4086.25,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:25.669Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:25.657Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
         "amount": 383241,
         "price": 4037.5,
       },
@@ -93047,21 +93075,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:25.669Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:25.669Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 48550,
-        "price": 4086.25,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:25.669Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:25.657Z,
     "type": "book_change",
   },
   Object {
@@ -95262,17 +95275,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "amount": 89,
-    "exchange": "bitmex",
-    "id": "756ea2cb-7499-a3d0-96ca-b9b5057d920e",
-    "localTimestamp": 2019-04-01T00:00:26.028Z,
-    "price": 4089,
-    "side": "buy",
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:25.781Z,
-    "type": "trade",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -95286,6 +95288,17 @@ Array [
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:26.013Z,
     "type": "book_change",
+  },
+  Object {
+    "amount": 89,
+    "exchange": "bitmex",
+    "id": "756ea2cb-7499-a3d0-96ca-b9b5057d920e",
+    "localTimestamp": 2019-04-01T00:00:26.028Z,
+    "price": 4089,
+    "side": "buy",
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:25.781Z,
+    "type": "trade",
   },
   Object {
     "asks": Array [],
@@ -95370,21 +95383,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 632609,
-        "price": 4089,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.062Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:26.062Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 238190,
         "price": 4093,
       },
@@ -95399,6 +95397,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.062Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:26.048Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 632609,
+        "price": 4089,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.062Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:26.062Z,
     "type": "book_change",
   },
   Object {
@@ -95511,6 +95524,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 96330,
+        "price": 4095,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.079Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.069Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 360113,
         "price": 4089.5,
       },
@@ -95525,21 +95553,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.079Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.079Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 96330,
-        "price": 4095,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.079Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.069Z,
     "type": "book_change",
   },
   Object {
@@ -96201,6 +96214,25 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 95630,
+        "price": 4095,
+      },
+      Object {
+        "amount": 102450,
+        "price": 4094,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.183Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.173Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 396888,
         "price": 4096.5,
       },
@@ -96216,25 +96248,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.183Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.183Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 95630,
-        "price": 4095,
-      },
-      Object {
-        "amount": 102450,
-        "price": 4094,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.183Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.173Z,
     "type": "book_change",
   },
   Object {
@@ -97373,25 +97386,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 1786273,
-        "price": 4097,
-      },
-      Object {
-        "amount": 800840,
-        "price": 4094,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.393Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:26.393Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -97427,6 +97421,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.393Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:26.384Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1786273,
+        "price": 4097,
+      },
+      Object {
+        "amount": 800840,
+        "price": 4094,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.393Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:26.393Z,
     "type": "book_change",
   },
   Object {
@@ -98313,6 +98326,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 372700,
+        "price": 4092,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.518Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.508Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 214965,
         "price": 4093.5,
       },
@@ -98344,21 +98372,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.518Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.518Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 372700,
-        "price": 4092,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.518Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.508Z,
     "type": "book_change",
   },
   Object {
@@ -98787,6 +98800,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 33140,
+        "price": 4094.25,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.581Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.571Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -98814,21 +98842,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.581Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.581Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 33140,
-        "price": 4094.25,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.581Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.571Z,
     "type": "book_change",
   },
   Object {
@@ -99315,21 +99328,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 95864,
-        "price": 4092,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.757Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:26.757Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 119970,
         "price": 4095,
       },
@@ -99344,6 +99342,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.757Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:26.748Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 95864,
+        "price": 4092,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.757Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:26.757Z,
     "type": "book_change",
   },
   Object {
@@ -99844,6 +99857,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 195700,
+        "price": 4093.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.834Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.825Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 575276,
         "price": 4094.5,
       },
@@ -99891,21 +99919,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.834Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.834Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 195700,
-        "price": 4093.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.834Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.825Z,
     "type": "book_change",
   },
   Object {
@@ -100173,6 +100186,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 39750,
+        "price": 4096.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:26.926Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:26.917Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -100189,21 +100217,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:26.926Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:26.926Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 39750,
-        "price": 4096.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:26.926Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:26.917Z,
     "type": "book_change",
   },
   Object {
@@ -100916,21 +100929,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 963048,
-        "price": 4098,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:27.126Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:27.126Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 239700,
         "price": 4093.5,
       },
@@ -100941,6 +100939,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:27.126Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:27.116Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 963048,
+        "price": 4098,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:27.126Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:27.126Z,
     "type": "book_change",
   },
   Object {
@@ -100965,21 +100978,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 215704,
-        "price": 4093.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:27.132Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:27.132Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 49090,
         "price": 4092.5,
       },
@@ -100990,6 +100988,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:27.132Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:27.122Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 215704,
+        "price": 4093.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:27.132Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:27.132Z,
     "type": "book_change",
   },
   Object {
@@ -103116,21 +103129,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 451379,
-        "price": 4088,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:27.552Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:27.552Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 72450,
@@ -103147,6 +103145,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:27.552Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:27.541Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 451379,
+        "price": 4088,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:27.552Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:27.552Z,
     "type": "book_change",
   },
   Object {
@@ -106177,6 +106190,25 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 229100,
+        "price": 4093,
+      },
+      Object {
+        "amount": 269030,
+        "price": 4093.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.192Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:28.182Z,
+    "type": "book_change",
+  },
+  Object {
     "amount": 1394,
     "exchange": "bitmex",
     "id": "24ae1fcf-ea80-77d4-f474-a589a86787bc",
@@ -106235,25 +106267,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.192Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:28.192Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 229100,
-        "price": 4093,
-      },
-      Object {
-        "amount": 269030,
-        "price": 4093.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.192Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:28.182Z,
     "type": "book_change",
   },
   Object {
@@ -106959,6 +106972,25 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 2000,
+        "price": 4111.5,
+      },
+      Object {
+        "amount": 129210,
+        "price": 4112,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.306Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:28.296Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 571695,
         "price": 4094.5,
       },
@@ -106984,25 +107016,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.306Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:28.306Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 2000,
-        "price": 4111.5,
-      },
-      Object {
-        "amount": 129210,
-        "price": 4112,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.306Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:28.296Z,
     "type": "book_change",
   },
   Object {
@@ -107482,21 +107495,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 947041,
-        "price": 4088.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.393Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:28.393Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 44770,
@@ -107509,6 +107507,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.393Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:28.384Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 947041,
+        "price": 4088.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.393Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:28.393Z,
     "type": "book_change",
   },
   Object {
@@ -107755,25 +107768,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 98766,
-        "price": 4092,
-      },
-      Object {
-        "amount": 68022,
-        "price": 4091,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.542Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:28.542Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -107790,6 +107784,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.542Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:28.527Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 98766,
+        "price": 4092,
+      },
+      Object {
+        "amount": 68022,
+        "price": 4091,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.542Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:28.542Z,
     "type": "book_change",
   },
   Object {
@@ -108379,30 +108392,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 637069,
-        "price": 4097.5,
-      },
-      Object {
-        "amount": 354096,
-        "price": 4096.5,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 519513,
-        "price": 4080,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.721Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:28.721Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -108435,20 +108424,25 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 393438,
-        "price": 4091.5,
+        "amount": 637069,
+        "price": 4097.5,
       },
       Object {
-        "amount": 76435,
-        "price": 4090.5,
+        "amount": 354096,
+        "price": 4096.5,
       },
     ],
-    "bids": Array [],
+    "bids": Array [
+      Object {
+        "amount": 519513,
+        "price": 4080,
+      },
+    ],
     "exchange": "bitmex",
     "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.723Z,
+    "localTimestamp": 2019-04-01T00:00:28.721Z,
     "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:28.723Z,
+    "timestamp": 2019-04-01T00:00:28.721Z,
     "type": "book_change",
   },
   Object {
@@ -108464,6 +108458,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.723Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:28.712Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 393438,
+        "price": 4091.5,
+      },
+      Object {
+        "amount": 76435,
+        "price": 4090.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.723Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:28.723Z,
     "type": "book_change",
   },
   Object {
@@ -109010,21 +109023,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 183625,
-        "price": 4083.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:28.785Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:28.785Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 0,
         "price": 4076.75,
       },
@@ -109038,6 +109036,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:28.785Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:28.774Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 183625,
+        "price": 4083.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:28.785Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:28.785Z,
     "type": "book_change",
   },
   Object {
@@ -111684,21 +111697,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 2064746,
-        "price": 4030,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:29.509Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:29.509Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 83870,
@@ -111715,6 +111713,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:29.509Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:29.499Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 2064746,
+        "price": 4030,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:29.509Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:29.509Z,
     "type": "book_change",
   },
   Object {
@@ -115925,21 +115938,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 312694,
-        "price": 4089,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:30.899Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:30.899Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 111000,
         "price": 4094.75,
       },
@@ -115950,6 +115948,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:30.899Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:30.890Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 312694,
+        "price": 4089,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:30.899Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:30.899Z,
     "type": "book_change",
   },
   Object {
@@ -121441,6 +121454,21 @@ Array [
   Object {
     "asks": Array [
       Object {
+        "amount": 20200,
+        "price": 4096.25,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:32.486Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:32.476Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
         "amount": 346914,
         "price": 4096.5,
       },
@@ -121455,21 +121483,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:32.486Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:32.486Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 20200,
-        "price": 4096.25,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:32.486Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:32.476Z,
     "type": "book_change",
   },
   Object {
@@ -122012,21 +122025,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 658753,
-        "price": 3930,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:32.684Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:32.684Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 0,
         "price": 4051.5,
       },
@@ -122036,6 +122034,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:32.684Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:32.671Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 658753,
+        "price": 3930,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:32.684Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:32.684Z,
     "type": "book_change",
   },
   Object {
@@ -122122,6 +122135,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 10300,
+        "price": 4144,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:32.703Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:32.694Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -122138,21 +122166,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:32.703Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:32.703Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 10300,
-        "price": 4144,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:32.703Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:32.694Z,
     "type": "book_change",
   },
   Object {
@@ -123361,21 +123374,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 316077,
-        "price": 4089,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:33.019Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:33.019Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 136640,
         "price": 4094.5,
       },
@@ -123386,6 +123384,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:33.019Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:33.010Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 316077,
+        "price": 4089,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:33.019Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:33.019Z,
     "type": "book_change",
   },
   Object {
@@ -124438,21 +124451,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 243830,
-        "price": 4084.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:33.378Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:33.378Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 0,
@@ -124469,6 +124467,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:33.378Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:33.367Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 243830,
+        "price": 4084.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:33.378Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:33.378Z,
     "type": "book_change",
   },
   Object {
@@ -124532,21 +124545,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
-      Object {
-        "amount": 500,
-        "price": 6133,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:33.403Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:33.403Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -124559,6 +124557,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:33.403Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:33.393Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 500,
+        "price": 6133,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:33.403Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:33.403Z,
     "type": "book_change",
   },
   Object {
@@ -124798,6 +124811,21 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
+        "amount": 9940,
+        "price": 4073.75,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:33.494Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:33.481Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
         "amount": 244133,
         "price": 4039.5,
       },
@@ -124811,21 +124839,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:33.494Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:33.494Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 9940,
-        "price": 4073.75,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:33.494Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:33.481Z,
     "type": "book_change",
   },
   Object {
@@ -131320,21 +131333,6 @@ Array [
   Object {
     "asks": Array [
       Object {
-        "amount": 346813,
-        "price": 4096.5,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:36.237Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:36.237Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
         "amount": 78220,
         "price": 4094,
       },
@@ -131345,6 +131343,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:36.237Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:36.216Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 346813,
+        "price": 4096.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:36.237Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:36.237Z,
     "type": "book_change",
   },
   Object {
@@ -132313,21 +132326,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 377890,
-        "price": 4087.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:36.559Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:36.559Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 38040,
@@ -132344,6 +132342,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:36.559Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:36.550Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 377890,
+        "price": 4087.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:36.559Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:36.559Z,
     "type": "book_change",
   },
   Object {
@@ -137735,25 +137748,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 719047,
-        "price": 4023,
-      },
-      Object {
-        "amount": 1002967,
-        "price": 4022,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:39.441Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:39.441Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 1600,
         "price": 4074,
       },
@@ -137767,6 +137761,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:39.441Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:39.432Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 719047,
+        "price": 4023,
+      },
+      Object {
+        "amount": 1002967,
+        "price": 4022,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:39.441Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:39.441Z,
     "type": "book_change",
   },
   Object {
@@ -137845,6 +137858,25 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
+        "amount": 126910,
+        "price": 4085.75,
+      },
+      Object {
+        "amount": 54460,
+        "price": 4085.5,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:39.511Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:39.502Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
         "amount": 246979,
         "price": 4039.5,
       },
@@ -137877,25 +137909,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:39.511Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:39.511Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 126910,
-        "price": 4085.75,
-      },
-      Object {
-        "amount": 54460,
-        "price": 4085.5,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:39.511Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:39.502Z,
     "type": "book_change",
   },
   Object {
@@ -139699,6 +139712,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 44840,
+        "price": 4092.5,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:41.025Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:41.015Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -139718,18 +139746,22 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [
+    "asks": Array [],
+    "bids": Array [
       Object {
-        "amount": 44840,
-        "price": 4092.5,
+        "amount": 76400,
+        "price": 4090.5,
+      },
+      Object {
+        "amount": 29540,
+        "price": 4090.75,
       },
     ],
-    "bids": Array [],
     "exchange": "deribit",
     "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:41.025Z,
+    "localTimestamp": 2019-04-01T00:00:41.028Z,
     "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:41.015Z,
+    "timestamp": 2019-04-01T00:00:41.017Z,
     "type": "book_change",
   },
   Object {
@@ -139749,25 +139781,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:41.028Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:41.028Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 76400,
-        "price": 4090.5,
-      },
-      Object {
-        "amount": 29540,
-        "price": 4090.75,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:41.028Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:41.017Z,
     "type": "book_change",
   },
   Object {
@@ -140187,21 +140200,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 344062,
-        "price": 4061,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:41.138Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:41.138Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 124030,
@@ -140237,6 +140235,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:41.138Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:41.128Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 344062,
+        "price": 4061,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:41.138Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:41.138Z,
     "type": "book_change",
   },
   Object {
@@ -143503,6 +143516,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 139990,
+        "price": 4088.5,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:42.902Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:42.892Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 471546,
@@ -143519,21 +143547,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:42.902Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:42.902Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 139990,
-        "price": 4088.5,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:42.902Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:42.892Z,
     "type": "book_change",
   },
   Object {
@@ -153435,21 +153448,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 408241,
-        "price": 4018,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:48.880Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:48.880Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 57200,
         "price": 4085,
       },
@@ -153463,6 +153461,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:48.880Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:48.830Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 408241,
+        "price": 4018,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:48.880Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:48.880Z,
     "type": "book_change",
   },
   Object {
@@ -155235,25 +155248,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 327284,
-        "price": 4077,
-      },
-      Object {
-        "amount": 614935,
-        "price": 4076,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:49.489Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:49.489Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 7000,
         "price": 4087.25,
       },
@@ -155267,6 +155261,25 @@ Array [
     "localTimestamp": 2019-04-01T00:00:49.489Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:49.452Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 327284,
+        "price": 4077,
+      },
+      Object {
+        "amount": 614935,
+        "price": 4076,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:49.489Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:49.489Z,
     "type": "book_change",
   },
   Object {
@@ -158449,21 +158462,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 87321,
-        "price": 4059,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:50.305Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:50.305Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 6800,
@@ -158476,6 +158474,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:50.305Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:50.287Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 87321,
+        "price": 4059,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:50.305Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:50.305Z,
     "type": "book_change",
   },
   Object {
@@ -158808,21 +158821,6 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
-        "amount": 246304,
-        "price": 4070.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:50.392Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:50.392Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
         "amount": 45930,
         "price": 4088.75,
       },
@@ -158836,6 +158834,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:50.392Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:50.382Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 246304,
+        "price": 4070.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:50.392Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:50.392Z,
     "type": "book_change",
   },
   Object {
@@ -161213,6 +161226,25 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 3350,
+        "price": 4098.5,
+      },
+      Object {
+        "amount": 1700,
+        "price": 4096.75,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:51.286Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:51.275Z,
+    "type": "book_change",
+  },
+  Object {
     "amount": 4499,
     "exchange": "bitmex",
     "id": "c4ccf79c-5ca9-f3a0-fd4c-360c946bf1bc",
@@ -161266,25 +161298,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:51.286Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:51.286Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 3350,
-        "price": 4098.5,
-      },
-      Object {
-        "amount": 1700,
-        "price": 4096.75,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:51.286Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:51.275Z,
     "type": "book_change",
   },
   Object {
@@ -165193,21 +165206,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 379318,
-        "price": 4088,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:53.443Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:53.443Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 5010,
@@ -165220,6 +165218,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:53.443Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:53.433Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 379318,
+        "price": 4088,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:53.443Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:53.443Z,
     "type": "book_change",
   },
   Object {
@@ -166089,6 +166102,25 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 108620,
+        "price": 4090,
+      },
+      Object {
+        "amount": 64110,
+        "price": 4089.25,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:53.867Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:53.857Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [
       Object {
         "amount": 27085,
@@ -166146,25 +166178,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:53.867Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:53.867Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 108620,
-        "price": 4090,
-      },
-      Object {
-        "amount": 64110,
-        "price": 4089.25,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:53.867Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:53.857Z,
     "type": "book_change",
   },
   Object {
@@ -167257,6 +167270,25 @@ Array [
     "asks": Array [],
     "bids": Array [
       Object {
+        "amount": 550,
+        "price": 4072,
+      },
+      Object {
+        "amount": 75000,
+        "price": 4072.25,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:54.289Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:54.279Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
         "amount": 184818,
         "price": 4084.5,
       },
@@ -167306,25 +167338,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:54.289Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:54.289Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 550,
-        "price": 4072,
-      },
-      Object {
-        "amount": 75000,
-        "price": 4072.25,
-      },
-    ],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:54.289Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:54.279Z,
     "type": "book_change",
   },
   Object {
@@ -170293,6 +170306,21 @@ Array [
     "type": "book_change",
   },
   Object {
+    "asks": Array [
+      Object {
+        "amount": 42000,
+        "price": 4107.25,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:56.285Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:56.275Z,
+    "type": "book_change",
+  },
+  Object {
     "asks": Array [],
     "bids": Array [
       Object {
@@ -170309,21 +170337,6 @@ Array [
     "localTimestamp": 2019-04-01T00:00:56.285Z,
     "symbol": "XBTUSD",
     "timestamp": 2019-04-01T00:00:56.285Z,
-    "type": "book_change",
-  },
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 42000,
-        "price": 4107.25,
-      },
-    ],
-    "bids": Array [],
-    "exchange": "deribit",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:56.285Z,
-    "symbol": "BTC-PERPETUAL",
-    "timestamp": 2019-04-01T00:00:56.275Z,
     "type": "book_change",
   },
   Object {
@@ -171314,21 +171327,6 @@ Array [
     "type": "book_change",
   },
   Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 512461,
-        "price": 4088.5,
-      },
-    ],
-    "exchange": "bitmex",
-    "isSnapshot": false,
-    "localTimestamp": 2019-04-01T00:00:56.926Z,
-    "symbol": "XBTUSD",
-    "timestamp": 2019-04-01T00:00:56.926Z,
-    "type": "book_change",
-  },
-  Object {
     "asks": Array [
       Object {
         "amount": 58040,
@@ -171341,6 +171339,21 @@ Array [
     "localTimestamp": 2019-04-01T00:00:56.926Z,
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-04-01T00:00:56.917Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 512461,
+        "price": 4088.5,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:56.926Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2019-04-01T00:00:56.926Z,
     "type": "book_change",
   },
   Object {
