@@ -1,14 +1,6 @@
-import { OrderBook } from '../orderbook'
+import { OrderBook, OnLevelRemovedCB } from '../orderbook'
 import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types'
 import { Computable } from './computable'
-
-type OnLevelRemovedCB = (
-  bookChange: BookChange,
-  bestBidBeforeRemoval: BookPriceLevel | undefined,
-  bestBidAfterRemoval: BookPriceLevel | undefined,
-  bestAskBeforeRemoval: BookPriceLevel | undefined,
-  bestAskAfterRemoval: BookPriceLevel | undefined
-) => void
 
 type BookSnapshotComputableOptions = {
   name?: string
@@ -43,12 +35,10 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private _bookChanged = false
 
   private readonly _type = 'book_snapshot'
-  private readonly _orderBook = new OrderBook()
+  private readonly _orderBook: OrderBook
   private readonly _depth: number
   private readonly _interval: number
   private readonly _name: string
-  private readonly _removeCrossedLevels: boolean | undefined
-  private readonly _onCrossedLevelRemoved: OnLevelRemovedCB | undefined
 
   private _lastUpdateTimestamp: Date = new Date(-1)
   private _bids: Optional<BookPriceLevel>[] = []
@@ -57,8 +47,11 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   constructor({ depth, name, interval, removeCrossedLevels, onCrossedLevelRemoved }: BookSnapshotComputableOptions) {
     this._depth = depth
     this._interval = interval
-    this._removeCrossedLevels = removeCrossedLevels
-    this._onCrossedLevelRemoved = onCrossedLevelRemoved
+
+    this._orderBook = new OrderBook({
+      removeCrossedLevels,
+      onCrossedLevelRemoved
+    })
 
     // initialize all bids/asks levels to empty ones
     for (let i = 0; i < this._depth; i++) {
@@ -114,43 +107,6 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
 
     const bidsIterable = this._orderBook.bids()
     const asksIterable = this._orderBook.asks()
-
-    if (this._removeCrossedLevels) {
-      let bestBid = this._orderBook.bestBid()
-      let bestAsk = this._orderBook.bestAsk()
-      let bookIsCrossed = bestBid !== undefined && bestAsk !== undefined && bestBid.price >= bestAsk.price
-      // if after update we have crossed order book (best bid >= best ask)
-      // it most likely means that exchange has not published delete message for the other side of the book
-      // more info:
-      // https://www.reddit.com/r/KrakenSupport/comments/d1a4nx/websocket_orderbook_receiving_wrong_bid_price_for/
-      // https://www.reddit.com/r/BitMEX/comments/8lbj9e/bidask_ledger_weirdness/
-      // https://twitter.com/coinarb/status/931260529993170944
-
-      if (bookIsCrossed) {
-        // decide from which side of the book we should remove level so book isn't crossed anymore
-        // if current book update updated "best ask" it means we should remove "best bid" as exchange hasn't provided book change update
-        // that deletes it, and vice versa for for "best bids"
-
-        const shouldRemoveBestBid = bookChange.asks.some((s) => s.price === bestAsk!.price)
-
-        while (bookIsCrossed) {
-          if (shouldRemoveBestBid) {
-            this._orderBook.removeBestBid()
-          } else {
-            this._orderBook.removeBestAsk()
-          }
-          const newBestBid = this._orderBook.bestBid()
-          const newBestAsk = this._orderBook.bestAsk()
-          if (this._onCrossedLevelRemoved !== undefined) {
-            this._onCrossedLevelRemoved(bookChange, bestBid, newBestBid, bestAsk, newBestAsk)
-          }
-
-          bestBid = newBestBid
-          bestAsk = newBestAsk
-          bookIsCrossed = bestBid !== undefined && bestAsk !== undefined && bestBid.price >= bestAsk.price
-        }
-      }
-    }
 
     for (let i = 0; i < this._depth; i++) {
       const bidLevelResult = bidsIterable.next()
