@@ -1,5 +1,6 @@
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
+import { parseμs } from '../handy'
 
 // https://docs.pro.coinbase.com/#websocket-feed
 
@@ -18,6 +19,9 @@ export const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
   },
 
   *map(message: CoinbaseTrade, localTimestamp: Date): IterableIterator<Trade> {
+    const timestamp = new Date(message.time)
+    timestamp.μs = parseμs(message.time)
+
     yield {
       type: 'trade',
       symbol: message.product_id,
@@ -26,7 +30,7 @@ export const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
       price: Number(message.price),
       amount: Number(message.size),
       side: message.side === 'sell' ? 'buy' : 'sell', // coinbase side field indicates the maker order side
-      timestamp: new Date(message.time),
+      timestamp,
       localTimestamp: localTimestamp
     }
   }
@@ -89,6 +93,7 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
         }
         timestamp = previousValidTimestamp
       } else {
+        timestamp.μs = parseμs(message.time)
         this._symbolLastTimestampMap.set(message.product_id, timestamp)
       }
 
