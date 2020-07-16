@@ -362,3 +362,27 @@ export class CircularBuffer<T> {
     this._index = 0
   }
 }
+
+export class CappedSet<T> {
+  private _set = new Set<T>()
+  constructor(private readonly _maxSize: number) {}
+
+  public has(value: T) {
+    return this._set.has(value)
+  }
+
+  public add(value: T) {
+    if (this._set.size >= this._maxSize) {
+      this._set.delete(this._set.keys().next().value)
+    }
+    this._set.add(value)
+  }
+
+  public remove(value: T) {
+    this._set.delete(value)
+  }
+
+  public size() {
+    return this._set.size
+  }
+}
