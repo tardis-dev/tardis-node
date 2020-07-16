@@ -24,6 +24,7 @@ import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
+import { GateBookChangeMapper, GateIOTradesMapper } from './gateio'
 
 export * from './mapper'
 
@@ -67,7 +68,8 @@ const tradesMappers = {
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
-  delta: () => deltaTradesMapper
+  delta: () => deltaTradesMapper,
+  'gate-io': () => new GateIOTradesMapper('gate-io')
 }
 
 const bookChangeMappers = {
@@ -111,7 +113,8 @@ const bookChangeMappers = {
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,
   phemex: () => phemexBookChangeMapper,
-  delta: () => deltaBookChangeMapper
+  delta: () => deltaBookChangeMapper,
+  'gate-io': () => new GateBookChangeMapper('gate-io')
 }
 
 const derivativeTickersMappers = {

@@ -2445,6 +2445,86 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io messages 1`] = `Array []`;
+
+exports[`mappers map gate-io messages 2`] = `
+Array [
+  Object {
+    "amount": 0.0019152098,
+    "exchange": "gate-io",
+    "id": "259066876",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 9137.38,
+    "side": "buy",
+    "symbol": "BTC_USDT",
+    "timestamp": 2020-07-01T00:00:00.655Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.002736014,
+    "exchange": "gate-io",
+    "id": "259066877",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 9137.38,
+    "side": "buy",
+    "symbol": "BTC_USDT",
+    "timestamp": 2020-07-01T00:00:00.775Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 3`] = `Array []`;
+
+exports[`mappers map gate-io messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 14.4232,
+        "price": 10.95,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 26.681457246,
+        "price": 10.53,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTG_USDT",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 5`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 1134158.88940972,
+        "price": 0.01631,
+      },
+      Object {
+        "amount": 41254.93309,
+        "price": 0.01625,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "TRX_USDT",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {

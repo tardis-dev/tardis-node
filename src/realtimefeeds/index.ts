@@ -24,6 +24,7 @@ import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
 import { PhemexRealTimeFeed } from './phemex'
 import { DeltaRealTimeFeed } from './delta'
+import { GateIORealTimeFeed } from './gateio'
 
 export * from './realtimefeed'
 
@@ -60,7 +61,8 @@ const realTimeFeedsMap: {
   okcoin: OKCoinRealTimeFeed,
   hitbtc: HitBtcRealTimeFeed,
   phemex: PhemexRealTimeFeed,
-  delta: DeltaRealTimeFeed
+  delta: DeltaRealTimeFeed,
+  'gate-io': GateIORealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

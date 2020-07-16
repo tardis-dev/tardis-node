@@ -3651,4 +3651,75 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('map gate-io messages', () => {
+    const messages = [
+      {
+        method: 'trades.update',
+        params: ['BTC_USDT', [{ id: 259066862, time: 1593561592.4327581, price: '9137.38', amount: '0.0047', type: 'buy' }]],
+        id: null
+      },
+      {
+        method: 'trades.update',
+        params: [
+          'BTC_USDT',
+          [
+            { id: 259066877, time: 1593561600.7751219, price: '9137.38', amount: '0.002736014', type: 'buy' },
+            { id: 259066876, time: 1593561600.655988, price: '9137.38', amount: '0.0019152098', type: 'buy' }
+          ]
+        ],
+        id: null
+      },
+      {
+        method: 'ticker.update',
+        params: [
+          'CVC_USDT',
+          {
+            period: 86400,
+            open: '0.0276',
+            close: '0.0269',
+            high: '0.0276',
+            low: '0.0262',
+            last: '0.0269',
+            change: '-2.53',
+            quoteVolume: '14765.07143428',
+            baseVolume: '394.022772826982'
+          }
+        ],
+        id: null
+      },
+      {
+        method: 'depth.update',
+        params: [
+          true,
+          {
+            asks: [['10.95', '14.4232']],
+            bids: [['10.53', '26.681457246']]
+          },
+          'BTG_USDT'
+        ],
+        id: null
+      },
+      {
+        method: 'depth.update',
+        params: [
+          false,
+          {
+            bids: [
+              ['0.01631', '1134158.88940972'],
+              ['0.01625', '41254.93309']
+            ]
+          },
+          'TRX_USDT'
+        ],
+        id: null
+      }
+    ]
+    const gateIOMapper = createMapper('gate-io')
+
+    for (const message of messages) {
+      const mappedMessages = gateIOMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
 })
