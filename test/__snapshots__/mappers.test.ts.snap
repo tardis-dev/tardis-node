@@ -3737,7 +3737,9 @@ Array [
 
 exports[`mappers map okex-options messages 8`] = `Array []`;
 
-exports[`mappers map okex-options messages 9`] = `
+exports[`mappers map okex-options messages 9`] = `Array []`;
+
+exports[`mappers map okex-options messages 10`] = `
 Array [
   Object {
     "asks": Array [
@@ -3761,7 +3763,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 10`] = `
+exports[`mappers map okex-options messages 11`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -3793,9 +3795,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 11`] = `Array []`;
+exports[`mappers map okex-options messages 12`] = `Array []`;
 
-exports[`mappers map okex-options messages 12`] = `
+exports[`mappers map okex-options messages 13`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -3827,7 +3829,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 13`] = `
+exports[`mappers map okex-options messages 14`] = `
 Array [
   Object {
     "bestAskAmount": 55,
@@ -3859,7 +3861,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 14`] = `
+exports[`mappers map okex-options messages 15`] = `
 Array [
   Object {
     "bestAskAmount": 4,
@@ -3890,6 +3892,8 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map okex-options messages 16`] = `Array []`;
 
 exports[`mappers map okex-swap messages 1`] = `Array []`;
 

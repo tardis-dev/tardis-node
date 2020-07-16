@@ -93,6 +93,10 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
 
   *map(okexDepthDataMessage: OkexDepthDataMessage, localTimestamp: Date): IterableIterator<BookChange> {
     for (const message of okexDepthDataMessage.data) {
+      if (message.bids.length === 0 && message.asks.length === 0) {
+        continue
+      }
+
       yield {
         type: 'book_change',
         symbol: message.instrument_id,

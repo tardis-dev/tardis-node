@@ -1207,6 +1207,19 @@ describe('mappers', () => {
             timestamp: '2020-06-01T00:00:39.117Z'
           }
         ]
+      },
+      {
+        table: 'option/depth_l2_tbt',
+        action: 'update',
+        data: [
+          {
+            instrument_id: 'BTC-USD-200710-8750-C',
+            asks: [],
+            bids: [],
+            timestamp: '2020-07-01T00:00:51.209Z',
+            checksum: 1490116368
+          }
+        ]
       }
     ]
 
