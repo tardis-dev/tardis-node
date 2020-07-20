@@ -223,7 +223,8 @@ export function optimizeFilters(filters: Filter<any>[]) {
 
 const httpsAgent = new https.Agent({
   keepAlive: true,
-  keepAliveMsecs: 10 * ONE_SEC_IN_MS
+  keepAliveMsecs: 10 * ONE_SEC_IN_MS,
+  maxSockets: 120
 })
 
 export async function download({
@@ -239,7 +240,7 @@ export async function download({
 }) {
   const httpRequestOptions = {
     agent: httpsAgent,
-    timeout: 45 * ONE_SEC_IN_MS,
+    timeout: 90 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': 'gzip',
       'User-Agent': userAgent,
