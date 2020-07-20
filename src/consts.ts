@@ -94,9 +94,9 @@ const DERIBIT_CHANNELS = [
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
 
-const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker'] as const
+const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
 
-const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker'] as const
+const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
 
 const OKEX_FUTURES_CHANNELS = [
   'futures/trade',
@@ -104,7 +104,8 @@ const OKEX_FUTURES_CHANNELS = [
   'futures/depth_l2_tbt',
   'futures/ticker',
   'futures/mark_price',
-  'index/ticker'
+  'index/ticker',
+  'system/status'
 ]
 
 const OKEX_SWAP_CHANNELS = [
@@ -114,7 +115,8 @@ const OKEX_SWAP_CHANNELS = [
   'swap/ticker',
   'swap/funding_rate',
   'swap/mark_price',
-  'index/ticker'
+  'index/ticker',
+  'system/status'
 ]
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -124,7 +126,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'option/ticker',
   'option/summary',
   'option/instruments',
-  'index/ticker'
+  'index/ticker',
+  'system/status'
 ]
 
 const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'OrderClosed', 'TickerChanged']
@@ -219,7 +222,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'binance-dex': BINANCE_DEX_CHANNELS,
   'binance-us': BINANCE_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
-  'bitfinex-alts': BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
   'ftx-us': FTX_US_CHANNELS,
   gemini: GEMINI_CHANNELS,
