@@ -134,7 +134,7 @@ const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'Ord
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
-const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets'] as const
+const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets', 'orderbookGrouped'] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
 
@@ -190,7 +190,7 @@ const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance
 
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
-const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets'] as const
+const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets', 'orderbookGrouped'] as const
 
 const DELTA_CHANNELS = [
   'l2_orderbook',
