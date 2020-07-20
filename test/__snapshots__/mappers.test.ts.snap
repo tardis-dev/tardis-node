@@ -2525,6 +2525,163 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io-futures messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 108,
+        "price": 0.3351,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 10,
+        "price": 0.2728,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "ZRX_USD",
+    "timestamp": 2020-07-01T00:00:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 390,
+        "price": 222.25,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 222.25,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BCH_USDT",
+    "timestamp": 2020-07-01T00:00:04.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 0.01643,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.01643,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "TRX_USDT",
+    "timestamp": 2020-07-01T00:00:04.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2500,
+        "price": 223.35,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 12405,
+        "price": 221.3,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BCH_USD",
+    "timestamp": 2020-07-01T00:00:06.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 5`] = `
+Array [
+  Object {
+    "exchange": "gate-io-futures",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": undefined,
+    "indexPrice": 5.734,
+    "lastPrice": 5.67,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "markPrice": 5.735,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.0001,
+    "symbol": "ETC_USD",
+    "timestamp": 2020-07-01T00:00:06.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 6`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "gate-io-futures",
+    "id": "31615",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 217.2,
+    "side": "buy",
+    "symbol": "COMP_USDT",
+    "timestamp": 2020-07-01T00:00:16.000Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 7`] = `
+Array [
+  Object {
+    "amount": 22,
+    "exchange": "gate-io-futures",
+    "id": "1696009",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 225.5,
+    "side": "sell",
+    "symbol": "ETH_USDT",
+    "timestamp": 2020-07-01T00:00:23.000Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 8`] = `Array []`;
+
+exports[`mappers map gate-io-futures messages 9`] = `Array []`;
+
+exports[`mappers map gate-io-futures messages 10`] = `Array []`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {

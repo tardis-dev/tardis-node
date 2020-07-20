@@ -24,7 +24,8 @@ import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
-import { GateBookChangeMapper, GateIOTradesMapper } from './gateio'
+import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
+import { GateIOFuturesTradesMapper, GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper } from './gateiofutures'
 
 export * from './mapper'
 
@@ -69,7 +70,8 @@ const tradesMappers = {
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
   delta: () => deltaTradesMapper,
-  'gate-io': () => new GateIOTradesMapper('gate-io')
+  'gate-io': () => new GateIOTradesMapper('gate-io'),
+  'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures')
 }
 
 const bookChangeMappers = {
@@ -114,7 +116,8 @@ const bookChangeMappers = {
   hitbtc: () => hitBtcBookChangeMapper,
   phemex: () => phemexBookChangeMapper,
   delta: () => deltaBookChangeMapper,
-  'gate-io': () => new GateBookChangeMapper('gate-io')
+  'gate-io': () => new GateIOBookChangeMapper('gate-io'),
+  'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures')
 }
 
 const derivativeTickersMappers = {
@@ -131,7 +134,8 @@ const derivativeTickersMappers = {
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
   delta: () => new DeltaDerivativeTickerMapper(),
   'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap')
+  'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
+  'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {

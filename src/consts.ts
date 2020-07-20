@@ -24,6 +24,7 @@ export const EXCHANGES = [
   'bybit',
   'phemex',
   'ftx-us',
+  'gate-io-futures',
   'gate-io',
   'okcoin',
   'bitflyer',
@@ -201,6 +202,7 @@ const DELTA_CHANNELS = [
 ]
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker']
+const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -235,4 +237,5 @@ export const EXCHANGE_CHANNELS_INFO = {
   phemex: PHEMEX_CHANNELS,
   delta: DELTA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
+  'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
 }

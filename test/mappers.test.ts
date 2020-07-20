@@ -14,7 +14,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'delta',
   'binance-delivery',
   'huobi-dm',
-  'huobi-dm-swap'
+  'huobi-dm-swap',
+  'gate-io-futures'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
@@ -3719,6 +3720,114 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = gateIOMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map gate-io-futures messages', () => {
+    const messages = [
+      {
+        time: 1593561600,
+        channel: 'futures.order_book',
+        event: 'all',
+        error: null,
+        result: {
+          contract: 'ZRX_USD',
+          asks: [{ p: '0.3351', s: 108 }],
+          bids: [{ p: '0.2728', s: 10 }]
+        }
+      },
+      {
+        time: 1593561604,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [
+          { p: '222.25', s: -390, c: 'BCH_USDT', id: 242207247 },
+          { p: '222.25', s: 0, c: 'BCH_USDT', id: 242207248 }
+        ]
+      },
+      {
+        time: 1593561604,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [{ p: '0.01643', s: 0, c: 'TRX_USDT', id: 62446928 }]
+      },
+      {
+        time: 1593561606,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [
+          { p: '221.3', s: 12405, c: 'BCH_USD', id: 453347637 },
+          { p: '223.35', s: -2500, c: 'BCH_USD', id: 453347638 }
+        ]
+      },
+      {
+        time: 1593561606,
+        channel: 'futures.tickers',
+        event: 'update',
+        error: null,
+        result: [
+          {
+            contract: 'ETC_USD',
+            last: '5.67',
+            change_percentage: '-1.31',
+            funding_rate: '0.0001',
+            mark_price: '5.735',
+            index_price: '5.734',
+            total_size: '46366',
+            volume_24h: '2713',
+            quanto_base_rate: '0.0006277',
+            volume_24h_usd: '14051',
+            volume_24h_btc: '1',
+            funding_rate_indicative: '0.0001',
+            volume_24h_quote: '14051',
+            volume_24h_settle: '1',
+            volume_24h_base: '2478'
+          },
+          {
+            contract: 'ETC_USD',
+            last: '5.67',
+            change_percentage: '-1.31',
+            funding_rate: '0.0001',
+            mark_price: '5.735',
+            index_price: '5.734',
+            total_size: '46366',
+            volume_24h: '2713',
+            quanto_base_rate: '0.00062772',
+            volume_24h_usd: '14051',
+            volume_24h_btc: '1',
+            funding_rate_indicative: '0.0001',
+            volume_24h_quote: '14051',
+            volume_24h_settle: '1',
+            volume_24h_base: '2478'
+          }
+        ]
+      },
+      {
+        time: 1593561616,
+        channel: 'futures.trades',
+        event: 'update',
+        error: null,
+        result: [{ size: 1, id: 31615, create_time: 1593561616, price: '217.2', contract: 'COMP_USDT' }]
+      },
+      {
+        time: 1593561623,
+        channel: 'futures.trades',
+        event: 'update',
+        error: null,
+        result: [{ size: -22, id: 1696009, create_time: 1593561623, price: '225.5', contract: 'ETH_USDT' }]
+      },
+      { time: 1593561600, channel: 'futures.trades', event: 'subscribe', error: null, result: { status: 'success' } },
+      { time: 1593561600, channel: 'futures.order_book', event: 'subscribe', error: null, result: { status: 'success' } },
+      { time: 1593561600, channel: 'futures.tickers', event: 'subscribe', error: null, result: { status: 'success' } }
+    ]
+    const gateIOFuturesMapper = createMapper('gate-io-futures')
+
+    for (const message of messages) {
+      const mappedMessages = gateIOFuturesMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
