@@ -4,10 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed'
 
 abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
   protected abstract wssURL: string
-  protected channelSuffixMap = {
-    trade: '.detail',
-    depth: '.step0'
-  } as any
+  protected channelSuffixMap = {} as any
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters
@@ -56,6 +53,12 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
 
 export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
   protected wssURL = 'wss://api.huobi.pro/ws'
+
+  protected channelSuffixMap = {
+    trade: '.detail',
+    depth: '.step0',
+    mbp: '.150'
+  } as any
 }
 
 export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
