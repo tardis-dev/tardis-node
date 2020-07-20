@@ -39,7 +39,6 @@ const realTimeFeedsMap: {
   'binance-futures': BinanceFuturesRealTimeFeed,
   'binance-delivery': BinanceDeliveryRealTimeFeed,
   bitfinex: BitfinexRealTimeFeed,
-  'bitfinex-alts': BitfinexRealTimeFeed,
   'bitfinex-derivatives': BitfinexRealTimeFeed,
   bitflyer: BitflyerRealTimeFeed,
   bitstamp: BitstampRealTimeFeed,

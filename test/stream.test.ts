@@ -39,7 +39,6 @@ describe('stream', () => {
             exchange === 'delta' ||
             exchange === 'ftx-us' ||
             exchange === 'binance-delivery' ||
-            exchange === 'bitfinex-alts' ||
             exchange === 'gate-io' ||
             exchange === 'huobi'
           ) {
