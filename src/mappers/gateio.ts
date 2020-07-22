@@ -56,7 +56,7 @@ const mapBookLevel = (level: GateIODepthLevel) => {
   return { price, amount }
 }
 
-export class GateBookChangeMapper implements Mapper<'gate-io', BookChange> {
+export class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: any) {
