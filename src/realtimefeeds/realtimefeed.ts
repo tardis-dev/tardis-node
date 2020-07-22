@@ -1,5 +1,7 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
+import { PassThrough } from 'stream'
+import { once } from 'events'
 import { ONE_SEC_IN_MS, wait } from '../handy'
 import { Exchange, Filter } from '../types'
 
@@ -29,12 +31,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private _connectionId = connectionCounter++
 
   constructor(
-    public readonly exchange: string,
+    protected readonly _exchange: string,
     private readonly _filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
     private readonly _onError?: (error: Error) => void
   ) {
-    this.debug = dbg(`tardis-dev:realtime:${exchange}`)
+    this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
   }
 
   private async *_stream() {
@@ -65,7 +67,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
         const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
           readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
-          readableHighWaterMark: 1024 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
+          readableHighWaterMark: 8096 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
         }) as AsyncIterableIterator<Buffer>
 
         for await (let message of realtimeMessagesStream) {
@@ -132,7 +134,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         this.debug(
           '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
           this._connectionId,
-          this.exchange,
+          this._exchange,
           retries,
           delay,
           isRateLimited,
@@ -261,4 +263,52 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private _onConnectionClosed = () => {
     this.debug('(connection id: %d) connection closed', this._connectionId)
   }
+}
+
+export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIterable {
+  constructor(
+    private readonly _exchange: string,
+    private readonly _filters: Filter<string>[],
+    private readonly _timeoutIntervalMS: number | undefined,
+    private readonly _onError?: (error: Error) => void
+  ) {}
+
+  [Symbol.asyncIterator]() {
+    return this._stream()
+  }
+
+  private async *_stream() {
+    const combinedStream = new PassThrough({
+      objectMode: true,
+      highWaterMark: 8096
+    })
+
+    const realTimeFeeds = this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError)
+
+    for (const realTimeFeed of realTimeFeeds) {
+      // iterate over separate real-time feeds and write their messages into combined stream
+      ;(async function writeMessagesToCombinedStream() {
+        for await (const message of realTimeFeed) {
+          if (combinedStream.destroyed) {
+            return
+          }
+
+          if (!combinedStream.write(message))
+            // Handle backpressure on write
+            await once(combinedStream, 'drain')
+        }
+      })()
+    }
+
+    for await (const message of combinedStream) {
+      yield message
+    }
+  }
+
+  protected abstract _getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void
+  ): IterableIterator<RealTimeFeedIterable>
 }

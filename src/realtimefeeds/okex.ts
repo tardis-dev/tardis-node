@@ -15,7 +15,7 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
     const args = filters
       .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
-          throw new Error(`${this.exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
+          throw new Error(`${this._exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
         }
 
         return filter.symbols.map((symbol) => {

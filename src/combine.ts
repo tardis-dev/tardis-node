@@ -70,7 +70,7 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
 
         if (!combinedStream.write(message))
           // Handle backpressure on write
-          await once(combinedStream!, 'drain')
+          await once(combinedStream, 'drain')
       }
     })
 
