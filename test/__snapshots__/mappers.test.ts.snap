@@ -1982,6 +1982,63 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 8`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": 0.08354928018352789,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "XTZBTC",
+    "timestamp": 2020-07-01T00:00:48.381Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 9`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": 0.010000000000000002,
+    "fundingTimestamp": 2020-07-22T08:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.01,
+    "symbol": "LINKUSDT",
+    "timestamp": 2020-07-22T00:00:26.629Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 10`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": undefined,
+    "fundingTimestamp": 2020-07-10T16:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "ETHBTC",
+    "timestamp": 2020-07-10T15:55:59.970Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {

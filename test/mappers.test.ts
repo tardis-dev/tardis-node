@@ -1967,6 +1967,33 @@ describe('mappers', () => {
         product_id: 27,
         type: 'l2_orderbook',
         symbol: 'BTCUSD'
+      },
+      {
+        funding_rate: '0.08354928018352788781686920000',
+        product_id: 37,
+        symbol: 'XTZBTC',
+        timestamp: 1593561648381531,
+        type: 'funding_rate'
+      },
+      {
+        funding_rate: 0.010000000000000002,
+        funding_rate_8h: 0.010000000000000002,
+        next_funding_realization: 1595404800000000,
+        predicted_funding_rate: 0.01,
+        predicted_funding_rate_8h: 0.01,
+        product_id: 65,
+        symbol: 'LINKUSDT',
+        timestamp: 1595376026629157,
+        type: 'funding_rate'
+      },
+      {
+        funding_rate_8h: 10.95,
+        next_funding_realization: 1594396800000000,
+        predicted_funding_rate_8h: 0.01,
+        product_id: 277,
+        symbol: 'ETHBTC',
+        timestamp: 1594396559970784,
+        type: 'funding_rate'
       }
     ]
 

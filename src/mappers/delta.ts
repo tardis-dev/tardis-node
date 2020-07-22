@@ -105,8 +105,19 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
     if (message.type === 'mark_price') {
       pendingTickerInfo.updateMarkPrice(Number(message.price))
     }
+
     if (message.type === 'funding_rate') {
-      pendingTickerInfo.updateFundingRate(Number(message.funding_rate))
+      if (message.funding_rate !== undefined) {
+        pendingTickerInfo.updateFundingRate(Number(message.funding_rate))
+      }
+
+      if (message.predicted_funding_rate !== undefined) {
+        pendingTickerInfo.updatePredictedFundingRate(Number(message.predicted_funding_rate))
+      }
+
+      if (message.next_funding_realization !== undefined) {
+        pendingTickerInfo.updateFundingTimestamp(fromMicroSecondsToDate(message.next_funding_realization))
+      }
     }
 
     pendingTickerInfo.updateTimestamp(fromMicroSecondsToDate(message.timestamp))
@@ -147,7 +158,9 @@ type DeltaMarkPrice = {
 }
 
 type DeltaFundingRate = {
-  funding_rate: string
+  funding_rate?: string | number
+  next_funding_realization?: number
+  predicted_funding_rate?: number
   symbol: string
   timestamp: number
   type: 'funding_rate'
