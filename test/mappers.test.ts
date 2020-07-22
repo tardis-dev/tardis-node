@@ -15,7 +15,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'binance-delivery',
   'huobi-dm',
   'huobi-dm-swap',
-  'gate-io-futures'
+  'gate-io-futures',
+  'coinflex'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
@@ -3955,6 +3956,116 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = poloniexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map coinflex messages', () => {
+    const messages = [
+      { channel: 'futures/depth:BTC-USD-SWAP-LIN', event: 'subscribe', success: true, timestamp: 1594684800279 },
+      { channel: 'trade:BTC-USD-SWAP-LIN', event: 'subscribe', success: true, timestamp: 1594684800280 },
+      { channel: 'ticker:BTC-USD-SWAP-LIN', event: 'subscribe', success: true, timestamp: 1594684800280 },
+      {
+        data: [
+          {
+            instrumentId: 'BTC-USD',
+            seqNum: 1594613594001171264,
+            asks: [
+              [9241, 1, 0, 0],
+              [9243.5, 0.967, 0, 0]
+            ],
+            checksum: 0,
+            bids: [
+              [9239.9, 0.46, 0, 0],
+              [9238.1, 0.5, 0, 0]
+            ],
+            timestamp: '1594684800290'
+          }
+        ],
+        action: 'partial',
+        table: 'futures/depth'
+      },
+      {
+        data: [
+          {
+            side: 'SELL',
+            quantity: '0.499900000',
+            price: '9237.500000000',
+            marketCode: 'BTC-USD-SWAP-LIN',
+            tradeId: '160061323905884640',
+            timestamp: '1594684856487'
+          }
+        ],
+        table: 'trade'
+      },
+      {
+        data: [
+          {
+            currencyVolume24h: '0.999800000',
+            high24h: '9237.500000000',
+            last: '9237.500000000',
+            lastQty: '0.499900000',
+            low24h: '9237.500000000',
+            markPrice: '9225.5',
+            marketCode: 'BTC-USD-SWAP-LIN',
+            open24h: '9237.500000000',
+            openInterest: '95.868400010',
+            timestamp: '1594684800000',
+            volume24h: '9235.652500000000000000'
+          }
+        ],
+        table: 'ticker'
+      },
+      {
+        data: [
+          {
+            side: 'BUY',
+            quantity: '0.258000000',
+            price: '9215.000000000',
+            marketCode: 'BTC-USD-SWAP-LIN',
+            tradeId: '160061323905902676',
+            timestamp: '1594738801694'
+          }
+        ],
+        table: 'trade'
+      },
+      {
+        data: [
+          {
+            side: 'SELL',
+            quantity: '0.817000000',
+            price: '9218.000000000',
+            marketCode: 'BTC-USD-SWAP-LIN',
+            tradeId: '160061323905902717',
+            timestamp: '1594738849445'
+          }
+        ],
+        table: 'trade'
+      },
+      {
+        data: [
+          {
+            currencyVolume24h: '21206.000000000',
+            high24h: '0.304000000',
+            last: '0.284000000',
+            lastQty: '100.000000000',
+            low24h: '0.284000000',
+            markPrice: '0.28725862068965517241',
+            marketCode: 'FLEX-USD',
+            open24h: '0.304000000',
+            openInterest: '0',
+            timestamp: '1594737689712',
+            volume24h: '6262.576000000000000000'
+          }
+        ],
+        table: 'ticker'
+      }
+    ]
+
+    const coinflexMapper = createMapper('coinflex')
+
+    for (const message of messages) {
+      const mappedMessages = coinflexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

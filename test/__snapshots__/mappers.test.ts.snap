@@ -1678,6 +1678,114 @@ Array [
 ]
 `;
 
+exports[`mappers map coinflex messages 1`] = `Array []`;
+
+exports[`mappers map coinflex messages 2`] = `Array []`;
+
+exports[`mappers map coinflex messages 3`] = `Array []`;
+
+exports[`mappers map coinflex messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1,
+        "price": 9241,
+      },
+      Object {
+        "amount": 0.967,
+        "price": 9243.5,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.46,
+        "price": 9239.9,
+      },
+      Object {
+        "amount": 0.5,
+        "price": 9238.1,
+      },
+    ],
+    "exchange": "coinflex",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2020-07-14T00:00:00.290Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map coinflex messages 5`] = `
+Array [
+  Object {
+    "amount": 0.4999,
+    "exchange": "coinflex",
+    "id": "160061323905884640",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 9237.5,
+    "side": "sell",
+    "symbol": "BTC-USD-SWAP-LIN",
+    "timestamp": 2020-07-14T00:00:56.487Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map coinflex messages 6`] = `
+Array [
+  Object {
+    "exchange": "coinflex",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 9237.5,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "markPrice": 9225.5,
+    "openInterest": 95.86840001,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP-LIN",
+    "timestamp": 2020-07-14T00:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map coinflex messages 7`] = `
+Array [
+  Object {
+    "amount": 0.258,
+    "exchange": "coinflex",
+    "id": "160061323905902676",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 9215,
+    "side": "buy",
+    "symbol": "BTC-USD-SWAP-LIN",
+    "timestamp": 2020-07-14T15:00:01.694Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map coinflex messages 8`] = `
+Array [
+  Object {
+    "amount": 0.817,
+    "exchange": "coinflex",
+    "id": "160061323905902717",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 9218,
+    "side": "sell",
+    "symbol": "BTC-USD-SWAP-LIN",
+    "timestamp": 2020-07-14T15:00:49.445Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map coinflex messages 9`] = `Array []`;
+
 exports[`mappers map cryptofacilities messages 1`] = `
 Array [
   Object {

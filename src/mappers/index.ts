@@ -27,6 +27,7 @@ import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMappe
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
 import { GateIOFuturesTradesMapper, GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper } from './gateiofutures'
 import { PoloniexTradesMapper, PoloniexBookChangeMapper } from './poloniex'
+import { coinflexTradesMapper, coinflexBookChangeMapper, CoinflexDerivativeTickerMapper } from './coinflex'
 
 export * from './mapper'
 
@@ -72,7 +73,8 @@ const tradesMappers = {
   delta: () => deltaTradesMapper,
   'gate-io': () => new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
-  poloniex: () => new PoloniexTradesMapper()
+  poloniex: () => new PoloniexTradesMapper(),
+  coinflex: () => coinflexTradesMapper
 }
 
 const bookChangeMappers = {
@@ -118,7 +120,8 @@ const bookChangeMappers = {
   delta: () => deltaBookChangeMapper,
   'gate-io': () => new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
-  poloniex: () => new PoloniexBookChangeMapper()
+  poloniex: () => new PoloniexBookChangeMapper(),
+  coinflex: () => coinflexBookChangeMapper
 }
 
 const derivativeTickersMappers = {
@@ -136,7 +139,8 @@ const derivativeTickersMappers = {
   delta: () => new DeltaDerivativeTickerMapper(),
   'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
-  'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper()
+  'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
+  coinflex: () => new CoinflexDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {

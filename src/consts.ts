@@ -130,7 +130,7 @@ const OKEX_OPTIONS_CHANNELS = [
   'system/status'
 ]
 
-const COINFLEX_CHANNELS = ['OrderOpened', 'OrderModified', 'OrdersMatched', 'OrderClosed', 'TickerChanged']
+const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker']
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
