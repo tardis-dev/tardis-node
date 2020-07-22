@@ -55,46 +55,30 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
   if (iterators.length === 0) {
     return
   }
-  let buffer: PassThrough | undefined = undefined
-  try {
-    // decide based on first provided iterator if we're dealing with real-time or historical data streams
-    if ((iterators[0] as any).__realtime__) {
-      buffer = new PassThrough({
-        objectMode: true,
-        highWaterMark: 1024
-      })
+  // decide based on first provided iterator if we're dealing with real-time or historical data streams
+  if ((iterators[0] as any).__realtime__) {
+    const combinedStream = new PassThrough({
+      objectMode: true,
+      highWaterMark: 8096
+    })
 
-      const writeMessagesToBuffer = iterators.map(async (messages) => {
-        for await (const message of messages) {
-          if (buffer!.destroyed) {
-            return
-          }
-
-          if (!buffer!.write(message))
-            // Handle backpressure on write
-            await once(buffer!, 'drain')
+    iterators.forEach(async function writeMessagesToCombinedStream(messages) {
+      for await (const message of messages) {
+        if (combinedStream.destroyed) {
+          return
         }
-      })
 
-      for await (const message of buffer as any) {
-        yield message
+        if (!combinedStream.write(message))
+          // Handle backpressure on write
+          await once(combinedStream!, 'drain')
       }
+    })
 
-      await writeMessagesToBuffer
-    } else {
-      return yield* combineHistorical(iterators) as any
+    for await (const message of combinedStream) {
+      yield message
     }
-  } finally {
-    if (buffer !== undefined) {
-      buffer.destroy()
-    }
-
-    //  this will close open real-time connections
-    for (const iterator of iterators) {
-      if (iterator.return !== undefined) {
-        iterator.return!()
-      }
-    }
+  } else {
+    return yield* combineHistorical(iterators) as any
   }
 }
 
