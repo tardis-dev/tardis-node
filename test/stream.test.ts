@@ -32,14 +32,12 @@ describe('stream', () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
           if (
-            exchange === 'coinflex' ||
-            exchange === 'okex-futures' ||
-            exchange === 'okex-options' ||
-            exchange === 'bybit' ||
-            exchange === 'delta' ||
-            exchange === 'ftx-us' ||
-            exchange === 'binance-delivery' ||
+            exchange === 'binance-dex' ||
             exchange === 'gate-io' ||
+            exchange === 'gate-io-futures' ||
+            exchange === 'poloniex' ||
+            exchange === 'bybit' ||
+            exchange === 'coinflex' ||
             exchange === 'huobi'
           ) {
             return
@@ -87,13 +85,6 @@ describe('stream', () => {
 
             if (msg.type === 'book_change' && (msg as any).isSnapshot) {
               snapshots++
-            }
-
-            if (exchange === 'binance-dex' || exchange === 'okcoin') {
-              count++
-              if (count >= 2) {
-                break
-              }
             }
 
             if (snapshots >= symbols.length - 1) {
