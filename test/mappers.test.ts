@@ -3822,7 +3822,28 @@ describe('mappers', () => {
       },
       { time: 1593561600, channel: 'futures.trades', event: 'subscribe', error: null, result: { status: 'success' } },
       { time: 1593561600, channel: 'futures.order_book', event: 'subscribe', error: null, result: { status: 'success' } },
-      { time: 1593561600, channel: 'futures.tickers', event: 'subscribe', error: null, result: { status: 'success' } }
+      { time: 1593561600, channel: 'futures.tickers', event: 'subscribe', error: null, result: { status: 'success' } },
+      {
+        time: 1595376003,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [
+          { p: '4.2201', s: 117, c: 'HT_USDT', id: 139300729 },
+          { p: '4.2907', s: -117, c: 'HT_USDT', id: 139300730 }
+        ]
+      },
+      {
+        time: 1595376005,
+        channel: 'futures.order_book',
+        event: 'all',
+        error: null,
+        result: {
+          contract: 'XRP_USDT',
+          asks: [{ p: '0.1996', s: 93 }],
+          bids: [{ p: '0.1954', s: 17 }]
+        }
+      }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')
 

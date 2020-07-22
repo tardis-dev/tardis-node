@@ -2682,6 +2682,56 @@ exports[`mappers map gate-io-futures messages 9`] = `Array []`;
 
 exports[`mappers map gate-io-futures messages 10`] = `Array []`;
 
+exports[`mappers map gate-io-futures messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 117,
+        "price": 4.2907,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 117,
+        "price": 4.2201,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "HT_USDT",
+    "timestamp": 2020-07-22T00:00:03.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 12`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 93,
+        "price": 0.1996,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 17,
+        "price": 0.1954,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "XRP_USDT",
+    "timestamp": 2020-07-22T00:00:05.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {
