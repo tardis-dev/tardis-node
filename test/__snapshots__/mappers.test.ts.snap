@@ -4500,3 +4500,179 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map poloniex messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 11210.09190734,
+        "price": 0.00000253,
+      },
+      Object {
+        "amount": 264.83225116,
+        "price": 0.00000254,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 184.56548785,
+        "price": 0.00000252,
+      },
+    ],
+    "exchange": "poloniex",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_BTS",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 2`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 84147.13099837,
+        "price": 0.00000249,
+      },
+    ],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_BTS",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 3`] = `
+Array [
+  Object {
+    "amount": 0.16519127,
+    "exchange": "poloniex",
+    "id": "572068",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 158.19075628,
+    "side": "buy",
+    "symbol": "USDC_BCHSV",
+    "timestamp": 2020-07-01T00:00:02.000Z,
+    "type": "trade",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3.74516873,
+        "price": 158.19075628,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "USDC_BCHSV",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 4`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 2075.23326384,
+        "price": 0.0364702,
+      },
+      Object {
+        "amount": 2174.03060057,
+        "price": 0.03647022,
+      },
+    ],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "USDT_MANA",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 8597.42720734,
+        "price": 0.00000253,
+      },
+      Object {
+        "amount": 2877.49695116,
+        "price": 0.00000254,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_BTS",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 6`] = `Array []`;
+
+exports[`mappers map poloniex messages 7`] = `
+Array [
+  Object {
+    "amount": 98.5515349,
+    "exchange": "poloniex",
+    "id": "20441515",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 0.00695218,
+    "side": "sell",
+    "symbol": "BTC_XMR",
+    "timestamp": 2020-07-01T00:00:36.000Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 1.72607982,
+    "exchange": "poloniex",
+    "id": "20441516",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 0.00695217,
+    "side": "sell",
+    "symbol": "BTC_XMR",
+    "timestamp": 2020-07-01T00:00:36.000Z,
+    "type": "trade",
+  },
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.00695218,
+      },
+      Object {
+        "amount": 0,
+        "price": 0.00695217,
+      },
+    ],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_XMR",
+    "timestamp": 2020-07-01T00:00:01.275Z,
+    "type": "book_change",
+  },
+]
+`;

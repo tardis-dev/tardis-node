@@ -26,6 +26,7 @@ import { PhemexRealTimeFeed } from './phemex'
 import { DeltaRealTimeFeed } from './delta'
 import { GateIORealTimeFeed } from './gateio'
 import { GateIOFuturesRealTimeFeed } from './gateiofutures'
+import { PoloniexRealTimeFeed } from './poloniex'
 
 export * from './realtimefeed'
 
@@ -63,7 +64,8 @@ const realTimeFeedsMap: {
   phemex: PhemexRealTimeFeed,
   delta: DeltaRealTimeFeed,
   'gate-io': GateIORealTimeFeed,
-  'gate-io-futures': GateIOFuturesRealTimeFeed
+  'gate-io-futures': GateIOFuturesRealTimeFeed,
+  poloniex: PoloniexRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

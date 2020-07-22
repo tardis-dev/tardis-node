@@ -14,24 +14,24 @@ export const EXCHANGES = [
   'huobi',
   'bitfinex-derivatives',
   'bitfinex',
-  'bitfinex-alts',
+  'coinbase',
   'cryptofacilities',
   'kraken',
   'bitstamp',
-  'coinbase',
   'gemini',
-  'coinflex',
+  'poloniex',
   'bybit',
   'phemex',
+  'delta',
   'ftx-us',
+  'binance-us',
   'gate-io-futures',
   'gate-io',
   'okcoin',
   'bitflyer',
   'hitbtc',
-  'delta',
+  'coinflex',
   'binance-jersey',
-  'binance-us',
   'binance-dex'
 ] as const
 
@@ -206,6 +206,8 @@ const DELTA_CHANNELS = [
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker']
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']
+const POLONIEX_CHANNELS = ['price_aggregated_book']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -240,4 +242,5 @@ export const EXCHANGE_CHANNELS_INFO = {
   delta: DELTA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
+  poloniex: POLONIEX_CHANNELS
 }
