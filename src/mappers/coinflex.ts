@@ -95,7 +95,11 @@ export class CoinflexDerivativeTickerMapper implements Mapper<'coinflex', Deriva
       }
 
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(ticker.marketCode, 'coinflex')
-      pendingTickerInfo.updateMarkPrice(Number(ticker.markPrice))
+
+      if (ticker.markPrice !== undefined) {
+        pendingTickerInfo.updateMarkPrice(Number(ticker.markPrice))
+      }
+
       if (ticker.openInterest !== undefined) {
         pendingTickerInfo.updateOpenInterest(Number(ticker.openInterest))
       }

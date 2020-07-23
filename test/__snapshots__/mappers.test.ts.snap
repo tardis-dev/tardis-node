@@ -1786,6 +1786,25 @@ Array [
 
 exports[`mappers map coinflex messages 9`] = `Array []`;
 
+exports[`mappers map coinflex messages 10`] = `
+Array [
+  Object {
+    "exchange": "coinflex",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 83,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SPR-QP-LIN",
+    "timestamp": 2020-07-14T13:36:56.647Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map cryptofacilities messages 1`] = `
 Array [
   Object {

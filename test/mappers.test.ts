@@ -4089,6 +4089,23 @@ describe('mappers', () => {
           }
         ],
         table: 'ticker'
+      },
+      {
+        data: [
+          {
+            currencyVolume24h: '4234.002000000',
+            high24h: '86.000000000',
+            last: '83.000000000',
+            lastQty: '17.979000000',
+            low24h: '81.000000000',
+            marketCode: 'BTC-USD-SPR-QP-LIN',
+            open24h: '82.000000000',
+            openInterest: '0',
+            timestamp: '1594733816647',
+            volume24h: '39119727.0229900000000000000'
+          }
+        ],
+        table: 'ticker'
       }
     ]
 
