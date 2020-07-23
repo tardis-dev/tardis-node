@@ -56,7 +56,7 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters.flatMap((filter) => {
-      if (filter.channel === 'depth') {
+      if (filter.channel === 'order_book') {
         return filter.symbols!.map((symbol) => {
           return {
             event: 'subscribe',
