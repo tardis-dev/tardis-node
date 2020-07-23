@@ -44,32 +44,6 @@ const mapBookLevel = (level: GateIOFuturesSnapshotLevel) => {
   return { price, amount: Math.abs(level.s) }
 }
 
-const filterBids = (level: GateIOFuturesSnapshotLevel, _: number, allLevels: GateIOFuturesSnapshotLevel[]) => {
-  if (level.s > 0) {
-    return true
-  }
-  // if level is set to 0 we don't know if it's ask or bid removal
-  // consider it a bid removal only if any other bid level update does not update the same level
-  if (level.s === 0) {
-    return allLevels.filter((l) => l.s > 0).some((s) => s.p === level.p) === false
-  }
-
-  return false
-}
-
-const filterAsks = (level: GateIOFuturesSnapshotLevel, _: number, allLevels: GateIOFuturesSnapshotLevel[]) => {
-  if (level.s < 0) {
-    return true
-  }
-  // if level is set to 0 we don't know if it's ask or bid removal
-  // consider it a ask removal only if any other ask level update does not update the same level
-  if (level.s === 0) {
-    return allLevels.filter((l) => l.s < 0).some((s) => s.p === level.p) === false
-  }
-
-  return false
-}
-
 export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
@@ -106,8 +80,8 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
         symbol: depthMessage.result[0].c,
         exchange: this._exchange,
         isSnapshot: false,
-        bids: depthMessage.result.filter(filterBids).map(mapBookLevel),
-        asks: depthMessage.result.filter(filterAsks).map(mapBookLevel),
+        bids: depthMessage.result.filter((l) => l.s >= 0).map(mapBookLevel),
+        asks: depthMessage.result.filter((l) => l.s <= 0).map(mapBookLevel),
         timestamp: new Date(depthMessage.time * 1000),
         localTimestamp: localTimestamp
       }

@@ -2723,6 +2723,10 @@ Array [
         "amount": 390,
         "price": 222.25,
       },
+      Object {
+        "amount": 0,
+        "price": 222.25,
+      },
     ],
     "bids": Array [
       Object {
@@ -2892,6 +2896,108 @@ Array [
     "localTimestamp": 2020-07-01T00:00:01.275Z,
     "symbol": "XRP_USDT",
     "timestamp": 2020-07-22T00:00:05.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 13`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 227.2,
+      },
+      Object {
+        "amount": 4925,
+        "price": 227.55,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4884,
+        "price": 227.2,
+      },
+      Object {
+        "amount": 4881,
+        "price": 227.2,
+      },
+      Object {
+        "amount": 2440,
+        "price": 227.2,
+      },
+      Object {
+        "amount": 1155,
+        "price": 227.2,
+      },
+      Object {
+        "amount": 0,
+        "price": 227.2,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "ETH_USDT",
+    "timestamp": 2020-07-01T10:44:53.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 14`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 223.75,
+      },
+      Object {
+        "amount": 0,
+        "price": 223.7,
+      },
+      Object {
+        "amount": 0,
+        "price": 223.6,
+      },
+      Object {
+        "amount": 20,
+        "price": 223.6,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 14,
+        "price": 223.75,
+      },
+      Object {
+        "amount": 0,
+        "price": 223.75,
+      },
+      Object {
+        "amount": 0,
+        "price": 223.7,
+      },
+      Object {
+        "amount": 0,
+        "price": 223.6,
+      },
+      Object {
+        "amount": 15039,
+        "price": 223.55,
+      },
+      Object {
+        "amount": 15089,
+        "price": 223.55,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BCH_USDT",
+    "timestamp": 2020-07-01T10:44:09.000Z,
     "type": "book_change",
   },
 ]

@@ -3871,6 +3871,36 @@ describe('mappers', () => {
           asks: [{ p: '0.1996', s: 93 }],
           bids: [{ p: '0.1954', s: 17 }]
         }
+      },
+
+      {
+        time: 1593600293,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [
+          { p: '227.2', s: 4884, c: 'ETH_USDT', id: 363072474 },
+          { p: '227.2', s: 4881, c: 'ETH_USDT', id: 363072475 },
+          { p: '227.2', s: 2440, c: 'ETH_USDT', id: 363072476 },
+          { p: '227.2', s: 1155, c: 'ETH_USDT', id: 363072477 },
+          { p: '227.2', s: 0, c: 'ETH_USDT', id: 363072478 },
+          { p: '227.55', s: -4925, c: 'ETH_USDT', id: 363072479 }
+        ]
+      },
+      {
+        time: 1593600249,
+        channel: 'futures.order_book',
+        event: 'update',
+        error: null,
+        result: [
+          { p: '223.75', s: 14, c: 'BCH_USDT', id: 242529117 },
+          { p: '223.75', s: 0, c: 'BCH_USDT', id: 242529118 },
+          { p: '223.7', s: 0, c: 'BCH_USDT', id: 242529119 },
+          { p: '223.6', s: 0, c: 'BCH_USDT', id: 242529120 },
+          { p: '223.6', s: -20, c: 'BCH_USDT', id: 242529121 },
+          { p: '223.55', s: 15039, c: 'BCH_USDT', id: 242529122 },
+          { p: '223.55', s: 15089, c: 'BCH_USDT', id: 242529123 }
+        ]
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')
