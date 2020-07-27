@@ -1222,6 +1222,72 @@ describe('mappers', () => {
             checksum: 1490116368
           }
         ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'ETH-USD-200724-190-C',
+            underlying: 'ETH-USD',
+            best_ask: '',
+            best_bid: '',
+            best_ask_size: '0',
+            best_bid_size: '0',
+            change_rate: '0',
+            delta: '',
+            gamma: '',
+            high_24h: '0',
+            highest_buy: '',
+            realized_vol: '0',
+            bid_vol: '',
+            ask_vol: '',
+            mark_vol: '1.6437',
+            last: '0',
+            leverage: '',
+            low_24h: '0',
+            lowest_sell: '',
+            mark_price: '',
+            theta: '',
+            vega: '0',
+            volume_24h: '0',
+            open_interest: '0',
+            estimated_price: '0',
+            timestamp: '2020-07-24T07:00:00.001Z'
+          }
+        ]
+      },
+      {
+        table: 'option/summary',
+        data: [
+          {
+            instrument_id: 'ETH-USD-200724-310-P',
+            underlying: 'ETH-USD',
+            best_ask: '',
+            best_bid: '',
+            best_ask_size: '0',
+            best_bid_size: '0',
+            change_rate: '0',
+            delta: '-∞',
+            gamma: '∞',
+            high_24h: '0',
+            highest_buy: '4611686018427388',
+            realized_vol: '0',
+            bid_vol: '',
+            ask_vol: '',
+            mark_vol: '2.5227',
+            last: '0',
+            leverage: '0',
+            low_24h: '0',
+            lowest_sell: '4611686018427388',
+            mark_price: '∞',
+            theta: '∞',
+            vega: '0',
+            volume_24h: '0',
+            open_interest: '0',
+            estimated_price: '0',
+            timestamp: '2020-07-24T07:00:00.001Z'
+          }
+        ]
       }
     ]
 
