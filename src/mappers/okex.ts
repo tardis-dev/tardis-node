@@ -172,6 +172,24 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
   }
 }
 
+function asNumberIfValid(val: string | undefined | null) {
+  if (val === undefined || val === null) {
+    return
+  }
+
+  var asNumber = Number(val)
+
+  if (isNaN(asNumber) || isFinite(asNumber) === false) {
+    return
+  }
+
+  if (asNumber === 0) {
+    return
+  }
+
+  return asNumber
+}
+
 export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly expiration_regex = /(\d{2})(\d{2})(\d{2})/
@@ -230,24 +248,24 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
         strikePrice,
         expirationDate,
 
-        bestBidPrice: Number(summary.best_bid) === 0 ? undefined : Number(summary.best_bid),
-        bestBidAmount: Number(summary.best_bid_size) === 0 ? undefined : Number(summary.best_bid_size),
-        bestBidIV: Number(summary.bid_vol) === 0 ? undefined : Number(summary.bid_vol),
+        bestBidPrice: asNumberIfValid(summary.best_bid),
+        bestBidAmount: asNumberIfValid(summary.best_bid_size),
+        bestBidIV: asNumberIfValid(summary.bid_vol),
 
-        bestAskPrice: Number(summary.best_ask) === 0 ? undefined : Number(summary.best_ask),
-        bestAskAmount: Number(summary.best_ask_size) === 0 ? undefined : Number(summary.best_ask_size),
-        bestAskIV: Number(summary.ask_vol) === 0 ? undefined : Number(summary.ask_vol),
+        bestAskPrice: asNumberIfValid(summary.best_ask),
+        bestAskAmount: asNumberIfValid(summary.best_ask_size),
+        bestAskIV: asNumberIfValid(summary.ask_vol),
 
-        lastPrice: Number(summary.last) === 0 ? undefined : Number(summary.last),
-        openInterest: Number(summary.open_interest),
+        lastPrice: asNumberIfValid(summary.last),
+        openInterest: asNumberIfValid(summary.open_interest),
 
-        markPrice: Number(summary.mark_price),
-        markIV: Number(summary.mark_vol),
+        markPrice: asNumberIfValid(summary.mark_price),
+        markIV: asNumberIfValid(summary.mark_vol),
 
-        delta: Number(summary.delta),
-        gamma: Number(summary.gamma),
-        vega: Number(summary.vega),
-        theta: Number(summary.theta),
+        delta: asNumberIfValid(summary.delta),
+        gamma: asNumberIfValid(summary.gamma),
+        vega: asNumberIfValid(summary.vega),
+        theta: asNumberIfValid(summary.theta),
         rho: undefined,
 
         underlyingPrice: lastUnderlyingPrice,

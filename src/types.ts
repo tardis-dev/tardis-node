@@ -81,15 +81,15 @@ export type OptionSummary = NormalizedData & {
   bestAskIV: number | undefined
 
   lastPrice: number | undefined
-  openInterest: number
+  openInterest: number | undefined
 
-  markPrice: number
-  markIV: number
+  markPrice: number | undefined
+  markIV: number | undefined
 
-  delta: number
-  gamma: number
-  vega: number
-  theta: number
+  delta: number | undefined
+  gamma: number | undefined
+  vega: number | undefined
+  theta: number | undefined
   rho: number | undefined
 
   underlyingPrice: number | undefined

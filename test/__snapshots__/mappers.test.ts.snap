@@ -4265,7 +4265,7 @@ Array [
     "localTimestamp": 2019-08-01T00:00:02.997Z,
     "markIV": 0.7875,
     "markPrice": 0.31908882,
-    "openInterest": 0,
+    "openInterest": undefined,
     "optionType": "call",
     "rho": undefined,
     "strikePrice": 180,
@@ -4314,9 +4314,73 @@ Array [
 
 exports[`mappers map okex-options messages 8`] = `Array []`;
 
-exports[`mappers map okex-options messages 9`] = `Array []`;
+exports[`mappers map okex-options messages 9`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": undefined,
+    "exchange": "okex-options",
+    "expirationDate": 2020-07-24T08:00:00.000Z,
+    "gamma": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markIV": 1.6437,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 190,
+    "symbol": "ETH-USD-200724-190-C",
+    "theta": undefined,
+    "timestamp": 2020-07-24T07:00:00.001Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 243.11,
+    "vega": undefined,
+  },
+]
+`;
 
 exports[`mappers map okex-options messages 10`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": undefined,
+    "exchange": "okex-options",
+    "expirationDate": 2020-07-24T08:00:00.000Z,
+    "gamma": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markIV": 2.5227,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 310,
+    "symbol": "ETH-USD-200724-310-P",
+    "theta": undefined,
+    "timestamp": 2020-07-24T07:00:00.001Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 243.11,
+    "vega": undefined,
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 11`] = `Array []`;
+
+exports[`mappers map okex-options messages 12`] = `
 Array [
   Object {
     "asks": Array [
@@ -4340,7 +4404,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 11`] = `
+exports[`mappers map okex-options messages 13`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -4372,9 +4436,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 12`] = `Array []`;
+exports[`mappers map okex-options messages 14`] = `Array []`;
 
-exports[`mappers map okex-options messages 13`] = `
+exports[`mappers map okex-options messages 15`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -4406,7 +4470,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 14`] = `
+exports[`mappers map okex-options messages 16`] = `
 Array [
   Object {
     "bestAskAmount": 55,
@@ -4423,7 +4487,7 @@ Array [
     "localTimestamp": 2020-02-08T00:00:02.997Z,
     "markIV": 0.7875,
     "markPrice": 0.31908882,
-    "openInterest": 0,
+    "openInterest": undefined,
     "optionType": "call",
     "rho": undefined,
     "strikePrice": 180,
@@ -4438,7 +4502,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 15`] = `
+exports[`mappers map okex-options messages 17`] = `
 Array [
   Object {
     "bestAskAmount": 4,
@@ -4470,7 +4534,71 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 16`] = `Array []`;
+exports[`mappers map okex-options messages 18`] = `Array []`;
+
+exports[`mappers map okex-options messages 19`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": undefined,
+    "exchange": "okex-options",
+    "expirationDate": 2020-07-24T08:00:00.000Z,
+    "gamma": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "markIV": 1.6437,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 190,
+    "symbol": "ETH-USD-200724-190-C",
+    "theta": undefined,
+    "timestamp": 2020-07-24T07:00:00.001Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 243.11,
+    "vega": undefined,
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 20`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": undefined,
+    "exchange": "okex-options",
+    "expirationDate": 2020-07-24T08:00:00.000Z,
+    "gamma": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "markIV": 2.5227,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 310,
+    "symbol": "ETH-USD-200724-310-P",
+    "theta": undefined,
+    "timestamp": 2020-07-24T07:00:00.001Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 243.11,
+    "vega": undefined,
+  },
+]
+`;
 
 exports[`mappers map okex-swap messages 1`] = `Array []`;
 
