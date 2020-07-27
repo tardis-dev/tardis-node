@@ -3,7 +3,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class OkexRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://real.okex.com:8443/ws/v3'
+  protected wssURL = 'wss://awspush.okex.com:8443/ws/v3'
 
   protected decompress = (message: any) => {
     message = inflateRawSync(message) as Buffer

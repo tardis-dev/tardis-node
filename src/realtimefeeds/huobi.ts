@@ -52,7 +52,7 @@ abstract class HuobiRealTimeFeedBase extends RealTimeFeedBase {
 }
 
 export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.huobi.pro/ws'
+  protected wssURL = 'wss://api-aws.huobi.pro/ws'
 
   protected channelSuffixMap = {
     trade: '.detail',
@@ -62,7 +62,7 @@ export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.com/ws'
+  protected wssURL = 'wss://api.hbdm.vn/ws'
 
   protected channelSuffixMap = {
     trade: '.detail',
@@ -71,7 +71,7 @@ export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.com/swap-ws'
+  protected wssURL = 'wss://api.hbdm.vn/swap-ws'
 
   protected channelSuffixMap = {
     trade: '.detail',

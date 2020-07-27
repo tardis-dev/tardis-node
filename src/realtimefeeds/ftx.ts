@@ -28,5 +28,5 @@ export class FtxRealTimeFeed extends RealTimeFeedBase {
 }
 
 export class FtxUSRealTimeFeed extends FtxRealTimeFeed {
-  protected wssURL = 'wss://ftx.us/ws/'
+  protected wssURL = 'wss://ws.ftx.com/ws'
 }
