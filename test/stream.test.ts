@@ -15,15 +15,16 @@ import {
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
   'binance-futures',
-  'binance-delivery',
-  'delta',
   'bitfinex-derivatives',
   'cryptofacilities',
   'deribit',
   'okex-futures',
   'okex-swap',
   'bybit',
-  'delta'
+  'delta',
+  'binance-delivery',
+  'gate-io-futures',
+  'coinflex'
 ]
 
 describe('stream', () => {
@@ -32,17 +33,10 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (
-            exchange === 'binance-dex' ||
-            exchange === 'gate-io' ||
-            exchange === 'gate-io-futures' ||
-            exchange === 'poloniex' ||
-            exchange === 'bybit' ||
-            exchange === 'coinflex' ||
-            exchange === 'huobi'
-          ) {
+          if (exchange === 'binance-dex' || exchange === 'poloniex' || 'huobi') {
             return
           }
+
           const exchangeDetails = await getExchangeDetails(exchange)
           const normalizers: any[] = [normalizeTrades, normalizeBookChanges]
 
