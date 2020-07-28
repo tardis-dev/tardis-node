@@ -81,15 +81,13 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
         onError
       })
 
-      const normalizedMessages = normalizeMessages(
-        exchange,
-        messages,
-        mappers,
-        createMappers,
-        withDisconnectMessages,
-        undefined,
-        new Date()
-      )
+      // filter normalized messages by symbol as some exchanges do not offer subscribing to specific symbols for some of the channels
+      // for example Phemex market24h channel
+      const filter = (symbol: string) => {
+        return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
+      }
+
+      const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter, new Date())
 
       for await (const message of normalizedMessages) {
         yield message
