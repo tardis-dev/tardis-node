@@ -1,6 +1,6 @@
 import got from 'got'
 import { Writable } from 'stream'
-import { batch, ONE_SEC_IN_MS } from '../handy'
+import { batch } from '../handy'
 import { Filter } from '../types'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed'
 
@@ -46,7 +46,9 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
             return
           }
 
-          const openInterestResponse = (await got.get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`).json()) as any
+          const openInterestResponse = (await got
+            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, { timeout: 2000 })
+            .json()) as any
 
           const openInterestMessage = {
             stream: `${instrument.toLocaleLowerCase()}@openInterest`,
@@ -125,7 +127,9 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = (await got.get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`).json()) as any
+      const depthSnapshotResponse = (await got
+        .get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, { timeout: 2000 })
+        .json()) as any
 
       const snapshot = {
         stream: `${symbol}@depthSnapshot`,

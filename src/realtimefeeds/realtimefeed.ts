@@ -315,7 +315,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
 
 export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected readonly debug: dbg.Debugger
-
+  private _tid: NodeJS.Timeout | undefined = undefined
   constructor(exchange: string, private readonly _poolingIntervalSeconds: number) {
     this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
   }
@@ -327,19 +327,24 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected abstract poolDataToStream(outputStream: Writable): Promise<void>
 
   private async _startPooling(outputStream: Writable) {
-    try {
-      await this.poolDataToStream(outputStream)
-    } catch (e) {
-      this.debug('pooling error %o', e)
-    }
+    const timeoutInterval = this._poolingIntervalSeconds * ONE_SEC_IN_MS
 
-    return setInterval(async () => {
+    const pool = async () => {
       try {
         await this.poolDataToStream(outputStream)
       } catch (e) {
         this.debug('pooling error %o', e)
       }
-    }, this._poolingIntervalSeconds * ONE_SEC_IN_MS)
+    }
+
+    const poolAndSchedule = () => {
+      pool().then(() => {
+        if (!outputStream.destroyed) {
+          this._tid = setTimeout(poolAndSchedule, timeoutInterval)
+        }
+      })
+    }
+    poolAndSchedule()
   }
 
   private async *_stream() {
@@ -348,14 +353,19 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
       highWaterMark: 1024
     })
 
-    const tid = await this._startPooling(stream)
+    this._startPooling(stream)
+
     this.debug('pooling started')
+
     try {
       for await (const message of stream) {
         yield message
       }
     } finally {
-      clearInterval(tid)
+      if (this._tid !== undefined) {
+        clearInterval(this._tid)
+      }
+
       this.debug('pooling finished')
     }
   }
