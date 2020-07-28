@@ -6,14 +6,15 @@ export class PhemexRealTimeFeed extends RealTimeFeedBase {
   protected readonly channelsMap = {
     book: 'orderbook.subscribe',
     trades: 'trade.subscribe',
-    market24h: 'market24h.subscribe'
+    market24h: 'market24h.subscribe',
+    spot_market24h: 'spot_market24h.subscribe'
   } as any
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     let id = 0
     return filters
       .map((filter) => {
-        if (filter.symbols !== undefined && filter.channel !== 'market24h') {
+        if (filter.symbols !== undefined && filter.channel !== 'market24h' && filter.channel !== 'spot_market24h') {
           return filter.symbols.map((symbol) => {
             return {
               id: id++,
