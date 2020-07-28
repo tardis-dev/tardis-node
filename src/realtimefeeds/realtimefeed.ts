@@ -1,6 +1,6 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
-import { PassThrough } from 'stream'
+import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
 import { ONE_SEC_IN_MS, wait } from '../handy'
 import { Exchange, Filter } from '../types'
@@ -311,4 +311,52 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     timeoutIntervalMS?: number,
     onError?: (error: Error) => void
   ): IterableIterator<RealTimeFeedIterable>
+}
+
+export abstract class PoolingClientBase implements RealTimeFeedIterable {
+  protected readonly debug: dbg.Debugger
+
+  constructor(exchange: string, private readonly _poolingIntervalSeconds: number) {
+    this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
+  }
+
+  [Symbol.asyncIterator]() {
+    return this._stream()
+  }
+
+  protected abstract poolDataToStream(outputStream: Writable): Promise<void>
+
+  private async _startPooling(outputStream: Writable) {
+    try {
+      await this.poolDataToStream(outputStream)
+    } catch (e) {
+      this.debug('pooling error %o', e)
+    }
+
+    return setInterval(async () => {
+      try {
+        await this.poolDataToStream(outputStream)
+      } catch (e) {
+        this.debug('pooling error %o', e)
+      }
+    }, this._poolingIntervalSeconds * ONE_SEC_IN_MS)
+  }
+
+  private async *_stream() {
+    const stream = new PassThrough({
+      objectMode: true,
+      highWaterMark: 1024
+    })
+
+    const tid = await this._startPooling(stream)
+    this.debug('pooling started')
+    try {
+      for await (const message of stream) {
+        yield message
+      }
+    } finally {
+      clearInterval(tid)
+      this.debug('pooling finished')
+    }
+  }
 }
