@@ -44,6 +44,26 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
               key: `deriv:t${symbol}`
             }
           }
+
+          if (filter.channel === 'raw_book') {
+            return {
+              event: 'subscribe',
+              channel: 'book',
+              len: 100,
+              prec: 'R0',
+              freq: 'F0',
+              symbol: `t${symbol}`
+            }
+          }
+
+          if (filter.channel === 'liquidations') {
+            return {
+              event: 'subscribe',
+              channel: 'status',
+              key: 'liq:global'
+            }
+          }
+
           return
         })
       })
