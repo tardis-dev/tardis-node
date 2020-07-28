@@ -55,7 +55,7 @@ for await (const message of messages) {
 
 <br/>
 
-- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, Binance Futures, FTX, OKEx, Huobi Global, Huobi DM, bitFlyer, Bitstamp, Coinbase Pro, Crypto Facilities, Gemini, Kraken, Bitfinex, Bybit, OKCoin, CoinFLEX and more
+- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, FTX, OKEx, Huobi Futures, Huobi Global, Bitfinex, Coinbase Pro, Kraken Futures, Kraken, Bitstamp, Gemini, Poloniex, Bybit, Phemex, Delta Exchange, FTX US, Binance US, Gate.io, OKCoin, bitFlyer, HitBTC, CoinFLEX (2.0), Binance Jersey and more
 
 <br/>
 
@@ -124,7 +124,7 @@ const exchangesToStream = [
 ]
 // for each specified exchange call streamNormalized for it
 // so we have multiple real-time streams for all specified exchanges
-const realTimeStreams = exchangesToStream.map(e => {
+const realTimeStreams = exchangesToStream.map((e) => {
   return streamNormalized(e, normalizeBookChanges)
 })
 
