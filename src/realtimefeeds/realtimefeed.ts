@@ -25,6 +25,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected readonly debug: dbg.Debugger
   protected abstract readonly wssURL: string
+  protected readonly throttleSubscribeMS: number = 0
   protected readonly manualSnapshotsBuffer: any[] = []
   private _receivedMessagesCount = 0
   private _ws?: WebSocket
@@ -236,6 +237,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       for (const message of subscribeMessages) {
         this.send(message)
+        if (this.throttleSubscribeMS > 0) {
+          await wait(this.throttleSubscribeMS)
+        }
       }
 
       this.debug('(connection id: %d) estabilished connection', this._connectionId)

@@ -3,6 +3,8 @@ import { RealTimeFeedBase } from './realtimefeed'
 
 export class PhemexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://phemex.com/ws'
+  protected readonly throttleSubscribeMS = 100
+
   protected readonly channelsMap = {
     book: 'orderbook.subscribe',
     trades: 'trade.subscribe',
