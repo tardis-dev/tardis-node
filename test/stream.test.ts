@@ -21,8 +21,12 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'okex-futures',
   'okex-swap',
   'bybit',
+  'phemex',
+  'ftx',
   'delta',
   'binance-delivery',
+  'huobi-dm',
+  'huobi-dm-swap',
   'gate-io-futures',
   'coinflex'
 ]
@@ -33,7 +37,7 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (exchange === 'binance-dex' || exchange === 'poloniex' || 'huobi') {
+          if (exchange === 'binance-dex' || exchange === 'poloniex') {
             return
           }
 
@@ -84,7 +88,7 @@ describe('stream', () => {
 
             if (snapshots >= symbols.length - 1) {
               count++
-              if (count >= 50) {
+              if (count >= 100) {
                 break
               }
             }
