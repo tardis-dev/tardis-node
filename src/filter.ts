@@ -12,9 +12,11 @@ export async function* filter<T extends NormalizedData | Disconnect>(messages: A
 export function uniqueTradesOnly<T extends NormalizedData | Disconnect>(
   {
     maxWindow,
-    onDuplicateFound
+    onDuplicateFound,
+    skipStaleOlderThanSeconds
   }: {
     maxWindow: number
+    skipStaleOlderThanSeconds?: number
     onDuplicateFound?: (trade: Trade) => void
   } = {
     maxWindow: 500
@@ -43,8 +45,11 @@ export function uniqueTradesOnly<T extends NormalizedData | Disconnect>(
         }
 
         const isDuplicate = alreadySeenTrades.has(trade.id)
+        const isStale =
+          skipStaleOlderThanSeconds !== undefined &&
+          trade.localTimestamp.valueOf() - trade.timestamp.valueOf() > skipStaleOlderThanSeconds * 1000
 
-        if (isDuplicate) {
+        if (isDuplicate || isStale) {
           if (onDuplicateFound !== undefined) {
             onDuplicateFound(trade)
           }
