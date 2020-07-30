@@ -321,8 +321,9 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       }
 
       if (message.data.e === 'markPriceUpdate') {
-        if ('r' in message.data) {
+        if ('r' in message.data && message.data.r !== '') {
           // only perpetual futures have funding rate info in mark price
+          // delivery futures sometimes send empty ('') r value
           pendingTickerInfo.updateFundingRate(Number(message.data.r))
           pendingTickerInfo.updateFundingTimestamp(new Date(message.data.T!))
         }
