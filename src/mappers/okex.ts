@@ -97,6 +97,12 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
         continue
       }
 
+      const timestamp = new Date(message.timestamp)
+
+      if (timestamp.valueOf() === 0) {
+        continue
+      }
+
       yield {
         type: 'book_change',
         symbol: message.instrument_id,
@@ -104,7 +110,7 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
         isSnapshot: okexDepthDataMessage.action === 'partial',
         bids: message.bids.map(mapBookLevel),
         asks: message.asks.map(mapBookLevel),
-        timestamp: new Date(message.timestamp),
+        timestamp,
         localTimestamp: localTimestamp
       }
     }
