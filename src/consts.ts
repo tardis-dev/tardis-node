@@ -127,7 +127,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'option/summary',
   'option/instruments',
   'index/ticker',
-  'system/status'
+  'system/status',
+  'option/trades'
 ]
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker']
