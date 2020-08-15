@@ -46,7 +46,7 @@ export class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
         type: 'trade',
         symbol,
         exchange: 'poloniex',
-        id,
+        id: String(id),
         price: Number(price),
         amount: Number(size),
         side: side === 1 ? 'buy' : 'sell',

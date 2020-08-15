@@ -5094,3 +5094,19 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map poloniex messages 8`] = `
+Array [
+  Object {
+    "amount": 299.99145733,
+    "exchange": "poloniex",
+    "id": "10384654",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 0.00000226,
+    "side": "buy",
+    "symbol": "BTC_BTS",
+    "timestamp": 2020-08-11T17:36:00.000Z,
+    "type": "trade",
+  },
+]
+`;
