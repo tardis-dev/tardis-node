@@ -170,7 +170,7 @@ const BINANCE_DELIVERY_CHANNELS = [
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations'] as const
 
-const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp'] as const
+const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp', 'etp'] as const
 
 const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'basis', 'liquidation_orders', 'contract_info', 'open_interest'] as const
 
@@ -178,6 +178,7 @@ const HUOBI_DM_SWAP_CHANNELS = [
   'depth',
   'detail',
   'trade',
+  'bbo',
   'basis',
   'funding_rate',
   'liquidation_orders',
