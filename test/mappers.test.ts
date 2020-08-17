@@ -1825,7 +1825,19 @@ describe('mappers', () => {
           a: []
         }
       },
-      { stream: 'btcusdt@openInterest', generated: true, data: { symbol: 'BTCUSDT', openInterest: '26286.181' } }
+      { stream: 'btcusdt@openInterest', generated: true, data: { symbol: 'BTCUSDT', openInterest: '26286.181' } },
+      {
+        stream: 'btcusdt@markPrice@1s',
+        data: {
+          e: 'markPriceUpdate',
+          E: 1597536008000,
+          s: 'BTCUSDT',
+          p: '11857.56000000',
+          i: '11851.86949091',
+          r: '0.00015640',
+          T: 1597564800000
+        }
+      }
     ]
 
     const binanceFuturesMapper = createMapper('binance-futures', new Date())

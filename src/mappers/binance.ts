@@ -327,6 +327,9 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
           pendingTickerInfo.updateFundingRate(Number(message.data.r))
           pendingTickerInfo.updateFundingTimestamp(new Date(message.data.T!))
         }
+        if (message.data.i !== undefined) {
+          pendingTickerInfo.updateIndexPrice(Number(message.data.i))
+        }
 
         pendingTickerInfo.updateMarkPrice(Number(message.data.p))
         pendingTickerInfo.updateTimestamp(new Date(message.data.E))
@@ -409,6 +412,7 @@ type BinanceFuturesMarkPriceData = {
   p: string // Mark price
   r?: string // Funding rate
   T?: number // Next funding time
+  i?: string
 }
 
 type BinanceFuturesTickerData = {

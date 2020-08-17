@@ -357,6 +357,25 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 10`] = `
+Array [
+  Object {
+    "exchange": "binance-futures",
+    "fundingRate": 0.0001564,
+    "fundingTimestamp": 2020-08-16T08:00:00.000Z,
+    "indexPrice": 11851.86949091,
+    "lastPrice": 10223.74,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 11857.56,
+    "openInterest": 26286.181,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-08-16T00:00:08.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {
