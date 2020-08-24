@@ -1560,7 +1560,7 @@ Array [
     "lastPrice": 9469.5,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "markPrice": 9475.13,
-    "openInterest": undefined,
+    "openInterest": 4471.23,
     "predictedFundingRate": 0.0001,
     "symbol": "BTCUSDT",
     "timestamp": 2020-05-28T16:31:02.000Z,
