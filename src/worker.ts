@@ -31,14 +31,17 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   // each filter will have separate sub dir based on it's sha hash
   const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}`
 
-  // start with fetching last slice - it will tell quickly if user has access to the end of requested date range
-  await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
-  // then fetch first slice - it will tell quickly if user has access to the beginning of requested date range
-  await getDataFeedSlice(payload, 0, filters, cacheDir)
-  // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
+  if (!payload.skipEndRangeAccessValidation) {
+    // fetch last slice - it will tell us if user has access to the end of requested date range
+    await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
+  }
 
+  // fetch first slice - it will tell us if user has access to the beginning of requested date range
+  await getDataFeedSlice(payload, 0, filters, cacheDir)
+
+  // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
   await pMap(
-    sequence(minutesCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch - 1 - as we already fetched first and last slice so no need to fetch them again
+    sequence(minutesCountToFetch, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch
     (offset) => getDataFeedSlice(payload, offset, filters, cacheDir),
     { concurrency: CONCURRENCY_LIMIT }
   )
@@ -95,4 +98,5 @@ export type WorkerJobPayload = {
   toDate: Date
   exchange: Exchange
   filters: Filter<any>[]
+  skipEndRangeAccessValidation?: boolean
 }

@@ -21,7 +21,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   withDisconnects = undefined,
   apiKey = undefined,
   withMicroseconds = undefined,
-  autoCleanup = undefined
+  autoCleanup = undefined,
+  skipEndRangeAccessValidation = undefined
 }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
   Z extends true
     ? U extends true
@@ -50,7 +51,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     fromDate,
     toDate,
     exchange,
-    filters: filters || []
+    filters: filters || [],
+    skipEndRangeAccessValidation
   }
 
   const worker = new Worker(path.resolve(__dirname, 'worker.js'), {
@@ -200,7 +202,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     to,
     withDisconnectMessages = undefined,
     apiKey = undefined,
-    autoCleanup = undefined
+    autoCleanup = undefined,
+    skipEndRangeAccessValidation = undefined
   }: ReplayNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
@@ -234,7 +237,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     filters,
     apiKey,
     withMicroseconds: true,
-    autoCleanup
+    autoCleanup,
+    skipEndRangeAccessValidation
   })
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
@@ -301,6 +305,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   readonly apiKey?: string
   readonly withMicroseconds?: boolean
   readonly autoCleanup?: boolean
+  readonly skipEndRangeAccessValidation?: boolean
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -311,4 +316,5 @@ export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = fals
   readonly withDisconnectMessages?: U
   readonly apiKey?: string
   readonly autoCleanup?: boolean
+  readonly skipEndRangeAccessValidation?: boolean
 }
