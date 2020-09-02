@@ -22,7 +22,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   apiKey = undefined,
   withMicroseconds = undefined,
   autoCleanup = undefined,
-  skipEndRangeAccessValidation = undefined
+  waitWhenDataNotYetAvailable = undefined
 }: ReplayOptions<T, U, Z>): AsyncIterableIterator<
   Z extends true
     ? U extends true
@@ -52,7 +52,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     toDate,
     exchange,
     filters: filters || [],
-    skipEndRangeAccessValidation
+    waitWhenDataNotYetAvailable
   }
 
   const worker = new Worker(path.resolve(__dirname, 'worker.js'), {
@@ -203,7 +203,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     withDisconnectMessages = undefined,
     apiKey = undefined,
     autoCleanup = undefined,
-    skipEndRangeAccessValidation = undefined
+    waitWhenDataNotYetAvailable = undefined
   }: ReplayNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<
@@ -238,7 +238,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     apiKey,
     withMicroseconds: true,
     autoCleanup,
-    skipEndRangeAccessValidation
+    waitWhenDataNotYetAvailable
   })
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
@@ -305,7 +305,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   readonly apiKey?: string
   readonly withMicroseconds?: boolean
   readonly autoCleanup?: boolean
-  readonly skipEndRangeAccessValidation?: boolean
+  readonly waitWhenDataNotYetAvailable?: boolean
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -316,5 +316,5 @@ export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = fals
   readonly withDisconnectMessages?: U
   readonly apiKey?: string
   readonly autoCleanup?: boolean
-  readonly skipEndRangeAccessValidation?: boolean
+  readonly waitWhenDataNotYetAvailable?: boolean
 }

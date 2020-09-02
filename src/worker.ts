@@ -2,7 +2,7 @@ import dbg from 'debug'
 import { existsSync } from 'fs-extra'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256 } from './handy'
+import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait } from './handy'
 import { Exchange, Filter } from './types'
 
 const debug = dbg('tardis-dev')
@@ -31,20 +31,47 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   // each filter will have separate sub dir based on it's sha hash
   const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}`
 
-  if (!payload.skipEndRangeAccessValidation) {
-    // fetch last slice - it will tell us if user has access to the end of requested date range
+  if (payload.waitWhenDataNotYetAvailable === undefined) {
+    // fetch last slice - it will tell us if user has access to the end of requested date range and data is available
     await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
   }
 
   // fetch first slice - it will tell us if user has access to the beginning of requested date range
   await getDataFeedSlice(payload, 0, filters, cacheDir)
+  const waitOffsetMS =
+    typeof payload.waitWhenDataNotYetAvailable === 'number'
+      ? payload.waitWhenDataNotYetAvailable * MILLISECONDS_IN_MINUTE
+      : 30 * MILLISECONDS_IN_MINUTE
 
-  // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
-  await pMap(
-    sequence(minutesCountToFetch, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch
-    (offset) => getDataFeedSlice(payload, offset, filters, cacheDir),
-    { concurrency: CONCURRENCY_LIMIT }
-  )
+  if (payload.waitWhenDataNotYetAvailable !== undefined && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS) {
+    const timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+
+    const minutesCountTharAreAlreadyAvailableToFetch = Math.floor(
+      (timestampForLastAvailableData - payload.fromDate.getTime()) / MILLISECONDS_IN_MINUTE
+    )
+
+    await pMap(sequence(minutesCountTharAreAlreadyAvailableToFetch, 1), (offset) => getDataFeedSlice(payload, offset, filters, cacheDir), {
+      concurrency: CONCURRENCY_LIMIT
+    })
+
+    // for remaining data iterate one by one and wait as needed
+    for (let offset = minutesCountTharAreAlreadyAvailableToFetch; offset < minutesCountToFetch; offset++) {
+      const timestampToFetch = payload.fromDate.valueOf() + offset * MILLISECONDS_IN_MINUTE
+      const timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+
+      if (timestampToFetch > timestampForLastAvailableData) {
+        await wait(MILLISECONDS_IN_MINUTE)
+      }
+      await getDataFeedSlice(payload, offset, filters, cacheDir)
+    }
+  } else {
+    // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
+    await pMap(
+      sequence(minutesCountToFetch, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch
+      (offset) => getDataFeedSlice(payload, offset, filters, cacheDir),
+      { concurrency: CONCURRENCY_LIMIT }
+    )
+  }
 }
 
 async function getDataFeedSlice(
@@ -98,5 +125,5 @@ export type WorkerJobPayload = {
   toDate: Date
   exchange: Exchange
   filters: Filter<any>[]
-  skipEndRangeAccessValidation?: boolean
+  waitWhenDataNotYetAvailable?: boolean | number
 }
