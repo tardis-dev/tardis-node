@@ -201,7 +201,6 @@ const DELTA_CHANNELS = [
   'mark_price',
   'spot_price',
   'funding_rate',
-  'funding_rate_8h',
   'product_updates',
   'announcements'
 ]
