@@ -305,7 +305,7 @@ export type ReplayOptions<T extends Exchange, U extends boolean = false, Z exten
   readonly apiKey?: string
   readonly withMicroseconds?: boolean
   readonly autoCleanup?: boolean
-  readonly waitWhenDataNotYetAvailable?: boolean
+  readonly waitWhenDataNotYetAvailable?: boolean | number
 }
 
 export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = false> = {
@@ -316,5 +316,5 @@ export type ReplayNormalizedOptions<T extends Exchange, U extends boolean = fals
   readonly withDisconnectMessages?: U
   readonly apiKey?: string
   readonly autoCleanup?: boolean
-  readonly waitWhenDataNotYetAvailable?: boolean
+  readonly waitWhenDataNotYetAvailable?: boolean | number
 }
