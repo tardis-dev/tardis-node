@@ -309,7 +309,13 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
               .on('aborted', () => reject(new Error('Request aborted')))
               .pipe(fileWriteStream)
               .on('error', reject)
-              .on('finish', resolve)
+              .on('finish', () => {
+                if (res.complete) {
+                  resolve()
+                } else {
+                  reject(new Error('The connection was terminated while the message was still being sent'))
+                }
+              })
           }
         })
         .on('error', reject)
