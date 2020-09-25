@@ -10,7 +10,7 @@ import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
 import { WorkerJobPayload, WorkerMessage } from './worker'
-import { clearCache } from './clearcache'
+import { clearCacheSync } from './clearcache'
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -176,7 +176,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       )
       let startDate = new Date(fromDate)
       while (startDate < toDate) {
-        await clearCache(exchange, filters, startDate.getUTCFullYear(), startDate.getUTCMonth() + 1, startDate.getUTCDate())
+        clearCacheSync(exchange, filters, startDate.getUTCFullYear(), startDate.getUTCMonth() + 1, startDate.getUTCDate())
 
         startDate = addDays(startDate, 1)
       }
