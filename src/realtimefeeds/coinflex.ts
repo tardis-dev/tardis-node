@@ -5,18 +5,22 @@ export class CoinflexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://v2api.coinflex.com/v2/websocket'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    const payload = filters.map((filter) => {
-      if (!filter.symbols || filter.symbols.length === 0) {
-        throw new Error('CoinflexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
-      }
+    const args = filters
+      .map((filter) => {
+        if (!filter.symbols || filter.symbols.length === 0) {
+          throw new Error('CoinflexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+        }
 
-      return {
-        op: 'subscribe',
-        args: filter.symbols.map((s) => `${filter.channel}:${s}`)
-      }
-    })
+        return filter.symbols.map((s) => `${filter.channel}:${s}`)
+      })
+      .flatMap((s) => s)
 
-    return payload
+    const payload = {
+      op: 'subscribe',
+      args
+    }
+
+    return [payload]
   }
 
   protected messageIsError(message: any): boolean {
