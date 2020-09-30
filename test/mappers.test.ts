@@ -1837,6 +1837,34 @@ describe('mappers', () => {
           r: '0.00015640',
           T: 1597564800000
         }
+      },
+      {
+        stream: 'ethusdt@trade',
+        data: {
+          e: 'trade',
+          E: 1596034530241,
+          T: 1596034530235,
+          s: 'ETHUSDT',
+          t: 73701056,
+          p: '2366.55',
+          q: '0.070',
+          X: 'INSURANCE_FUND',
+          m: true
+        }
+      },
+      {
+        stream: 'btcusdt@trade',
+        data: {
+          e: 'trade',
+          E: 1596240000596,
+          T: 1596240000519,
+          s: 'BTCUSDT',
+          t: 173525189,
+          p: '11343.67',
+          q: '0.467',
+          X: 'MARKET',
+          m: true
+        }
       }
     ]
 

@@ -376,6 +376,24 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 11`] = `Array []`;
+
+exports[`mappers map binance futures messages 12`] = `
+Array [
+  Object {
+    "amount": 0.467,
+    "exchange": "binance-futures",
+    "id": "173525189",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 11343.67,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-08-01T00:00:00.519Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {

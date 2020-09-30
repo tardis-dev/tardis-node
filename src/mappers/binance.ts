@@ -30,6 +30,11 @@ export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' 
   *map(binanceTradeResponse: BinanceResponse<BinanceTradeData>, localTimestamp: Date) {
     const binanceTrade = binanceTradeResponse.data
 
+    const isOffBookTrade = binanceTrade.X === 'INSURANCE_FUND'
+    if (isOffBookTrade) {
+      return
+    }
+
     const trade: Trade = {
       type: 'trade',
       symbol: binanceTrade.s,
@@ -370,6 +375,7 @@ type BinanceTradeData = {
   q: string
   T: number
   m: true
+  X?: 'INSURANCE_FUND' | 'MARKET'
 }
 
 type BinanceBookLevel = [string, string]
