@@ -29,7 +29,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
-const exchangesWithLiquidationsSupport: Exchange[] = ['ftx']
+const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex']
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
@@ -633,7 +633,13 @@ describe('mappers', () => {
             openInterest: 58922153
           }
         ]
-      }
+      },
+      {
+        table: 'liquidation',
+        action: 'insert',
+        data: [{ orderID: 'dd9cea25-207c-0dab-15b5-b88da776f500', symbol: 'XBTUSD', side: 'Buy', price: 10106, leavesQty: 9214 }]
+      },
+      { table: 'liquidation', action: 'delete', data: [{ orderID: 'dd9cea25-207c-0dab-15b5-b88da776f500', symbol: 'XBTUSD' }] }
     ]
 
     const bitmexMapper = createMapper('bitmex')

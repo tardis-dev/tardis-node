@@ -1,4 +1,4 @@
-import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Trade } from '../types'
+import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
@@ -172,6 +172,39 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
   }
 }
 
+export const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
+  canHandle(message: BitmexDataMessage) {
+    return message.table === 'liquidation' && message.action === 'insert'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'liquidation',
+        symbols
+      }
+    ]
+  },
+
+  *map(bitmexLiquiationsMessage: BitmexLiquidation, localTimestamp: Date) {
+    for (const bitmexLiquidation of bitmexLiquiationsMessage.data) {
+      const liquidation: Liquidation = {
+        type: 'liquidation',
+        symbol: bitmexLiquidation.symbol,
+        exchange: 'bitmex',
+        id: bitmexLiquidation.orderID,
+        price: bitmexLiquidation.price,
+        amount: bitmexLiquidation.leavesQty,
+        side: bitmexLiquidation.side === 'Buy' ? 'buy' : 'sell',
+        timestamp: localTimestamp,
+        localTimestamp: localTimestamp
+      }
+
+      yield liquidation
+    }
+  }
+}
+
 type BitmexDataMessage = {
   table: FilterForExchange['bitmex']['channel']
   action: 'partial' | 'update' | 'insert' | 'delete'
@@ -180,7 +213,14 @@ type BitmexDataMessage = {
 type BitmexTradesMessage = BitmexDataMessage & {
   table: 'trade'
   action: 'insert'
-  data: { symbol: string; trdMatchID: string; side?: 'Buy' | 'Sell'; size: number; price: number; timestamp: string }[]
+  data: {
+    symbol: string
+    trdMatchID: string
+    side?: 'Buy' | 'Sell'
+    size: number
+    price: number
+    timestamp: string
+  }[]
 }
 
 type BitmexInstrument = {
@@ -203,5 +243,22 @@ type BitmexInstrumentsMessage = BitmexDataMessage & {
 
 type BitmexOrderBookL2Message = BitmexDataMessage & {
   table: 'orderBookL2'
-  data: { symbol: string; id: number; side: 'Buy' | 'Sell'; size?: number; price?: number }[]
+  data: {
+    symbol: string
+    id: number
+    side: 'Buy' | 'Sell'
+    size?: number
+    price?: number
+  }[]
+}
+
+type BitmexLiquidation = BitmexDataMessage & {
+  table: 'liquidation'
+  data: {
+    orderID: string
+    symbol: string
+    side: 'Buy' | 'Sell'
+    price: number
+    leavesQty: number
+  }[]
 }

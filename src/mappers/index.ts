@@ -9,7 +9,7 @@ import {
 import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
 import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexTradesMapper } from './bitfinex'
 import { BitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
-import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexTradesMapper } from './bitmex'
+import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexLiquidationsMapper, bitmexTradesMapper } from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
@@ -149,7 +149,8 @@ const optionsSummaryMappers = {
 }
 
 const liquidationsMappers = {
-  ftx: () => new FTXLiquidationsMapper()
+  ftx: () => new FTXLiquidationsMapper(),
+  bitmex: () => bitmexLiquidationsMapper
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

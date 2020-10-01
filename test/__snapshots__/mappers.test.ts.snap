@@ -1081,6 +1081,24 @@ Array [
 
 exports[`mappers map bitmex messages 11`] = `Array []`;
 
+exports[`mappers map bitmex messages 12`] = `
+Array [
+  Object {
+    "amount": 9214,
+    "exchange": "bitmex",
+    "id": "dd9cea25-207c-0dab-15b5-b88da776f500",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 10106,
+    "side": "buy",
+    "symbol": "XBTUSD",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bitmex messages 13`] = `Array []`;
+
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
 exports[`mappers map bitstamp messages 2`] = `
