@@ -2596,6 +2596,33 @@ Array [
 ]
 `;
 
+exports[`mappers map ftx messages 9`] = `
+Array [
+  Object {
+    "amount": 0.0149,
+    "exchange": "ftx",
+    "id": "114724653",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 10683.5,
+    "side": "buy",
+    "symbol": "BTC-PERP",
+    "timestamp": 2020-09-15T00:02:05.787Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.0149,
+    "exchange": "ftx",
+    "id": "114724653",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 10683.5,
+    "side": "buy",
+    "symbol": "BTC-PERP",
+    "timestamp": 2020-09-15T00:02:05.787Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map ftx us messages 1`] = `Array []`;
 
 exports[`mappers map ftx us messages 2`] = `

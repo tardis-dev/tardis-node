@@ -1,4 +1,12 @@
-import { Exchange, Mapper, normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades, normalizeOptionsSummary } from '../src'
+import {
+  Exchange,
+  Mapper,
+  normalizeBookChanges,
+  normalizeDerivativeTickers,
+  normalizeTrades,
+  normalizeOptionsSummary,
+  normalizeLiquidations
+} from '../src'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -21,6 +29,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
+const exchangesWithLiquidationsSupport: Exchange[] = ['ftx']
+
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
   if (exchangesWithDerivativeInfo.includes(exchange)) {
@@ -29,6 +39,10 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 
   if (exchangesWithOptionsSummary.includes(exchange)) {
     normalizers.push(normalizeOptionsSummary)
+  }
+
+  if (exchangesWithLiquidationsSupport.includes(exchange)) {
+    normalizers.push(normalizeLiquidations)
   }
 
   const mappersForExchange = normalizers.map((m: any) => m(exchange, localTimestamp)) as Mapper<any, any>[]
@@ -2444,6 +2458,12 @@ describe('mappers', () => {
             volumeUsd24h: 10557.55092
           }
         }
+      },
+      {
+        channel: 'trades',
+        market: 'BTC-PERP',
+        type: 'update',
+        data: [{ id: 114724653, price: 10683.5, size: 0.0149, side: 'buy', liquidation: true, time: '2020-09-15T00:02:05.787437+00:00' }]
       }
     ]
 

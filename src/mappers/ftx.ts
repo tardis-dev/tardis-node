@@ -1,5 +1,5 @@
 import { parseμs } from '../handy'
-import { BookChange, Trade, DerivativeTicker, Exchange } from '../types'
+import { BookChange, Trade, DerivativeTicker, Exchange, Liquidation } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.ftx.com/#websocket-api
@@ -136,6 +136,46 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
   }
 }
 
+export class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
+  canHandle(message: FtxTrades | FtxOrderBook) {
+    if (message.data == undefined) {
+      return false
+    }
+
+    return message.channel === 'trades'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trades',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(ftxTrades: FtxTrades, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const ftxTrade of ftxTrades.data) {
+      if (ftxTrade.liquidation) {
+        const timestamp = new Date(ftxTrade.time)
+        timestamp.μs = parseμs(ftxTrade.time)
+
+        yield {
+          type: 'liquidation',
+          symbol: ftxTrades.market,
+          exchange: 'ftx',
+          id: ftxTrade.id !== null ? String(ftxTrade.id) : undefined,
+          price: ftxTrade.price,
+          amount: ftxTrade.size,
+          side: ftxTrade.side,
+          timestamp,
+          localTimestamp
+        }
+      }
+    }
+  }
+}
+
 type FtxTrades = {
   channel: 'trades'
   market: string
@@ -146,6 +186,7 @@ type FtxTrades = {
     size: number
     side: 'buy' | 'sell'
     time: string
+    liquidation?: boolean
   }[]
 }
 

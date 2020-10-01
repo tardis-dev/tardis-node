@@ -1,5 +1,5 @@
 import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, OptionSummary, Trade } from '../types'
+import { BookChange, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -13,21 +13,21 @@ import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexTradesMappe
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
+import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
 import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, deltaTradesMapper } from './delta'
 import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, DeribitOptionSummaryMapper, deribitTradesMapper } from './deribit'
-import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXTradesMapper } from './ftx'
+import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXTradesMapper } from './ftx'
+import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
+import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
-import { HuobiBookChangeMapper, HuobiTradesMapper, HuobiDerivativeTickerMapper, HuobiMBPBookChangeMapper } from './huobi'
+import { HuobiBookChangeMapper, HuobiDerivativeTickerMapper, HuobiMBPBookChangeMapper, HuobiTradesMapper } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
-import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
-import { GateIOFuturesTradesMapper, GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper } from './gateiofutures'
-import { PoloniexTradesMapper, PoloniexBookChangeMapper } from './poloniex'
-import { coinflexTradesMapper, coinflexBookChangeMapper, CoinflexDerivativeTickerMapper } from './coinflex'
+import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
 
 export * from './mapper'
 
@@ -148,6 +148,10 @@ const optionsSummaryMappers = {
   'okex-options': () => new OkexOptionSummaryMapper()
 }
 
+const liquidationsMappers = {
+  ftx: () => new FTXLiquidationsMapper()
+}
+
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {
   const createTradesMapper = tradesMappers[exchange]
 
@@ -195,4 +199,17 @@ export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMap
   }
 
   return createOptionSummaryMapper() as any
+}
+
+export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers>(
+  exchange: T,
+  _localTimestamp: Date
+): Mapper<T, Liquidation> => {
+  const createLiquidationsMapper = liquidationsMappers[exchange]
+
+  if (createLiquidationsMapper === undefined) {
+    throw new Error(`normalizeLiquidations: ${exchange} not supported`)
+  }
+
+  return createLiquidationsMapper() as any
 }

@@ -96,6 +96,18 @@ export type OptionSummary = NormalizedData & {
   underlyingIndex: string
 }
 
+export type Liquidation = {
+  readonly type: 'liquidation'
+  readonly symbol: string
+  readonly exchange: Exchange
+  readonly id: string | undefined
+  readonly price: number
+  readonly amount: number
+  readonly side: 'buy' | 'sell'
+  readonly timestamp: Date
+  readonly localTimestamp: Date
+}
+
 export type Disconnect = {
   readonly type: 'disconnect'
   readonly exchange: Exchange
