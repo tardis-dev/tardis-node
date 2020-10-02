@@ -29,7 +29,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
-const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex']
+const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex', 'deribit']
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
@@ -332,6 +332,48 @@ describe('mappers', () => {
             best_ask_amount: 0.0,
             ask_iv: 0.0
           }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'trades.BTC-PERPETUAL.raw',
+          data: [
+            {
+              trade_seq: 40781986,
+              trade_id: '66460463',
+              timestamp: 1584058044032,
+              tick_direction: 3,
+              price: 4469.5,
+              liquidation: 'T',
+              instrument_name: 'BTC-PERPETUAL',
+              index_price: 4805.41,
+              direction: 'sell',
+              amount: 1120
+            }
+          ]
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'trades.BTC-PERPETUAL.raw',
+          data: [
+            {
+              trade_seq: 40782080,
+              trade_id: '66460626',
+              timestamp: 1584058067675,
+              tick_direction: 3,
+              price: 4458.5,
+              liquidation: 'M',
+              instrument_name: 'BTC-PERPETUAL',
+              index_price: 4793.6,
+              direction: 'buy',
+              amount: 2500
+            }
+          ]
         }
       }
     ]

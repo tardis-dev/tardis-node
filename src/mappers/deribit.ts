@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Trade, OptionSummary } from '../types'
+import { BookChange, DerivativeTicker, Trade, OptionSummary, Liquidation } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
@@ -193,6 +193,52 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
   }
 }
 
+export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
+  canHandle(message: any) {
+    const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
+    if (channel === undefined) {
+      return false
+    }
+
+    return channel.startsWith('trades')
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trades',
+        symbols
+      }
+    ]
+  },
+
+  *map(message: DeribitTradesMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const deribitTrade of message.params.data) {
+      if (deribitTrade.liquidation !== undefined) {
+        let side
+        // "T" when liquidity taker side was under liquidation
+        if (deribitTrade.liquidation === 'T') {
+          side = deribitTrade.direction
+        } else {
+          // "M" when maker (passive) side of trade was under liquidation
+          side = deribitTrade.direction === 'buy' ? ('sell' as const) : ('buy' as const)
+        }
+        yield {
+          type: 'liquidation',
+          symbol: deribitTrade.instrument_name,
+          exchange: 'deribit',
+          id: deribitTrade.trade_id,
+          price: deribitTrade.price,
+          amount: deribitTrade.amount,
+          side,
+          timestamp: new Date(deribitTrade.timestamp),
+          localTimestamp: localTimestamp
+        }
+      }
+    }
+  }
+}
+
 type DeribitMessage = {
   params: {
     channel: string
@@ -209,6 +255,7 @@ type DeribitTradesMessage = DeribitMessage & {
       price: number
       amount: number
       trade_seq: number
+      liquidation?: 'M' | 'T' | 'MT'
     }[]
   }
 }

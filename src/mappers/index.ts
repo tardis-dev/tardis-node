@@ -16,7 +16,13 @@ import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import { cryptofacilitiesBookChangeMapper, CryptofacilitiesDerivativeTickerMapper, cryptofacilitiesTradesMapper } from './cryptofacilities'
 import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, deltaTradesMapper } from './delta'
-import { deribitBookChangeMapper, DeribitDerivativeTickerMapper, DeribitOptionSummaryMapper, deribitTradesMapper } from './deribit'
+import {
+  deribitBookChangeMapper,
+  DeribitDerivativeTickerMapper,
+  deribitLiquidationsMapper,
+  DeribitOptionSummaryMapper,
+  deribitTradesMapper
+} from './deribit'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXTradesMapper } from './ftx'
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
 import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
@@ -150,7 +156,8 @@ const optionsSummaryMappers = {
 
 const liquidationsMappers = {
   ftx: () => new FTXLiquidationsMapper(),
-  bitmex: () => bitmexLiquidationsMapper
+  bitmex: () => bitmexLiquidationsMapper,
+  deribit: () => deribitLiquidationsMapper
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

@@ -2478,6 +2478,60 @@ Array [
 ]
 `;
 
+exports[`mappers map deribit messages 11`] = `
+Array [
+  Object {
+    "amount": 1120,
+    "exchange": "deribit",
+    "id": "66460463",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 4469.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2020-03-13T00:07:24.032Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 1120,
+    "exchange": "deribit",
+    "id": "66460463",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 4469.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2020-03-13T00:07:24.032Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map deribit messages 12`] = `
+Array [
+  Object {
+    "amount": 2500,
+    "exchange": "deribit",
+    "id": "66460626",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 4458.5,
+    "side": "buy",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2020-03-13T00:07:47.675Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 2500,
+    "exchange": "deribit",
+    "id": "66460626",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "price": 4458.5,
+    "side": "sell",
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2020-03-13T00:07:47.675Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map ftx messages 1`] = `Array []`;
 
 exports[`mappers map ftx messages 2`] = `
