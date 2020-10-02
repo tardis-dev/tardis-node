@@ -29,7 +29,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
-const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex', 'deribit']
+const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex', 'deribit', 'binance-futures', 'binance-delivery']
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
@@ -1927,6 +1927,26 @@ describe('mappers', () => {
           X: 'MARKET',
           m: true
         }
+      },
+      {
+        stream: 'btcusdt@forceOrder',
+        data: {
+          e: 'forceOrder',
+          E: 1584059031426,
+          o: {
+            s: 'BTCUSDT',
+            S: 'BUY',
+            o: 'LIMIT',
+            f: 'IOC',
+            q: '0.014',
+            p: '4793.91',
+            ap: '4706.04',
+            X: 'FILLED',
+            l: '0.014',
+            z: '0.014',
+            T: 1584059031421
+          }
+        }
       }
     ]
 
@@ -2020,6 +2040,27 @@ describe('mappers', () => {
       {
         stream: 'btcusd_200925@trade',
         data: { e: 'trade', E: 1592265616654, T: 1592265616653, s: 'BTCUSD_200925', t: 173906, p: '9504.9', q: '1', X: 'MARKET', m: false }
+      },
+      {
+        stream: 'btcusd_200925@forceOrder',
+        data: {
+          e: 'forceOrder',
+          E: 1594622954023,
+          o: {
+            s: 'BTCUSD_200925',
+            ps: 'BTCUSD',
+            S: 'SELL',
+            o: 'LIMIT',
+            f: 'IOC',
+            q: '3',
+            p: '9314.5',
+            ap: '9352.7',
+            X: 'FILLED',
+            l: '3',
+            z: '3',
+            T: 1594622954021
+          }
+        }
       }
     ]
 

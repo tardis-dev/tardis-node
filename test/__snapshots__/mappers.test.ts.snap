@@ -142,6 +142,22 @@ Array [
 ]
 `;
 
+exports[`mappers map binance delivery messages 10`] = `
+Array [
+  Object {
+    "amount": 3,
+    "exchange": "binance-delivery",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 9352.7,
+    "side": "sell",
+    "symbol": "BTCUSD_200925",
+    "timestamp": 2020-07-13T06:49:14.021Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
@@ -390,6 +406,22 @@ Array [
     "symbol": "BTCUSDT",
     "timestamp": 2020-08-01T00:00:00.519Z,
     "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map binance futures messages 13`] = `
+Array [
+  Object {
+    "amount": 0.014,
+    "exchange": "binance-futures",
+    "id": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 4706.04,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-03-13T00:23:51.421Z,
+    "type": "liquidation",
   },
 ]
 `;

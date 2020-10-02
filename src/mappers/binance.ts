@@ -1,11 +1,12 @@
 import { debug } from '../debug'
 import { CircularBuffer } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
-export class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures', Trade> {
+export class BinanceTradesMapper
+  implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -210,7 +211,8 @@ export class BinanceBookChangeMapper
   }
 }
 
-export class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper
+export class BinanceFuturesBookChangeMapper
+  extends BinanceBookChangeMapper
   implements Mapper<'binance-futures' | 'binance-delivery', BookChange> {
   constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {
     super(exchange, ignoreBookSnapshotOverlapError)
@@ -356,6 +358,51 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
   }
 }
 
+export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'binance-delivery', Liquidation> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
+    return message.stream.endsWith('@forceOrder')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = lowerCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'forceOrder',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(binanceTradeResponse: BinanceResponse<BinanceFuturesForceOrderData>, localTimestamp: Date) {
+    const binanceLiquidation = binanceTradeResponse.data.o
+    // not sure if order status can be different to 'FILLED' for liquodations in practice, but...
+    if (binanceLiquidation.X !== 'FILLED') {
+      return
+    }
+
+    const liquidation: Liquidation = {
+      type: 'liquidation',
+      symbol: binanceLiquidation.s,
+      exchange: this._exchange,
+      id: undefined,
+      price: Number(binanceLiquidation.ap), // use Average Price that matches trade
+      amount: Number(binanceLiquidation.z), // use  Order Filled Accumulated Quantity
+      side: binanceLiquidation.S === 'SELL' ? 'sell' : 'buy',
+      timestamp: new Date(binanceLiquidation.T),
+      localTimestamp: localTimestamp
+    }
+
+    yield liquidation
+  }
+}
+
 function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => s.toLowerCase())
@@ -439,4 +486,17 @@ type BinanceFuturesIndexPriceData = {
   E: 1591261236000 // Event time
   i: string // Pair
   p: string // Index Price
+}
+
+type BinanceFuturesForceOrderData = {
+  o: {
+    s: string // Symbol
+    S: string // Side
+    q: string // Original Quantity
+    p: string // Price
+    ap: string // Average Price
+    X: 'FILLED' // Order Status
+    T: 1568014460893 // Order Trade Time
+    z: string // Order Filled Accumulated Quantity
+  }
 }
