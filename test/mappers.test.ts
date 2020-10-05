@@ -29,7 +29,14 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
 
-const exchangesWithLiquidationsSupport: Exchange[] = ['ftx', 'bitmex', 'deribit', 'binance-futures', 'binance-delivery']
+const exchangesWithLiquidationsSupport: Exchange[] = [
+  'ftx',
+  'bitmex',
+  'deribit',
+  'binance-futures',
+  'binance-delivery',
+  'bitfinex-derivatives'
+]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
   let normalizers: any = [normalizeTrades, normalizeBookChanges]
@@ -1508,7 +1515,50 @@ describe('mappers', () => {
       ],
       [23925, 'hb', 924771, 1590596648661, 'trades', 'BTCDOMF0:USTF0'],
       [23916, 'te', [452025730, 1590593199934, 0.005, 9135.5], 11125, 1590593199956, 'trades', 'BTCF0:USTF0'],
-      [23916, 'tu', [452025730, 1590593199934, 0.005, 9135.5], 11141, 1590593199986, 'trades', 'BTCF0:USTF0']
+      [23916, 'tu', [452025730, 1590593199934, 0.005, 9135.5], 11141, 1590593199986, 'trades', 'BTCF0:USTF0'],
+      [
+        386841,
+        [['pos', 143683674, 1593522802742, null, 'tBTCF0:USTF0', 0.00268657, 9135.972557016, null, 0, 1, null, 9080]],
+        7,
+        1593566593351,
+        'liquidations',
+        'global'
+      ],
+      [386841, 'hb', 2043, 1593566613422, 'liquidations', 'global'],
+      [
+        386841,
+        [['pos', 143683674, 1593522802742, null, 'tBTCF0:USTF0', 0.00268657, 9135.972557016, null, 0, 1, null, 9080]],
+        7,
+        1593566593351
+      ],
+      {
+        event: 'subscribed',
+        channel: 'status',
+        chanId: 386841,
+        key: 'liq:global'
+      },
+      [
+        386841,
+        [['pos', 143683674, 1593522802742, null, 'tBTCF0:USTF0', 0.00268657, 9135.972557016, null, 0, 1, null, 9080]],
+        7,
+        1593566593351
+      ],
+      [
+        907,
+        [['pos', 143679087, 1594036710543, null, 'tETHF0:USTF0', -4.56671421, 222.248906484356, null, 1, 1, null, 235.52]],
+        1206215,
+        1594036710595,
+        'liquidations',
+        'global'
+      ],
+      [
+        907,
+        [['pos', 143679087, 1594036710534, null, 'tETHF0:USTF0', -8.6007, 222.248906484356, null, 0, 1, null, null]],
+        1206216,
+        1594036710596,
+        'liquidations',
+        'global'
+      ]
     ]
 
     const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')

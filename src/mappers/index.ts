@@ -8,7 +8,7 @@ import {
   BinanceTradesMapper
 } from './binance'
 import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
-import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexTradesMapper } from './bitfinex'
+import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexLiquidationsMapper, BitfinexTradesMapper } from './bitfinex'
 import { BitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
 import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexLiquidationsMapper, bitmexTradesMapper } from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
@@ -160,7 +160,8 @@ const liquidationsMappers = {
   bitmex: () => bitmexLiquidationsMapper,
   deribit: () => deribitLiquidationsMapper,
   'binance-futures': () => new BinanceLiquidationsMapper('binance-futures'),
-  'binance-delivery': () => new BinanceLiquidationsMapper('binance-delivery')
+  'binance-delivery': () => new BinanceLiquidationsMapper('binance-delivery'),
+  'bitfinex-derivatives': () => new BitfinexLiquidationsMapper('bitfinex-derivatives')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

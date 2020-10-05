@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
@@ -238,6 +238,79 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
   }
 }
 
+export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liquidation> {
+  private _liquidationsChannelId: number | undefined = undefined
+
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: BitfinexMessage) {
+    // non sub messages are provided as arrays
+    if (Array.isArray(message)) {
+      // first test if message itself provides channel name and if so if it's liquidations
+      const channelName = message[message.length - 2]
+      if (typeof channelName === 'string') {
+        return channelName === 'liquidations'
+      }
+
+      // otherwise use channel id
+      return this._liquidationsChannelId === message[0]
+    }
+
+    // store liquidation channel id
+    if (message.event === 'subscribed') {
+      const isLiquidationsChannel = message.channel === 'status' && message.key === 'liq:global'
+      if (isLiquidationsChannel) {
+        this._liquidationsChannelId = message.chanId
+      }
+    }
+
+    return false
+  }
+
+  getFilters() {
+    // liquidations channel is global, not per symbol
+    return [
+      {
+        channel: 'liquidations'
+      } as const
+    ]
+  }
+
+  *map(message: BitfinexLiquidation, localTimestamp: Date) {
+    // ignore heartbeats
+    if (message[1] === 'hb') {
+      return
+    }
+    // see https://docs.bitfinex.com/reference#ws-public-status
+    for (let bitfinexLiquidation of message[1]) {
+      const isInitialLiquidationTrigger = bitfinexLiquidation[8] === 0
+      // process only initial liquidation triggers not subsequent 'matches', assumption here is that
+      // there's only single initial liquidation trigger but there can be multiple matches for single liquidation
+      if (isInitialLiquidationTrigger) {
+        const id = String(bitfinexLiquidation[1])
+        const timestamp = new Date(bitfinexLiquidation[2])
+        const symbol = bitfinexLiquidation[4].replace('t', '')
+        const price = bitfinexLiquidation[6]
+        const amount = bitfinexLiquidation[5]
+
+        const liquidation: Liquidation = {
+          type: 'liquidation',
+          symbol,
+          exchange: this._exchange,
+          id,
+          price,
+          amount: Math.abs(amount),
+          side: amount < 0 ? 'sell' : 'buy',
+          timestamp,
+          localTimestamp: localTimestamp
+        }
+
+        yield liquidation
+      }
+    }
+  }
+}
+
 type BitfinexMessage =
   | {
       event: 'subscribed'
@@ -255,3 +328,7 @@ type BitfinexBookLevel = [number, number, number]
 type BitfinexBooks = [number, BitfinexBookLevel | BitfinexBookLevel[], number, number] | BitfinexHeartbeat
 
 type BitfinexStatusMessage = [number, (number | undefined)[], number, number] | BitfinexHeartbeat
+
+type BitfinexLiquidation =
+  | [number, ['pos', number, number, null, string, number, number, null, number, number, null, number][]]
+  | BitfinexHeartbeat
