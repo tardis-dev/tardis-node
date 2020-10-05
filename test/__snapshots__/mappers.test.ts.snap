@@ -748,7 +748,7 @@ Array [
     "id": "143683674",
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "price": 9135.972557016,
-    "side": "buy",
+    "side": "sell",
     "symbol": "BTCF0:USTF0",
     "timestamp": 2020-06-30T13:13:22.742Z,
     "type": "liquidation",
@@ -770,7 +770,7 @@ Array [
     "id": "143683674",
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "price": 9135.972557016,
-    "side": "buy",
+    "side": "sell",
     "symbol": "BTCF0:USTF0",
     "timestamp": 2020-06-30T13:13:22.742Z,
     "type": "liquidation",
@@ -788,7 +788,7 @@ Array [
     "id": "143679087",
     "localTimestamp": 2019-08-01T00:00:02.496Z,
     "price": 222.248906484356,
-    "side": "sell",
+    "side": "buy",
     "symbol": "ETHF0:USTF0",
     "timestamp": 2020-07-06T11:58:30.534Z,
     "type": "liquidation",
@@ -2126,6 +2126,60 @@ Array [
     "symbol": "PI_LTCUSD",
     "timestamp": 2019-09-01T00:00:42.131Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map cryptofacilities messages 10`] = `
+Array [
+  Object {
+    "amount": 12000,
+    "exchange": "cryptofacilities",
+    "id": "3ee209b8-bc9f-4ed5-965b-8c6208b26411",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.1736,
+    "side": "sell",
+    "symbol": "PI_XRPUSD",
+    "timestamp": 2020-07-01T00:06:05.283Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 12000,
+    "exchange": "cryptofacilities",
+    "id": "3ee209b8-bc9f-4ed5-965b-8c6208b26411",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 0.1736,
+    "side": "sell",
+    "symbol": "PI_XRPUSD",
+    "timestamp": 2020-07-01T00:06:05.283Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map cryptofacilities messages 11`] = `
+Array [
+  Object {
+    "amount": 250,
+    "exchange": "cryptofacilities",
+    "id": "e7f3a144-5c04-4ed6-999e-5922cd0b6160",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 231.6,
+    "side": "buy",
+    "symbol": "PI_ETHUSD",
+    "timestamp": 2020-07-01T16:27:33.613Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 250,
+    "exchange": "cryptofacilities",
+    "id": "e7f3a144-5c04-4ed6-999e-5922cd0b6160",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "price": 231.6,
+    "side": "buy",
+    "symbol": "PI_ETHUSD",
+    "timestamp": 2020-07-01T16:27:33.613Z,
+    "type": "liquidation",
   },
 ]
 `;

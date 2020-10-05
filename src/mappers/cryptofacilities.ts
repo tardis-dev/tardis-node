@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Trade } from '../types'
+import { BookChange, DerivativeTicker, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API
@@ -124,8 +124,38 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
   }
 }
 
+export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation> = {
+  canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
+    return message.feed === 'trade' && message.event === undefined && message.type === 'liquidation'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trade',
+        symbols
+      }
+    ]
+  },
+
+  *map(liquidationTrade: CryptofacilitiesTrade, localTimestamp: Date): IterableIterator<Liquidation> {
+    yield {
+      type: 'liquidation',
+      symbol: liquidationTrade.product_id,
+      exchange: 'cryptofacilities',
+      id: liquidationTrade.uid,
+      price: liquidationTrade.price,
+      amount: liquidationTrade.qty,
+      side: liquidationTrade.side,
+      timestamp: new Date(liquidationTrade.time),
+      localTimestamp: localTimestamp
+    }
+  }
+}
+
 type CryptofacilitiesTrade = {
   feed: 'trade'
+  type: 'liquidation' | 'fill'
   uid: string | undefined
   event: undefined
   product_id: string

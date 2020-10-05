@@ -35,7 +35,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'deribit',
   'binance-futures',
   'binance-delivery',
-  'bitfinex-derivatives'
+  'bitfinex-derivatives',
+  'cryptofacilities'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -2371,7 +2372,29 @@ describe('mappers', () => {
         tickSize: null
       },
       { feed: 'book', product_id: 'PI_LTCUSD', side: 'sell', seq: 361428, price: 64.41, qty: 14912.0, timestamp: 1567296042122 },
-      { feed: 'book', product_id: 'PI_LTCUSD', side: 'buy', seq: 361432, price: 64.24, qty: 0.0, timestamp: 1567296042131 }
+      { feed: 'book', product_id: 'PI_LTCUSD', side: 'buy', seq: 361432, price: 64.24, qty: 0.0, timestamp: 1567296042131 },
+      {
+        feed: 'trade',
+        product_id: 'PI_XRPUSD',
+        uid: '3ee209b8-bc9f-4ed5-965b-8c6208b26411',
+        side: 'sell',
+        type: 'liquidation',
+        seq: 41799,
+        time: 1593561965283,
+        qty: 12000,
+        price: 0.1736
+      },
+      {
+        feed: 'trade',
+        product_id: 'PI_ETHUSD',
+        uid: 'e7f3a144-5c04-4ed6-999e-5922cd0b6160',
+        side: 'buy',
+        type: 'liquidation',
+        seq: 253796,
+        time: 1593620853613,
+        qty: 250,
+        price: 231.6
+      }
     ]
 
     const cryptofacilitiesMapper = createMapper('cryptofacilities')

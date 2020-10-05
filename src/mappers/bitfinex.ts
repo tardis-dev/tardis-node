@@ -300,7 +300,7 @@ export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives'
           id,
           price,
           amount: Math.abs(amount),
-          side: amount < 0 ? 'sell' : 'buy',
+          side: amount < 0 ? 'buy' : 'sell',
           timestamp,
           localTimestamp: localTimestamp
         }
