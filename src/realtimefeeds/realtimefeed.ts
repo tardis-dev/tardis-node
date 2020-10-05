@@ -2,7 +2,7 @@ import dbg from 'debug'
 import WebSocket from 'ws'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
-import { ONE_SEC_IN_MS, wait } from '../handy'
+import { ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
 import { Exchange, Filter } from '../types'
 
 export type RealTimeFeed = {
@@ -27,16 +27,18 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected abstract readonly wssURL: string
   protected readonly throttleSubscribeMS: number = 0
   protected readonly manualSnapshotsBuffer: any[] = []
+  private readonly _filters: Filter<string>[]
   private _receivedMessagesCount = 0
   private _ws?: WebSocket
   private _connectionId = connectionCounter++
 
   constructor(
     protected readonly _exchange: string,
-    private readonly _filters: Filter<string>[],
+    filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
     private readonly _onError?: (error: Error) => void
   ) {
+    this._filters = optimizeFilters(filters)
     this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
   }
 
