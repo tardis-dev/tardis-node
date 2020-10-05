@@ -3914,6 +3914,42 @@ Array [
 
 exports[`mappers map huobi-dm, messages 5`] = `Array []`;
 
+exports[`mappers map huobi-dm, messages 6`] = `Array []`;
+
+exports[`mappers map huobi-dm, messages 7`] = `Array []`;
+
+exports[`mappers map huobi-dm, messages 8`] = `
+Array [
+  Object {
+    "amount": 319,
+    "exchange": "huobi-dm",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 9115.43,
+    "side": "sell",
+    "symbol": "BTC_CQ",
+    "timestamp": 2020-07-01T00:02:53.025Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm, messages 9`] = `
+Array [
+  Object {
+    "amount": 218,
+    "exchange": "huobi-dm",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 9244.08,
+    "side": "buy",
+    "symbol": "BTC_CW",
+    "timestamp": 2020-07-01T08:46:09.156Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm-swap, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm-swap, messages 2`] = `Array []`;
@@ -4009,6 +4045,38 @@ Array [
     "symbol": "BTC-USD",
     "timestamp": 2020-06-23T09:33:43.141Z,
     "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-swap, messages 9`] = `
+Array [
+  Object {
+    "amount": 231,
+    "exchange": "huobi-dm-swap",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 229.95,
+    "side": "buy",
+    "symbol": "ETH-USD",
+    "timestamp": 2020-07-01T13:34:52.167Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-swap, messages 10`] = `
+Array [
+  Object {
+    "amount": 3,
+    "exchange": "huobi-dm-swap",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 153.28,
+    "side": "sell",
+    "symbol": "BSV-USD",
+    "timestamp": 2020-07-01T06:38:51.562Z,
+    "type": "liquidation",
   },
 ]
 `;

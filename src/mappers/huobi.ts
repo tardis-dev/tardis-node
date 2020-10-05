@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 import { CircularBuffer } from '../handy'
 
@@ -233,11 +233,11 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
 function normalizeSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => {
-      // huobi-dm and huobi-dm-swap expects symbols to be upper cases
+      // huobi-dm and huobi-dm-swap expect symbols to be upper cased
       if (s.includes('_') || s.includes('-')) {
         return s
       }
-      // huobi global and us expects lower cased symbols
+      // huobi global expects lower cased symbols
       return s.toLowerCase()
     })
   }
@@ -317,6 +317,92 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
 
       if (pendingTickerInfo.hasChanged()) {
         yield pendingTickerInfo.getSnapshot(localTimestamp)
+      }
+    }
+  }
+}
+
+export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap', Liquidation> {
+  private readonly _contractCodeToSymbolMap: Map<string, string> = new Map()
+  private readonly _contractTypesSuffixes = { this_week: 'CW', next_week: 'NW', quarter: 'CQ', next_quarter: 'NQ' }
+
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: HuobiLiquidationOrder | HuobiContractInfo) {
+    if (message.op !== 'notify') {
+      return false
+    }
+
+    if (this._exchange === 'huobi-dm' && message.topic.endsWith('.contract_info')) {
+      this._updateContractCodeToSymbolMap(message as HuobiContractInfo)
+    }
+
+    return message.topic.endsWith('.liquidation_orders')
+  }
+
+  getFilters(symbols?: string[]) {
+    if (this._exchange === 'huobi-dm') {
+      // huobi-dm for liquidations requires prividing different symbols which are indexes names for example 'BTC' or 'ETH'
+      // not futures names like 'BTC_NW'
+      // see https://huobiapi.github.io/docs/dm/v1/en/#subscribe-liquidation-order-data-no-authentication-sub
+
+      if (symbols !== undefined) {
+        symbols = symbols.map((s) => s.split('_')[0])
+      }
+
+      // we also need to subscribe to contract_info which will provide us information that will allow us to map
+      // liquidation message symbol and contract code to symbols we expect (BTC_NW etc)
+
+      return [
+        {
+          channel: 'liquidation_orders',
+          symbols
+        } as const,
+        {
+          channel: 'contract_info',
+          symbols
+        } as const
+      ]
+    } else {
+      // huobi dm swap liquidations messages provide correct symbol & contract code
+      return [
+        {
+          channel: 'liquidation_orders',
+          symbols
+        } as const
+      ]
+    }
+  }
+
+  private _updateContractCodeToSymbolMap(message: HuobiContractInfo) {
+    for (const item of message.data) {
+      this._contractCodeToSymbolMap.set(item.contract_code, `${item.symbol}_${this._contractTypesSuffixes[item.contract_type]}`)
+    }
+  }
+
+  *map(message: HuobiLiquidationOrder, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const huobiLiquidation of message.data) {
+      let symbol = huobiLiquidation.contract_code
+      // huobi-dm returns index name as a symbol, not future alias, so we need to map it here
+      if (this._exchange === 'huobi-dm') {
+        const futureAliasSymbol = this._contractCodeToSymbolMap.get(huobiLiquidation.contract_code)
+        if (futureAliasSymbol === undefined) {
+          continue
+        }
+
+        symbol = futureAliasSymbol
+      }
+
+      yield {
+        type: 'liquidation',
+        symbol,
+        exchange: this._exchange,
+        id: undefined,
+        price: huobiLiquidation.price,
+        amount: huobiLiquidation.volume,
+        side: huobiLiquidation.direction,
+        timestamp: new Date(huobiLiquidation.created_at),
+        localTimestamp: localTimestamp
       }
     }
   }
@@ -411,4 +497,30 @@ type HuobiMBPSnapshot = {
 type MBPInfo = {
   bufferedUpdates: CircularBuffer<HuobiMBPDataMessage>
   snapshotProcessed?: boolean
+}
+
+type HuobiLiquidationOrder = {
+  op: 'notify'
+  topic: string
+  ts: number
+  data: {
+    symbol: string
+    contract_code: string
+    direction: 'buy' | 'sell'
+    offset: string
+    volume: number
+    price: number
+    created_at: number
+  }[]
+}
+
+type HuobiContractInfo = {
+  op: 'notify'
+  topic: string
+  ts: number
+  data: {
+    symbol: string
+    contract_code: string
+    contract_type: 'this_week' | 'next_week' | 'quarter' | 'next_quarter'
+  }[]
 }

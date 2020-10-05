@@ -34,7 +34,13 @@ import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
 import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
-import { HuobiBookChangeMapper, HuobiDerivativeTickerMapper, HuobiMBPBookChangeMapper, HuobiTradesMapper } from './huobi'
+import {
+  HuobiBookChangeMapper,
+  HuobiDerivativeTickerMapper,
+  HuobiLiquidationsMapper,
+  HuobiMBPBookChangeMapper,
+  HuobiTradesMapper
+} from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
@@ -167,7 +173,9 @@ const liquidationsMappers = {
   'binance-futures': () => new BinanceLiquidationsMapper('binance-futures'),
   'binance-delivery': () => new BinanceLiquidationsMapper('binance-delivery'),
   'bitfinex-derivatives': () => new BitfinexLiquidationsMapper('bitfinex-derivatives'),
-  cryptofacilities: () => cryptofacilitiesLiquidationsMapper
+  cryptofacilities: () => cryptofacilitiesLiquidationsMapper,
+  'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
+  'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {

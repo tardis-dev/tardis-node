@@ -36,7 +36,9 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'binance-futures',
   'binance-delivery',
   'bitfinex-derivatives',
-  'cryptofacilities'
+  'cryptofacilities',
+  'huobi-dm',
+  'huobi-dm-swap'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -3290,6 +3292,102 @@ describe('mappers', () => {
             contract_status: 1
           }
         ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.BTC.liquidation_orders',
+        ts: 1593561769911,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200703',
+            direction: 'sell',
+            offset: 'close',
+            volume: 1450,
+            price: 9062.71,
+            created_at: 1593561769833
+          }
+        ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.BTC.contract_info',
+        ts: 1593561601464,
+        event: 'init',
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200703',
+            contract_type: 'this_week',
+            contract_size: 100,
+            price_tick: 0.01,
+            delivery_date: '20200703',
+            create_date: '20200612',
+            contract_status: 1
+          },
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200710',
+            contract_type: 'next_week',
+            contract_size: 100,
+            price_tick: 0.01,
+            delivery_date: '20200710',
+            create_date: '20200619',
+            contract_status: 1
+          },
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200925',
+            contract_type: 'quarter',
+            contract_size: 100,
+            price_tick: 0.01,
+            delivery_date: '20200925',
+            create_date: '20200605',
+            contract_status: 1
+          },
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC201225',
+            contract_type: 'next_quarter',
+            contract_size: 100,
+            price_tick: 0.01,
+            delivery_date: '20201225',
+            create_date: '20200612',
+            contract_status: 1
+          }
+        ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.BTC.liquidation_orders',
+        ts: 1593561773080,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200925',
+            direction: 'sell',
+            offset: 'close',
+            volume: 319,
+            price: 9115.43,
+            created_at: 1593561773025
+          }
+        ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.BTC.liquidation_orders',
+        ts: 1593593169204,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC200703',
+            direction: 'buy',
+            offset: 'close',
+            volume: 218,
+            price: 9244.08,
+            created_at: 1593593169156
+          }
+        ]
       }
     ]
 
@@ -3367,6 +3465,38 @@ describe('mappers', () => {
             funding_rate: '0.000100000000000000',
             estimated_rate: '0.000113655663368468',
             settlement_time: '1592913600000'
+          }
+        ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.ETH-USD.liquidation_orders',
+        ts: 1593610492198,
+        data: [
+          {
+            symbol: 'ETH',
+            contract_code: 'ETH-USD',
+            direction: 'buy',
+            offset: 'close',
+            volume: 231,
+            price: 229.95,
+            created_at: 1593610492167
+          }
+        ]
+      },
+      {
+        op: 'notify',
+        topic: 'public.BSV-USD.liquidation_orders',
+        ts: 1593585531616,
+        data: [
+          {
+            symbol: 'BSV',
+            contract_code: 'BSV-USD',
+            direction: 'sell',
+            offset: 'close',
+            volume: 3,
+            price: 153.28,
+            created_at: 1593585531562
           }
         ]
       }
