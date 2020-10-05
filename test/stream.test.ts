@@ -7,6 +7,7 @@ import {
   getExchangeDetails,
   normalizeBookChanges,
   normalizeDerivativeTickers,
+  normalizeLiquidations,
   normalizeTrades,
   streamNormalized
 } from '../dist'
@@ -30,6 +31,18 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'coinflex'
 ]
 
+const exchangesWithLiquidationsSupport: Exchange[] = [
+  'ftx',
+  'bitmex',
+  'deribit',
+  'binance-futures',
+  'binance-delivery',
+  'bitfinex-derivatives',
+  'cryptofacilities',
+  'huobi-dm',
+  'huobi-dm-swap'
+]
+
 describe('stream', () => {
   test(
     'streams normalized real-time messages for each supported exchange',
@@ -45,6 +58,10 @@ describe('stream', () => {
 
           if (exchangesWithDerivativeInfo.includes(exchange)) {
             normalizers.push(normalizeDerivativeTickers)
+          }
+
+          if (exchangesWithLiquidationsSupport.includes(exchange)) {
+            normalizers.push(normalizeLiquidations)
           }
 
           var symbols = exchangeDetails.availableSymbols

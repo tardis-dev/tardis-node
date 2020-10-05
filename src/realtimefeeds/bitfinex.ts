@@ -14,11 +14,20 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
 
     const subscribeMessages = filters
       .map((filter) => {
-        if (!filter.symbols || filter.symbols.length === 0) {
+        if (filter.channel !== 'liquidations' && (!filter.symbols || filter.symbols.length === 0)) {
           throw new Error('BitfinexRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
+        if (filter.channel === 'liquidations') {
+          return [
+            {
+              event: 'subscribe',
+              channel: 'status',
+              key: 'liq:global'
+            }
+          ]
+        }
 
-        return filter.symbols.map((symbol) => {
+        return filter.symbols!.map((symbol) => {
           if (filter.channel === 'trades') {
             return {
               event: 'subscribe',
@@ -53,14 +62,6 @@ export class BitfinexRealTimeFeed extends RealTimeFeedBase {
               prec: 'R0',
               freq: 'F0',
               symbol: `t${symbol}`
-            }
-          }
-
-          if (filter.channel === 'liquidations') {
-            return {
-              event: 'subscribe',
-              channel: 'status',
-              key: 'liq:global'
             }
           }
 
