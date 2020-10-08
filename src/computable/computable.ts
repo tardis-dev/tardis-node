@@ -26,13 +26,13 @@ async function* _compute<T extends ComputableFactory<any>[], U extends Normalize
     const normalizedMessage = message as NormalizedData
     const id = normalizedMessage.name !== undefined ? `${normalizedMessage.symbol}:${normalizedMessage.name}` : normalizedMessage.symbol
 
-    const computables = factory.getOrCreate(normalizedMessage.exchange, id)
+    const computablesMap = factory.getOrCreate(normalizedMessage.exchange, id)
+    const computables = computablesMap[normalizedMessage.type]
+    if (!computables) continue
 
     for (const computable of computables) {
-      if (computable.sourceDataTypes.includes(normalizedMessage.type)) {
-        for (const computedMessage of computable.compute(normalizedMessage)) {
-          yield computedMessage
-        }
+      for (const computedMessage of computable.compute(normalizedMessage)) {
+        yield computedMessage
       }
     }
   }
@@ -54,7 +54,7 @@ export function compute<T extends ComputableFactory<any>[], U extends Normalized
 class Computables {
   private _computables: {
     [ex in Exchange]?: {
-      [key: string]: Computable<any>[]
+      [key: string]: { [dataType: string]: Computable<any>[] }
     }
   } = {}
 
@@ -66,7 +66,7 @@ class Computables {
     }
 
     if (this._computables[exchange]![id] === undefined) {
-      this._computables[exchange]![id] = this._computablesFactories.map((c) => c())
+      this._computables[exchange]![id] = createComputablesMap(this._computablesFactories.map((c) => c()))
     }
 
     return this._computables[exchange]![id]!
@@ -75,4 +75,18 @@ class Computables {
   reset(exchange: Exchange) {
     this._computables[exchange] = undefined
   }
+}
+
+function createComputablesMap(computables: Computable<any>[]) {
+  return computables.reduce((acc, computable) => {
+    computable.sourceDataTypes.forEach((dataType) => {
+      const existing = acc[dataType]
+      if (!existing) {
+        acc[dataType] = [computable]
+      } else {
+        acc[dataType].push(computable)
+      }
+    })
+    return acc
+  }, {} as { [dataType: string]: Computable<any>[] })
 }
