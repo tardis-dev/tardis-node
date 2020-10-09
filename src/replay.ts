@@ -37,7 +37,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   const fromDate = parseAsUTCDate(from)
   const toDate = parseAsUTCDate(to)
   const cachedSlicePaths = new Map<string, string>()
-  let workerError
+  let replayError
   debug('replay for exchange: %s started - from: %s, to: %s, filters: %o', exchange, fromDate.toISOString(), toDate.toISOString(), filters)
 
   const options = getOptions()
@@ -66,7 +66,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   worker.on('error', (err) => {
     debug('worker error %o', err)
 
-    workerError = err
+    replayError = err
   })
 
   worker.on('exit', (code) => {
@@ -89,9 +89,9 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       while (cachedSlicePath === undefined) {
         cachedSlicePath = cachedSlicePaths.get(sliceKey)
 
-        // if something went wrong with worker throw error it has returned (network issue, auth issue etc)
-        if (workerError !== undefined) {
-          throw workerError
+        // if something went wrong(network issue, auth issue, gunzip issue etc)
+        if (replayError !== undefined) {
+          throw replayError
         }
 
         if (cachedSlicePath === undefined) {
@@ -105,6 +105,10 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
         // unzip it
         .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
+        .on('error',(err) => {
+          debug('gunzip error %o', err)
+          replayError = err
+        })
         // and split by new line
         .pipe(new BinarySplitStream())
 
