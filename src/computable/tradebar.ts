@@ -1,4 +1,4 @@
-import { Trade, TradeBar, Writeable } from '../types'
+import { BookChange, NormalizedData, Trade, TradeBar, Writeable } from '../types'
 import { Computable } from './computable'
 
 const DATE_MIN = new Date(-1)
@@ -16,7 +16,11 @@ const kindSuffix: { [key in BarKind]: string } = {
 }
 
 class TradeBarComputable implements Computable<TradeBar> {
-  public readonly sourceDataTypes = ['trade']
+  // use book_change messages as workaround for issue when time passes for new bar to be produced but there's no trades,
+  // so logic `compute` would not execute
+  // assumption is that if one subscribes to book changes too then there's pretty good chance that
+  // even if there are no trades, there's plenty of book changes that trigger computing new trade bar if time passess
+  public readonly sourceDataTypes = ['trade', 'book_change']
 
   private _inProgressBar: Writeable<TradeBar>
   private readonly _kind: BarKind
@@ -38,25 +42,29 @@ class TradeBarComputable implements Computable<TradeBar> {
     this._reset()
   }
 
-  public *compute(trade: Trade) {
+  public *compute(message: Trade | BookChange) {
     // first check if there is a new trade bar for new timestamp for time based trade bars
-    if (this._hasNewBar(trade.timestamp)) {
-      yield this._computeBar(trade)
+    if (this._hasNewBar(message.timestamp)) {
+      yield this._computeBar(message)
+    }
+
+    if (message.type !== 'trade') {
+      return
     }
 
     // update in progress trade bar with new data
-    this._update(trade)
+    this._update(message)
 
     // and check again if there is a new trade bar after the update (volume/tick based trade bars)
-    if (this._hasNewBar(trade.timestamp)) {
-      yield this._computeBar(trade)
+    if (this._hasNewBar(message.timestamp)) {
+      yield this._computeBar(message)
     }
   }
 
-  private _computeBar(trade: Trade) {
-    this._inProgressBar.localTimestamp = trade.localTimestamp
-    this._inProgressBar.symbol = trade.symbol
-    this._inProgressBar.exchange = trade.exchange
+  private _computeBar(message: NormalizedData) {
+    this._inProgressBar.localTimestamp = message.localTimestamp
+    this._inProgressBar.symbol = message.symbol
+    this._inProgressBar.exchange = message.exchange
 
     const tradeBar: TradeBar = { ...this._inProgressBar }
 
