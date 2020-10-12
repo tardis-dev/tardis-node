@@ -151,7 +151,8 @@ const BINANCE_FUTURES_CHANNELS = [
   'bookTicker',
   'forceOrder',
   'openInterest',
-  'recentTrades'
+  'recentTrades',
+  'compositeIndex'
 ]
 
 const BINANCE_DELIVERY_CHANNELS = [
