@@ -8,19 +8,21 @@ const fromMicroSecondsToDate = (micros: number) => {
   return timestamp
 }
 
-export const deltaTradesMapper: Mapper<'delta', Trade> = {
+export class DeltaTradesMapper implements Mapper<'delta', Trade> {
+  constructor(private _useV2Channels: boolean) {}
+
   canHandle(message: DeltaTrade) {
-    return message.type === 'recent_trade'
-  },
+    return message.type === (this._useV2Channels ? 'all_trades' : 'recent_trade')
+  }
 
   getFilters(symbols?: string[]) {
     return [
       {
-        channel: 'recent_trade',
+        channel: this._useV2Channels ? 'all_trades' : 'recent_trade',
         symbols
       } as const
     ]
-  },
+  }
 
   *map(message: DeltaTrade, localTimestamp: Date): IterableIterator<Trade> {
     yield {
@@ -73,16 +75,22 @@ export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
 }
 
 export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTicker> {
+  constructor(private _useV2Channels: boolean) {}
+
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: DeltaTrade | DeltaMarkPrice | DeltaFundingRate) {
-    return message.type === 'recent_trade' || message.type === 'funding_rate' || message.type === 'mark_price'
+    return (
+      message.type === (this._useV2Channels ? 'all_trades' : 'recent_trade') ||
+      message.type === 'funding_rate' ||
+      message.type === 'mark_price'
+    )
   }
 
   getFilters(symbols?: string[]) {
     return [
       {
-        channel: 'recent_trade',
+        channel: this._useV2Channels ? 'all_trades' : 'recent_trade',
         symbols
       } as const,
       {
@@ -99,7 +107,7 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
   *map(message: DeltaTrade | DeltaMarkPrice | DeltaFundingRate, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.symbol.replace('MARK:', ''), 'delta')
 
-    if (message.type === 'recent_trade') {
+    if (message.type === 'recent_trade' || message.type === 'all_trades') {
       pendingTickerInfo.updateLastPrice(Number(message.price))
     }
     if (message.type === 'mark_price') {
@@ -134,7 +142,7 @@ type DeltaTrade = {
   size: number
   symbol: string
   timestamp: number
-  type: 'recent_trade'
+  type: 'recent_trade' | 'all_trades'
 }
 
 type DeltaBookLevel = {

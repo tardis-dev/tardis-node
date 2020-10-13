@@ -2260,9 +2260,76 @@ describe('mappers', () => {
       }
     ]
 
-    const deltaMapper = createMapper('delta', new Date())
+    const v2Messages = [
+      {
+        buyer_role: 'maker',
+        price: '9522.0',
+        product_id: 27,
+        seller_role: 'taker',
+        size: 4662,
+        symbol: 'BTCUSDT',
+        timestamp: 1592352002423123,
+        type: 'recent_trade'
+      },
+      {
+        buyer_role: 'maker',
+        price: '50.34',
+        product_id: 188,
+        seller_role: 'taker',
+        size: 46,
+        symbol: 'LTCUSDT',
+        timestamp: 1602585251855645,
+        type: 'all_trades'
+      },
+      {
+        close: 11540.5,
+        high: 11717.5,
+        low: 11225,
+        mark_price: '11537.538898',
+        open: 11332.5,
+        product_id: 27,
+        size: 5748794,
+        spot_price: '11537.623333333331',
+        symbol: 'BTCUSD',
+        timestamp: 1602585247446827,
+        turnover: 499.8070683500003,
+        turnover_symbol: 'BTC',
+        turnover_usd: 5748598.978422551,
+        type: 'v2/ticker',
+        volume: 5748794
+      },
+      {
+        funding_rate: 0.01,
+        funding_rate_8h: 0.01,
+        next_funding_realization: 1602604800000000,
+        predicted_funding_rate: 0.010000000000000002,
+        predicted_funding_rate_8h: 0.010000000000000002,
+        product_id: 27,
+        symbol: 'BTCUSD',
+        timestamp: 1602585247941647,
+        type: 'funding_rate'
+      },
+      {
+        annualized_basis: '-0.0964916589141385196387753250',
+        price: '11536.746127',
+        price_band: { lower_limit: '11248.25543107500000000000000', upper_limit: '11825.08904292500000000000000' },
+        product_id: 27,
+        symbol: 'MARK:BTCUSD',
+        timestamp: 1602585252946976,
+        type: 'mark_price'
+      }
+    ]
+
+    let deltaMapper = createMapper('delta', new Date('2020-10-13T00:00:01.2750543Z'))
     for (const message of messages) {
       const mappedMessages = deltaMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    deltaMapper = createMapper('delta', new Date('2020-10-14T00:00:01.2750543Z'))
+
+    for (const message of v2Messages) {
+      const mappedMessages = deltaMapper.map(message, new Date('2020-10-14T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

@@ -21,7 +21,7 @@ import {
   cryptofacilitiesLiquidationsMapper,
   cryptofacilitiesTradesMapper
 } from './cryptofacilities'
-import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, deltaTradesMapper } from './delta'
+import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta'
 import {
   deribitBookChangeMapper,
   DeribitDerivativeTickerMapper,
@@ -88,7 +88,7 @@ const tradesMappers = {
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
-  delta: () => deltaTradesMapper,
+  delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
   'gate-io': () => new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
   poloniex: () => new PoloniexTradesMapper(),
@@ -154,7 +154,7 @@ const derivativeTickersMappers = {
   bybit: () => new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
-  delta: () => new DeltaDerivativeTickerMapper(),
+  delta: (localTimestamp: Date) => new DeltaDerivativeTickerMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
   'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
@@ -178,14 +178,14 @@ const liquidationsMappers = {
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap')
 }
 
-export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Trade> => {
+export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {
   const createTradesMapper = tradesMappers[exchange]
 
   if (createTradesMapper === undefined) {
     throw new Error(`normalizeTrades: ${exchange} not supported`)
   }
 
-  return createTradesMapper() as Mapper<T, Trade>
+  return createTradesMapper(localTimestamp) as Mapper<T, Trade>
 }
 
 export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
@@ -203,7 +203,7 @@ export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
 
 export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(
   exchange: T,
-  _localTimestamp: Date
+  localTimestamp: Date
 ): Mapper<T, DerivativeTicker> => {
   const createDerivativeTickerMapper = derivativeTickersMappers[exchange]
 
@@ -211,7 +211,7 @@ export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTick
     throw new Error(`normalizeDerivativeTickers: ${exchange} not supported`)
   }
 
-  return createDerivativeTickerMapper() as any
+  return createDerivativeTickerMapper(localTimestamp) as any
 }
 
 export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMappers>(

@@ -2363,6 +2363,78 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 11`] = `Array []`;
+
+exports[`mappers map delta messages 12`] = `
+Array [
+  Object {
+    "amount": 46,
+    "exchange": "delta",
+    "id": undefined,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "price": 50.34,
+    "side": "sell",
+    "symbol": "LTCUSDT",
+    "timestamp": 2020-10-13T10:34:11.855Z,
+    "type": "trade",
+  },
+  Object {
+    "exchange": "delta",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 50.34,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "LTCUSDT",
+    "timestamp": 2020-10-13T10:34:11.855Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 13`] = `Array []`;
+
+exports[`mappers map delta messages 14`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": 0.01,
+    "fundingTimestamp": 2020-10-13T16:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.010000000000000002,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-10-13T10:34:07.941Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map delta messages 15`] = `
+Array [
+  Object {
+    "exchange": "delta",
+    "fundingRate": 0.01,
+    "fundingTimestamp": 2020-10-13T16:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "markPrice": 11536.746127,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.010000000000000002,
+    "symbol": "BTCUSD",
+    "timestamp": 2020-10-13T10:34:12.946Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {
