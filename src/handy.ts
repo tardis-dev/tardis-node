@@ -280,6 +280,7 @@ export async function download({
   }
 }
 
+export const tmpFileCleanups = new Map<string, () => void>()
 async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string) {
   // first ensure that directory where we want to download file exists
   ensureDirSync(path.dirname(downloadPath))
@@ -288,6 +289,14 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
   const tmpFilePath = `${downloadPath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
   const fileWriteStream = createWriteStream(tmpFilePath)
+  const cleanup = () => {
+    try {
+      fileWriteStream.destroy()
+      removeSync(tmpFilePath)
+    } catch {}
+  }
+  tmpFileCleanups.set(tmpFilePath, cleanup)
+
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
     await new Promise((resolve, reject) => {
@@ -329,10 +338,8 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     // then we're sure that responses is 100% saved and also even if different process was doing the same we're good
     await rename(tmpFilePath, downloadPath)
   } finally {
-    fileWriteStream.destroy()
-    try {
-      removeSync(tmpFilePath)
-    } catch {}
+    tmpFileCleanups.delete(tmpFilePath)
+    cleanup()
   }
 }
 

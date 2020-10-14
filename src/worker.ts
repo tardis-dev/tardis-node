@@ -1,8 +1,8 @@
 import dbg from 'debug'
-import { existsSync } from 'fs-extra'
+import { existsSync, removeSync } from 'fs-extra'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait } from './handy'
+import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, tmpFileCleanups } from './handy'
 import { Exchange, Filter } from './types'
 
 const debug = dbg('tardis-dev')
@@ -10,6 +10,12 @@ const debug = dbg('tardis-dev')
 if (isMainThread) {
   debug('existing, worker is not meant to run in main thread')
 } else {
+  parentPort!.on('message', (signal: WorkerSignal) => {
+    if (signal === WorkerSignal.BEFORE_TERMINATE) {
+      tmpFileCleanups.forEach((cleanup) => cleanup())
+      parentPort!.postMessage(WorkerSignal.READY_TO_TERMINATE)
+    }
+  })
   getDataFeedSlices(workerData as WorkerJobPayload)
 }
 
@@ -126,4 +132,9 @@ export type WorkerJobPayload = {
   exchange: Exchange
   filters: Filter<any>[]
   waitWhenDataNotYetAvailable?: boolean | number
+}
+
+export const enum WorkerSignal {
+  BEFORE_TERMINATE = 'BEFORE_TERMINATE',
+  READY_TO_TERMINATE = 'READY_TO_TERMINATE'
 }

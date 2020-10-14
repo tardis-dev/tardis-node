@@ -9,7 +9,7 @@ import { getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait, addDays 
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
-import { WorkerJobPayload, WorkerMessage } from './worker'
+import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker'
 import { clearCacheSync } from './clearcache'
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
@@ -105,7 +105,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
         // unzip it
         .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
-        .on('error',(err) => {
+        .on('error', (err) => {
           debug('gunzip error %o', err)
           replayError = err
         })
@@ -194,8 +194,25 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       )
     }
 
-    await worker.terminate()
+    await terminateWorker(worker, 500)
   }
+}
+
+// gracefully terminate worker
+async function terminateWorker(worker: Worker, waitTimeout: number) {
+  let cancelWait = () => {}
+  const maxWaitGuard = new Promise((resolve) => {
+    const timeoutId = setTimeout(resolve, waitTimeout)
+    cancelWait = () => clearTimeout(timeoutId)
+  })
+
+  const readyToTerminate = new Promise((resolve) => {
+    worker.once('message', (signal) => signal === WorkerSignal.READY_TO_TERMINATE && resolve())
+  }).then(cancelWait)
+
+  worker.postMessage(WorkerSignal.BEFORE_TERMINATE)
+  await Promise.race([readyToTerminate, maxWaitGuard])
+  await worker.terminate()
 }
 
 export function replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
