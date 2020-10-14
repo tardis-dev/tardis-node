@@ -2,7 +2,7 @@ import dbg from 'debug'
 import { existsSync, removeSync } from 'fs-extra'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, tmpFileCleanups } from './handy'
+import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy'
 import { Exchange, Filter } from './types'
 
 const debug = dbg('tardis-dev')
@@ -12,7 +12,7 @@ if (isMainThread) {
 } else {
   parentPort!.on('message', (signal: WorkerSignal) => {
     if (signal === WorkerSignal.BEFORE_TERMINATE) {
-      tmpFileCleanups.forEach((cleanup) => cleanup())
+      cleanTempFiles()
       parentPort!.postMessage(WorkerSignal.READY_TO_TERMINATE)
     }
   })

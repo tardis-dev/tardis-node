@@ -280,7 +280,12 @@ export async function download({
   }
 }
 
-export const tmpFileCleanups = new Map<string, () => void>()
+const tmpFileCleanups = new Map<string, () => void>()
+
+export function cleanTempFiles() {
+  tmpFileCleanups.forEach((cleanup) => cleanup())
+}
+
 async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string) {
   // first ensure that directory where we want to download file exists
   ensureDirSync(path.dirname(downloadPath))
