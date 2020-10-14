@@ -105,12 +105,16 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
         // unzip it
         .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
-        .on('error', (err) => {
+        .on('error', function onGunzipError(err) {
           debug('gunzip error %o', err)
-          replayError = err
+          linesStream.destroy(err)
         })
         // and split by new line
         .pipe(new BinarySplitStream())
+        .on('error', function onBinarySplitStreamError(err) {
+          debug('binary split stream error %o', err)
+          linesStream.destroy(err)
+        })
 
       let linesCount = 0
       // date is always formatted to have lendth of 28 so we can skip looking for first space in line and use it
