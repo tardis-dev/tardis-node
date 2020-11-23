@@ -51,6 +51,7 @@ describe('stream', () => {
         EXCHANGES.map(async (exchange) => {
           if (
             exchange === 'binance-dex' ||
+            exchange === 'binance-jersey' ||
             exchange === 'okex-options' ||
             exchange === 'okex-futures' ||
             exchange === 'coinflex' ||
