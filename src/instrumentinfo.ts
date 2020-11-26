@@ -78,9 +78,9 @@ export interface InstrumentInfo {
   /** only for derivatives */
   contractMultiplier?: number
   /** only for quanto instruments */
-  quantoUnit?: string
-  /** only for quanto instruments */
-  quantoMultiplier?: number
+  quanto?: boolean
+  /**  only for quanto instruments as settlement currency is different base/quote currency */
+  settlementCurrency?: string
   /** strike price, only for options */
   strikePrice?: number
   /** option type, only for options */
