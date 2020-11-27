@@ -304,7 +304,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const req = https
         .get(url, requestOptions, (res) => {
           const { statusCode } = res

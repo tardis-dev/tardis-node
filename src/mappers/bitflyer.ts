@@ -23,7 +23,7 @@ export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
       const timestamp = new Date(execution.exec_date)
       timestamp.μs = parseμs(execution.exec_date)
 
-      yield {
+      const trade: Trade = {
         type: 'trade',
         symbol,
         exchange: 'bitflyer',
@@ -34,6 +34,8 @@ export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
         timestamp,
         localTimestamp: localTimestamp
       }
+
+      yield trade
     }
   }
 }

@@ -210,7 +210,7 @@ async function terminateWorker(worker: Worker, waitTimeout: number) {
     cancelWait = () => clearTimeout(timeoutId)
   })
 
-  const readyToTerminate = new Promise((resolve) => {
+  const readyToTerminate = new Promise<void>((resolve) => {
     worker.once('message', (signal) => signal === WorkerSignal.READY_TO_TERMINATE && resolve())
   }).then(cancelWait)
 

@@ -19,7 +19,7 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
 
   *map(bitmexTradesMessage: BitmexTradesMessage, localTimestamp: Date) {
     for (const bitmexTrade of bitmexTradesMessage.data) {
-      yield {
+      const trade: Trade = {
         type: 'trade',
         symbol: bitmexTrade.symbol,
         exchange: 'bitmex',
@@ -30,6 +30,8 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
         timestamp: new Date(bitmexTrade.timestamp),
         localTimestamp: localTimestamp
       }
+
+      yield trade
     }
   }
 }
