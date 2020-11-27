@@ -248,7 +248,7 @@ export async function download({
     }
   }
 
-  const MAX_ATTEMPTS = 5
+  const MAX_ATTEMPTS = 8
   let attempts = 0
 
   while (true) {
@@ -312,6 +312,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
             // read the error response text and throw it as an HttpError
             res.setEncoding('utf8')
             let body = ''
+            res.on('error', reject)
             res.on('data', (chunk) => (body += chunk))
             res.on('end', () => {
               reject(new HttpError(statusCode!, body, url))
