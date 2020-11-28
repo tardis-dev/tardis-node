@@ -42,28 +42,36 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
     await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
   }
 
-  // fetch first slice - it will tell us if user has access to the beginning of requested date range
-  await getDataFeedSlice(payload, 0, filters, cacheDir)
   const waitOffsetMS =
     typeof payload.waitWhenDataNotYetAvailable === 'number'
       ? payload.waitWhenDataNotYetAvailable * MILLISECONDS_IN_MINUTE
       : 30 * MILLISECONDS_IN_MINUTE
 
   if (payload.waitWhenDataNotYetAvailable !== undefined && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS) {
-    const timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+    let timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
 
-    const minutesCountTharAreAlreadyAvailableToFetch = Math.floor(
-      (timestampForLastAvailableData - payload.fromDate.getTime()) / MILLISECONDS_IN_MINUTE
+    // in case when even initial from date is not yet available wait until it is
+    if (timestampForLastAvailableData < payload.fromDate.valueOf()) {
+      const initialWaitTime = payload.fromDate.valueOf() - timestampForLastAvailableData
+      if (initialWaitTime > 0) {
+        await wait(initialWaitTime)
+      }
+    }
+
+    // fetch concurently any data that is already available
+    timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+    const minutesCountThatAreAlreadyAvailableToFetch = Math.floor(
+      (timestampForLastAvailableData - payload.fromDate.valueOf()) / MILLISECONDS_IN_MINUTE
     )
 
-    await pMap(sequence(minutesCountTharAreAlreadyAvailableToFetch, 1), (offset) => getDataFeedSlice(payload, offset, filters, cacheDir), {
+    await pMap(sequence(minutesCountThatAreAlreadyAvailableToFetch, 0), (offset) => getDataFeedSlice(payload, offset, filters, cacheDir), {
       concurrency: CONCURRENCY_LIMIT
     })
 
     // for remaining data iterate one by one and wait as needed
-    for (let offset = minutesCountTharAreAlreadyAvailableToFetch; offset < minutesCountToFetch; offset++) {
+    for (let offset = minutesCountThatAreAlreadyAvailableToFetch; offset < minutesCountToFetch; offset++) {
       const timestampToFetch = payload.fromDate.valueOf() + offset * MILLISECONDS_IN_MINUTE
-      const timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+      timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
 
       if (timestampToFetch > timestampForLastAvailableData) {
         await wait(MILLISECONDS_IN_MINUTE)
@@ -71,6 +79,9 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
       await getDataFeedSlice(payload, offset, filters, cacheDir)
     }
   } else {
+    // fetch first slice - it will tell us if user has access to the beginning of requested date range
+    await getDataFeedSlice(payload, 0, filters, cacheDir)
+
     // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
     await pMap(
       sequence(minutesCountToFetch, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch
