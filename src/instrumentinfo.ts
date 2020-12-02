@@ -4,10 +4,23 @@ import type { SymbolType } from './exchangedetails'
 import type { Exchange } from './types'
 
 export async function getInstrumentInfo(exchange: Exchange): Promise<InstrumentInfo[]>
-export async function getInstrumentInfo(exchange: Exchange, filter: InstrumentInfoFilter): Promise<InstrumentInfo[]>
+export async function getInstrumentInfo(exchange: Exchange | Exchange[], filter: InstrumentInfoFilter): Promise<InstrumentInfo[]>
 export async function getInstrumentInfo(exchange: Exchange, symbol: string): Promise<InstrumentInfo>
-export async function getInstrumentInfo(exchange: Exchange, filterOrSymbol?: InstrumentInfoFilter | string) {
+
+export async function getInstrumentInfo(exchange: Exchange | Exchange[], filterOrSymbol?: InstrumentInfoFilter | string) {
+  if (Array.isArray(exchange)) {
+    const exchanges = exchange
+    const results = await Promise.all(exchanges.map((e) => getInstrumentInfoForExchange(e, filterOrSymbol)))
+
+    return results.flat()
+  } else {
+    return getInstrumentInfoForExchange(exchange, filterOrSymbol)
+  }
+}
+
+async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?: InstrumentInfoFilter | string) {
   const options = getOptions()
+
   let url = `${options.endpoint}/instruments/${exchange}`
   if (typeof filterOrSymbol === 'string') {
     url += `/${filterOrSymbol}`
@@ -42,8 +55,26 @@ type InstrumentInfoFilter = {
   baseCurrency?: string | string[]
   quoteCurrency?: string | string[]
   type?: SymbolType | SymbolType[]
+  contractType?: ContractType | ContractType[]
   active?: boolean
 }
+
+export type ContractType =
+  | 'move'
+  | 'linear_future'
+  | 'inverse_future'
+  | 'quanto_future'
+  | 'linear_perpetual'
+  | 'inverse_perpetual'
+  | 'quanto_perpetual'
+  | 'put_option'
+  | 'call_option'
+  | 'turbo_put_option'
+  | 'turbo_call_option'
+  | 'spread'
+  | 'interest_rate_swap'
+  | 'repo'
+  | 'index'
 
 export interface InstrumentInfo {
   /** symbol id */
