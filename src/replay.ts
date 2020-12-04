@@ -1,7 +1,7 @@
 import { createReadStream } from 'fs-extra'
 import path from 'path'
 import { Worker } from 'worker_threads'
-import zlib from 'zlib'
+import { constants, createGunzip } from 'zlib'
 import { BinarySplitStream } from './binarysplit'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
@@ -74,6 +74,20 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   })
 
   try {
+    // date is always formatted to have length of 28 so we can skip looking for first space in line and use it
+    // as hardcoded value
+    const DATE_MESSAGE_SPLIT_INDEX = 28
+
+    // experimental more lenient gzip decompression, behind env flag for now
+    // see https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239
+
+    const ZLIB_OPTIONS = process.env.TARDIS_LENIENT_GZIP_DECOMPRESS
+      ? {
+          chunkSize: 128 * 1024,
+          flush: constants.Z_SYNC_FLUSH,
+          finishFlush: constants.Z_SYNC_FLUSH
+        }
+      : { chunkSize: 128 * 1024 }
     // helper flag that helps us not yielding two subsequent undefined/disconnect messages
     let lastMessageWasUndefined = false
 
@@ -104,7 +118,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       // response is a path to file on disk let' read it as stream
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
         // unzip it
-        .pipe(zlib.createGunzip({ chunkSize: 128 * 1024 }))
+        .pipe(createGunzip(ZLIB_OPTIONS))
         .on('error', function onGunzipError(err) {
           debug('gunzip error %o', err)
           linesStream.destroy(err)
@@ -117,12 +131,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
         })
 
       let linesCount = 0
-      // date is always formatted to have lendth of 28 so we can skip looking for first space in line and use it
-      // as hardcoded value
-      const DATE_MESSAGE_SPLIT_INDEX = 28
 
-      for await (const line of linesStream) {
-        const bufferLine = line as Buffer
+      for await (const bufferLine of (linesStream as unknown) as Iterable<Buffer>) {
         linesCount++
         if (bufferLine.length > 0) {
           lastMessageWasUndefined = false
