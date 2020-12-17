@@ -11,6 +11,7 @@ export const EXCHANGES = [
   'okex',
   'huobi-dm',
   'huobi-dm-swap',
+  'huobi-dm-linear-swap',
   'huobi',
   'bitfinex-derivatives',
   'bitfinex',
@@ -104,6 +105,7 @@ const OKEX_FUTURES_CHANNELS = [
   'futures/depth_l2_tbt',
   'futures/ticker',
   'futures/mark_price',
+  'futures/liquidation',
   'index/ticker',
   'system/status'
 ]
@@ -115,6 +117,7 @@ const OKEX_SWAP_CHANNELS = [
   'swap/ticker',
   'swap/funding_rate',
   'swap/mark_price',
+  'swap/liquidation',
   'index/ticker',
   'system/status'
 ]
@@ -152,7 +155,10 @@ const BINANCE_FUTURES_CHANNELS = [
   'forceOrder',
   'openInterest',
   'recentTrades',
-  'compositeIndex'
+  'compositeIndex',
+  'topLongShortAccountRatio',
+  'topLongShortPositionRatio',
+  'globalLongShortAccountRatio'
 ]
 
 const BINANCE_DELIVERY_CHANNELS = [
@@ -166,7 +172,10 @@ const BINANCE_DELIVERY_CHANNELS = [
   'bookTicker',
   'forceOrder',
   'openInterest',
-  'recentTrades'
+  'recentTrades',
+  'topLongShortAccountRatio',
+  'topLongShortPositionRatio',
+  'globalLongShortAccountRatio'
 ]
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations'] as const
@@ -187,9 +196,21 @@ const HUOBI_DM_SWAP_CHANNELS = [
   'open_interest'
 ] as const
 
+const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
+  'depth',
+  'detail',
+  'trade',
+  'bbo',
+  'basis',
+  'funding_rate',
+  'liquidation_orders',
+  'contract_info',
+  'open_interest'
+] as const
+
 const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
 
-const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200'] as const
+const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200', 'liquidation'] as const
 
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
@@ -238,6 +259,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   huobi: HUOBI_CHANNELS,
   'huobi-dm': HUOBI_DM_CHANNELS,
   'huobi-dm-swap': HUOBI_DM_SWAP_CHANNELS,
+  'huobi-dm-linear-swap': HUOBI_DM_LINEAR_SWAP_CHANNELS,
   bybit: BYBIT_CHANNELS,
   okcoin: OKCOIN_CHANNELS,
   hitbtc: HITBTC_CHANNELS,

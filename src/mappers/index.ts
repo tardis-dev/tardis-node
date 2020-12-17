@@ -84,6 +84,7 @@ const tradesMappers = {
   huobi: () => new HuobiTradesMapper('huobi'),
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
+  'huobi-dm-linear-swap': () => new HuobiTradesMapper('huobi-dm-linear-swap'),
   bybit: () => new BybitTradesMapper('bybit'),
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
@@ -130,6 +131,7 @@ const bookChangeMappers = {
 
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
+  'huobi-dm-linear-swap': () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
   bybit: () => new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
@@ -157,6 +159,7 @@ const derivativeTickersMappers = {
   delta: (localTimestamp: Date) => new DeltaDerivativeTickerMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
   'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
+  'huobi-dm-linear-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
   coinflex: () => new CoinflexDerivativeTickerMapper()
 }
@@ -175,7 +178,8 @@ const liquidationsMappers = {
   'bitfinex-derivatives': () => new BitfinexLiquidationsMapper('bitfinex-derivatives'),
   cryptofacilities: () => cryptofacilitiesLiquidationsMapper,
   'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap')
+  'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
+  'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

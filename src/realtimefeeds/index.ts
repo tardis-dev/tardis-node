@@ -18,7 +18,7 @@ import { DeribitRealTimeDataFeed } from './deribit'
 import { FtxRealTimeFeed, FtxUSRealTimeFeed } from './ftx'
 import { GeminiRealTimeFeed } from './gemini'
 import { HitBtcRealTimeFeed } from './hitbtc'
-import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiDMSwapRealTimeFeed } from './huobi'
+import { HuobiDMRealTimeFeed, HuobiRealTimeFeed, HuobiDMSwapRealTimeFeed, HuobiDMLinearSwapRealTimeFeed } from './huobi'
 import { KrakenRealTimeFeed } from './kraken'
 import { OKCoinRealTimeFeed, OkexRealTimeFeed } from './okex'
 import { RealTimeFeed } from './realtimefeed'
@@ -58,6 +58,7 @@ const realTimeFeedsMap: {
   'okex-options': OkexRealTimeFeed,
   'huobi-dm': HuobiDMRealTimeFeed,
   'huobi-dm-swap': HuobiDMSwapRealTimeFeed,
+  'huobi-dm-linear-swap': HuobiDMLinearSwapRealTimeFeed,
   huobi: HuobiRealTimeFeed,
   bybit: BybitRealTimeDataFeed,
   okcoin: OKCoinRealTimeFeed,

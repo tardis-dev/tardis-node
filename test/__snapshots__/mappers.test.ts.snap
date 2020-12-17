@@ -4022,6 +4022,125 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi-dm-linear-swap, messages 1`] = `Array []`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 2`] = `Array []`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 3`] = `Array []`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 4`] = `
+Array [
+  Object {
+    "amount": 30,
+    "exchange": "huobi-dm-linear-swap",
+    "id": "2918924670000",
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "price": 3.2658,
+    "side": "buy",
+    "symbol": "EOS-USDT",
+    "timestamp": 2020-12-01T00:00:32.955Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 118,
+        "price": 6.7918,
+      },
+      Object {
+        "amount": 0,
+        "price": 6.7941,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "huobi-dm-linear-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "symbol": "ETC-USDT",
+    "timestamp": 2020-12-01T00:00:33.036Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 6`] = `
+Array [
+  Object {
+    "exchange": "huobi-dm-linear-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 19695.41,
+    "lastPrice": 19717.9,
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDT",
+    "timestamp": 2020-12-01T00:00:06.356Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 7`] = `
+Array [
+  Object {
+    "exchange": "huobi-dm-linear-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 19695.41,
+    "lastPrice": 19717.9,
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": 3063121,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDT",
+    "timestamp": 2020-12-01T00:00:07.036Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 8`] = `
+Array [
+  Object {
+    "exchange": "huobi-dm-linear-swap",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2020-12-01T00:00:00.000Z,
+    "indexPrice": 19695.41,
+    "lastPrice": 19717.9,
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": 3063121,
+    "predictedFundingRate": 0.000236636095370214,
+    "symbol": "BTC-USDT",
+    "timestamp": 2020-12-01T00:00:07.036Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 9`] = `
+Array [
+  Object {
+    "amount": 227,
+    "exchange": "huobi-dm-linear-swap",
+    "id": undefined,
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "price": 23350.5,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2020-12-17T17:35:02.284Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm-swap, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm-swap, messages 2`] = `Array []`;

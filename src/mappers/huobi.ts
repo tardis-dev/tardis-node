@@ -5,7 +5,7 @@ import { CircularBuffer } from '../handy'
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
-export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap', Trade> {
+export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Trade> {
   private readonly _seenSymbols = new Set<string>()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -52,7 +52,7 @@ export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-d
   }
 }
 
-export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap', BookChange> {
+export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookChange> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {
@@ -244,7 +244,7 @@ function normalizeSymbols(symbols?: string[]) {
   return
 }
 
-export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap', DerivativeTicker> {
+export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -272,7 +272,8 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
         symbols
       }
     ]
-    if (this._exchange === 'huobi-dm-swap') {
+
+    if (this._exchange === 'huobi-dm-swap' || this._exchange === 'huobi-dm-linear-swap') {
       filters.push({
         channel: 'funding_rate',
         symbols
@@ -322,7 +323,7 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
   }
 }
 
-export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap', Liquidation> {
+export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Liquidation> {
   private readonly _contractCodeToSymbolMap: Map<string, string> = new Map()
   private readonly _contractTypesSuffixes = { this_week: 'CW', next_week: 'NW', quarter: 'CQ', next_quarter: 'NQ' }
 

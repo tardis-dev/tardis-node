@@ -24,7 +24,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm',
   'huobi-dm-swap',
   'gate-io-futures',
-  'coinflex'
+  'coinflex',
+  'huobi-dm-linear-swap'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
@@ -38,7 +39,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'bitfinex-derivatives',
   'cryptofacilities',
   'huobi-dm',
-  'huobi-dm-swap'
+  'huobi-dm-swap',
+  'huobi-dm-linear-swap'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -3576,6 +3578,113 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('map huobi-dm-linear-swap, messages', () => {
+    const messages = [
+      { id: '3', subbed: 'market.BTC-USDT.depth.size_150.high_freq', ts: 1606780800116, status: 'ok' },
+      { op: 'sub', cid: '1', topic: 'public.BTC-USDT.funding_rate', ts: 1606780803260, 'err-code': 0 },
+
+      {
+        ch: 'market.EOS-USDT.trade.detail',
+        ts: 1606780814945,
+        tick: {
+          id: 291891365,
+          ts: 1606780814931,
+          data: [{ amount: 6, ts: 1606780814931, id: 2918913650000, price: 3.2639, direction: 'buy' }]
+        }
+      },
+      {
+        ch: 'market.EOS-USDT.trade.detail',
+        ts: 1606780832971,
+        tick: {
+          id: 291892467,
+          ts: 1606780832955,
+          data: [{ amount: 30, ts: 1606780832955, id: 2918924670000, price: 3.2658, direction: 'buy' }]
+        }
+      },
+
+      {
+        ch: 'market.ETC-USDT.depth.size_150.high_freq',
+        tick: {
+          asks: [
+            [6.7918, 118],
+            [6.7941, 0]
+          ],
+          bids: [],
+          ch: 'market.ETC-USDT.depth.size_150.high_freq',
+          event: 'update',
+          id: 826962660,
+          mrid: 826962660,
+          ts: 1606780833036,
+          version: 27290512
+        },
+        ts: 1606780833036
+      },
+
+      {
+        ch: 'market.BTC-USDT.basis.1min.close',
+        ts: 1606780806356,
+        tick: {
+          id: 1606780800,
+          index_price: '19695.41',
+          contract_price: '19717.9',
+          basis: '22.49',
+          basis_rate: '0.0011418904201537312500729865486425517'
+        }
+      },
+
+      {
+        ch: 'market.BTC-USDT.open_interest',
+        generated: true,
+        data: [{ volume: 3063121.0, amount: 3063.121, symbol: 'BTC', value: 60398313.5659, contract_code: 'BTC-USDT' }],
+        ts: 1606780807036
+      },
+
+      {
+        op: 'notify',
+        topic: 'public.BTC-USDT.funding_rate',
+        ts: 1606780803260,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC-USDT',
+            fee_asset: 'USDT',
+            funding_time: '1606780800000',
+            funding_rate: '0.000100000000000000',
+            estimated_rate: '0.000236636095370214',
+            settlement_time: '1606780800000'
+          }
+        ]
+      },
+
+      {
+        op: 'notify',
+        topic: 'public.BTC-USDT.liquidation_orders',
+        ts: 1608226502344,
+        data: [
+          {
+            symbol: 'BTC',
+            contract_code: 'BTC-USDT',
+            direction: 'sell',
+            offset: 'close',
+            volume: 227.0,
+            price: 23350.5,
+            created_at: 1608226502284,
+            amount: 0.227,
+            trade_turnover: 5300.5635
+          }
+        ]
+      }
+    ]
+
+    const huobiDMSwap = createMapper('huobi-dm-linear-swap')
+
+    for (const message of messages) {
+      const mappedMessages = huobiDMSwap.map(message, new Date('2020-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
   test('map bybit messages', () => {
     const messages = [
       {

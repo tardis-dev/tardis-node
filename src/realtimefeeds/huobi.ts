@@ -293,3 +293,18 @@ export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
     return `swap_open_interest?contract_code=${symbol}`
   }
 }
+
+export class HuobiDMLinearSwapRealTimeFeed extends HuobiRealTimeFeedBase {
+  protected wssURL = 'wss://api.hbdm.vn/linear-swap-ws'
+  protected httpURL = 'https://api.hbdm.vn/linear-swap-api/v1'
+
+  protected suffixes = {
+    trade: '.detail',
+    depth: '.size_150.high_freq',
+    basis: '.1min.close'
+  }
+
+  protected getURLPath(symbol: string) {
+    return `swap_open_interest?contract_code=${symbol}`
+  }
+}

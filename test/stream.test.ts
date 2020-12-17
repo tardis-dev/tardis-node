@@ -28,7 +28,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm',
   'huobi-dm-swap',
   'gate-io-futures',
-  'coinflex'
+  'coinflex',
+  'huobi-dm-linear-swap'
 ]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
@@ -49,14 +50,7 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (
-            exchange === 'binance-dex' ||
-            exchange === 'binance-jersey' ||
-            exchange === 'okex-options' ||
-            exchange === 'okex-futures' ||
-            exchange === 'coinflex' ||
-            exchange === 'delta'
-          ) {
+          if (exchange === 'binance-dex' || exchange === 'binance-jersey' || exchange === 'huobi-dm-linear-swap') {
             return
           }
 
