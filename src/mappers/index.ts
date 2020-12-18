@@ -12,7 +12,7 @@ import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexLiqui
 import { BitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
 import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexLiquidationsMapper, bitmexTradesMapper } from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
-import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitTradesMapper } from './bybit'
+import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
 import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import {
@@ -43,7 +43,7 @@ import {
 } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
-import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
+import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexLiquidationsMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
 
@@ -179,7 +179,10 @@ const liquidationsMappers = {
   cryptofacilities: () => cryptofacilitiesLiquidationsMapper,
   'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap')
+  'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
+  bybit: () => new BybitLiquidationsMapper('bybit'),
+  'okex-futures': () => new OkexLiquidationsMapper('okex-futures', 'futures'),
+  'okex-swap': () => new OkexLiquidationsMapper('okex-swap', 'swap')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

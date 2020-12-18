@@ -1715,6 +1715,22 @@ Array [
 
 exports[`mappers map bybit messages 24`] = `Array []`;
 
+exports[`mappers map bybit messages 25`] = `
+Array [
+  Object {
+    "amount": 836,
+    "exchange": "bybit",
+    "id": "3422858",
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 23216,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2020-12-18T08:32:19.753Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {
@@ -4697,6 +4713,38 @@ Array [
 
 exports[`mappers map okex-futures messages 12`] = `Array []`;
 
+exports[`mappers map okex-futures messages 13`] = `
+Array [
+  Object {
+    "amount": 475,
+    "exchange": "okex-futures",
+    "id": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 655.308,
+    "side": "sell",
+    "symbol": "ETH-USD-210326",
+    "timestamp": 2020-12-18T00:30:58.559Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 14`] = `
+Array [
+  Object {
+    "amount": 8,
+    "exchange": "okex-futures",
+    "id": undefined,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 24515.8,
+    "side": "buy",
+    "symbol": "BTC-USD-210326",
+    "timestamp": 2020-12-18T08:32:34.576Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map okex-options messages 1`] = `
 Array [
   Object {
@@ -5272,6 +5320,38 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 9`] = `Array []`;
+
+exports[`mappers map okex-swap messages 10`] = `
+Array [
+  Object {
+    "amount": 8,
+    "exchange": "okex-swap",
+    "id": undefined,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "price": 3.523,
+    "side": "sell",
+    "symbol": "UNI-USD-SWAP",
+    "timestamp": 2020-12-18T00:30:58.374Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 11`] = `
+Array [
+  Object {
+    "amount": 30,
+    "exchange": "okex-swap",
+    "id": undefined,
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "price": 22376.9,
+    "side": "sell",
+    "symbol": "BTC-USDT-SWAP",
+    "timestamp": 2020-12-18T00:31:08.794Z,
+    "type": "liquidation",
+  },
+]
+`;
 
 exports[`mappers map phemex messages 1`] = `
 Array [

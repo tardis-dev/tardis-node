@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/en/websocket.md
@@ -162,6 +162,44 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
   }
 }
 
+export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
+  constructor(private readonly _exchange: Exchange) {}
+  canHandle(message: BybitDataMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('liquidation.')
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'liquidation',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitLiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const bybitLiquidation of message.data) {
+      const liquidation: Liquidation = {
+        type: 'liquidation',
+        symbol: bybitLiquidation.symbol,
+        exchange: this._exchange,
+        id: String(bybitLiquidation.id),
+        price: Number(bybitLiquidation.price),
+        amount: bybitLiquidation.qty,
+        side: bybitLiquidation.side == 'Buy' ? 'sell' : 'buy',
+        timestamp: new Date(bybitLiquidation.time),
+        localTimestamp
+      }
+
+      yield liquidation
+    }
+  }
+}
+
 type BybitDataMessage = {
   topic: string
 }
@@ -219,4 +257,15 @@ type BybitInstrumentDataMessage = BybitDataMessage & {
     | {
         update: [BybitInstrumentUpdate]
       }
+}
+
+type BybitLiquidationMessage = BybitDataMessage & {
+  data: {
+    id: number
+    qty: number
+    side: 'Sell' | 'Buy'
+    time: number
+    symbol: string
+    price: number
+  }[]
 }

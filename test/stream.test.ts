@@ -50,7 +50,12 @@ describe('stream', () => {
     async () => {
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
-          if (exchange === 'binance-dex' || exchange === 'binance-jersey' || exchange === 'huobi-dm-linear-swap') {
+          if (
+            exchange === 'binance-dex' ||
+            exchange === 'binance-jersey' ||
+            exchange === 'huobi-dm-linear-swap' ||
+            exchange === 'okex-futures'
+          ) {
             return
           }
 

@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary } from '../types'
+import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
@@ -286,6 +286,40 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
   }
 }
 
+export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
+  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+
+  canHandle(message: OkexDataMessage) {
+    return message.table === `${this._market}/liquidation`
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: `${this._market}/liquidation`,
+        symbols
+      }
+    ]
+  }
+
+  *map(okexLiquidationDataMessage: OkexLiqudationDataMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const okexLiquidation of okexLiquidationDataMessage.data) {
+      const liquidation: Liquidation = {
+        type: 'liquidation',
+        symbol: okexLiquidation.instrument_id,
+        exchange: this._exchange,
+        id: undefined,
+        price: Number(okexLiquidation.price),
+        amount: Number(okexLiquidation.size),
+        side: okexLiquidation.type === '3' ? 'sell' : 'buy',
+        timestamp: new Date(okexLiquidation.created_at),
+        localTimestamp: localTimestamp
+      }
+      yield liquidation
+    }
+  }
+}
+
 type OkexDataMessage = {
   table: string
 }
@@ -299,6 +333,17 @@ type OKexTradesDataMessage = {
     size?: string | number
     instrument_id: string
     timestamp: string
+  }[]
+}
+
+type OkexLiqudationDataMessage = {
+  data: {
+    loss: string
+    size: string
+    price: string
+    created_at: string
+    type: string
+    instrument_id: string
   }[]
 }
 

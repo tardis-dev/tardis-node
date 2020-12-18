@@ -40,7 +40,10 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'cryptofacilities',
   'huobi-dm',
   'huobi-dm-swap',
-  'huobi-dm-linear-swap'
+  'huobi-dm-linear-swap',
+  'bybit',
+  'okex-futures',
+  'okex-swap'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -961,6 +964,34 @@ describe('mappers', () => {
             timestamp: '2019-08-01T00:00:08.930Z'
           }
         ]
+      },
+      {
+        table: 'futures/liquidation',
+        generated: true,
+        data: [
+          {
+            loss: '0.05612247',
+            size: '475',
+            price: '655.308',
+            created_at: '2020-12-18T00:30:58.559Z',
+            type: '3',
+            instrument_id: 'ETH-USD-210326'
+          }
+        ]
+      },
+      {
+        table: 'futures/liquidation',
+        generated: true,
+        data: [
+          {
+            loss: '0.00013667',
+            size: '8',
+            price: '24515.8',
+            created_at: '2020-12-18T08:32:34.576Z',
+            type: '4',
+            instrument_id: 'BTC-USD-210326'
+          }
+        ]
       }
     ]
 
@@ -1095,6 +1126,18 @@ describe('mappers', () => {
             timestamp: '2020-02-08T00:01:00.035Z',
             checksum: -229520224
           }
+        ]
+      },
+      {
+        table: 'swap/liquidation',
+        generated: true,
+        data: [{ loss: '0', size: '8', price: '3.523', created_at: '2020-12-18T00:30:58.374Z', type: '3', instrument_id: 'UNI-USD-SWAP' }]
+      },
+      {
+        table: 'swap/liquidation',
+        generated: true,
+        data: [
+          { loss: '0', size: '30', price: '22376.9', created_at: '2020-12-18T00:31:08.794Z', type: '3', instrument_id: 'BTC-USDT-SWAP' }
         ]
       }
     ]
@@ -4067,6 +4110,11 @@ describe('mappers', () => {
         },
         cross_seq: 1116030776,
         timestamp_e6: 1580515259758557
+      },
+      {
+        topic: 'liquidation.BTCUSD',
+        generated: true,
+        data: [{ id: 3422858, qty: 836, side: 'Sell', time: 1608280339753, symbol: 'BTCUSD', price: 23216 }]
       }
     ]
 
