@@ -426,6 +426,25 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 14`] = `
+Array [
+  Object {
+    "exchange": "binance-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 31307.034,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 31799.2773,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCBUSD_210129",
+    "timestamp": 2021-01-05T07:02:01.004Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {
