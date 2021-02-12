@@ -220,7 +220,7 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
       } as const,
       {
         channel: `index/ticker`,
-        indexes
+        symbols: indexes
       } as const
     ]
   }
