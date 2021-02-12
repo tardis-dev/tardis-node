@@ -137,7 +137,7 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
 
     if (this.symbolToMBPInfoMapping[symbol] === undefined) {
       this.symbolToMBPInfoMapping[symbol] = {
-        bufferedUpdates: new CircularBuffer<HuobiMBPDataMessage>(200)
+        bufferedUpdates: new CircularBuffer<HuobiMBPDataMessage>(20)
       }
     }
 
@@ -145,9 +145,6 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
     const snapshotAlreadyProcessed = mbpInfo.snapshotProcessed
 
     if (isSnapshot(message)) {
-      if (snapshotAlreadyProcessed) {
-        return
-      }
       const snapshotBids = message.data.bids.map(this._mapBookLevel)
       const snapshotAsks = message.data.asks.map(this._mapBookLevel)
 
@@ -181,7 +178,6 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
       }
 
       mbpInfo.snapshotProcessed = true
-      mbpInfo.bufferedUpdates.clear()
 
       yield {
         type: 'book_change',
@@ -193,15 +189,16 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
         timestamp: new Date(message.ts),
         localTimestamp
       } as const
-    } else if (snapshotAlreadyProcessed) {
-      // snapshot was already processed let's map the mbp message as normal book_change
-      const update = this._mapMBPUpdate(message, symbol, localTimestamp)
-      if (update !== undefined) {
-        yield update
-      }
     } else {
-      // there was no snapshot yet, let's buffer the update
       mbpInfo.bufferedUpdates.append(message)
+
+      if (snapshotAlreadyProcessed) {
+        // snapshot was already processed let's map the mbp message as normal book_change
+        const update = this._mapMBPUpdate(message, symbol, localTimestamp)
+        if (update !== undefined) {
+          yield update
+        }
+      }
     }
   }
 
