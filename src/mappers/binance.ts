@@ -88,7 +88,7 @@ export class BinanceBookChangeMapper
 
     if (this.symbolToDepthInfoMapping[symbol] === undefined) {
       this.symbolToDepthInfoMapping[symbol] = {
-        bufferedUpdates: new CircularBuffer<BinanceDepthData>(200)
+        bufferedUpdates: new CircularBuffer<BinanceDepthData>(2000)
       }
     }
 
