@@ -36,7 +36,7 @@ export const EXCHANGES = [
   'binance-dex'
 ] as const
 
-const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades'] as const
+const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
 const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book'] as const
 
@@ -53,6 +53,7 @@ const BITMEX_CHANNELS = [
   'funding',
   'insurance',
   'orderBookL2_25',
+  'orderBook10',
   'quote',
   'quoteBin1m',
   'quoteBin5m',
@@ -95,7 +96,7 @@ const DERIBIT_CHANNELS = [
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
 
-const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
+const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status', 'margin/interest_rate'] as const
 
 const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
 
@@ -107,7 +108,10 @@ const OKEX_FUTURES_CHANNELS = [
   'futures/mark_price',
   'futures/liquidation',
   'index/ticker',
-  'system/status'
+  'system/status',
+  'information/sentiment',
+  'information/long_short_ratio',
+  'information/margin'
 ]
 
 const OKEX_SWAP_CHANNELS = [
@@ -119,7 +123,10 @@ const OKEX_SWAP_CHANNELS = [
   'swap/mark_price',
   'swap/liquidation',
   'index/ticker',
-  'system/status'
+  'system/status',
+  'information/sentiment',
+  'information/long_short_ratio',
+  'information/margin'
 ]
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -138,7 +145,7 @@ const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker']
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
-const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets', 'orderbookGrouped'] as const
+const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets', 'orderbookGrouped', 'lendingRate', 'borrowRate'] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
 
@@ -182,7 +189,18 @@ const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquid
 
 const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp', 'etp'] as const
 
-const HUOBI_DM_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'basis', 'liquidation_orders', 'contract_info', 'open_interest'] as const
+const HUOBI_DM_CHANNELS = [
+  'depth',
+  'detail',
+  'trade',
+  'bbo',
+  'basis',
+  'liquidation_orders',
+  'contract_info',
+  'open_interest',
+  'elite_account_ratio',
+  'elite_position_ratio'
+] as const
 
 const HUOBI_DM_SWAP_CHANNELS = [
   'depth',
@@ -193,7 +211,9 @@ const HUOBI_DM_SWAP_CHANNELS = [
   'funding_rate',
   'liquidation_orders',
   'contract_info',
-  'open_interest'
+  'open_interest',
+  'elite_account_ratio',
+  'elite_position_ratio'
 ] as const
 
 const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
@@ -205,7 +225,9 @@ const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
   'funding_rate',
   'liquidation_orders',
   'contract_info',
-  'open_interest'
+  'open_interest',
+  'elite_account_ratio',
+  'elite_position_ratio'
 ] as const
 
 const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
