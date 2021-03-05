@@ -406,3 +406,14 @@ export class CappedSet<T> {
     return this._set.size
   }
 }
+
+function hasFraction(n: number) {
+  return Math.abs(Math.round(n) - n) > 1e-10
+}
+// https://stackoverflow.com/a/44815797
+export function decimalPlaces(n: number) {
+  let count = 0
+  // multiply by increasing powers of 10 until the fractional part is ~ 0
+  while (hasFraction(n * 10 ** count) && isFinite(10 ** count)) count++
+  return count
+}
