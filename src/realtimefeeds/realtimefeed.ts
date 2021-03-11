@@ -266,8 +266,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     }
   }
 
-  private _onConnectionClosed = () => {
-    this.debug('(connection id: %d) connection closed', this._connectionId)
+  private _onConnectionClosed = (event: WebSocket.CloseEvent) => {
+    this.debug('(connection id: %d) connection closed %s', this._connectionId, event.reason)
   }
 }
 

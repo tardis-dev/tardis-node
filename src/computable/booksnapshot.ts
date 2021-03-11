@@ -223,6 +223,7 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       name: this._name,
       depth: this._depth,
       interval: this._interval,
+      grouping: this._grouping,
       bids: [...this._bids],
       asks: [...this._asks],
       timestamp: this._lastUpdateTimestamp,

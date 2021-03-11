@@ -145,6 +145,7 @@ export type BookSnapshot = {
   readonly name: string
   readonly depth: number
   readonly interval: number
+  readonly grouping?: number
   readonly bids: Optional<BookPriceLevel>[]
   readonly asks: Optional<BookPriceLevel>[]
 
