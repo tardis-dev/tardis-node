@@ -1750,6 +1750,44 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 26`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 56585.08,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": 60824.3538,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDM21",
+    "timestamp": 2021-03-11T13:05:00.200Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 27`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 29.753,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": 29.771,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "LINKUSDT",
+    "timestamp": 2021-03-11T13:04:49.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {

@@ -4128,6 +4128,56 @@ describe('mappers', () => {
         topic: 'liquidation.BTCUSD',
         generated: true,
         data: [{ id: 3422858, qty: 836, side: 'Sell', time: 1608280339753, symbol: 'BTCUSD', price: 23216 }]
+      },
+      {
+        topic: 'instrument_info.100ms.BTCUSDM21',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            {
+              id: 1,
+              symbol: 'BTCUSDM21',
+              symbol_name: 'BTCUSD0625',
+              symbol_year: 2021,
+              contract_type: 'InverseFutures',
+              coin: 'BTC',
+              quote_symbol: 'BTCUSD',
+              mode: 'MergedSingle',
+              start_trading_time_e9: 1615449600000000000,
+              time_to_settle: 9140100,
+              settle_time_e9: 1624608000000000000,
+              mark_price_e4: 608243538,
+              index_price_e4: 565850800,
+              fair_basis_e8: 429342000000,
+              fair_basis_rate_e8: 7586575,
+              basis_in_year_e8: 26118474,
+              cross_seq: 7182433
+            }
+          ],
+          insert: []
+        },
+        cross_seq: 7182693,
+        timestamp_e6: 1615467900200258
+      },
+      {
+        topic: 'instrument_info.100ms.LINKUSDT',
+        type: 'delta',
+        data: {
+          update: [
+            {
+              id: 5,
+              symbol: 'LINKUSDT',
+              mark_price_e4: '297710',
+              index_price_e4: '297530',
+              cross_seq: '1575602495',
+              created_at: '1970-01-01T00:00:00.000Z',
+              updated_at: '2021-03-11T13:04:49.000Z'
+            }
+          ]
+        },
+        cross_seq: '1575604210',
+        timestamp_e6: '1615467899958860'
       }
     ]
 

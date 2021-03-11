@@ -154,7 +154,15 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
       instrumentInfo.open_interest_e8 !== undefined ? instrumentInfo.open_interest_e8 / 100000000 : instrumentInfo.open_interest
     )
     pendingTickerInfo.updateLastPrice(instrumentInfo.last_price_e4 !== undefined ? instrumentInfo.last_price_e4 / 10000 : undefined)
-    pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
+
+    if (instrumentInfo.updated_at) {
+      pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
+    } else {
+      const timestampBybit = Number(message.timestamp_e6)
+      const timestamp = new Date(timestampBybit / 1000)
+      timestamp.μs = timestampBybit % 1000
+      pendingTickerInfo.updateTimestamp(timestamp)
+    }
 
     if (pendingTickerInfo.hasChanged()) {
       yield pendingTickerInfo.getSnapshot(localTimestamp)
@@ -252,6 +260,7 @@ type BybitInstrumentUpdate = {
 }
 
 type BybitInstrumentDataMessage = BybitDataMessage & {
+  timestamp_e6: string
   data:
     | BybitInstrumentUpdate
     | {
