@@ -281,6 +281,10 @@ export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives'
     if (message[1] === 'hb') {
       return
     }
+
+    if (!message[1]) {
+      return
+    }
     // see https://docs.bitfinex.com/reference#ws-public-status
     for (let bitfinexLiquidation of message[1]) {
       const isInitialLiquidationTrigger = bitfinexLiquidation[8] === 0

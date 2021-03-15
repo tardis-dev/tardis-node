@@ -382,7 +382,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
 
   *map(binanceTradeResponse: BinanceResponse<BinanceFuturesForceOrderData>, localTimestamp: Date) {
     const binanceLiquidation = binanceTradeResponse.data.o
-    // not sure if order status can be different to 'FILLED' for liquodations in practice, but...
+    // not sure if order status can be different to 'FILLED' for liquidations in practice, but...
     if (binanceLiquidation.X !== 'FILLED') {
       return
     }
