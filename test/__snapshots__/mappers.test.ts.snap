@@ -2508,6 +2508,31 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 16`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1,
+        "price": 344.327,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1,
+        "price": 344.191,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": true,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "symbol": "AAVEUSDT",
+    "timestamp": 2021-03-28T17:00:10.982Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {

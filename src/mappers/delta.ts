@@ -42,7 +42,7 @@ export class DeltaTradesMapper implements Mapper<'delta', Trade> {
 const mapBookLevel = (level: DeltaBookLevel) => {
   return {
     price: Number(level.limit_price),
-    amount: level.size
+    amount: Number(level.size)
   }
 }
 
@@ -147,7 +147,7 @@ type DeltaTrade = {
 
 type DeltaBookLevel = {
   limit_price: string
-  size: number
+  size: number | string
 }
 
 type DeltaL2OrderBook = {

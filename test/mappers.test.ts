@@ -2375,6 +2375,16 @@ describe('mappers', () => {
         symbol: 'MARK:BTCUSD',
         timestamp: 1602585252946976,
         type: 'mark_price'
+      },
+      {
+        buy: [{ limit_price: '344.191', size: '1.000000000000000000' }],
+        last_sequence_no: 1616950810982556,
+        last_updated_at: 1616950805954000,
+        product_id: 1063,
+        sell: [{ limit_price: '344.327', size: '1.000000000000000000' }],
+        symbol: 'AAVEUSDT',
+        timestamp: 1616950810982556,
+        type: 'l2_orderbook'
       }
     ]
 
