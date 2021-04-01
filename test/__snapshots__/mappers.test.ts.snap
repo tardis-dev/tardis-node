@@ -2533,6 +2533,36 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 17`] = `
+Array [
+  Object {
+    "amount": 215.45,
+    "exchange": "delta",
+    "id": undefined,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "price": 0.2,
+    "side": "buy",
+    "symbol": "DETO_USDT",
+    "timestamp": 2021-03-31T14:04:59.982Z,
+    "type": "trade",
+  },
+  Object {
+    "exchange": "delta",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.2,
+    "localTimestamp": 2020-10-14T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "DETO_USDT",
+    "timestamp": 2021-03-31T14:04:59.982Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {

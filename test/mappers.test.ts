@@ -2385,6 +2385,16 @@ describe('mappers', () => {
         symbol: 'AAVEUSDT',
         timestamp: 1616950810982556,
         type: 'l2_orderbook'
+      },
+      {
+        buyer_role: 'taker',
+        price: '0.20000',
+        product_id: 5160,
+        seller_role: 'taker',
+        size: '215.45',
+        symbol: 'DETO_USDT',
+        timestamp: 1617199499982823,
+        type: 'all_trades'
       }
     ]
 

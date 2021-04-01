@@ -31,7 +31,7 @@ export class DeltaTradesMapper implements Mapper<'delta', Trade> {
       exchange: 'delta',
       id: undefined,
       price: Number(message.price),
-      amount: message.size,
+      amount: Number(message.size),
       side: message.buyer_role === 'taker' ? 'buy' : 'sell',
       timestamp: fromMicroSecondsToDate(message.timestamp),
       localTimestamp: localTimestamp
@@ -139,7 +139,7 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
 type DeltaTrade = {
   buyer_role: 'taker' | 'maker'
   price: string
-  size: number
+  size: number | string
   symbol: string
   timestamp: number
   type: 'recent_trade' | 'all_trades'
