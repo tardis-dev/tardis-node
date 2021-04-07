@@ -1,3 +1,4 @@
+import { existsSync } from 'fs-extra'
 import pMap from 'p-map'
 import { debug } from './debug'
 import { DatasetType } from './exchangedetails'
@@ -17,6 +18,7 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
   const downloadDir = downloadDatasetsOptions.downloadDir !== undefined ? downloadDatasetsOptions.downloadDir : DEFAULT_DOWNLOAD_DIR
   const format = downloadDatasetsOptions.format !== undefined ? downloadDatasetsOptions.format : 'csv'
   const getFilename = downloadDatasetsOptions.getFilename !== undefined ? downloadDatasetsOptions.getFilename : getFilenameDefault
+  const skipIfExists = downloadDatasetsOptions.skipIfExists === undefined ? true : downloadDatasetsOptions.skipIfExists
 
   // in case someone provided 'api/exchange' symbol, transform it to symbol that is accepted by datasets API
   const datasetsSymbols = symbols.map((s) => s.replace(/\/|:/g, '-').toUpperCase())
@@ -29,7 +31,7 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
 
       if (daysCountToFetch > 1) {
         // start with downloading last day of the range, validates is API key has access to the end range of requested data
-        await download(
+        await downloadDataSet(
           getDownloadOptions({
             exchange,
             symbol,
@@ -39,12 +41,13 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
             format,
             getFilename,
             date: addDays(startDate, daysCountToFetch - 1)
-          })
+          }),
+          skipIfExists
         )
       }
 
       // then download the first day of the range, validates is API key has access to the start range of requested data
-      await download(
+      await downloadDataSet(
         getDownloadOptions({
           exchange,
           symbol,
@@ -54,14 +57,15 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
           format,
           getFilename,
           date: startDate
-        })
+        }),
+        skipIfExists
       )
 
       // download the rest concurrently up to the CONCURRENCY_LIMIT
       await pMap(
         sequence(daysCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to daysCountToFetch - 1 (as we already downloaded data for the first and last day)
         (offset) =>
-          download(
+          downloadDataSet(
             getDownloadOptions({
               exchange,
               symbol,
@@ -71,7 +75,8 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
               format,
               getFilename,
               date: addDays(startDate, offset)
-            })
+            }),
+            skipIfExists
           ),
         { concurrency: CONCURRENCY_LIMIT }
       )
@@ -79,6 +84,14 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
 
       debug('dataset download finished for %s %s %s from %s to %s, time: %s seconds', exchange, dataType, symbol, from, to, elapsedSeconds)
     }
+  }
+}
+
+async function downloadDataSet(downloadOptions: DownloadOptions, skipIfExists: boolean) {
+  if (skipIfExists && existsSync(downloadOptions.downloadPath)) {
+    debug('dataset %s already exists, skipping download', downloadOptions.downloadPath)
+  } else {
+    return await download(downloadOptions)
   }
 }
 
@@ -100,7 +113,7 @@ function getDownloadOptions({
   apiKey: string
   downloadDir: string
   getFilename: (options: GetFilenameOptions) => string
-}) {
+}): DownloadOptions {
   const year = date.getUTCFullYear()
   const month = doubleDigit(date.getUTCMonth() + 1)
   const day = doubleDigit(date.getUTCDate())
@@ -123,6 +136,8 @@ function getDownloadOptions({
     apiKey
   }
 }
+
+type DownloadOptions = Parameters<typeof download>[0]
 
 function getFilenameDefault({ exchange, dataType, format, date, symbol }: GetFilenameOptions) {
   return `${exchange}_${dataType}_${date.toISOString().split('T')[0]}_${symbol}.${format}.gz`
@@ -169,4 +184,5 @@ type DownloadDatasetsOptions = {
   apiKey?: string
   downloadDir?: string
   getFilename?: (options: GetFilenameOptions) => string
+  skipIfExists?: boolean
 }
