@@ -107,6 +107,9 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
 
   *map(message: GateIOFuturesTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const futuresTicker of message.result) {
+      if (futuresTicker.contract === undefined) {
+        return
+      }
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(futuresTicker.contract, 'gate-io-futures')
 
       pendingTickerInfo.updateFundingRate(Number(futuresTicker.funding_rate))

@@ -4626,6 +4626,31 @@ describe('mappers', () => {
           { p: '223.55', s: 15039, c: 'BCH_USDT', id: 242529122 },
           { p: '223.55', s: 15089, c: 'BCH_USDT', id: 242529123 }
         ]
+      },
+      {
+        time: 1617952183,
+        channel: 'futures.tickers',
+        event: 'update',
+        error: null,
+        result: [
+          [
+            {
+              contract: 'BSV_USDT',
+              last: '244.9',
+              change_percentage: '0.30',
+              funding_rate: '0.000962',
+              mark_price: '244.78',
+              index_price: '244.75',
+              total_size: '417015',
+              volume_24h: '1327595',
+              quanto_base_rate: '',
+              funding_rate_indicative: '0.000216',
+              volume_24h_quote: '3251280',
+              volume_24h_settle: '3251280',
+              volume_24h_base: '13275'
+            }
+          ]
+        ]
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')

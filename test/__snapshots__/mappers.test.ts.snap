@@ -3500,6 +3500,8 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io-futures messages 15`] = `Array []`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {
