@@ -31,7 +31,7 @@ export class BinanceTradesMapper
   *map(binanceTradeResponse: BinanceResponse<BinanceTradeData>, localTimestamp: Date) {
     const binanceTrade = binanceTradeResponse.data
 
-    const isOffBookTrade = binanceTrade.X === 'INSURANCE_FUND'
+    const isOffBookTrade = binanceTrade.X === 'INSURANCE_FUND' || binanceTrade.X === 'ADL'
     if (isOffBookTrade) {
       return
     }
@@ -422,7 +422,7 @@ type BinanceTradeData = {
   q: string
   T: number
   m: true
-  X?: 'INSURANCE_FUND' | 'MARKET'
+  X?: 'INSURANCE_FUND' | 'MARKET' | 'ADL'
 }
 
 type BinanceBookLevel = [string, string]

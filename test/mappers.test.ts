@@ -2172,6 +2172,10 @@ describe('mappers', () => {
             T: 1594622954021
           }
         }
+      },
+      {
+        stream: 'etcusdt@trade',
+        data: { e: 'trade', E: 1618716867643, T: 1618716867639, s: 'ETCUSDT', t: 84242137, p: '852.722', q: '0.05', X: 'ADL', m: true }
       }
     ]
 

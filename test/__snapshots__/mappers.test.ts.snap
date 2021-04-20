@@ -158,6 +158,8 @@ Array [
 ]
 `;
 
+exports[`mappers map binance delivery messages 11`] = `Array []`;
+
 exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
