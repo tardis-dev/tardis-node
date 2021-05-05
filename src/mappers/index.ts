@@ -1,10 +1,11 @@
 import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types'
+import { BookChange, DerivativeTicker, Liquidation, OptionSummary, Quote, Trade } from '../types'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
   BinanceFuturesDerivativeTickerMapper,
   BinanceLiquidationsMapper,
+  BinanceQuotesMapper,
   BinanceTradesMapper
 } from './binance'
 import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
@@ -185,6 +186,13 @@ const liquidationsMappers = {
   'okex-swap': () => new OkexLiquidationsMapper('okex-swap', 'swap')
 }
 
+const quotesMappers = {
+  binance: () => new BinanceQuotesMapper('binance'),
+  'binance-futures': () => new BinanceQuotesMapper('binance-futures'),
+  'binance-delivery': () => new BinanceQuotesMapper('binance-delivery'),
+  'binance-us': () => new BinanceQuotesMapper('binance-us')
+}
+
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {
   const createTradesMapper = tradesMappers[exchange]
 
@@ -245,4 +253,14 @@ export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers
   }
 
   return createLiquidationsMapper() as any
+}
+
+export const normalizeQuotes = <T extends keyof typeof quotesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Quote> => {
+  const createQuotesMapper = quotesMappers[exchange]
+
+  if (createQuotesMapper === undefined) {
+    throw new Error(`normalizeQuotes: ${exchange} not supported`)
+  }
+
+  return createQuotesMapper() as any
 }

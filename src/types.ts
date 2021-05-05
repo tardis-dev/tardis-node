@@ -65,6 +65,20 @@ export type DerivativeTicker = {
   readonly localTimestamp: Date
 }
 
+export type Quote = {
+  readonly type: 'quote'
+  readonly symbol: string
+  readonly exchange: Exchange
+
+  readonly askAmount: number
+  readonly askPrice: number
+  readonly bidPrice: number
+  readonly bidAmount: number
+
+  readonly timestamp: Date
+  readonly localTimestamp: Date
+}
+
 export type OptionSummary = NormalizedData & {
   type: 'option_summary'
   optionType: 'put' | 'call'

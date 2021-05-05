@@ -1,6 +1,6 @@
 import { debug } from '../debug'
 import { CircularBuffer } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Quote, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
@@ -403,6 +403,47 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
   }
 }
 
+export class BinanceQuotesMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', Quote> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: BinanceResponse<any>) {
+    if (message.stream === undefined) {
+      return false
+    }
+
+    return message.stream.endsWith('@bookTicker')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = lowerCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'bookTicker',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(binanceBookTickerResponse: BinanceResponse<BinanceBookTickerData>, localTimestamp: Date) {
+    const binanceBookTicker = binanceBookTickerResponse.data
+
+    const quote: Quote = {
+      type: 'quote',
+      symbol: binanceBookTicker.s,
+      exchange: this._exchange,
+      askAmount: Number(binanceBookTicker.A),
+      askPrice: Number(binanceBookTicker.a),
+      bidPrice: Number(binanceBookTicker.b),
+      bidAmount: Number(binanceBookTicker.B),
+      timestamp: binanceBookTicker.T !== undefined ? new Date(binanceBookTicker.T) : localTimestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield quote
+  }
+}
+
 function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => s.toLowerCase())
@@ -499,4 +540,14 @@ type BinanceFuturesForceOrderData = {
     T: 1568014460893 // Order Trade Time
     z: string // Order Filled Accumulated Quantity
   }
+}
+
+type BinanceBookTickerData = {
+  u: number // order book updateId
+  s: string // symbol
+  b: string // best bid price
+  B: string // best bid qty
+  a: string // best ask price
+  A: string // best ask qty
+  T?: number // transaction time
 }
