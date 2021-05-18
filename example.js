@@ -1,29 +1,35 @@
-process.env.DEBUG = 'tardis-dev*'
-const {
-  replayNormalized,
-  streamNormalized,
-  normalizeBookChanges,
-  normalizeOptionsSummary,
-  compute,
-  computeBookSnapshots,
-  stream
-} = require('./dist')
+const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = require('tardis-dev')
+
+const historicalMessages = replayNormalized(
+  {
+    exchange: 'bitmex',
+    symbols: ['XBTUSD'],
+    from: '2019-08-01',
+    to: '2019-08-02'
+  },
+  normalizeTrades
+)
 
 const realTimeMessages = streamNormalized(
   {
-    exchange: 'binance-options',
-    symbols: ['BTC-210521-44000-C']
+    exchange: 'bitmex',
+    symbols: ['XBTUSD']
   },
-  normalizeOptionsSummary
+  normalizeTrades
 )
 
 async function produceVolumeBasedTradeBars(messages) {
-  // aggregate by 50k contracts volume;
-  //const withVolumeTradeBars = compute(realTimeMessages, computeBookSnapshots({ depth: 2, interval: 0 }))
+  // aggregate by 50k contracts volume
+  const withVolumeTradeBars = compute(messages, computeTradeBars({ kind: 'volume', interval: 50 * 1000 }))
 
-  for await (const message of realTimeMessages) {
-    console.log(message)
+  for await (const message of withVolumeTradeBars) {
+    if (message.type === 'trade_bar') {
+      console.log(message.name, message)
+    }
   }
 }
 
-produceVolumeBasedTradeBars()
+await produceVolumeBasedTradeBars(historicalMessages)
+
+// or for real time data
+//  await produceVolumeBasedTradeBars(realTimeMessages)
