@@ -9,6 +9,7 @@ import {
   BinanceTradesMapper
 } from './binance'
 import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
+import { BinanceOptionsBookChangeMapper, BinanceOptionsTradesMapper, BinanceOptionSummaryMapper } from './binanceoptions'
 import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexLiquidationsMapper, BitfinexTradesMapper } from './bitfinex'
 import { BitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
 import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexLiquidationsMapper, bitmexTradesMapper } from './bitmex'
@@ -94,7 +95,8 @@ const tradesMappers = {
   'gate-io': () => new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
   poloniex: () => new PoloniexTradesMapper(),
-  coinflex: () => coinflexTradesMapper
+  coinflex: () => coinflexTradesMapper,
+  'binance-options': () => new BinanceOptionsTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -142,7 +144,8 @@ const bookChangeMappers = {
   'gate-io': () => new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: () => new PoloniexBookChangeMapper(),
-  coinflex: () => coinflexBookChangeMapper
+  coinflex: () => coinflexBookChangeMapper,
+  'binance-options': () => new BinanceOptionsBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -167,7 +170,8 @@ const derivativeTickersMappers = {
 
 const optionsSummaryMappers = {
   deribit: () => new DeribitOptionSummaryMapper(),
-  'okex-options': () => new OkexOptionSummaryMapper()
+  'okex-options': () => new OkexOptionSummaryMapper(),
+  'binance-options': () => new BinanceOptionSummaryMapper()
 }
 
 const liquidationsMappers = {

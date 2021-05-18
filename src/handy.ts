@@ -417,3 +417,21 @@ export function decimalPlaces(n: number) {
   while (hasFraction(n * 10 ** count) && isFinite(10 ** count)) count++
   return count
 }
+
+export function asNumberIfValid(val: string | undefined | null) {
+  if (val === undefined || val === null) {
+    return
+  }
+
+  var asNumber = Number(val)
+
+  if (isNaN(asNumber) || isFinite(asNumber) === false) {
+    return
+  }
+
+  if (asNumber === 0) {
+    return
+  }
+
+  return asNumber
+}

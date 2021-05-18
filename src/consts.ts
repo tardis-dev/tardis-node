@@ -3,6 +3,7 @@ export const EXCHANGES = [
   'deribit',
   'binance-futures',
   'binance-delivery',
+  'binance-options',
   'binance',
   'ftx',
   'okex-futures',
@@ -230,6 +231,8 @@ const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
   'elite_position_ratio'
 ] as const
 
+const BINANCE_OPTIONS_CHANNELS = ['TRADE', 'TICKER', 'DEPTH100', 'INDEX'] as const
+
 const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200', 'liquidation'] as const
@@ -290,5 +293,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   delta: DELTA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
-  poloniex: POLONIEX_CHANNELS
+  poloniex: POLONIEX_CHANNELS,
+  'binance-options': BINANCE_OPTIONS_CHANNELS
 }

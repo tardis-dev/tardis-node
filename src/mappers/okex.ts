@@ -1,3 +1,4 @@
+import { asNumberIfValid } from '../handy'
 import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
@@ -176,24 +177,6 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
       }
     }
   }
-}
-
-function asNumberIfValid(val: string | undefined | null) {
-  if (val === undefined || val === null) {
-    return
-  }
-
-  var asNumber = Number(val)
-
-  if (isNaN(asNumber) || isFinite(asNumber) === false) {
-    return
-  }
-
-  if (asNumber === 0) {
-    return
-  }
-
-  return asNumber
 }
 
 export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {

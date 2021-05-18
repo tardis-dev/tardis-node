@@ -618,6 +618,158 @@ Array [
 ]
 `;
 
+exports[`mappers map binance-options messages 1`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 1.7478,
+    "bestAskPrice": 90.36,
+    "bestBidAmount": undefined,
+    "bestBidIV": 1.2244,
+    "bestBidPrice": 3.1,
+    "delta": 0.00254,
+    "exchange": "binance-options",
+    "expirationDate": 2021-05-28T08:00:00.000Z,
+    "gamma": 0.00001,
+    "lastPrice": 74.17,
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "markIV": undefined,
+    "markPrice": 6.96,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 85000,
+    "symbol": "BTC-210528-85000-C",
+    "theta": -3.86009,
+    "timestamp": 2021-05-18T08:39:00.324Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTCUSDT",
+    "underlyingPrice": undefined,
+    "vega": 0.58677,
+  },
+]
+`;
+
+exports[`mappers map binance-options messages 2`] = `Array []`;
+
+exports[`mappers map binance-options messages 3`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 5.0792,
+    "bestAskPrice": 46260.3,
+    "bestBidAmount": undefined,
+    "bestBidIV": 0.0001,
+    "bestBidPrice": 800,
+    "delta": -0.9999,
+    "exchange": "binance-options",
+    "expirationDate": 2021-05-28T08:00:00.000Z,
+    "gamma": 0.00001,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "markIV": undefined,
+    "markPrice": 39795.47,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 85000,
+    "symbol": "BTC-210528-85000-P",
+    "theta": -0.13844,
+    "timestamp": 2021-05-18T08:39:00.451Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTCUSDT",
+    "underlyingPrice": 45208.90734296,
+    "vega": 0.02762,
+  },
+]
+`;
+
+exports[`mappers map binance-options messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.02,
+        "price": 174.69,
+      },
+      Object {
+        "amount": 0.2541,
+        "price": 174.7,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.3265,
+        "price": 71.44,
+      },
+    ],
+    "exchange": "binance-options",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "symbol": "BTC-210528-70000-C",
+    "timestamp": 2021-05-18T08:39:01.058Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance-options messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.02,
+        "price": 174.69,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.15,
+        "price": 66,
+      },
+    ],
+    "exchange": "binance-options",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "symbol": "BTC-210528-70000-C",
+    "timestamp": 2021-05-18T08:39:01.058Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map binance-options messages 6`] = `
+Array [
+  Object {
+    "amount": 0.0326,
+    "exchange": "binance-options",
+    "id": "747",
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "price": 2835.53,
+    "side": "buy",
+    "symbol": "BTC-210521-44000-C",
+    "timestamp": 2021-05-18T04:44:01.000Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map binance-options messages 7`] = `
+Array [
+  Object {
+    "amount": 0.007,
+    "exchange": "binance-options",
+    "id": "748",
+    "localTimestamp": 2021-05-18T04:44:04.000Z,
+    "price": 2172.01,
+    "side": "sell",
+    "symbol": "BTC-210521-44000-C",
+    "timestamp": 2021-05-18T08:39:35.000Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map bitfinex derivatives messages 1`] = `Array []`;
 
 exports[`mappers map bitfinex derivatives messages 2`] = `
