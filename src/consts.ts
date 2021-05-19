@@ -34,7 +34,8 @@ export const EXCHANGES = [
   'hitbtc',
   'coinflex',
   'binance-jersey',
-  'binance-dex'
+  'binance-dex',
+  'upbit'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -257,6 +258,7 @@ const DELTA_CHANNELS = [
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker']
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']
 const POLONIEX_CHANNELS = ['price_aggregated_book']
+const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
@@ -294,5 +296,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
   poloniex: POLONIEX_CHANNELS,
-  'binance-options': BINANCE_OPTIONS_CHANNELS
+  'binance-options': BINANCE_OPTIONS_CHANNELS,
+  upbit: UPBIT_CHANNELS
 }

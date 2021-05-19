@@ -48,6 +48,7 @@ import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexLiquidationsMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
+import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
 
 export * from './mapper'
 
@@ -96,7 +97,8 @@ const tradesMappers = {
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
   poloniex: () => new PoloniexTradesMapper(),
   coinflex: () => coinflexTradesMapper,
-  'binance-options': () => new BinanceOptionsTradesMapper()
+  'binance-options': () => new BinanceOptionsTradesMapper(),
+  upbit: () => new UpbitTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -145,7 +147,8 @@ const bookChangeMappers = {
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: () => new PoloniexBookChangeMapper(),
   coinflex: () => coinflexBookChangeMapper,
-  'binance-options': () => new BinanceOptionsBookChangeMapper()
+  'binance-options': () => new BinanceOptionsBookChangeMapper(),
+  upbit: () => new UpbitBookChangeMapper()
 }
 
 const derivativeTickersMappers = {

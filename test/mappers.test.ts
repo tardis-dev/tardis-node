@@ -28,7 +28,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm-linear-swap'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options']
+const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options']
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -4868,6 +4868,210 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = coinflexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map binance-options messages', () => {
+    const messages = [
+      {
+        stream: 'BTC-210528-85000-C@TICKER',
+        data: {
+          e: 'ticker',
+          E: 1621327140324,
+          s: 'BTC-210528-85000-C',
+          o: '74.17',
+          h: '74.17',
+          l: '74.17',
+          c: '74.17',
+          V: '0',
+          A: '0',
+          p: '0',
+          Q: '0',
+          F: '0',
+          L: '0',
+          n: 0,
+          bo: '3.1',
+          ao: '90.36',
+          b: '1.2244',
+          a: '1.7478',
+          d: '0.00254',
+          t: '-3.86009',
+          g: '0.00001',
+          v: '0.58677',
+          vo: '1.31217',
+          mp: '6.96',
+          hl: '1810.56',
+          ll: '0.01',
+          eep: '0'
+        }
+      },
+      { stream: 'BTCUSDT@INDEX', data: { e: 'index', E: 1621327140322, s: 'BTCUSDT', p: '45208.90734296' } },
+      {
+        stream: 'BTC-210528-85000-C@TICKER',
+        data: {
+          e: 'ticker',
+          E: 1621327141478,
+          s: 'BTC-210528-85000-C',
+          o: '74.17',
+          h: '74.17',
+          l: '74.17',
+          c: '74.17',
+          V: '0',
+          A: '0',
+          p: '0',
+          Q: '0',
+          F: '0',
+          L: '0',
+          n: 0,
+          bo: '3.1',
+          ao: '90.36',
+          b: '1.2242',
+          a: '1.7475',
+          d: '0.00254',
+          t: '-3.86272',
+          g: '0.00001',
+          v: '0.5872',
+          vo: '1.31209',
+          mp: '6.97',
+          hl: '1810.74',
+          ll: '0.01',
+          eep: '0'
+        }
+      },
+      {
+        stream: 'BTC-210528-40000-C@DEPTH100',
+        data: {
+          e: 'depth',
+          E: 1621327140126,
+          s: 'BTC-210528-40000-C',
+          b: [
+            ['5652.36', '0.3018'],
+            ['5583.89', '0.4192'],
+            ['4500', '0.005'],
+            ['2100', '0.08'],
+            ['1001', '0.001']
+          ],
+          a: [
+            ['8256.82', '0.02'],
+            ['8327.7', '0.4547'],
+            ['8464.46', '0.4969']
+          ]
+        }
+      },
+      {
+        stream: 'BTC-210528-40000-C@DEPTH100',
+        data: {
+          e: 'depth',
+          E: 1621327140336,
+          s: 'BTC-210528-40000-C',
+          b: [['1001', '0.001']],
+          a: [['8256.82', '0.02']]
+        }
+      },
+      {
+        stream: 'BTC-210521-44000-C@TRADE',
+        data: {
+          e: 'trade',
+          E: 1621327175890,
+          s: 'BTC-210521-44000-C',
+          t: [
+            { t: '649', p: '1710.4', q: '0.0005', b: '4612097235776182706', a: '4612111529500577664', T: 1621293897000, s: '-1' },
+            { t: '744', p: '2448.96', q: '0.0008', b: '4612108230892458593', a: '4612111529502760966', T: 1621309281000, s: '1' }
+          ]
+        }
+      },
+      {
+        stream: 'BTC-210521-44000-C@TRADE',
+        data: {
+          e: 'trade',
+          E: 1621327175890,
+          s: 'BTC-210521-44000-C',
+          t: [
+            { t: '744', p: '2448.96', q: '0.0008', b: '4612108230892458593', a: '4612111529502760966', T: 1621309281000, s: '1' },
+            { t: '745', p: '2577.4', q: '0.0206', b: '4612111529503286820', a: '4612099434799438240', T: 1621312991000, s: '-1' },
+            { t: '746', p: '2577.4', q: '0.0154', b: '4612111529503286820', a: '4612096136264555013', T: 1621313012000, s: '-1' }
+          ]
+        }
+      },
+      {
+        stream: 'BTC-210305-40000-C@TICKER',
+        data: {
+          e: 'ticker',
+          E: 1614556802373,
+          s: 'BTC-210305-40000-C',
+          o: '8210',
+          h: '8210',
+          l: '8210',
+          c: '8210',
+          V: '0',
+          A: '0',
+          p: '0',
+          Q: '0.01',
+          F: '0',
+          L: '0',
+          n: 0,
+          bo: '0',
+          ao: '8456.93',
+          b: '-1',
+          a: '2.9884',
+          d: '0.83519',
+          t: '-172.50456',
+          g: '0.00005',
+          v: '12.20434',
+          vo: '1.225',
+          mp: '5714.97',
+          hl: '6392.28',
+          ll: '5037.66',
+          eep: '0'
+        }
+      }
+    ]
+
+    const binanceOptionsMapper = createMapper('binance-options')
+
+    for (const message of messages) {
+      const mappedMessages = binanceOptionsMapper.map(message, new Date('2021-05-18T03:41:21.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map upbit messages', () => {
+    const messages = [
+      {
+        type: 'orderbook',
+        code: 'KRW-DOT',
+        timestamp: 1614729599677,
+        total_ask_size: 1415.12521016,
+        total_bid_size: 8058.44442437,
+        orderbook_units: [
+          { ask_price: 41840.0, bid_price: 41730.0, ask_size: 103.6, bid_size: 47.62562404 },
+          { ask_price: 0, bid_price: 41720.0, ask_size: 102.9, bid_size: 250.0 }
+        ],
+        stream_type: 'REALTIME'
+      },
+      {
+        type: 'trade',
+        code: 'KRW-DOGE',
+        timestamp: 1614729599905,
+        trade_date: '2021-03-02',
+        trade_time: '23:59:59',
+        trade_timestamp: 1614729599000,
+        trade_price: 58.4,
+        trade_volume: 836.12040133,
+        ask_bid: 'ASK',
+        prev_closing_price: 57.5,
+        change: 'RISE',
+        change_price: 0.9,
+        sequential_id: 1614729599000000,
+        stream_type: 'REALTIME'
+      }
+    ]
+
+    const upbit = createMapper('upbit')
+
+    for (const message of messages) {
+      const mappedMessages = upbit.map(message, new Date('2021-03-02T23:59:59.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

@@ -6058,3 +6058,48 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map upbit messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 103.6,
+        "price": 41840,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 47.62562404,
+        "price": 41730,
+      },
+      Object {
+        "amount": 250,
+        "price": 41720,
+      },
+    ],
+    "exchange": "upbit",
+    "isSnapshot": true,
+    "localTimestamp": 2021-03-02T23:59:59.000Z,
+    "symbol": "KRW-DOT",
+    "timestamp": 2021-03-02T23:59:59.677Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map upbit messages 2`] = `
+Array [
+  Object {
+    "amount": 836.12040133,
+    "exchange": "upbit",
+    "id": "1614729599000000",
+    "localTimestamp": 2021-03-02T23:59:59.000Z,
+    "price": 58.4,
+    "side": "sell",
+    "symbol": "KRW-DOGE",
+    "timestamp": 2021-03-02T23:59:59.000Z,
+    "type": "trade",
+  },
+]
+`;

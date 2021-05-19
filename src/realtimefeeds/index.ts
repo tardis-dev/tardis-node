@@ -29,6 +29,7 @@ import { GateIOFuturesRealTimeFeed } from './gateiofutures'
 import { PoloniexRealTimeFeed } from './poloniex'
 import { CoinflexRealTimeFeed } from './coinflex'
 import { BinanceOptionsRealTimeFeed } from './binanceoptions'
+import { UpbitRealTimeFeed } from './upbit'
 
 export * from './realtimefeed'
 
@@ -70,7 +71,8 @@ const realTimeFeedsMap: {
   'gate-io-futures': GateIOFuturesRealTimeFeed,
   poloniex: PoloniexRealTimeFeed,
   coinflex: CoinflexRealTimeFeed,
-  'binance-options': BinanceOptionsRealTimeFeed
+  'binance-options': BinanceOptionsRealTimeFeed,
+  upbit: UpbitRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
