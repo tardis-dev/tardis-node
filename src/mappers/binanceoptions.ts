@@ -159,6 +159,16 @@ export class BinanceOptionSummaryMapper implements Mapper<'binance-options', Opt
       bestAskPrice = undefined
     }
 
+    let bestBidIV = bestBidPrice !== undefined ? asNumberIfValid(optionInfo.b) : undefined
+    if (bestBidIV === -1) {
+      bestBidIV = undefined
+    }
+
+    let bestAskIV = bestAskPrice !== undefined ? asNumberIfValid(optionInfo.a) : undefined
+    if (bestAskIV === -1) {
+      bestAskIV = undefined
+    }
+
     const optionSummary: OptionSummary = {
       type: 'option_summary',
       symbol: optionInfo.s,
@@ -169,11 +179,11 @@ export class BinanceOptionSummaryMapper implements Mapper<'binance-options', Opt
 
       bestBidPrice,
       bestBidAmount: undefined,
-      bestBidIV: bestBidPrice !== undefined ? asNumberIfValid(optionInfo.b) : undefined,
+      bestBidIV,
 
       bestAskPrice,
       bestAskAmount: undefined,
-      bestAskIV: bestAskPrice !== undefined ? asNumberIfValid(optionInfo.a) : undefined,
+      bestAskIV,
 
       lastPrice: asNumberIfValid(optionInfo.c),
       openInterest: undefined,
