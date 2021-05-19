@@ -149,6 +149,16 @@ export class BinanceOptionSummaryMapper implements Mapper<'binance-options', Opt
 
     const underlyingIndex = `${base}USDT`
 
+    let bestBidPrice = asNumberIfValid(optionInfo.bo)
+    if (bestBidPrice === 0) {
+      bestBidPrice = undefined
+    }
+
+    let bestAskPrice = asNumberIfValid(optionInfo.ao)
+    if (bestAskPrice === 0) {
+      bestAskPrice = undefined
+    }
+
     const optionSummary: OptionSummary = {
       type: 'option_summary',
       symbol: optionInfo.s,
@@ -156,13 +166,14 @@ export class BinanceOptionSummaryMapper implements Mapper<'binance-options', Opt
       optionType: isPut ? 'put' : 'call',
       strikePrice: Number(strikePrice),
       expirationDate,
-      bestBidPrice: asNumberIfValid(optionInfo.bo),
-      bestBidAmount: undefined,
-      bestBidIV: asNumberIfValid(optionInfo.b),
 
-      bestAskPrice: asNumberIfValid(optionInfo.ao),
+      bestBidPrice,
+      bestBidAmount: undefined,
+      bestBidIV: bestBidPrice !== undefined ? asNumberIfValid(optionInfo.b) : undefined,
+
+      bestAskPrice,
       bestAskAmount: undefined,
-      bestAskIV: asNumberIfValid(optionInfo.a),
+      bestAskIV: bestAskPrice !== undefined ? asNumberIfValid(optionInfo.a) : undefined,
 
       lastPrice: asNumberIfValid(optionInfo.c),
       openInterest: undefined,
