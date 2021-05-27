@@ -88,6 +88,7 @@ const DERIBIT_CHANNELS = [
   'book',
   'deribit_price_index',
   'deribit_price_ranking',
+  'deribit_volatility_index',
   'estimated_expiration_price',
   'markprice.options',
   'perpetual',
