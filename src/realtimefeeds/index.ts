@@ -30,6 +30,7 @@ import { PoloniexRealTimeFeed } from './poloniex'
 import { CoinflexRealTimeFeed } from './coinflex'
 import { BinanceOptionsRealTimeFeed } from './binanceoptions'
 import { UpbitRealTimeFeed } from './upbit'
+import { AscendexRealTimeFeed } from './ascendex'
 
 export * from './realtimefeed'
 
@@ -72,7 +73,8 @@ const realTimeFeedsMap: {
   poloniex: PoloniexRealTimeFeed,
   coinflex: CoinflexRealTimeFeed,
   'binance-options': BinanceOptionsRealTimeFeed,
-  upbit: UpbitRealTimeFeed
+  upbit: UpbitRealTimeFeed,
+  ascendex: AscendexRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

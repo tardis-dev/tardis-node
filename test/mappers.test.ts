@@ -25,7 +25,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm-swap',
   'gate-io-futures',
   'coinflex',
-  'huobi-dm-linear-swap'
+  'huobi-dm-linear-swap',
+  'ascendex'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options']
@@ -5072,6 +5073,59 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = upbit.map(message, new Date('2021-03-02T23:59:59.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map ascendex messages', () => {
+    const messages = [
+      { m: 'trades', symbol: 'BNB/USDT', data: [{ p: '233.9451', q: '0.30', ts: 1616716800368, bm: true, seqnum: 36028837135976585 }] },
+      {
+        m: 'trades',
+        symbol: 'BTC/USDT',
+        data: [
+          { p: '51297.85', q: '0.03393', ts: 1616716801842, bm: false, seqnum: 72057619793078351 },
+          { p: '51299.54', q: '0.00457', ts: 1616716801928, bm: false, seqnum: 72057619793078385 }
+        ]
+      },
+      { m: 'depth-realtime', symbol: 'XRP/USDT', data: { ts: 1621814400204, seqnum: 39862426, asks: [], bids: [['0.7892', '0']] } },
+      {
+        m: 'depth-snapshot-realtime',
+        symbol: 'XRP/USDT',
+        data: {
+          ts: 0,
+          seqnum: 39862426,
+          asks: [['0.7898', '1899']],
+          bids: [
+            ['0.78958', '498'],
+            ['0.78952', '499']
+          ]
+        }
+      },
+      { m: 'depth-realtime', symbol: 'XRP/USDT', data: { ts: 1621814400266, seqnum: 39862427, asks: [], bids: [['0.78721', '0']] } },
+      { m: 'trades', symbol: 'BTC-PERP', data: [{ p: '34816', q: '0.0500', ts: 1621814424397, bm: true, seqnum: 180143987382487678 }] },
+      {
+        m: 'futures-pricing-data',
+        con: [
+          {
+            t: 1621814344113,
+            s: 'BTC-PERP',
+            mp: '34638.370817096',
+            ip: '34670.285',
+            oi: '80.2099',
+            r: '0.000093927',
+            f: 1621814400000,
+            fi: 28800000
+          }
+        ],
+        col: [{ a: 'BCH', p: '552.29' }]
+      }
+    ]
+
+    const ascendexMapper = createMapper('ascendex')
+
+    for (const message of messages) {
+      const mappedMessages = ascendexMapper.map(message, new Date('2021-05-24T00:59:59.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

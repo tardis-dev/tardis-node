@@ -1,5 +1,152 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`mappers map ascendex messages 1`] = `
+Array [
+  Object {
+    "amount": 0.3,
+    "exchange": "ascendex",
+    "id": undefined,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "price": 233.9451,
+    "side": "sell",
+    "symbol": "BNB/USDT",
+    "timestamp": 2021-03-26T00:00:00.368Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 2`] = `
+Array [
+  Object {
+    "amount": 0.03393,
+    "exchange": "ascendex",
+    "id": undefined,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "price": 51297.85,
+    "side": "buy",
+    "symbol": "BTC/USDT",
+    "timestamp": 2021-03-26T00:00:01.842Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.00457,
+    "exchange": "ascendex",
+    "id": undefined,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "price": 51299.54,
+    "side": "buy",
+    "symbol": "BTC/USDT",
+    "timestamp": 2021-03-26T00:00:01.928Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.7892,
+      },
+    ],
+    "exchange": "ascendex",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "symbol": "XRP/USDT",
+    "timestamp": 2021-05-24T00:00:00.204Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1899,
+        "price": 0.7898,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 498,
+        "price": 0.78958,
+      },
+      Object {
+        "amount": 499,
+        "price": 0.78952,
+      },
+    ],
+    "exchange": "ascendex",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "symbol": "XRP/USDT",
+    "timestamp": 2021-05-24T00:59:59.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 5`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.78721,
+      },
+    ],
+    "exchange": "ascendex",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "symbol": "XRP/USDT",
+    "timestamp": 2021-05-24T00:00:00.266Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 6`] = `
+Array [
+  Object {
+    "amount": 0.05,
+    "exchange": "ascendex",
+    "id": undefined,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "price": 34816,
+    "side": "sell",
+    "symbol": "BTC-PERP",
+    "timestamp": 2021-05-24T00:00:24.397Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map ascendex messages 7`] = `
+Array [
+  Object {
+    "exchange": "ascendex",
+    "fundingRate": 0.000093927,
+    "fundingTimestamp": 2021-05-24T00:00:00.000Z,
+    "indexPrice": 34670.285,
+    "lastPrice": 34816,
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "markPrice": 34638.370817096,
+    "openInterest": 80.2099,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-PERP",
+    "timestamp": 2021-05-23T23:59:04.113Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance delivery messages 1`] = `Array []`;
 
 exports[`mappers map binance delivery messages 2`] = `

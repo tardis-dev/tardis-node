@@ -1,5 +1,6 @@
 import { ONE_SEC_IN_MS } from '../handy'
 import { BookChange, DerivativeTicker, Liquidation, OptionSummary, Quote, Trade } from '../types'
+import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexTradesMapper } from './ascendex'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -98,7 +99,8 @@ const tradesMappers = {
   poloniex: () => new PoloniexTradesMapper(),
   coinflex: () => coinflexTradesMapper,
   'binance-options': () => new BinanceOptionsTradesMapper(),
-  upbit: () => new UpbitTradesMapper()
+  upbit: () => new UpbitTradesMapper(),
+  ascendex: () => new AscendexTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -148,7 +150,8 @@ const bookChangeMappers = {
   poloniex: () => new PoloniexBookChangeMapper(),
   coinflex: () => coinflexBookChangeMapper,
   'binance-options': () => new BinanceOptionsBookChangeMapper(),
-  upbit: () => new UpbitBookChangeMapper()
+  upbit: () => new UpbitBookChangeMapper(),
+  ascendex: () => new AscendexBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -168,7 +171,8 @@ const derivativeTickersMappers = {
   'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
-  coinflex: () => new CoinflexDerivativeTickerMapper()
+  coinflex: () => new CoinflexDerivativeTickerMapper(),
+  ascendex: () => new AscendexDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
