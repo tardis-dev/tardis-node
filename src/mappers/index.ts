@@ -32,6 +32,7 @@ import {
   DeribitOptionSummaryMapper,
   deribitTradesMapper
 } from './deribit'
+import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXTradesMapper } from './ftx'
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
 import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
@@ -100,7 +101,8 @@ const tradesMappers = {
   coinflex: () => coinflexTradesMapper,
   'binance-options': () => new BinanceOptionsTradesMapper(),
   upbit: () => new UpbitTradesMapper(),
-  ascendex: () => new AscendexTradesMapper()
+  ascendex: () => new AscendexTradesMapper(),
+  dydx: () => new DydxTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -151,7 +153,8 @@ const bookChangeMappers = {
   coinflex: () => coinflexBookChangeMapper,
   'binance-options': () => new BinanceOptionsBookChangeMapper(),
   upbit: () => new UpbitBookChangeMapper(),
-  ascendex: () => new AscendexBookChangeMapper()
+  ascendex: () => new AscendexBookChangeMapper(),
+  dydx: () => new DydxBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -172,7 +175,8 @@ const derivativeTickersMappers = {
   'huobi-dm-linear-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
   coinflex: () => new CoinflexDerivativeTickerMapper(),
-  ascendex: () => new AscendexDerivativeTickerMapper()
+  ascendex: () => new AscendexDerivativeTickerMapper(),
+  dydx: () => new DydxDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {

@@ -26,7 +26,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'gate-io-futures',
   'coinflex',
   'huobi-dm-linear-swap',
-  'ascendex'
+  'ascendex',
+  'dydx'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options']
@@ -5126,6 +5127,125 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = ascendexMapper.map(message, new Date('2021-05-24T00:59:59.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map dydx messages', () => {
+    const messages = [
+      {
+        type: 'subscribed',
+        connection_id: '22be6448-1464-45ff-ae7d-1204eac64d0f',
+        message_id: 2,
+        channel: 'v3_trades',
+        id: '1INCH-USD',
+        contents: {
+          trades: [{ side: 'BUY', size: '63', price: '5.632', createdAt: '2021-04-30T23:08:12.481Z' }]
+        }
+      },
+      {
+        type: 'channel_data',
+        connection_id: 'e368fe1e-a007-44bd-9532-8eacc81a8bbc',
+        message_id: 229,
+        id: 'BTC-USD',
+        channel: 'v3_trades',
+        contents: {
+          trades: [
+            { size: '0.075', side: 'SELL', price: '57696', createdAt: '2021-05-01T00:00:34.046Z' },
+            { size: '0.425', side: 'SELL', price: '57673', createdAt: '2021-05-01T00:00:34.046Z' }
+          ]
+        }
+      },
+      {
+        type: 'subscribed',
+        connection_id: '22be6448-1464-45ff-ae7d-1204eac64d0f',
+        message_id: 1,
+        channel: 'v3_orderbook',
+        id: '1INCH-USD',
+        contents: {
+          bids: [{ price: '5', offset: '118546101', size: '50' }],
+          asks: [{ price: '7', offset: '120842096', size: '20' }]
+        }
+      },
+      {
+        type: 'channel_data',
+        connection_id: '22be6448-1464-45ff-ae7d-1204eac64d0f',
+        message_id: 161,
+        id: '1INCH-USD',
+        channel: 'v3_orderbook',
+        contents: {
+          offset: '125090042',
+          bids: [],
+          asks: [
+            ['5.664', '3000'],
+            ['5.666', '0']
+          ]
+        }
+      },
+      {
+        type: 'channel_data',
+        connection_id: '22be6448-1464-45ff-ae7d-1204eac64d0f',
+        message_id: 161,
+        id: '1INCH-USD',
+        channel: 'v3_orderbook',
+        contents: {
+          offset: '125090041',
+          bids: [],
+          asks: [
+            ['5.664', '4000'],
+            ['5.666', '5']
+          ]
+        }
+      },
+      {
+        type: 'subscribed',
+        connection_id: '8c11ee31-dbca-49fa-9df0-fc973948b7b5',
+        message_id: 3,
+        channel: 'v3_markets',
+        contents: {
+          markets: {
+            'BTC-USD': {
+              market: 'BTC-USD',
+              status: 'ONLINE',
+              baseAsset: 'BTC',
+              quoteAsset: 'USD',
+              stepSize: '0.0001',
+              tickSize: '1',
+              indexPrice: '57794.7000',
+              oraclePrice: '57880.5200',
+              priceChange24H: '4257.9',
+              nextFundingRate: '0.0000587260',
+              nextFundingAt: '2021-05-01T00:00:00.000Z',
+              minOrderSize: '0.001',
+              type: 'PERPETUAL',
+              initialMarginFraction: '0.04',
+              maintenanceMarginFraction: '0.03',
+              volume24H: '4710467.697100',
+              trades24H: '663',
+              openInterest: '101.2026',
+              incrementalInitialMarginFraction: '0.01',
+              incrementalPositionSize: '0.5',
+              maxPositionSize: '30',
+              baselinePositionSize: '1.0',
+              allTimeLiquidationQuoteVolume: '3001153.615633',
+              dailyLiquidationQuoteVolume: '6047.074828'
+            }
+          }
+        }
+      },
+      {
+        type: 'channel_data',
+        connection_id: '8c11ee31-dbca-49fa-9df0-fc973948b7b5',
+        message_id: 221,
+        channel: 'v3_markets',
+        contents: { 'BTC-USD': { volume24H: '4739305.922100', trades24H: '665', openInterest: '101.2776' } }
+      }
+    ]
+
+    const dydxMapper = createMapper('dydx')
+
+    for (const message of messages) {
+      const mappedMessages = dydxMapper.map(message, new Date('2021-05-01T00:00:37.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

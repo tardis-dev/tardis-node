@@ -36,7 +36,8 @@ export const EXCHANGES = [
   'binance-jersey',
   'binance-dex',
   'upbit',
-  'ascendex'
+  'ascendex',
+  'dydx'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -262,6 +263,7 @@ const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']
 const POLONIEX_CHANNELS = ['price_aggregated_book']
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker']
 const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data']
+const DYDX_CHANNELS = ['v3_trades', 'v3_orderbook', 'v3_markets']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
@@ -301,5 +303,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   poloniex: POLONIEX_CHANNELS,
   'binance-options': BINANCE_OPTIONS_CHANNELS,
   upbit: UPBIT_CHANNELS,
-  ascendex: ASCENDEX_CHANNELS
+  ascendex: ASCENDEX_CHANNELS,
+  dydx: DYDX_CHANNELS
 }

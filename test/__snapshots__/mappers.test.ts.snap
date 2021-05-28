@@ -3238,6 +3238,124 @@ Array [
 ]
 `;
 
+exports[`mappers map dydx messages 1`] = `Array []`;
+
+exports[`mappers map dydx messages 2`] = `
+Array [
+  Object {
+    "amount": 0.075,
+    "exchange": "dydx",
+    "id": undefined,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "price": 57696,
+    "side": "sell",
+    "symbol": "BTC-USD",
+    "timestamp": 2021-05-01T00:00:34.046Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.425,
+    "exchange": "dydx",
+    "id": undefined,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "price": 57673,
+    "side": "sell",
+    "symbol": "BTC-USD",
+    "timestamp": 2021-05-01T00:00:34.046Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 20,
+        "price": 7,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 50,
+        "price": 5,
+      },
+    ],
+    "exchange": "dydx",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "symbol": "1INCH-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3000,
+        "price": 5.664,
+      },
+      Object {
+        "amount": 0,
+        "price": 5.666,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "dydx",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "symbol": "1INCH-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 5`] = `Array []`;
+
+exports[`mappers map dydx messages 6`] = `
+Array [
+  Object {
+    "exchange": "dydx",
+    "fundingRate": 0.000058726,
+    "fundingTimestamp": 2021-05-01T00:00:00.000Z,
+    "indexPrice": 57794.7,
+    "lastPrice": 57673,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "markPrice": 57880.52,
+    "openInterest": 101.2026,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 7`] = `
+Array [
+  Object {
+    "exchange": "dydx",
+    "fundingRate": 0.000058726,
+    "fundingTimestamp": 2021-05-01T00:00:00.000Z,
+    "indexPrice": 57794.7,
+    "lastPrice": 57673,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "markPrice": 57880.52,
+    "openInterest": 101.2776,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map ftx messages 1`] = `Array []`;
 
 exports[`mappers map ftx messages 2`] = `
