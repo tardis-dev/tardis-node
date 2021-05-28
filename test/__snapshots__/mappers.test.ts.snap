@@ -1865,7 +1865,21 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 11`] = `Array []`;
+exports[`mappers map bybit messages 11`] = `
+Array [
+  Object {
+    "amount": 0.001,
+    "exchange": "bybit",
+    "id": "bfbbb893-0971-5733-8eb2-aab164d0a552",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 9452,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2020-05-28T16:31:02.124Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map bybit messages 12`] = `
 Array [
@@ -4167,7 +4181,21 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 4`] = `Array []`;
+exports[`mappers map huobi messages 4`] = `
+Array [
+  Object {
+    "amount": 62,
+    "exchange": "huobi",
+    "id": "251029750220000",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 190.031,
+    "side": "sell",
+    "symbol": "ETH_CQ",
+    "timestamp": 2019-11-05T00:00:28.237Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map huobi messages 5`] = `
 Array [
@@ -4231,7 +4259,21 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 7`] = `Array []`;
+exports[`mappers map huobi messages 7`] = `
+Array [
+  Object {
+    "amount": 1569.86,
+    "exchange": "huobi",
+    "id": "100027416191",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 6.37e-8,
+    "side": "buy",
+    "symbol": "MEXBTC",
+    "timestamp": 2019-11-04T23:44:48.761Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map huobi messages 8`] = `
 Array [
@@ -4280,7 +4322,21 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 11`] = `Array []`;
+exports[`mappers map huobi messages 11`] = `
+Array [
+  Object {
+    "amount": 6.5286,
+    "exchange": "huobi",
+    "id": "10020171792852100010452",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 0.006663,
+    "side": "buy",
+    "symbol": "XMRBTC",
+    "timestamp": 2019-10-16T15:03:59.378Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map huobi messages 12`] = `
 Array [
@@ -4638,7 +4694,21 @@ exports[`mappers map huobi-dm-linear-swap, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm-linear-swap, messages 2`] = `Array []`;
 
-exports[`mappers map huobi-dm-linear-swap, messages 3`] = `Array []`;
+exports[`mappers map huobi-dm-linear-swap, messages 3`] = `
+Array [
+  Object {
+    "amount": 6,
+    "exchange": "huobi-dm-linear-swap",
+    "id": "2918913650000",
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "price": 3.2639,
+    "side": "buy",
+    "symbol": "EOS-USDT",
+    "timestamp": 2020-12-01T00:00:14.931Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map huobi-dm-linear-swap, messages 4`] = `
 Array [
@@ -4757,7 +4827,21 @@ exports[`mappers map huobi-dm-swap, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm-swap, messages 2`] = `Array []`;
 
-exports[`mappers map huobi-dm-swap, messages 3`] = `Array []`;
+exports[`mappers map huobi-dm-swap, messages 3`] = `
+Array [
+  Object {
+    "amount": 8,
+    "exchange": "huobi-dm-swap",
+    "id": "95306843320000",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 177.3,
+    "side": "sell",
+    "symbol": "BSV-USD",
+    "timestamp": 2020-06-23T09:33:34.962Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map huobi-dm-swap, messages 4`] = `
 Array [
@@ -5078,7 +5162,21 @@ Array [
 ]
 `;
 
-exports[`mappers map okcoin messages 5`] = `Array []`;
+exports[`mappers map okcoin messages 5`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "okcoin",
+    "id": "459",
+    "localTimestamp": 2019-11-09T00:00:01.275Z,
+    "price": 20.38,
+    "side": "buy",
+    "symbol": "DCR-USD",
+    "timestamp": 2019-11-09T07:53:40.478Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map okcoin messages 6`] = `
 Array [
@@ -5096,7 +5194,21 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 1`] = `Array []`;
+exports[`mappers map okex messages 1`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "exchange": "okex",
+    "id": "423886239",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.806Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map okex messages 2`] = `
 Array [
@@ -5151,9 +5263,37 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 1`] = `Array []`;
+exports[`mappers map okex-futures messages 1`] = `
+Array [
+  Object {
+    "amount": 4,
+    "exchange": "okex-futures",
+    "id": "2578238628528131",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 4061.94,
+    "side": "sell",
+    "symbol": "BTC-USD-190628",
+    "timestamp": 2019-03-31T23:59:59.388Z,
+    "type": "trade",
+  },
+]
+`;
 
-exports[`mappers map okex-futures messages 2`] = `Array []`;
+exports[`mappers map okex-futures messages 2`] = `
+Array [
+  Object {
+    "amount": 5,
+    "exchange": "okex-futures",
+    "id": "3269040623943685",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 10209.43,
+    "side": "buy",
+    "symbol": "BTC-USD-190927",
+    "timestamp": 2019-08-01T00:00:01.320Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map okex-futures messages 3`] = `
 Array [
@@ -5781,7 +5921,21 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 1`] = `Array []`;
+exports[`mappers map okex-swap messages 1`] = `
+Array [
+  Object {
+    "amount": 0.12,
+    "exchange": "okex-swap",
+    "id": "423886239",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "price": 328.74,
+    "side": "sell",
+    "symbol": "BCH-USDT",
+    "timestamp": 2019-08-01T00:00:08.806Z,
+    "type": "trade",
+  },
+]
+`;
 
 exports[`mappers map okex-swap messages 2`] = `
 Array [
