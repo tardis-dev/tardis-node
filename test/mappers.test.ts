@@ -5249,4 +5249,48 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+
+  test('map serum messages', () => {
+    const messages = [
+      {
+        type: 'l2snapshot',
+        market: 'RAY/USDT',
+        timestamp: '2021-05-21T23:58:56.899Z',
+        slot: 79469186,
+        version: 3,
+        asks: [
+          ['5.235', '2571.1'],
+          ['5.240', '992.7']
+        ],
+        bids: [['5.202', '2405.1']]
+      },
+      {
+        type: 'l2update',
+        market: 'BTC/USDT',
+        timestamp: '2021-05-22T00:00:00.101Z',
+        slot: 79469279,
+        version: 3,
+        asks: [['37905.7', '0.0000']],
+        bids: [['36304.8', '0.0000']]
+      },
+      {
+        type: 'trade',
+        market: 'RAY/USDT',
+        timestamp: '2021-05-22T00:00:59.448Z',
+        slot: 79469377,
+        version: 3,
+        id: '96845406386975144808722|185.8|1621641659448',
+        side: 'buy',
+        price: '5.235',
+        size: '185.8'
+      }
+    ]
+
+    const serumMapper = createMapper('serum')
+
+    for (const message of messages) {
+      const mappedMessages = serumMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
 })

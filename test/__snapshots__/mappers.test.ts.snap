@@ -6324,6 +6324,76 @@ Array [
 ]
 `;
 
+exports[`mappers map serum messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2571.1,
+        "price": 5.235,
+      },
+      Object {
+        "amount": 992.7,
+        "price": 5.24,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2405.1,
+        "price": 5.202,
+      },
+    ],
+    "exchange": "serum",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "RAY/USDT",
+    "timestamp": 2021-05-21T23:58:56.899Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map serum messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 37905.7,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 36304.8,
+      },
+    ],
+    "exchange": "serum",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "BTC/USDT",
+    "timestamp": 2021-05-22T00:00:00.101Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map serum messages 3`] = `
+Array [
+  Object {
+    "amount": 185.8,
+    "exchange": "serum",
+    "id": "96845406386975144808722|185.8|1621641659448",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 5.235,
+    "side": "buy",
+    "symbol": "RAY/USDT",
+    "timestamp": 2021-05-22T00:00:59.448Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map upbit messages 1`] = `
 Array [
   Object {

@@ -32,6 +32,7 @@ import { BinanceOptionsRealTimeFeed } from './binanceoptions'
 import { UpbitRealTimeFeed } from './upbit'
 import { AscendexRealTimeFeed } from './ascendex'
 import { DydxRealTimeFeed } from './dydx'
+import { SerumRealTimeFeed } from './serum'
 
 export * from './realtimefeed'
 
@@ -76,7 +77,8 @@ const realTimeFeedsMap: {
   'binance-options': BinanceOptionsRealTimeFeed,
   upbit: UpbitRealTimeFeed,
   ascendex: AscendexRealTimeFeed,
-  dydx: DydxRealTimeFeed
+  dydx: DydxRealTimeFeed,
+  serum: SerumRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

@@ -50,6 +50,7 @@ import { Mapper } from './mapper'
 import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexLiquidationsMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
+import { SerumBookChangeMapper, SerumTradesMapper } from './serum'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
 
 export * from './mapper'
@@ -102,7 +103,8 @@ const tradesMappers = {
   'binance-options': () => new BinanceOptionsTradesMapper(),
   upbit: () => new UpbitTradesMapper(),
   ascendex: () => new AscendexTradesMapper(),
-  dydx: () => new DydxTradesMapper()
+  dydx: () => new DydxTradesMapper(),
+  serum: () => new SerumTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -154,7 +156,8 @@ const bookChangeMappers = {
   'binance-options': () => new BinanceOptionsBookChangeMapper(),
   upbit: () => new UpbitBookChangeMapper(),
   ascendex: () => new AscendexBookChangeMapper(),
-  dydx: () => new DydxBookChangeMapper()
+  dydx: () => new DydxBookChangeMapper(),
+  serum: () => new SerumBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
