@@ -51,7 +51,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       try {
         const subscribeMessages = this.mapToSubscribeMessages(this._filters)
 
-        this.debug('(connection id: %d) estabilishing connection to %s', this._connectionId, this.wssURL)
+        const wssUrlOverride = process.env[`WSS_URL_${this._exchange.toUpperCase()}`]
+        const finalWssUrl = wssUrlOverride !== undefined ? wssUrlOverride : this.wssURL
+
+        this.debug('(connection id: %d) estabilishing connection to %s', this._connectionId, finalWssUrl)
 
         this.debug(
           '(connection id: %d) provided filters: %o mapped to subscribe messages: %o',
@@ -60,7 +63,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           subscribeMessages
         )
 
-        this._ws = new WebSocket(this.wssURL, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
+        this._ws = new WebSocket(finalWssUrl, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
 
         this._ws.onopen = this._onConnectionEstabilished
         this._ws.onclose = this._onConnectionClosed
