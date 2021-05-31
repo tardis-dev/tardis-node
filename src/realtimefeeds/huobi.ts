@@ -48,11 +48,26 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     if (openInterestFilters.length > 0) {
       const instruments = openInterestFilters.flatMap((s) => s.symbols!)
 
-      yield new HuobiOpenInterestClient(exchange, this.httpURL, instruments, this.getURLPath.bind(this))
+      yield new HuobiOpenInterestClient(exchange, this.httpURL, instruments, this.getOpenInterestURLPath.bind(this))
+    }
+
+    const optionMarketIndexFilters = filters.filter((f) => f.channel === 'option_market_index')
+    if (optionMarketIndexFilters.length > 0) {
+      const instruments = optionMarketIndexFilters.flatMap((s) => s.symbols!)
+
+      yield new HuobiOptionsMarketIndexClient(exchange, this.httpURL, instruments)
+    }
+
+    const optionIndexFilters = filters.filter((f) => f.channel === 'option_index')
+
+    if (optionIndexFilters.length > 0) {
+      const instruments = optionIndexFilters.flatMap((s) => s.symbols!)
+
+      yield new HuobiOptionsIndexClient(exchange, this.httpURL, instruments)
     }
   }
 
-  protected getURLPath(symbol: string) {
+  protected getOpenInterestURLPath(symbol: string) {
     return symbol
   }
 }
@@ -242,6 +257,76 @@ class HuobiOpenInterestClient extends PoolingClientBase {
   }
 }
 
+class HuobiOptionsMarketIndexClient extends PoolingClientBase {
+  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
+    super(exchange, 4)
+  }
+
+  protected async poolDataToStream(outputStream: Writable) {
+    for (const instruments of batch(this._instruments, 10)) {
+      await Promise.all(
+        instruments.map(async (instrument) => {
+          if (outputStream.destroyed) {
+            return
+          }
+          const url = `${this._httpURL}/option_market_index?contract_code=${instrument}`
+          const marketIndexResponse = (await got.get(url, { timeout: 2000 }).json()) as any
+
+          if (marketIndexResponse.status !== 'ok') {
+            throw new Error(`open interest response error:${JSON.stringify(marketIndexResponse)}, url:${url}`)
+          }
+
+          const marketIndexMessage = {
+            ch: `market.${instrument}.option_market_index`,
+            generated: true,
+            data: marketIndexResponse.data[0],
+            ts: marketIndexResponse.ts
+          }
+
+          if (outputStream.writable) {
+            outputStream.write(marketIndexMessage)
+          }
+        })
+      )
+    }
+  }
+}
+
+class HuobiOptionsIndexClient extends PoolingClientBase {
+  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
+    super(exchange, 4)
+  }
+
+  protected async poolDataToStream(outputStream: Writable) {
+    for (const instruments of batch(this._instruments, 10)) {
+      await Promise.all(
+        instruments.map(async (instrument) => {
+          if (outputStream.destroyed) {
+            return
+          }
+          const url = `${this._httpURL}/option_index?symbol=${instrument}`
+          const optionIndexResponse = (await got.get(url, { timeout: 2000 }).json()) as any
+
+          if (optionIndexResponse.status !== 'ok') {
+            throw new Error(`open interest response error:${JSON.stringify(optionIndexResponse)}, url:${url}`)
+          }
+
+          const optionIndexMessage = {
+            ch: `market.${instrument}.option_index`,
+            generated: true,
+            data: optionIndexResponse.data[0],
+            ts: optionIndexResponse.ts
+          }
+
+          if (outputStream.writable) {
+            outputStream.write(optionIndexMessage)
+          }
+        })
+      )
+    }
+  }
+}
+
 export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
   protected wssURL = 'wss://api-aws.huobi.pro/ws'
   protected httpURL = 'https://api-aws.huobi.pro/v1'
@@ -270,7 +355,7 @@ export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
     NQ: 'next_quarter'
   }
 
-  protected getURLPath(symbol: string) {
+  protected getOpenInterestURLPath(symbol: string) {
     const split = symbol.split('_')
     const index = split[0]
     const contractType = this._contractTypeMap[split[1]]
@@ -289,7 +374,7 @@ export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
     basis: '.1min.close'
   }
 
-  protected getURLPath(symbol: string) {
+  protected getOpenInterestURLPath(symbol: string) {
     return `swap_open_interest?contract_code=${symbol}`
   }
 }
@@ -304,7 +389,22 @@ export class HuobiDMLinearSwapRealTimeFeed extends HuobiRealTimeFeedBase {
     basis: '.1min.close'
   }
 
-  protected getURLPath(symbol: string) {
+  protected getOpenInterestURLPath(symbol: string) {
     return `swap_open_interest?contract_code=${symbol}`
+  }
+}
+
+export class HuobiDMOptionsRealTimeFeed extends HuobiRealTimeFeedBase {
+  protected wssURL = 'wss://api.hbdm.vn/option-ws'
+  protected httpURL = 'https://api.hbdm.vn/option-api/v1'
+
+  protected suffixes = {
+    trade: '.detail',
+    depth: '.size_150.high_freq',
+    basis: '.1min.close'
+  }
+
+  protected getOpenInterestURLPath(symbol: string) {
+    return `option_open_interest?contract_code=${symbol}`
   }
 }

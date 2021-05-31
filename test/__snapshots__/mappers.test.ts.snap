@@ -4823,6 +4823,118 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi-dm-options, messages 1`] = `
+Array [
+  Object {
+    "amount": 8,
+    "exchange": "huobi-dm-options",
+    "id": "2634626360000",
+    "localTimestamp": 2021-05-03T00:00:00.130Z,
+    "price": 1969.99,
+    "side": "buy",
+    "symbol": "BTC-USDT-201204-C-17000",
+    "timestamp": 2020-11-30T13:30:05.993Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 20,
+    "exchange": "huobi-dm-options",
+    "id": "2634626360001",
+    "localTimestamp": 2021-05-03T00:00:00.130Z,
+    "price": 1970,
+    "side": "buy",
+    "symbol": "BTC-USDT-201204-C-17000",
+    "timestamp": 2020-11-30T13:30:05.993Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-options, messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 74,
+        "price": 106,
+      },
+      Object {
+        "amount": 3613,
+        "price": 239.94,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 5,
+        "price": 51,
+      },
+    ],
+    "exchange": "huobi-dm-options",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-03T00:00:00.130Z,
+    "symbol": "ETH-USDT-210521-P-3000",
+    "timestamp": 2021-05-17T23:59:48.498Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-options, messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 578,
+        "price": 4116.94,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "huobi-dm-options",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-03T00:00:00.130Z,
+    "symbol": "BTC-USDT-210625-C-87000",
+    "timestamp": 2021-05-18T00:00:59.498Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-options, messages 4`] = `Array []`;
+
+exports[`mappers map huobi-dm-options, messages 5`] = `Array []`;
+
+exports[`mappers map huobi-dm-options, messages 6`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 1.64869787,
+    "bestAskPrice": 2000,
+    "bestBidAmount": undefined,
+    "bestBidIV": 1.13185884,
+    "bestBidPrice": 1189.49,
+    "delta": -0.3704996546766173,
+    "exchange": "huobi-dm-options",
+    "expirationDate": 2021-05-21T08:00:00.000Z,
+    "gamma": 0.00006528,
+    "lastPrice": 1968.83,
+    "localTimestamp": 2021-05-03T00:00:00.130Z,
+    "markIV": 1.39190675,
+    "markPrice": 1594.7397774915714,
+    "openInterest": 684,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 42000,
+    "symbol": "BTC-USDT-210521-P-42000",
+    "theta": -327.85540508,
+    "timestamp": 2021-05-18T00:00:02.820Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTC-USDT",
+    "underlyingPrice": 43501.21,
+    "vega": 15.70293917,
+  },
+]
+`;
+
 exports[`mappers map huobi-dm-swap, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm-swap, messages 2`] = `Array []`;

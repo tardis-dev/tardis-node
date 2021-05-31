@@ -38,7 +38,8 @@ export const EXCHANGES = [
   'upbit',
   'ascendex',
   'dydx',
-  'serum'
+  'serum',
+  'huobi-dm-options'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -278,13 +279,7 @@ const SERUM_CHANNELS = [
   'done'
 ] as const
 
-const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker']
-const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']
-const POLONIEX_CHANNELS = ['price_aggregated_book']
-const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker']
-const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data']
-const DYDX_CHANNELS = ['v3_trades', 'v3_orderbook', 'v3_markets']
-const SERUM_CHANNELS = ['recent_trades', 'trade', 'quote', 'l2snapshot', 'l2update', 'l3snapshot', 'open', 'fill', 'change', 'done']
+const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
@@ -326,5 +321,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   upbit: UPBIT_CHANNELS,
   ascendex: ASCENDEX_CHANNELS,
   dydx: DYDX_CHANNELS,
-  serum: SERUM_CHANNELS
+  serum: SERUM_CHANNELS,
+  'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS
 }

@@ -1,11 +1,12 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { CircularBuffer } from '../handy'
+import { asNumberIfValid, CircularBuffer } from '../handy'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
-export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Trade> {
+export class HuobiTradesMapper
+  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -44,7 +45,8 @@ export class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-d
   }
 }
 
-export class HuobiBookChangeMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookChange> {
+export class HuobiBookChangeMapper
+  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', BookChange> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {
@@ -398,6 +400,116 @@ export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-sw
   }
 }
 
+export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSummary> {
+  private readonly _indexPrices = new Map<string, number>()
+  private readonly _openInterest = new Map<string, number>()
+
+  canHandle(message: HuobiOpenInterestDataMessage | HuobiOptionsIndexMessage | HuobiOptionsMarketIndexMessage) {
+    if (message.ch === undefined) {
+      return false
+    }
+
+    return message.ch.endsWith('.open_interest') || message.ch.endsWith('.option_index') || message.ch.endsWith('.option_market_index')
+  }
+
+  getFilters(symbols?: string[]) {
+    const indexes =
+      symbols !== undefined
+        ? symbols.map((s) => {
+            const symbolParts = s.split('-')
+            return `${symbolParts[0]}-${symbolParts[1]}`
+          })
+        : undefined
+
+    return [
+      {
+        channel: `open_interest`,
+        symbols
+      } as const,
+      {
+        channel: `option_index`,
+        symbols: indexes
+      } as const,
+      {
+        channel: 'option_market_index',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(
+    message: HuobiOpenInterestDataMessage | HuobiOptionsIndexMessage | HuobiOptionsMarketIndexMessage,
+    localTimestamp: Date
+  ): IterableIterator<OptionSummary> | undefined {
+    if (message.ch.endsWith('.option_index')) {
+      const indexUpdateMessage = message as HuobiOptionsIndexMessage
+      this._indexPrices.set(indexUpdateMessage.data.symbol, indexUpdateMessage.data.index_price)
+
+      return
+    }
+
+    if (message.ch.endsWith('.open_interest')) {
+      const openInterestMessage = message as HuobiOptionsOpenInterestMessage
+      for (const ioMessage of openInterestMessage.data) {
+        this._openInterest.set(ioMessage.contract_code, ioMessage.volume)
+      }
+
+      return
+    }
+
+    const marketIndexMessage = message as HuobiOptionsMarketIndexMessage
+
+    const symbolParts = marketIndexMessage.data.contract_code.split('-')
+
+    const expirationDate = new Date(`20${symbolParts[2].slice(0, 2)}-${symbolParts[2].slice(2, 4)}-${symbolParts[2].slice(4, 6)}Z`)
+    expirationDate.setUTCHours(8)
+
+    const underlying = `${symbolParts[0]}-${symbolParts[1]}`
+
+    const lastUnderlyingPrice = this._indexPrices.get(underlying)
+    const openInterest = this._openInterest.get(marketIndexMessage.data.contract_code)
+
+    const optionSummary: OptionSummary = {
+      type: 'option_summary',
+      symbol: marketIndexMessage.data.contract_code,
+      exchange: 'huobi-dm-options',
+      optionType: marketIndexMessage.data.option_right_type === 'P' ? 'put' : 'call',
+      strikePrice: Number(symbolParts[4]),
+      expirationDate,
+
+      bestBidPrice: asNumberIfValid(marketIndexMessage.data.bid_one),
+
+      bestBidAmount: undefined,
+      bestBidIV: asNumberIfValid(marketIndexMessage.data.iv_bid_one),
+
+      bestAskPrice: asNumberIfValid(marketIndexMessage.data.ask_one),
+      bestAskAmount: undefined,
+      bestAskIV: asNumberIfValid(marketIndexMessage.data.iv_ask_one),
+
+      lastPrice: asNumberIfValid(marketIndexMessage.data.last_price),
+
+      openInterest,
+
+      markPrice: asNumberIfValid(marketIndexMessage.data.mark_price),
+      markIV: asNumberIfValid(marketIndexMessage.data.iv_mark_price),
+
+      delta: asNumberIfValid(marketIndexMessage.data.delta),
+      gamma: asNumberIfValid(marketIndexMessage.data.gamma),
+      vega: asNumberIfValid(marketIndexMessage.data.vega),
+      theta: asNumberIfValid(marketIndexMessage.data.theta),
+      rho: undefined,
+
+      underlyingPrice: lastUnderlyingPrice,
+      underlyingIndex: underlying,
+
+      timestamp: new Date(marketIndexMessage.ts),
+      localTimestamp: localTimestamp
+    }
+
+    yield optionSummary
+  }
+}
+
 type HuobiDataMessage = {
   ch: string
 }
@@ -513,4 +625,55 @@ type HuobiContractInfo = {
     contract_code: string
     contract_type: 'this_week' | 'next_week' | 'quarter' | 'next_quarter'
   }[]
+}
+
+type HuobiOptionsOpenInterestMessage = {
+  ch: 'market.BTC-USDT-210521-C-42000.open_interest'
+  generated: true
+  data: [
+    {
+      volume: 684.0
+      amount: 0.684
+      symbol: 'BTC'
+      contract_type: 'this_week'
+      contract_code: 'BTC-USDT-210521-C-42000'
+      trade_partition: 'USDT'
+      trade_amount: 0.792
+      trade_volume: 792
+      trade_turnover: 3237.37806
+    }
+  ]
+  ts: 1621296002336
+}
+
+type HuobiOptionsIndexMessage = {
+  ch: 'market.BTC-USDT.option_index'
+  generated: true
+  data: { symbol: 'BTC-USDT'; index_price: 43501.21; index_ts: 1621295997270 }
+  ts: 1621296002825
+}
+
+type HuobiOptionsMarketIndexMessage = {
+  ch: 'market.BTC-USDT-210521-P-42000.option_market_index'
+  generated: true
+  data: {
+    contract_code: 'BTC-USDT-210521-P-42000'
+    symbol: 'BTC'
+    iv_last_price: 1.62902357
+    iv_ask_one: 1.64869787
+    iv_bid_one: 1.13185884
+    iv_mark_price: 1.39190675
+    delta: -0.3704996546766173
+    gamma: 0.00006528
+    theta: -327.85540508
+    vega: 15.70293917
+    ask_one: 2000
+    bid_one: 1189.49
+    last_price: 1968.83
+    mark_price: 1594.739777491571343067
+    trade_partition: 'USDT'
+    contract_type: 'this_week'
+    option_right_type: 'P'
+  }
+  ts: 1621296002820
 }

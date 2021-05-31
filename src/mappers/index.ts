@@ -43,6 +43,7 @@ import {
   HuobiDerivativeTickerMapper,
   HuobiLiquidationsMapper,
   HuobiMBPBookChangeMapper,
+  HuobiOptionsSummaryMapper,
   HuobiTradesMapper
 } from './huobi'
 import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
@@ -91,6 +92,7 @@ const tradesMappers = {
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiTradesMapper('huobi-dm-linear-swap'),
+  'huobi-dm-options': () => new HuobiTradesMapper('huobi-dm-options'),
   bybit: () => new BybitTradesMapper('bybit'),
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
@@ -143,6 +145,8 @@ const bookChangeMappers = {
   'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
+  'huobi-dm-options': () => new HuobiBookChangeMapper('huobi-dm-options'),
+
   bybit: () => new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
@@ -185,7 +189,8 @@ const derivativeTickersMappers = {
 const optionsSummaryMappers = {
   deribit: () => new DeribitOptionSummaryMapper(),
   'okex-options': () => new OkexOptionSummaryMapper(),
-  'binance-options': () => new BinanceOptionSummaryMapper()
+  'binance-options': () => new BinanceOptionSummaryMapper(),
+  'huobi-dm-options': () => new HuobiOptionsSummaryMapper()
 }
 
 const liquidationsMappers = {

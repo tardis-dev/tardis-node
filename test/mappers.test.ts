@@ -30,7 +30,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'dydx'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options']
+const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -3763,6 +3763,110 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobiDMSwap.map(message, new Date('2020-12-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map huobi-dm-options, messages', () => {
+    const messages = [
+      {
+        ch: 'market.BTC-USDT-201204-C-17000.trade.detail',
+        ts: 1606743006033,
+        tick: {
+          id: 263462636,
+          ts: 1606743005993,
+          data: [
+            { amount: 8, ts: 1606743005993, id: 2634626360000, price: 1969.99, direction: 'buy' },
+            { amount: 20, ts: 1606743005993, id: 2634626360001, price: 1970, direction: 'buy' }
+          ]
+        }
+      },
+      {
+        ch: 'market.ETH-USDT-210521-P-3000.depth.size_150.high_freq',
+        tick: {
+          asks: [
+            [106, 74],
+
+            [239.94, 3613]
+          ],
+          bids: [[51, 5]],
+          ch: 'market.ETH-USDT-210521-P-3000.depth.size_150.high_freq',
+          event: 'snapshot',
+          id: 769970495,
+          mrid: 769970495,
+          ts: 1621295988496,
+          version: 107218
+        },
+        ts: 1621295988498
+      },
+      {
+        ch: 'market.BTC-USDT-210625-C-87000.depth.size_150.high_freq',
+        tick: {
+          asks: [[4116.94, 578]],
+          bids: [],
+          ch: 'market.BTC-USDT-210625-C-87000.depth.size_150.high_freq',
+          event: 'update',
+          id: 769971704,
+          mrid: 769971704,
+          ts: 1621296059496,
+          version: 1736113
+        },
+        ts: 1621296059498
+      },
+      {
+        ch: 'market.BTC-USDT-210521-C-42000.open_interest',
+        generated: true,
+        data: [
+          {
+            volume: 684.0,
+            amount: 0.684,
+            symbol: 'BTC',
+            contract_type: 'this_week',
+            contract_code: 'BTC-USDT-210521-P-42000',
+            trade_partition: 'USDT',
+            trade_amount: 0.792,
+            trade_volume: 792,
+            trade_turnover: 3237.37806
+          }
+        ],
+        ts: 1621296002336
+      },
+      {
+        ch: 'market.BTC-USDT.option_index',
+        generated: true,
+        data: { symbol: 'BTC-USDT', index_price: 43501.21, index_ts: 1621295997270 },
+        ts: 1621296002825
+      },
+      {
+        ch: 'market.BTC-USDT-210521-P-42000.option_market_index',
+        generated: true,
+        data: {
+          contract_code: 'BTC-USDT-210521-P-42000',
+          symbol: 'BTC',
+          iv_last_price: 1.62902357,
+          iv_ask_one: 1.64869787,
+          iv_bid_one: 1.13185884,
+          iv_mark_price: 1.39190675,
+          delta: -0.3704996546766173,
+          gamma: 0.00006528,
+          theta: -327.85540508,
+          vega: 15.70293917,
+          ask_one: 2000,
+          bid_one: 1189.49,
+          last_price: 1968.83,
+          mark_price: 1594.739777491571343067,
+          trade_partition: 'USDT',
+          contract_type: 'this_week',
+          option_right_type: 'P'
+        },
+        ts: 1621296002820
+      }
+    ]
+
+    const huobiDMOptionsMapper = createMapper('huobi-dm-options')
+
+    for (const message of messages) {
+      const mappedMessages = huobiDMOptionsMapper.map(message, new Date('2021-05-03T00:00:00.1309902Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

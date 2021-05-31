@@ -418,7 +418,7 @@ export function decimalPlaces(n: number) {
   return count
 }
 
-export function asNumberIfValid(val: string | undefined | null) {
+export function asNumberIfValid(val: string | number | undefined | null) {
   if (val === undefined || val === null) {
     return
   }
