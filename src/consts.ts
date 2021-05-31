@@ -118,7 +118,7 @@ const OKEX_FUTURES_CHANNELS = [
   'information/sentiment',
   'information/long_short_ratio',
   'information/margin'
-]
+] as const
 
 const OKEX_SWAP_CHANNELS = [
   'swap/trade',
@@ -133,7 +133,7 @@ const OKEX_SWAP_CHANNELS = [
   'information/sentiment',
   'information/long_short_ratio',
   'information/margin'
-]
+] as const
 
 const OKEX_OPTIONS_CHANNELS = [
   'option/trade',
@@ -145,9 +145,9 @@ const OKEX_OPTIONS_CHANNELS = [
   'index/ticker',
   'system/status',
   'option/trades'
-]
+] as const
 
-const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker']
+const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
@@ -172,7 +172,7 @@ const BINANCE_FUTURES_CHANNELS = [
   'topLongShortAccountRatio',
   'topLongShortPositionRatio',
   'globalLongShortAccountRatio'
-]
+] as const
 
 const BINANCE_DELIVERY_CHANNELS = [
   'trade',
@@ -189,7 +189,7 @@ const BINANCE_DELIVERY_CHANNELS = [
   'topLongShortAccountRatio',
   'topLongShortPositionRatio',
   'globalLongShortAccountRatio'
-]
+] as const
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations'] as const
 
@@ -257,7 +257,26 @@ const DELTA_CHANNELS = [
   'announcements',
   'all_trades',
   'v2/ticker'
-]
+] as const
+
+const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker'] as const
+const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers'] as const
+const POLONIEX_CHANNELS = ['price_aggregated_book'] as const
+const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
+const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data'] as const
+const DYDX_CHANNELS = ['v3_trades', 'v3_orderbook', 'v3_markets'] as const
+const SERUM_CHANNELS = [
+  'recent_trades',
+  'trade',
+  'quote',
+  'l2snapshot',
+  'l2update',
+  'l3snapshot',
+  'open',
+  'fill',
+  'change',
+  'done'
+] as const
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker']
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers']

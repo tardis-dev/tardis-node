@@ -15,7 +15,7 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
       {
         channel: 'trades',
         symbols
-      }
+      } as const
     ]
   }
 
@@ -56,7 +56,7 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
       {
         channel: 'order_book',
         symbols
-      }
+      } as const
     ]
   }
 

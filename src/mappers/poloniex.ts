@@ -23,7 +23,7 @@ export class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
       {
         channel: 'price_aggregated_book',
         symbols
-      }
+      } as const
     ]
   }
 
@@ -93,7 +93,7 @@ export class PoloniexBookChangeMapper implements Mapper<'poloniex', BookChange> 
       {
         channel: 'price_aggregated_book',
         symbols
-      }
+      } as const
     ]
   }
 

@@ -14,7 +14,7 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
   getFilters(symbols?: string[]) {
     return [
       {
-        channel: `${this._market}/trade`,
+        channel: `${this._market}/trade` as const,
         symbols
       }
     ]
@@ -63,9 +63,9 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
     if (this._canUseTickByTickChannel) {
       return [
         {
-          channel: `${this._market}/depth_l2_tbt`,
+          channel: `${this._market}/depth_l2_tbt` as const,
           symbols
-        } as const
+        }
       ]
     }
 
@@ -129,7 +129,7 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
       return {
         channel,
         symbols
-      }
+      } as any
     })
   }
 
@@ -273,7 +273,7 @@ export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidatio
       {
         channel: `${this._market}/liquidation`,
         symbols
-      }
+      } as any
     ]
   }
 

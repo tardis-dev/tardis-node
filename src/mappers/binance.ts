@@ -288,21 +288,21 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
       {
         channel: 'markPrice',
         symbols
-      },
+      } as const,
       {
         channel: 'ticker',
         symbols
-      },
+      } as const,
       {
         channel: 'openInterest',
         symbols
-      }
+      } as const
     ]
 
     if (this.exchange === 'binance-delivery') {
       // index channel requires index symbol
       filters.push({
-        channel: 'indexPrice',
+        channel: 'indexPrice' as any,
         symbols: symbols !== undefined ? symbols.map((s) => s.split('_')[0]) : undefined
       })
     }
