@@ -20,7 +20,9 @@ abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     if (instrumentInfoFilters.length > 0) {
       const instruments = instrumentInfoFilters.flatMap((s) => s.symbols!)
 
-      yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments)
+      if (instruments.length > 0) {
+        yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments)
+      }
     }
   }
 }

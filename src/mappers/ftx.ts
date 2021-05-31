@@ -110,7 +110,7 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
     return [
       {
         channel: 'instrument',
-        symbols
+        symbols: symbols !== undefined ? symbols.filter((s) => s.includes('/') === false) : undefined
       } as const
     ]
   }
