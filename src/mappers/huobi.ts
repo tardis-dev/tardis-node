@@ -490,7 +490,7 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
 
       openInterest,
 
-      markPrice: asNumberIfValid(marketIndexMessage.data.mark_price),
+      markPrice: marketIndexMessage.data.mark_price > 0 ? asNumberIfValid(marketIndexMessage.data.mark_price) : undefined,
       markIV: asNumberIfValid(marketIndexMessage.data.iv_mark_price),
 
       delta: asNumberIfValid(marketIndexMessage.data.delta),
