@@ -115,7 +115,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         if (staleConnectionTimerId !== undefined) {
           clearInterval(staleConnectionTimerId)
         }
-        yield undefined
+        yield { __disconnect__: true }
       } catch (error) {
         if (this._onError !== undefined) {
           this._onError(error)
@@ -151,8 +151,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         if (staleConnectionTimerId !== undefined) {
           clearInterval(staleConnectionTimerId)
         }
-
-        yield undefined
+        yield { __disconnect__: true }
 
         await wait(delay)
       } finally {
