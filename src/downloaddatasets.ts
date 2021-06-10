@@ -133,7 +133,8 @@ function getDownloadOptions({
     url,
     downloadPath,
     userAgent: options._userAgent,
-    apiKey
+    apiKey, 
+    proxy: options.proxy
   }
 }
 

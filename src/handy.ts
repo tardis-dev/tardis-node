@@ -1,6 +1,7 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
 import https, { RequestOptions } from 'https'
+import createHttpsProxyAgent from 'https-proxy-agent'
 import path from 'path'
 import { debug } from './debug'
 import { Mapper } from './mappers'
@@ -221,7 +222,7 @@ export function optimizeFilters(filters: Filter<any>[]) {
   return optimizedFilters
 }
 
-const httpsAgent = new https.Agent({
+var httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 10 * ONE_SEC_IN_MS,
   maxSockets: 120
@@ -231,13 +232,18 @@ export async function download({
   apiKey,
   downloadPath,
   url,
-  userAgent
+  userAgent,
+  proxy
 }: {
   url: string
   downloadPath: string
   userAgent: string
   apiKey: string
+  proxy: string
 }) {
+  if(proxy) {
+    httpsAgent = createHttpsProxyAgent(proxy);    
+  }
   const httpRequestOptions = {
     agent: httpsAgent,
     timeout: 90 * ONE_SEC_IN_MS,

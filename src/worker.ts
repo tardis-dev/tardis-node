@@ -90,7 +90,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
 }
 
 async function getDataFeedSlice(
-  { exchange, fromDate, endpoint, apiKey, userAgent }: WorkerJobPayload,
+  { exchange, fromDate, endpoint, apiKey, userAgent, proxy }: WorkerJobPayload,
   offset: number,
   filters: object[],
   cacheDir: string
@@ -111,7 +111,8 @@ async function getDataFeedSlice(
       apiKey,
       downloadPath: slicePath,
       url,
-      userAgent
+      userAgent,
+      proxy
     })
 
     debug('getDataFeedSlice fetched from API and cached, %s', sliceKey)
@@ -136,6 +137,7 @@ export type WorkerJobPayload = {
   endpoint: string
   apiKey: string
   userAgent: string
+  proxy: string
   fromDate: Date
   toDate: Date
   exchange: Exchange
