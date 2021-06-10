@@ -5,8 +5,15 @@ import {
   normalizeDerivativeTickers,
   normalizeTrades,
   normalizeOptionsSummary,
-  normalizeLiquidations
+  normalizeLiquidations,
+  init
 } from '../src'
+
+if(process.env.http_proxy) {
+  init({
+    proxy: process.env.http_proxy,
+  })
+}
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',

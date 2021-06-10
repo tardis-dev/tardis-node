@@ -1,11 +1,21 @@
-import got from 'got'
+import got, { OptionsOfTextResponseBody } from 'got'
 import { getOptions } from './options'
 import { Exchange, FilterForExchange } from './types'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   const options = getOptions()
-  const exchangeDetails = await got.get(`${options.endpoint}/exchanges/${exchange}`).json()
-
+  var httpRequestOpts: OptionsOfTextResponseBody = {}  
+  if(options.proxy) {
+    var agent = new HttpsProxyAgent(options.proxy)
+    httpRequestOpts = {
+      agent: {
+        https: agent
+      }
+    }  
+  }
+  
+  const exchangeDetails = await got.get(`${options.endpoint}/exchanges/${exchange}`, httpRequestOpts).json()
   return exchangeDetails as ExchangeDetails<T>
 }
 
