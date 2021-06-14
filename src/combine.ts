@@ -1,7 +1,7 @@
 import { PassThrough } from 'stream'
 import { once } from 'events'
 
-type NextMessageResultWitIndex = {
+type NextMessageResultWithIndex = {
   index: number
   result: IteratorResult<Combinable, Combinable>
 }
@@ -10,16 +10,38 @@ type Combinable = { localTimestamp: Date }
 
 const DATE_MAX = new Date(8640000000000000)
 
-async function nextWithIndex(iterator: AsyncIterableIterator<Combinable>, index: number): Promise<NextMessageResultWitIndex> {
-  const result = await iterator.next()
+type OffsetMS = number | ((message: Combinable) => number)
 
-  return {
-    result,
-    index
+async function nextWithIndex(
+  iterator: AsyncIterableIterator<Combinable> | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS },
+  index: number
+): Promise<NextMessageResultWithIndex> {
+  if ('offsetMS' in iterator) {
+    const result = await iterator.stream.next()
+
+    if (!result.done) {
+      const offsetMS = typeof iterator.offsetMS === 'function' ? iterator.offsetMS(result.value) : iterator.offsetMS
+
+      if (offsetMS !== 0) {
+        result.value.localTimestamp.setUTCMilliseconds(result.value.localTimestamp.getUTCMilliseconds() + offsetMS)
+      }
+    }
+
+    return {
+      result,
+      index
+    }
+  } else {
+    const result = await iterator.next()
+
+    return {
+      result,
+      index
+    }
   }
 }
 
-function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessageResultWitIndex) {
+function findOldestResult(oldest: NextMessageResultWithIndex, current: NextMessageResultWithIndex) {
   if (oldest.result.done) {
     return oldest
   }
@@ -49,9 +71,20 @@ function findOldestResult(oldest: NextMessageResultWitIndex, current: NextMessag
 
 // combines multiple iterators from for example multiple exchanges
 // works both for real-time and historical data
-export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
-  ...iterators: T
-): AsyncIterableIterator<T extends AsyncIterableIterator<infer U>[] ? U : never> {
+export async function* combine<
+  T extends AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
+>(
+  ...iteratorsPayload: T
+): AsyncIterableIterator<
+  T extends AsyncIterableIterator<infer U>[] ? U : T extends { stream: AsyncIterableIterator<infer Z> }[] ? Z : never
+> {
+  const iterators = iteratorsPayload.map((payload) => {
+    if ('stream' in payload) {
+      return payload.stream
+    }
+    return payload
+  })
+
   if (iterators.length === 0) {
     return
   }
@@ -79,17 +112,19 @@ export async function* combine<T extends AsyncIterableIterator<Combinable>[]>(
       yield message
     }
   } else {
-    return yield* combineHistorical(iterators) as any
+    return yield* combineHistorical(iteratorsPayload) as any
   }
 }
 
-async function* combineHistorical(iterators: AsyncIterableIterator<Combinable>[]) {
+async function* combineHistorical(
+  iterators: AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
+) {
   // wait for all results to resolve
   const results = await Promise.all(iterators.map(nextWithIndex))
   let aliveIteratorsCount = results.length
   do {
-    // if we're deailing with historical data replay
-    // and need to return combined messages iterable sorted by local timestamp in acending order
+    // if we're dealing with historical data replay
+    // and need to return combined messages iterable sorted by local timestamp in ascending order
 
     // find resolved one that is the 'oldest'
     const oldestResult = results.reduce(findOldestResult, results[0])
