@@ -47,8 +47,7 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
 
 if(process.env.http_proxy) {
   init({
-    proxy: process.env.http_proxy,
-    apiKey: '***REMOVED***'
+    proxy: process.env.http_proxy    
   })
 }
 
