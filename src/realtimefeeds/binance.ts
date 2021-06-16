@@ -47,7 +47,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
           }
 
           const openInterestResponse = (await got
-            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, { timeout: 2000 })
+            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, { timeout: 10000 })
             .json()) as any
 
           const openInterestMessage = {
@@ -128,7 +128,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
       }
 
       const depthSnapshotResponse = (await got
-        .get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, { timeout: 2000 })
+        .get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, { timeout: 10000 })
         .json()) as any
 
       const snapshot = {

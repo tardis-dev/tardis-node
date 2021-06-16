@@ -92,8 +92,6 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
               return
             }
 
-            this._offsets[message.id][bid[0]] = updateOffset
-
             return {
               price: Number(bid[0]),
               amount: Number(bid[1])
@@ -108,8 +106,6 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
               return
             }
 
-            this._offsets[message.id][ask[0]] = updateOffset
-
             return {
               price: Number(ask[0]),
               amount: Number(ask[1])
@@ -119,6 +115,14 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
         timestamp: localTimestamp,
         localTimestamp
+      }
+
+      for (const bid of message.contents.bids) {
+        this._offsets[message.id][bid[0]] = updateOffset
+      }
+
+      for (const ask of message.contents.asks) {
+        this._offsets[message.id][ask[0]] = updateOffset
       }
 
       if (bookChange.bids.length > 0 || bookChange.asks.length > 0) {

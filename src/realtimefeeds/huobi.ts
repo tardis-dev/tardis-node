@@ -235,7 +235,7 @@ class HuobiOpenInterestClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/${this._getURLPath(instrument)}`
-          const openInterestResponse = (await got.get(url, { timeout: 2000 }).json()) as any
+          const openInterestResponse = (await got.get(url, { timeout: 10000 }).json()) as any
 
           if (openInterestResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(openInterestResponse)}, url:${url}`)
@@ -270,7 +270,7 @@ class HuobiOptionsMarketIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_market_index?contract_code=${instrument}`
-          const marketIndexResponse = (await got.get(url, { timeout: 2000 }).json()) as any
+          const marketIndexResponse = (await got.get(url, { timeout: 10000 }).json()) as any
 
           if (marketIndexResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(marketIndexResponse)}, url:${url}`)
@@ -305,7 +305,7 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_index?symbol=${instrument}`
-          const optionIndexResponse = (await got.get(url, { timeout: 2000 }).json()) as any
+          const optionIndexResponse = (await got.get(url, { timeout: 10000 }).json()) as any
 
           if (optionIndexResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(optionIndexResponse)}, url:${url}`)
@@ -328,8 +328,8 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
 }
 
 export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api-aws.huobi.pro/ws'
-  protected httpURL = 'https://api-aws.huobi.pro/v1'
+  protected wssURL = 'wss://api.huobi.pro/ws'
+  protected httpURL = 'https://api.huobi.pro/v1'
 
   protected suffixes = {
     trade: '.detail',
@@ -339,8 +339,8 @@ export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.vn/ws'
-  protected httpURL = 'https://api.hbdm.vn/api/v1'
+  protected wssURL = 'wss://api.hbdm.com/ws'
+  protected httpURL = 'https://api.hbdm.com/api/v1'
 
   protected suffixes = {
     trade: '.detail',
@@ -365,8 +365,8 @@ export class HuobiDMRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.vn/swap-ws'
-  protected httpURL = 'https://api.hbdm.vn/swap-api/v1'
+  protected wssURL = 'wss://api.hbdm.com/swap-ws'
+  protected httpURL = 'https://api.hbdm.com/swap-api/v1'
 
   protected suffixes = {
     trade: '.detail',
@@ -380,8 +380,8 @@ export class HuobiDMSwapRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMLinearSwapRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.vn/linear-swap-ws'
-  protected httpURL = 'https://api.hbdm.vn/linear-swap-api/v1'
+  protected wssURL = 'wss://api.hbdm.com/linear-swap-ws'
+  protected httpURL = 'https://api.hbdm.com/linear-swap-api/v1'
 
   protected suffixes = {
     trade: '.detail',
@@ -395,8 +395,8 @@ export class HuobiDMLinearSwapRealTimeFeed extends HuobiRealTimeFeedBase {
 }
 
 export class HuobiDMOptionsRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.hbdm.vn/option-ws'
-  protected httpURL = 'https://api.hbdm.vn/option-api/v1'
+  protected wssURL = 'wss://api.hbdm.com/option-ws'
+  protected httpURL = 'https://api.hbdm.com/option-api/v1'
 
   protected suffixes = {
     trade: '.detail',

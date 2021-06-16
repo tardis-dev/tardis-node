@@ -1,4 +1,4 @@
-import { BookChange, Trade } from '../types'
+import { BookChange, BookPriceLevel, Trade } from '../types'
 import { Mapper } from './mapper'
 import { parseμs } from '../handy'
 
@@ -50,6 +50,17 @@ const mapSnapshotBookLevel = (level: CoinbaseSnapshotBookLevel) => {
   return { price, amount }
 }
 
+const validAmountsOnly = (level: BookPriceLevel) => {
+  if (Number.isNaN(level.amount)) {
+    return false
+  }
+  if (level.amount < 0) {
+    return false
+  }
+
+  return true
+}
+
 export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   private readonly _symbolLastTimestampMap = new Map<string, Date>()
 
@@ -77,8 +88,8 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
         symbol: message.product_id,
         exchange: 'coinbase',
         isSnapshot: true,
-        bids: message.bids.map(mapSnapshotBookLevel),
-        asks: message.asks.map(mapSnapshotBookLevel),
+        bids: message.bids.map(mapSnapshotBookLevel).filter(validAmountsOnly),
+        asks: message.asks.map(mapSnapshotBookLevel).filter(validAmountsOnly),
         timestamp: localTimestamp,
         localTimestamp
       }
