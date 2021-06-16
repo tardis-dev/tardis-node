@@ -75,8 +75,8 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
           }
 
           const responses = await Promise.all([
-            got.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 2000 }).json() as any,
-            got.get(`${this._httpURL}/futures/${instrument}`, { timeout: 2000 }).json() as any
+            got.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
+            got.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
           ])
 
           if (responses.some((r) => r.success === false)) {
@@ -104,7 +104,7 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
 }
 
 export class FtxRealTimeFeed extends FTXRealTimeFeedBase {
-  protected wssURL = 'wss://ws.ftx.com/ws'
+  protected wssURL = 'wss://ftx.com/ws'
   protected httpURL = 'https://ftx.com/api'
 }
 
