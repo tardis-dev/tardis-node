@@ -69,7 +69,9 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
       timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
 
       if (timestampToFetch > timestampForLastAvailableData) {
-        await wait(MILLISECONDS_IN_MINUTE)
+        const waitTime = timestampToFetch - timestampForLastAvailableData + 100
+
+        await wait(waitTime)
       }
       await getDataFeedSlice(payload, offset, filters, cacheDir)
     }
