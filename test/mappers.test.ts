@@ -5352,6 +5352,43 @@ describe('mappers', () => {
         message_id: 221,
         channel: 'v3_markets',
         contents: { 'BTC-USD': { volume24H: '4739305.922100', trades24H: '665', openInterest: '101.2776' } }
+      },
+      {
+        type: 'subscribed',
+        connection_id: '989837bd-ea9b-4812-9744-c482199867fa',
+        message_id: 1,
+        channel: 'v3_orderbook',
+        id: 'ETH-USD',
+        contents: {
+          bids: [],
+          asks: [{ price: '2531.2', offset: '378828475', size: '0' }]
+        }
+      },
+      {
+        type: 'channel_data',
+        connection_id: '989837bd-ea9b-4812-9744-c482199867fa',
+        message_id: 12211,
+        id: 'ETH-USD',
+        channel: 'v3_orderbook',
+        contents: { offset: '378910896', bids: [], asks: [['2531.2', '2.5']] }
+      },
+
+      {
+        type: 'channel_data',
+        connection_id: '989837bd-ea9b-4812-9744-c482199867fa',
+        message_id: 12259,
+        id: 'ETH-USD',
+        channel: 'v3_orderbook',
+        contents: { offset: '378911283', bids: [['2531.2', '9.35']], asks: [['2531.2', '0']] }
+      },
+
+      {
+        type: 'channel_data',
+        connection_id: '989837bd-ea9b-4812-9744-c482199867fa',
+        message_id: 12260,
+        id: 'ETH-USD',
+        channel: 'v3_trades',
+        contents: { trades: [{ size: '2.5', side: 'BUY', price: '2531.2', createdAt: '2021-06-16T04:32:06.470Z' }] }
       }
     ]
 

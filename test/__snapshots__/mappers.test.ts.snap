@@ -3395,6 +3395,87 @@ Array [
 ]
 `;
 
+exports[`mappers map dydx messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 2531.2,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "dydx",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "symbol": "ETH-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.5,
+        "price": 2531.2,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "dydx",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "symbol": "ETH-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 10`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 2531.2,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 9.35,
+        "price": 2531.2,
+      },
+    ],
+    "exchange": "dydx",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "symbol": "ETH-USD",
+    "timestamp": 2021-05-01T00:00:37.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map dydx messages 11`] = `
+Array [
+  Object {
+    "amount": 2.5,
+    "exchange": "dydx",
+    "id": undefined,
+    "localTimestamp": 2021-05-01T00:00:37.000Z,
+    "price": 2531.2,
+    "side": "buy",
+    "symbol": "ETH-USD",
+    "timestamp": 2021-06-16T04:32:06.470Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map ftx messages 1`] = `Array []`;
 
 exports[`mappers map ftx messages 2`] = `
