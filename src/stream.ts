@@ -18,8 +18,8 @@ async function* _stream<T extends Exchange, U extends boolean = false>({
   const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, onError)
 
   for await (const message of realTimeFeed) {
-    if (message === undefined) {
-      // undefined message means that websocket connection has been closed
+    if (message.__disconnect__ === true) {
+      // __disconnect__ message means that websocket connection has been closed
       // notify about it by yielding undefined if flag is set
       if (withDisconnects) {
         yield undefined as any
