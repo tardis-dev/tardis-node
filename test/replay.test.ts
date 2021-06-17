@@ -262,7 +262,7 @@ describe('replay', () => {
         for await (const message of messages) {
           bufferedMessages.push(message)
           count++
-          if (count === 100) {
+          if (count === 10) {
             break
           }
         }
