@@ -1,10 +1,4 @@
-import { OrderBook, init } from '../src'
-
-if(process.env.http_proxy) {
-  init({
-    proxy: process.env.http_proxy,
-  })
-}
+import { OrderBook } from '../src'
 
 describe('orderbook', () => {
   test('should update levels', () => {

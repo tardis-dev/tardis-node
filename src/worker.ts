@@ -1,5 +1,5 @@
 import dbg from 'debug'
-import { existsSync, removeSync } from 'fs-extra'
+import { existsSync } from 'fs-extra'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
 import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy'
@@ -92,7 +92,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
 }
 
 async function getDataFeedSlice(
-  { exchange, fromDate, endpoint, apiKey, userAgent, proxy }: WorkerJobPayload,
+  { exchange, fromDate, endpoint, apiKey, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
   cacheDir: string
@@ -113,8 +113,7 @@ async function getDataFeedSlice(
       apiKey,
       downloadPath: slicePath,
       url,
-      userAgent,
-      proxy
+      userAgent
     })
 
     debug('getDataFeedSlice fetched from API and cached, %s', sliceKey)
@@ -139,7 +138,6 @@ export type WorkerJobPayload = {
   endpoint: string
   apiKey: string
   userAgent: string
-  proxy: string
   fromDate: Date
   toDate: Date
   exchange: Exchange

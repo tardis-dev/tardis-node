@@ -1,12 +1,15 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
-import createHttpsProxyAgent, { HttpsProxyAgent } from 'https-proxy-agent'
+import { ClientRequestArgs } from 'http'
+import createHttpsProxyAgent from 'https-proxy-agent'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
 import { ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
 import { getOptions } from '../options'
 import { Exchange, Filter } from '../types'
-import {parse} from 'url'
+import { parse } from 'url'
+
+const options = getOptions()
 
 export type RealTimeFeed = {
   new (
@@ -34,7 +37,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private _receivedMessagesCount = 0
   private _ws?: WebSocket
   private _connectionId = connectionCounter++
-  private _proxyAgent?: HttpsProxyAgent  
+  private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
 
   constructor(
     protected readonly _exchange: string,
@@ -44,11 +47,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   ) {
     this._filters = optimizeFilters(filters)
     this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
-    var options = getOptions()    
-    if (options.proxy) {
-      var proxyOptions = parse(options.proxy)
-      this._proxyAgent = createHttpsProxyAgent(proxyOptions)      
-    }    
+
+    this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
+
+    if (options.proxy !== undefined) {
+      this._wsClientOptions.agent = createHttpsProxyAgent(parse(options.proxy))
+    }
   }
 
   private async *_stream() {
@@ -71,12 +75,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           this._filters,
           subscribeMessages
         )
-        
-        var clientOptions: WebSocket.ClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
-        if (this._proxyAgent) {          
-          clientOptions['agent'] = this._proxyAgent
-        }        
-        this._ws = new WebSocket(finalWssUrl, clientOptions)
+
+        this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
         this._ws.onopen = this._onConnectionEstabilished
         this._ws.onclose = this._onConnectionClosed
 

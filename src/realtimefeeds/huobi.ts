@@ -1,8 +1,7 @@
-import got from 'got'
 import { unzipSync } from 'zlib'
 import { Filter } from '../types'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase } from './realtimefeed'
-import { wait, ONE_SEC_IN_MS, batch } from '../handy'
+import { wait, ONE_SEC_IN_MS, batch, httpClient } from '../handy'
 import { Writable } from 'stream'
 
 abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
@@ -235,7 +234,7 @@ class HuobiOpenInterestClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/${this._getURLPath(instrument)}`
-          const openInterestResponse = (await got.get(url, { timeout: 10000 }).json()) as any
+          const openInterestResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
 
           if (openInterestResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(openInterestResponse)}, url:${url}`)
@@ -270,7 +269,7 @@ class HuobiOptionsMarketIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_market_index?contract_code=${instrument}`
-          const marketIndexResponse = (await got.get(url, { timeout: 10000 }).json()) as any
+          const marketIndexResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
 
           if (marketIndexResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(marketIndexResponse)}, url:${url}`)
@@ -305,7 +304,7 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_index?symbol=${instrument}`
-          const optionIndexResponse = (await got.get(url, { timeout: 10000 }).json()) as any
+          const optionIndexResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
 
           if (optionIndexResponse.status !== 'ok') {
             throw new Error(`open interest response error:${JSON.stringify(optionIndexResponse)}, url:${url}`)

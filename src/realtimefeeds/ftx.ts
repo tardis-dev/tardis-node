@@ -1,9 +1,8 @@
-import got from 'got'
 import { Writable } from 'stream'
 
 import { Filter } from '../types'
 import { RealTimeFeedBase, PoolingClientBase, MultiConnectionRealTimeFeedBase } from './realtimefeed'
-import { batch } from '../handy'
+import { batch, httpClient } from '../handy'
 
 abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
@@ -75,8 +74,8 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
           }
 
           const responses = await Promise.all([
-            got.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
-            got.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
+            httpClient.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
+            httpClient.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
           ])
 
           if (responses.some((r) => r.success === false)) {
