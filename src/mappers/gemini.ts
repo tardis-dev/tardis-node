@@ -25,7 +25,7 @@ export const geminiTradesMapper: Mapper<'gemini', Trade> = {
       id: String(geminiTrade.event_id),
       price: Number(geminiTrade.price),
       amount: Number(geminiTrade.quantity),
-      side: geminiTrade.side,
+      side: geminiTrade.side === 'buy' ? 'buy' : geminiTrade.side === 'sell' ? 'sell' : 'unknown',
       timestamp: new Date(geminiTrade.timestamp),
       localTimestamp: localTimestamp
     }
