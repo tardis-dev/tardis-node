@@ -48,7 +48,6 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     endpoint: options.endpoint,
     apiKey: apiKey || options.apiKey,
     userAgent: options._userAgent,
-    proxy: options.proxy,
     fromDate,
     toDate,
     exchange,

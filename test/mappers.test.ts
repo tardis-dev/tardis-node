@@ -5,15 +5,8 @@ import {
   normalizeDerivativeTickers,
   normalizeTrades,
   normalizeOptionsSummary,
-  normalizeLiquidations,
-  init
+  normalizeLiquidations
 } from '../src'
-
-if(process.env.http_proxy) {
-  init({
-    proxy: process.env.http_proxy,
-  })
-}
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -2869,8 +2862,7 @@ describe('mappers', () => {
           ['sell', '0.02185', '0'],
           ['sell', '0.02188', '149.57']
         ]
-      },
-      { type: 'trade', symbol: 'ETHUSD', event_id: 9608228023, timestamp: 1580919901276, price: '200.19', quantity: '100', side: 'block' }
+      }
     ]
 
     const geminiMapper = createMapper('gemini')
