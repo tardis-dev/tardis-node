@@ -1,4 +1,10 @@
-import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist'
+import { combine, normalizeBookChanges, normalizeTrades, replayNormalized, init } from '../dist'
+
+if(process.env.http_proxy) {
+  init({
+    proxy: process.env.http_proxy,
+  })
+}
 
 describe('combine(...asyncIterators)', () => {
   test(
