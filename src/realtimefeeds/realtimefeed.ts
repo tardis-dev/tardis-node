@@ -1,8 +1,9 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
+import { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
-import { ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
+import { httpsProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
 import { Exchange, Filter } from '../types'
 
 export type RealTimeFeed = {
@@ -31,6 +32,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private _receivedMessagesCount = 0
   private _ws?: WebSocket
   private _connectionId = connectionCounter++
+  private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
 
   constructor(
     protected readonly _exchange: string,
@@ -40,6 +42,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   ) {
     this._filters = optimizeFilters(filters)
     this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
+
+    this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
+
+    if (httpsProxyAgent == undefined) {
+      this._wsClientOptions.agent = httpsProxyAgent
+    }
   }
 
   private async *_stream() {
@@ -63,8 +71,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           subscribeMessages
         )
 
-        this._ws = new WebSocket(finalWssUrl, { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS })
-
+        this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
         this._ws.onopen = this._onConnectionEstabilished
         this._ws.onclose = this._onConnectionClosed
 

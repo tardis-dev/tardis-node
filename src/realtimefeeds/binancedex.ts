@@ -1,4 +1,4 @@
-import got from 'got'
+import { httpClient } from '../handy'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
@@ -42,7 +42,7 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = (await got.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()) as any
+      const depthSnapshotResponse = (await httpClient.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()) as any
 
       const snapshot = {
         stream: `depthSnapshot`,

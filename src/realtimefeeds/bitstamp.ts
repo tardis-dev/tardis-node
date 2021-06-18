@@ -1,4 +1,4 @@
-import got from 'got'
+import { httpClient } from '../handy'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
@@ -50,7 +50,7 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = await got.get(`${this.httpURL}/order_book/${symbol}?group=1`).json()
+      const depthSnapshotResponse = await httpClient.get(`${this.httpURL}/order_book/${symbol}?group=1`).json()
 
       const snapshot = {
         data: depthSnapshotResponse,

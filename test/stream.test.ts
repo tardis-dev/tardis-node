@@ -44,6 +44,24 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'huobi-dm-swap'
 ]
 
+describe('exchange-details', () => {
+  test('provides exchange info', async () => {
+    const exchange = 'binance'
+    const exchangeDetails = await getExchangeDetails(exchange)
+
+    expect(exchangeDetails.availableChannels).toEqual([
+      'trade',
+      'aggTrade',
+      'ticker',
+      'depth',
+      'depthSnapshot',
+      'bookTicker',
+      'recentTrades',
+      'borrowInterest'
+    ])
+  })
+})
+
 describe('stream', () => {
   test(
     'streams normalized real-time messages for each supported exchange',
@@ -81,9 +99,9 @@ describe('stream', () => {
               exchange,
               symbols,
               withDisconnectMessages: true,
-              timeoutIntervalMS: 20 * 1000,
+              timeoutIntervalMS: 30 * 1000,
               onError: (err) => {
-                console.log('Error', err)
+                console.log('Error', err, exchange)
               }
             },
             ...normalizers

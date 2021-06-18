@@ -1,7 +1,7 @@
-import got from 'got'
 import { getOptions } from './options'
 import type { SymbolType } from './exchangedetails'
 import type { Exchange } from './types'
+import { httpClient } from './handy'
 
 export async function getInstrumentInfo(exchange: Exchange): Promise<InstrumentInfo[]>
 export async function getInstrumentInfo(exchange: Exchange | Exchange[], filter: InstrumentInfoFilter): Promise<InstrumentInfo[]>
@@ -29,7 +29,7 @@ async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?:
   }
 
   try {
-    return await got
+    return await httpClient
       .get(url, {
         headers: { Authorization: `Bearer ${options.apiKey}` }
       })

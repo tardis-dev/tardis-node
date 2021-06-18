@@ -1,10 +1,11 @@
-import got from 'got'
+import { httpClient } from './handy'
 import { getOptions } from './options'
 import { Exchange, FilterForExchange } from './types'
 
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   const options = getOptions()
-  const exchangeDetails = await got.get(`${options.endpoint}/exchanges/${exchange}`).json()
+
+  const exchangeDetails = await httpClient.get(`${options.endpoint}/exchanges/${exchange}`).json()
 
   return exchangeDetails as ExchangeDetails<T>
 }

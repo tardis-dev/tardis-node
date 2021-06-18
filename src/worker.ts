@@ -1,5 +1,5 @@
 import dbg from 'debug'
-import { existsSync, removeSync } from 'fs-extra'
+import { existsSync } from 'fs-extra'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
 import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy'

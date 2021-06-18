@@ -132,7 +132,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       let linesCount = 0
 
-      for await (const bufferLine of (linesStream as unknown) as Iterable<Buffer>) {
+      for await (const bufferLine of linesStream as unknown as Iterable<Buffer>) {
         linesCount++
         if (bufferLine.length > 0) {
           lastMessageWasUndefined = false

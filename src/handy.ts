@@ -1,6 +1,8 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
 import https, { RequestOptions } from 'https'
+import createHttpsProxyAgent from 'https-proxy-agent'
+import got, { ExtendOptions } from 'got'
 import path from 'path'
 import { debug } from './debug'
 import { Mapper } from './mappers'
@@ -227,6 +229,9 @@ const httpsAgent = new https.Agent({
   maxSockets: 120
 })
 
+export const httpsProxyAgent: https.Agent | undefined =
+  process.env.HTTP_PROXY !== undefined ? createHttpsProxyAgent(process.env.HTTP_PROXY) : undefined
+
 export async function download({
   apiKey,
   downloadPath,
@@ -239,7 +244,7 @@ export async function download({
   apiKey: string
 }) {
   const httpRequestOptions = {
-    agent: httpsAgent,
+    agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
     timeout: 90 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': 'gzip',
@@ -435,3 +440,13 @@ export function asNumberIfValid(val: string | number | undefined | null) {
 
   return asNumber
 }
+
+const gotDefaultOptions: ExtendOptions = {}
+
+if (httpsProxyAgent !== undefined) {
+  gotDefaultOptions.agent = {
+    https: httpsProxyAgent
+  }
+}
+
+export const httpClient = got.extend(gotDefaultOptions)
