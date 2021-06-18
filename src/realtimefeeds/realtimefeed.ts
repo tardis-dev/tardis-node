@@ -45,7 +45,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
     this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
 
-    if (httpsProxyAgent == undefined) {
+    if (httpsProxyAgent !== undefined) {
       this._wsClientOptions.agent = httpsProxyAgent
     }
   }
