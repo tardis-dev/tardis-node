@@ -7,8 +7,7 @@ import {
   normalizeTrades,
   replay,
   replayNormalized,
-  ReplayOptions,
-  init
+  ReplayOptions
 } from '../dist'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -22,21 +21,14 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bybit'
 ]
 
-if(process.env.http_proxy) {
-  init({
-    proxy: process.env.http_proxy,
-  })
-}
-
-
 describe('replay', () => {
-  beforeEach(() => {    
+  beforeEach(() => {
     return clearCache()
   }, 1000 * 60 * 10)
-  
+
   test(
     'invalid args validation',
-    async () => {      
+    async () => {
       await expect(replay({ exchange: 'binance', from: 'sdf', to: 'dsf', filters: [] }).next()).rejects.toThrowError()
 
       await expect(
@@ -96,7 +88,7 @@ describe('replay', () => {
           }
         ]
       }
-      
+
       const bitmexDataFeedMessages = replay(replayOptions)
       const receivedMessages = []
       const receivedTimestamps = []
@@ -120,7 +112,7 @@ describe('replay', () => {
       }
 
       expect(receivedMessagesOfRawFeed).toMatchSnapshot('bitmex-received-messages')
-      expect(receivedTimestampsOfRawFeed).toMatchSnapshot('bitmex-received-timestamps')      
+      expect(receivedTimestampsOfRawFeed).toMatchSnapshot('bitmex-received-timestamps')
     },
     1000 * 60 * 10
   )
@@ -149,7 +141,7 @@ describe('replay', () => {
       }
 
       expect(receivedMessages).toMatchSnapshot()
-      expect(receivedTimestamps).toMatchSnapshot()      
+      expect(receivedTimestamps).toMatchSnapshot()
     },
     1000 * 60 * 10
   )
@@ -178,7 +170,7 @@ describe('replay', () => {
       }
 
       expect(receivedMessages).toMatchSnapshot()
-      expect(receivedTimestamps).toMatchSnapshot()      
+      expect(receivedTimestamps).toMatchSnapshot()
     },
     1000 * 60 * 10
   )
@@ -205,7 +197,7 @@ describe('replay', () => {
         expect(e).toHaveProperty('status')
       }
 
-      expect(receivedCount).toBe(0)      
+      expect(receivedCount).toBe(0)
     },
     20 * 1000
   )
@@ -218,7 +210,7 @@ describe('replay', () => {
         deribit: { symbols: ['BTC-PERPETUAL', 'BTC-9AUG19-9500-P'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         binance: { symbols: ['btcusdt', 'btcusds'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         ftx: { symbols: ['BTC/USD', 'BTC-PERP'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
-        //okex: { symbols: ['BTC-USDT'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
+        okex: { symbols: ['BTC-USDT'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         bitflyer: { symbols: ['BTC_JPY', 'BTCJPY30AUG2019'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
         bitstamp: { symbols: ['btcusd', 'btceur'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         coinbase: { symbols: ['BTC-USDC', 'BTC-USD'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
@@ -235,7 +227,7 @@ describe('replay', () => {
         'binance-jersey': { symbols: ['btcgbp', 'btceur'], from: '2019-11-01T00:00:00.000Z', to: '2019-11-02T00:00:00.000Z' },
         'binance-us': { symbols: ['btcusdt', 'btcusd'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
         'okex-futures': { symbols: ['BTC-USD-190405'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
-        //'okex-swap': { symbols: ['BTC-USD-SWAP'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' }
+        'okex-swap': { symbols: ['BTC-USD-SWAP'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' }
       } as any
 
       for (const exchange of EXCHANGES) {

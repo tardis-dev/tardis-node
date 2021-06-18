@@ -4181,22 +4181,6 @@ Array [
 ]
 `;
 
-exports[`mappers map gemini messages 4`] = `
-Array [
-  Object {
-    "amount": 100,
-    "exchange": "gemini",
-    "id": "9608228023",
-    "localTimestamp": 2019-09-01T00:00:01.275Z,
-    "price": 200.19,
-    "side": "unknown",
-    "symbol": "ETHUSD",
-    "timestamp": 2020-02-05T16:25:01.276Z,
-    "type": "trade",
-  },
-]
-`;
-
 exports[`mappers map hitbtc messages 1`] = `Array []`;
 
 exports[`mappers map hitbtc messages 2`] = `

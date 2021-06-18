@@ -236,14 +236,12 @@ export async function download({
   apiKey,
   downloadPath,
   url,
-  userAgent,
-  proxy
+  userAgent
 }: {
   url: string
   downloadPath: string
   userAgent: string
   apiKey: string
-  proxy: string
 }) {
   const httpRequestOptions = {
     agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
