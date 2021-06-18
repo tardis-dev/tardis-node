@@ -223,7 +223,7 @@ export function optimizeFilters(filters: Filter<any>[]) {
   return optimizedFilters
 }
 
-let httpsAgent = new https.Agent({
+const httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 10 * ONE_SEC_IN_MS,
   maxSockets: 120
