@@ -1,15 +1,12 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
 import https, { RequestOptions } from 'https'
-import createHttpsProxyAgent, { HttpsProxyAgent } from 'https-proxy-agent'
+import createHttpsProxyAgent from 'https-proxy-agent'
 import got, { ExtendOptions } from 'got'
 import path from 'path'
 import { debug } from './debug'
 import { Mapper } from './mappers'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
-import { getOptions } from './options'
-
-const options = getOptions()
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
@@ -232,6 +229,9 @@ let httpsAgent = new https.Agent({
   maxSockets: 120
 })
 
+export const httpsProxyAgent: https.Agent | undefined =
+  process.env.HTTP_PROXY !== undefined ? createHttpsProxyAgent(process.env.HTTP_PROXY) : undefined
+
 export async function download({
   apiKey,
   downloadPath,
@@ -243,11 +243,8 @@ export async function download({
   userAgent: string
   apiKey: string
 }) {
-  if (options.proxy !== undefined) {
-    httpsAgent = createHttpsProxyAgent(options.proxy)
-  }
   const httpRequestOptions = {
-    agent: httpsAgent,
+    agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
     timeout: 90 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': 'gzip',
@@ -446,9 +443,9 @@ export function asNumberIfValid(val: string | number | undefined | null) {
 
 const gotDefaultOptions: ExtendOptions = {}
 
-if (options.proxy) {
+if (httpsProxyAgent !== undefined) {
   gotDefaultOptions.agent = {
-    https: new HttpsProxyAgent(options.proxy)
+    https: httpsProxyAgent
   }
 }
 

@@ -1,15 +1,10 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
 import { ClientRequestArgs } from 'http'
-import createHttpsProxyAgent from 'https-proxy-agent'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
-import { ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
-import { getOptions } from '../options'
+import { httpsProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
 import { Exchange, Filter } from '../types'
-import { parse } from 'url'
-
-const options = getOptions()
 
 export type RealTimeFeed = {
   new (
@@ -50,8 +45,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
     this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
 
-    if (options.proxy !== undefined) {
-      this._wsClientOptions.agent = createHttpsProxyAgent(parse(options.proxy))
+    if (httpsProxyAgent == undefined) {
+      this._wsClientOptions.agent = httpsProxyAgent
     }
   }
 

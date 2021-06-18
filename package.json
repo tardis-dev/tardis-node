@@ -82,8 +82,7 @@
     "transform": {
       "\\.(ts|tsx)?$": "ts-jest"
     },
-    "testEnvironment": "node",
-    "globalSetup": "./test/setup.js"
+    "testEnvironment": "node"
   },
   "runkitExampleFilename": "example.js"
 }
