@@ -1,12 +1,11 @@
 import { httpClient } from './handy'
 import { getOptions } from './options'
 import { Exchange, FilterForExchange } from './types'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   const options = getOptions()
-
   const exchangeDetails = await httpClient.get(`${options.endpoint}/exchanges/${exchange}`).json()
-
   return exchangeDetails as ExchangeDetails<T>
 }
 

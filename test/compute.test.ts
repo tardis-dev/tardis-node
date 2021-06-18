@@ -6,8 +6,15 @@ import {
   normalizeBookChanges,
   normalizeTrades,
   replayNormalized,
-  Trade
+  Trade,
+  init
 } from '../dist'
+
+if(process.env.http_proxy) {
+  init({
+    proxy: process.env.http_proxy,
+  })
+}
 
 describe('compute(messages, types)', () => {
   test(

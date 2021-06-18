@@ -9,7 +9,8 @@ import {
   normalizeDerivativeTickers,
   normalizeLiquidations,
   normalizeTrades,
-  streamNormalized
+  streamNormalized,
+  init
 } from '../dist'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -77,8 +78,11 @@ describe('stream', () => {
           ) {
             return
           }
-
-          const exchangeDetails = await getExchangeDetails(exchange)
+          if(exchange !== 'binance') {
+            return
+          }
+          
+          const exchangeDetails = await getExchangeDetails(exchange)          
           const normalizers: any[] = [normalizeTrades, normalizeBookChanges]
 
           if (exchangesWithDerivativeInfo.includes(exchange)) {
