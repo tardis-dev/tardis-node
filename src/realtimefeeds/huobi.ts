@@ -24,7 +24,8 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     const basisFilters = filters.filter((f) => f.channel === 'basis')
 
     if (basisFilters.length > 0) {
-      const basisWSURL = this.wssURL.replace('/ws', '/ws_index').replace('/swap-ws', '/ws_index')
+      const basisWSURL = this.wssURL.replace('/ws', '/ws_index').replace('/swap-ws', '/ws_index').replace('/linear-swap-ws', '/ws_index')
+
       yield new HuobiMarketDataRealTimeFeed(exchange, basisFilters, basisWSURL, this.suffixes, timeoutIntervalMS, onError)
     }
 
@@ -37,7 +38,10 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     const notificationsFilters = filters.filter((f) => this._notificationsChannels.includes(f.channel))
 
     if (notificationsFilters.length > 0) {
-      const notificationsWSURL = this.wssURL.replace('/swap-ws', '/swap-notification').replace('/ws', '/notification')
+      const notificationsWSURL = this.wssURL
+        .replace('/swap-ws', '/swap-notification')
+        .replace('/ws', '/notification')
+        .replace('/linear-swap-ws', '/linear-swap-notification')
 
       yield new HuobiNotificationsRealTimeFeed(exchange, notificationsFilters, notificationsWSURL, timeoutIntervalMS, onError)
     }
