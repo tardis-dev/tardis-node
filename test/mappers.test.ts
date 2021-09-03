@@ -4318,6 +4318,39 @@ describe('mappers', () => {
         },
         cross_seq: '1575604210',
         timestamp_e6: '1615467899958860'
+      },
+      {
+        topic: 'instrument_info.100ms.ETHUSDU21',
+        type: 'delta',
+        data: {
+          delete: [],
+          update: [
+            {
+              id: 4,
+              symbol: 'ETHUSDU21',
+              symbol_name: 'ETHUSD0924',
+              symbol_year: 2021,
+              contract_type: 'InverseFutures',
+              coin: 'ETH',
+              quote_symbol: 'ETHUSD',
+              mode: 'MergedSingle',
+              start_trading_time_e9: 1621839600000000000,
+              time_to_settle: 1843200,
+              settle_time_e9: 1632470400000000000,
+              bid1_price_e4: 38213500,
+              bid1_price: '3821.35',
+              ask1_price_e4: 38214000,
+              ask1_price: '3821.40',
+              mark_price_e4: 38216700,
+              mark_price: '3821.67',
+              expect_price: '0.00',
+              cross_seq: 5645795973
+            }
+          ],
+          insert: []
+        },
+        cross_seq: 5645798595,
+        timestamp_e6: 1630627199958670
       }
     ]
 

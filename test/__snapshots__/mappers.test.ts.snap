@@ -2166,6 +2166,25 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 28`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": 3821.67,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "ETHUSDU21",
+    "timestamp": 2021-09-02T23:59:59.958Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {
