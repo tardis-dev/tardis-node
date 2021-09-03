@@ -137,12 +137,30 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
     pendingTickerInfo.updateFundingTimestamp(
       instrumentInfo.next_funding_time !== undefined ? new Date(instrumentInfo.next_funding_time) : undefined
     )
-    pendingTickerInfo.updateIndexPrice(instrumentInfo.index_price_e4 !== undefined ? instrumentInfo.index_price_e4 / 10000 : undefined)
-    pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price_e4 !== undefined ? instrumentInfo.mark_price_e4 / 10000 : undefined)
-    pendingTickerInfo.updateOpenInterest(
-      instrumentInfo.open_interest_e8 !== undefined ? instrumentInfo.open_interest_e8 / 100000000 : instrumentInfo.open_interest
-    )
-    pendingTickerInfo.updateLastPrice(instrumentInfo.last_price_e4 !== undefined ? instrumentInfo.last_price_e4 / 10000 : undefined)
+
+    if (instrumentInfo.index_price !== undefined) {
+      pendingTickerInfo.updateIndexPrice(instrumentInfo.index_price)
+    } else if (instrumentInfo.index_price_e4 !== undefined) {
+      pendingTickerInfo.updateIndexPrice(instrumentInfo.index_price_e4 / 10000)
+    }
+
+    if (instrumentInfo.mark_price !== undefined) {
+      pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price)
+    } else if (instrumentInfo.mark_price_e4 !== undefined) {
+      pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price_e4 / 10000)
+    }
+
+    if (instrumentInfo.open_interest !== undefined) {
+      pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest)
+    } else if (instrumentInfo.open_interest_e8 !== undefined) {
+      pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest_e8 / 100000000)
+    }
+
+    if (instrumentInfo.last_price !== undefined) {
+      pendingTickerInfo.updateLastPrice(instrumentInfo.last_price)
+    } else if (instrumentInfo.last_price_e4 !== undefined) {
+      pendingTickerInfo.updateLastPrice(instrumentInfo.last_price_e4 / 10000)
+    }
 
     if (instrumentInfo.updated_at) {
       pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
@@ -238,13 +256,16 @@ type BybitBookSnapshotUpdateMessage = BybitDataMessage & {
 type BybitInstrumentUpdate = {
   symbol: string
   mark_price_e4?: number
+  mark_price?: number
   index_price_e4?: number
+  index_price?: number
   open_interest?: number
   open_interest_e8?: number
   funding_rate_e6?: number
   predicted_funding_rate_e6?: number
   next_funding_time?: string
   last_price_e4?: number
+  last_price?: number
   updated_at: string
 }
 
