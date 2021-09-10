@@ -1,16 +1,17 @@
 import { createReadStream } from 'fs-extra'
 import path from 'path'
+import { EventEmitter } from 'stream'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip } from 'zlib'
 import { BinarySplitStream } from './binarysplit'
+import { clearCacheSync } from './clearcache'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
-import { getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait, addDays } from './handy'
+import { addDays, getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait } from './handy'
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker'
-import { clearCacheSync } from './clearcache'
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -55,9 +56,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     waitWhenDataNotYetAvailable
   }
 
-  const worker = new Worker(path.resolve(__dirname, 'worker.js'), {
-    workerData: payload
-  })
+  const worker = new ReliableWorker(payload)
 
   worker.on('message', (message: WorkerMessage) => {
     cachedSlicePaths.set(message.sliceKey, message.slicePath)
@@ -67,10 +66,6 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     debug('worker error %o', err)
 
     replayError = err
-  })
-
-  worker.on('exit', (code) => {
-    debug('worker finished with code: %d', code)
   })
 
   try {
@@ -208,7 +203,10 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       )
     }
 
-    await terminateWorker(worker, 500)
+    const underlyingWorker = worker.getUnderlyingWorker()
+    if (underlyingWorker !== undefined) {
+      await terminateWorker(underlyingWorker, 500)
+    }
   }
 }
 
@@ -327,6 +325,52 @@ function validateReplayNormalizedOptions(fromDate: Date, normalizers: MapperFact
 
   if (hasBookChangeNormalizer && dateDoesNotStartAtTheBeginningOfTheDay) {
     debug('Initial order book snapshots are available only at 00:00 UTC')
+  }
+}
+
+class ReliableWorker extends EventEmitter {
+  private _errorsCount = 0
+  private _worker: Worker | undefined = undefined
+
+  constructor(private readonly _payload: WorkerJobPayload) {
+    super()
+
+    this._initWorker()
+  }
+
+  private _initWorker() {
+    this._worker = new Worker(path.resolve(__dirname, 'worker.js'), {
+      workerData: this._payload
+    })
+
+    this._worker.on('message', (message: WorkerMessage) => {
+      this.emit('message', message)
+    })
+
+    this._worker.on('error', this._handleError)
+
+    this._worker.on('exit', (code) => {
+      debug('worker finished with code: %d', code)
+    })
+  }
+
+  private _handleError = async (err: Error) => {
+    debug('underlying worker error %o', err)
+
+    if (err.message.includes('HttpError') === false && this._errorsCount < 30) {
+      this._errorsCount++
+      const delayMS = Math.min(Math.pow(2, this._errorsCount) * 1000, 120 * 1000)
+      debug('re-init worker after: %d ms', delayMS)
+      await wait(delayMS)
+      // it was most likely unhandled socket hang up error, let's retry first with new worker and don't emit error right away
+      this._initWorker()
+    } else {
+      this.emit('error', err)
+    }
+  }
+
+  public getUnderlyingWorker() {
+    return this._worker
   }
 }
 

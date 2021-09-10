@@ -253,7 +253,7 @@ export async function download({
     }
   }
 
-  const MAX_ATTEMPTS = 8
+  const MAX_ATTEMPTS = 30
   let attempts = 0
 
   while (true) {
@@ -270,7 +270,7 @@ export async function download({
       }
 
       const randomIngridient = Math.random() * 500
-      const attemptsDelayMS = Math.pow(2, attempts) * ONE_SEC_IN_MS
+      const attemptsDelayMS = Math.min(Math.pow(2, attempts) * ONE_SEC_IN_MS, 120 * ONE_SEC_IN_MS)
       let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
 
       if (tooManyRequests) {
