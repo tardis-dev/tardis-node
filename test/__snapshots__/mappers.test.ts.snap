@@ -2185,6 +2185,92 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 29`] = `
+Array [
+  Object {
+    "amount": 1257079,
+    "exchange": "bybit",
+    "id": "10759329",
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 44662.5,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2021-09-20T07:34:52.903Z,
+    "type": "liquidation",
+  },
+  Object {
+    "amount": 2314,
+    "exchange": "bybit",
+    "id": "10759323",
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 44593,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2021-09-20T07:34:54.901Z,
+    "type": "liquidation",
+  },
+  Object {
+    "amount": 650,
+    "exchange": "bybit",
+    "id": "10759328",
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 44598,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2021-09-20T07:34:54.908Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 30`] = `
+Array [
+  Object {
+    "amount": 3655,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 3384.15,
+    "side": "buy",
+    "symbol": "ETHUSD",
+    "timestamp": 2021-09-14T08:41:21.954Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 31`] = `
+Array [
+  Object {
+    "amount": 2329,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 45171,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2021-09-20T07:45:49.005Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 32`] = `
+Array [
+  Object {
+    "amount": 0.009,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 45212.5,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2021-09-20T07:45:52.732Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {

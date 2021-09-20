@@ -198,15 +198,33 @@ export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
     ]
   }
 
-  *map(message: BybitLiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
-    for (const bybitLiquidation of message.data) {
+  *map(message: BybitLiquidationMessage | BybitLiquidationNativeMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    // from bybit telegram: When "side":"Buy", a long position was liquidated. Will fix the docs.
+    if (message.generated) {
+      for (const bybitLiquidation of message.data) {
+        const liquidation: Liquidation = {
+          type: 'liquidation',
+          symbol: bybitLiquidation.symbol,
+          exchange: this._exchange,
+          id: String(bybitLiquidation.id),
+          price: Number(bybitLiquidation.price),
+          amount: bybitLiquidation.qty,
+          side: bybitLiquidation.side == 'Buy' ? 'sell' : 'buy',
+          timestamp: new Date(bybitLiquidation.time),
+          localTimestamp
+        }
+
+        yield liquidation
+      }
+    } else {
+      const bybitLiquidation = message.data
       const liquidation: Liquidation = {
         type: 'liquidation',
         symbol: bybitLiquidation.symbol,
         exchange: this._exchange,
-        id: String(bybitLiquidation.id),
+        id: undefined,
         price: Number(bybitLiquidation.price),
-        amount: bybitLiquidation.qty,
+        amount: Number(bybitLiquidation.qty),
         side: bybitLiquidation.side == 'Buy' ? 'sell' : 'buy',
         timestamp: new Date(bybitLiquidation.time),
         localTimestamp
@@ -281,6 +299,7 @@ type BybitInstrumentDataMessage = BybitDataMessage & {
 }
 
 type BybitLiquidationMessage = BybitDataMessage & {
+  generated: true
   data: {
     id: number
     qty: number
@@ -289,4 +308,9 @@ type BybitLiquidationMessage = BybitDataMessage & {
     symbol: string
     price: number
   }[]
+}
+
+type BybitLiquidationNativeMessage = BybitDataMessage & {
+  generated: undefined
+  data: { symbol: string; side: 'Sell' | 'Buy'; price: string; qty: string; time: number }
 }

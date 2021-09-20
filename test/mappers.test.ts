@@ -4351,7 +4351,30 @@ describe('mappers', () => {
         },
         cross_seq: 5645798595,
         timestamp_e6: 1630627199958670
-      }
+      },
+
+      {
+        topic: 'liquidation.BTCUSD',
+        generated: true,
+        data: [
+          { id: 10759329, qty: 1257079, side: 'Buy', time: 1632123292903, symbol: 'BTCUSD', price: 44662.5 },
+          { id: 10759323, qty: 2314, side: 'Buy', time: 1632123294901, symbol: 'BTCUSD', price: 44593 },
+          { id: 10759328, qty: 650, side: 'Buy', time: 1632123294908, symbol: 'BTCUSD', price: 44598 }
+        ]
+      },
+
+      {
+        topic: 'liquidation.ETHUSD',
+        data: {
+          symbol: 'ETHUSD',
+          side: 'Sell',
+          price: '3384.15',
+          qty: '3655',
+          time: 1631608881954
+        }
+      },
+      { topic: 'liquidation.BTCUSD', data: { symbol: 'BTCUSD', side: 'Sell', price: '45171.00', qty: '2329', time: 1632123949005 } },
+      { topic: 'liquidation.BTCUSDT', data: { symbol: 'BTCUSDT', side: 'Sell', price: '45212.50', qty: '0.009', time: 1632123952732 } }
     ]
 
     for (const message of messagesIncludingOrderBook200) {
