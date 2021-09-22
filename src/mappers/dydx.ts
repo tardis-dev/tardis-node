@@ -25,7 +25,7 @@ export class DydxTradesMapper implements Mapper<'dydx', Trade> {
         price: Number(trade.price),
         amount: Number(trade.size),
         side: trade.side === 'SELL' ? 'sell' : 'buy',
-        timestamp: new Date(trade.createdAt),
+        timestamp: trade.createdAt ? new Date(trade.createdAt) : localTimestamp,
         localTimestamp: localTimestamp
       }
     }
@@ -201,10 +201,7 @@ type DyDxTrade = {
   id: 'BTC-USD'
   channel: 'v3_trades'
   contents: {
-    trades: [
-      { size: '0.075'; side: 'SELL'; price: '57696'; createdAt: '2021-05-01T00:00:34.046Z' },
-      { size: '0.425'; side: 'SELL'; price: '57673'; createdAt: '2021-05-01T00:00:34.046Z' }
-    ]
+    trades: [{ size: '0.075'; side: 'SELL'; price: '57696'; createdAt: '2021-05-01T00:00:34.046Z' | undefined }]
   }
 }
 
