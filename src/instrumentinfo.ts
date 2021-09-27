@@ -34,7 +34,7 @@ async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?:
         headers: { Authorization: `Bearer ${options.apiKey}` }
       })
       .json()
-  } catch (e) {
+  } catch (e: any) {
     // expose 400 error message from server
     if (e.response?.statusCode === 400) {
       let err: { code: Number; message: string }

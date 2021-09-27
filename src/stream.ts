@@ -92,7 +92,7 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
       for await (const message of normalizedMessages) {
         yield message
       }
-    } catch (error) {
+    } catch (error: any) {
       if (onError !== undefined) {
         onError(error)
       }

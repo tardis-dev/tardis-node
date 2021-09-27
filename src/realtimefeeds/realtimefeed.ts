@@ -123,7 +123,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           clearInterval(staleConnectionTimerId)
         }
         yield { __disconnect__: true }
-      } catch (error) {
+      } catch (error: any) {
         if (this._onError !== undefined) {
           this._onError(error)
         }
