@@ -1,0 +1,45 @@
+name: Publish New Release To NPM
+
+on:
+  release:
+    # This specifies that the build will be triggered when we publish a release
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish New Release To NPM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Use Node.js v15
+        uses: actions/setup-node@v1
+        with:
+          node-version: 15.x
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install Dependencies And Compile TS
+        run: npm ci
+
+      - name: Configure Git
+        run: git config --global user.name "GitHub Release Bot"
+
+      - name: Update package version
+        run: npm version ${{ github.event.release.tag_name }}
+
+      - name: Run Tests
+        run: npm run test
+
+      - name: Publish Package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push Version Changes To GitHub
+        run: git push
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

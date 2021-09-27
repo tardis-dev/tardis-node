@@ -13,9 +13,10 @@
   "scripts": {
     "build": "tsc",
     "precommit": "lint-staged",
-    "test": "npm run build && jest --runInBand --forceExit",
+    "test": "npm run build && jest --forceExit",
     "prepare": "npm run build",
-    "release": "cross-var \"npm run test && npm run build && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish --access=public\""
+    "format": "prettier --write **/*.{ts,json,md,yaml}",
+    "check-format": "prettier --check **/*.{ts,json,md,yaml}"
   },
   "files": [
     "src",

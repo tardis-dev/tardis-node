@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [15.x, 16.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies And Compile TS
+        run: npm ci
+
+      - name: Check Code Format
+        run: npm run check-format
+
+      - name: Run Tests
+        run: npm run test
