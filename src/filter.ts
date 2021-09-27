@@ -31,7 +31,7 @@ export function uniqueTradesOnly<T extends NormalizedData | Disconnect>(
     if (message.type !== 'trade') {
       return true
     } else {
-      const trade = (message as unknown) as Trade
+      const trade = message as unknown as Trade
       // pass trough trades that can't be uniquely identified
       // ignore index trades
       if (trade.id === undefined || trade.symbol.startsWith('.')) {
