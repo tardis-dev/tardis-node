@@ -43,7 +43,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     this._filters = optimizeFilters(filters)
     this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
 
-    this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS }
+    this._wsClientOptions = { perMessageDeflate: false, handshakeTimeout: 10 * ONE_SEC_IN_MS, skipUTF8Validation: true } as any
 
     if (httpsProxyAgent !== undefined) {
       this._wsClientOptions.agent = httpsProxyAgent
