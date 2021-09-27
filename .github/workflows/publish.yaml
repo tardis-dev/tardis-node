@@ -23,7 +23,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install Dependencies And Compile TS
-        run: npm ci
+        run: npm install
 
       - name: Configure Git
         run: git config --global user.name "GitHub Release Bot"
