@@ -73,16 +73,15 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     // as hardcoded value
     const DATE_MESSAGE_SPLIT_INDEX = 28
 
-    // experimental more lenient gzip decompression, behind env flag for now
+    // more lenient gzip decompression
     // see https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239
 
-    const ZLIB_OPTIONS = process.env.TARDIS_LENIENT_GZIP_DECOMPRESS
-      ? {
-          chunkSize: 128 * 1024,
-          flush: constants.Z_SYNC_FLUSH,
-          finishFlush: constants.Z_SYNC_FLUSH
-        }
-      : { chunkSize: 128 * 1024 }
+    const ZLIB_OPTIONS = {
+      chunkSize: 128 * 1024,
+      flush: constants.Z_SYNC_FLUSH,
+      finishFlush: constants.Z_SYNC_FLUSH
+    }
+
     // helper flag that helps us not yielding two subsequent undefined/disconnect messages
     let lastMessageWasUndefined = false
 
