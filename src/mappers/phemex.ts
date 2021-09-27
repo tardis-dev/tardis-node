@@ -72,12 +72,14 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   }
 }
 
-const mapBookLevelForSymbol = (symbol: string) => ([priceEp, qty]: PhemexBookLevel) => {
-  return {
-    price: priceEp / getPriceScale(symbol),
-    amount: qty / getQtyScale(symbol)
+const mapBookLevelForSymbol =
+  (symbol: string) =>
+  ([priceEp, qty]: PhemexBookLevel) => {
+    return {
+      price: priceEp / getPriceScale(symbol),
+      amount: qty / getQtyScale(symbol)
+    }
   }
-}
 
 export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   canHandle(message: PhemexBookMessage) {

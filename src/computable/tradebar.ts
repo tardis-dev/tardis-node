@@ -7,7 +7,10 @@ type BarKind = 'time' | 'volume' | 'tick'
 
 type TradeBarComputableOptions = { kind: BarKind; interval: number; name?: string }
 
-export const computeTradeBars = (options: TradeBarComputableOptions): (() => Computable<TradeBar>) => () => new TradeBarComputable(options)
+export const computeTradeBars =
+  (options: TradeBarComputableOptions): (() => Computable<TradeBar>) =>
+  () =>
+    new TradeBarComputable(options)
 
 const kindSuffix: { [key in BarKind]: string } = {
   tick: 'ticks',

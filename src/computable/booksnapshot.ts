@@ -12,8 +12,10 @@ type BookSnapshotComputableOptions = {
   onCrossedLevelRemoved?: OnLevelRemovedCB
 }
 
-export const computeBookSnapshots = (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) => () =>
-  new BookSnapshotComputable(options)
+export const computeBookSnapshots =
+  (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) =>
+  () =>
+    new BookSnapshotComputable(options)
 
 const emptyBookLevel = {
   price: undefined,
