@@ -27,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies And Compile TS
-        run: npm ci
+        run: npm install
 
       - name: Check Code Format
         run: npm run check-format
