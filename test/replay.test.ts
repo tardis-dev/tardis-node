@@ -79,8 +79,8 @@ describe('replay', () => {
     async () => {
       const replayOptions: ReplayOptions<'bitmex'> = {
         exchange: 'bitmex',
-        from: '2019-05-01 00:00',
-        to: '2019-05-01 01:05',
+        from: '2019-05-01T00:00:00.000Z',
+        to: '2019-05-01T00:02:00.000Z',
         filters: [
           {
             channel: 'trade',
@@ -122,8 +122,8 @@ describe('replay', () => {
     async () => {
       const coinbaseDataFeedMessages = replay({
         exchange: 'coinbase',
-        from: '2019-06-01',
-        to: '2019-06-01 02:00',
+        from: '2019-06-01T00:00:00.000Z',
+        to: '2019-06-01T00:02:00.000Z',
         filters: [
           {
             channel: 'match',
@@ -151,8 +151,8 @@ describe('replay', () => {
     async () => {
       const binanceDataFeedMessages = replay({
         exchange: 'binance',
-        from: '2019-06-01',
-        to: '2019-06-01 02:00',
+        from: '2019-06-01T00:00:00.000Z',
+        to: '2019-06-01T00:02:00.000Z',
         filters: [
           {
             channel: 'trade',
@@ -252,6 +252,9 @@ describe('replay', () => {
         const bufferedMessages = []
 
         for await (const message of messages) {
+          if (message.type === 'book_change' && (message as any).isSnapshot === true) {
+            continue
+          }
           bufferedMessages.push(message)
           count++
           if (count === 10) {
