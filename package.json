@@ -55,7 +55,7 @@
     "fs-extra": "^10.0.0",
     "got": "^11.8.2",
     "https-proxy-agent": "^5.0.0",
-    "p-map": "^5.1.0",
+    "p-map": "^4.0.0",
     "ws": "^8.2.2"
   },
   "devDependencies": {
