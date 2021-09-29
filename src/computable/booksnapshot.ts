@@ -37,6 +37,7 @@ const levelsChanged = (level1: Optional<BookPriceLevel>, level2: Optional<BookPr
 class BookSnapshotComputable implements Computable<BookSnapshot> {
   public readonly sourceDataTypes = ['book_change']
   private _bookChanged = false
+  private _initialized = false
 
   private readonly _type = 'book_snapshot'
   private readonly _orderBook: OrderBook
@@ -82,8 +83,13 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     this._update(bookChange)
 
     // check again after the update as book snapshot with interval set to 0 (real-time) could have changed
+    // or it's initial snapshot
     if (this._hasNewSnapshot(bookChange.timestamp)) {
       yield this._getSnapshot(bookChange)
+
+      if (this._initialized === false) {
+        this._initialized = true
+      }
     }
   }
 
@@ -94,6 +100,11 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
 
     // report new snapshot anytime book changed
     if (this._interval === 0) {
+      return true
+    }
+
+    // report new snapshot for book snapshots with interval for initial snapshot
+    if (this._initialized === false) {
       return true
     }
 
