@@ -44,8 +44,8 @@ export const EXCHANGES = [
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
-const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot'] as const
-const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book'] as const
+const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot', 'ticker'] as const
+const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book', 'ticker'] as const
 
 const BITMEX_CHANNELS = [
   'trade',
@@ -153,7 +153,18 @@ const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
 
 const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
 
-const FTX_CHANNELS = ['orderbook', 'trades', 'instrument', 'markets', 'orderbookGrouped', 'lendingRate', 'borrowRate'] as const
+const FTX_CHANNELS = [
+  'orderbook',
+  'trades',
+  'instrument',
+  'markets',
+  'orderbookGrouped',
+  'lendingRate',
+  'borrowRate',
+  'borrowSummary',
+  'ticker',
+  'leveragedTokenInfo'
+] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
 
@@ -193,7 +204,7 @@ const BINANCE_DELIVERY_CHANNELS = [
   'globalLongShortAccountRatio'
 ] as const
 
-const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations'] as const
+const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations', 'ticker'] as const
 
 const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp', 'etp'] as const
 
@@ -246,7 +257,7 @@ const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance
 
 const HITBTC_CHANNELS = ['updateTrades', 'snapshotTrades', 'snapshotOrderbook', 'updateOrderbook'] as const
 
-const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets', 'orderbookGrouped'] as const
+const FTX_US_CHANNELS = ['orderbook', 'trades', 'markets', 'orderbookGrouped', 'ticker'] as const
 
 const DELTA_CHANNELS = [
   'l2_orderbook',
