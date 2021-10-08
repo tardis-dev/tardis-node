@@ -75,7 +75,8 @@ describe('stream', () => {
             exchange === 'okex-futures' ||
             exchange === 'okex-options' ||
             exchange === 'huobi-dm-options' ||
-            exchange === 'star-atlas'
+            exchange === 'star-atlas' ||
+            exchange === 'huobi-dm'
           ) {
             return
           }
