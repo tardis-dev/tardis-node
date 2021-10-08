@@ -39,7 +39,8 @@ export const EXCHANGES = [
   'ascendex',
   'dydx',
   'serum',
-  'huobi-dm-options'
+  'huobi-dm-options',
+  'star-atlas'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -322,5 +323,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   ascendex: ASCENDEX_CHANNELS,
   dydx: DYDX_CHANNELS,
   serum: SERUM_CHANNELS,
+  'star-atlas': SERUM_CHANNELS,
   'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS
 }

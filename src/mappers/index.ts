@@ -106,7 +106,8 @@ const tradesMappers = {
   upbit: () => new UpbitTradesMapper(),
   ascendex: () => new AscendexTradesMapper(),
   dydx: () => new DydxTradesMapper(),
-  serum: () => new SerumTradesMapper()
+  serum: () => new SerumTradesMapper(),
+  'star-atlas': () => new SerumTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -161,7 +162,8 @@ const bookChangeMappers = {
   upbit: () => new UpbitBookChangeMapper(),
   ascendex: () => new AscendexBookChangeMapper(),
   dydx: () => new DydxBookChangeMapper(),
-  serum: () => new SerumBookChangeMapper()
+  serum: () => new SerumBookChangeMapper(),
+  'star-atlas': () => new SerumBookChangeMapper()
 }
 
 const derivativeTickersMappers = {

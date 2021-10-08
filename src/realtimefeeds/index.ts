@@ -39,6 +39,7 @@ import { UpbitRealTimeFeed } from './upbit'
 import { AscendexRealTimeFeed } from './ascendex'
 import { DydxRealTimeFeed } from './dydx'
 import { SerumRealTimeFeed } from './serum'
+import { StarAtlasRealTimeFeed } from './staratlas'
 
 export * from './realtimefeed'
 
@@ -85,6 +86,7 @@ const realTimeFeedsMap: {
   ascendex: AscendexRealTimeFeed,
   dydx: DydxRealTimeFeed,
   serum: SerumRealTimeFeed,
+  'star-atlas': StarAtlasRealTimeFeed,
   'huobi-dm-options': HuobiDMOptionsRealTimeFeed
 }
 
