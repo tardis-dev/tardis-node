@@ -155,7 +155,7 @@ export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liqu
 
 export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
   canHandle(message: CryptofacilitiesTicker) {
-    return message.feed === 'ticker'
+    return message.feed === 'ticker' && message.event === undefined
   },
 
   getFilters(symbols?: string[]) {
@@ -178,10 +178,7 @@ export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTi
 
       bidPrice: cryptofacilitiesTicker.bid,
       bidAmount: cryptofacilitiesTicker.bid_size,
-      timestamp:
-        cryptofacilitiesTicker.time !== undefined && cryptofacilitiesTicker.time !== null
-          ? new Date(cryptofacilitiesTicker.time)
-          : localTimestamp,
+      timestamp: new Date(cryptofacilitiesTicker.time),
       localTimestamp: localTimestamp
     }
 
