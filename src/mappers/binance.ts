@@ -1,6 +1,6 @@
 import { debug } from '../debug'
 import { CircularBuffer } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Quote, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, BookTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
@@ -406,7 +406,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
   }
 }
 
-export class BinanceQuotesMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', Quote> {
+export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -431,19 +431,19 @@ export class BinanceQuotesMapper implements Mapper<'binance-futures' | 'binance-
   *map(binanceBookTickerResponse: BinanceResponse<BinanceBookTickerData>, localTimestamp: Date) {
     const binanceBookTicker = binanceBookTickerResponse.data
 
-    const quote: Quote = {
-      type: 'quote',
+    const ticker: BookTicker = {
+      type: 'book_ticker',
       symbol: binanceBookTicker.s,
       exchange: this._exchange,
-      askAmount: Number(binanceBookTicker.A),
-      askPrice: Number(binanceBookTicker.a),
-      bidPrice: Number(binanceBookTicker.b),
-      bidAmount: Number(binanceBookTicker.B),
+      askAmount: binanceBookTicker.A !== undefined ? Number(binanceBookTicker.A) : undefined,
+      askPrice: binanceBookTicker.a !== undefined ? Number(binanceBookTicker.a) : undefined,
+      bidPrice: binanceBookTicker.b !== undefined ? Number(binanceBookTicker.b) : undefined,
+      bidAmount: binanceBookTicker.B !== undefined ? Number(binanceBookTicker.B) : undefined,
       timestamp: binanceBookTicker.T !== undefined ? new Date(binanceBookTicker.T) : localTimestamp,
       localTimestamp: localTimestamp
     }
 
-    yield quote
+    yield ticker
   }
 }
 

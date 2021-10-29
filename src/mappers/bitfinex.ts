@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
@@ -315,6 +315,81 @@ export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives'
   }
 }
 
+export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookTicker> {
+  private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
+
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: BitfinexMessage) {
+    // non sub messages are provided as arrays
+    if (Array.isArray(message)) {
+      // first test if message itself provides channel name and if so if it's trades
+      const channelName = message[message.length - 2]
+      if (typeof channelName === 'string') {
+        return channelName === 'ticker'
+      }
+
+      // otherwise use channel to id mapping
+      return this._channelIdToSymbolMap.get(message[0]) !== undefined
+    }
+
+    // store mapping between channel id and symbols
+    if (message.event === 'subscribed') {
+      const isTicker = message.channel === 'ticker' && message.pair !== undefined
+      if (isTicker) {
+        this._channelIdToSymbolMap.set(message.chanId, message.pair)
+      }
+    }
+
+    return false
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BitfinexTicker, localTimestamp: Date) {
+    const symbolFromMessage = message[message.length - 1]
+    const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
+
+    // ignore if we don't have matching symbol
+    if (symbol === undefined) {
+      return
+    }
+
+    // ignore heartbeats
+    if (message[1] === 'hb') {
+      return
+    }
+    // ignore funding tickers
+
+    if (message[1].length > 10) {
+      return
+    }
+
+    const [bidPrice, bidAmount, askPrice, askAmount, _, __] = message[1]
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol,
+      exchange: this._exchange,
+      askAmount,
+      askPrice,
+      bidPrice,
+      bidAmount,
+      timestamp: new Date(message[3]),
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type BitfinexMessage =
   | {
       event: 'subscribed'
@@ -335,4 +410,24 @@ type BitfinexStatusMessage = [number, (number | undefined)[], number, number] | 
 
 type BitfinexLiquidation =
   | [number, ['pos', number, number, null, string, number, number, null, number, number, null, number][]]
+  | BitfinexHeartbeat
+
+type BitfinexTicker =
+  | [
+      CHANNEL_ID: number,
+      ITEMS: [
+        BID: number,
+        BID_SIZE: number,
+        ASK: number,
+        ASK_SIZE: number,
+        DAILY_CHANGE: number,
+        DAILY_CHANGE_RELATIVE: number,
+        LAST_PRICE: number,
+        VOLUME: number,
+        HIGH: number,
+        LOW: number
+      ],
+      SEQ_ID: number,
+      TIMESTAMP: number
+    ]
   | BitfinexHeartbeat

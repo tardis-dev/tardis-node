@@ -147,6 +147,22 @@ Array [
 ]
 `;
 
+exports[`mappers map ascendex messages 8`] = `
+Array [
+  Object {
+    "askAmount": 21,
+    "askPrice": 17.67664,
+    "bidAmount": 2,
+    "bidPrice": 17.39749,
+    "exchange": "ascendex",
+    "localTimestamp": 2021-05-24T00:59:59.000Z,
+    "symbol": "PROM/USDT",
+    "timestamp": 2021-10-11T00:00:00.019Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance delivery messages 1`] = `Array []`;
 
 exports[`mappers map binance delivery messages 2`] = `
@@ -307,6 +323,22 @@ Array [
 
 exports[`mappers map binance delivery messages 11`] = `Array []`;
 
+exports[`mappers map binance delivery messages 12`] = `
+Array [
+  Object {
+    "askAmount": 6,
+    "askPrice": 353.477,
+    "bidAmount": 271,
+    "bidPrice": 353.401,
+    "exchange": "binance-delivery",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BNBUSD_PERP",
+    "timestamp": 2021-06-01T00:00:00.000Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance dex messages 1`] = `
 Array [
   Object {
@@ -388,7 +420,37 @@ Array [
 ]
 `;
 
-exports[`mappers map binance dex messages 4`] = `Array []`;
+exports[`mappers map binance dex messages 4`] = `
+Array [
+  Object {
+    "askAmount": 646900,
+    "askPrice": 0.00008414,
+    "bidAmount": 394500,
+    "bidPrice": 0.00008379,
+    "exchange": "binance-dex",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "RAVEN-F66_BNB",
+    "timestamp": 2019-07-01T00:00:23.000Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map binance dex messages 5`] = `
+Array [
+  Object {
+    "askAmount": 2110,
+    "askPrice": 0.000111,
+    "bidAmount": 200,
+    "bidPrice": 0.000105,
+    "exchange": "binance-dex",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ARN-71B_BNB",
+    "timestamp": 2021-10-11T00:53:00.000Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map binance futures messages 1`] = `Array []`;
 
@@ -594,6 +656,22 @@ Array [
 ]
 `;
 
+exports[`mappers map binance futures messages 15`] = `
+Array [
+  Object {
+    "askAmount": 0.38,
+    "askPrice": 33139.39,
+    "bidAmount": 0.17,
+    "bidPrice": 33134.42,
+    "exchange": "binance-futures",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2021-02-01T00:00:03.568Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map binance messages 1`] = `
 Array [
   Object {
@@ -626,7 +704,21 @@ Array [
 ]
 `;
 
-exports[`mappers map binance messages 3`] = `Array []`;
+exports[`mappers map binance messages 3`] = `
+Array [
+  Object {
+    "askAmount": 0.031201,
+    "askPrice": 8012.15,
+    "bidAmount": 0.142459,
+    "bidPrice": 8010,
+    "exchange": "binance",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-09-01T00:00:01.275Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map binance messages 4`] = `Array []`;
 
@@ -1296,6 +1388,28 @@ Array [
 
 exports[`mappers map bitfinex messages 11`] = `Array []`;
 
+exports[`mappers map bitfinex messages 12`] = `Array []`;
+
+exports[`mappers map bitfinex messages 13`] = `
+Array [
+  Object {
+    "askAmount": 197418.99101772,
+    "askPrice": 0.00002274,
+    "bidAmount": 657877.4673439099,
+    "bidPrice": 0.00002271,
+    "exchange": "bitfinex",
+    "localTimestamp": 2019-08-01T00:00:02.496Z,
+    "symbol": "MATIC:BTC",
+    "timestamp": 2021-10-11T00:00:36.166Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bitfinex messages 14`] = `Array []`;
+
+exports[`mappers map bitfinex messages 15`] = `Array []`;
+
 exports[`mappers map bitflyer messages 1`] = `
 Array [
   Object {
@@ -1373,6 +1487,38 @@ Array [
 ]
 `;
 
+exports[`mappers map bitflyer messages 4`] = `
+Array [
+  Object {
+    "askAmount": 0.2,
+    "askPrice": 1020332,
+    "bidAmount": 0.03,
+    "bidPrice": 1020000,
+    "exchange": "bitflyer",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:01.247Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bitflyer messages 5`] = `
+Array [
+  Object {
+    "askAmount": 0.4,
+    "askPrice": 376676,
+    "bidAmount": 0.01,
+    "bidPrice": 376592,
+    "exchange": "bitflyer",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "ETH_JPY",
+    "timestamp": 2021-09-01T00:00:00.211Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map bitmex messages 1`] = `
 Array [
   Object {
@@ -1445,7 +1591,21 @@ Array [
 ]
 `;
 
-exports[`mappers map bitmex messages 6`] = `Array []`;
+exports[`mappers map bitmex messages 6`] = `
+Array [
+  Object {
+    "askAmount": 62427,
+    "askPrice": 267.75,
+    "bidAmount": 701,
+    "bidPrice": 267.7,
+    "exchange": "bitmex",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETHUSD",
+    "timestamp": 2019-05-31T23:59:59.942Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map bitmex messages 7`] = `
 Array [
@@ -1569,6 +1729,33 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 13`] = `Array []`;
+
+exports[`mappers map bitmex messages 14`] = `
+Array [
+  Object {
+    "askAmount": 205100,
+    "askPrice": 55411.5,
+    "bidAmount": 2700,
+    "bidPrice": 55411,
+    "exchange": "bitmex",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2021-10-13T07:07:00.106Z,
+    "type": "book_ticker",
+  },
+  Object {
+    "askAmount": 241500,
+    "askPrice": 55400.5,
+    "bidAmount": 700,
+    "bidPrice": 55400,
+    "exchange": "bitmex",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2021-10-13T07:07:01.010Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
@@ -2402,6 +2589,38 @@ Array [
 ]
 `;
 
+exports[`mappers map coinbase messages 7`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 4095,
+    "bidAmount": undefined,
+    "bidPrice": 4094.99,
+    "exchange": "coinbase",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:04.540Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map coinbase messages 8`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 58800.01,
+    "bidAmount": undefined,
+    "bidPrice": 58800,
+    "exchange": "coinbase",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2021-04-01T00:00:01.618Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinflex messages 1`] = `Array []`;
 
 exports[`mappers map coinflex messages 2`] = `Array []`;
@@ -2565,6 +2784,17 @@ Array [
     "timestamp": 2019-04-01T00:00:00.684Z,
     "type": "derivative_ticker",
   },
+  Object {
+    "askAmount": 150,
+    "askPrice": 60.62,
+    "bidAmount": 10000,
+    "bidPrice": 60.57,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "FI_LTCUSD_190628",
+    "timestamp": 2019-04-01T00:00:00.684Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
@@ -2583,6 +2813,17 @@ Array [
     "symbol": "PI_LTCUSD",
     "timestamp": 2019-04-01T00:00:00.695Z,
     "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 20000,
+    "askPrice": 60.38,
+    "bidAmount": 10000,
+    "bidPrice": 60.35,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-04-01T00:00:00.695Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -2634,6 +2875,17 @@ Array [
     "symbol": "PI_LTCUSD",
     "timestamp": 2019-09-01T00:00:52.217Z,
     "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 7,
+    "askPrice": 64.28,
+    "bidAmount": 2996,
+    "bidPrice": 64.27,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2019-09-01T00:00:52.217Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -2761,6 +3013,66 @@ Array [
     "symbol": "PI_ETHUSD",
     "timestamp": 2020-07-01T16:27:33.613Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map cryptofacilities messages 12`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 141.16,
+    "lastPrice": 141.8,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 141.45,
+    "openInterest": 393129,
+    "predictedFundingRate": undefined,
+    "symbol": "FI_ETHUSD_190426",
+    "timestamp": 2019-03-31T23:59:58.897Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 5873,
+    "askPrice": 141.5,
+    "bidAmount": 10000,
+    "bidPrice": 141.4,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "FI_ETHUSD_190426",
+    "timestamp": 2019-03-31T23:59:58.897Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map cryptofacilities messages 13`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": 7.94427729016e-7,
+    "fundingTimestamp": 2021-04-01T04:00:00.000Z,
+    "indexPrice": 196.82,
+    "lastPrice": 196.85,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "markPrice": 197.05,
+    "openInterest": 2239386,
+    "predictedFundingRate": 7.94427729016e-7,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2021-04-01T00:00:00.598Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 839,
+    "askPrice": 197.21,
+    "bidAmount": 2875,
+    "bidPrice": 196.89,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PI_LTCUSD",
+    "timestamp": 2021-04-01T00:00:00.598Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -3178,6 +3490,17 @@ Array [
     "timestamp": 2019-08-01T00:00:04.229Z,
     "type": "derivative_ticker",
   },
+  Object {
+    "askAmount": 250,
+    "askPrice": 10095.5,
+    "bidAmount": 7000,
+    "bidPrice": 10095,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-08-01T00:00:04.229Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
@@ -3196,6 +3519,17 @@ Array [
     "symbol": "BTC-PERPETUAL",
     "timestamp": 2019-10-01T00:00:03.897Z,
     "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 5260,
+    "askPrice": 8304.5,
+    "bidAmount": 267900,
+    "bidPrice": 8304,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-10-01T00:00:03.897Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -3229,6 +3563,17 @@ Array [
     "underlyingPrice": 9724.48,
     "vega": 0,
   },
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-8JUN20-8750-P",
+    "timestamp": 2020-06-08T08:00:00.048Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
@@ -3260,6 +3605,17 @@ Array [
     "underlyingIndex": "SYN.BTC-5JUN20",
     "underlyingPrice": 9440.73,
     "vega": 3.88497,
+  },
+  Object {
+    "askAmount": 4.8,
+    "askPrice": 0.04,
+    "bidAmount": 15.4,
+    "bidPrice": 0.0365,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-5JUN20-9250-C",
+    "timestamp": 2020-06-01T00:00:52.595Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -3293,6 +3649,17 @@ Array [
     "underlyingPrice": 231.7,
     "vega": 0.0092,
   },
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETH-5JUN20-310-P",
+    "timestamp": 2020-05-31T23:59:57.073Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
@@ -3324,6 +3691,17 @@ Array [
     "underlyingIndex": "SYN.ETH-10JUN20",
     "underlyingPrice": 244.14,
     "vega": 0.01246,
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETH-10JUN20-270-C",
+    "timestamp": 2020-06-08T09:24:58.178Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -3740,6 +4118,22 @@ Array [
     "symbol": "BTC-PERP",
     "timestamp": 2020-09-15T00:02:05.787Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map ftx messages 10`] = `
+Array [
+  Object {
+    "askAmount": 0.0048,
+    "askPrice": 54411,
+    "bidAmount": 0.0919,
+    "bidPrice": 54346,
+    "exchange": "ftx",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC/EUR",
+    "timestamp": 2021-10-26T00:00:00.086Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -4819,6 +5213,22 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi messages 23`] = `
+Array [
+  Object {
+    "askAmount": 2.323241,
+    "askPrice": 7543.59,
+    "bidAmount": 0.002329,
+    "bidPrice": 7541.16,
+    "exchange": "huobi",
+    "localTimestamp": 2020-07-03T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-12-01T00:00:04.057Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm, messages 2`] = `
@@ -4913,6 +5323,38 @@ Array [
     "symbol": "BTC_CW",
     "timestamp": 2020-07-01T08:46:09.156Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm, messages 10`] = `
+Array [
+  Object {
+    "askAmount": 68,
+    "askPrice": 9142.13,
+    "bidAmount": 6091,
+    "bidPrice": 9142.12,
+    "exchange": "huobi-dm",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC_CW",
+    "timestamp": 2020-07-01T00:00:03.500Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm, messages 11`] = `
+Array [
+  Object {
+    "askAmount": 3,
+    "askPrice": 43829.95,
+    "bidAmount": 7,
+    "bidPrice": 43812.82,
+    "exchange": "huobi-dm",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC_CW",
+    "timestamp": 2021-10-01T00:00:07.225Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -5046,6 +5488,22 @@ Array [
     "symbol": "BTC-USDT",
     "timestamp": 2020-12-17T17:35:02.284Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map huobi-dm-linear-swap, messages 10`] = `
+Array [
+  Object {
+    "askAmount": 9249,
+    "askPrice": 47176.6,
+    "bidAmount": 1,
+    "bidPrice": 47176.5,
+    "exchange": "huobi-dm-linear-swap",
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "symbol": "BTC-USDT",
+    "timestamp": 2021-09-01T00:00:00.495Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -5307,6 +5765,22 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi-dm-swap, messages 11`] = `
+Array [
+  Object {
+    "askAmount": 4635,
+    "askPrice": 47152.4,
+    "bidAmount": 1436,
+    "bidPrice": 47152.3,
+    "exchange": "huobi-dm-swap",
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2021-09-01T00:00:00.734Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map kraken messages 1`] = `
 Array [
   Object {
@@ -5452,6 +5926,22 @@ Array [
 ]
 `;
 
+exports[`mappers map kraken messages 7`] = `
+Array [
+  Object {
+    "askAmount": 0.3167044,
+    "askPrice": 43770.3,
+    "bidAmount": 43770.2,
+    "bidPrice": 0.00917717,
+    "exchange": "kraken",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "spread",
+    "timestamp": 2021-10-01T02:02:59.916Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map okcoin messages 1`] = `
 Array [
   Object {
@@ -5479,7 +5969,21 @@ Array [
 
 exports[`mappers map okcoin messages 2`] = `Array []`;
 
-exports[`mappers map okcoin messages 3`] = `Array []`;
+exports[`mappers map okcoin messages 3`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 5.51,
+    "bidAmount": undefined,
+    "bidPrice": 4.166,
+    "exchange": "okcoin",
+    "localTimestamp": 2019-11-09T00:00:01.275Z,
+    "symbol": "ETC-USD",
+    "timestamp": 2019-11-21T23:59:04.392Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map okcoin messages 4`] = `
 Array [
@@ -5582,7 +6086,21 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 3`] = `Array []`;
+exports[`mappers map okex messages 3`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 0.0001659,
+    "bidAmount": undefined,
+    "bidPrice": 0.0001654,
+    "exchange": "okex",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "TRX-ETH",
+    "timestamp": 2019-04-01T00:00:27.106Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
 exports[`mappers map okex messages 4`] = `Array []`;
 
@@ -5598,6 +6116,38 @@ Array [
     "symbol": "BCH-USDT",
     "timestamp": 2019-08-01T00:00:08.807Z,
     "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex messages 6`] = `
+Array [
+  Object {
+    "askAmount": 849.6017,
+    "askPrice": 2.585,
+    "bidAmount": 1574.0289,
+    "bidPrice": 2.584,
+    "exchange": "okex",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "EOS-USDT",
+    "timestamp": 2019-12-31T23:59:58.352Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex messages 7`] = `
+Array [
+  Object {
+    "askAmount": 235,
+    "askPrice": 3.9385,
+    "bidAmount": 0.350812,
+    "bidPrice": 3.9383,
+    "exchange": "okex",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "EOS-USDT",
+    "timestamp": 2021-09-30T23:59:59.874Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -5736,12 +6286,99 @@ Array [
     "timestamp": 2019-08-01T00:02:00.429Z,
     "type": "derivative_ticker",
   },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 0.02255,
+    "bidAmount": undefined,
+    "bidPrice": 0.0225,
+    "exchange": "okex-futures",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "TRX-USD-190802",
+    "timestamp": 2019-08-01T00:02:00.429Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
 exports[`mappers map okex-futures messages 9`] = `Array []`;
 
 exports[`mappers map okex-futures messages 10`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 7181.47,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 530385,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-200103",
+    "timestamp": 2019-12-31T23:59:59.382Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 7181.95,
+    "bidAmount": undefined,
+    "bidPrice": 7181.22,
+    "exchange": "okex-futures",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-200103",
+    "timestamp": 2019-12-31T23:59:59.382Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 11`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 7181.95,
+    "bidAmount": undefined,
+    "bidPrice": 7181.22,
+    "exchange": "okex-futures",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-200103",
+    "timestamp": 2019-12-31T23:59:59.382Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 12`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 47.826,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 160296,
+    "predictedFundingRate": undefined,
+    "symbol": "ETC-USD-220325",
+    "timestamp": 2021-09-30T23:59:59.965Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 20,
+    "askPrice": 47.837,
+    "bidAmount": 112,
+    "bidPrice": 47.799,
+    "exchange": "okex-futures",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "ETC-USD-220325",
+    "timestamp": 2021-09-30T23:59:59.965Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 13`] = `
 Array [
   Object {
     "asks": Array [
@@ -5766,7 +6403,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 11`] = `
+exports[`mappers map okex-futures messages 14`] = `
 Array [
   Object {
     "asks": Array [],
@@ -5786,9 +6423,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 12`] = `Array []`;
+exports[`mappers map okex-futures messages 15`] = `Array []`;
 
-exports[`mappers map okex-futures messages 13`] = `
+exports[`mappers map okex-futures messages 16`] = `
 Array [
   Object {
     "amount": 475,
@@ -5804,7 +6441,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 14`] = `
+exports[`mappers map okex-futures messages 17`] = `
 Array [
   Object {
     "amount": 8,
@@ -6038,9 +6675,25 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 11`] = `Array []`;
+exports[`mappers map okex-options messages 11`] = `
+Array [
+  Object {
+    "askAmount": 305,
+    "askPrice": 0.0305,
+    "bidAmount": 405,
+    "bidPrice": 0.0285,
+    "exchange": "okex-options",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-200327-8000-P",
+    "timestamp": 2020-01-31T23:59:06.622Z,
+    "type": "book_ticker",
+  },
+]
+`;
 
-exports[`mappers map okex-options messages 12`] = `
+exports[`mappers map okex-options messages 12`] = `Array []`;
+
+exports[`mappers map okex-options messages 13`] = `
 Array [
   Object {
     "asks": Array [
@@ -6064,7 +6717,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 13`] = `
+exports[`mappers map okex-options messages 14`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -6096,9 +6749,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 14`] = `Array []`;
+exports[`mappers map okex-options messages 15`] = `Array []`;
 
-exports[`mappers map okex-options messages 15`] = `
+exports[`mappers map okex-options messages 16`] = `
 Array [
   Object {
     "bestAskAmount": 505,
@@ -6130,7 +6783,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 16`] = `
+exports[`mappers map okex-options messages 17`] = `
 Array [
   Object {
     "bestAskAmount": 55,
@@ -6162,7 +6815,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 17`] = `
+exports[`mappers map okex-options messages 18`] = `
 Array [
   Object {
     "bestAskAmount": 4,
@@ -6194,9 +6847,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 18`] = `Array []`;
+exports[`mappers map okex-options messages 19`] = `Array []`;
 
-exports[`mappers map okex-options messages 19`] = `
+exports[`mappers map okex-options messages 20`] = `
 Array [
   Object {
     "bestAskAmount": undefined,
@@ -6228,7 +6881,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 20`] = `
+exports[`mappers map okex-options messages 21`] = `
 Array [
   Object {
     "bestAskAmount": undefined,
@@ -6256,6 +6909,22 @@ Array [
     "underlyingIndex": "ETH-USD",
     "underlyingPrice": 243.11,
     "vega": undefined,
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 22`] = `
+Array [
+  Object {
+    "askAmount": 305,
+    "askPrice": 0.0305,
+    "bidAmount": 405,
+    "bidPrice": 0.0285,
+    "exchange": "okex-options",
+    "localTimestamp": 2020-02-08T00:00:02.997Z,
+    "symbol": "BTC-USD-200327-8000-P",
+    "timestamp": 2020-01-31T23:59:06.622Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -6329,6 +6998,17 @@ Array [
     "timestamp": 2019-08-01T00:00:02.483Z,
     "type": "derivative_ticker",
   },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 329.3,
+    "bidAmount": undefined,
+    "bidPrice": 329.29,
+    "exchange": "okex-swap",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BCH-USD-SWAP",
+    "timestamp": 2019-08-01T00:00:02.483Z,
+    "type": "book_ticker",
+  },
 ]
 `;
 
@@ -6391,6 +7071,66 @@ Array [
 exports[`mappers map okex-swap messages 8`] = `
 Array [
   Object {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 9337.7,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 2233398,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2020-01-31T23:59:53.276Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 9336.7,
+    "bidAmount": undefined,
+    "bidPrice": 9336.6,
+    "exchange": "okex-swap",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2020-01-31T23:59:53.276Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 9`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 11654.5,
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "markPrice": undefined,
+    "openInterest": 1322785,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2020-09-01T00:00:00.453Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 2190,
+    "askPrice": 11654.6,
+    "bidAmount": 3690,
+    "bidPrice": 11654.5,
+    "exchange": "okex-swap",
+    "localTimestamp": 2019-08-01T00:00:02.997Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2020-09-01T00:00:00.453Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 10`] = `
+Array [
+  Object {
     "asks": Array [
       Object {
         "amount": 0,
@@ -6408,9 +7148,9 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 9`] = `Array []`;
+exports[`mappers map okex-swap messages 11`] = `Array []`;
 
-exports[`mappers map okex-swap messages 10`] = `
+exports[`mappers map okex-swap messages 12`] = `
 Array [
   Object {
     "amount": 8,
@@ -6426,7 +7166,7 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 11`] = `
+exports[`mappers map okex-swap messages 13`] = `
 Array [
   Object {
     "amount": 30,
@@ -6883,6 +7623,22 @@ Array [
     "symbol": "RAY/USDT",
     "timestamp": 2021-05-22T00:00:59.448Z,
     "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map serum messages 4`] = `
+Array [
+  Object {
+    "askAmount": 995,
+    "askPrice": 2.2417,
+    "bidAmount": 3051,
+    "bidPrice": 2.2173,
+    "exchange": "serum",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "OXY/USDT",
+    "timestamp": 2021-09-30T23:55:43.411Z,
+    "type": "book_ticker",
   },
 ]
 `;

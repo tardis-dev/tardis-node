@@ -1,4 +1,4 @@
-import { BookChange, Trade } from '../types'
+import { BookChange, Trade, BookTicker } from '../types'
 import { Mapper } from './mapper'
 
 // https://docs.binance.org/api-reference/dex-api/ws-streams.html
@@ -90,6 +90,40 @@ export const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
   }
 }
 
+export const binanceDexBookTickerMapper: Mapper<'binance-dex', BookTicker> = {
+  canHandle(message: BinanceDexResponse<any>) {
+    return message.stream === 'ticker'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      }
+    ]
+  },
+
+  *map(binanceDexTradeResponse: BinanceDexResponse<BinanceDexTickerData>, localTimestamp: Date): IterableIterator<BookTicker> {
+    const binanceDexTicker = binanceDexTradeResponse.data
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: binanceDexTicker.s,
+      exchange: 'binance-dex',
+
+      askAmount: binanceDexTicker.A !== undefined ? Number(binanceDexTicker.A) : undefined,
+      askPrice: binanceDexTicker.a !== undefined ? Number(binanceDexTicker.a) : undefined,
+      bidPrice: binanceDexTicker.b !== undefined ? Number(binanceDexTicker.b) : undefined,
+      bidAmount: binanceDexTicker.B !== undefined ? Number(binanceDexTicker.B) : undefined,
+      timestamp: binanceDexTicker.E !== undefined ? new Date(binanceDexTicker.E * 1000) : localTimestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type BinanceDexResponse<T> = {
   stream: string
   data: T
@@ -118,4 +152,15 @@ type BinanceDexMarketDiffData = {
   s: string // Symbol
   b: BinanceDexBookLevel[]
   a: BinanceDexBookLevel[]
+}
+
+type BinanceDexTickerData = {
+  e: '24hrTicker' // Event type
+  E: 123456789 // Event time
+  s: 'ABC_0DX-BNB' // Symbol
+
+  b: '0.0024' // Best bid price
+  B: '10' // Best bid quantity
+  a: '0.0026' // Best ask price
+  A: '100' // Best ask quantity
 }

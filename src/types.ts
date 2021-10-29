@@ -65,15 +65,15 @@ export type DerivativeTicker = {
   readonly localTimestamp: Date
 }
 
-export type Quote = {
-  readonly type: 'quote'
+export type BookTicker = {
+  readonly type: 'book_ticker'
   readonly symbol: string
   readonly exchange: Exchange
 
-  readonly askAmount: number
-  readonly askPrice: number
-  readonly bidPrice: number
-  readonly bidAmount: number
+  readonly askAmount: number | undefined
+  readonly askPrice: number | undefined
+  readonly bidPrice: number | undefined
+  readonly bidAmount: number | undefined
 
   readonly timestamp: Date
   readonly localTimestamp: Date

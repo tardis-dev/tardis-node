@@ -1,7 +1,10 @@
 import { Mapper } from './mapper'
-import { Trade, BookChange } from '../types'
+import { Trade, BookChange, BookTicker, Exchange } from '../types'
+import { asNumberIfValid } from '../handy'
 
-export class SerumTradesMapper implements Mapper<'serum', Trade> {
+export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: SerumVialTrade) {
     return message.type === 'trade'
   }
@@ -19,7 +22,7 @@ export class SerumTradesMapper implements Mapper<'serum', Trade> {
     yield {
       type: 'trade',
       symbol: message.market,
-      exchange: 'serum',
+      exchange: this._exchange,
       id: message.id,
       price: Number(message.price),
       amount: Number(message.size),
@@ -30,7 +33,9 @@ export class SerumTradesMapper implements Mapper<'serum', Trade> {
   }
 }
 
-export class SerumBookChangeMapper implements Mapper<'serum', BookChange> {
+export class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', BookChange> {
+  constructor(private readonly _exchange: Exchange) {}
+
   canHandle(message: SerumVialL2Snapshot | SerumVialL2Update) {
     return message.type === 'l2snapshot' || message.type === 'l2update'
   }
@@ -52,7 +57,7 @@ export class SerumBookChangeMapper implements Mapper<'serum', BookChange> {
     yield {
       type: 'book_change',
       symbol: message.market,
-      exchange: 'serum',
+      exchange: this._exchange,
       isSnapshot: message.type === 'l2snapshot',
       bids: message.bids.map(this.mapBookLevel),
       asks: message.asks.map(this.mapBookLevel),
@@ -65,6 +70,39 @@ export class SerumBookChangeMapper implements Mapper<'serum', BookChange> {
     const price = Number(level[0])
     const amount = Number(level[1])
     return { price, amount }
+  }
+}
+
+export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', BookTicker> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: SerumVialQuote) {
+    return message.type === 'quote'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'quote',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: SerumVialQuote, localTimestamp: Date): IterableIterator<BookTicker> {
+    yield {
+      type: 'book_ticker',
+      symbol: message.market,
+      exchange: this._exchange,
+
+      askAmount: message.bestAsk !== undefined ? asNumberIfValid(message.bestAsk[1]) : undefined,
+      askPrice: message.bestAsk !== undefined ? asNumberIfValid(message.bestAsk[0]) : undefined,
+
+      bidPrice: message.bestBid !== undefined ? asNumberIfValid(message.bestBid[0]) : undefined,
+      bidAmount: message.bestBid !== undefined ? asNumberIfValid(message.bestBid[1]) : undefined,
+      timestamp: new Date(message.timestamp),
+      localTimestamp: localTimestamp
+    }
   }
 }
 
@@ -100,4 +138,14 @@ type SerumVialL2Update = {
   version: 3
   asks: SerumVialPriceLevel[]
   bids: SerumVialPriceLevel[]
+}
+
+type SerumVialQuote = {
+  type: 'quote'
+  market: string
+  timestamp: string
+  slot: number
+  version: number
+  bestAsk: [price: string, size: string] | undefined
+  bestBid: [price: string, size: string] | undefined
 }

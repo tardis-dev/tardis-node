@@ -5,7 +5,8 @@ import {
   normalizeDerivativeTickers,
   normalizeTrades,
   normalizeOptionsSummary,
-  normalizeLiquidations
+  normalizeLiquidations,
+  normalizeBookTickers
 } from '../src'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -28,6 +29,34 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm-linear-swap',
   'ascendex',
   'dydx'
+]
+
+const exchangesWithBookTickerInfo: Exchange[] = [
+  'ascendex',
+  'binance',
+  'binance-futures',
+  'binance-delivery',
+  'binance-dex',
+  'bitfinex',
+  'bitfinex-derivatives',
+  'bitflyer',
+  'bitmex',
+  'coinbase',
+  'cryptofacilities',
+  'deribit',
+  'ftx',
+  'ftx-us',
+  'huobi',
+  'huobi-dm',
+  'huobi-dm-linear-swap',
+  'huobi-dm-swap',
+  'kraken',
+  'okex',
+  'okex-futures',
+  'okex-swap',
+  'okex-options',
+  'okcoin',
+  'serum'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -60,6 +89,10 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 
   if (exchangesWithLiquidationsSupport.includes(exchange)) {
     normalizers.push(normalizeLiquidations)
+  }
+
+  if (exchangesWithBookTickerInfo.includes(exchange)) {
+    normalizers.push(normalizeBookTickers)
   }
 
   const mappersForExchange = normalizers.map((m: any) => m(exchange, localTimestamp)) as Mapper<any, any>[]
@@ -698,7 +731,15 @@ describe('mappers', () => {
         action: 'insert',
         data: [{ orderID: 'dd9cea25-207c-0dab-15b5-b88da776f500', symbol: 'XBTUSD', side: 'Buy', price: 10106, leavesQty: 9214 }]
       },
-      { table: 'liquidation', action: 'delete', data: [{ orderID: 'dd9cea25-207c-0dab-15b5-b88da776f500', symbol: 'XBTUSD' }] }
+      { table: 'liquidation', action: 'delete', data: [{ orderID: 'dd9cea25-207c-0dab-15b5-b88da776f500', symbol: 'XBTUSD' }] },
+      {
+        table: 'quote',
+        action: 'insert',
+        data: [
+          { timestamp: '2021-10-13T07:07:00.106Z', symbol: 'XBTUSD', bidSize: 2700, bidPrice: 55411, askPrice: 55411.5, askSize: 205100 },
+          { timestamp: '2021-10-13T07:07:01.010Z', symbol: 'XBTUSD', bidSize: 700, bidPrice: 55400, askPrice: 55400.5, askSize: 241500 }
+        ]
+      }
     ]
 
     const bitmexMapper = createMapper('bitmex')
@@ -782,6 +823,48 @@ describe('mappers', () => {
             size: '0.12',
             timestamp: '2019-08-01T00:00:08.807Z',
             trade_id: '423886240'
+          }
+        ]
+      },
+      {
+        table: 'spot/ticker',
+        data: [
+          {
+            instrument_id: 'EOS-USDT',
+            last: '2.585',
+            last_qty: '27.461',
+            best_bid: '2.584',
+            best_bid_size: '1574.0289',
+            best_ask: '2.585',
+            best_ask_size: '849.6017',
+            open_24h: '2.625',
+            high_24h: '2.652',
+            low_24h: '2.565',
+            base_volume_24h: '5681140.617',
+            quote_volume_24h: '14812717.779',
+            timestamp: '2019-12-31T23:59:58.352Z'
+          }
+        ]
+      },
+      {
+        table: 'spot/ticker',
+        data: [
+          {
+            last: '3.9382',
+            open_24h: '3.744',
+            best_bid: '3.9383',
+            high_24h: '3.9477',
+            low_24h: '3.7212',
+            open_utc0: '3.744',
+            open_utc8: '3.8902',
+            base_volume_24h: '3884430.836',
+            quote_volume_24h: '15059329.85077',
+            best_ask: '3.9385',
+            instrument_id: 'EOS-USDT',
+            timestamp: '2021-09-30T23:59:59.874Z',
+            best_bid_size: '0.350812',
+            best_ask_size: '235',
+            last_qty: '1.19892'
           }
         ]
       }
@@ -911,6 +994,65 @@ describe('mappers', () => {
             bids: [['2.25', '1459', '0', '1']],
             timestamp: '2019-12-03T15:14:59.904Z',
             checksum: 1099728614
+          }
+        ]
+      },
+      {
+        table: 'futures/ticker',
+        data: [
+          {
+            last: '7181.47',
+            open_24h: '7237.34',
+            best_bid: '7181.22',
+            high_24h: '7319.1',
+            low_24h: '7131.35',
+            volume_24h: '2602513',
+            volume_token_24h: '36069.935',
+            best_ask: '7181.95',
+            open_interest: '530385',
+            instrument_id: 'BTC-USD-200103',
+            timestamp: '2019-12-31T23:59:59.382Z'
+          }
+        ]
+      },
+      {
+        table: 'futures/ticker',
+        data: [
+          {
+            last: '7181.47',
+            open_24h: '7237.34',
+            best_bid: '7181.22',
+            high_24h: '7319.1',
+            low_24h: '7131.35',
+            volume_24h: '2602513',
+            volume_token_24h: '36069.935',
+            best_ask: '7181.95',
+            open_interest: '530385',
+            instrument_id: 'BTC-USD-200103',
+            timestamp: '2019-12-31T23:59:59.382Z'
+          }
+        ]
+      },
+      {
+        table: 'futures/ticker',
+        data: [
+          {
+            last: '47.826',
+            open_24h: '46.281',
+            best_bid: '47.799',
+            high_24h: '48.122',
+            low_24h: '46.061',
+            open_utc0: '46.281',
+            open_utc8: '47.314',
+            volume_24h: '1737691',
+            volume_token_24h: '366790.4051',
+            best_ask: '47.837',
+            open_interest: '160296.0000000000000000',
+            instrument_id: 'ETC-USD-220325',
+            timestamp: '2021-09-30T23:59:59.965Z',
+            best_bid_size: '112',
+            best_ask_size: '20',
+            last_qty: '65'
           }
         ]
       }
@@ -1091,6 +1233,45 @@ describe('mappers', () => {
             size: '0.12',
             timestamp: '2019-08-01T00:00:08.816Z',
             trade_id: '423886240'
+          }
+        ]
+      },
+      {
+        table: 'swap/ticker',
+        data: [
+          {
+            last: '9337.7',
+            open_24h: '9508.4',
+            best_bid: '9336.6',
+            high_24h: '9525.3',
+            low_24h: '9189',
+            volume_24h: '6004144',
+            volume_token_24h: '64331.636',
+            best_ask: '9336.7',
+            open_interest: '2233398',
+            instrument_id: 'BTC-USD-SWAP',
+            timestamp: '2020-01-31T23:59:53.276Z'
+          }
+        ]
+      },
+      {
+        table: 'swap/ticker',
+        data: [
+          {
+            last: '11654.5',
+            open_24h: '11722.1',
+            best_bid: '11654.5',
+            high_24h: '11782',
+            low_24h: '11580',
+            volume_24h: '3590081',
+            volume_token_24h: '30713.1647',
+            best_ask: '11654.6',
+            open_interest: '1322785',
+            instrument_id: 'BTC-USD-SWAP',
+            timestamp: '2020-09-01T00:00:00.453Z',
+            best_bid_size: '3690',
+            best_ask_size: '2190',
+            last_qty: '2'
           }
         ]
       }
@@ -1407,6 +1588,27 @@ describe('mappers', () => {
             timestamp: '2020-07-24T07:00:00.001Z'
           }
         ]
+      },
+      {
+        table: 'option/ticker',
+        data: [
+          {
+            last: '0.0315',
+            open_24h: '0.0295',
+            best_bid: '0.0285',
+            high_24h: '0.0315',
+            low_24h: '0.0295',
+            volume_24h: '10',
+            volume_token_24h: '1',
+            best_ask: '0.0305',
+            open_interest: '354',
+            instrument_id: 'BTC-USD-200327-8000-P',
+            timestamp: '2020-01-31T23:59:06.622Z',
+            best_bid_size: '405',
+            best_ask_size: '305',
+            last_qty: '0'
+          }
+        ]
       }
     ]
 
@@ -1448,7 +1650,47 @@ describe('mappers', () => {
       [6959, [219.11, 3, -18.10913638], 45, 1564617601214],
       [6959, [218.99, 0, -1], 61, 1564617601769],
       [6959, [218.03, 0, 1], 430, 1564617602483],
-      [6959, 'hb', 3603, 1569715249702]
+
+      [6959, 'hb', 3603, 1569715249702],
+      { event: 'subscribed', channel: 'ticker', chanId: 103542, symbol: 'tBTCUSD', pair: 'BTCUSD' },
+      [
+        94952,
+        [
+          0.00002271, 657877.4673439099, 0.00002274, 197418.99101772, -0.00000177, -0.0177, 0.00002276, 81802.36928943, 0.00002453,
+          0.00002276
+        ],
+        9797,
+        1633910436166,
+        'ticker',
+        'MATIC:BTC'
+      ],
+      { event: 'subscribed', channel: 'ticker', chanId: 129136, symbol: 'fBTC', currency: 'BTC' },
+
+      [
+        129136,
+        [
+          0.000012589041095890411,
+          0.00000788,
+          90,
+          150.27107061000004,
+          4.5e-7,
+          2,
+          1775.8614332800003,
+          -0.00000245,
+          -0.0245,
+          9e-7,
+          6320.78681972,
+          0.00001729,
+          1e-8,
+          null,
+          null,
+          14121.77787059
+        ],
+        92,
+        1633910430074,
+        'ticker',
+        'BTC'
+      ]
     ]
     const bitfinex = createMapper('bitfinex')
     for (const message of messages) {
@@ -1875,6 +2117,34 @@ describe('mappers', () => {
           L: '16916084-0',
           n: 276
         }
+      },
+      {
+        stream: 'ticker',
+        data: {
+          e: '24hrTicker',
+          E: 1633913580,
+          s: 'ARN-71B_BNB',
+          p: '0.00000438',
+          P: '0.03990000',
+          w: '0.00010380',
+          x: '0.00011399',
+          c: '0.00011399',
+          Q: '50.00000000',
+          b: '0.00010500',
+          B: '200.00000000',
+          a: '0.00011100',
+          A: '2110.00000000',
+          o: '0.00010961',
+          h: '0.00011399',
+          l: '0.00009701',
+          v: '95530.00000000',
+          q: '9.91591940',
+          O: 1633827179000,
+          C: 1633913579000,
+          F: '194931754-0',
+          L: '195141197-1',
+          n: 121
+        }
       }
     ]
 
@@ -2060,6 +2330,20 @@ describe('mappers', () => {
           r: '0.00000000',
           T: 0
         }
+      },
+      {
+        stream: 'btcusdt@bookTicker',
+        data: {
+          e: 'bookTicker',
+          u: 185130926750,
+          s: 'BTCUSDT',
+          b: '33134.42',
+          B: '0.170',
+          a: '33139.39',
+          A: '0.380',
+          T: 1612137603568,
+          E: 1612137603571
+        }
       }
     ]
 
@@ -2178,6 +2462,21 @@ describe('mappers', () => {
       {
         stream: 'etcusdt@trade',
         data: { e: 'trade', E: 1618716867643, T: 1618716867639, s: 'ETCUSDT', t: 84242137, p: '852.722', q: '0.05', X: 'ADL', m: true }
+      },
+      {
+        stream: 'bnbusd_perp@bookTicker',
+        data: {
+          u: 129067660302,
+          e: 'bookTicker',
+          s: 'BNBUSD_PERP',
+          ps: 'BNBUSD',
+          b: '353.401',
+          B: '271',
+          a: '353.477',
+          A: '6',
+          T: 1622505600000,
+          E: 1622505600005
+        }
       }
     ]
 
@@ -2547,6 +2846,56 @@ describe('mappers', () => {
         time: 1593620853613,
         qty: 250,
         price: 231.6
+      },
+
+      {
+        feed: 'ticker',
+        product_id: 'FI_ETHUSD_190426',
+        bid: 141.4,
+        ask: 141.5,
+        bid_size: 10000.0,
+        ask_size: 5873.0,
+        volume: 287575.0,
+        dtm: 25,
+        leverage: '50x',
+        index: 141.16,
+        premium: 0.2,
+        last: 141.8,
+        time: 1554076798897,
+        change: 0.6,
+        suspended: false,
+        tag: 'month',
+        pair: 'ETH:USD',
+        openInterest: 393129.0,
+        markPrice: 141.45,
+        maturityTime: 1556290800000
+      },
+      {
+        time: 1617235200598,
+        feed: 'ticker',
+        product_id: 'PI_LTCUSD',
+        bid: 196.89,
+        ask: 197.21,
+        bid_size: 2875.0,
+        ask_size: 839.0,
+        volume: 4304857.0,
+        dtm: 0,
+        leverage: '50x',
+        index: 196.82,
+        premium: 0.1,
+        last: 196.85,
+        change: 0.5054630858776665,
+        funding_rate: 7.94427729016e-7,
+        funding_rate_prediction: 7.94427729016e-7,
+        suspended: false,
+        tag: 'perpetual',
+        pair: 'LTC:USD',
+        openInterest: 2239386.0,
+        markPrice: 197.05,
+        maturityTime: 0,
+        relative_funding_rate: 0.000156359265625,
+        relative_funding_rate_prediction: 0.000156359265625,
+        next_funding_rate_time: 1617249600000
       }
     ]
 
@@ -2609,6 +2958,52 @@ describe('mappers', () => {
               sell_child_order_acceptance_id: 'JRF20190901-000006-323731'
             }
           ]
+        }
+      },
+
+      {
+        jsonrpc: '2.0',
+        method: 'channelMessage',
+        params: {
+          channel: 'lightning_ticker_BTC_JPY',
+          message: {
+            product_code: 'BTC_JPY',
+            timestamp: '2019-09-01T00:00:01.2477968Z',
+            tick_id: 2470920,
+            best_bid: 1020000.0,
+            best_ask: 1020332.0,
+            best_bid_size: 0.03,
+            best_ask_size: 0.2,
+            total_bid_depth: 875.75561073,
+            total_ask_depth: 2073.74153664,
+            ltp: 1020001.0,
+            volume: 1683.35387311,
+            volume_by_product: 1683.35387311
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'channelMessage',
+        params: {
+          channel: 'lightning_ticker_ETH_JPY',
+          message: {
+            product_code: 'ETH_JPY',
+            state: 'RUNNING',
+            timestamp: '2021-09-01T00:00:00.2115808Z',
+            tick_id: 2830807,
+            best_bid: 376592.0,
+            best_ask: 376676.0,
+            best_bid_size: 0.01,
+            best_ask_size: 0.4,
+            total_bid_depth: 5234.4333389,
+            total_ask_depth: 1511.52678,
+            market_bid_size: 0.0,
+            market_ask_size: 0.0,
+            ltp: 376789.0,
+            volume: 37853.5120461,
+            volume_by_product: 37853.5120461
+          }
         }
       }
     ]
@@ -2779,6 +3174,12 @@ describe('mappers', () => {
         market: 'BTC-PERP',
         type: 'update',
         data: [{ id: 114724653, price: 10683.5, size: 0.0149, side: 'buy', liquidation: true, time: '2020-09-15T00:02:05.787437+00:00' }]
+      },
+      {
+        channel: 'ticker',
+        market: 'BTC/EUR',
+        type: 'update',
+        data: { bid: 54346.0, ask: 54411.0, bidSize: 0.0919, askSize: 0.0048, last: 54315.0, time: 1635206400.0866942 }
       }
     ]
 
@@ -2829,6 +3230,40 @@ describe('mappers', () => {
           ['40533.24', '0.020416'],
           ['40531.19', '0.-10000']
         ]
+      },
+      {
+        type: 'ticker',
+        sequence: 8176375276,
+        product_id: 'BTC-USD',
+        price: '4095.00000000',
+        open_24h: '4094.14000000',
+        volume_24h: '3142.70640811',
+        low_24h: '4077.01000000',
+        high_24h: '4103.00000000',
+        volume_30d: '183219.70896887',
+        best_bid: '4094.99',
+        best_ask: '4095',
+        side: 'buy',
+        time: '2019-04-01T00:00:04.540000Z',
+        trade_id: 61165589,
+        last_size: '2.00000000'
+      },
+      {
+        type: 'ticker',
+        sequence: 23345076686,
+        product_id: 'BTC-USD',
+        price: '58800.01',
+        open_24h: '58786.46',
+        volume_24h: '17374.93342584',
+        low_24h: '56873.8',
+        high_24h: '59800',
+        volume_30d: '582258.79522269',
+        best_bid: '58800.00',
+        best_ask: '58800.01',
+        side: 'buy',
+        time: '2021-04-01T00:00:01.618503Z',
+        trade_id: 151521557,
+        last_size: '0.05'
       }
     ]
 
@@ -3016,7 +3451,8 @@ describe('mappers', () => {
         ,
         'book-1000',
         'ADA/CAD'
-      ]
+      ],
+      [325, ['43770.20000', '43770.30000', '1633053779.916349', '0.00917717', '0.31670440'], 'spread', 'XBT/USD']
     ]
 
     const krakenMapper = createMapper('kraken')
@@ -3378,6 +3814,19 @@ describe('mappers', () => {
           asks: [[9137.68, 3.691799]],
           bids: [[9137.67, 2.389677]]
         }
+      },
+      {
+        ch: 'market.btcusdt.bbo',
+        ts: 1575158404058,
+        tick: {
+          seqId: 103273695595,
+          ask: 7543.59,
+          askSize: 2.323241,
+          bid: 7541.16,
+          bidSize: 0.002329,
+          quoteTime: 1575158404057,
+          symbol: 'btcusdt'
+        }
       }
     ]
 
@@ -3549,6 +3998,32 @@ describe('mappers', () => {
             created_at: 1593593169156
           }
         ]
+      },
+      {
+        ch: 'market.BTC_CW.bbo',
+        ts: 1593561603501,
+        tick: {
+          mrid: 77909396157,
+          id: 1593561603,
+          bid: [9142.12, 6091],
+          ask: [9142.13, 68],
+          ts: 1593561603500,
+          version: 77909396157,
+          ch: 'market.BTC_CW.bbo'
+        }
+      },
+      {
+        ch: 'market.BTC_CW.bbo',
+        ts: 1633046407225,
+        tick: {
+          mrid: 147102064535,
+          id: 1633046407,
+          bid: [43812.82, 7],
+          ask: [43829.95, 3],
+          ts: 1633046407225,
+          version: 147102064535,
+          ch: 'market.BTC_CW.bbo'
+        }
       }
     ]
 
@@ -3660,6 +4135,19 @@ describe('mappers', () => {
             created_at: 1593585531562
           }
         ]
+      },
+      {
+        ch: 'market.BTC-USD.bbo',
+        ts: 1630454400735,
+        tick: {
+          mrid: 114759822380,
+          id: 1630454400,
+          bid: [47152.3, 1436],
+          ask: [47152.4, 4635],
+          ts: 1630454400734,
+          version: 114759822380,
+          ch: 'market.BTC-USD.bbo'
+        }
       }
     ]
 
@@ -3766,6 +4254,19 @@ describe('mappers', () => {
             trade_turnover: 5300.5635
           }
         ]
+      },
+      {
+        ch: 'market.BTC-USDT.bbo',
+        ts: 1630454400495,
+        tick: {
+          mrid: 64797873746,
+          id: 1630454400,
+          bid: [47176.5, 1],
+          ask: [47176.6, 9249],
+          ts: 1630454400495,
+          version: 64797873746,
+          ch: 'market.BTC-USDT.bbo'
+        }
       }
     ]
 
@@ -5290,7 +5791,9 @@ describe('mappers', () => {
           }
         ],
         col: [{ a: 'BCH', p: '552.29' }]
-      }
+      },
+
+      { m: 'bbo', symbol: 'PROM/USDT', data: { ts: 1633910400019, bid: ['17.39749', '2'], ask: ['17.67664', '21'] } }
     ]
 
     const ascendexMapper = createMapper('ascendex')
@@ -5490,6 +5993,15 @@ describe('mappers', () => {
         side: 'buy',
         price: '5.235',
         size: '185.8'
+      },
+      {
+        type: 'quote',
+        market: 'OXY/USDT',
+        timestamp: '2021-09-30T23:55:43.411Z',
+        slot: 99161001,
+        version: 3,
+        bestAsk: ['2.2417', '995'],
+        bestBid: ['2.2173', '3051']
       }
     ]
 

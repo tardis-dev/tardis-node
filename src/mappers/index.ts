@@ -1,27 +1,40 @@
 import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, Liquidation, OptionSummary, Quote, Trade } from '../types'
-import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexTradesMapper } from './ascendex'
+import { BookChange, DerivativeTicker, Liquidation, OptionSummary, BookTicker, Trade } from '../types'
+import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexBookTickerMapper, AscendexTradesMapper } from './ascendex'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
   BinanceFuturesDerivativeTickerMapper,
   BinanceLiquidationsMapper,
-  BinanceQuotesMapper,
+  BinanceBookTickerMapper,
   BinanceTradesMapper
 } from './binance'
-import { binanceDexBookChangeMapper, binanceDexTradesMapper } from './binancedex'
+import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex'
 import { BinanceOptionsBookChangeMapper, BinanceOptionsTradesMapper, BinanceOptionSummaryMapper } from './binanceoptions'
-import { BitfinexBookChangeMapper, BitfinexDerivativeTickerMapper, BitfinexLiquidationsMapper, BitfinexTradesMapper } from './bitfinex'
-import { BitflyerBookChangeMapper, bitflyerTradesMapper } from './bitflyer'
-import { BitmexBookChangeMapper, BitmexDerivativeTickerMapper, bitmexLiquidationsMapper, bitmexTradesMapper } from './bitmex'
+import {
+  BitfinexBookChangeMapper,
+  BitfinexDerivativeTickerMapper,
+  BitfinexLiquidationsMapper,
+  BitfinexBookTickerMapper,
+  BitfinexTradesMapper
+} from './bitfinex'
+import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer'
+import {
+  BitmexBookChangeMapper,
+  BitmexDerivativeTickerMapper,
+  bitmexLiquidationsMapper,
+  bitmexBookTickerMapper,
+  bitmexTradesMapper
+} from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
-import { CoinbaseBookChangMapper, coinbaseTradesMapper } from './coinbase'
+import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import {
   cryptofacilitiesBookChangeMapper,
   CryptofacilitiesDerivativeTickerMapper,
   cryptofacilitiesLiquidationsMapper,
+  cryptofacilitiesBookTickerMapper,
   cryptofacilitiesTradesMapper
 } from './cryptofacilities'
 import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta'
@@ -30,10 +43,11 @@ import {
   DeribitDerivativeTickerMapper,
   deribitLiquidationsMapper,
   DeribitOptionSummaryMapper,
+  deribitBookTickerMapper,
   deribitTradesMapper
 } from './deribit'
 import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
-import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXTradesMapper } from './ftx'
+import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
 import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
@@ -44,14 +58,22 @@ import {
   HuobiLiquidationsMapper,
   HuobiMBPBookChangeMapper,
   HuobiOptionsSummaryMapper,
+  HuobiBookTickerMapper,
   HuobiTradesMapper
 } from './huobi'
-import { krakenBookChangeMapper, krakenTradesMapper } from './kraken'
+import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
 import { Mapper } from './mapper'
-import { OkexBookChangeMapper, OkexDerivativeTickerMapper, OkexLiquidationsMapper, OkexOptionSummaryMapper, OkexTradesMapper } from './okex'
+import {
+  OkexBookChangeMapper,
+  OkexBookTickerMapper,
+  OkexDerivativeTickerMapper,
+  OkexLiquidationsMapper,
+  OkexOptionSummaryMapper,
+  OkexTradesMapper
+} from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
-import { SerumBookChangeMapper, SerumTradesMapper } from './serum'
+import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
 
 export * from './mapper'
@@ -106,8 +128,8 @@ const tradesMappers = {
   upbit: () => new UpbitTradesMapper(),
   ascendex: () => new AscendexTradesMapper(),
   dydx: () => new DydxTradesMapper(),
-  serum: () => new SerumTradesMapper(),
-  'star-atlas': () => new SerumTradesMapper()
+  serum: () => new SerumTradesMapper('serum'),
+  'star-atlas': () => new SerumTradesMapper('star-atlas')
 }
 
 const bookChangeMappers = {
@@ -162,8 +184,8 @@ const bookChangeMappers = {
   upbit: () => new UpbitBookChangeMapper(),
   ascendex: () => new AscendexBookChangeMapper(),
   dydx: () => new DydxBookChangeMapper(),
-  serum: () => new SerumBookChangeMapper(),
-  'star-atlas': () => new SerumBookChangeMapper()
+  serum: () => new SerumBookChangeMapper('serum'),
+  'star-atlas': () => new SerumBookChangeMapper('star-atlas')
 }
 
 const derivativeTickersMappers = {
@@ -211,11 +233,34 @@ const liquidationsMappers = {
   'okex-swap': () => new OkexLiquidationsMapper('okex-swap', 'swap')
 }
 
-const quotesMappers = {
-  binance: () => new BinanceQuotesMapper('binance'),
-  'binance-futures': () => new BinanceQuotesMapper('binance-futures'),
-  'binance-delivery': () => new BinanceQuotesMapper('binance-delivery'),
-  'binance-us': () => new BinanceQuotesMapper('binance-us')
+const bookTickersMappers = {
+  binance: () => new BinanceBookTickerMapper('binance'),
+  'binance-futures': () => new BinanceBookTickerMapper('binance-futures'),
+  'binance-delivery': () => new BinanceBookTickerMapper('binance-delivery'),
+  'binance-us': () => new BinanceBookTickerMapper('binance-us'),
+  ascendex: () => new AscendexBookTickerMapper(),
+  'binance-dex': () => binanceDexBookTickerMapper,
+  bitfinex: () => new BitfinexBookTickerMapper('bitfinex'),
+  'bitfinex-derivatives': () => new BitfinexBookTickerMapper('bitfinex-derivatives'),
+  bitflyer: () => bitflyerBookTickerMapper,
+  bitmex: () => bitmexBookTickerMapper,
+  coinbase: () => coinbaseBookTickerMapper,
+  cryptofacilities: () => cryptofacilitiesBookTickerMapper,
+  deribit: () => deribitBookTickerMapper,
+  ftx: () => new FTXBookTickerMapper('ftx'),
+  'ftx-us': () => new FTXBookTickerMapper('ftx-us'),
+  huobi: () => new HuobiBookTickerMapper('huobi'),
+  'huobi-dm': () => new HuobiBookTickerMapper('huobi-dm'),
+  'huobi-dm-swap': () => new HuobiBookTickerMapper('huobi-dm-swap'),
+  'huobi-dm-linear-swap': () => new HuobiBookTickerMapper('huobi-dm-linear-swap'),
+  kraken: () => krakenBookTickerMapper,
+  okex: () => new OkexBookTickerMapper('okex', 'spot'),
+  'okex-futures': () => new OkexBookTickerMapper('okex-futures', 'futures'),
+  'okex-swap': () => new OkexBookTickerMapper('okex-swap', 'swap'),
+  'okex-options': () => new OkexBookTickerMapper('okex-options', 'option'),
+  okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
+  serum: () => new SerumBookTickerMapper('serum'),
+  'star-atlas': () => new SerumBookTickerMapper('star-atlas')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {
@@ -280,12 +325,15 @@ export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers
   return createLiquidationsMapper() as any
 }
 
-export const normalizeQuotes = <T extends keyof typeof quotesMappers>(exchange: T, _localTimestamp: Date): Mapper<T, Quote> => {
-  const createQuotesMapper = quotesMappers[exchange]
+export const normalizeBookTickers = <T extends keyof typeof bookTickersMappers>(
+  exchange: T,
+  _localTimestamp: Date
+): Mapper<T, BookTicker> => {
+  const createTickerMapper = bookTickersMappers[exchange]
 
-  if (createQuotesMapper === undefined) {
-    throw new Error(`normalizeQuotes: ${exchange} not supported`)
+  if (createTickerMapper === undefined) {
+    throw new Error(`normalizeBookTickers: ${exchange} not supported`)
   }
 
-  return createQuotesMapper() as any
+  return createTickerMapper() as any
 }

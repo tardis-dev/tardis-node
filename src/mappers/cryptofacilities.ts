@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Liquidation, Trade } from '../types'
+import { BookChange, DerivativeTicker, Liquidation, BookTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API
@@ -153,6 +153,39 @@ export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liqu
   }
 }
 
+export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
+  canHandle(message: CryptofacilitiesTicker) {
+    return message.feed === 'ticker'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      }
+    ]
+  },
+
+  *map(cryptofacilitiesTicker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: cryptofacilitiesTicker.product_id,
+      exchange: 'cryptofacilities',
+
+      askAmount: cryptofacilitiesTicker.ask_size,
+      askPrice: cryptofacilitiesTicker.ask,
+
+      bidPrice: cryptofacilitiesTicker.bid,
+      bidAmount: cryptofacilitiesTicker.bid_size,
+      timestamp: new Date(cryptofacilitiesTicker.time),
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type CryptofacilitiesTrade = {
   feed: 'trade'
   type: 'liquidation' | 'fill'
@@ -177,6 +210,10 @@ type CryptofacilitiesTicker = {
   funding_rate_prediction: number | undefined
   next_funding_rate_time: number | undefined
   time: number
+  bid: number | undefined
+  ask: number | undefined
+  bid_size: number | undefined
+  ask_size: number | undefined
 }
 
 type CryptofacilitiesBookLevel = {

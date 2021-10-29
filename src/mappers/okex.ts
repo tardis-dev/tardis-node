@@ -1,5 +1,5 @@
 import { asNumberIfValid } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation } from '../types'
+import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.okex.com/docs/en/#ws_swap-README
@@ -295,6 +295,43 @@ export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidatio
   }
 }
 
+export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
+  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+
+  canHandle(message: OkexDataMessage) {
+    return message.table === `${this._market}/ticker`
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: `${this._market}/ticker`,
+        symbols
+      } as any
+    ]
+  }
+
+  *map(message: OkexTickersMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    for (const okexTicker of message.data) {
+      const ticker: BookTicker = {
+        type: 'book_ticker',
+        symbol: okexTicker.instrument_id,
+        exchange: this._exchange,
+
+        askAmount: asNumberIfValid(okexTicker.best_ask_size),
+        askPrice: asNumberIfValid(okexTicker.best_ask),
+
+        bidPrice: asNumberIfValid(okexTicker.best_bid),
+        bidAmount: asNumberIfValid(okexTicker.best_bid_size),
+        timestamp: new Date(okexTicker.timestamp),
+        localTimestamp: localTimestamp
+      }
+
+      yield ticker
+    }
+  }
+}
+
 type OkexDataMessage = {
   table: string
 }
@@ -330,6 +367,8 @@ type OkexTickersMessage = {
     open_interest: string | undefined
     instrument_id: string
     timestamp: string
+    best_bid_size: string | undefined
+    best_ask_size: string | undefined
   }[]
 }
 

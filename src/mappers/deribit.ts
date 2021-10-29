@@ -1,4 +1,5 @@
-import { BookChange, DerivativeTicker, Trade, OptionSummary, Liquidation } from '../types'
+import { asNumberIfValid } from '../handy'
+import { BookChange, DerivativeTicker, Trade, OptionSummary, Liquidation, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
@@ -162,15 +163,15 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
       strikePrice,
       expirationDate,
 
-      bestBidPrice: optionInfo.best_bid_price === 0 ? undefined : optionInfo.best_bid_price,
-      bestBidAmount: optionInfo.best_bid_amount === 0 ? undefined : optionInfo.best_bid_amount,
-      bestBidIV: optionInfo.bid_iv === 0 ? undefined : optionInfo.bid_iv,
+      bestBidPrice: asNumberIfValid(optionInfo.best_bid_price),
+      bestBidAmount: asNumberIfValid(optionInfo.best_bid_amount),
+      bestBidIV: asNumberIfValid(optionInfo.bid_iv),
 
-      bestAskPrice: optionInfo.best_ask_price === 0 ? undefined : optionInfo.best_ask_price,
-      bestAskAmount: optionInfo.best_ask_amount === 0 ? undefined : optionInfo.best_ask_amount,
-      bestAskIV: optionInfo.ask_iv === 0 ? undefined : optionInfo.ask_iv,
+      bestAskPrice: asNumberIfValid(optionInfo.best_ask_price),
+      bestAskAmount: asNumberIfValid(optionInfo.best_ask_amount),
+      bestAskIV: asNumberIfValid(optionInfo.ask_iv),
 
-      lastPrice: optionInfo.last_price !== null ? optionInfo.last_price : undefined,
+      lastPrice: asNumberIfValid(optionInfo.last_price),
       openInterest: optionInfo.open_interest,
 
       markPrice: optionInfo.mark_price,
@@ -239,6 +240,46 @@ export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
   }
 }
 
+export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
+  canHandle(message: any) {
+    const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
+    if (channel === undefined) {
+      return false
+    }
+
+    return channel.startsWith('ticker')
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      }
+    ]
+  },
+
+  *map(message: DeribitTickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    const deribitTicker = message.params.data
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: deribitTicker.instrument_name,
+      exchange: 'deribit',
+
+      askAmount: asNumberIfValid(deribitTicker.best_ask_amount),
+      askPrice: asNumberIfValid(deribitTicker.best_ask_price),
+      bidPrice: asNumberIfValid(deribitTicker.best_bid_price),
+      bidAmount: asNumberIfValid(deribitTicker.best_bid_amount),
+
+      timestamp: new Date(deribitTicker.timestamp),
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type DeribitMessage = {
   params: {
     channel: string
@@ -279,17 +320,21 @@ type DeribitTickerMessage = DeribitMessage & {
     data: {
       timestamp: number
       open_interest: number
-      last_price: number | null
+      last_price: number | undefined
       mark_price: number
       instrument_name: string
       index_price: number
       current_funding?: number
       funding_8h?: number
+      best_bid_price: number | undefined
+      best_bid_amount: number | undefined
+      best_ask_price: number | undefined
+      best_ask_amount: number | undefined
     }
   }
 }
 
-type DeribitOptionTickerMessage = DeribitMessage & {
+type DeribitOptionTickerMessage = DeribitTickerMessage & {
   params: {
     data: {
       underlying_price: number
@@ -299,15 +344,8 @@ type DeribitOptionTickerMessage = DeribitMessage & {
       mark_price: number
       mark_iv: number
       last_price: number | null
-
-      instrument_name: string
       greeks: { vega: number; theta: number; rho: number; gamma: number; delta: number }
-
       bid_iv: number | undefined
-      best_bid_price: number | undefined
-      best_bid_amount: number | undefined
-      best_ask_price: number | undefined
-      best_ask_amount: number | undefined
       ask_iv: number | undefined
     }
   }

@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 import { asNumberIfValid, CircularBuffer } from '../handy'
 
@@ -512,6 +512,62 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
   }
 }
 
+export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookTicker> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: HuobiDataMessage) {
+    if (message.ch === undefined) {
+      return false
+    }
+    return message.ch.endsWith('.bbo')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = normalizeSymbols(symbols)
+
+    return [
+      {
+        channel: 'bbo',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: HuobiBBOMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    const symbol = message.ch.split('.')[1].toUpperCase()
+
+    if ('seqId' in message.tick) {
+      yield {
+        type: 'book_ticker',
+        symbol,
+        exchange: this._exchange,
+
+        askAmount: asNumberIfValid(message.tick.askSize),
+        askPrice: asNumberIfValid(message.tick.ask),
+
+        bidPrice: asNumberIfValid(message.tick.bid),
+        bidAmount: asNumberIfValid(message.tick.bidSize),
+        timestamp: new Date(message.tick.quoteTime),
+        localTimestamp: localTimestamp
+      }
+    } else {
+      yield {
+        type: 'book_ticker',
+        symbol,
+        exchange: this._exchange,
+
+        askAmount: asNumberIfValid(message.tick.ask[1]),
+        askPrice: asNumberIfValid(message.tick.ask[0]),
+
+        bidPrice: asNumberIfValid(message.tick.bid[0]),
+        bidAmount: asNumberIfValid(message.tick.bid[1]),
+        timestamp: new Date(message.tick.ts),
+        localTimestamp: localTimestamp
+      }
+    }
+  }
+}
+
 type HuobiDataMessage = {
   ch: string
 }
@@ -679,3 +735,31 @@ type HuobiOptionsMarketIndexMessage = {
   }
   ts: 1621296002820
 }
+
+type HuobiBBOMessage =
+  | {
+      ch: 'market.BTC-USDT.bbo'
+      ts: 1630454400495
+      tick: {
+        mrid: 64797873746
+        id: 1630454400
+        bid: [47176.5, 1]
+        ask: [47176.6, 9249]
+        ts: 1630454400495
+        version: 64797873746
+        ch: 'market.BTC-USDT.bbo'
+      }
+    }
+  | {
+      ch: 'market.btcusdt.bbo'
+      ts: 1575158404058
+      tick: {
+        seqId: 103273695595
+        ask: 7543.59
+        askSize: 2.323241
+        bid: 7541.16
+        bidSize: 0.002329
+        quoteTime: 1575158404057
+        symbol: 'btcusdt'
+      }
+    }

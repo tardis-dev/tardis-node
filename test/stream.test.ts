@@ -9,7 +9,8 @@ import {
   normalizeDerivativeTickers,
   normalizeLiquidations,
   normalizeTrades,
-  streamNormalized
+  streamNormalized,
+  normalizeBookTickers
 } from '../dist'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
@@ -44,6 +45,34 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'huobi-dm-swap'
 ]
 
+const exchangesWithBookTickerInfo: Exchange[] = [
+  'ascendex',
+  'binance',
+  'binance-futures',
+  'binance-delivery',
+  'binance-dex',
+  'bitfinex',
+  'bitfinex-derivatives',
+  'bitflyer',
+  'bitmex',
+  'coinbase',
+  'cryptofacilities',
+  'deribit',
+  'ftx',
+  'ftx-us',
+  'huobi',
+  'huobi-dm',
+  'huobi-dm-linear-swap',
+  'huobi-dm-swap',
+  'kraken',
+  'okex',
+  'okex-futures',
+  'okex-swap',
+  'okex-options',
+  'okcoin',
+  'serum'
+]
+
 describe('exchange-details', () => {
   test('provides exchange info', async () => {
     const exchange = 'binance'
@@ -76,7 +105,7 @@ describe('stream', () => {
             exchange === 'okex-options' ||
             exchange === 'huobi-dm-options' ||
             exchange === 'star-atlas' ||
-            exchange === 'huobi-dm'
+            exchange === 'binance-options'
           ) {
             return
           }
@@ -90,6 +119,10 @@ describe('stream', () => {
 
           if (exchangesWithLiquidationsSupport.includes(exchange)) {
             normalizers.push(normalizeLiquidations)
+          }
+
+          if (exchangesWithBookTickerInfo.includes(exchange)) {
+            normalizers.push(normalizeBookTickers)
           }
 
           var symbols = exchangeDetails.availableSymbols

@@ -1,4 +1,4 @@
-import { BookChange, BookPriceLevel, Trade } from '../types'
+import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
 import { parseμs } from '../handy'
 
@@ -122,6 +122,38 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   }
 }
 
+export const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
+  canHandle(message: CoinbaseTicker) {
+    return message.type === 'ticker'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      }
+    ]
+  },
+
+  *map(message: CoinbaseTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    const timestamp = new Date(message.time)
+    timestamp.μs = parseμs(message.time)
+
+    yield {
+      type: 'book_ticker',
+      symbol: message.product_id,
+      exchange: 'coinbase',
+      askAmount: undefined,
+      askPrice: message.best_ask !== undefined ? Number(message.best_ask) : undefined,
+      bidPrice: message.best_bid !== undefined ? Number(message.best_bid) : undefined,
+      bidAmount: undefined,
+      timestamp,
+      localTimestamp: localTimestamp
+    }
+  }
+}
+
 type CoinbaseTrade = {
   type: 'match'
   trade_id: number
@@ -148,4 +180,14 @@ type CoinbaseLevel2Update = {
   product_id: string
   time: string
   changes: CoinbaseUpdateBookLevel[]
+}
+
+type CoinbaseTicker = {
+  type: 'ticker'
+  sequence: 2349290585
+  product_id: 'CGLD-USD'
+  price: '5.415'
+  best_bid: '5.4149'
+  best_ask: '5.4150'
+  time: '2021-10-13T07:05:00.028961Z'
 }

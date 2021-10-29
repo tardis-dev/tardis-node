@@ -1,5 +1,5 @@
-import { parseμs } from '../handy'
-import { BookChange, Trade, DerivativeTicker, Exchange, Liquidation } from '../types'
+import { asNumberIfValid, parseμs } from '../handy'
+import { BookChange, Trade, DerivativeTicker, Exchange, Liquidation, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.ftx.com/#websocket-api
@@ -176,6 +176,48 @@ export class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
   }
 }
 
+export class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: FTXTicker) {
+    if (message.data == undefined) {
+      return false
+    }
+
+    return message.channel === 'ticker'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(ftxTicker: FTXTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    const timestamp = new Date(ftxTicker.data.time * 1000)
+    timestamp.μs = Math.floor(ftxTicker.data.time * 1000000) % 1000
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: ftxTicker.market,
+      exchange: this._exchange,
+
+      askAmount: asNumberIfValid(ftxTicker.data.askSize),
+      askPrice: asNumberIfValid(ftxTicker.data.ask),
+
+      bidPrice: asNumberIfValid(ftxTicker.data.bid),
+      bidAmount: asNumberIfValid(ftxTicker.data.bidSize),
+      timestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type FtxTrades = {
   channel: 'trades'
   market: string
@@ -215,4 +257,11 @@ type FTXInstrument = {
       index: number
     }
   }
+}
+
+type FTXTicker = {
+  channel: 'ticker'
+  market: string
+  type: 'update'
+  data: { bid: number; ask: number; bidSize: number; askSize: number; last: number; time: number }
 }

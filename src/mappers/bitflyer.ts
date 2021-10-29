@@ -1,5 +1,5 @@
 import { parseμs } from '../handy'
-import { BookChange, Trade } from '../types'
+import { BookChange, Trade, BookTicker } from '../types'
 import { Mapper } from './mapper'
 
 export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
@@ -91,6 +91,44 @@ export class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> 
   }
 }
 
+export const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
+  canHandle(message: BitflyerTicker) {
+    return message.params.channel.startsWith('lightning_ticker')
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'lightning_ticker',
+        symbols
+      }
+    ]
+  },
+
+  *map(bitflyerTickerMessage: BitflyerTicker, localTimestamp: Date) {
+    const symbol = bitflyerTickerMessage.params.channel.replace('lightning_ticker_', '')
+    const bitflyerTicker = bitflyerTickerMessage.params.message
+    const timestamp = new Date(bitflyerTicker.timestamp)
+    timestamp.μs = parseμs(bitflyerTicker.timestamp)
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol,
+      exchange: 'bitflyer',
+
+      askAmount: bitflyerTicker.best_ask_size,
+      askPrice: bitflyerTicker.best_ask,
+
+      bidPrice: bitflyerTicker.best_bid,
+      bidAmount: bitflyerTicker.best_bid_size,
+      timestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type BitflyerExecutions = {
   method: 'channelMessage'
   params: {
@@ -117,6 +155,30 @@ type BitflyerBoard = {
     message: {
       bids: BitflyerBookLevel[]
       asks: BitflyerBookLevel[]
+    }
+  }
+}
+
+type BitflyerTicker = {
+  method: 'channelMessage'
+  params: {
+    channel: 'lightning_ticker_ETH_JPY'
+    message: {
+      product_code: 'ETH_JPY'
+      state: 'RUNNING'
+      timestamp: '2021-09-01T00:00:00.2115808Z'
+      tick_id: 2830807
+      best_bid: 376592.0
+      best_ask: 376676.0
+      best_bid_size: 0.01
+      best_ask_size: 0.4
+      total_bid_depth: 5234.4333389
+      total_ask_depth: 1511.52678
+      market_bid_size: 0.0
+      market_ask_size: 0.0
+      ltp: 376789.0
+      volume: 37853.5120461
+      volume_by_product: 37853.5120461
     }
   }
 }

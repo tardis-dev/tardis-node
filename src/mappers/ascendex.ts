@@ -1,5 +1,5 @@
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { Trade, BookChange, DerivativeTicker } from '../types'
+import { Trade, BookChange, DerivativeTicker, BookTicker } from '../types'
 
 export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   canHandle(message: AscendexTrade) {
@@ -114,6 +114,39 @@ export class AscendexDerivativeTickerMapper implements Mapper<'ascendex', Deriva
   }
 }
 
+export class AscendexBookTickerMapper implements Mapper<'ascendex', BookTicker> {
+  canHandle(message: AscendexTicker) {
+    return message.m === 'bbo'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'bbo',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: AscendexTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    const ask = message.data.ask
+    const bid = message.data.bid
+
+    yield {
+      type: 'book_ticker',
+      symbol: message.symbol,
+      exchange: 'ascendex',
+
+      askAmount: ask !== undefined && ask[1] !== undefined ? Number(ask[1]) : undefined,
+      askPrice: ask !== undefined && ask[0] !== undefined ? Number(ask[0]) : undefined,
+      bidPrice: bid !== undefined && bid[0] !== undefined ? Number(bid[0]) : undefined,
+      bidAmount: bid !== undefined && bid[1] !== undefined ? Number(bid[1]) : undefined,
+      timestamp: new Date(message.data.ts),
+      localTimestamp: localTimestamp
+    }
+  }
+}
+
 type AscendexTrade = {
   m: 'trades'
   symbol: string
@@ -138,6 +171,8 @@ type AscendexDepthRealTimeSnapshot = {
     bids: AscendexPriceLevel[]
   }
 }
+
+type AscendexTicker = { m: 'bbo'; symbol: string; data: { ts: number; bid?: AscendexPriceLevel; ask?: AscendexPriceLevel } }
 
 type AscendexFuturesData = {
   m: 'futures-pricing-data'

@@ -1,4 +1,5 @@
-import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Liquidation, Trade } from '../types'
+import { asNumberIfValid } from '../handy'
+import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Liquidation, Trade, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
@@ -207,6 +208,40 @@ export const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
   }
 }
 
+export const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
+  canHandle(message: BitmexDataMessage) {
+    return message.table === 'quote' && message.action === 'insert'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'quote',
+        symbols
+      }
+    ]
+  },
+
+  *map(bitmexQuoteMessage: BitmexQuote, localTimestamp: Date) {
+    for (const bitmexQuote of bitmexQuoteMessage.data) {
+      const ticker: BookTicker = {
+        type: 'book_ticker',
+        symbol: bitmexQuote.symbol,
+        exchange: 'bitmex',
+        askAmount: asNumberIfValid(bitmexQuote.askSize),
+        askPrice: asNumberIfValid(bitmexQuote.askPrice),
+
+        bidPrice: asNumberIfValid(bitmexQuote.bidPrice),
+        bidAmount: asNumberIfValid(bitmexQuote.bidSize),
+        timestamp: new Date(bitmexQuote.timestamp),
+        localTimestamp: localTimestamp
+      }
+
+      yield ticker
+    }
+  }
+}
+
 type BitmexDataMessage = {
   table: FilterForExchange['bitmex']['channel']
   action: 'partial' | 'update' | 'insert' | 'delete'
@@ -263,4 +298,10 @@ type BitmexLiquidation = BitmexDataMessage & {
     price: number
     leavesQty: number
   }[]
+}
+
+type BitmexQuote = BitmexDataMessage & {
+  table: 'quote'
+  action: 'insert'
+  data: [{ timestamp: string; symbol: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number }]
 }

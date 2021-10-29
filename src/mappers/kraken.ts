@@ -1,10 +1,11 @@
-import { BookChange, Trade } from '../types'
+import { asNumberIfValid } from '../handy'
+import { BookChange, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
 
 // https://www.kraken.com/features/websocket-api
 
 export const krakenTradesMapper: Mapper<'kraken', Trade> = {
-  canHandle(message: Trade) {
+  canHandle(message: KrakenTrades) {
     if (!Array.isArray(message)) {
       return false
     }
@@ -62,7 +63,7 @@ const getLatestTimestamp = (bids: KrakenBookLevel[], asks: KrakenBookLevel[]): D
 }
 
 export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
-  canHandle(message: Trade) {
+  canHandle(message: KrakenBookSnapshot | KrakenBookUpdate) {
     if (!Array.isArray(message)) {
       return false
     }
@@ -117,6 +118,49 @@ export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   }
 }
 
+export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
+  canHandle(message: KrakenSpread) {
+    if (!Array.isArray(message)) {
+      return false
+    }
+
+    const channel = message[message.length - 2] as string
+    return channel === 'spread'
+  },
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'spread',
+        symbols
+      }
+    ]
+  },
+
+  *map(message: KrakenSpread, localTimestamp: Date): IterableIterator<BookTicker> {
+    const [bid, ask, time, bidVolume, askVolume] = message[1]
+    const timeExchange = Number(time)
+    const timestamp = new Date(timeExchange * 1000)
+    timestamp.μs = Math.floor(timeExchange * 1000000) % 1000
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: message[2],
+      exchange: 'kraken',
+
+      askAmount: asNumberIfValid(askVolume),
+      askPrice: asNumberIfValid(ask),
+
+      bidPrice: asNumberIfValid(bidVolume),
+      bidAmount: asNumberIfValid(bid),
+      timestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type KrakenTrades = [number, [string, string, string, 's' | 'b', string, string][], string, string]
 type KrakenBookLevel = [string, string, string]
 type KrakenBookSnapshot = [
@@ -156,3 +200,10 @@ type KrakenBookUpdate =
       string,
       string
     ]
+
+type KrakenSpread = [
+  325,
+  [bid: '43770.20000', ask: '43770.30000', timestamp: '1633053779.916349', bidVolume: '0.00917717', askVolume: '0.31670440'],
+  'spread',
+  'XBT/USD'
+]
