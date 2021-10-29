@@ -178,7 +178,10 @@ export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTi
 
       bidPrice: cryptofacilitiesTicker.bid,
       bidAmount: cryptofacilitiesTicker.bid_size,
-      timestamp: new Date(cryptofacilitiesTicker.time),
+      timestamp:
+        cryptofacilitiesTicker.time !== undefined && cryptofacilitiesTicker.time !== null
+          ? new Date(cryptofacilitiesTicker.time)
+          : localTimestamp,
       localTimestamp: localTimestamp
     }
 

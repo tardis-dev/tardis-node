@@ -137,8 +137,13 @@ export const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
   },
 
   *map(message: CoinbaseTicker, localTimestamp: Date): IterableIterator<BookTicker> {
-    const timestamp = new Date(message.time)
-    timestamp.μs = parseμs(message.time)
+    let timestamp = new Date(message.time)
+
+    if (message.time === undefined || timestamp.valueOf() < 0) {
+      timestamp = localTimestamp
+    } else {
+      timestamp.μs = parseμs(message.time)
+    }
 
     yield {
       type: 'book_ticker',
