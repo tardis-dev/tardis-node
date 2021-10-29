@@ -556,11 +556,11 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         symbol,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(message.tick.ask[1]),
-        askPrice: asNumberIfValid(message.tick.ask[0]),
+        askAmount: message.tick.ask !== undefined ? asNumberIfValid(message.tick.ask[1]) : undefined,
+        askPrice: message.tick.ask !== undefined ? asNumberIfValid(message.tick.ask[0]) : undefined,
 
-        bidPrice: asNumberIfValid(message.tick.bid[0]),
-        bidAmount: asNumberIfValid(message.tick.bid[1]),
+        bidPrice: message.tick.bid !== undefined ? asNumberIfValid(message.tick.bid[0]) : undefined,
+        bidAmount: message.tick.bid !== undefined ? asNumberIfValid(message.tick.bid[1]) : undefined,
         timestamp: new Date(message.tick.ts),
         localTimestamp: localTimestamp
       }
@@ -743,8 +743,8 @@ type HuobiBBOMessage =
       tick: {
         mrid: 64797873746
         id: 1630454400
-        bid: [47176.5, 1]
-        ask: [47176.6, 9249]
+        bid: [47176.5, 1] | undefined
+        ask: [47176.6, 9249] | undefined
         ts: 1630454400495
         version: 64797873746
         ch: 'market.BTC-USDT.bbo'
