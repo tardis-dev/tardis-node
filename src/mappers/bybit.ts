@@ -164,13 +164,13 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
       pendingTickerInfo.updateLastPrice(Number(instrumentInfo.last_price_e4) / 10000)
     }
 
-    if (instrumentInfo.updated_at) {
-      pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
-    } else {
+    if (message.timestamp_e6 !== undefined) {
       const timestampBybit = Number(message.timestamp_e6)
       const timestamp = new Date(timestampBybit / 1000)
       timestamp.μs = timestampBybit % 1000
       pendingTickerInfo.updateTimestamp(timestamp)
+    } else {
+      pendingTickerInfo.updateTimestamp(new Date(instrumentInfo.updated_at))
     }
 
     if (pendingTickerInfo.hasChanged()) {

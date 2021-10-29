@@ -1913,7 +1913,7 @@ Array [
     "openInterest": 13793020,
     "predictedFundingRate": 0.0001,
     "symbol": "ETHUSD",
-    "timestamp": 2019-11-06T12:49:56.000Z,
+    "timestamp": 2019-11-06T12:50:49.041Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2024,7 +2024,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSD",
-    "timestamp": 2019-11-06T20:03:01.000Z,
+    "timestamp": 2019-11-06T20:03:01.891Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2081,7 +2081,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:02.000Z,
+    "timestamp": 2020-05-28T16:31:02.401Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2271,7 +2271,7 @@ Array [
     "openInterest": 4471.23,
     "predictedFundingRate": 0.0001,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:02.000Z,
+    "timestamp": 2020-05-28T16:31:02.401Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2347,7 +2347,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "LINKUSDT",
-    "timestamp": 2021-03-11T13:04:49.000Z,
+    "timestamp": 2021-03-11T13:04:59.958Z,
     "type": "derivative_ticker",
   },
 ]
