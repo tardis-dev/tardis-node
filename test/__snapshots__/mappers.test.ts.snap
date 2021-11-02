@@ -5942,6 +5942,8 @@ Array [
 ]
 `;
 
+exports[`mappers map kraken messages 8`] = `Array []`;
+
 exports[`mappers map okcoin messages 1`] = `
 Array [
   Object {

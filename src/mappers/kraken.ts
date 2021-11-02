@@ -140,6 +140,10 @@ export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
   *map(message: KrakenSpread, localTimestamp: Date): IterableIterator<BookTicker> {
     const [bid, ask, time, bidVolume, askVolume] = message[1]
     const timeExchange = Number(time)
+
+    if (timeExchange === 0) {
+      return
+    }
     const timestamp = new Date(timeExchange * 1000)
     timestamp.μs = Math.floor(timeExchange * 1000000) % 1000
 
