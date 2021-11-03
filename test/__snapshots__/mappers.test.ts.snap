@@ -5229,6 +5229,22 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi messages 24`] = `
+Array [
+  Object {
+    "askAmount": 0.3,
+    "askPrice": 9434.09,
+    "bidAmount": 0.3,
+    "bidPrice": 9422.13,
+    "exchange": "huobi",
+    "localTimestamp": 2020-07-03T00:00:01.275Z,
+    "symbol": "BTCHUSD",
+    "timestamp": 2020-04-30T06:11:19.007Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm, messages 1`] = `Array []`;
 
 exports[`mappers map huobi-dm, messages 2`] = `

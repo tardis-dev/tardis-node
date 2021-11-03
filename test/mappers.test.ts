@@ -3828,6 +3828,11 @@ describe('mappers', () => {
           quoteTime: 1575158404057,
           symbol: 'btcusdt'
         }
+      },
+      {
+        ch: 'market.btchusd.bbo',
+        ts: 1588227079008,
+        tick: { ask: 9434.09, askSize: 0.3, bid: 9422.13, bidSize: 0.3, quoteTime: 1588227079007, symbol: 'btchusd' }
       }
     ]
 

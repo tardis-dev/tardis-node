@@ -536,7 +536,7 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
   *map(message: HuobiBBOMessage, localTimestamp: Date): IterableIterator<BookTicker> {
     const symbol = message.ch.split('.')[1].toUpperCase()
 
-    if ('seqId' in message.tick) {
+    if ('quoteTime' in message.tick) {
       yield {
         type: 'book_ticker',
         symbol,
