@@ -262,7 +262,9 @@ export async function download({
     try {
       return await _downloadFile(httpRequestOptions, url, downloadPath)
     } catch (error) {
-      const badOrUnauthorizedRequest = error instanceof HttpError && (error.status === 400 || error.status === 401)
+      const badOrUnauthorizedRequest =
+        error instanceof HttpError &&
+        ((error.status === 400 && error.message.includes('ISO 8601 format') === false) || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       // do not retry when we've got bad or unauthorized request or enough attempts
       if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
