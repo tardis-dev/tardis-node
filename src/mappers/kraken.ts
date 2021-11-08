@@ -149,7 +149,7 @@ export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
 
     const ticker: BookTicker = {
       type: 'book_ticker',
-      symbol: message[2],
+      symbol: message[3],
       exchange: 'kraken',
 
       askAmount: asNumberIfValid(askVolume),

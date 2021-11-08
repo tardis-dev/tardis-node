@@ -5951,7 +5951,7 @@ Array [
     "bidPrice": 0.00917717,
     "exchange": "kraken",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
-    "symbol": "spread",
+    "symbol": "XBT/USD",
     "timestamp": 2021-10-01T02:02:59.916Z,
     "type": "book_ticker",
   },
