@@ -71,6 +71,21 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
           [key: string]: typeof bitmexOrderBookL2Message.data
         }
       )
+
+      if (bitmexOrderBookL2Message.data.length === 0 && bitmexOrderBookL2Message.filter?.symbol !== undefined) {
+        const emptySnapshot: BookChange = {
+          type: 'book_change',
+          symbol: bitmexOrderBookL2Message.filter?.symbol!,
+          exchange: 'bitmex',
+          isSnapshot: true,
+          bids: [],
+          asks: [],
+          timestamp: localTimestamp,
+          localTimestamp: localTimestamp
+        }
+
+        yield emptySnapshot
+      }
     } else {
       // in case of other messages types BitMEX always returns data for single symbol
       bitmexBookMessagesGrouppedBySymbol = {
@@ -107,12 +122,14 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
         }
       }
 
-      if (bids.length > 0 || asks.length > 0) {
+      const isSnapshot = bitmexOrderBookL2Message.action === 'partial'
+
+      if (bids.length > 0 || asks.length > 0 || isSnapshot) {
         const bookChange: BookChange = {
           type: 'book_change',
           symbol,
           exchange: 'bitmex',
-          isSnapshot: bitmexOrderBookL2Message.action === 'partial',
+          isSnapshot,
           bids,
           asks,
           timestamp: localTimestamp,
@@ -280,6 +297,7 @@ type BitmexInstrumentsMessage = BitmexDataMessage & {
 
 type BitmexOrderBookL2Message = BitmexDataMessage & {
   table: 'orderBookL2'
+  filter?: { symbol?: string }
   data: {
     symbol: string
     id: number

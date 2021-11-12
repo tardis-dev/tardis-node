@@ -739,10 +739,21 @@ describe('mappers', () => {
           { timestamp: '2021-10-13T07:07:00.106Z', symbol: 'XBTUSD', bidSize: 2700, bidPrice: 55411, askPrice: 55411.5, askSize: 205100 },
           { timestamp: '2021-10-13T07:07:01.010Z', symbol: 'XBTUSD', bidSize: 700, bidPrice: 55400, askPrice: 55400.5, askSize: 241500 }
         ]
+      },
+      {
+        table: 'orderBookL2',
+        action: 'partial',
+        keys: ['symbol', 'id', 'side'],
+        types: { symbol: 'symbol', id: 'long', side: 'symbol', size: 'long', price: 'float' },
+        foreignKeys: { symbol: 'instrument', side: 'side' },
+        attributes: { symbol: 'parted', id: 'sorted' },
+        filter: { symbol: 'XBTZ21' },
+        data: []
       }
     ]
 
     const bitmexMapper = createMapper('bitmex')
+
     for (const message of messages) {
       const mappedMessages = bitmexMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
       expect(mappedMessages).toMatchSnapshot()

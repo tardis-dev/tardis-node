@@ -1757,6 +1757,21 @@ Array [
 ]
 `;
 
+exports[`mappers map bitmex messages 15`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTZ21",
+    "timestamp": 2019-06-01T00:00:28.619Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
 exports[`mappers map bitstamp messages 2`] = `
