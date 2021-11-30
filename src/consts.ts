@@ -184,7 +184,8 @@ const BINANCE_FUTURES_CHANNELS = [
   'compositeIndex',
   'topLongShortAccountRatio',
   'topLongShortPositionRatio',
-  'globalLongShortAccountRatio'
+  'globalLongShortAccountRatio',
+  'takerlongshortRatio'
 ] as const
 
 const BINANCE_DELIVERY_CHANNELS = [
@@ -201,7 +202,8 @@ const BINANCE_DELIVERY_CHANNELS = [
   'recentTrades',
   'topLongShortAccountRatio',
   'topLongShortPositionRatio',
-  'globalLongShortAccountRatio'
+  'globalLongShortAccountRatio',
+  'takerBuySellVol'
 ] as const
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations', 'ticker'] as const
