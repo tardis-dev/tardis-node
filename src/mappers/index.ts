@@ -69,7 +69,13 @@ import {
   OkexDerivativeTickerMapper,
   OkexLiquidationsMapper,
   OkexOptionSummaryMapper,
-  OkexTradesMapper
+  OkexTradesMapper,
+  OkexV5BookChangeMapper,
+  OkexV5BookTickerMapper,
+  OkexV5DerivativeTickerMapper,
+  OkexV5LiquidationsMapper,
+  OkexV5OptionSummaryMapper,
+  OkexV5TradesMapper
 } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
@@ -85,6 +91,12 @@ const isRealTime = (date: Date) => {
     return false
   }
   return date.valueOf() + THREE_MINUTES_IN_MS > new Date().valueOf()
+}
+
+const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
+
+const shouldUseOkexV5Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_API_SWITCH_DATE.valueOf()
 }
 
 const tradesMappers = {
@@ -106,10 +118,18 @@ const tradesMappers = {
   'ftx-us': () => new FTXTradesMapper('ftx-us'),
   gemini: () => geminiTradesMapper,
   kraken: () => krakenTradesMapper,
-  okex: () => new OkexTradesMapper('okex', 'spot'),
-  'okex-futures': () => new OkexTradesMapper('okex-futures', 'futures'),
-  'okex-swap': () => new OkexTradesMapper('okex-swap', 'swap'),
-  'okex-options': () => new OkexTradesMapper('okex-options', 'option'),
+  okex: (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex') : new OkexTradesMapper('okex', 'spot'),
+
+  'okex-futures': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-futures') : new OkexTradesMapper('okex-futures', 'futures'),
+
+  'okex-swap': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-swap') : new OkexTradesMapper('okex-swap', 'swap'),
+
+  'okex-options': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-options') : new OkexTradesMapper('okex-options', 'option'),
+
   huobi: () => new HuobiTradesMapper('huobi'),
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
@@ -152,14 +172,24 @@ const bookChangeMappers = {
   'ftx-us': () => new FTXBookChangeMapper('ftx-us'),
   gemini: () => geminiBookChangeMapper,
   kraken: () => krakenBookChangeMapper,
-  okex: (localTimestamp: Date) => new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
+  okex: (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookChangeMapper('okex')
+      : new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
   'okex-futures': (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookChangeMapper('okex-futures')
+      : new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
 
   'okex-swap': (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookChangeMapper('okex-swap')
+      : new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
   'okex-options': (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookChangeMapper('okex-options')
+      : new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
+
   huobi: (localTimestamp: Date) =>
     localTimestamp.valueOf() >= new Date('2020-07-03').valueOf()
       ? new HuobiMBPBookChangeMapper('huobi')
@@ -195,8 +225,14 @@ const derivativeTickersMappers = {
   'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
   cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
   deribit: () => new DeribitDerivativeTickerMapper(),
-  'okex-futures': () => new OkexDerivativeTickerMapper('okex-futures'),
-  'okex-swap': () => new OkexDerivativeTickerMapper('okex-swap'),
+  'okex-futures': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5DerivativeTickerMapper('okex-futures')
+      : new OkexDerivativeTickerMapper('okex-futures'),
+
+  'okex-swap': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5DerivativeTickerMapper('okex-swap') : new OkexDerivativeTickerMapper('okex-swap'),
+
   bybit: () => new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
@@ -212,7 +248,8 @@ const derivativeTickersMappers = {
 
 const optionsSummaryMappers = {
   deribit: () => new DeribitOptionSummaryMapper(),
-  'okex-options': () => new OkexOptionSummaryMapper(),
+  'okex-options': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5OptionSummaryMapper() : new OkexOptionSummaryMapper(),
   'binance-options': () => new BinanceOptionSummaryMapper(),
   'huobi-dm-options': () => new HuobiOptionsSummaryMapper()
 }
@@ -229,8 +266,12 @@ const liquidationsMappers = {
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
   bybit: () => new BybitLiquidationsMapper('bybit'),
-  'okex-futures': () => new OkexLiquidationsMapper('okex-futures', 'futures'),
-  'okex-swap': () => new OkexLiquidationsMapper('okex-swap', 'swap')
+  'okex-futures': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5LiquidationsMapper('okex-futures')
+      : new OkexLiquidationsMapper('okex-futures', 'futures'),
+  'okex-swap': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5LiquidationsMapper('okex-swap') : new OkexLiquidationsMapper('okex-swap', 'swap')
 }
 
 const bookTickersMappers = {
@@ -254,10 +295,22 @@ const bookTickersMappers = {
   'huobi-dm-swap': () => new HuobiBookTickerMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiBookTickerMapper('huobi-dm-linear-swap'),
   kraken: () => krakenBookTickerMapper,
-  okex: () => new OkexBookTickerMapper('okex', 'spot'),
-  'okex-futures': () => new OkexBookTickerMapper('okex-futures', 'futures'),
-  'okex-swap': () => new OkexBookTickerMapper('okex-swap', 'swap'),
-  'okex-options': () => new OkexBookTickerMapper('okex-options', 'option'),
+  okex: (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okex') : new OkexBookTickerMapper('okex', 'spot'),
+
+  'okex-futures': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookTickerMapper('okex-futures')
+      : new OkexBookTickerMapper('okex-futures', 'futures'),
+
+  'okex-swap': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okex-swap') : new OkexBookTickerMapper('okex-swap', 'swap'),
+
+  'okex-options': (localTimestamp: Date) =>
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookTickerMapper('okex-options')
+      : new OkexBookTickerMapper('okex-options', 'option'),
+
   okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
   serum: () => new SerumBookTickerMapper('serum'),
   'star-atlas': () => new SerumBookTickerMapper('star-atlas')
@@ -301,7 +354,7 @@ export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTick
 
 export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMappers>(
   exchange: T,
-  _localTimestamp: Date
+  localTimestamp: Date
 ): Mapper<T, OptionSummary> => {
   const createOptionSummaryMapper = optionsSummaryMappers[exchange]
 
@@ -309,12 +362,12 @@ export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMap
     throw new Error(`normalizeOptionsSummary: ${exchange} not supported`)
   }
 
-  return createOptionSummaryMapper() as any
+  return createOptionSummaryMapper(localTimestamp) as any
 }
 
 export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers>(
   exchange: T,
-  _localTimestamp: Date
+  localTimestamp: Date
 ): Mapper<T, Liquidation> => {
   const createLiquidationsMapper = liquidationsMappers[exchange]
 
@@ -322,12 +375,12 @@ export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers
     throw new Error(`normalizeLiquidations: ${exchange} not supported`)
   }
 
-  return createLiquidationsMapper() as any
+  return createLiquidationsMapper(localTimestamp) as any
 }
 
 export const normalizeBookTickers = <T extends keyof typeof bookTickersMappers>(
   exchange: T,
-  _localTimestamp: Date
+  localTimestamp: Date
 ): Mapper<T, BookTicker> => {
   const createTickerMapper = bookTickersMappers[exchange]
 
@@ -335,5 +388,5 @@ export const normalizeBookTickers = <T extends keyof typeof bookTickersMappers>(
     throw new Error(`normalizeBookTickers: ${exchange} not supported`)
   }
 
-  return createTickerMapper() as any
+  return createTickerMapper(localTimestamp) as any
 }

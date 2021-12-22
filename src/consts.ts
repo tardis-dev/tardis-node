@@ -104,7 +104,24 @@ const DERIBIT_CHANNELS = [
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
 
-const OKEX_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status', 'margin/interest_rate'] as const
+const OKEX_CHANNELS = [
+  'spot/trade',
+  'spot/depth',
+  'spot/depth_l2_tbt',
+  'spot/ticker',
+  'system/status',
+  'margin/interest_rate',
+
+  // v5
+  'trades',
+  'books-l2-tbt',
+  'tickers',
+  'interest-rate-loan-quota',
+  'vip-interest-rate-loan-quota',
+  'status',
+  'instruments',
+  'taker-volume'
+] as const
 
 const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
 
@@ -119,7 +136,21 @@ const OKEX_FUTURES_CHANNELS = [
   'system/status',
   'information/sentiment',
   'information/long_short_ratio',
-  'information/margin'
+  'information/margin',
+
+  // v5
+  'trades',
+  'books-l2-tbt',
+  'tickers',
+  'open-interest',
+  'mark-price',
+  'price-limit',
+  'status',
+  'instruments',
+  'index-tickers',
+  'long-short-account-ratio',
+  'taker-volume',
+  'liquidations'
 ] as const
 
 const OKEX_SWAP_CHANNELS = [
@@ -134,7 +165,22 @@ const OKEX_SWAP_CHANNELS = [
   'system/status',
   'information/sentiment',
   'information/long_short_ratio',
-  'information/margin'
+  'information/margin',
+
+  //v5
+  'trades',
+  'books-l2-tbt',
+  'tickers',
+  'open-interest',
+  'mark-price',
+  'price-limit',
+  'funding-rate',
+  'status',
+  'instruments',
+  'index-tickers',
+  'long-short-account-ratio',
+  'taker-volume',
+  'liquidations'
 ] as const
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -146,7 +192,19 @@ const OKEX_OPTIONS_CHANNELS = [
   'option/instruments',
   'index/ticker',
   'system/status',
-  'option/trades'
+  'option/trades',
+
+  //v5
+  'trades',
+  'books-l2-tbt',
+  'tickers',
+  'opt-summary',
+  'status',
+  'instruments',
+  'index-tickers',
+  'open-interest',
+  'mark-price',
+  'price-limit'
 ] as const
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const

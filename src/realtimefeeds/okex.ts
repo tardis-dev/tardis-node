@@ -3,13 +3,39 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class OkexRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://real.okex.com:8443/ws/v3'
+  protected wssURL = 'wss://ws.okex.com:8443/ws/v5/public'
 
-  protected decompress = (message: any) => {
-    message = inflateRawSync(message) as Buffer
+  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
+    const args = filters
+      .map((filter) => {
+        if (!filter.symbols || filter.symbols.length === 0) {
+          throw new Error(`${this._exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
+        }
 
-    return message
+        return filter.symbols.map((symbol) => {
+          return {
+            channel: filter.channel,
+            instId: symbol
+          }
+        })
+      })
+      .flatMap((s) => s)
+
+    return [
+      {
+        op: 'subscribe',
+        args: [...new Set(args)]
+      }
+    ]
   }
+
+  protected messageIsError(message: any): boolean {
+    return message.event === 'error'
+  }
+}
+
+export class OKCoinRealTimeFeed extends RealTimeFeedBase {
+  protected wssURL = 'wss://real.okcoin.com:8443/ws/v3'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters
@@ -35,17 +61,19 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.event === 'error'
   }
-}
 
-export class OKCoinRealTimeFeed extends OkexRealTimeFeed {
-  protected wssURL = 'wss://real.okcoin.com:8443/ws/v3'
+  protected decompress = (message: any) => {
+    message = inflateRawSync(message) as Buffer
+
+    return message
+  }
 }
 
 export class OkexOptionsRealTimeFeed extends OkexRealTimeFeed {
-  private _defaultIndexes = ['BTC-USD', 'ETH-USD', 'EOS-USD']
+  private _defaultIndexes = ['BTC-USD', 'ETH-USD']
 
   private _channelRequiresIndexNotSymbol(channel: string) {
-    if (channel === 'index/ticker' || channel === 'option/summary') {
+    if (channel === 'index-tickers' || channel === 'opt-summary') {
       return true
     }
     return false
@@ -70,7 +98,11 @@ export class OkexOptionsRealTimeFeed extends OkexRealTimeFeed {
             const symbolParts = symbol.split('-')
             finalSymbol = `${symbolParts[0]}-${symbolParts[1]}`
           }
-          return `${filter.channel}:${finalSymbol}`
+          return {
+            channel: filter.channel,
+            instId: filter.channel !== 'opt-summary' ? finalSymbol : undefined,
+            uly: filter.channel === 'opt-summary' ? finalSymbol : undefined
+          }
         })
       })
       .flatMap((s) => s)

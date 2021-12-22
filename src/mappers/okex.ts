@@ -2,6 +2,571 @@ import { asNumberIfValid } from '../handy'
 import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
+// V5 Okex API mappers
+// https://www.okex.com/docs-v5/en/#websocket-api-public-channel-trades-channel
+
+export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+    return message.arg.channel === 'trades'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: `trades` as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(okexTradesMessage: OkexV5TradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+    for (const okexTrade of okexTradesMessage.data) {
+      yield {
+        type: 'trade',
+        symbol: okexTrade.instId,
+        exchange: this._exchange,
+        id: okexTrade.tradeId,
+        price: Number(okexTrade.px),
+        amount: Number(okexTrade.sz),
+        side: okexTrade.side === 'buy' ? 'buy' : 'sell',
+        timestamp: new Date(Number(okexTrade.ts)),
+        localTimestamp: localTimestamp
+      }
+    }
+  }
+}
+
+const mapV5BookLevel = (level: OkexV5BookLevel) => {
+  const price = Number(level[0])
+  const amount = Number(level[1])
+
+  return { price, amount }
+}
+
+export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+    return message.arg.channel === 'books-l2-tbt'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: `books-l2-tbt` as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(okexDepthDataMessage: OkexV5BookMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    for (const message of okexDepthDataMessage.data) {
+      if (okexDepthDataMessage.action === 'update' && message.bids.length === 0 && message.asks.length === 0) {
+        continue
+      }
+
+      const timestamp = new Date(Number(message.ts))
+
+      if (timestamp.valueOf() === 0) {
+        continue
+      }
+
+      yield {
+        type: 'book_change',
+        symbol: okexDepthDataMessage.arg.instId,
+        exchange: this._exchange,
+        isSnapshot: okexDepthDataMessage.action === 'snapshot',
+        bids: message.bids.map(mapV5BookLevel),
+        asks: message.asks.map(mapV5BookLevel),
+        timestamp,
+        localTimestamp: localTimestamp
+      }
+    }
+  }
+}
+
+export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+    return message.arg.channel === 'tickers'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: `tickers` as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(message: OkexV5TickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    for (const okexTicker of message.data) {
+      const ticker: BookTicker = {
+        type: 'book_ticker',
+        symbol: okexTicker.instId,
+        exchange: this._exchange,
+
+        askAmount: asNumberIfValid(okexTicker.askSz),
+        askPrice: asNumberIfValid(okexTicker.askPx),
+
+        bidPrice: asNumberIfValid(okexTicker.bidPx),
+        bidAmount: asNumberIfValid(okexTicker.bidSz),
+        timestamp: new Date(Number(okexTicker.ts)),
+        localTimestamp: localTimestamp
+      }
+
+      yield ticker
+    }
+  }
+}
+
+export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  private readonly _indexPrices = new Map<string, number>()
+
+  private _futuresChannels = ['tickers', 'open-interest', 'mark-price', 'index-tickers'] as const
+
+  private _swapChannels = ['tickers', 'open-interest', 'mark-price', 'index-tickers', 'funding-rate'] as const
+
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
+
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+
+    return channels.includes(message.arg.channel)
+  }
+
+  getFilters(symbols?: string[]) {
+    const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
+    return channels.map((channel) => {
+      if (channel === 'index-tickers') {
+        const indexes =
+          symbols !== undefined
+            ? symbols.map((s) => {
+                const symbolParts = s.split('-')
+                return `${symbolParts[0]}-${symbolParts[1]}`
+              })
+            : undefined
+        return {
+          channel,
+          symbols: indexes
+        }
+      }
+
+      return {
+        channel,
+        symbols
+      }
+    })
+  }
+
+  *map(
+    message: OkexV5TickerMessage | OkexV5OpenInterestMessage | OkexV5MarkPriceMessage | OkexV5IndexTickerMessage | OkexV5FundingRateMessage,
+    localTimestamp: Date
+  ): IterableIterator<DerivativeTicker> {
+    if (message.arg.channel === 'index-tickers') {
+      for (const dataMessage of message.data) {
+        const indexTickerMessage = dataMessage as OkexV5IndexTickerMessage['data'][0]
+
+        const lastIndexPrice = Number(indexTickerMessage.idxPx)
+        if (lastIndexPrice > 0) {
+          this._indexPrices.set(indexTickerMessage.instId, lastIndexPrice)
+        }
+      }
+
+      return
+    }
+
+    for (const dataMessage of message.data) {
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(dataMessage.instId, this._exchange)
+      const symbolParts = dataMessage.instId.split('-')
+      const indexSymbol = `${symbolParts[0]}-${symbolParts[1]}`
+
+      const indexPrice = this._indexPrices.get(indexSymbol)
+
+      if (indexPrice !== undefined) {
+        pendingTickerInfo.updateIndexPrice(indexPrice)
+      }
+
+      if (message.arg.channel === 'mark-price') {
+        const markPriceMessage = dataMessage as OkexV5MarkPriceMessage['data'][0]
+
+        const markPrice = Number(markPriceMessage.markPx)
+        if (markPrice > 0) {
+          pendingTickerInfo.updateMarkPrice(markPrice)
+          pendingTickerInfo.updateTimestamp(new Date(Number(markPriceMessage.ts)))
+        }
+      }
+
+      if (message.arg.channel === 'open-interest') {
+        const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
+
+        const openInterest = Number(openInterestMessage.oi)
+        if (openInterest > 0) {
+          pendingTickerInfo.updateOpenInterest(openInterest)
+          pendingTickerInfo.updateTimestamp(new Date(Number(openInterestMessage.ts)))
+        }
+      }
+
+      if (message.arg.channel === 'funding-rate') {
+        const fundingRateMessage = dataMessage as OkexV5FundingRateMessage['data'][0]
+
+        pendingTickerInfo.updateFundingRate(Number(fundingRateMessage.fundingRate))
+        //
+        pendingTickerInfo.updateFundingTimestamp(new Date(Number(fundingRateMessage.fundingTime)))
+
+        if (fundingRateMessage.nextFundingRate !== undefined) {
+          pendingTickerInfo.updatePredictedFundingRate(Number(fundingRateMessage.nextFundingRate))
+        }
+      }
+
+      if (message.arg.channel === 'tickers') {
+        const tickerMessage = dataMessage as OkexV5TickerMessage['data'][0]
+
+        const lastPrice = Number(tickerMessage.last)
+
+        if (lastPrice > 0) {
+          pendingTickerInfo.updateLastPrice(lastPrice)
+          pendingTickerInfo.updateTimestamp(new Date(Number(tickerMessage.ts)))
+        }
+      }
+
+      if (pendingTickerInfo.hasChanged()) {
+        yield pendingTickerInfo.getSnapshot(localTimestamp)
+      }
+    }
+  }
+}
+
+export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+    return message.arg.channel === 'liquidations'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'liquidations',
+        symbols
+      } as any
+    ]
+  }
+
+  *map(okexLiquidationMessage: OkexV5LiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const okexLiquidation of okexLiquidationMessage.data) {
+      const liquidation: Liquidation = {
+        type: 'liquidation',
+        symbol: okexLiquidationMessage.arg.instId,
+        exchange: this._exchange,
+        id: undefined,
+        price: Number(okexLiquidation.bkPx),
+        amount: Number(okexLiquidation.sz),
+        side: okexLiquidation.side === 'buy' ? 'buy' : 'sell',
+        timestamp: new Date(Number(okexLiquidation.ts)),
+        localTimestamp: localTimestamp
+      }
+      yield liquidation
+    }
+  }
+}
+
+export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
+  private readonly _indexPrices = new Map<string, number>()
+  private readonly _openInterests = new Map<string, number>()
+  private readonly _markPrices = new Map<string, number>()
+
+  private readonly _tickers = new Map<string, OkexV5TickerMessage['data'][0]>()
+  private readonly expiration_regex = /(\d{2})(\d{2})(\d{2})/
+
+  canHandle(message: any) {
+    if (message.event !== undefined || message.arg === undefined) {
+      return false
+    }
+    return (
+      message.arg.channel === 'opt-summary' ||
+      message.arg.channel === 'index-tickers' ||
+      message.arg.channel === 'tickers' ||
+      message.arg.channel === 'open-interest' ||
+      message.arg.channel === 'mark-price'
+    )
+  }
+
+  getFilters(symbols?: string[]) {
+    const indexes =
+      symbols !== undefined
+        ? symbols.map((s) => {
+            const symbolParts = s.split('-')
+            return `${symbolParts[0]}-${symbolParts[1]}`
+          })
+        : undefined
+
+    return [
+      {
+        channel: `opt-summary`,
+        symbols: [] as string[]
+      } as const,
+      {
+        channel: `index-tickers`,
+        symbols: indexes
+      } as const,
+      {
+        channel: `tickers`,
+        symbols: symbols
+      } as const,
+      {
+        channel: `open-interest`,
+        symbols: symbols
+      } as const,
+      {
+        channel: `mark-price`,
+        symbols: symbols
+      } as const
+    ]
+  }
+
+  *map(
+    message: OkexV5SummaryMessage | OkexV5IndexTickerMessage | OkexV5TickerMessage | OkexV5OpenInterestMessage | OkexV5MarkPriceMessage,
+    localTimestamp: Date
+  ): IterableIterator<OptionSummary> | undefined {
+    if (message.arg.channel === 'index-tickers') {
+      for (const dataMessage of message.data) {
+        const indexTickerMessage = dataMessage as OkexV5IndexTickerMessage['data'][0]
+
+        const lastIndexPrice = Number(indexTickerMessage.idxPx)
+        if (lastIndexPrice > 0) {
+          this._indexPrices.set(indexTickerMessage.instId, lastIndexPrice)
+        }
+      }
+      return
+    }
+
+    if (message.arg.channel === 'open-interest') {
+      for (const dataMessage of message.data) {
+        const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
+
+        const openInterestValue = Number(openInterestMessage.oi)
+        if (openInterestValue > 0) {
+          this._openInterests.set(openInterestMessage.instId, openInterestValue)
+        }
+      }
+      return
+    }
+
+    if (message.arg.channel === 'mark-price') {
+      for (const dataMessage of message.data) {
+        const markPriceMessage = dataMessage as OkexV5MarkPriceMessage['data'][0]
+
+        const markPrice = Number(markPriceMessage.markPx)
+        if (markPrice > 0) {
+          this._markPrices.set(markPriceMessage.instId, markPrice)
+        }
+      }
+      return
+    }
+
+    if (message.arg.channel === 'tickers') {
+      for (const dataMessage of message.data) {
+        const tickerMessage = dataMessage as OkexV5TickerMessage['data'][0]
+
+        this._tickers.set(tickerMessage.instId, tickerMessage)
+      }
+      return
+    }
+
+    if (message.arg.channel === 'opt-summary') {
+      for (const dataMessage of message.data) {
+        const summary = dataMessage as OkexV5SummaryMessage['data'][0]
+
+        const symbolParts = summary.instId.split('-')
+        const isPut = symbolParts[4] === 'P'
+        const strikePrice = Number(symbolParts[3])
+
+        var dateArray = this.expiration_regex.exec(symbolParts[2])!
+
+        const expirationDate = new Date(Date.UTC(+('20' + dateArray[1]), +dateArray[2] - 1, +dateArray[3], 8, 0, 0, 0))
+        const lastUnderlyingPrice = this._indexPrices.get(summary.uly)
+
+        const lastOpenInterest = this._openInterests.get(summary.instId)
+
+        const lastMarkPrice = this._markPrices.get(summary.instId)
+
+        const lastTickerInfo = this._tickers.get(summary.instId)
+
+        const optionSummary: OptionSummary = {
+          type: 'option_summary',
+          symbol: summary.instId,
+          exchange: 'okex-options',
+          optionType: isPut ? 'put' : 'call',
+          strikePrice,
+          expirationDate,
+
+          bestBidPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidPx) : undefined,
+          bestBidAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidSz) : undefined,
+          bestBidIV: asNumberIfValid(summary.bidVol),
+
+          bestAskPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askPx) : undefined,
+          bestAskAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askSz) : undefined,
+          bestAskIV: asNumberIfValid(summary.askVol),
+
+          lastPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.last) : undefined,
+          openInterest: lastOpenInterest,
+
+          markPrice: lastMarkPrice,
+          markIV: asNumberIfValid(summary.markVol),
+
+          delta: asNumberIfValid(summary.delta),
+          gamma: asNumberIfValid(summary.gamma),
+          vega: asNumberIfValid(summary.vega),
+          theta: asNumberIfValid(summary.theta),
+          rho: undefined,
+
+          underlyingPrice: lastUnderlyingPrice,
+          underlyingIndex: summary.uly,
+
+          timestamp: new Date(Number(summary.ts)),
+          localTimestamp: localTimestamp
+        }
+
+        yield optionSummary
+      }
+    }
+  }
+}
+
+type OkexV5TradeMessage = {
+  arg: { channel: 'trades'; instId: 'CRV-USDT' }
+  data: [{ instId: 'CRV-USDT'; tradeId: '21300150'; px: '3.973'; sz: '13.491146'; side: 'buy'; ts: '1639999319938' }]
+}
+
+type OkexV5BookLevel = [string, string, string, string]
+
+type OkexV5BookMessage =
+  | {
+      arg: { channel: 'books-l2-tbt'; instId: string }
+      action: 'snapshot'
+      data: [
+        {
+          asks: OkexV5BookLevel[]
+          bids: OkexV5BookLevel[]
+          ts: string
+        }
+      ]
+    }
+  | {
+      arg: { channel: 'books-l2-tbt'; instId: string }
+      action: 'update'
+      data: [{ asks: OkexV5BookLevel[]; bids: OkexV5BookLevel[]; ts: string }]
+    }
+
+type OkexV5TickerMessage = {
+  arg: { channel: 'tickers'; instId: string }
+  data: [
+    {
+      instType: 'SPOT'
+      instId: 'ACT-USDT'
+      last: '0.00718'
+      lastSz: '8052.117146'
+      askPx: '0.0072'
+      askSz: '54969.407534'
+      bidPx: '0.00713'
+      bidSz: '4092.326'
+      open24h: '0.00717'
+      high24h: '0.00722'
+      low24h: '0.00696'
+      sodUtc0: '0.00714'
+      sodUtc8: '0.00721'
+      volCcy24h: '278377.765301'
+      vol24h: '39168761.49997'
+      ts: '1639999318686'
+    }
+  ]
+}
+
+type OkexV5OpenInterestMessage = {
+  arg: { channel: 'open-interest'; instId: string }
+  data: [{ instId: 'FIL-USDT-220325'; instType: 'FUTURES'; oi: '236870'; oiCcy: '23687'; ts: '1640131202886' }]
+}
+
+type OkexV5MarkPriceMessage = {
+  arg: { channel: 'mark-price'; instId: string }
+  data: [{ instId: 'FIL-USDT-220325'; instType: 'FUTURES'; markPx: '36.232'; ts: '1640131204676' }]
+}
+
+type OkexV5IndexTickerMessage = {
+  arg: { channel: 'index-tickers'; instId: string }
+  data: [
+    {
+      instId: 'FIL-USDT'
+      idxPx: '35.583'
+      open24h: '34.558'
+      high24h: '35.862'
+      low24h: '34.529'
+      sodUtc0: '35.309'
+      sodUtc8: '34.83'
+      ts: '1640140200581'
+    }
+  ]
+}
+
+type OkexV5FundingRateMessage = {
+  arg: { channel: 'funding-rate'; instId: string }
+  data: [{ fundingRate: '0.00048105'; fundingTime: '1640131200000'; instId: string; instType: 'SWAP'; nextFundingRate: '0.00114' }]
+}
+
+type OkexV5LiquidationMessage = {
+  arg: { channel: 'liquidations'; instId: 'BTC-USDT-211231'; generated: true }
+  data: [{ bkLoss: '0'; bkPx: '49674.2'; ccy: ''; posSide: 'short'; side: 'buy'; sz: '40'; ts: '1640140211925' }]
+}
+
+type OkexV5SummaryMessage = {
+  arg: { channel: 'opt-summary'; uly: 'ETH-USD' }
+  data: [
+    {
+      instType: 'OPTION'
+      instId: 'ETH-USD-211222-4000-C'
+      uly: 'ETH-USD'
+      delta: '0.1975745164'
+      gamma: '4.7290833601'
+      vega: '0.0002005415'
+      theta: '-0.004262964'
+      lever: '162.472613953'
+      markVol: '0.7794507758'
+      bidVol: '0.7421960156'
+      askVol: '0.8203208593'
+      realVol: ''
+      deltaBS: '0.2038286081'
+      gammaBS: '0.0013437829'
+      thetaBS: '-16.4798150221'
+      vegaBS: '0.7647227087'
+      ts: '1640001659301'
+    }
+  ]
+}
+
+//---
+//V3 Okex API mappers
 // https://www.okex.com/docs/en/#ws_swap-README
 
 export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {

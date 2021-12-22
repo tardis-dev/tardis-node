@@ -100,14 +100,9 @@ describe('stream', () => {
           if (
             exchange === 'binance-dex' ||
             exchange === 'binance-jersey' ||
-            exchange === 'huobi-dm-linear-swap' ||
-            exchange === 'okex-futures' ||
-            exchange === 'okex-options' ||
             exchange === 'huobi-dm-options' ||
             exchange === 'star-atlas' ||
-            exchange === 'binance-options' ||
-            exchange === 'coinflex' ||
-            exchange === 'bitmex'
+            exchange === 'binance-options'
           ) {
             return
           }
@@ -139,7 +134,7 @@ describe('stream', () => {
               withDisconnectMessages: true,
               timeoutIntervalMS: 30 * 1000,
               onError: (err) => {
-                console.log('Error', err, exchange)
+                console.log('Error', exchange, err)
               }
             },
             ...normalizers

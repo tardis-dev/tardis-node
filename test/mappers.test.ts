@@ -886,6 +886,68 @@ describe('mappers', () => {
       const mappedMessages = okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
+
+    const okexV5Mapper = createMapper('okex', new Date('2021-12-23T00:00:00.000Z'))
+
+    const okexV5Messages = [
+      { event: 'subscribe', arg: { channel: 'trades', instId: 'BTC-USDT' } },
+      {
+        arg: { channel: 'trades', instId: 'CRV-USDT' },
+        data: [{ instId: 'CRV-USDT', tradeId: '21300150', px: '3.973', sz: '13.491146', side: 'buy', ts: '1639999319938' }]
+      },
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'BTC-DAI' },
+        action: 'snapshot',
+        data: [
+          {
+            asks: [
+              ['46167.8', '0.02250534', '0', '3'],
+              ['46167.9', '0.00455491', '0', '1']
+            ],
+            bids: [
+              ['46043.4', '0.00375882', '0', '1'],
+              ['46043.3', '0.00238905', '0', '1'],
+              ['45906.8', '0.0435796', '0', '1']
+            ],
+            ts: '1639999305247',
+            checksum: -1971869027
+          }
+        ]
+      },
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'ETC-ETH' },
+        action: 'update',
+        data: [{ asks: [], bids: [['0.00895', '3.5', '0', '1']], ts: '1639999318695', checksum: 386150553 }]
+      },
+      {
+        arg: { channel: 'tickers', instId: 'ACT-USDT' },
+        data: [
+          {
+            instType: 'SPOT',
+            instId: 'ACT-USDT',
+            last: '0.00718',
+            lastSz: '8052.117146',
+            askPx: '0.0072',
+            askSz: '54969.407534',
+            bidPx: '0.00713',
+            bidSz: '4092.326',
+            open24h: '0.00717',
+            high24h: '0.00722',
+            low24h: '0.00696',
+            sodUtc0: '0.00714',
+            sodUtc8: '0.00721',
+            volCcy24h: '278377.765301',
+            vol24h: '39168761.49997',
+            ts: '1639999318686'
+          }
+        ]
+      }
+    ]
+
+    for (const message of okexV5Messages) {
+      const mappedMessages = okexV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
   })
 
   test('map okex-futures messages', () => {
@@ -1156,6 +1218,113 @@ describe('mappers', () => {
       const mappedMessages = okexFuturesMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
+
+    const okexFuturesV5Mapper = createMapper('okex-futures', new Date('2021-12-23T00:00:00.000Z'))
+
+    const okexFuturesV5Messages = [
+      { event: 'subscribe', arg: { channel: 'trades', instId: 'ETH-USD-211224' } },
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'ADA-USDT-211224' },
+        action: 'snapshot',
+        data: [
+          {
+            asks: [['1.27898', '65', '0', '1']],
+            bids: [
+              ['1.27803', '2', '0', '1'],
+              ['1.27802', '65', '0', '1']
+            ],
+            ts: '1640131206623',
+            checksum: -44519492
+          }
+        ]
+      },
+      {
+        arg: { channel: 'trades', instId: 'FIL-USD-220325' },
+        data: [{ instId: 'FIL-USD-220325', tradeId: '1271987', px: '36.239', sz: '11', side: 'buy', ts: '1640131185600' }]
+      },
+      {
+        arg: { channel: 'mark-price', instId: 'FIL-USDT-220325' },
+        data: [{ instId: 'FIL-USDT-220325', instType: 'FUTURES', markPx: '36.232', ts: '1640131204676' }]
+      },
+      {
+        arg: { channel: 'open-interest', instId: 'FIL-USDT-220325' },
+        data: [{ instId: 'FIL-USDT-220325', instType: 'FUTURES', oi: '236870', oiCcy: '23687', ts: '1640131202886' }]
+      },
+      {
+        arg: { channel: 'price-limit', instId: 'XRP-USD-211231' },
+        data: [{ buyLmt: '0.98122', instId: 'XRP-USD-211231', instType: 'FUTURES', sellLmt: '0.90546', ts: '1640131201675' }]
+      },
+      {
+        arg: { channel: 'tickers', instId: 'FIL-USDT-220325' },
+        data: [
+          {
+            instType: 'FUTURES',
+            instId: 'FIL-USDT-220325',
+            last: '36.245',
+            lastSz: '5',
+            askPx: '36.251',
+            askSz: '900',
+            bidPx: '36.214',
+            bidSz: '240',
+            open24h: '35.733',
+            high24h: '37.278',
+            low24h: '35.132',
+            sodUtc0: '36.245',
+            sodUtc8: '35.702',
+            volCcy24h: '39687.4',
+            vol24h: '396874',
+            ts: '1640131209045'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'LTC-USDT-220624' },
+        action: 'update',
+        data: [
+          {
+            asks: [],
+            bids: [
+              ['161.26', '6', '0', '1'],
+              ['161.24', '0', '0', '0']
+            ],
+            ts: '1640131256488',
+            checksum: -465502296
+          }
+        ]
+      },
+      {
+        arg: { channel: 'liquidations', instId: 'BTC-USD-220624', generated: true },
+        data: [{ bkLoss: '0', bkPx: '51886.2', ccy: '', posSide: 'short', side: 'buy', sz: '12', ts: '1640140210617' }]
+      },
+      {
+        arg: { channel: 'liquidations', instId: 'BTC-USDT-211231', generated: true },
+        data: [{ bkLoss: '0', bkPx: '49674.2', ccy: '', posSide: 'short', side: 'buy', sz: '40', ts: '1640140211925' }]
+      },
+      {
+        arg: { channel: 'index-tickers', instId: 'FIL-USDT' },
+        data: [
+          {
+            instId: 'FIL-USDT',
+            idxPx: '35.583',
+            open24h: '34.558',
+            high24h: '35.862',
+            low24h: '34.529',
+            sodUtc0: '35.309',
+            sodUtc8: '34.83',
+            ts: '1640140200581'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'mark-price', instId: 'FIL-USDT-220325' },
+        data: [{ instId: 'FIL-USDT-220325', instType: 'FUTURES', markPx: '36.662', ts: '1640140257676' }]
+      }
+    ]
+
+    for (const message of okexFuturesV5Messages) {
+      const mappedMessages = okexFuturesV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
   })
 
   test('map okex-swap messages', () => {
@@ -1340,6 +1509,92 @@ describe('mappers', () => {
 
     for (const message of messagesWithTickByTickBook) {
       const mappedMessages = okexSwap.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const okexSwapV5Mapper = createMapper('okex-swap', new Date('2021-12-23T00:00:00.000Z'))
+
+    const okexSwapV5Messages = [
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'REN-USDT-SWAP' },
+        action: 'update',
+        data: [
+          {
+            asks: [['0.65442', '14', '0', '2']],
+            bids: [
+              ['0.65441', '1', '0', '1'],
+              ['0.65418', '0', '0', '0']
+            ],
+            ts: '1640131236035',
+            checksum: 2017579879
+          }
+        ]
+      },
+      {
+        arg: { channel: 'funding-rate', instId: 'WNCG-USDT-SWAP' },
+        data: [
+          {
+            fundingRate: '0.00048105',
+            fundingTime: '1640131200000',
+            instId: 'WNCG-USDT-SWAP',
+            instType: 'SWAP',
+            nextFundingRate: '0.00114'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'trades', instId: 'BTC-USDT-SWAP' },
+        data: [{ instId: 'BTC-USDT-SWAP', tradeId: '148266905', px: '48938.5', sz: '5', side: 'buy', ts: '1640131236050' }]
+      },
+      {
+        arg: { channel: 'tickers', instId: 'WNCG-USDT-SWAP' },
+        data: [
+          {
+            instType: 'SWAP',
+            instId: 'WNCG-USDT-SWAP',
+            last: '2.1729',
+            lastSz: '0',
+            askPx: '2.1738',
+            askSz: '168',
+            bidPx: '2.1737',
+            bidSz: '2',
+            open24h: '2.164',
+            high24h: '2.25',
+            low24h: '2.1493',
+            sodUtc0: '2.1718',
+            sodUtc8: '2.1644',
+            volCcy24h: '803940',
+            vol24h: '803940',
+            ts: '1640131263109'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'index-tickers', instId: 'WNCG-USDT' },
+        data: [
+          {
+            instId: 'WNCG-USDT',
+            idxPx: '2.1675',
+            open24h: '2.1599',
+            high24h: '2.2499',
+            low24h: '2.1524',
+            sodUtc0: '2.1658',
+            sodUtc8: '2.1641',
+            ts: '1640131290649'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'mark-price', instId: 'WNCG-USDT-SWAP' },
+        data: [{ instId: 'WNCG-USDT-SWAP', instType: 'SWAP', markPx: '2.1729', ts: '1640131259180' }]
+      },
+      {
+        arg: { channel: 'open-interest', instId: 'WNCG-USDT-SWAP' },
+        data: [{ instId: 'WNCG-USDT-SWAP', instType: 'SWAP', oi: '644195', oiCcy: '644195', ts: '1640131258756' }]
+      }
+    ]
+    for (const message of okexSwapV5Messages) {
+      const mappedMessages = okexSwapV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
@@ -1634,6 +1889,124 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okexOptions.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const okexOptionsV5Mapper = createMapper('okex-options', new Date('2021-12-23T00:00:00.000Z'))
+
+    const okexOptionsV5Messages = [
+      {
+        arg: { channel: 'books-l2-tbt', instId: 'ETH-USD-220128-3500-C' },
+        action: 'update',
+        data: [
+          {
+            asks: [
+              ['0.1795', '500', '0', '1'],
+              ['0.18', '0', '0', '0']
+            ],
+            bids: [],
+            ts: '1640001600039',
+            checksum: 496416989
+          }
+        ]
+      },
+      {
+        arg: { channel: 'index-tickers', instId: 'ETH-USD' },
+        data: [
+          {
+            instId: 'ETH-USD',
+            idxPx: '3814.05',
+            open24h: '3928.05',
+            high24h: '3999.49',
+            low24h: '3764.14',
+            sodUtc0: '3925.3',
+            sodUtc8: '3927.32',
+            ts: '1640001659508'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'open-interest', instId: 'ETH-USD-211231-9600-C' },
+        data: [{ instId: 'ETH-USD-211231-9600-C', instType: 'OPTION', oi: '36', oiCcy: '3.6', ts: '1640183217591' }]
+      },
+      {
+        arg: { channel: 'mark-price', instId: 'ETH-USD-211231-9600-C' },
+        data: [{ instId: 'ETH-USD-211231-9600-C', instType: 'OPTION', markPx: '3.8005764218904408', ts: '1640183727000' }]
+      },
+      {
+        arg: { channel: 'tickers', instId: 'ETH-USD-211231-9600-C' },
+        data: [
+          {
+            instType: 'OPTION',
+            instId: 'ETH-USD-211231-9600-C',
+            last: '0.006',
+            lastSz: '0',
+            askPx: '0.0005',
+            askSz: '111',
+            bidPx: '',
+            bidSz: '',
+            open24h: '0.006',
+            high24h: '0.006',
+            low24h: '0.006',
+            sodUtc0: '0.006',
+            sodUtc8: '0.006',
+            volCcy24h: '0',
+            vol24h: '0',
+            ts: '1640001603301'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'opt-summary', uly: 'ETH-USD' },
+        data: [
+          {
+            instType: 'OPTION',
+            instId: 'ETH-USD-211222-4000-C',
+            uly: 'ETH-USD',
+            delta: '0.1975745164',
+            gamma: '4.7290833601',
+            vega: '0.0002005415',
+            theta: '-0.004262964',
+            lever: '162.472613953',
+            markVol: '0.7794507758',
+            bidVol: '0.7421960156',
+            askVol: '0.8203208593',
+            realVol: '',
+            deltaBS: '0.2038286081',
+            gammaBS: '0.0013437829',
+            thetaBS: '-16.4798150221',
+            vegaBS: '0.7647227087',
+            ts: '1640001659301'
+          },
+          {
+            instType: 'OPTION',
+            instId: 'ETH-USD-211231-9600-C',
+            uly: 'ETH-USD',
+            delta: '0.0034043137',
+            gamma: '0.0275368426',
+            vega: '0.0000192452',
+            theta: '-0.0001676198',
+            lever: '2000',
+            markVol: '1.8880399194',
+            bidVol: '',
+            askVol: '1.9531310937',
+            realVol: '',
+            deltaBS: '0.0037586392',
+            gammaBS: '0.0000090065',
+            thetaBS: '-0.6403023344',
+            vegaBS: '0.0733893466',
+            ts: '1640001659181'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'trades', instId: 'BTC-USD-211224-56000-C' },
+        data: [{ instId: 'BTC-USD-211224-56000-C', tradeId: '376', px: '0.0005', sz: '1', side: 'buy', ts: '1640001607045' }]
+      }
+    ]
+
+    for (const message of okexOptionsV5Messages) {
+      const mappedMessages = okexOptionsV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

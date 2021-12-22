@@ -6185,6 +6185,97 @@ Array [
 ]
 `;
 
+exports[`mappers map okex messages 8`] = `Array []`;
+
+exports[`mappers map okex messages 9`] = `
+Array [
+  Object {
+    "amount": 13.491146,
+    "exchange": "okex",
+    "id": "21300150",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 3.973,
+    "side": "buy",
+    "symbol": "CRV-USDT",
+    "timestamp": 2021-12-20T11:21:59.938Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex messages 10`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.02250534,
+        "price": 46167.8,
+      },
+      Object {
+        "amount": 0.00455491,
+        "price": 46167.9,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.00375882,
+        "price": 46043.4,
+      },
+      Object {
+        "amount": 0.00238905,
+        "price": 46043.3,
+      },
+      Object {
+        "amount": 0.0435796,
+        "price": 45906.8,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": true,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "BTC-DAI",
+    "timestamp": 2021-12-20T11:21:45.247Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex messages 11`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 3.5,
+        "price": 0.00895,
+      },
+    ],
+    "exchange": "okex",
+    "isSnapshot": false,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "ETC-ETH",
+    "timestamp": 2021-12-20T11:21:58.695Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex messages 12`] = `
+Array [
+  Object {
+    "askAmount": 54969.407534,
+    "askPrice": 0.0072,
+    "bidAmount": 4092.326,
+    "bidPrice": 0.00713,
+    "exchange": "okex",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "ACT-USDT",
+    "timestamp": 2021-12-20T11:21:58.686Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map okex-futures messages 1`] = `
 Array [
   Object {
@@ -6486,6 +6577,200 @@ Array [
     "symbol": "BTC-USD-210326",
     "timestamp": 2020-12-18T08:32:34.576Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 18`] = `Array []`;
+
+exports[`mappers map okex-futures messages 19`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 65,
+        "price": 1.27898,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2,
+        "price": 1.27803,
+      },
+      Object {
+        "amount": 65,
+        "price": 1.27802,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "ADA-USDT-211224",
+    "timestamp": 2021-12-22T00:00:06.623Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 20`] = `
+Array [
+  Object {
+    "amount": 11,
+    "exchange": "okex-futures",
+    "id": "1271987",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 36.239,
+    "side": "buy",
+    "symbol": "FIL-USD-220325",
+    "timestamp": 2021-12-21T23:59:45.600Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 21`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 36.232,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "FIL-USDT-220325",
+    "timestamp": 2021-12-22T00:00:04.676Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 22`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 36.232,
+    "openInterest": 236870,
+    "predictedFundingRate": undefined,
+    "symbol": "FIL-USDT-220325",
+    "timestamp": 2021-12-22T00:00:04.676Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 23`] = `Array []`;
+
+exports[`mappers map okex-futures messages 24`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 36.245,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 36.232,
+    "openInterest": 236870,
+    "predictedFundingRate": undefined,
+    "symbol": "FIL-USDT-220325",
+    "timestamp": 2021-12-22T00:00:09.045Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 900,
+    "askPrice": 36.251,
+    "bidAmount": 240,
+    "bidPrice": 36.214,
+    "exchange": "okex-futures",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "FIL-USDT-220325",
+    "timestamp": 2021-12-22T00:00:09.045Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 25`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 6,
+        "price": 161.26,
+      },
+      Object {
+        "amount": 0,
+        "price": 161.24,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "LTC-USDT-220624",
+    "timestamp": 2021-12-22T00:00:56.488Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 26`] = `
+Array [
+  Object {
+    "amount": 12,
+    "exchange": "okex-futures",
+    "id": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 51886.2,
+    "side": "buy",
+    "symbol": "BTC-USD-220624",
+    "timestamp": 2021-12-22T02:30:10.617Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 27`] = `
+Array [
+  Object {
+    "amount": 40,
+    "exchange": "okex-futures",
+    "id": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 49674.2,
+    "side": "buy",
+    "symbol": "BTC-USDT-211231",
+    "timestamp": 2021-12-22T02:30:11.925Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-futures messages 28`] = `Array []`;
+
+exports[`mappers map okex-futures messages 29`] = `
+Array [
+  Object {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 35.583,
+    "lastPrice": 36.245,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 36.662,
+    "openInterest": 236870,
+    "predictedFundingRate": undefined,
+    "symbol": "FIL-USDT-220325",
+    "timestamp": 2021-12-22T02:30:57.676Z,
+    "type": "derivative_ticker",
   },
 ]
 `;
@@ -6962,6 +7247,127 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-options messages 23`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 500,
+        "price": 0.1795,
+      },
+      Object {
+        "amount": 0,
+        "price": 0.18,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "okex-options",
+    "isSnapshot": false,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "ETH-USD-220128-3500-C",
+    "timestamp": 2021-12-20T12:00:00.039Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 24`] = `Array []`;
+
+exports[`mappers map okex-options messages 25`] = `Array []`;
+
+exports[`mappers map okex-options messages 26`] = `Array []`;
+
+exports[`mappers map okex-options messages 27`] = `
+Array [
+  Object {
+    "askAmount": 111,
+    "askPrice": 0.0005,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "okex-options",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "ETH-USD-211231-9600-C",
+    "timestamp": 2021-12-20T12:00:03.301Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 28`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 0.8203208593,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": 0.7421960156,
+    "bestBidPrice": undefined,
+    "delta": 0.1975745164,
+    "exchange": "okex-options",
+    "expirationDate": 2021-12-22T08:00:00.000Z,
+    "gamma": 4.7290833601,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markIV": 0.7794507758,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 4000,
+    "symbol": "ETH-USD-211222-4000-C",
+    "theta": -0.004262964,
+    "timestamp": 2021-12-20T12:00:59.301Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 3814.05,
+    "vega": 0.0002005415,
+  },
+  Object {
+    "bestAskAmount": 111,
+    "bestAskIV": 1.9531310937,
+    "bestAskPrice": 0.0005,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.0034043137,
+    "exchange": "okex-options",
+    "expirationDate": 2021-12-31T08:00:00.000Z,
+    "gamma": 0.0275368426,
+    "lastPrice": 0.006,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markIV": 1.8880399194,
+    "markPrice": 3.8005764218904408,
+    "openInterest": 36,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 9600,
+    "symbol": "ETH-USD-211231-9600-C",
+    "theta": -0.0001676198,
+    "timestamp": 2021-12-20T12:00:59.181Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 3814.05,
+    "vega": 0.0000192452,
+  },
+]
+`;
+
+exports[`mappers map okex-options messages 29`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "okex-options",
+    "id": "376",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 0.0005,
+    "side": "buy",
+    "symbol": "BTC-USD-211224-56000-C",
+    "timestamp": 2021-12-20T12:00:07.045Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map okex-swap messages 1`] = `
 Array [
   Object {
@@ -7211,6 +7617,140 @@ Array [
     "symbol": "BTC-USDT-SWAP",
     "timestamp": 2020-12-18T00:31:08.794Z,
     "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 14`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 14,
+        "price": 0.65442,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1,
+        "price": 0.65441,
+      },
+      Object {
+        "amount": 0,
+        "price": 0.65418,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "REN-USDT-SWAP",
+    "timestamp": 2021-12-22T00:00:36.035Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 15`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": 0.00048105,
+    "fundingTimestamp": 2021-12-22T00:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.00114,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-23T00:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 16`] = `
+Array [
+  Object {
+    "amount": 5,
+    "exchange": "okex-swap",
+    "id": "148266905",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 48938.5,
+    "side": "buy",
+    "symbol": "BTC-USDT-SWAP",
+    "timestamp": 2021-12-22T00:00:36.050Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 17`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": 0.00048105,
+    "fundingTimestamp": 2021-12-22T00:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": 2.1729,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.00114,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-23T00:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 168,
+    "askPrice": 2.1738,
+    "bidAmount": 2,
+    "bidPrice": 2.1737,
+    "exchange": "okex-swap",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-22T00:01:03.109Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 18`] = `Array []`;
+
+exports[`mappers map okex-swap messages 19`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": 0.00048105,
+    "fundingTimestamp": 2021-12-22T00:00:00.000Z,
+    "indexPrice": 2.1675,
+    "lastPrice": 2.1729,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 2.1729,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.00114,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-23T00:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 20`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": 0.00048105,
+    "fundingTimestamp": 2021-12-22T00:00:00.000Z,
+    "indexPrice": 2.1675,
+    "lastPrice": 2.1729,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": 2.1729,
+    "openInterest": 644195,
+    "predictedFundingRate": 0.00114,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-23T00:00:00.000Z,
+    "type": "derivative_ticker",
   },
 ]
 `;
