@@ -215,7 +215,7 @@ describe('replay', () => {
         bitstamp: { symbols: ['btcusd', 'btceur'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         coinbase: { symbols: ['BTC-USDC', 'BTC-USD'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
         cryptofacilities: { symbols: ['PI_XRPUSD', 'PI_XBTUSD'], from: '2019-04-01T00:00:00.000Z', to: '2019-04-02T00:00:00.000Z' },
-        gemini: { symbols: ['btcusd'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
+        gemini: { symbols: ['BTCUSD'], from: '2019-09-01T00:00:00.000Z', to: '2019-09-02T00:00:00.000Z' },
         kraken: { symbols: ['XBT/USD', 'XBT/JPY'], from: '2019-07-01T00:00:00.000Z', to: '2019-07-02T00:00:00.000Z' },
         bitfinex: { symbols: ['BTCUST', 'BTCUSD'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
         'bitfinex-derivatives': { symbols: ['BTCF0:USTF0'], from: '2019-10-01T00:00:00.000Z', to: '2019-10-02T00:00:00.000Z' },
