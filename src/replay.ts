@@ -247,12 +247,6 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     ? X
     : never
 > {
-  // mappers assume that symbols are uppercased by default
-  // if user by mistake provide lowercase one let's automatically fix it
-  if (symbols !== undefined) {
-    symbols = symbols.map((s) => s.toUpperCase())
-  }
-
   const fromDate = parseAsUTCDate(from)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
@@ -275,8 +269,9 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
   // for symbols we've not requested for
+  const upperCaseSymbols = symbols !== undefined ? symbols.map((s) => s.toUpperCase()) : undefined
   const filter = (symbol: string) => {
-    return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
+    return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
   }
 
   return normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter)

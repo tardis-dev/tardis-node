@@ -61,12 +61,6 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
     ? X
     : never
 > {
-  // mappers assume that symbols are uppercased by default
-  // if user by mistake provide lowercase one let's automatically fix it
-  if (symbols !== undefined) {
-    symbols = symbols.map((s) => s.toUpperCase())
-  }
-
   while (true) {
     try {
       const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
@@ -83,8 +77,10 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
 
       // filter normalized messages by symbol as some exchanges do not offer subscribing to specific symbols for some of the channels
       // for example Phemex market24h channel
+
+      const upperCaseSymbols = symbols !== undefined ? symbols.map((s) => s.toUpperCase()) : undefined
       const filter = (symbol: string) => {
-        return symbols === undefined || symbols.length === 0 || symbols.includes(symbol)
+        return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
       }
 
       const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter, new Date())

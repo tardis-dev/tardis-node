@@ -21,7 +21,7 @@ export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> 
   *map(message: SerumVialTrade, localTimestamp: Date): IterableIterator<Trade> {
     yield {
       type: 'trade',
-      symbol: message.market,
+      symbol: message.market.toUpperCase(),
       exchange: this._exchange,
       id: message.id,
       price: Number(message.price),
@@ -56,7 +56,7 @@ export class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', Boo
   *map(message: SerumVialL2Snapshot | SerumVialL2Update, localTimestamp: Date): IterableIterator<BookChange> {
     yield {
       type: 'book_change',
-      symbol: message.market,
+      symbol: message.market.toUpperCase(),
       exchange: this._exchange,
       isSnapshot: message.type === 'l2snapshot',
       bids: message.bids.map(this.mapBookLevel),
@@ -92,7 +92,7 @@ export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', Boo
   *map(message: SerumVialQuote, localTimestamp: Date): IterableIterator<BookTicker> {
     yield {
       type: 'book_ticker',
-      symbol: message.market,
+      symbol: message.market.toUpperCase(),
       exchange: this._exchange,
 
       askAmount: message.bestAsk !== undefined ? asNumberIfValid(message.bestAsk[1]) : undefined,
