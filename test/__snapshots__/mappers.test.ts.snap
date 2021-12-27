@@ -7368,6 +7368,38 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-options messages 30`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": 5,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": -1.0127414362,
+    "exchange": "okex-options",
+    "expirationDate": 2021-12-27T08:00:00.000Z,
+    "gamma": 5.1005664647,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markIV": 1.30710927,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 4150,
+    "symbol": "ETH-USD-211227-4150-P",
+    "theta": -0.0002998793,
+    "timestamp": 2021-12-27T07:00:00.390Z,
+    "type": "option_summary",
+    "underlyingIndex": "ETH-USD",
+    "underlyingPrice": 3814.05,
+    "vega": 0.0000045884,
+  },
+]
+`;
+
 exports[`mappers map okex-swap messages 1`] = `
 Array [
   Object {

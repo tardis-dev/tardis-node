@@ -354,8 +354,8 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const indexTickerMessage = dataMessage as OkexV5IndexTickerMessage['data'][0]
 
-        const lastIndexPrice = Number(indexTickerMessage.idxPx)
-        if (lastIndexPrice > 0) {
+        const lastIndexPrice = asNumberIfValid(indexTickerMessage.idxPx)
+        if (lastIndexPrice !== undefined) {
           this._indexPrices.set(indexTickerMessage.instId, lastIndexPrice)
         }
       }
@@ -366,8 +366,8 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
 
-        const openInterestValue = Number(openInterestMessage.oi)
-        if (openInterestValue > 0) {
+        const openInterestValue = asNumberIfValid(openInterestMessage.oi)
+        if (openInterestValue !== undefined) {
           this._openInterests.set(openInterestMessage.instId, openInterestValue)
         }
       }
@@ -378,8 +378,8 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const markPriceMessage = dataMessage as OkexV5MarkPriceMessage['data'][0]
 
-        const markPrice = Number(markPriceMessage.markPx)
-        if (markPrice > 0) {
+        const markPrice = asNumberIfValid(markPriceMessage.markPx)
+        if (markPrice !== undefined) {
           this._markPrices.set(markPriceMessage.instId, markPrice)
         }
       }

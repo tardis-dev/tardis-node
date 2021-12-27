@@ -2002,6 +2002,30 @@ describe('mappers', () => {
       {
         arg: { channel: 'trades', instId: 'BTC-USD-211224-56000-C' },
         data: [{ instId: 'BTC-USD-211224-56000-C', tradeId: '376', px: '0.0005', sz: '1', side: 'buy', ts: '1640001607045' }]
+      },
+      {
+        arg: { channel: 'opt-summary', uly: 'ETH-USD' },
+        data: [
+          {
+            instType: 'OPTION',
+            instId: 'ETH-USD-211227-4150-P',
+            uly: 'ETH-USD',
+            delta: '-1.0127414362',
+            gamma: '5.1005664647',
+            vega: '0.0000045884',
+            theta: '-0.0002998793',
+            lever: '0',
+            markVol: '1.30710927',
+            bidVol: '',
+            askVol: '5',
+            realVol: '',
+            deltaBS: '-0.9826286266',
+            gammaBS: '0.000755397',
+            thetaBS: '-43.7640140001',
+            vegaBS: '0.0186786885',
+            ts: '1640588400390'
+          }
+        ]
       }
     ]
 
