@@ -1,5 +1,5 @@
-import { asNumberIfValid } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, Trade, OptionSummary, Liquidation, BookTicker } from '../types'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // V5 Okex API mappers
@@ -16,6 +16,8 @@ export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `trades` as const,
@@ -59,6 +61,8 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `books-l2-tbt` as const,
@@ -104,6 +108,8 @@ export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `tickers` as const,
@@ -154,6 +160,8 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
     return channels.map((channel) => {
       if (channel === 'index-tickers') {
@@ -266,6 +274,8 @@ export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidat
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'liquidations',
@@ -314,6 +324,8 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const indexes =
       symbols !== undefined
         ? symbols.map((s) => {
@@ -577,6 +589,8 @@ export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `${this._market}/trade` as const,
@@ -625,6 +639,8 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     if (this._canUseTickByTickChannel) {
       return [
         {
@@ -689,6 +705,8 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
     return channels.map((channel) => {
       return {
@@ -745,6 +763,8 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const indexes =
       symbols !== undefined
         ? symbols.map((s) => {
@@ -834,6 +854,8 @@ export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidatio
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `${this._market}/liquidation`,
@@ -868,6 +890,8 @@ export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: `${this._market}/ticker`,

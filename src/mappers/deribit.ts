@@ -1,5 +1,5 @@
-import { asNumberIfValid } from '../handy'
-import { BookChange, DerivativeTicker, Trade, OptionSummary, Liquidation, BookTicker } from '../types'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
@@ -15,6 +15,8 @@ export const deribitTradesMapper: Mapper<'deribit', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -58,6 +60,8 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'book',
@@ -98,6 +102,8 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',
@@ -125,6 +131,8 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
 
 export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSummary> {
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',
@@ -205,6 +213,8 @@ export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -251,6 +261,8 @@ export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

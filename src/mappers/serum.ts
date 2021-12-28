@@ -1,6 +1,6 @@
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
-import { Trade, BookChange, BookTicker, Exchange } from '../types'
-import { asNumberIfValid } from '../handy'
 
 export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
   constructor(private readonly _exchange: Exchange) {}
@@ -10,6 +10,10 @@ export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> 
   }
 
   getFilters(symbols?: string[]) {
+    if (this._exchange === 'serum') {
+      symbols = upperCaseSymbols(symbols)
+    }
+
     return [
       {
         channel: 'trade',
@@ -41,6 +45,10 @@ export class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', Boo
   }
 
   getFilters(symbols?: string[]) {
+    if (this._exchange === 'serum') {
+      symbols = upperCaseSymbols(symbols)
+    }
+
     return [
       {
         channel: 'l2snapshot',
@@ -81,6 +89,10 @@ export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', Boo
   }
 
   getFilters(symbols?: string[]) {
+    if (this._exchange === 'serum') {
+      symbols = upperCaseSymbols(symbols)
+    }
+
     return [
       {
         channel: 'quote',

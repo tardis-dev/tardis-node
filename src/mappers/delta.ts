@@ -1,5 +1,6 @@
+import { upperCaseSymbols } from '../handy'
+import { BookChange, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { Trade, BookChange, DerivativeTicker } from '../types'
 
 const fromMicroSecondsToDate = (micros: number) => {
   const timestamp = new Date(micros / 1000)
@@ -16,6 +17,8 @@ export class DeltaTradesMapper implements Mapper<'delta', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: this._useV2Channels ? 'all_trades' : 'recent_trade',
@@ -52,6 +55,8 @@ export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'l2_orderbook',
@@ -88,6 +93,8 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: this._useV2Channels ? 'all_trades' : 'recent_trade',

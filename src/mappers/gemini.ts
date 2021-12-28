@@ -1,3 +1,4 @@
+import { upperCaseSymbols } from '../handy'
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -9,6 +10,8 @@ export const geminiTradesMapper: Mapper<'gemini', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -45,6 +48,8 @@ export const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'l2_updates',

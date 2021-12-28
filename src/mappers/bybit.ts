@@ -1,3 +1,4 @@
+import { upperCaseSymbols } from '../handy'
 import { BookChange, DerivativeTicker, Exchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
@@ -14,6 +15,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -57,6 +60,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     if (this._canUseBook200Channel) {
       return [
         {
@@ -117,6 +122,8 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'instrument_info',
@@ -190,6 +197,8 @@ export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'liquidation',

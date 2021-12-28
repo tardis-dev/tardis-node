@@ -1,5 +1,5 @@
-import { asNumberIfValid } from '../handy'
-import { BookChange, BookPriceLevel, DerivativeTicker, FilterForExchange, Liquidation, Trade, BookTicker } from '../types'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.bitmex.com/app/wsAPI
@@ -10,6 +10,8 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -45,6 +47,8 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'orderBookL2',
@@ -150,6 +154,8 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'instrument',
@@ -198,6 +204,8 @@ export const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'liquidation',
@@ -231,6 +239,8 @@ export const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'quote',

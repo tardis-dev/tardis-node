@@ -1,4 +1,5 @@
-import { BookChange, Trade, DerivativeTicker } from '../types'
+import { upperCaseSymbols } from '../handy'
+import { BookChange, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.coinflex.com/v2/#websocket-api-subscriptions-public
@@ -9,6 +10,8 @@ export const coinflexTradesMapper: Mapper<'coinflex', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -47,6 +50,8 @@ export const coinflexBookChangeMapper: Mapper<'coinflex', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'futures/depth',
@@ -79,6 +84,8 @@ export class CoinflexDerivativeTickerMapper implements Mapper<'coinflex', Deriva
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

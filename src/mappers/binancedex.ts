@@ -1,4 +1,5 @@
-import { BookChange, Trade, BookTicker } from '../types'
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
 
 // https://docs.binance.org/api-reference/dex-api/ws-streams.html
@@ -9,6 +10,8 @@ export const binanceDexTradesMapper: Mapper<'binance-dex', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -46,6 +49,7 @@ export const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'depthSnapshot',
@@ -96,6 +100,7 @@ export const binanceDexBookTickerMapper: Mapper<'binance-dex', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'ticker',

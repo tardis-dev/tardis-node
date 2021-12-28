@@ -1,4 +1,5 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade, BookTicker } from '../types'
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
@@ -33,6 +34,8 @@ export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-deriv
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -107,6 +110,8 @@ export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-d
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'book',
@@ -187,6 +192,8 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'status',
@@ -345,6 +352,8 @@ export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-d
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

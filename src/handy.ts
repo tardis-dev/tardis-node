@@ -451,4 +451,18 @@ if (httpsProxyAgent !== undefined) {
   }
 }
 
+export function upperCaseSymbols(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map((s) => s.toUpperCase())
+  }
+  return
+}
+
+export function lowerCaseSymbols(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map((s) => s.toLowerCase())
+  }
+  return
+}
+
 export const httpClient = got.extend(gotDefaultOptions)

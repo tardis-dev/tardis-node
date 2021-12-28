@@ -1,4 +1,5 @@
-import { BookChange, DerivativeTicker, Liquidation, BookTicker, Trade } from '../types'
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API
@@ -9,6 +10,8 @@ export const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -42,6 +45,8 @@ export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookCh
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'book',
@@ -96,6 +101,8 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',
@@ -130,6 +137,8 @@ export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liqu
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -159,6 +168,8 @@ export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTi
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

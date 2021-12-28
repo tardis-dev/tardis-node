@@ -1,5 +1,6 @@
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookPriceLevel, Trade } from '../types'
 import { Mapper } from './mapper'
-import { Trade, BookChange, BookPriceLevel } from '../types'
 
 export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
   canHandle(message: UpbitTrade) {
@@ -7,6 +8,8 @@ export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -36,6 +39,8 @@ export class UpbitBookChangeMapper implements Mapper<'upbit', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'orderbook',

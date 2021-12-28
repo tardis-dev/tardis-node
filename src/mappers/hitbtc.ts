@@ -1,3 +1,4 @@
+import { upperCaseSymbols } from '../handy'
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -9,6 +10,8 @@ export const hitBtcTradesMapper: Mapper<'hitbtc', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'updateTrades',
@@ -50,6 +53,8 @@ export const hitBtcBookChangeMapper: Mapper<'hitbtc', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'snapshotOrderbook',

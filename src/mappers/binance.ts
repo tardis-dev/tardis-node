@@ -1,6 +1,6 @@
 import { debug } from '../debug'
-import { CircularBuffer } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, BookTicker, Trade } from '../types'
+import { CircularBuffer, lowerCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
@@ -445,13 +445,6 @@ export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'bina
 
     yield ticker
   }
-}
-
-function lowerCaseSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((s) => s.toLowerCase())
-  }
-  return
 }
 
 type BinanceResponse<T> = {

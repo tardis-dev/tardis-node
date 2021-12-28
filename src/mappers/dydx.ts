@@ -1,5 +1,6 @@
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookPriceLevel, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { Trade, BookChange, DerivativeTicker, BookPriceLevel } from '../types'
 
 export class DydxTradesMapper implements Mapper<'dydx', Trade> {
   canHandle(message: DyDxTrade) {
@@ -7,6 +8,8 @@ export class DydxTradesMapper implements Mapper<'dydx', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'v3_trades',
@@ -40,6 +43,8 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'v3_orderbook',
@@ -140,6 +145,8 @@ export class DydxDerivativeTickerMapper implements Mapper<'dydx', DerivativeTick
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'v3_markets',

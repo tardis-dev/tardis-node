@@ -1,5 +1,5 @@
-import { asNumberIfValid, parseμs } from '../handy'
-import { BookChange, Trade, DerivativeTicker, Exchange, Liquidation, BookTicker } from '../types'
+import { asNumberIfValid, parseμs, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.ftx.com/#websocket-api
@@ -16,6 +16,8 @@ export class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -63,6 +65,8 @@ export class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange>
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'orderbook',
@@ -107,6 +111,8 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'instrument',
@@ -146,6 +152,8 @@ export class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -188,6 +196,8 @@ export class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker>
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

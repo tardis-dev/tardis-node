@@ -1,4 +1,5 @@
-import { BookChange, Exchange, Trade, DerivativeTicker } from '../types'
+import { upperCaseSymbols } from '../handy'
+import { BookChange, DerivativeTicker, Exchange, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.gate.io/docs/futures/ws/index.html
@@ -11,6 +12,8 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -52,6 +55,8 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'order_book',
@@ -97,6 +102,8 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'tickers',

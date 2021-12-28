@@ -1,6 +1,6 @@
-import { BookChange, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade, BookTicker } from '../types'
+import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { asNumberIfValid, CircularBuffer } from '../handy'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
@@ -255,6 +255,8 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const filters: FilterForExchange['huobi-dm-swap'][] = [
       {
         channel: 'basis',
@@ -335,6 +337,8 @@ export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-sw
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     if (this._exchange === 'huobi-dm') {
       // huobi-dm for liquidations requires prividing different symbols which are indexes names for example 'BTC' or 'ETH'
       // not futures names like 'BTC_NW'

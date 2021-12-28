@@ -1,5 +1,5 @@
-import { parseμs } from '../handy'
-import { BookChange, Trade, BookTicker } from '../types'
+import { parseμs, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
 
 export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
@@ -8,6 +8,8 @@ export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'lightning_executions',
@@ -52,6 +54,8 @@ export class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'lightning_board_snapshot',
@@ -97,6 +101,8 @@ export const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'lightning_ticker',

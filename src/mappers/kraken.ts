@@ -1,4 +1,4 @@
-import { asNumberIfValid } from '../handy'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
 import { BookChange, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -15,6 +15,8 @@ export const krakenTradesMapper: Mapper<'kraken', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trade',
@@ -73,6 +75,8 @@ export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'book',
@@ -129,6 +133,8 @@ export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'spread',

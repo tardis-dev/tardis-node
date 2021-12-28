@@ -1,3 +1,4 @@
+import { lowerCaseSymbols } from '../handy'
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -166,13 +167,6 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
     const amount = Number(level[1])
     return { price, amount }
   }
-}
-
-function lowerCaseSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((s) => s.toLowerCase())
-  }
-  return
 }
 
 type BitstampTrade = {

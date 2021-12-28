@@ -1,3 +1,4 @@
+import { upperCaseSymbols } from '../handy'
 import { BookChange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -19,6 +20,8 @@ export class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'price_aggregated_book',
@@ -89,6 +92,8 @@ export class PoloniexBookChangeMapper implements Mapper<'poloniex', BookChange> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'price_aggregated_book',

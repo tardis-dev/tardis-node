@@ -1,4 +1,4 @@
-import { asNumberIfValid } from '../handy'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
 import { BookChange, OptionSummary, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -15,6 +15,8 @@ export class BinanceOptionsTradesMapper implements Mapper<'binance-options', Tra
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'TRADE',
@@ -68,6 +70,8 @@ export class BinanceOptionsBookChangeMapper implements Mapper<'binance-options',
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'DEPTH100',
@@ -109,6 +113,8 @@ export class BinanceOptionSummaryMapper implements Mapper<'binance-options', Opt
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     const indexes =
       symbols !== undefined
         ? symbols.map((s) => {

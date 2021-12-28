@@ -1,6 +1,6 @@
+import { parseμs, upperCaseSymbols } from '../handy'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types'
 import { Mapper } from './mapper'
-import { parseμs } from '../handy'
 
 // https://docs.pro.coinbase.com/#websocket-feed
 
@@ -10,6 +10,8 @@ export const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'match',
@@ -69,6 +71,8 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'snapshot',
@@ -128,6 +132,8 @@ export const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'ticker',

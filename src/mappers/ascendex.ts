@@ -1,5 +1,6 @@
+import { upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { Trade, BookChange, DerivativeTicker, BookTicker } from '../types'
 
 export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   canHandle(message: AscendexTrade) {
@@ -7,6 +8,7 @@ export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'trades',
@@ -38,6 +40,7 @@ export class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'depth-realtime',
@@ -78,6 +81,7 @@ export class AscendexDerivativeTickerMapper implements Mapper<'ascendex', Deriva
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'futures-pricing-data',
@@ -120,6 +124,7 @@ export class AscendexBookTickerMapper implements Mapper<'ascendex', BookTicker> 
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
     return [
       {
         channel: 'bbo',

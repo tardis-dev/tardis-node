@@ -1,3 +1,4 @@
+import { upperCaseSymbols } from '../handy'
 import { BookChange, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -13,6 +14,8 @@ export class GateIOTradesMapper implements Mapper<'gate-io', Trade> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'trades',
@@ -64,6 +67,8 @@ export class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
   }
 
   getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
     return [
       {
         channel: 'depth',
