@@ -1591,6 +1591,10 @@ describe('mappers', () => {
       {
         arg: { channel: 'open-interest', instId: 'WNCG-USDT-SWAP' },
         data: [{ instId: 'WNCG-USDT-SWAP', instType: 'SWAP', oi: '644195', oiCcy: '644195', ts: '1640131258756' }]
+      },
+      {
+        arg: { channel: 'funding-rate', instId: 'SOS-USDT-SWAP' },
+        data: [{ fundingTime: '1640851200000', instId: 'SOS-USDT-SWAP', instType: 'SWAP', nextFundingRate: '0.0003' }]
       }
     ]
     for (const message of okexSwapV5Messages) {

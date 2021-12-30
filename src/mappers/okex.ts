@@ -236,9 +236,12 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
       if (message.arg.channel === 'funding-rate') {
         const fundingRateMessage = dataMessage as OkexV5FundingRateMessage['data'][0]
 
-        pendingTickerInfo.updateFundingRate(Number(fundingRateMessage.fundingRate))
-        //
-        pendingTickerInfo.updateFundingTimestamp(new Date(Number(fundingRateMessage.fundingTime)))
+        if (fundingRateMessage.fundingRate !== undefined) {
+          pendingTickerInfo.updateFundingRate(Number(fundingRateMessage.fundingRate))
+        }
+        if (fundingRateMessage.fundingTime !== undefined) {
+          pendingTickerInfo.updateFundingTimestamp(new Date(Number(fundingRateMessage.fundingTime)))
+        }
 
         if (fundingRateMessage.nextFundingRate !== undefined) {
           pendingTickerInfo.updatePredictedFundingRate(Number(fundingRateMessage.nextFundingRate))
@@ -544,7 +547,9 @@ type OkexV5IndexTickerMessage = {
 
 type OkexV5FundingRateMessage = {
   arg: { channel: 'funding-rate'; instId: string }
-  data: [{ fundingRate: '0.00048105'; fundingTime: '1640131200000'; instId: string; instType: 'SWAP'; nextFundingRate: '0.00114' }]
+  data: [
+    { fundingRate: '0.00048105' | undefined; fundingTime: '1640131200000'; instId: string; instType: 'SWAP'; nextFundingRate: '0.00114' }
+  ]
 }
 
 type OkexV5LiquidationMessage = {

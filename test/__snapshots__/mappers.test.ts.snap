@@ -7787,6 +7787,25 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-swap messages 21`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": 2021-12-30T08:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.0003,
+    "symbol": "SOS-USDT-SWAP",
+    "timestamp": 2021-12-23T00:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map phemex messages 1`] = `
 Array [
   Object {
