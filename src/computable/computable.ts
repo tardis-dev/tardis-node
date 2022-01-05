@@ -11,30 +11,34 @@ async function* _compute<T extends ComputableFactory<any>[], U extends Normalize
   messages: AsyncIterableIterator<U>,
   ...computables: T
 ): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? U | Z | Disconnect : U | Z) : never> {
-  const factory = new Computables(computables)
+  try {
+    const factory = new Computables(computables)
 
-  for await (const message of messages) {
-    // always pass through source message
-    yield message as any
+    for await (const message of messages) {
+      // always pass through source message
+      yield message as any
 
-    if (message.type === 'disconnect') {
-      // reset all computables for given exchange if we've received disconnect for it
-      factory.reset(message.exchange)
-      continue
-    }
+      if (message.type === 'disconnect') {
+        // reset all computables for given exchange if we've received disconnect for it
+        factory.reset(message.exchange)
+        continue
+      }
 
-    const normalizedMessage = message as NormalizedData
-    const id = normalizedMessage.name !== undefined ? `${normalizedMessage.symbol}:${normalizedMessage.name}` : normalizedMessage.symbol
+      const normalizedMessage = message as NormalizedData
+      const id = normalizedMessage.name !== undefined ? `${normalizedMessage.symbol}:${normalizedMessage.name}` : normalizedMessage.symbol
 
-    const computablesMap = factory.getOrCreate(normalizedMessage.exchange, id)
-    const computables = computablesMap[normalizedMessage.type]
-    if (!computables) continue
+      const computablesMap = factory.getOrCreate(normalizedMessage.exchange, id)
+      const computables = computablesMap[normalizedMessage.type]
+      if (!computables) continue
 
-    for (const computable of computables) {
-      for (const computedMessage of computable.compute(normalizedMessage)) {
-        yield computedMessage
+      for (const computable of computables) {
+        for (const computedMessage of computable.compute(normalizedMessage)) {
+          yield computedMessage
+        }
       }
     }
+  } finally {
+    messages.return!()
   }
 }
 
