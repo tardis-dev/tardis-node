@@ -228,7 +228,7 @@ function normalizeSymbols(symbols?: string[]) {
     return symbols.map((s) => {
       // huobi-dm and huobi-dm-swap expect symbols to be upper cased
       if (s.includes('_') || s.includes('-')) {
-        return s
+        return s.toUpperCase()
       }
       // huobi global expects lower cased symbols
       return s.toLowerCase()
