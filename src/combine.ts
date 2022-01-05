@@ -119,34 +119,40 @@ export async function* combine<
 async function* combineHistorical(
   iterators: AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
 ) {
-  // wait for all results to resolve
-  const results = await Promise.all(iterators.map(nextWithIndex))
-  let aliveIteratorsCount = results.length
-  do {
-    // if we're dealing with historical data replay
-    // and need to return combined messages iterable sorted by local timestamp in ascending order
+  try {
+    // wait for all results to resolve
+    const results = await Promise.all(iterators.map(nextWithIndex))
+    let aliveIteratorsCount = results.length
+    do {
+      // if we're dealing with historical data replay
+      // and need to return combined messages iterable sorted by local timestamp in ascending order
 
-    // find resolved one that is the 'oldest'
-    const oldestResult = results.reduce(findOldestResult, results[0])
-    const { result, index } = oldestResult
+      // find resolved one that is the 'oldest'
+      const oldestResult = results.reduce(findOldestResult, results[0])
+      const { result, index } = oldestResult
 
-    if (result.done) {
-      aliveIteratorsCount--
+      if (result.done) {
+        aliveIteratorsCount--
 
-      // we don't want finished iterators to every be considered 'oldest' again
-      // hence provide them with result that has local timestamp set to DATE_MAX
-      // and that is not done
+        // we don't want finished iterators to every be considered 'oldest' again
+        // hence provide them with result that has local timestamp set to DATE_MAX
+        // and that is not done
 
-      results[index].result = {
-        done: false,
-        value: {
-          localTimestamp: DATE_MAX
+        results[index].result = {
+          done: false,
+          value: {
+            localTimestamp: DATE_MAX
+          }
         }
+      } else {
+        // yield oldest value and replace with next value from iterable for given index
+        yield result.value
+        results[index] = await nextWithIndex(iterators[index], index)
       }
-    } else {
-      // yield oldest value and replace with next value from iterable for given index
-      yield result.value
-      results[index] = await nextWithIndex(iterators[index], index)
+    } while (aliveIteratorsCount > 0)
+  } finally {
+    for (let iterator of iterators) {
+      ;(iterator as any).return()
     }
-  } while (aliveIteratorsCount > 0)
+  }
 }
