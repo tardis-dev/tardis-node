@@ -7,6 +7,7 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected channelsWithIntervals: FilterForExchange['deribit']['channel'][] = ['book', 'perpetual', 'trades', 'ticker']
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
+    const hasCredentials = this.hasCredentials()
     const channels = filters
       .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
@@ -14,17 +15,21 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
         }
 
         return filter.symbols.map((symbol) => {
-          const suffix = this.channelsWithIntervals.includes(filter.channel as any) ? '.raw' : ''
+          let suffix = this.channelsWithIntervals.includes(filter.channel as any) ? '.raw' : ''
+          if (hasCredentials === false && filter.channel === 'book') {
+            // deribit requires authentications for raw book data feed
+            suffix = '.100ms'
+          }
+
           return `${filter.channel}.${symbol}${suffix}`
         })
       })
       .flatMap((f) => f)
-
     return [
       {
         jsonrpc: '2.0',
-        id: 1,
-        method: 'public/subscribe',
+        id: 3,
+        method: hasCredentials ? 'private/subscribe' : 'public/subscribe',
         params: {
           channels
         }
@@ -34,6 +39,10 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
 
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
+  }
+
+  private hasCredentials() {
+    return process.env.DERIBIT_API_CLIENT_ID !== undefined && process.env.DERIBIT_API_CLIENT_SECRET !== undefined
   }
 
   protected onConnected() {
@@ -48,6 +57,19 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
         interval: 10
       }
     })
+
+    if (this.hasCredentials()) {
+      this.send({
+        jsonrpc: '2.0',
+        method: 'public/auth',
+        id: 1,
+        params: {
+          grant_type: 'client_credentials',
+          client_id: process.env.DERIBIT_API_CLIENT_ID,
+          client_secret: process.env.DERIBIT_API_CLIENT_SECRET
+        }
+      })
+    }
   }
 
   protected messageIsHeartbeat(msg: any) {

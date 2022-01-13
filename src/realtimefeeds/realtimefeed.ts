@@ -246,6 +246,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         return prev
       }, new Set<string>()).size
 
+      this.onConnected()
+
       for (const message of subscribeMessages) {
         this.send(message)
         if (this.throttleSubscribeMS > 0) {
@@ -254,8 +256,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       }
 
       this.debug('(connection id: %d) estabilished connection', this._connectionId)
-
-      this.onConnected()
 
       //wait before fetching snapshots until we're sure we've got proper connection estabilished (received some messages)
       while (this._receivedMessagesCount < symbolsCount * 2) {
