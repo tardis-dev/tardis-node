@@ -144,7 +144,9 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
       instrumentInfo.predicted_funding_rate_e6 !== undefined ? instrumentInfo.predicted_funding_rate_e6 / 1000000 : undefined
     )
     pendingTickerInfo.updateFundingTimestamp(
-      instrumentInfo.next_funding_time !== undefined ? new Date(instrumentInfo.next_funding_time) : undefined
+      instrumentInfo.next_funding_time !== undefined && new Date(instrumentInfo.next_funding_time).valueOf() > 0
+        ? new Date(instrumentInfo.next_funding_time)
+        : undefined
     )
 
     if (instrumentInfo.index_price !== undefined) {

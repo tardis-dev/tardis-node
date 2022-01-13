@@ -2473,6 +2473,25 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 33`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.28765,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "XLMUSDT",
+    "timestamp": 2022-01-13T08:38:52.602Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {

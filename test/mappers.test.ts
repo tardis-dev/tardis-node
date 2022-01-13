@@ -5293,7 +5293,36 @@ describe('mappers', () => {
         }
       },
       { topic: 'liquidation.BTCUSD', data: { symbol: 'BTCUSD', side: 'Sell', price: '45171.00', qty: '2329', time: 1632123949005 } },
-      { topic: 'liquidation.BTCUSDT', data: { symbol: 'BTCUSDT', side: 'Sell', price: '45212.50', qty: '0.009', time: 1632123952732 } }
+      { topic: 'liquidation.BTCUSDT', data: { symbol: 'BTCUSDT', side: 'Sell', price: '45212.50', qty: '0.009', time: 1632123952732 } },
+      {
+        topic: 'instrument_info.100ms.XLMUSDT',
+        type: 'delta',
+        data: {
+          update: [
+            {
+              id: 21,
+              symbol: 'XLMUSDT',
+              last_price_e4: '28765',
+              last_price: '0.28765',
+              price_24h_pcnt_e6: '68139',
+              price_1h_pcnt_e6: '4539',
+              total_turnover_e8: '125642016505120000',
+              turnover_24h_e8: '894268603420001',
+              total_volume_e8: '374847497700000000',
+              volume_24h_e8: '3145533600000000',
+              cross_seq: '9611371383',
+              created_at: '2021-08-17T07:23:14.000Z',
+              updated_at: '2022-01-13T08:38:52.000Z',
+              next_funding_time: '1970-01-01T00:00:00Z',
+              count_down_hour: '-456127',
+              ask1_price_e4: '28765',
+              ask1_price: '0.28765'
+            }
+          ]
+        },
+        cross_seq: '9611371386',
+        timestamp_e6: '1642063132602687'
+      }
     ]
 
     for (const message of messagesIncludingOrderBook200) {
