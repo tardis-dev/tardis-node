@@ -15,16 +15,13 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
         }
 
         return filter.symbols.map((symbol) => {
-          let suffix = this.channelsWithIntervals.includes(filter.channel as any) ? '.raw' : ''
-          if (hasCredentials === false && filter.channel === 'book') {
-            // deribit requires authentications for raw book data feed
-            suffix = '.100ms'
-          }
+          const suffix = this.channelsWithIntervals.includes(filter.channel as any) ? (hasCredentials ? '.raw' : '.100ms') : ''
 
           return `${filter.channel}.${symbol}${suffix}`
         })
       })
       .flatMap((f) => f)
+
     return [
       {
         jsonrpc: '2.0',
