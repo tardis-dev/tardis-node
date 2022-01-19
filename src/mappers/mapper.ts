@@ -54,6 +54,10 @@ class PendingDerivativeTickerInfo {
     this._hasChanged = false
   }
 
+  public getCurrentFundingTimestamp() {
+    return this._pendingTicker.fundingTimestamp
+  }
+
   public updateOpenInterest(openInterest: number | undefined | null) {
     if (isNullOrUndefined(openInterest)) {
       return

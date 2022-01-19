@@ -4172,6 +4172,8 @@ Array [
 ]
 `;
 
+exports[`mappers map ftx messages 11`] = `Array []`;
+
 exports[`mappers map ftx us messages 1`] = `Array []`;
 
 exports[`mappers map ftx us messages 2`] = `

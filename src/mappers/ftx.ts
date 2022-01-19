@@ -125,8 +125,22 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.market, this._exchange)
     const { stats, info } = message.data
 
-    if (stats.nextFundingTime !== undefined) {
-      pendingTickerInfo.updateFundingTimestamp(new Date(stats.nextFundingTime))
+    const currentFundingTimestamp = pendingTickerInfo.getCurrentFundingTimestamp()
+    const updatedFundingTimestamp = stats.nextFundingTime !== undefined ? new Date(stats.nextFundingTime) : undefined
+
+    // due to how instrument info messages are sourced (from REST API) it can sometimes return data that is stale (cached perhaps by the API)
+    // let's skip such messages
+    const isStaleInfo =
+      updatedFundingTimestamp !== undefined &&
+      currentFundingTimestamp !== undefined &&
+      currentFundingTimestamp.valueOf() > updatedFundingTimestamp.valueOf()
+
+    if (isStaleInfo) {
+      return
+    }
+
+    if (updatedFundingTimestamp !== undefined) {
+      pendingTickerInfo.updateFundingTimestamp(updatedFundingTimestamp)
       pendingTickerInfo.updateFundingRate(stats.nextFundingRate)
     }
 

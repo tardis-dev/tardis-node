@@ -3592,6 +3592,45 @@ describe('mappers', () => {
         market: 'BTC/EUR',
         type: 'update',
         data: { bid: 54346.0, ask: 54411.0, bidSize: 0.0919, askSize: 0.0048, last: 54315.0, time: 1635206400.0866942 }
+      },
+      {
+        channel: 'instrument',
+        generated: true,
+        market: 'BTC-PERP',
+        type: 'update',
+        data: {
+          stats: { nextFundingRate: 0.1, nextFundingTime: '2020-05-12T12:00:00+00:00', openInterest: 11471.4921, volume: 87818.5334 },
+          info: {
+            ask: 8791.5,
+            bid: 8791.0,
+            change1h: 0.0007399396664579658,
+            change24h: -0.015014005602240896,
+            changeBod: 0.025667950064169876,
+            description: 'Bitcoin Perpetual Futures',
+            enabled: true,
+            expired: false,
+            expiryDescription: 'Perpetual',
+            group: 'perpetual',
+            imfFactor: 0.002,
+            index: 8790.512800652727,
+            last: 8791.0,
+            lowerBound: 8351.0,
+            marginPrice: 8791.0,
+            mark: 8791.0,
+            name: 'BTC-PERP',
+            perpetual: true,
+            positionLimitWeight: 1.0,
+            postOnly: false,
+            priceIncrement: 0.5,
+            sizeIncrement: 0.0001,
+            type: 'perpetual',
+            underlying: 'BTC',
+            underlyingDescription: 'Bitcoin',
+            upperBound: 9232.0,
+            volume: 87818.5334,
+            volumeUsd24h: 762549880.0517
+          }
+        }
       }
     ]
 
