@@ -100,8 +100,20 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
     for (let symbol in bitmexBookMessagesGrouppedBySymbol) {
       const bids: BookPriceLevel[] = []
       const asks: BookPriceLevel[] = []
+      let latestBitmexTimestamp: Date | undefined = undefined
 
       for (const item of bitmexBookMessagesGrouppedBySymbol[symbol]) {
+        if (item.timestamp !== undefined) {
+          const priceLevelTimestamp = new Date(item.timestamp)
+          if (latestBitmexTimestamp === undefined) {
+            latestBitmexTimestamp = priceLevelTimestamp
+          } else {
+            if (priceLevelTimestamp.valueOf() > latestBitmexTimestamp.valueOf()) {
+              latestBitmexTimestamp = priceLevelTimestamp
+            }
+          }
+        }
+
         // https://www.bitmex.com/app/restAPI#OrderBookL2
         if (item.price !== undefined) {
           // store the mapping from id to price level if price is specified
@@ -136,7 +148,7 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
           isSnapshot,
           bids,
           asks,
-          timestamp: localTimestamp,
+          timestamp: latestBitmexTimestamp !== undefined ? latestBitmexTimestamp : localTimestamp,
           localTimestamp: localTimestamp
         }
 
@@ -314,6 +326,7 @@ type BitmexOrderBookL2Message = BitmexDataMessage & {
     side: 'Buy' | 'Sell'
     size?: number
     price?: number
+    timestamp?: string
   }[]
 }
 

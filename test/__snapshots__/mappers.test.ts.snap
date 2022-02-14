@@ -1772,6 +1772,79 @@ Array [
 ]
 `;
 
+exports[`mappers map bitmex messages 16`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1000000,
+        "price": 42362,
+      },
+      Object {
+        "amount": 10000,
+        "price": 662520,
+      },
+      Object {
+        "amount": 20000,
+        "price": 658900,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitmex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2022-02-14T07:59:54.829Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitmex messages 17`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 20000,
+        "price": 42362,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2022-02-14T08:06:54.742Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitmex messages 18`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 662520,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 658900,
+      },
+    ],
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "XBTUSD",
+    "timestamp": 2022-02-14T08:34:56.913Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map bitstamp messages 1`] = `Array []`;
 
 exports[`mappers map bitstamp messages 2`] = `

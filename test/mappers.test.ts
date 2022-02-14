@@ -749,6 +749,35 @@ describe('mappers', () => {
         attributes: { symbol: 'parted', id: 'sorted' },
         filter: { symbol: 'XBTZ21' },
         data: []
+      },
+
+      {
+        table: 'orderBookL2',
+        action: 'partial',
+        keys: ['symbol', 'id', 'side'],
+        types: { symbol: 'symbol', id: 'long', side: 'symbol', size: 'long', price: 'float', timestamp: 'timestamp' },
+        foreignKeys: { symbol: 'instrument', side: 'side' },
+        attributes: { symbol: 'grouped' },
+        filter: { symbol: 'XBTUSD' },
+        data: [
+          { symbol: 'XBTUSD', id: 8791115350, side: 'Sell', size: 1000000, price: 42362, timestamp: '2022-02-14T07:59:54.829Z' },
+          { symbol: 'XBTUSD', id: 8733748000, side: 'Sell', size: 10000, price: 662520, timestamp: '2022-02-14T07:59:54.829Z' },
+          { symbol: 'XBTUSD', id: 8734110000, side: 'Sell', size: 20000, price: 658900, timestamp: '2022-02-14T07:59:54.829Z' }
+        ]
+      },
+      {
+        table: 'orderBookL2',
+        action: 'insert',
+        data: [{ symbol: 'XBTUSD', id: 8791115350, side: 'Buy', size: 20000, price: 42362, timestamp: '2022-02-14T08:06:54.742Z' }]
+      },
+
+      {
+        table: 'orderBookL2',
+        action: 'delete',
+        data: [
+          { symbol: 'XBTUSD', id: 8733748000, side: 'Sell', timestamp: '2022-02-14T08:34:56.852Z' },
+          { symbol: 'XBTUSD', id: 8734110000, side: 'Buy', timestamp: '2022-02-14T08:34:56.913Z' }
+        ]
       }
     ]
 
