@@ -6056,8 +6056,8 @@ Array [
   Object {
     "askAmount": 0.3167044,
     "askPrice": 43770.3,
-    "bidAmount": 43770.2,
-    "bidPrice": 0.00917717,
+    "bidAmount": 0.00917717,
+    "bidPrice": 43770.2,
     "exchange": "kraken",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "XBT/USD",

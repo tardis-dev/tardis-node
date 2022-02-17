@@ -161,8 +161,8 @@ export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
       askAmount: asNumberIfValid(askVolume),
       askPrice: asNumberIfValid(ask),
 
-      bidPrice: asNumberIfValid(bidVolume),
-      bidAmount: asNumberIfValid(bid),
+      bidPrice: asNumberIfValid(bid),
+      bidAmount: asNumberIfValid(bidVolume),
       timestamp,
       localTimestamp: localTimestamp
     }
