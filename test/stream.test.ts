@@ -163,7 +163,7 @@ describe('stream', () => {
 
             if (snapshots >= symbols.length - 1) {
               count++
-              if (count >= 100) {
+              if (count >= 10) {
                 break
               }
             }
