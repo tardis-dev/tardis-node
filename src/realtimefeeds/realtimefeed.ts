@@ -130,12 +130,12 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
         retries++
 
-        const MAX_DELAY = 16 * 1000
+        const MAX_DELAY = 32 * 1000
         const isRateLimited = error.message.includes('429')
 
         let delay
         if (isRateLimited) {
-          delay = MAX_DELAY * retries
+          delay = (MAX_DELAY / 2) * retries
         } else {
           delay = Math.pow(2, retries - 1) * 1000
 
