@@ -4712,6 +4712,25 @@ Array [
 
 exports[`mappers map gate-io-futures messages 15`] = `Array []`;
 
+exports[`mappers map gate-io-futures messages 16`] = `
+Array [
+  Object {
+    "exchange": "gate-io-futures",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": undefined,
+    "indexPrice": 26.9291,
+    "lastPrice": 25.595,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "markPrice": 26.929,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.0001,
+    "symbol": "ETC_USD",
+    "timestamp": 2022-03-17T07:13:26.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {

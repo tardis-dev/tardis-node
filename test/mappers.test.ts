@@ -5843,6 +5843,28 @@ describe('mappers', () => {
             }
           ]
         ]
+      },
+      {
+        time: 1647501206,
+        channel: 'futures.tickers',
+        event: 'update',
+        result: {
+          contract: 'ETC_USD',
+          last: '25.595',
+          change_percentage: '0',
+          total_size: '14',
+          volume_24h: '0',
+          volume_24h_base: '0',
+          volume_24h_quote: '0',
+          volume_24h_settle: '0',
+          mark_price: '26.929',
+          funding_rate: '0.0001',
+          funding_rate_indicative: '0.0001',
+          index_price: '26.9291',
+          quanto_base_rate: '0.0006594',
+          volume_24_usd: '0',
+          volume_24_btc: '0'
+        }
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')

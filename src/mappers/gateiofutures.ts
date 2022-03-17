@@ -113,7 +113,9 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
   }
 
   *map(message: GateIOFuturesTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    for (const futuresTicker of message.result) {
+    const tickers = Array.isArray(message.result) ? message.result : [message.result]
+
+    for (const futuresTicker of tickers) {
       if (futuresTicker.contract === undefined) {
         return
       }
@@ -179,14 +181,23 @@ type GateIOFuturesTicker = {
   channel: 'futures.tickers'
   event: 'update'
 
-  result: [
-    {
-      contract: string
-      last: string
-      funding_rate: string
-      mark_price: string
-      index_price: string
-      funding_rate_indicative: string
-    }
-  ]
+  result:
+    | [
+        {
+          contract: string
+          last: string
+          funding_rate: string
+          mark_price: string
+          index_price: string
+          funding_rate_indicative: string
+        }
+      ]
+    | {
+        contract: string
+        last: string
+        funding_rate: string
+        mark_price: string
+        index_price: string
+        funding_rate_indicative: string
+      }
 }
