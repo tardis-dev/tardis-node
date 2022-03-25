@@ -95,6 +95,8 @@ export async function* combine<
       highWaterMark: 8096
     })
 
+    combinedStream.setMaxListeners(iterators.length + 1)
+
     iterators.forEach(async function writeMessagesToCombinedStream(messages) {
       for await (const message of messages) {
         if (combinedStream.destroyed) {
