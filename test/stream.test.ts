@@ -104,7 +104,8 @@ describe('stream', () => {
             exchange === 'star-atlas' ||
             exchange === 'upbit' ||
             exchange === 'binance-options' ||
-            exchange === 'okex-futures'
+            exchange === 'okex-futures' ||
+            exchange === 'okex-options'
           ) {
             return
           }
