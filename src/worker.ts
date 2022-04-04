@@ -42,7 +42,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
       ? payload.waitWhenDataNotYetAvailable * MILLISECONDS_IN_MINUTE
       : 30 * MILLISECONDS_IN_MINUTE
 
-  if (payload.waitWhenDataNotYetAvailable !== undefined && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS) {
+  if (payload.waitWhenDataNotYetAvailable && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS) {
     let timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
 
     // in case when even initial from date is not yet available wait until it is
