@@ -174,20 +174,20 @@ const bookChangeMappers = {
   kraken: () => krakenBookChangeMapper,
   okex: (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex')
+      ? new OkexV5BookChangeMapper('okex', isRealTime(localTimestamp))
       : new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-futures')
+      ? new OkexV5BookChangeMapper('okex-futures', isRealTime(localTimestamp))
       : new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
 
   'okex-swap': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-swap')
+      ? new OkexV5BookChangeMapper('okex-swap', isRealTime(localTimestamp))
       : new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
   'okex-options': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-options')
+      ? new OkexV5BookChangeMapper('okex-options', isRealTime(localTimestamp))
       : new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
 
   huobi: (localTimestamp: Date) =>

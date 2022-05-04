@@ -3,7 +3,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class OkexRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ws.okex.com:8443/ws/v5/public'
+  protected wssURL = 'wss://ws.okx.com:8443/ws/v5/public'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters

@@ -51,17 +51,30 @@ const mapV5BookLevel = (level: OkexV5BookLevel) => {
 }
 
 export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange, private readonly _usePublicBooksChannel: boolean) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
       return false
+    }
+
+    if (this._usePublicBooksChannel) {
+      return message.arg.channel === 'books'
     }
     return message.arg.channel === 'books-l2-tbt'
   }
 
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
+
+    if (this._usePublicBooksChannel) {
+      return [
+        {
+          channel: `books` as any,
+          symbols
+        }
+      ]
+    }
 
     return [
       {
