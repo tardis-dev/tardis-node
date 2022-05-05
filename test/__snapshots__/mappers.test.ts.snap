@@ -7919,6 +7919,43 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-swap messages 22`] = `Array []`;
+
+exports[`mappers map okex-swap messages 23`] = `
+Array [
+  Object {
+    "askAmount": 727,
+    "askPrice": 38632.4,
+    "bidAmount": 990,
+    "bidPrice": 38632.3,
+    "exchange": "okex-swap",
+    "localTimestamp": 2022-05-06T00:00:00.000Z,
+    "symbol": "BTC-USDT-SWAP",
+    "timestamp": 2022-05-05T14:32:00.004Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex-swap messages 24`] = `
+Array [
+  Object {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 2.1729,
+    "localTimestamp": 2022-05-06T00:00:00.000Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "WNCG-USDT-SWAP",
+    "timestamp": 2021-12-22T00:01:03.109Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map phemex messages 1`] = `
 Array [
   Object {

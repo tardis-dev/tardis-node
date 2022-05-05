@@ -115,6 +115,7 @@ const OKEX_CHANNELS = [
   // v5
   'trades',
   'books-l2-tbt',
+  'bbo-tbt',
   'tickers',
   'interest-rate-loan-quota',
   'vip-interest-rate-loan-quota',
@@ -141,6 +142,7 @@ const OKEX_FUTURES_CHANNELS = [
   // v5
   'trades',
   'books-l2-tbt',
+  'bbo-tbt',
   'tickers',
   'open-interest',
   'mark-price',
@@ -170,6 +172,7 @@ const OKEX_SWAP_CHANNELS = [
   //v5
   'trades',
   'books-l2-tbt',
+  'bbo-tbt',
   'tickers',
   'open-interest',
   'mark-price',
@@ -197,6 +200,7 @@ const OKEX_OPTIONS_CHANNELS = [
   //v5
   'trades',
   'books-l2-tbt',
+  'bbo-tbt',
   'tickers',
   'opt-summary',
   'status',

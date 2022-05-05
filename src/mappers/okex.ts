@@ -111,18 +111,31 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
 }
 
 export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange, private readonly _useTbtTickerChannel: boolean) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
       return false
     }
+
+    if (this._useTbtTickerChannel) {
+      return message.arg.channel === 'bbo-tbt'
+    }
+
     return message.arg.channel === 'tickers'
   }
 
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
 
+    if (this._useTbtTickerChannel) {
+      return [
+        {
+          channel: `bbo-tbt` as const,
+          symbols
+        }
+      ]
+    }
     return [
       {
         channel: `tickers` as const,
@@ -131,7 +144,42 @@ export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker
     ]
   }
 
-  *map(message: OkexV5TickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+  map(message: OkexV5TickerMessage | OkexBBOTbtData, localTimestamp: Date): IterableIterator<BookTicker> {
+    if (message.arg.channel === 'bbo-tbt') {
+      return this._mapFromTbtTicker(message as OkexBBOTbtData, localTimestamp)
+    } else {
+      return this._mapFromTicker(message as OkexV5TickerMessage, localTimestamp)
+    }
+  }
+
+  private *_mapFromTbtTicker(message: OkexBBOTbtData, localTimestamp: Date): IterableIterator<BookTicker> {
+    if (!message.data) {
+      return
+    }
+
+    for (const tbtTicker of message.data) {
+      const bestAsk = tbtTicker.asks !== undefined && tbtTicker.asks[0] ? mapBookLevel(tbtTicker.asks[0]) : undefined
+      const bestBid = tbtTicker.bids !== undefined && tbtTicker.bids[0] ? mapBookLevel(tbtTicker.bids[0]) : undefined
+
+      const ticker: BookTicker = {
+        type: 'book_ticker',
+        symbol: message.arg.instId,
+        exchange: this._exchange,
+
+        askAmount: bestAsk?.amount,
+        askPrice: bestAsk?.price,
+
+        bidPrice: bestBid?.price,
+        bidAmount: bestBid?.amount,
+        timestamp: new Date(Number(tbtTicker.ts)),
+        localTimestamp: localTimestamp
+      }
+
+      yield ticker
+    }
+  }
+
+  private *_mapFromTicker(message: OkexV5TickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
     for (const okexTicker of message.data) {
       const ticker: BookTicker = {
         type: 'book_ticker',
@@ -1048,4 +1096,9 @@ type OkexOptionSummaryData = {
       timestamp: string
     }
   ]
+}
+
+type OkexBBOTbtData = {
+  arg: { channel: 'bbo-tbt'; instId: 'WAVES-USDT-SWAP' }
+  data: [{ asks: [['16.083', '65', '0', '1']]; bids: [['16.082', '143', '0', '4']]; ts: '1651750920000' }]
 }

@@ -1624,10 +1624,51 @@ describe('mappers', () => {
       {
         arg: { channel: 'funding-rate', instId: 'SOS-USDT-SWAP' },
         data: [{ fundingTime: '1640851200000', instId: 'SOS-USDT-SWAP', instType: 'SWAP', nextFundingRate: '0.0003' }]
+      },
+      {
+        arg: { channel: 'bbo-tbt', instId: 'BTC-USDT-SWAP' },
+        data: [{ asks: [['38632.4', '727', '0', '22']], bids: [['38632.3', '990', '0', '22']], ts: '1651761120004' }]
       }
     ]
     for (const message of okexSwapV5Messages) {
       const mappedMessages = okexSwapV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const okexV5WithBookTickerMessages = [
+      {
+        arg: { channel: 'bbo-tbt', instId: 'BTC-USDT-SWAP' },
+        data: [{ asks: [['38632.4', '727', '0', '22']], bids: [['38632.3', '990', '0', '22']], ts: '1651761120004' }]
+      },
+      {
+        arg: { channel: 'tickers', instId: 'WNCG-USDT-SWAP' },
+        data: [
+          {
+            instType: 'SWAP',
+            instId: 'WNCG-USDT-SWAP',
+            last: '2.1729',
+            lastSz: '0',
+            askPx: '2.1738',
+            askSz: '168',
+            bidPx: '2.1737',
+            bidSz: '2',
+            open24h: '2.164',
+            high24h: '2.25',
+            low24h: '2.1493',
+            sodUtc0: '2.1718',
+            sodUtc8: '2.1644',
+            volCcy24h: '803940',
+            vol24h: '803940',
+            ts: '1640131263109'
+          }
+        ]
+      }
+    ]
+
+    const okexWithBookTickerMapper = createMapper('okex-swap', new Date('2022-05-06T00:00:00.000Z'))
+
+    for (const message of okexV5WithBookTickerMessages) {
+      const mappedMessages = okexWithBookTickerMapper.map(message, new Date('2022-05-06T00:00:00.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

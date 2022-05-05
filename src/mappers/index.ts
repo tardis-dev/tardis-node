@@ -94,9 +94,13 @@ const isRealTime = (date: Date) => {
 }
 
 const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
-
+const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
 const shouldUseOkexV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_API_SWITCH_DATE.valueOf()
+}
+
+const canUseOkexTbtBookTicker = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE.valueOf()
 }
 
 const tradesMappers = {
@@ -296,19 +300,23 @@ const bookTickersMappers = {
   'huobi-dm-linear-swap': () => new HuobiBookTickerMapper('huobi-dm-linear-swap'),
   kraken: () => krakenBookTickerMapper,
   okex: (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okex') : new OkexBookTickerMapper('okex', 'spot'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookTickerMapper('okex', canUseOkexTbtBookTicker(localTimestamp))
+      : new OkexBookTickerMapper('okex', 'spot'),
 
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex-futures')
+      ? new OkexV5BookTickerMapper('okex-futures', canUseOkexTbtBookTicker(localTimestamp))
       : new OkexBookTickerMapper('okex-futures', 'futures'),
 
   'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okex-swap') : new OkexBookTickerMapper('okex-swap', 'swap'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5BookTickerMapper('okex-swap', canUseOkexTbtBookTicker(localTimestamp))
+      : new OkexBookTickerMapper('okex-swap', 'swap'),
 
   'okex-options': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex-options')
+      ? new OkexV5BookTickerMapper('okex-options', canUseOkexTbtBookTicker(localTimestamp))
       : new OkexBookTickerMapper('okex-options', 'option'),
 
   okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
