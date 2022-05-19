@@ -51,34 +51,46 @@ const mapV5BookLevel = (level: OkexV5BookLevel) => {
 }
 
 export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
-  constructor(private readonly _exchange: Exchange, private readonly _usePublicBooksChannel: boolean) {}
+  private _channelName: string
+
+  constructor(private readonly _exchange: Exchange, usePublicBooksChannel: boolean) {
+    this._channelName = this._getBooksChannelName(usePublicBooksChannel)
+  }
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
       return false
     }
 
-    if (this._usePublicBooksChannel) {
-      return message.arg.channel === 'books'
+    return message.arg.channel === this._channelName
+  }
+
+  private _hasCredentials = process.env.OKX_API_KEY !== undefined
+  private _hasVip5Access = process.env.OKX_API_VIP_5 !== undefined
+
+  private _getBooksChannelName(usePublicBooksChannel: boolean) {
+    if (usePublicBooksChannel === false) {
+      // historical data always uses books-l2-tbt
+      return 'books-l2-tbt'
     }
-    return message.arg.channel === 'books-l2-tbt'
+
+    if (this._hasCredentials && this._hasVip5Access) {
+      return 'books-l2-tbt'
+    }
+
+    if (this._hasCredentials) {
+      return 'books50-l2-tbt'
+    }
+
+    return 'books'
   }
 
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
 
-    if (this._usePublicBooksChannel) {
-      return [
-        {
-          channel: `books` as any,
-          symbols
-        }
-      ]
-    }
-
     return [
       {
-        channel: `books-l2-tbt` as const,
+        channel: this._channelName as any,
         symbols
       }
     ]

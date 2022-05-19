@@ -204,7 +204,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected onMessage(_msg: any) {}
 
-  protected onConnected() {}
+  protected async onConnected() {}
 
   protected decompress?: (msg: any) => Buffer
 
@@ -254,7 +254,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         return prev
       }, new Set<string>()).size
 
-      this.onConnected()
+      await this.onConnected()
 
       for (const message of subscribeMessages) {
         this.send(message)

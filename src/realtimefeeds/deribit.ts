@@ -1,13 +1,16 @@
+import { wait } from '../handy'
 import { Filter, FilterForExchange } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://www.deribit.com/ws/api/v2'
+  private _hasCredentials = process.env.DERIBIT_API_CLIENT_ID !== undefined && process.env.DERIBIT_API_CLIENT_SECRET !== undefined
 
   protected channelsWithIntervals: FilterForExchange['deribit']['channel'][] = ['book', 'perpetual', 'trades', 'ticker']
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    const hasCredentials = this.hasCredentials()
+    const hasCredentials = this._hasCredentials
+
     const channels = filters
       .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
@@ -38,11 +41,7 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
     return message.error !== undefined
   }
 
-  private hasCredentials() {
-    return process.env.DERIBIT_API_CLIENT_ID !== undefined && process.env.DERIBIT_API_CLIENT_SECRET !== undefined
-  }
-
-  protected onConnected() {
+  protected async onConnected() {
     // set heartbeat so deribit won't close connection prematurely
     // https://docs.deribit.com/v2/#public-set_heartbeat
 
@@ -55,7 +54,7 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
       }
     })
 
-    if (this.hasCredentials()) {
+    if (this._hasCredentials) {
       this.send({
         jsonrpc: '2.0',
         method: 'public/auth',
@@ -66,6 +65,8 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
           client_secret: process.env.DERIBIT_API_CLIENT_SECRET
         }
       })
+
+      await wait(10)
     }
   }
 
