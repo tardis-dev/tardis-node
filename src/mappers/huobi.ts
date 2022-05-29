@@ -114,7 +114,7 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
       return false
     }
 
-    return channel.includes('.mbp.') && message.data !== null
+    return channel.includes('.mbp.')
   }
 
   getFilters(symbols?: string[]) {
@@ -141,6 +141,10 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
     const snapshotAlreadyProcessed = mbpInfo.snapshotProcessed
 
     if (isSnapshot(message)) {
+      if (message.data == null) {
+        return
+      }
+
       const snapshotBids = message.data.bids.map(this._mapBookLevel)
       const snapshotAsks = message.data.asks.map(this._mapBookLevel)
 
@@ -651,7 +655,7 @@ type HuobiMBPDataMessage = HuobiDataMessage & {
 type HuobiMBPSnapshot = {
   ts: number
   rep: string
-  data: {
+  data?: {
     bids: HuobiBookLevel[]
     asks: HuobiBookLevel[]
     seqNum: number
