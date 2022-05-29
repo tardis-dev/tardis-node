@@ -114,7 +114,7 @@ export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
       return false
     }
 
-    return channel.includes('.mbp.')
+    return channel.includes('.mbp.') && message.data !== null
   }
 
   getFilters(symbols?: string[]) {
