@@ -20,7 +20,7 @@ abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
       const instruments = instrumentInfoFilters.flatMap((s) => s.symbols!)
 
       if (instruments.length > 0) {
-        yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments)
+        yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments, onError)
       }
     }
   }
@@ -61,8 +61,13 @@ class FtxSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 }
 
 class FTXInstrumentInfoClient extends PoolingClientBase {
-  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
-    super(exchange, 3)
+  constructor(
+    exchange: string,
+    private readonly _httpURL: string,
+    private readonly _instruments: string[],
+    onError?: (error: Error) => void
+  ) {
+    super(exchange, 5, onError)
   }
 
   protected async poolDataToStream(outputStream: Writable) {
@@ -73,28 +78,34 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
             return
           }
 
-          const responses = await Promise.all([
-            httpClient.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
-            httpClient.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
-          ])
+          try {
+            const responses = await Promise.all([
+              httpClient.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
+              httpClient.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
+            ])
 
-          if (responses.some((r) => r.success === false)) {
-            return
-          }
-
-          const instrumentMessage = {
-            channel: 'instrument',
-            generated: true,
-            market: instrument,
-            type: 'update',
-            data: {
-              stats: responses[0].result,
-              info: responses[1].result
+            if (responses.some((r) => r.success === false)) {
+              return
             }
-          }
 
-          if (outputStream.writable) {
-            outputStream.write(instrumentMessage)
+            const instrumentMessage = {
+              channel: 'instrument',
+              generated: true,
+              market: instrument,
+              type: 'update',
+              data: {
+                stats: responses[0].result,
+                info: responses[1].result
+              }
+            }
+
+            if (outputStream.writable) {
+              outputStream.write(instrumentMessage)
+            }
+          } catch (err) {
+            if (this.onError !== undefined) {
+              this.onError(err as any)
+            }
           }
         })
       )

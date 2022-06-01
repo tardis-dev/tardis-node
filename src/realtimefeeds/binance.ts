@@ -171,7 +171,7 @@ export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
 }
 
 export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://fstream3.binance.com/stream'
+  protected wssURL = 'wss://fstream.binance.com/stream'
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
 
   protected suffixes = {
