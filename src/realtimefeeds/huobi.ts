@@ -145,6 +145,15 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
     return false
   }
 
+  protected isIgnoredError(message: any) {
+    // ignore market not found errors
+    if (message['err-msg'] !== undefined && message['err-msg'].includes('invalid symbol ')) {
+      return true
+    }
+
+    return false
+  }
+
   protected onMessage(message: any) {
     if (message.ping !== undefined) {
       this.send({

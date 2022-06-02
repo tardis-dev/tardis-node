@@ -58,6 +58,11 @@ class FtxSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.type === 'error'
   }
+
+  protected isIgnoredError(message: any) {
+    // ignore market not found errors
+    return message.code == 404
+  }
 }
 
 class FTXInstrumentInfoClient extends PoolingClientBase {

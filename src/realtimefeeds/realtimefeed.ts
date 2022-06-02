@@ -99,7 +99,13 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           const messageDeserialized = JSON.parse(message as any)
 
           if (this.messageIsError(messageDeserialized)) {
-            throw new Error(`Received error message:${message.toString()}`)
+            if (this.isIgnoredError(messageDeserialized)) {
+              if (this._onError !== undefined) {
+                this._onError(new Error(`Received ignored error message:${message.toString()}`))
+              }
+            } else {
+              throw new Error(`Received error message:${message.toString()}`)
+            }
           }
 
           // exclude heaartbeat messages from  received messages counter
@@ -195,6 +201,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
+
+  protected isIgnoredError(_message: any) {
+    return false
+  }
 
   protected messageIsHeartbeat(_msg: any) {
     return false
