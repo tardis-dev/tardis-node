@@ -1470,7 +1470,7 @@ Array [
     "price": 1046399,
     "side": "buy",
     "symbol": "FX_BTC_JPY",
-    "timestamp": 2019-09-01T00:00:11.225Z,
+    "timestamp": 2019-09-01T00:00:11.225681Z,
     "type": "trade",
   },
   Object {
@@ -1481,7 +1481,7 @@ Array [
     "price": 1046400,
     "side": "buy",
     "symbol": "FX_BTC_JPY",
-    "timestamp": 2019-09-01T00:00:11.225Z,
+    "timestamp": 2019-09-01T00:00:11.225681Z,
     "type": "trade",
   },
 ]
@@ -1497,7 +1497,7 @@ Array [
     "exchange": "bitflyer",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC_JPY",
-    "timestamp": 2019-09-01T00:00:01.247Z,
+    "timestamp": 2019-09-01T00:00:01.247796Z,
     "type": "book_ticker",
   },
 ]
@@ -1513,7 +1513,7 @@ Array [
     "exchange": "bitflyer",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ETH_JPY",
-    "timestamp": 2021-09-01T00:00:00.211Z,
+    "timestamp": 2021-09-01T00:00:00.211580Z,
     "type": "book_ticker",
   },
 ]
@@ -1857,7 +1857,7 @@ Array [
     "price": 3651.3,
     "side": "buy",
     "symbol": "BTCEUR",
-    "timestamp": 2019-04-01T00:00:03.243Z,
+    "timestamp": 2019-04-01T00:00:03.243152Z,
     "type": "trade",
   },
 ]
@@ -1907,7 +1907,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCHUSD",
-    "timestamp": 2019-04-01T00:00:00.436Z,
+    "timestamp": 2019-04-01T00:00:00.436165Z,
     "type": "book_change",
   },
 ]
@@ -1940,7 +1940,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2019-04-01T00:00:01.338Z,
+    "timestamp": 2019-04-01T00:00:01.338397Z,
     "type": "book_change",
   },
 ]
@@ -1964,7 +1964,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCHUSD",
-    "timestamp": 2019-04-01T00:00:01.338Z,
+    "timestamp": 2019-04-01T00:00:01.338397Z,
     "type": "book_change",
   },
 ]
@@ -1980,7 +1980,7 @@ Array [
     "price": 8304.47,
     "side": "buy",
     "symbol": "BTCUSD",
-    "timestamp": 2019-10-01T00:00:00.557Z,
+    "timestamp": 2019-10-01T00:00:00.557673Z,
     "type": "trade",
   },
 ]
@@ -2001,7 +2001,7 @@ Array [
     "openInterest": 13793020,
     "predictedFundingRate": 0.0001,
     "symbol": "ETHUSD",
-    "timestamp": 2019-11-06T12:50:49.041Z,
+    "timestamp": 2019-11-06T12:50:49.041458Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2026,7 +2026,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2019-11-06T12:50:48.627Z,
+    "timestamp": 2019-11-06T12:50:48.627110Z,
     "type": "book_change",
   },
 ]
@@ -2046,7 +2046,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2019-11-06T12:50:50.028Z,
+    "timestamp": 2019-11-06T12:50:50.028026Z,
     "type": "book_change",
   },
 ]
@@ -2091,7 +2091,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "XRPUSD",
-    "timestamp": 2019-11-06T12:59:01.027Z,
+    "timestamp": 2019-11-06T12:59:01.027590Z,
     "type": "book_change",
   },
 ]
@@ -2112,7 +2112,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSD",
-    "timestamp": 2019-11-06T20:03:01.891Z,
+    "timestamp": 2019-11-06T20:03:01.891131Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2134,7 +2134,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:00.293Z,
+    "timestamp": 2020-05-28T16:31:00.293107Z,
     "type": "book_change",
   },
 ]
@@ -2169,7 +2169,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:02.401Z,
+    "timestamp": 2020-05-28T16:31:02.401579Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2205,7 +2205,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "XRPUSD",
-    "timestamp": 2020-05-28T16:31:03.122Z,
+    "timestamp": 2020-05-28T16:31:03.122042Z,
     "type": "book_change",
   },
 ]
@@ -2241,7 +2241,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:15:03.852Z,
+    "timestamp": 2020-05-28T16:15:03.852140Z,
     "type": "book_change",
   },
 ]
@@ -2261,7 +2261,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-05-28T16:15:03.318Z,
+    "timestamp": 2020-05-28T16:15:03.318949Z,
     "type": "book_change",
   },
 ]
@@ -2290,7 +2290,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-05-28T16:15:04.061Z,
+    "timestamp": 2020-05-28T16:15:04.061720Z,
     "type": "book_change",
   },
 ]
@@ -2310,7 +2310,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-05-28T16:15:04.459Z,
+    "timestamp": 2020-05-28T16:15:04.459494Z,
     "type": "book_change",
   },
 ]
@@ -2338,7 +2338,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:15:28.033Z,
+    "timestamp": 2020-05-28T16:15:28.033099Z,
     "type": "book_change",
   },
 ]
@@ -2359,7 +2359,7 @@ Array [
     "openInterest": 4471.23,
     "predictedFundingRate": 0.0001,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-05-28T16:31:02.401Z,
+    "timestamp": 2020-05-28T16:31:02.401579Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2379,7 +2379,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-14T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-02-01T00:00:59.707Z,
+    "timestamp": 2020-02-01T00:00:59.707361Z,
     "type": "book_change",
   },
 ]
@@ -2416,7 +2416,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDM21",
-    "timestamp": 2021-03-11T13:05:00.200Z,
+    "timestamp": 2021-03-11T13:05:00.200258Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2435,7 +2435,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "LINKUSDT",
-    "timestamp": 2021-03-11T13:04:59.958Z,
+    "timestamp": 2021-03-11T13:04:59.958860Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2454,7 +2454,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "ETHUSDU21",
-    "timestamp": 2021-09-02T23:59:59.958Z,
+    "timestamp": 2021-09-02T23:59:59.958670Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2559,7 +2559,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "XLMUSDT",
-    "timestamp": 2022-01-13T08:38:52.602Z,
+    "timestamp": 2022-01-13T08:38:52.602687Z,
     "type": "derivative_ticker",
   },
 ]
@@ -2575,7 +2575,7 @@ Array [
     "price": 4.978,
     "side": "sell",
     "symbol": "ETC-GBP",
-    "timestamp": 2019-08-01T00:00:03.816Z,
+    "timestamp": 2019-08-01T00:00:03.816000Z,
     "type": "trade",
   },
 ]
@@ -2595,7 +2595,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-EUR",
-    "timestamp": 2019-08-01T00:00:03.818Z,
+    "timestamp": 2019-08-01T00:00:03.818000Z,
     "type": "book_change",
   },
 ]
@@ -2615,7 +2615,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ETH-USD",
-    "timestamp": 2019-08-01T00:00:03.869Z,
+    "timestamp": 2019-08-01T00:00:03.869000Z,
     "type": "book_change",
   },
 ]
@@ -2665,7 +2665,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-EUR",
-    "timestamp": 2019-08-01T00:00:03.818Z,
+    "timestamp": 2019-08-01T00:00:03.818000Z,
     "type": "book_change",
   },
 ]
@@ -2706,7 +2706,7 @@ Array [
     "exchange": "coinbase",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-USD",
-    "timestamp": 2019-04-01T00:00:04.540Z,
+    "timestamp": 2019-04-01T00:00:04.540000Z,
     "type": "book_ticker",
   },
 ]
@@ -2722,7 +2722,7 @@ Array [
     "exchange": "coinbase",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-USD",
-    "timestamp": 2021-04-01T00:00:01.618Z,
+    "timestamp": 2021-04-01T00:00:01.618503Z,
     "type": "book_ticker",
   },
 ]
@@ -3207,7 +3207,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-06-16T23:59:59.719Z,
+    "timestamp": 2020-06-16T23:59:59.719000Z,
     "type": "book_change",
   },
 ]
@@ -3226,7 +3226,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-06-16T23:59:57.873Z,
+    "timestamp": 2020-06-16T23:59:57.873000Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3245,7 +3245,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-06-16T23:59:57.873Z,
+    "timestamp": 2020-06-16T23:59:57.873000Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3261,7 +3261,7 @@ Array [
     "price": 9522,
     "side": "sell",
     "symbol": "BTCUSDT",
-    "timestamp": 2020-06-17T00:00:02.423Z,
+    "timestamp": 2020-06-17T00:00:02.423123Z,
     "type": "trade",
   },
   Object {
@@ -3275,7 +3275,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "BTCUSDT",
-    "timestamp": 2020-06-17T00:00:02.423Z,
+    "timestamp": 2020-06-17T00:00:02.423123Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3319,7 +3319,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "XTZBTC",
-    "timestamp": 2020-07-01T00:00:48.381Z,
+    "timestamp": 2020-07-01T00:00:48.381531Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3330,7 +3330,7 @@ Array [
   Object {
     "exchange": "delta",
     "fundingRate": 0.010000000000000002,
-    "fundingTimestamp": 2020-07-22T08:00:00.000Z,
+    "fundingTimestamp": 2020-07-22T08:00:00.000000Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -3338,7 +3338,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": 0.01,
     "symbol": "LINKUSDT",
-    "timestamp": 2020-07-22T00:00:26.629Z,
+    "timestamp": 2020-07-22T00:00:26.629157Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3349,7 +3349,7 @@ Array [
   Object {
     "exchange": "delta",
     "fundingRate": undefined,
-    "fundingTimestamp": 2020-07-10T16:00:00.000Z,
+    "fundingTimestamp": 2020-07-10T16:00:00.000000Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -3357,7 +3357,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "ETHBTC",
-    "timestamp": 2020-07-10T15:55:59.970Z,
+    "timestamp": 2020-07-10T15:55:59.970784Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3375,7 +3375,7 @@ Array [
     "price": 50.34,
     "side": "sell",
     "symbol": "LTCUSDT",
-    "timestamp": 2020-10-13T10:34:11.855Z,
+    "timestamp": 2020-10-13T10:34:11.855645Z,
     "type": "trade",
   },
   Object {
@@ -3389,7 +3389,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "LTCUSDT",
-    "timestamp": 2020-10-13T10:34:11.855Z,
+    "timestamp": 2020-10-13T10:34:11.855645Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3402,7 +3402,7 @@ Array [
   Object {
     "exchange": "delta",
     "fundingRate": 0.01,
-    "fundingTimestamp": 2020-10-13T16:00:00.000Z,
+    "fundingTimestamp": 2020-10-13T16:00:00.000000Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
     "localTimestamp": 2020-10-14T00:00:01.275Z,
@@ -3410,7 +3410,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": 0.010000000000000002,
     "symbol": "BTCUSD",
-    "timestamp": 2020-10-13T10:34:07.941Z,
+    "timestamp": 2020-10-13T10:34:07.941647Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3421,7 +3421,7 @@ Array [
   Object {
     "exchange": "delta",
     "fundingRate": 0.01,
-    "fundingTimestamp": 2020-10-13T16:00:00.000Z,
+    "fundingTimestamp": 2020-10-13T16:00:00.000000Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
     "localTimestamp": 2020-10-14T00:00:01.275Z,
@@ -3429,7 +3429,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": 0.010000000000000002,
     "symbol": "BTCUSD",
-    "timestamp": 2020-10-13T10:34:12.946Z,
+    "timestamp": 2020-10-13T10:34:12.946976Z,
     "type": "derivative_ticker",
   },
 ]
@@ -3454,7 +3454,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2020-10-14T00:00:01.275Z,
     "symbol": "AAVEUSDT",
-    "timestamp": 2021-03-28T17:00:10.982Z,
+    "timestamp": 2021-03-28T17:00:10.982556Z,
     "type": "book_change",
   },
 ]
@@ -3470,7 +3470,7 @@ Array [
     "price": 0.2,
     "side": "buy",
     "symbol": "DETO_USDT",
-    "timestamp": 2021-03-31T14:04:59.982Z,
+    "timestamp": 2021-03-31T14:04:59.982823Z,
     "type": "trade",
   },
   Object {
@@ -3484,7 +3484,7 @@ Array [
     "openInterest": undefined,
     "predictedFundingRate": undefined,
     "symbol": "DETO_USDT",
-    "timestamp": 2021-03-31T14:04:59.982Z,
+    "timestamp": 2021-03-31T14:04:59.982823Z,
     "type": "derivative_ticker",
   },
 ]
@@ -4087,7 +4087,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC-1227",
-    "timestamp": 2019-09-01T00:00:01.328Z,
+    "timestamp": 2019-09-01T00:00:01.328941Z,
     "type": "book_change",
   },
 ]
@@ -4107,7 +4107,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BNB-PERP",
-    "timestamp": 2019-09-01T00:00:05.667Z,
+    "timestamp": 2019-09-01T00:00:05.667879Z,
     "type": "book_change",
   },
 ]
@@ -4123,7 +4123,7 @@ Array [
     "price": 64.33,
     "side": "sell",
     "symbol": "LTC-PERP",
-    "timestamp": 2019-09-01T00:00:12.659Z,
+    "timestamp": 2019-09-01T00:00:12.659525Z,
     "type": "trade",
   },
 ]
@@ -4139,7 +4139,7 @@ Array [
     "price": 181.86,
     "side": "sell",
     "symbol": "ETH-PERP",
-    "timestamp": 2019-10-01T00:00:21.260Z,
+    "timestamp": 2019-10-01T00:00:21.260951Z,
     "type": "trade",
   },
 ]
@@ -4212,7 +4212,7 @@ Array [
     "price": 10683.5,
     "side": "buy",
     "symbol": "BTC-PERP",
-    "timestamp": 2020-09-15T00:02:05.787Z,
+    "timestamp": 2020-09-15T00:02:05.787437Z,
     "type": "trade",
   },
   Object {
@@ -4223,7 +4223,7 @@ Array [
     "price": 10683.5,
     "side": "buy",
     "symbol": "BTC-PERP",
-    "timestamp": 2020-09-15T00:02:05.787Z,
+    "timestamp": 2020-09-15T00:02:05.787437Z,
     "type": "liquidation",
   },
 ]
@@ -4239,13 +4239,46 @@ Array [
     "exchange": "ftx",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC/EUR",
-    "timestamp": 2021-10-26T00:00:00.086Z,
+    "timestamp": 2021-10-26T00:00:00.086694Z,
     "type": "book_ticker",
   },
 ]
 `;
 
 exports[`mappers map ftx messages 11`] = `Array []`;
+
+exports[`mappers map ftx messages 12`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 5.9795,
+        "price": 36043,
+      },
+      Object {
+        "amount": 9.7243,
+        "price": 36046,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 2.3987,
+        "price": 36006,
+      },
+      Object {
+        "amount": 8.8432,
+        "price": 35958,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2022-05-06T21:27:15.285900Z,
+    "type": "book_change",
+  },
+]
+`;
 
 exports[`mappers map ftx us messages 1`] = `Array []`;
 
@@ -4268,7 +4301,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "ETH/USD",
-    "timestamp": 2020-06-16T00:00:01.272Z,
+    "timestamp": 2020-06-16T00:00:01.272778Z,
     "type": "book_change",
   },
 ]
@@ -4295,7 +4328,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTC/USD",
-    "timestamp": 2020-06-16T01:39:02.221Z,
+    "timestamp": 2020-06-16T01:39:02.221954Z,
     "type": "book_change",
   },
 ]
@@ -4311,7 +4344,7 @@ Array [
     "price": 9469,
     "side": "sell",
     "symbol": "BTC/USD",
-    "timestamp": 2020-06-17T06:31:19.399Z,
+    "timestamp": 2020-06-17T06:31:19.399582Z,
     "type": "trade",
   },
 ]
@@ -4329,7 +4362,7 @@ Array [
     "price": 9137.38,
     "side": "buy",
     "symbol": "BTC_USDT",
-    "timestamp": 2020-07-01T00:00:00.655Z,
+    "timestamp": 2020-07-01T00:00:00.655988Z,
     "type": "trade",
   },
   Object {
@@ -4340,7 +4373,7 @@ Array [
     "price": 9137.38,
     "side": "buy",
     "symbol": "BTC_USDT",
-    "timestamp": 2020-07-01T00:00:00.775Z,
+    "timestamp": 2020-07-01T00:00:00.775122Z,
     "type": "trade",
   },
 ]
@@ -5935,7 +5968,7 @@ Array [
     "price": 0.011365,
     "side": "sell",
     "symbol": "LTC/XBT",
-    "timestamp": 2019-07-01T00:00:01.587Z,
+    "timestamp": 2019-07-01T00:00:01.587070Z,
     "type": "trade",
   },
 ]
@@ -5951,7 +5984,7 @@ Array [
     "price": 9482.4,
     "side": "sell",
     "symbol": "XBT/EUR",
-    "timestamp": 2019-07-01T00:00:58.512Z,
+    "timestamp": 2019-07-01T00:00:58.512503Z,
     "type": "trade",
   },
   Object {
@@ -5962,7 +5995,7 @@ Array [
     "price": 9488.2,
     "side": "buy",
     "symbol": "XBT/EUR",
-    "timestamp": 2019-07-01T00:00:58.557Z,
+    "timestamp": 2019-07-01T00:00:58.557040Z,
     "type": "trade",
   },
 ]
@@ -5982,7 +6015,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "XMR/USD",
-    "timestamp": 2019-07-01T00:00:58.527Z,
+    "timestamp": 2019-07-01T00:00:58.527900Z,
     "type": "book_change",
   },
 ]
@@ -6015,7 +6048,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/USD",
-    "timestamp": 2019-07-01T00:00:58.534Z,
+    "timestamp": 2019-07-01T00:00:58.534680Z,
     "type": "book_change",
   },
 ]
@@ -6039,7 +6072,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BCH/EUR",
-    "timestamp": 2019-07-01T00:00:58.548Z,
+    "timestamp": 2019-07-01T00:00:58.548498Z,
     "type": "book_change",
   },
 ]
@@ -6064,7 +6097,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "book-1000",
-    "timestamp": 2019-06-30T23:59:59.992Z,
+    "timestamp": 2019-06-30T23:59:59.992830Z,
     "type": "book_change",
   },
 ]
@@ -6080,7 +6113,7 @@ Array [
     "exchange": "kraken",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "XBT/USD",
-    "timestamp": 2021-10-01T02:02:59.916Z,
+    "timestamp": 2021-10-01T02:02:59.916349Z,
     "type": "book_ticker",
   },
 ]
@@ -7969,7 +8002,7 @@ Array [
     "openInterest": 10113855,
     "predictedFundingRate": -0.00260708,
     "symbol": "BTCUSD",
-    "timestamp": 2020-03-30T00:00:59.199Z,
+    "timestamp": 2020-03-30T00:00:59.199354Z,
     "type": "derivative_ticker",
   },
 ]
@@ -7989,7 +8022,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-03-30T00:00:59.126Z,
+    "timestamp": 2020-03-30T00:00:59.126872Z,
     "type": "book_change",
   },
 ]
@@ -8018,7 +8051,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "XTZUSD",
-    "timestamp": 2020-03-30T00:00:58.842Z,
+    "timestamp": 2020-03-30T00:00:58.842641Z,
     "type": "book_change",
   },
 ]
@@ -8034,7 +8067,7 @@ Array [
     "price": 2.021,
     "side": "buy",
     "symbol": "LINKUSD",
-    "timestamp": 2020-03-30T00:00:59.381Z,
+    "timestamp": 2020-03-30T00:00:59.381696Z,
     "type": "trade",
   },
 ]
@@ -8061,7 +8094,7 @@ Array [
     "isSnapshot": true,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "BTCUSD",
-    "timestamp": 2020-03-30T00:00:00.543Z,
+    "timestamp": 2020-03-30T00:00:00.543970Z,
     "type": "book_change",
   },
 ]
@@ -8085,7 +8118,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
     "symbol": "SBTCUSDT",
-    "timestamp": 2020-06-04T10:57:01.628Z,
+    "timestamp": 2020-06-04T10:57:01.628126Z,
     "type": "book_change",
   },
 ]
@@ -8101,7 +8134,7 @@ Array [
     "price": 240.25,
     "side": "buy",
     "symbol": "SETHUSDT",
-    "timestamp": 2020-06-04T10:57:04.163Z,
+    "timestamp": 2020-06-04T10:57:04.163281Z,
     "type": "trade",
   },
 ]
@@ -8117,7 +8150,7 @@ Array [
     "price": 9544.88,
     "side": "sell",
     "symbol": "SBTCUSDT",
-    "timestamp": 2020-06-04T10:57:06.414Z,
+    "timestamp": 2020-06-04T10:57:06.414925Z,
     "type": "trade",
   },
 ]
@@ -8133,7 +8166,7 @@ Array [
     "price": 4.378,
     "side": "sell",
     "symbol": "LINKUSD",
-    "timestamp": 2020-06-04T10:57:10.652Z,
+    "timestamp": 2020-06-04T10:57:10.652613Z,
     "type": "trade",
   },
 ]

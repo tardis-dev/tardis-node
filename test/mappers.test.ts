@@ -3701,6 +3701,24 @@ describe('mappers', () => {
             volumeUsd24h: 762549880.0517
           }
         }
+      },
+      {
+        channel: 'orderbook',
+        market: 'BTC-PERP',
+        type: 'update',
+        data: {
+          time: 1651872435.2858999,
+          checksum: 570490144,
+          bids: [
+            [36006.0, 2.3987],
+            [35958.0, 8.8432]
+          ],
+          asks: [
+            [36043.0, 5.9795],
+            [36046.0, 9.7243]
+          ],
+          action: 'update'
+        }
       }
     ]
 
