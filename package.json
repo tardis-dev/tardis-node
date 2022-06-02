@@ -84,7 +84,9 @@
       "\\.(ts|tsx)?$": "ts-jest"
     },
     "testEnvironment": "node",
-    "setupFiles": ["./test/setup.js"]
+    "setupFiles": [
+      "./test/setup.js"
+    ]
   },
   "runkitExampleFilename": "example.js"
 }
