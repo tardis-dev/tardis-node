@@ -73,7 +73,10 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
   *map(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const deribitBookChange = message.params.data
     // snapshots do not have prev_change_id set
-    const isSnapshot = deribitBookChange.prev_change_id === undefined
+    const isSnapshot =
+      (deribitBookChange.type !== undefined && deribitBookChange.type === 'snapshot') ||
+      deribitBookChange.prev_change_id === undefined ||
+      deribitBookChange.prev_change_id === 0
 
     yield {
       type: 'book_change',
@@ -323,6 +326,7 @@ type DeribitBookMessage = DeribitMessage & {
       prev_change_id?: number
       bids: DeribitBookLevel[]
       asks: DeribitBookLevel[]
+      type?: 'snapshot' | 'change'
     }
   }
 }

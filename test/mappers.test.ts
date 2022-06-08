@@ -425,6 +425,44 @@ describe('mappers', () => {
             }
           ]
         }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'book.ETH-10SEP21-3350-P.raw',
+          data: {
+            type: 'change',
+            timestamp: 1631026812566,
+            prev_change_id: 0,
+            instrument_name: 'ETH-10SEP21-3350-P',
+            change_id: 14617771529,
+            bids: [['new', 0.019, 93.0]],
+            asks: [['new', 0.037, 93.0]]
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'book.LINK_USDC-PERPETUAL.raw',
+          data: {
+            type: 'snapshot',
+            timestamp: 1654041599955,
+            instrument_name: 'LINK_USDC-PERPETUAL',
+            prev_change_id: 20,
+            change_id: 1232767964,
+            bids: [
+              ['new', 7.562, 34.0],
+              ['new', 7.561, 329.0],
+              ['new', 7.56, 401.0],
+              ['new', 7.559, 133.0],
+              ['new', 7.558, 660.0]
+            ],
+            asks: []
+          }
+        }
       }
     ]
     const deribitMapper = createMapper('deribit')

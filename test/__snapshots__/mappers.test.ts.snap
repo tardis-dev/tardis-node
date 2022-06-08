@@ -3867,6 +3867,67 @@ Array [
 ]
 `;
 
+exports[`mappers map deribit messages 13`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 93,
+        "price": 0.037,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 93,
+        "price": 0.019,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "ETH-10SEP21-3350-P",
+    "timestamp": 2021-09-07T15:00:12.566Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map deribit messages 14`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 34,
+        "price": 7.562,
+      },
+      Object {
+        "amount": 329,
+        "price": 7.561,
+      },
+      Object {
+        "amount": 401,
+        "price": 7.56,
+      },
+      Object {
+        "amount": 133,
+        "price": 7.559,
+      },
+      Object {
+        "amount": 660,
+        "price": 7.558,
+      },
+    ],
+    "exchange": "deribit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "LINK_USDC-PERPETUAL",
+    "timestamp": 2022-05-31T23:59:59.955Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map dydx messages 1`] = `Array []`;
 
 exports[`mappers map dydx messages 2`] = `
