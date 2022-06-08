@@ -84,6 +84,7 @@ describe('exchange-details', () => {
       'ticker',
       'depth',
       'depthSnapshot',
+      'depth20',
       'bookTicker',
       'recentTrades',
       'borrowInterest'
@@ -106,7 +107,8 @@ describe('stream', () => {
             exchange === 'binance-options' ||
             exchange === 'okex-futures' ||
             exchange === 'okex-options' ||
-            exchange === 'bitfinex'
+            exchange === 'bitfinex' ||
+            exchange === 'phemex'
           ) {
             return
           }
