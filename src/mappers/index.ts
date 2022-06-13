@@ -49,7 +49,12 @@ import {
 import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
-import { GateIOFuturesBookChangeMapper, GateIOFuturesDerivativeTickerMapper, GateIOFuturesTradesMapper } from './gateiofutures'
+import {
+  GateIOFuturesBookChangeMapper,
+  GateIOFuturesBookTickerMapper,
+  GateIOFuturesDerivativeTickerMapper,
+  GateIOFuturesTradesMapper
+} from './gateiofutures'
 import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
 import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
 import {
@@ -321,7 +326,8 @@ const bookTickersMappers = {
 
   okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
   serum: () => new SerumBookTickerMapper('serum'),
-  'star-atlas': () => new SerumBookTickerMapper('star-atlas')
+  'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
+  'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

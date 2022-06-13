@@ -1,5 +1,5 @@
 import { upperCaseSymbols } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, Trade } from '../types'
+import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://www.gate.io/docs/futures/ws/index.html
@@ -135,6 +135,43 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
   }
 }
 
+export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', BookTicker> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: any) {
+    return message.channel === 'futures.book_ticker' && message.event === 'update'
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'book_ticker',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(gateIoFuturesBookTickerMessage: GateIOFuturesBookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    const gateIoFuturesBookTicker = gateIoFuturesBookTickerMessage.result
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: gateIoFuturesBookTicker.s,
+      exchange: this._exchange,
+      askAmount: gateIoFuturesBookTicker.A !== 0 ? gateIoFuturesBookTicker.A : undefined,
+      askPrice: gateIoFuturesBookTicker.a !== '' ? Number(gateIoFuturesBookTicker.a) : undefined,
+      bidPrice: gateIoFuturesBookTicker.b !== '' ? Number(gateIoFuturesBookTicker.b) : undefined,
+      bidAmount: gateIoFuturesBookTicker.B !== 0 ? gateIoFuturesBookTicker.B : undefined,
+      timestamp: gateIoFuturesBookTicker.t !== undefined ? new Date(gateIoFuturesBookTicker.t) : localTimestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type GateIOFuturesTrade = {
   size: number
   id: number
@@ -200,4 +237,13 @@ type GateIOFuturesTicker = {
         index_price: string
         funding_rate_indicative: string
       }
+}
+
+type GateIOFuturesBookTicker = {
+  id: null
+  time: 1648771200
+  channel: 'futures.book_ticker'
+  event: 'update'
+  error: null
+  result: { t: 1648771200080; u: 3502782378; s: 'BTC_USD'; b: string; B: number; a: string; A: number }
 }

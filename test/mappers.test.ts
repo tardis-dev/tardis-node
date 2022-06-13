@@ -56,7 +56,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okex-swap',
   'okex-options',
   'okcoin',
-  'serum'
+  'serum',
+  'gate-io-futures'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -5962,6 +5963,14 @@ describe('mappers', () => {
           volume_24_usd: '0',
           volume_24_btc: '0'
         }
+      },
+      {
+        id: null,
+        time: 1648771200,
+        channel: 'futures.book_ticker',
+        event: 'update',
+        error: null,
+        result: { t: 1648771200080, u: 3502782378, s: 'BTC_USD', b: '45534.7', B: 2500, a: '45534.8', A: 15227 }
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')

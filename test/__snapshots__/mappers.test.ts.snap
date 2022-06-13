@@ -4825,6 +4825,22 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io-futures messages 17`] = `
+Array [
+  Object {
+    "askAmount": 15227,
+    "askPrice": 45534.8,
+    "bidAmount": 2500,
+    "bidPrice": 45534.7,
+    "exchange": "gate-io-futures",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_USD",
+    "timestamp": 2022-04-01T00:00:00.080Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {
