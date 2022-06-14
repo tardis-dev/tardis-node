@@ -156,6 +156,9 @@ export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', 
   *map(gateIoFuturesBookTickerMessage: GateIOFuturesBookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
     const gateIoFuturesBookTicker = gateIoFuturesBookTickerMessage.result
 
+    if (gateIoFuturesBookTicker.t === 0) {
+      return
+    }
     const ticker: BookTicker = {
       type: 'book_ticker',
       symbol: gateIoFuturesBookTicker.s,
@@ -245,5 +248,5 @@ type GateIOFuturesBookTicker = {
   channel: 'futures.book_ticker'
   event: 'update'
   error: null
-  result: { t: 1648771200080; u: 3502782378; s: 'BTC_USD'; b: string; B: number; a: string; A: number }
+  result: { t: number; u: 3502782378; s: 'BTC_USD'; b: string; B: number; a: string; A: number }
 }

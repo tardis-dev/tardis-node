@@ -5971,6 +5971,14 @@ describe('mappers', () => {
         event: 'update',
         error: null,
         result: { t: 1648771200080, u: 3502782378, s: 'BTC_USD', b: '45534.7', B: 2500, a: '45534.8', A: 15227 }
+      },
+      {
+        id: null,
+        time: 1648880663,
+        channel: 'futures.book_ticker',
+        event: 'update',
+        error: null,
+        result: { t: 0, u: 0, s: 'BSW_USDT', b: '', B: 0, a: '', A: 0 }
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')
