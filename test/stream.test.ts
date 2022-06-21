@@ -108,7 +108,8 @@ describe('stream', () => {
             exchange === 'okex-futures' ||
             exchange === 'okex-options' ||
             exchange === 'bitfinex' ||
-            exchange === 'phemex'
+            exchange === 'phemex' ||
+            exchange === 'delta'
           ) {
             return
           }
