@@ -5488,6 +5488,99 @@ describe('mappers', () => {
         },
         cross_seq: '9611371386',
         timestamp_e6: '1642063132602687'
+      },
+      {
+        topic: 'orderBookL2_25.BTCPERP',
+        type: 'snapshot',
+        data: {
+          orderBook: [{ price: '21039.00', symbol: 'BTCPERP', id: '210390000', side: 'Buy', size: 0.274 }]
+        },
+        crossSeq: '385207691',
+        timestampE6: '1655804219680634'
+      },
+      {
+        topic: 'orderBookL2_25.BTCPERP',
+        type: 'delta',
+        data: { delete: [], update: [{ price: '21203.00', symbol: 'BTCPERP', id: '212030000', side: 'Sell', size: 4.651 }], insert: [] },
+        crossSeq: '385208816',
+        timestampE6: '1655804279360632'
+      },
+      {
+        topic: 'trade.BTCPERP',
+        data: [
+          {
+            symbol: 'BTCPERP',
+            tickDirection: 'PlusTick',
+            price: '21213.00',
+            size: 0.007,
+            timestamp: '2022-06-21T09:36:58.000Z',
+            tradeTimeMs: '1655804218524',
+            side: 'Sell',
+            tradeId: '7aad7741-f763-5f78-bf43-c38b29a40f67'
+          }
+        ]
+      },
+      {
+        topic: 'instrument_info.100ms.BTCPERP',
+        type: 'snapshot',
+        data: {
+          id: 1,
+          symbol: 'BTCPERP',
+          lastPriceE4: '212130000',
+          lastPrice: '21213.00',
+          lastTickDirection: 'PlusTick',
+          prevPrice24hE4: '207180000',
+          prevPrice24h: '20718.00',
+          price24hPcntE6: '23892',
+          highPrice24hE4: '214085000',
+          highPrice24h: '21408.50',
+          lowPrice24hE4: '198005000',
+          lowPrice24h: '19800.50',
+          prevPrice1hE4: '213315000',
+          prevPrice1h: '21331.50',
+          price1hPcntE6: '-5555',
+          markPriceE4: '212094700',
+          markPrice: '21209.47',
+          indexPriceE4: '212247200',
+          indexPrice: '21224.72',
+          openInterestE8: '18317600000',
+          totalTurnoverE8: '94568739311650000',
+          turnover24hE8: '1375880657550000',
+          totalVolumeE8: '2734659400000',
+          volume24hE8: '66536799999',
+          fundingRateE6: '-900',
+          predictedFundingRateE6: '-614',
+          crossSeq: '385207672',
+          createdAt: '1970-01-01T00:00:00.000Z',
+          updatedAt: '2022-06-21T09:36:58.000Z',
+          nextFundingTime: '2022-06-21T16:00:00Z',
+          countDownHour: '7',
+          bid1PriceE4: '212130000',
+          bid1Price: '21213.00',
+          ask1PriceE4: '212135000',
+          ask1Price: '21213.50'
+        },
+        crossSeq: '385207695',
+        timestampE6: '1655804220916799'
+      },
+      {
+        topic: 'instrument_info.100ms.BTCPERP',
+        type: 'delta',
+        data: {
+          update: [
+            {
+              id: 1,
+              symbol: 'BTCPERP',
+              markPriceE4: '212094600',
+              markPrice: '21209.46',
+              crossSeq: '385207672',
+              createdAt: '1970-01-01T00:00:00.000Z',
+              updatedAt: '2022-06-21T09:36:58.000Z'
+            }
+          ]
+        },
+        crossSeq: '385207725',
+        timestampE6: '1655804221013058'
       }
     ]
 

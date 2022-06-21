@@ -9,7 +9,12 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     const inverseContractsFilters = filters.reduce(
-      this._only((s) => s.endsWith('USDT') === false),
+      this._only((s) => s.endsWith('USDT') === false && s.endsWith('PERP') === false),
+      [] as Filter<string>[]
+    )
+
+    const usdcContracts = filters.reduce(
+      this._only((s) => s.endsWith('PERP')),
       [] as Filter<string>[]
     )
 
@@ -19,6 +24,16 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
 
     if (inverseContractsFilters.length > 0) {
       yield new BybitSingleConnectionRealTimeDataFeed('realtime', exchange, inverseContractsFilters, timeoutIntervalMS, onError)
+    }
+
+    if (usdcContracts.length > 0) {
+      yield new BybitSingleConnectionRealTimeDataFeed(
+        'perpetual/ws/v1/realtime_public',
+        exchange,
+        usdcContracts,
+        timeoutIntervalMS,
+        onError
+      )
     }
   }
 

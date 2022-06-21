@@ -27,13 +27,18 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 
   *map(message: BybitTradeDataMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of message.data) {
-      const timestamp = trade.trade_time_ms !== undefined ? new Date(Number(trade.trade_time_ms)) : new Date(trade.timestamp)
+      const timestamp =
+        'trade_time_ms' in trade
+          ? new Date(Number(trade.trade_time_ms))
+          : 'tradeTimeMs' in trade
+          ? new Date(Number(trade.tradeTimeMs))
+          : new Date(trade.timestamp)
 
       yield {
         type: 'trade',
         symbol: trade.symbol,
         exchange: this._exchange,
-        id: trade.trade_id,
+        id: 'trade_id' in trade ? trade.trade_id : trade.tradeId,
         price: Number(trade.price),
         amount: trade.size,
         side: trade.side == 'Buy' ? 'buy' : trade.side === 'Sell' ? 'sell' : 'unknown',
@@ -86,10 +91,15 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
       message.type === 'snapshot'
         ? 'order_book' in message.data
           ? message.data.order_book
+          : 'orderBook' in message.data
+          ? message.data.orderBook
           : message.data
         : [...message.data.delete, ...message.data.update, ...message.data.insert]
 
-    const timestampBybit = Number(message.timestamp_e6)
+    // TODO: test instrument info
+    // TODO: test liquidations?
+
+    const timestampBybit = message.timestamp_e6 !== undefined ? Number(message.timestamp_e6) : Number(message.timestampE6)
     const timestamp = new Date(timestampBybit / 1000)
     timestamp.μs = timestampBybit % 1000
 
@@ -136,45 +146,65 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
     const instrumentInfo = 'symbol' in message.data ? message.data : message.data.update[0]
 
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(instrumentInfo.symbol, 'bybit')
+    const fundingRate = 'funding_rate_e6' in instrumentInfo ? instrumentInfo.funding_rate_e6 : instrumentInfo.fundingRateE6
 
-    pendingTickerInfo.updateFundingRate(
-      instrumentInfo.funding_rate_e6 !== undefined ? Number(instrumentInfo.funding_rate_e6) / 1000000 : undefined
-    )
-    pendingTickerInfo.updatePredictedFundingRate(
-      instrumentInfo.predicted_funding_rate_e6 !== undefined ? instrumentInfo.predicted_funding_rate_e6 / 1000000 : undefined
-    )
+    pendingTickerInfo.updateFundingRate(fundingRate !== undefined ? Number(fundingRate) / 1000000 : undefined)
+
+    const predictedFundingRate =
+      'predicted_funding_rate_e6' in instrumentInfo ? instrumentInfo.predicted_funding_rate_e6 : instrumentInfo.predictedFundingRateE6
+
+    pendingTickerInfo.updatePredictedFundingRate(predictedFundingRate !== undefined ? Number(predictedFundingRate) / 1000000 : undefined)
+
+    const nextFundingTime = 'next_funding_time' in instrumentInfo ? instrumentInfo.next_funding_time : instrumentInfo.nextFundingTime
     pendingTickerInfo.updateFundingTimestamp(
-      instrumentInfo.next_funding_time !== undefined && new Date(instrumentInfo.next_funding_time).valueOf() > 0
-        ? new Date(instrumentInfo.next_funding_time)
-        : undefined
+      nextFundingTime !== undefined && new Date(nextFundingTime).valueOf() > 0 ? new Date(nextFundingTime) : undefined
     )
 
     if (instrumentInfo.index_price !== undefined) {
       pendingTickerInfo.updateIndexPrice(Number(instrumentInfo.index_price))
+    } else if (instrumentInfo.indexPrice !== undefined) {
+      pendingTickerInfo.updateIndexPrice(Number(instrumentInfo.indexPrice))
     } else if (instrumentInfo.index_price_e4 !== undefined) {
       pendingTickerInfo.updateIndexPrice(Number(instrumentInfo.index_price_e4) / 10000)
+    } else if (instrumentInfo.indexPriceE4 !== undefined) {
+      pendingTickerInfo.updateIndexPrice(Number(instrumentInfo.indexPriceE4) / 10000)
     }
 
     if (instrumentInfo.mark_price !== undefined) {
       pendingTickerInfo.updateMarkPrice(Number(instrumentInfo.mark_price))
+    } else if (instrumentInfo.markPrice !== undefined) {
+      pendingTickerInfo.updateMarkPrice(Number(instrumentInfo.markPrice))
     } else if (instrumentInfo.mark_price_e4 !== undefined) {
-      pendingTickerInfo.updateMarkPrice(instrumentInfo.mark_price_e4 / 10000)
+      pendingTickerInfo.updateMarkPrice(Number(instrumentInfo.mark_price_e4) / 10000)
+    } else if (instrumentInfo.markPriceE4 !== undefined) {
+      pendingTickerInfo.updateMarkPrice(Number(instrumentInfo.markPriceE4) / 10000)
     }
 
     if (instrumentInfo.open_interest !== undefined) {
       pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest)
+    } else if (instrumentInfo.openInterestE8 !== undefined) {
+      pendingTickerInfo.updateOpenInterest(Number(instrumentInfo.openInterestE8) / 100000000)
     } else if (instrumentInfo.open_interest_e8 !== undefined) {
       pendingTickerInfo.updateOpenInterest(instrumentInfo.open_interest_e8 / 100000000)
     }
 
     if (instrumentInfo.last_price !== undefined) {
       pendingTickerInfo.updateLastPrice(Number(instrumentInfo.last_price))
+    } else if (instrumentInfo.lastPrice !== undefined) {
+      pendingTickerInfo.updateLastPrice(Number(instrumentInfo.lastPrice))
     } else if (instrumentInfo.last_price_e4 !== undefined) {
       pendingTickerInfo.updateLastPrice(Number(instrumentInfo.last_price_e4) / 10000)
+    } else if (instrumentInfo.lastPriceE4) {
+      pendingTickerInfo.updateLastPrice(Number(instrumentInfo.lastPriceE4) / 10000)
     }
 
     if (message.timestamp_e6 !== undefined) {
       const timestampBybit = Number(message.timestamp_e6)
+      const timestamp = new Date(timestampBybit / 1000)
+      timestamp.μs = timestampBybit % 1000
+      pendingTickerInfo.updateTimestamp(timestamp)
+    } else if (message.timestampE6 !== undefined) {
+      const timestampBybit = Number(message.timestampE6)
       const timestamp = new Date(timestampBybit / 1000)
       timestamp.μs = timestampBybit % 1000
       pendingTickerInfo.updateTimestamp(timestamp)
@@ -250,17 +280,33 @@ type BybitDataMessage = {
   topic: string
 }
 
-type BybitTradeDataMessage = BybitDataMessage & {
-  data: {
-    timestamp: string
-    trade_time_ms?: number | string
-    symbol: string
-    side: 'Buy' | 'Sell'
-    size: number
-    price: number | string
-    trade_id: string
-  }[]
-}
+type BybitTradeDataMessage =
+  | (BybitDataMessage & {
+      data: {
+        timestamp: string
+        trade_time_ms?: number | string
+        symbol: string
+        side: 'Buy' | 'Sell'
+        size: number
+        price: number | string
+        trade_id: string
+      }[]
+    })
+  | {
+      topic: 'trade.BTCPERP'
+      data: [
+        {
+          symbol: 'BTCPERP'
+          tickDirection: 'PlusTick'
+          price: '21213.00'
+          size: 0.007
+          timestamp: '2022-06-21T09:36:58.000Z'
+          tradeTimeMs: '1655804218524'
+          side: 'Sell'
+          tradeId: '7aad7741-f763-5f78-bf43-c38b29a40f67'
+        }
+      ]
+    }
 
 type BybitBookLevel = {
   price: string
@@ -270,8 +316,9 @@ type BybitBookLevel = {
 
 type BybitBookSnapshotDataMessage = BybitDataMessage & {
   type: 'snapshot'
-  data: BybitBookLevel[] | { order_book: BybitBookLevel[] }
+  data: BybitBookLevel[] | { order_book: BybitBookLevel[] } | { orderBook: BybitBookLevel[] }
   timestamp_e6: number | string
+  timestampE6: number | string
 }
 
 type BybitBookSnapshotUpdateMessage = BybitDataMessage & {
@@ -282,6 +329,7 @@ type BybitBookSnapshotUpdateMessage = BybitDataMessage & {
     insert: BybitBookLevel[]
   }
   timestamp_e6: number | string
+  timestampE6: number | string
 }
 
 type BybitInstrumentUpdate = {
@@ -298,16 +346,51 @@ type BybitInstrumentUpdate = {
   last_price_e4?: string
   last_price?: string
   updated_at: string
+  lastPriceE4: '212130000'
+  lastPrice: '21213.00'
+  lastTickDirection: 'PlusTick'
+  prevPrice24hE4: '207180000'
+  prevPrice24h: '20718.00'
+  price24hPcntE6: '23892'
+  highPrice24hE4: '214085000'
+  highPrice24h: '21408.50'
+  lowPrice24hE4: '198005000'
+  lowPrice24h: '19800.50'
+  prevPrice1hE4: '213315000'
+  prevPrice1h: '21331.50'
+  price1hPcntE6: '-5555'
+  markPriceE4: '212094700'
+  markPrice: '21209.47'
+  indexPriceE4: '212247200'
+  indexPrice: '21224.72'
+  openInterestE8: '18317600000'
+  totalTurnoverE8: '94568739311650000'
+  turnover24hE8: '1375880657550000'
+  totalVolumeE8: '2734659400000'
+  volume24hE8: '66536799999'
+  fundingRateE6: '-900'
+  predictedFundingRateE6: '-614'
+  crossSeq: '385207672'
+  createdAt: '1970-01-01T00:00:00.000Z'
+  updatedAt: '2022-06-21T09:36:58.000Z'
+  nextFundingTime: '2022-06-21T16:00:00Z'
+  countDownHour: '7'
+  bid1PriceE4: '212130000'
+  bid1Price: '21213.00'
+  ask1PriceE4: '212135000'
+  ask1Price: '21213.50'
 }
 
-type BybitInstrumentDataMessage = BybitDataMessage & {
-  timestamp_e6: string
-  data:
-    | BybitInstrumentUpdate
-    | {
-        update: [BybitInstrumentUpdate]
-      }
-}
+type BybitInstrumentDataMessage =
+  | BybitDataMessage & {
+      timestamp_e6: string
+      timestampE6: string
+      data:
+        | BybitInstrumentUpdate
+        | {
+            update: [BybitInstrumentUpdate]
+          }
+    }
 
 type BybitLiquidationMessage = BybitDataMessage & {
   generated: true

@@ -2565,6 +2565,100 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 34`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0.274,
+        "price": 21039,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "symbol": "BTCPERP",
+    "timestamp": 2022-06-21T09:36:59.680634Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 35`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 4.651,
+        "price": 21203,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "symbol": "BTCPERP",
+    "timestamp": 2022-06-21T09:37:59.360632Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 36`] = `
+Array [
+  Object {
+    "amount": 0.007,
+    "exchange": "bybit",
+    "id": "7aad7741-f763-5f78-bf43-c38b29a40f67",
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "price": 21213,
+    "side": "sell",
+    "symbol": "BTCPERP",
+    "timestamp": 2022-06-21T09:36:58.524Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 37`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": -0.0009,
+    "fundingTimestamp": 2022-06-21T16:00:00.000Z,
+    "indexPrice": 21224.72,
+    "lastPrice": 21213,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": 21209.47,
+    "openInterest": 183.176,
+    "predictedFundingRate": -0.000614,
+    "symbol": "BTCPERP",
+    "timestamp": 2022-06-21T09:37:00.916799Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 38`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": -0.0009,
+    "fundingTimestamp": 2022-06-21T16:00:00.000Z,
+    "indexPrice": 21224.72,
+    "lastPrice": 21213,
+    "localTimestamp": 2019-12-14T00:00:01.275Z,
+    "markPrice": 21209.46,
+    "openInterest": 183.176,
+    "predictedFundingRate": -0.000614,
+    "symbol": "BTCPERP",
+    "timestamp": 2022-06-21T09:37:01.013058Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinbase messages 1`] = `
 Array [
   Object {
