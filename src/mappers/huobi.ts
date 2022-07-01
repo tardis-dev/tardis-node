@@ -568,7 +568,7 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         askPrice: message.tick.ask !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.ask[0]) : undefined,
 
         bidPrice: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[0]) : undefined,
-        bidAmount: message.tick.bid !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.bid[1]) : undefined,
+        bidAmount: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[1]) : undefined,
         timestamp: new Date(message.tick.ts),
         localTimestamp: localTimestamp
       }
