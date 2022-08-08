@@ -39,6 +39,7 @@ export const EXCHANGES = [
   'ascendex',
   'dydx',
   'serum',
+  'mango',
   'huobi-dm-options',
   'star-atlas'
 ] as const
@@ -355,6 +356,19 @@ const SERUM_CHANNELS = [
   'done'
 ] as const
 
+const MANGO_CHANNELS = [
+  'recent_trades',
+  'trade',
+  'quote',
+  'l2snapshot',
+  'l2update',
+  'l3snapshot',
+  'open',
+  'fill',
+  'change',
+  'done'
+] as const
+
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
@@ -399,5 +413,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   dydx: DYDX_CHANNELS,
   serum: SERUM_CHANNELS,
   'star-atlas': SERUM_CHANNELS,
-  'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS
+  'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS,
+  mango: MANGO_CHANNELS
 }

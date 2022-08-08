@@ -40,6 +40,7 @@ import { AscendexRealTimeFeed } from './ascendex'
 import { DydxRealTimeFeed } from './dydx'
 import { SerumRealTimeFeed } from './serum'
 import { StarAtlasRealTimeFeed } from './staratlas'
+import { MangoRealTimeFeed } from './mango'
 
 export * from './realtimefeed'
 
@@ -87,7 +88,8 @@ const realTimeFeedsMap: {
   dydx: DydxRealTimeFeed,
   serum: SerumRealTimeFeed,
   'star-atlas': StarAtlasRealTimeFeed,
-  'huobi-dm-options': HuobiDMOptionsRealTimeFeed
+  'huobi-dm-options': HuobiDMOptionsRealTimeFeed,
+  mango: MangoRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

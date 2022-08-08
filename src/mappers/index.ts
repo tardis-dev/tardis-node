@@ -165,7 +165,8 @@ const tradesMappers = {
   ascendex: () => new AscendexTradesMapper(),
   dydx: () => new DydxTradesMapper(),
   serum: () => new SerumTradesMapper('serum'),
-  'star-atlas': () => new SerumTradesMapper('star-atlas')
+  'star-atlas': () => new SerumTradesMapper('star-atlas'),
+  mango: () => new SerumTradesMapper('mango')
 }
 
 const bookChangeMappers = {
@@ -232,7 +233,8 @@ const bookChangeMappers = {
   ascendex: () => new AscendexBookChangeMapper(),
   dydx: () => new DydxBookChangeMapper(),
   serum: () => new SerumBookChangeMapper('serum'),
-  'star-atlas': () => new SerumBookChangeMapper('star-atlas')
+  'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
+  mango: () => new SerumBookChangeMapper('mango')
 }
 
 const derivativeTickersMappers = {
@@ -335,6 +337,7 @@ const bookTickersMappers = {
   okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
   serum: () => new SerumBookTickerMapper('serum'),
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
+  mango: () => new SerumBookTickerMapper('mango'),
   'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures')
 }
 

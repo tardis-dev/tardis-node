@@ -31,8 +31,8 @@ export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> 
       price: Number(message.price),
       amount: Number(message.size),
       side: message.side,
-      timestamp: new Date(message.timestamp),
-      localTimestamp: localTimestamp
+      timestamp: message.eventTimestamp !== undefined ? new Date(message.eventTimestamp) : new Date(message.timestamp),
+      localTimestamp
     }
   }
 }
@@ -118,17 +118,31 @@ export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', Boo
   }
 }
 
-type SerumVialTrade = {
-  type: 'trade'
-  market: 'RAY/USDT'
-  timestamp: '2021-05-22T00:00:59.448Z'
-  slot: 79469377
-  version: 3
-  id: '96845406386975144808722|185.8|1621641659448'
-  side: 'buy'
-  price: '5.235'
-  size: '185.8'
-}
+type SerumVialTrade =
+  | {
+      type: 'trade'
+      market: 'RAY/USDT'
+      timestamp: '2021-05-22T00:00:59.448Z'
+      slot: 79469377
+      version: 3
+      id: '96845406386975144808722|185.8|1621641659448'
+      side: 'buy'
+      price: '5.235'
+      size: '185.8'
+      eventTimestamp: undefined
+    }
+  | {
+      type: 'trade'
+      market: string
+      timestamp: string
+      slot: number
+      version: number
+      id: string
+      side: 'buy' | 'sell'
+      price: string
+      size: string
+      eventTimestamp: string
+    }
 
 type SerumVialPriceLevel = [string, string]
 
