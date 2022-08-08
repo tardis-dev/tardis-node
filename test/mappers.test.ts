@@ -100,7 +100,7 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 
   return {
     map(message: any, localTimestamp: Date) {
-      const responses = []
+      const responses: any[] = []
       for (const mapper of mappersForExchange) {
         if (mapper.canHandle(message)) {
           const mappedMessages = mapper.map(message, localTimestamp)
@@ -6154,10 +6154,71 @@ describe('mappers', () => {
       ],
       [14, 98527492, [['t', 10384654, 1, '0.00000226', '299.99145733', 1597167360]], 'BTC_BTS']
     ]
-    const poloniexMapper = createMapper('poloniex')
+
+    let poloniexMapper = createMapper('poloniex', new Date('2022-08-01T00:00:01.2750543Z'))
 
     for (const message of messages) {
       const mappedMessages = poloniexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const v2Messages = [
+      {
+        event: 'subscribe',
+        channel: 'trades',
+        symbols: ['DASH_BTC', 'XEM_BTC']
+      },
+      {
+        channel: 'trades',
+        data: [
+          {
+            symbol: 'USDD_USDT',
+            amount: '53.17153856',
+            quantity: '53.0866',
+            takerSide: 'sell',
+            createTime: 1659916859838,
+            price: '1.0016',
+            id: '60100203',
+            ts: 1659916859843
+          }
+        ]
+      },
+      {
+        channel: 'book_lv2',
+        data: [
+          {
+            symbol: 'VSP_TRX',
+            createTime: 1659900600092,
+            asks: [['245.688', '145.01703']],
+            bids: [['0.062', '510.51612']],
+            lastId: 85,
+            id: 86,
+            ts: 1659916800614
+          }
+        ],
+        action: 'snapshot'
+      },
+      {
+        channel: 'book_lv2',
+        data: [
+          {
+            symbol: 'AAVE_BTC',
+            createTime: 1659916859818,
+            asks: [['0.004387', '1.18']],
+            bids: [],
+            lastId: 20251,
+            id: 20252,
+            ts: 1659916859824
+          }
+        ],
+        action: 'update'
+      }
+    ]
+
+    poloniexMapper = createMapper('poloniex', new Date('2022-08-02T00:00:01.2750543Z'))
+
+    for (const message of v2Messages) {
+      const mappedMessages = poloniexMapper.map(message, new Date('2022-08-02T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

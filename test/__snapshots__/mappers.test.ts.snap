@@ -8537,6 +8537,69 @@ Array [
 ]
 `;
 
+exports[`mappers map poloniex messages 9`] = `Array []`;
+
+exports[`mappers map poloniex messages 10`] = `
+Array [
+  Object {
+    "amount": 53.0866,
+    "exchange": "poloniex",
+    "id": "60100203",
+    "localTimestamp": 2022-08-02T00:00:01.275Z,
+    "price": 1.0016,
+    "side": "sell",
+    "symbol": "USDD_USDT",
+    "timestamp": 2022-08-08T00:00:59.838Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 145.01703,
+        "price": 245.688,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 510.51612,
+        "price": 0.062,
+      },
+    ],
+    "exchange": "poloniex",
+    "isSnapshot": true,
+    "localTimestamp": 2022-08-02T00:00:01.275Z,
+    "symbol": "VSP_TRX",
+    "timestamp": 2022-08-08T00:00:00.614Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map poloniex messages 12`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1.18,
+        "price": 0.004387,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "poloniex",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-02T00:00:01.275Z,
+    "symbol": "AAVE_BTC",
+    "timestamp": 2022-08-08T00:00:59.824Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map serum messages 1`] = `
 Array [
   Object {

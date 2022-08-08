@@ -202,6 +202,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected abstract messageIsError(message: any): boolean
 
+  protected sendCustomPing: (() => void) | undefined = undefined
+
   protected isIgnoredError(_message: any) {
     return false
   }
@@ -247,7 +249,11 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         return
       }
 
-      this._ws.ping()
+      if (this.sendCustomPing !== undefined) {
+        this.sendCustomPing()
+      } else {
+        this._ws.ping()
+      }
     }, 5 * ONE_SEC_IN_MS)
   }
 

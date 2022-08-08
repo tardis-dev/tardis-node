@@ -83,7 +83,7 @@ import {
   OkexV5TradesMapper
 } from './okex'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
-import { PoloniexBookChangeMapper, PoloniexTradesMapper } from './poloniex'
+import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex'
 import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
 
@@ -106,6 +106,12 @@ const shouldUseOkexV5Mappers = (localTimestamp: Date) => {
 
 const canUseOkexTbtBookTicker = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE.valueOf()
+}
+
+const POLONIEX_V2_API_SWITCH_DATE = new Date('2022-08-02T00:00:00.000Z')
+
+const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= POLONIEX_V2_API_SWITCH_DATE.valueOf()
 }
 
 const tradesMappers = {
@@ -151,7 +157,8 @@ const tradesMappers = {
   delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
   'gate-io': () => new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
-  poloniex: () => new PoloniexTradesMapper(),
+  poloniex: (localTimestamp: Date) =>
+    shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2TradesMapper() : new PoloniexTradesMapper(),
   coinflex: () => coinflexTradesMapper,
   'binance-options': () => new BinanceOptionsTradesMapper(),
   upbit: () => new UpbitTradesMapper(),
@@ -217,7 +224,8 @@ const bookChangeMappers = {
   delta: () => deltaBookChangeMapper,
   'gate-io': () => new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
-  poloniex: () => new PoloniexBookChangeMapper(),
+  poloniex: (localTimestamp: Date) =>
+    shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
   coinflex: () => coinflexBookChangeMapper,
   'binance-options': () => new BinanceOptionsBookChangeMapper(),
   upbit: () => new UpbitBookChangeMapper(),
