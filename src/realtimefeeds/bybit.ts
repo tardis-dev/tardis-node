@@ -90,4 +90,12 @@ class BybitSingleConnectionRealTimeDataFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.success === false
   }
+
+  protected sendCustomPing = () => {
+    this.send({ op: 'ping' })
+  }
+
+  protected messageIsHeartbeat(msg: any) {
+    return msg.ret_msg === 'pong' || msg.op == 'pong'
+  }
 }

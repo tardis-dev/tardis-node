@@ -63,6 +63,14 @@ class FtxSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     // ignore market not found errors
     return message.code == 404
   }
+
+  protected sendCustomPing = () => {
+    this.send({ op: 'ping' })
+  }
+
+  protected messageIsHeartbeat(msg: any) {
+    return msg.type === 'pong'
+  }
 }
 
 class FTXInstrumentInfoClient extends PoolingClientBase {

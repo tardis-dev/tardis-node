@@ -38,6 +38,14 @@ export class AscendexRealTimeFeed extends RealTimeFeedBase {
     return message.m === 'error'
   }
 
+  protected sendCustomPing = () => {
+    this.send({ op: 'ping' })
+  }
+
+  protected messageIsHeartbeat(msg: any) {
+    return msg.m === 'pong'
+  }
+
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
     const depthSnapshotChannel = filters.find((f) => f.channel === 'depth-snapshot-realtime')
     if (!depthSnapshotChannel) {

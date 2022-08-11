@@ -24,4 +24,12 @@ export class DeltaRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.error !== undefined && message.error !== null
   }
+
+  protected sendCustomPing = () => {
+    this.send({ type: 'ping' })
+  }
+
+  protected messageIsHeartbeat(msg: any) {
+    return msg.type === 'pong'
+  }
 }
