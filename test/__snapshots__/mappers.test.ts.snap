@@ -1,5 +1,66 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`map bybit spot messages 1`] = `Array []`;
+
+exports[`map bybit spot messages 2`] = `Array []`;
+
+exports[`map bybit spot messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 555.8,
+        "price": 0.00002951,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 25862.5,
+        "price": 0.00002949,
+      },
+    ],
+    "exchange": "bybit-spot",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "BITBTC",
+    "timestamp": 2022-07-31T23:59:59.986Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bybit spot messages 4`] = `
+Array [
+  Object {
+    "amount": 1.4,
+    "exchange": "bybit-spot",
+    "id": "2280000000007453966",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 1678.54,
+    "side": "buy",
+    "symbol": "ETHUSDT",
+    "timestamp": 2022-08-01T00:00:00.103Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bybit spot messages 5`] = `
+Array [
+  Object {
+    "askAmount": 0.001651,
+    "askPrice": 23293.37,
+    "bidAmount": 0.052479,
+    "bidPrice": 23293.19,
+    "exchange": "bybit-spot",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2022-08-01T00:00:00.113Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map ascendex messages 1`] = `
 Array [
   Object {

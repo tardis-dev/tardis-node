@@ -28,6 +28,7 @@ import {
 } from './bitmex'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
+import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
 import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import {
@@ -166,7 +167,8 @@ const tradesMappers = {
   dydx: () => new DydxTradesMapper(),
   serum: () => new SerumTradesMapper('serum'),
   'star-atlas': () => new SerumTradesMapper('star-atlas'),
-  mango: () => new SerumTradesMapper('mango')
+  mango: () => new SerumTradesMapper('mango'),
+  'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot')
 }
 
 const bookChangeMappers = {
@@ -216,7 +218,7 @@ const bookChangeMappers = {
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
   'huobi-dm-options': () => new HuobiBookChangeMapper('huobi-dm-options'),
-
+  'bybit-spot': () => new BybitSpotBookChangeMapper('bybit-spot'),
   bybit: () => new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
@@ -338,7 +340,8 @@ const bookTickersMappers = {
   serum: () => new SerumBookTickerMapper('serum'),
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
   mango: () => new SerumBookTickerMapper('mango'),
-  'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures')
+  'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
+  'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

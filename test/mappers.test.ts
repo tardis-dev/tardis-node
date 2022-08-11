@@ -57,7 +57,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okex-options',
   'okcoin',
   'serum',
-  'gate-io-futures'
+  'gate-io-futures',
+  'bybit-spot'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -6817,4 +6818,47 @@ describe('mappers', () => {
       expect(mappedMessages).toMatchSnapshot()
     }
   })
+})
+
+test('map bybit spot messages', () => {
+  const messages = [
+    { topic: 'depth', event: 'cancel', params: { symbol: 'DFIUSDT', binary: 'false', symbolName: 'DFIUSDT' }, code: '0', msg: 'Success' },
+    {
+      topic: 'depth',
+      event: 'sub',
+      params: { symbol: 'SAND2SUSDT', binary: 'false', symbolName: 'SAND2SUSDT' },
+      code: '0',
+      msg: 'Success'
+    },
+    {
+      topic: 'depth',
+      params: { symbol: 'BITBTC', binary: 'false', symbolName: 'BITBTC' },
+      data: {
+        s: 'BITBTC',
+        t: 1659311999986,
+        v: '132777961_22362914_8',
+        b: [['0.00002949', '25862.5']],
+        a: [['0.00002951', '555.8']]
+      }
+    },
+
+    {
+      topic: 'trade',
+      params: { symbol: 'ETHUSDT', binary: 'false', symbolName: 'ETHUSDT' },
+      data: { v: '2280000000007453966', t: 1659312000103, p: '1678.54', q: '1.4', m: true }
+    },
+
+    {
+      topic: 'bookTicker',
+      params: { symbol: 'BTCUSDT', binary: 'false', symbolName: 'BTCUSDT' },
+      data: { symbol: 'BTCUSDT', bidPrice: '23293.19', bidQty: '0.052479', askPrice: '23293.37', askQty: '0.001651', time: 1659312000113 }
+    }
+  ]
+
+  const bybitSpotMapper = createMapper('bybit-spot')
+
+  for (const message of messages) {
+    const mappedMessages = bybitSpotMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
 })

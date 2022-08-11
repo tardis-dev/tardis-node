@@ -84,7 +84,6 @@ describe('exchange-details', () => {
       'ticker',
       'depth',
       'depthSnapshot',
-      'depth20',
       'bookTicker',
       'recentTrades',
       'borrowInterest'
@@ -111,8 +110,7 @@ describe('stream', () => {
             exchange === 'phemex' ||
             exchange === 'delta' ||
             exchange === 'coinbase' ||
-            exchange === 'mango' ||
-            exchange === 'poloniex'
+            exchange === 'bybit-spot'
           ) {
             return
           }

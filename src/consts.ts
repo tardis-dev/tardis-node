@@ -23,6 +23,7 @@ export const EXCHANGES = [
   'gemini',
   'poloniex',
   'bybit',
+  'bybit-spot',
   'phemex',
   'delta',
   'ftx-us',
@@ -371,6 +372,8 @@ const MANGO_CHANNELS = [
 
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
+const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -399,6 +402,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm-swap': HUOBI_DM_SWAP_CHANNELS,
   'huobi-dm-linear-swap': HUOBI_DM_LINEAR_SWAP_CHANNELS,
   bybit: BYBIT_CHANNELS,
+  'bybit-spot': BYBIT_SPOT_CHANNELS,
   okcoin: OKCOIN_CHANNELS,
   hitbtc: HITBTC_CHANNELS,
   coinflex: COINFLEX_CHANNELS,

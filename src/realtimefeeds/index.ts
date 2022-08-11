@@ -41,6 +41,7 @@ import { DydxRealTimeFeed } from './dydx'
 import { SerumRealTimeFeed } from './serum'
 import { StarAtlasRealTimeFeed } from './staratlas'
 import { MangoRealTimeFeed } from './mango'
+import { BybitSpotRealTimeFeed } from './bybitspot'
 
 export * from './realtimefeed'
 
@@ -89,7 +90,8 @@ const realTimeFeedsMap: {
   serum: SerumRealTimeFeed,
   'star-atlas': StarAtlasRealTimeFeed,
   'huobi-dm-options': HuobiDMOptionsRealTimeFeed,
-  mango: MangoRealTimeFeed
+  mango: MangoRealTimeFeed,
+  'bybit-spot': BybitSpotRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
