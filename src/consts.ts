@@ -42,7 +42,9 @@ export const EXCHANGES = [
   'serum',
   'mango',
   'huobi-dm-options',
-  'star-atlas'
+  'star-atlas',
+  'crypto-com',
+  'crypto-com-derivatives'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -374,6 +376,10 @@ const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_inte
 
 const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth']
 
+const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker']
+
+const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -418,5 +424,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   serum: SERUM_CHANNELS,
   'star-atlas': SERUM_CHANNELS,
   'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS,
-  mango: MANGO_CHANNELS
+  mango: MANGO_CHANNELS,
+  'crypto-com': CRYPTO_COM_CHANNELS,
+  'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES
 }

@@ -31,6 +31,7 @@ import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMa
 import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
 import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
+import { CryptoComBookChangeMapper, CryptoComBookTickerMapper, CryptoComDerivativeTickerMapper, CryptoComTradesMapper } from './cryptocom'
 import {
   cryptofacilitiesBookChangeMapper,
   CryptofacilitiesDerivativeTickerMapper,
@@ -168,7 +169,9 @@ const tradesMappers = {
   serum: () => new SerumTradesMapper('serum'),
   'star-atlas': () => new SerumTradesMapper('star-atlas'),
   mango: () => new SerumTradesMapper('mango'),
-  'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot')
+  'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot'),
+  'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
+  'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives')
 }
 
 const bookChangeMappers = {
@@ -236,7 +239,9 @@ const bookChangeMappers = {
   dydx: () => new DydxBookChangeMapper(),
   serum: () => new SerumBookChangeMapper('serum'),
   'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
-  mango: () => new SerumBookChangeMapper('mango')
+  mango: () => new SerumBookChangeMapper('mango'),
+  'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
+  'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives')
 }
 
 const derivativeTickersMappers = {
@@ -264,7 +269,8 @@ const derivativeTickersMappers = {
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
   coinflex: () => new CoinflexDerivativeTickerMapper(),
   ascendex: () => new AscendexDerivativeTickerMapper(),
-  dydx: () => new DydxDerivativeTickerMapper()
+  dydx: () => new DydxDerivativeTickerMapper(),
+  'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives')
 }
 
 const optionsSummaryMappers = {
@@ -341,7 +347,9 @@ const bookTickersMappers = {
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
   mango: () => new SerumBookTickerMapper('mango'),
   'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
-  'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot')
+  'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot'),
+  'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
+  'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

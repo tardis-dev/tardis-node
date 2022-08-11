@@ -42,6 +42,8 @@ import { SerumRealTimeFeed } from './serum'
 import { StarAtlasRealTimeFeed } from './staratlas'
 import { MangoRealTimeFeed } from './mango'
 import { BybitSpotRealTimeFeed } from './bybitspot'
+import { CryptoComRealTimeFeed } from './cryptocom'
+import { CryptoComDerivativesRealTimeFeed } from './cryptocomderivatives'
 
 export * from './realtimefeed'
 
@@ -91,7 +93,9 @@ const realTimeFeedsMap: {
   'star-atlas': StarAtlasRealTimeFeed,
   'huobi-dm-options': HuobiDMOptionsRealTimeFeed,
   mango: MangoRealTimeFeed,
-  'bybit-spot': BybitSpotRealTimeFeed
+  'bybit-spot': BybitSpotRealTimeFeed,
+  'crypto-com': CryptoComRealTimeFeed,
+  'crypto-com-derivatives': CryptoComDerivativesRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

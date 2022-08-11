@@ -61,6 +61,327 @@ Array [
 ]
 `;
 
+exports[`map crypto-com messages 1`] = `Array []`;
+
+exports[`map crypto-com messages 2`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "crypto-com",
+    "id": "2552833531650627600",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 0.00737,
+    "side": "buy",
+    "symbol": "RSR_USDT",
+    "timestamp": 2022-05-30T13:26:07.912Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 6.9,
+    "exchange": "crypto-com",
+    "id": "2552833547970376700",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 0.00737,
+    "side": "buy",
+    "symbol": "RSR_USDT",
+    "timestamp": 2022-05-30T13:26:08.398Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com messages 3`] = `
+Array [
+  Object {
+    "amount": 0.04,
+    "exchange": "crypto-com",
+    "id": "2733854056108316700",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 0.4272,
+    "side": "sell",
+    "symbol": "GODS_USDT",
+    "timestamp": 2022-07-31T23:59:59.941Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com messages 4`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": 7905.8,
+    "bidAmount": undefined,
+    "bidPrice": 7892.58,
+    "exchange": "crypto-com",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "YFI_USDT",
+    "timestamp": 2022-05-30T13:26:45.936Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map crypto-com messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 9.8577,
+        "price": 97.685,
+      },
+      Object {
+        "amount": 0.005,
+        "price": 302.01,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 7.5202,
+        "price": 97.44,
+      },
+    ],
+    "exchange": "crypto-com",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "AAVE_USDT",
+    "timestamp": 2022-07-31T23:59:59.918Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map crypto-com messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 696.434,
+        "price": 8.6427,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4.694,
+        "price": 8.6143,
+      },
+      Object {
+        "amount": 0,
+        "price": 8.6135,
+      },
+    ],
+    "exchange": "crypto-com",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "DOT_USDT",
+    "timestamp": 2022-08-01T00:00:00.046Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map crypto-com messages 7`] = `
+Array [
+  Object {
+    "amount": 0.04,
+    "exchange": "crypto-com",
+    "id": "2733854073183727600",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 23297.35,
+    "side": "sell",
+    "symbol": "BTC_USDT",
+    "timestamp": 2022-08-01T00:00:00.449Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.04,
+    "exchange": "crypto-com",
+    "id": "2733854074175694000",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 23297.35,
+    "side": "sell",
+    "symbol": "BTC_USDT",
+    "timestamp": 2022-08-01T00:00:00.479Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.04,
+    "exchange": "crypto-com",
+    "id": "2733854074994198500",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 23297.35,
+    "side": "sell",
+    "symbol": "BTC_USDT",
+    "timestamp": 2022-08-01T00:00:00.503Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 1`] = `Array []`;
+
+exports[`map crypto-com-derivatives messages 2`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "crypto-com-derivatives",
+    "id": "4611686018427711803",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 10.364,
+    "side": "buy",
+    "symbol": "ATOMUSD-PERP",
+    "timestamp": 2022-05-31T10:21:11.408Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.1,
+    "exchange": "crypto-com-derivatives",
+    "id": "4611686018427711804",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 10.361,
+    "side": "buy",
+    "symbol": "ATOMUSD-PERP",
+    "timestamp": 2022-05-31T10:21:50.011Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 451,
+        "price": 0.9801,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 5303,
+        "price": 0.9787,
+      },
+    ],
+    "exchange": "crypto-com-derivatives",
+    "isSnapshot": true,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "1INCHUSD-PERP",
+    "timestamp": 2022-05-31T10:22:23.210Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 4`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 50,
+        "price": 7.581,
+      },
+      Object {
+        "amount": 0,
+        "price": 7.584,
+      },
+    ],
+    "exchange": "crypto-com-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "BALUSD-PERP",
+    "timestamp": 2022-05-31T10:22:23.272Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 5`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "crypto-com-derivatives",
+    "id": "4611686018439397540",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 31603.5,
+    "side": "buy",
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-05-31T10:22:58.435Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 6`] = `
+Array [
+  Object {
+    "exchange": "crypto-com-derivatives",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 31611,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "markPrice": undefined,
+    "openInterest": 318.5162,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-05-31T10:22:23.383Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 31613.5,
+    "bidAmount": undefined,
+    "bidPrice": 31613,
+    "exchange": "crypto-com-derivatives",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-05-31T10:22:23.383Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 7`] = `Array []`;
+
+exports[`map crypto-com-derivatives messages 8`] = `
+Array [
+  Object {
+    "exchange": "crypto-com-derivatives",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 31601.35,
+    "lastPrice": 31611,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "markPrice": 31606.3,
+    "openInterest": 318.5162,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-05-31T10:22:23.383Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map crypto-com-derivatives messages 9`] = `
+Array [
+  Object {
+    "exchange": "crypto-com-derivatives",
+    "fundingRate": 0.000007,
+    "fundingTimestamp": 2022-05-31T11:00:00.000Z,
+    "indexPrice": 31601.35,
+    "lastPrice": 31611,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "markPrice": 31606.3,
+    "openInterest": 318.5162,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-05-31T10:22:59.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map ascendex messages 1`] = `
 Array [
   Object {

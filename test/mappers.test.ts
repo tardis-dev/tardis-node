@@ -28,7 +28,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'coinflex',
   'huobi-dm-linear-swap',
   'ascendex',
-  'dydx'
+  'dydx',
+  'crypto-com-derivatives'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -58,7 +59,9 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okcoin',
   'serum',
   'gate-io-futures',
-  'bybit-spot'
+  'bybit-spot',
+  'crypto-com',
+  'crypto-com-derivatives'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -6859,6 +6862,256 @@ test('map bybit spot messages', () => {
 
   for (const message of messages) {
     const mappedMessages = bybitSpotMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map crypto-com messages', () => {
+  const messages = [
+    { id: 1, code: 0, method: 'subscribe' },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'RSR_USDT',
+        subscription: 'trade.RSR_USDT',
+        channel: 'trade',
+        data: [
+          { dataTime: 1653917168407, d: 2552833547970376845, s: 'BUY', p: 0.00737, q: 6.9, t: 1653917168398, i: 'RSR_USDT' },
+          { dataTime: 1653917167913, d: 2552833531650627373, s: 'BUY', p: 0.00737, q: 0.1, t: 1653917167912, i: 'RSR_USDT' }
+        ]
+      }
+    },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'GODS_USDT',
+        subscription: 'trade.GODS_USDT',
+        channel: 'trade',
+        data: [{ dataTime: 1659311999946, d: 2733854056108316782, s: 'SELL', p: 0.4272, q: 0.04, t: 1659311999941, i: 'GODS_USDT' }]
+      }
+    },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'YFI_USDT',
+        subscription: 'ticker.YFI_USDT',
+        channel: 'ticker',
+        data: [{ i: 'YFI_USDT', b: 7892.58, k: 7905.8, a: 7905.8, t: 1653917205936, v: 16.9967, h: 8287.99, l: 7379.2, c: 324.02 }]
+      }
+    },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'AAVE_USDT',
+        subscription: 'book.AAVE_USDT.150',
+        channel: 'book',
+        depth: 150,
+        data: [
+          {
+            bids: [[97.44, 7.5202, 1]],
+            asks: [
+              [97.685, 9.8577, 1],
+
+              [302.01, 0.005, 1]
+            ],
+            t: 1659311999918,
+            s: 702658069
+          }
+        ]
+      }
+    },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'DOT_USDT',
+        subscription: 'book.DOT_USDT.150',
+        channel: 'book.update',
+        depth: 150,
+        data: [
+          {
+            update: {
+              bids: [
+                [8.6143, 4.694, 1],
+                [8.6135, 0, 0]
+              ],
+              asks: [[8.6427, 696.434, 2]]
+            },
+            t: 1659312000046,
+            s: 763793123
+          }
+        ]
+      }
+    },
+    {
+      code: 0,
+      method: 'subscribe',
+      result: {
+        instrument_name: 'BTC_USDT',
+        subscription: 'trade.BTC_USDT',
+        channel: 'trade',
+        data: [
+          { dataTime: 1659312000505, d: 2733854074994198560, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000503, i: 'BTC_USDT' },
+          { dataTime: 1659312000480, d: 2733854074175694048, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000479, i: 'BTC_USDT' },
+          { dataTime: 1659312000450, d: 2733854073183727584, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000449, i: 'BTC_USDT' }
+        ]
+      }
+    }
+  ]
+
+  const cryptoComMapper = createMapper('crypto-com')
+
+  for (const message of messages) {
+    const mappedMessages = cryptoComMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map crypto-com-derivatives messages', () => {
+  const messages = [
+    { id: 1, method: 'subscribe', code: 0 },
+
+    {
+      id: 1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'trade',
+        subscription: 'trade.ATOMUSD-PERP',
+        instrument_name: 'ATOMUSD-PERP',
+        data: [
+          { d: '4611686018427711804', t: 1653992510011, p: '10.361', q: '0.1', s: 'BUY', i: 'ATOMUSD-PERP' },
+          { d: '4611686018427711803', t: 1653992471408, p: '10.364', q: '0.1', s: 'BUY', i: 'ATOMUSD-PERP' }
+        ]
+      }
+    },
+    {
+      id: 1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'book',
+        subscription: 'book.1INCHUSD-PERP.50',
+        instrument_name: '1INCHUSD-PERP',
+        depth: 50,
+        data: [
+          {
+            asks: [['0.9801', '451', '2']],
+            bids: [['0.9787', '5303', '3']],
+            t: 1653992543210,
+            tt: 1653992543165,
+            u: 68541606944,
+            cs: 1386851553
+          }
+        ]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'book.update',
+        subscription: 'book.BALUSD-PERP.50',
+        instrument_name: 'BALUSD-PERP',
+        depth: 50,
+        data: [
+          {
+            update: {
+              asks: [],
+              bids: [
+                ['7.581', '50.0', '1'],
+                ['7.584', '0', '0']
+              ]
+            },
+            t: 1653992543272,
+            tt: 1653992543265,
+            u: 68541671328,
+            pu: 68541637184,
+            cs: 509555332
+          }
+        ]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'trade',
+        subscription: 'trade.BTCUSD-PERP',
+        instrument_name: 'BTCUSD-PERP',
+        data: [{ d: '4611686018439397540', t: 1653992578435, p: '31603.5', q: '0.1000', s: 'BUY', i: 'BTCUSD-PERP' }]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'ticker',
+        instrument_name: 'BTCUSD-PERP',
+        subscription: 'ticker.BTCUSD-PERP',
+        data: [
+          {
+            h: '32222.5',
+            l: '30240.0',
+            a: '31611.0',
+            c: '0.0320',
+            b: '31613.0',
+            k: '31613.5',
+            i: 'BTCUSD-PERP',
+            v: '13206.4884',
+            vv: '433945264.39',
+            oi: '318.5162',
+            t: 1653992543383
+          }
+        ]
+      }
+    },
+    {
+      id: -1,
+      method: 'subscribe',
+      code: 0,
+      result: {
+        instrument_name: 'BTCUSD-INDEX',
+        subscription: 'index.BTCUSD-INDEX',
+        channel: 'index',
+        data: [{ v: '31601.35', t: 1653992545000 }]
+      }
+    },
+    {
+      id: 1,
+      method: 'subscribe',
+      code: 0,
+      result: {
+        instrument_name: 'BTCUSD-PERP',
+        subscription: 'mark.BTCUSD-PERP',
+        channel: 'mark',
+        data: [{ v: '31606.3', t: 1653992543000 }]
+      }
+    },
+    {
+      id: -1,
+      method: 'subscribe',
+      code: 0,
+      result: {
+        instrument_name: 'BTCUSD-PERP',
+        subscription: 'funding.BTCUSD-PERP',
+        channel: 'funding',
+        data: [{ v: '0.00000700', t: 1653992579000 }]
+      }
+    }
+  ]
+
+  const cryptoComDerivativesMapper = createMapper('crypto-com-derivatives')
+
+  for (const message of messages) {
+    const mappedMessages = cryptoComDerivativesMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })
