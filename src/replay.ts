@@ -1,4 +1,4 @@
-import { createReadStream } from 'fs-extra'
+import { createReadStream, remove } from 'fs-extra'
 import path from 'path'
 import { EventEmitter } from 'stream'
 import { Worker } from 'worker_threads'
@@ -166,6 +166,10 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       // remove slice key from the map as it's already processed
       cachedSlicePaths.delete(sliceKey)
+
+      if (autoCleanup) {
+        await cleanupSlice(cachedSlicePath)
+      }
       // move one minute forward
       currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
     }
@@ -206,6 +210,14 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     if (underlyingWorker !== undefined) {
       await terminateWorker(underlyingWorker, 500)
     }
+  }
+}
+
+async function cleanupSlice(slicePath: string) {
+  try {
+    await remove(slicePath)
+  } catch (e) {
+    debug('cleanupSlice error %s %o', slicePath, e)
   }
 }
 
