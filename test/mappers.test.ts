@@ -7297,7 +7297,7 @@ test('map kucoin messages', () => {
     }
   ]
 
-  const kucoinMapper = createMapper('kucoin')
+  const kucoinMapper = createMapper('kucoin', new Date('2022-08-16T00:00:00.4642130Z'))
 
   for (const message of messages) {
     const mappedMessages = kucoinMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
