@@ -39,7 +39,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
 
   protected async poolDataToStream(outputStream: Writable) {
     for (const instruments of batch(this._instruments, 10)) {
-      await Promise.all(
+      await Promise.allSettled(
         instruments.map(async (instrument) => {
           if (outputStream.destroyed) {
             return
