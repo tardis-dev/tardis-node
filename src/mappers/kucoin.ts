@@ -1,6 +1,6 @@
-import { BookPriceLevel } from '..'
+import { debug } from '../debug'
 import { CircularBuffer, upperCaseSymbols } from '../handy'
-import { BookChange, Exchange, BookTicker, Trade } from '../types'
+import { BookChange, Exchange, BookTicker, Trade, BookPriceLevel } from '../types'
 import { Mapper } from './mapper'
 
 export class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
@@ -46,7 +46,7 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly _exchange: Exchange) {}
+  constructor(protected readonly _exchange: Exchange, private readonly ignoreBookSnapshotOverlapError: boolean) {}
 
   canHandle(message: KucoinLevel2SnapshotMessage | KucoinLevel2UpdateMessage) {
     return message.type === 'message' && message.topic.startsWith('/market/level2')
@@ -173,8 +173,12 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
         const message = `Book depth snapshot has no overlap with first update, update ${JSON.stringify(
           l2UpdateMessage
         )}, lastUpdateId: ${lastUpdateId}, exchange ${this._exchange}`
-
-        throw new Error(message)
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthContext.validatedFirstUpdate = true
+          debug(message)
+        } else {
+          throw new Error(message)
+        }
       }
     }
     const bids = l2UpdateMessage.data.changes.bids.map(this.mapBookLevel).filter(this.nonZeroLevels)

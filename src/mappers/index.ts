@@ -244,7 +244,7 @@ const bookChangeMappers = {
   mango: () => new SerumBookChangeMapper('mango'),
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
-  kucoin: () => new KucoinBookChangeMapper('kucoin')
+  kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false)
 }
 
 const derivativeTickersMappers = {
