@@ -23,6 +23,10 @@ export function wait(delayMS: number) {
   })
 }
 
+export function getRandomString() {
+  return crypto.randomBytes(24).toString('hex')
+}
+
 export function formatDateToPath(date: Date) {
   const year = date.getUTCFullYear()
   const month = doubleDigit(date.getUTCMonth() + 1)

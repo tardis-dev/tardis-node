@@ -61,7 +61,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'gate-io-futures',
   'bybit-spot',
   'crypto-com',
-  'crypto-com-derivatives'
+  'crypto-com-derivatives',
+  'kucoin'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -7112,6 +7113,194 @@ test('map crypto-com-derivatives messages', () => {
 
   for (const message of messages) {
     const mappedMessages = cryptoComDerivativesMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map kucoin messages', () => {
+  const messages = [
+    {
+      id: '1545910590801',
+      type: 'pong'
+    },
+    {
+      id: 'hQvf8jkno',
+      type: 'welcome'
+    },
+    {
+      id: '1545910660739',
+      type: 'ack'
+    },
+    {
+      type: 'message',
+      topic: '/market/match:BTC-USDT',
+      subject: 'trade.l3match',
+      data: {
+        symbol: 'BTC-USDT',
+        side: 'sell',
+        type: 'match',
+        makerOrderId: '62fadde41add68000167fb58',
+        sequence: '1636276321894',
+        size: '0.00001255',
+        price: '24093.9',
+        takerOrderId: '62faddfff0476c0001c86c71',
+        time: '1660608000026914990',
+        tradeId: '62fade002e113d292303a18b'
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/match:LMR-BTC',
+      subject: 'trade.l3match',
+      data: {
+        makerOrderId: '62fabfc195e86000013e41cb',
+        price: '0.000001094',
+        sequence: '455391760226305',
+        side: 'sell',
+        size: '12.9629',
+        symbol: 'LMR-BTC',
+        takerOrderId: '62faddff90bdf400011fa69a',
+        time: '1660608000023000000',
+        tradeId: '455391760226305',
+        type: 'match'
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/match:XRP-USDT',
+      subject: 'trade.l3match',
+      data: {
+        symbol: 'XRP-USDT',
+        side: 'sell',
+        type: 'match',
+        makerOrderId: '62fade211f0caa0001b28594',
+        sequence: '1622936939836',
+        size: '66.5603',
+        price: '0.37587',
+        takerOrderId: '62fade217f3d2500012367c5',
+        time: '1660608033110362773',
+        tradeId: '62fade212e113d325d5cf21d'
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/ticker:APE3S-USDT',
+      subject: 'trade.ticker',
+      data: {
+        bestAsk: '0.9052',
+        bestAskSize: '404.3024',
+        bestBid: '0.9027',
+        bestBidSize: '202.2365',
+        price: '0.909',
+        sequence: '1653547330151',
+        size: '53.4976',
+        time: 1660608019966
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276321877,
+        symbol: 'BTC-USDT',
+        changes: { asks: [['0', '0', '1636276321877']], bids: [] },
+        sequenceEnd: 1636276321877
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324353,
+        symbol: 'BTC-USDT',
+        changes: { asks: [], bids: [['24081.2', '0.00265', '1636276324353']] },
+        sequenceEnd: 1636276324353
+      }
+    },
+
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324355,
+        symbol: 'BTC-USDT',
+        changes: { asks: [], bids: [['0', '0', '1636276324355']] },
+        sequenceEnd: 1636276324355
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324356,
+        symbol: 'BTC-USDT',
+        changes: { asks: [['0', '0', '1636276324356']], bids: [['12', '0.12', '1636276324356']] },
+        sequenceEnd: 1636276324356
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324361,
+        symbol: 'BTC-USDT',
+        changes: { asks: [['24088.8', '0', '1636276324361']], bids: [['0', '0', '1636276324361']] },
+        sequenceEnd: 1636276324361
+      }
+    },
+    {
+      type: 'message',
+      generated: true,
+      topic: '/market/level2Snapshot:BTC-USDT',
+      subject: 'trade.l2Snapshot',
+      code: '200000',
+      data: {
+        time: 1660608003710,
+        sequence: '1636276324355',
+        bids: [
+          ['24088.6', '7.07264171'],
+
+          ['24046', '0.00007756']
+        ],
+        asks: [
+          ['24088.7', '0.64205639'],
+          ['24088.8', '0.15869352']
+        ]
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324362,
+        symbol: 'BTC-USDT',
+        changes: { asks: [['24088.8', '12', '1636276324361']], bids: [] },
+        sequenceEnd: 1636276324363
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        sequenceStart: 1636276324364,
+        symbol: 'BTC-USDT',
+        changes: { asks: [['0', '0', '1636276324361']], bids: [] },
+        sequenceEnd: 1636276324365
+      }
+    }
+  ]
+
+  const kucoinMapper = createMapper('kucoin')
+
+  for (const message of messages) {
+    const mappedMessages = kucoinMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

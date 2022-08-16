@@ -44,7 +44,8 @@ export const EXCHANGES = [
   'huobi-dm-options',
   'star-atlas',
   'crypto-com',
-  'crypto-com-derivatives'
+  'crypto-com-derivatives',
+  'kucoin'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -380,6 +381,8 @@ const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker']
 
 const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding']
 
+const KUCOIN_CHANNELS = ['market/ticker', 'market/snapshot', 'market/level2', 'market/match', 'market/level2Snapshot']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -426,5 +429,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS,
   mango: MANGO_CHANNELS,
   'crypto-com': CRYPTO_COM_CHANNELS,
-  'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES
+  'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES,
+  kucoin: KUCOIN_CHANNELS
 }

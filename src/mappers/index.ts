@@ -69,6 +69,7 @@ import {
   HuobiTradesMapper
 } from './huobi'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
+import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
 import { Mapper } from './mapper'
 import {
   OkexBookChangeMapper,
@@ -171,7 +172,8 @@ const tradesMappers = {
   mango: () => new SerumTradesMapper('mango'),
   'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot'),
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives')
+  'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
+  kucoin: () => new KucoinTradesMapper('kucoin')
 }
 
 const bookChangeMappers = {
@@ -241,7 +243,8 @@ const bookChangeMappers = {
   'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
   mango: () => new SerumBookChangeMapper('mango'),
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives')
+  'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
+  kucoin: () => new KucoinBookChangeMapper('kucoin')
 }
 
 const derivativeTickersMappers = {
@@ -349,7 +352,8 @@ const bookTickersMappers = {
   'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
   'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot'),
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives')
+  'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives'),
+  kucoin: () => new KucoinBookTickerMapper('kucoin')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

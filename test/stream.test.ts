@@ -102,16 +102,12 @@ describe('stream', () => {
             exchange === 'binance-jersey' ||
             exchange === 'huobi-dm-options' ||
             exchange === 'star-atlas' ||
-            exchange === 'upbit' ||
             exchange === 'binance-options' ||
             exchange === 'okex-futures' ||
             exchange === 'okex-options' ||
-            exchange === 'bitfinex' ||
-            exchange === 'phemex' ||
             exchange === 'delta' ||
-            exchange === 'coinbase' ||
-            exchange === 'crypto-com' ||
-            exchange === 'crypto-com-derivatives'
+            exchange === 'kucoin' ||
+            exchange === 'phemex'
           ) {
             return
           }

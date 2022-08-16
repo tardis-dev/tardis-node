@@ -58,6 +58,13 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     }
   }
 
+  protected async getWebSocketUrl() {
+    const wssUrlOverride = process.env[`WSS_URL_${this._exchange.toUpperCase()}`]
+    const finalWssUrl = wssUrlOverride !== undefined ? wssUrlOverride : this.wssURL
+
+    return finalWssUrl
+  }
+
   private async *_stream() {
     let staleConnectionTimerId
     let pingTimerId
@@ -66,9 +73,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     while (true) {
       try {
         const subscribeMessages = this.mapToSubscribeMessages(this._filters)
-
-        const wssUrlOverride = process.env[`WSS_URL_${this._exchange.toUpperCase()}`]
-        const finalWssUrl = wssUrlOverride !== undefined ? wssUrlOverride : this.wssURL
+        const finalWssUrl = await this.getWebSocketUrl()
 
         this.debug('(connection id: %d) estabilishing connection to %s', this._connectionId, finalWssUrl)
 

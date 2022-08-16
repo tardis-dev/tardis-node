@@ -382,6 +382,145 @@ Array [
 ]
 `;
 
+exports[`map kucoin messages 1`] = `Array []`;
+
+exports[`map kucoin messages 2`] = `Array []`;
+
+exports[`map kucoin messages 3`] = `Array []`;
+
+exports[`map kucoin messages 4`] = `
+Array [
+  Object {
+    "amount": 0.00001255,
+    "exchange": "kucoin",
+    "id": "62fade002e113d292303a18b",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 24093.9,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2022-08-16T00:00:00.026914Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map kucoin messages 5`] = `
+Array [
+  Object {
+    "amount": 12.9629,
+    "exchange": "kucoin",
+    "id": "455391760226305",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 0.000001094,
+    "side": "sell",
+    "symbol": "LMR-BTC",
+    "timestamp": 2022-08-16T00:00:00.023000Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map kucoin messages 6`] = `
+Array [
+  Object {
+    "amount": 66.5603,
+    "exchange": "kucoin",
+    "id": "62fade212e113d325d5cf21d",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 0.37587,
+    "side": "sell",
+    "symbol": "XRP-USDT",
+    "timestamp": 2022-08-16T00:00:33.110362Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map kucoin messages 7`] = `
+Array [
+  Object {
+    "askAmount": 404.3024,
+    "askPrice": 0.9052,
+    "bidAmount": 202.2365,
+    "bidPrice": 0.9027,
+    "exchange": "kucoin",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "APE3S-USDT",
+    "timestamp": 2022-08-16T00:00:19.966Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map kucoin messages 8`] = `Array []`;
+
+exports[`map kucoin messages 9`] = `Array []`;
+
+exports[`map kucoin messages 10`] = `Array []`;
+
+exports[`map kucoin messages 11`] = `Array []`;
+
+exports[`map kucoin messages 12`] = `Array []`;
+
+exports[`map kucoin messages 13`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.64205639,
+        "price": 24088.7,
+      },
+      Object {
+        "amount": 0,
+        "price": 24088.8,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 7.07264171,
+        "price": 24088.6,
+      },
+      Object {
+        "amount": 0.00007756,
+        "price": 24046,
+      },
+      Object {
+        "amount": 0.12,
+        "price": 12,
+      },
+    ],
+    "exchange": "kucoin",
+    "isSnapshot": true,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BTC-USDT",
+    "timestamp": 2022-08-16T00:00:00.464Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map kucoin messages 14`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 12,
+        "price": 24088.8,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "kucoin",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BTC-USDT",
+    "timestamp": 2022-08-16T00:00:00.464Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map kucoin messages 15`] = `Array []`;
+
 exports[`mappers map ascendex messages 1`] = `
 Array [
   Object {
