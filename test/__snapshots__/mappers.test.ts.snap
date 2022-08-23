@@ -4543,6 +4543,22 @@ Array [
 ]
 `;
 
+exports[`mappers map deribit messages 15`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-STRD-30SEP22-20000",
+    "timestamp": 2022-08-23T17:03:00.291Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map dydx messages 1`] = `Array []`;
 
 exports[`mappers map dydx messages 2`] = `

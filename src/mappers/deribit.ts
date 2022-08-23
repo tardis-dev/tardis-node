@@ -151,7 +151,11 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
     }
 
     // options ticker has greeks
-    return channel.startsWith('ticker') && message.params.data.greeks !== undefined
+
+    return (
+      channel.startsWith('ticker') &&
+      (message.params.data.instrument_name.endsWith('-P') || message.params.data.instrument_name.endsWith('-C'))
+    )
   }
 
   *map(message: DeribitOptionTickerMessage, localTimestamp: Date) {

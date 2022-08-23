@@ -469,6 +469,40 @@ describe('mappers', () => {
             asks: []
           }
         }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-STRD-30SEP22-20000.raw',
+          data: {
+            underlying_price: 21478.45,
+            underlying_index: 'index_price',
+            timestamp: 1661274180291,
+            stats: { volume: null, price_change: null, low: null, high: null },
+            state: 'open',
+            open_interest: 0.0,
+            min_price: 0.1364,
+            max_price: 0.271,
+            mark_price: 0.1922,
+            mark_iv: 149.18,
+            last_price: null,
+            interest_rate: 0.0,
+            instrument_name: 'BTC-STRD-30SEP22-20000',
+            index_price: 21478.45,
+            implied_bid: 0.189,
+            implied_ask: 0.196,
+            greeks: { vega: 50.40834, theta: -49.97019, rho: 2.9473, gamma: 0.00014, delta: 0.32525 },
+            estimated_delivery_price: 21478.45,
+            combo_state: 'active',
+            bid_iv: 0.0,
+            best_bid_price: 0.0,
+            best_bid_amount: 0.0,
+            best_ask_price: 0.0,
+            best_ask_amount: 0.0,
+            ask_iv: 0.0
+          }
+        }
       }
     ]
     const deribitMapper = createMapper('deribit')
