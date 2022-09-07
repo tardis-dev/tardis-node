@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ws-feed.pro.coinbase.com'
+  protected wssURL = 'wss://ws-feed.exchange.coinbase.com'
 
   // map from coinbase subscribe 'channels' to more granular channels that tardis uses
 
