@@ -1,4 +1,3 @@
-process.env.DEBUG = 'tardis-dev*'
 import {
   compute,
   computeBookSnapshots,
@@ -96,6 +95,7 @@ describe('stream', () => {
   test(
     'streams normalized real-time messages for each supported exchange',
     async () => {
+      const exchanges: Exchange[] = []
       await Promise.all(
         EXCHANGES.map(async (exchange) => {
           if (
@@ -114,6 +114,8 @@ describe('stream', () => {
           ) {
             return
           }
+
+          exchanges.push(exchange)
 
           const exchangeDetails = await getExchangeDetails(exchange)
           const normalizers: any[] = [normalizeTrades, normalizeBookChanges]
@@ -175,6 +177,8 @@ describe('stream', () => {
               }
             }
           }
+          exchanges.splice(exchanges.indexOf(exchange), 1)
+          console.log('remaining', exchanges)
         })
       )
     },
