@@ -4546,6 +4546,20 @@ Array [
 exports[`mappers map deribit messages 15`] = `
 Array [
   Object {
+    "exchange": "deribit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 21478.45,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.1922,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-STRD-30SEP22-20000",
+    "timestamp": 2022-08-23T17:03:00.291Z,
+    "type": "derivative_ticker",
+  },
+  Object {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -4554,6 +4568,66 @@ Array [
     "localTimestamp": 2019-06-01T00:00:28.619Z,
     "symbol": "BTC-STRD-30SEP22-20000",
     "timestamp": 2022-08-23T17:03:00.291Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map deribit messages 16`] = `
+Array [
+  Object {
+    "exchange": "deribit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 19320.68,
+    "lastPrice": -13.5,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 10.12,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-FS-30SEP22_PERP",
+    "timestamp": 2022-09-09T00:00:59.203Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 300000,
+    "askPrice": -5,
+    "bidAmount": 300000,
+    "bidPrice": -7,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-FS-30SEP22_PERP",
+    "timestamp": 2022-09-09T00:00:59.203Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map deribit messages 17`] = `
+Array [
+  Object {
+    "exchange": "deribit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 19322.48,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markPrice": 0.0053,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-CSR12-16SEP22-21000_23000",
+    "timestamp": 2022-09-09T00:00:56.186Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 18,
+    "askPrice": 0.008,
+    "bidAmount": 18,
+    "bidPrice": 0.003,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "BTC-CSR12-16SEP22-21000_23000",
+    "timestamp": 2022-09-09T00:00:56.186Z,
     "type": "book_ticker",
   },
 ]

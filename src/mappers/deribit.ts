@@ -100,8 +100,7 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
       return false
     }
 
-    // exclude options tickers
-    return channel.startsWith('ticker') && message.params.data.greeks === undefined
+    return channel.startsWith('ticker') && (message.params.data.greeks === undefined || message.params.data.combo_state === 'active')
   }
 
   getFilters(symbols?: string[]) {
@@ -149,8 +148,6 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
     if (channel === undefined) {
       return false
     }
-
-    // options ticker has greeks
 
     return (
       channel.startsWith('ticker') &&
