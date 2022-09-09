@@ -503,6 +503,69 @@ describe('mappers', () => {
             ask_iv: 0.0
           }
         }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-FS-30SEP22_PERP.raw',
+          data: {
+            timestamp: 1662681659203,
+            stats: { volume_usd: null, volume: null, price_change: null, low: null, high: null },
+            state: 'open',
+            settlement_price: -5.64,
+            open_interest: 0,
+            min_price: -67.0,
+            max_price: 87.5,
+            mark_price: 10.12,
+            last_price: -13.5,
+            instrument_name: 'BTC-FS-30SEP22_PERP',
+            index_price: 19320.68,
+            implied_bid: 8.5,
+            implied_ask: 10.5,
+            estimated_delivery_price: 19320.68,
+            combo_state: 'active',
+            best_bid_price: -7.0,
+            best_bid_amount: 300000.0,
+            best_ask_price: -5.0,
+            best_ask_amount: 300000.0
+          }
+        }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.BTC-CSR12-16SEP22-21000_23000.raw',
+          data: {
+            underlying_price: 19322.48,
+            underlying_index: 'index_price',
+            timestamp: 1662681656186,
+            stats: { volume: null, price_change: null, low: null, high: null },
+            state: 'open',
+            settlement_price: 0.00488191,
+            open_interest: 0.0,
+            min_price: -0.0096,
+            max_price: 0.0203,
+            mark_price: 0.0053,
+            mark_iv: -74.2,
+            last_price: null,
+            interest_rate: 0.0,
+            instrument_name: 'BTC-CSR12-16SEP22-21000_23000',
+            index_price: 19322.48,
+            implied_bid: 0.004,
+            implied_ask: 0.0065,
+            greeks: { vega: 2.60113, theta: -9.04163, rho: 0.37783, gamma: 0.00007, delta: 0.10275 },
+            estimated_delivery_price: 19322.48,
+            combo_state: 'active',
+            bid_iv: 0.0,
+            best_bid_price: 0.003,
+            best_bid_amount: 18.0,
+            best_ask_price: 0.008,
+            best_ask_amount: 18.0,
+            ask_iv: 0.0
+          }
+        }
       }
     ]
     const deribitMapper = createMapper('deribit')
