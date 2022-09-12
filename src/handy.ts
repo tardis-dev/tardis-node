@@ -7,6 +7,7 @@ import path from 'path'
 import { debug } from './debug'
 import { Mapper } from './mappers'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
+import { SocksProxyAgent } from 'socks-proxy-agent'
 
 export function parseAsUTCDate(val: string) {
   // not sure about this one, but it should force parsing date as UTC date not as local timezone
@@ -234,7 +235,11 @@ const httpsAgent = new https.Agent({
 })
 
 export const httpsProxyAgent: https.Agent | undefined =
-  process.env.HTTP_PROXY !== undefined ? createHttpsProxyAgent(process.env.HTTP_PROXY) : undefined
+  process.env.HTTP_PROXY !== undefined
+    ? createHttpsProxyAgent(process.env.HTTP_PROXY)
+    : process.env.SOCKS_PROXY !== undefined
+    ? new SocksProxyAgent(process.env.SOCKS_PROXY)
+    : undefined
 
 export async function download({
   apiKey,
