@@ -117,6 +117,14 @@ const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= POLONIEX_V2_API_SWITCH_DATE.valueOf()
 }
 
+const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
+  if (process.env.IGNORE_BOOK_SNAPSHOT_OVERLAP_ERROR) {
+    return true
+  }
+
+  return isRealTime(date) === false
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -178,12 +186,14 @@ const tradesMappers = {
 
 const bookChangeMappers = {
   bitmex: () => new BitmexBookChangeMapper(),
-  binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', isRealTime(localTimestamp) === false),
-  'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', isRealTime(localTimestamp) === false),
-  'binance-jersey': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-jersey', isRealTime(localTimestamp) === false),
-  'binance-futures': (localTimestamp: Date) => new BinanceFuturesBookChangeMapper('binance-futures', isRealTime(localTimestamp) === false),
+  binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
+  'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
+  'binance-jersey': (localTimestamp: Date) =>
+    new BinanceBookChangeMapper('binance-jersey', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
+  'binance-futures': (localTimestamp: Date) =>
+    new BinanceFuturesBookChangeMapper('binance-futures', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
   'binance-delivery': (localTimestamp: Date) =>
-    new BinanceFuturesBookChangeMapper('binance-delivery', isRealTime(localTimestamp) === false),
+    new BinanceFuturesBookChangeMapper('binance-delivery', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
   'binance-dex': () => binanceDexBookChangeMapper,
   bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
   'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
