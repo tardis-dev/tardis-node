@@ -25,8 +25,7 @@ export class CryptoComDerivativesRealTimeFeed extends RealTimeFeedBase {
         nonce: new Date().valueOf(),
         params: {
           channels: channels,
-          book_subscription_type: 'SNAPSHOT_AND_UPDATE',
-          book_update_frequency: 5
+          book_subscription_type: 'SNAPSHOT_AND_UPDATE'
         }
       }
     ]
