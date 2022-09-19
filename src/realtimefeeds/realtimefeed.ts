@@ -59,7 +59,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   }
 
   protected async getWebSocketUrl() {
-    const wssUrlOverride = process.env[`WSS_URL_${this._exchange.toUpperCase()}`]
+    const wssUrlOverride = process.env[`WSS_URL_${this._exchange.toUpperCase().replace(/-/g, '_')}`]
     const finalWssUrl = wssUrlOverride !== undefined ? wssUrlOverride : this.wssURL
 
     return finalWssUrl
