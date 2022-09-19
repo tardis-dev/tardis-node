@@ -1,5 +1,5 @@
 import { Writable } from 'stream'
-import { batch, httpClient } from '../handy'
+import { batch, httpClient, wait } from '../handy'
 import { Filter } from '../types'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed'
 
@@ -7,6 +7,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
   protected abstract httpURL: string
   protected abstract suffixes: { [key: string]: string }
+  protected abstract depthRequestRequestWeight: number
 
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
     const wsFilters = filters.filter((f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades')
@@ -18,6 +19,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
         this.wssURL,
         this.httpURL,
         this.suffixes,
+        this.depthRequestRequestWeight,
         timeoutIntervalMS,
         onError
       )
@@ -71,6 +73,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     protected wssURL: string,
     private readonly _httpURL: string,
     private readonly _suffixes: { [key: string]: string },
+    private readonly _depthRequestRequestWeight: number,
     timeoutIntervalMS: number | undefined,
     onError?: (error: Error) => void
   ) {
@@ -117,29 +120,99 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
     const depthSnapshotFilter = filters.find((f) => f.channel === 'depthSnapshot')
+
     if (!depthSnapshotFilter) {
       return
     }
-    this.debug('requesting manual snapshots for: %s', depthSnapshotFilter.symbols)
-    for (let symbol of depthSnapshotFilter.symbols!) {
+
+    let currentWeightLimit: number = 0
+
+    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, { timeout: 10000, retry: 5 })
+
+    const exchangeInfo = JSON.parse(exchangeInfoResponse.body)
+
+    const REQUEST_WEIGHT_LIMIT_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_REQUEST_WEIGHT_LIMIT`
+
+    if (process.env[REQUEST_WEIGHT_LIMIT_ENV] !== undefined) {
+      currentWeightLimit = Number.parseInt(process.env[REQUEST_WEIGHT_LIMIT_ENV] as string)
+    }
+
+    if (!currentWeightLimit) {
+      currentWeightLimit = exchangeInfo.rateLimits.find((d: any) => d.rateLimitType === 'REQUEST_WEIGHT').limit as number
+    }
+
+    let usedWeight = Number.parseInt(exchangeInfoResponse.headers['x-mbx-used-weight-1m'] as string)
+
+    this.debug('current x-mbx-used-weight-1m limit: %s, already used weight: %s', currentWeightLimit, usedWeight)
+
+    let concurrencyLimit = 4
+
+    const CONCURRENCY_LIMIT_WEIGHT_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_CONCURRENCY_LIMIT`
+
+    if (process.env[CONCURRENCY_LIMIT_WEIGHT_ENV] !== undefined) {
+      concurrencyLimit = Number.parseInt(process.env[CONCURRENCY_LIMIT_WEIGHT_ENV] as string)
+    }
+
+    this.debug('current snapshots requests concurrency limit: %s', concurrencyLimit)
+
+    let minWeightBuffer = 2 * concurrencyLimit * this._depthRequestRequestWeight
+
+    const MIN_WEIGHT_BUFFER_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_MIN_AVAILABLE_WEIGHT_BUFFER`
+
+    if (process.env[MIN_WEIGHT_BUFFER_ENV] !== undefined) {
+      minWeightBuffer = Number.parseInt(process.env[MIN_WEIGHT_BUFFER_ENV] as string)
+    }
+
+    for (const symbolsBatch of batch(depthSnapshotFilter.symbols!, concurrencyLimit)) {
       if (shouldCancel()) {
         return
       }
 
-      const depthSnapshotResponse = (await httpClient
-        .get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, { timeout: 10000 })
-        .json()) as any
+      this.debug('requesting manual snapshots for: %s', symbolsBatch)
 
-      const snapshot = {
-        stream: `${symbol}@depthSnapshot`,
-        generated: true,
-        data: depthSnapshotResponse
-      }
+      const usedWeights = await Promise.all(
+        symbolsBatch.map(async (symbol) => {
+          if (shouldCancel()) {
+            return 0
+          }
 
-      this.manualSnapshotsBuffer.push(snapshot)
+          const isOverRateLimit = currentWeightLimit - usedWeight < minWeightBuffer
+
+          if (isOverRateLimit) {
+            const secondsToWait = 61 - new Date().getUTCSeconds()
+            this.debug(
+              'reached rate limit (x-mbx-used-weight-1m limit: %s, used weight: %s, minimum available weight buffer: %s), waiting: %s seconds',
+              currentWeightLimit,
+              usedWeight,
+              minWeightBuffer,
+              secondsToWait
+            )
+
+            await wait(secondsToWait * 1000)
+          }
+
+          const depthSnapshotResponse = await httpClient.get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, {
+            timeout: 10000,
+            retry: 10
+          })
+
+          const snapshot = {
+            stream: `${symbol}@depthSnapshot`,
+            generated: true,
+            data: JSON.parse(depthSnapshotResponse.body)
+          }
+
+          this.manualSnapshotsBuffer.push(snapshot)
+
+          return Number.parseInt(depthSnapshotResponse.headers['x-mbx-used-weight-1m'] as string)
+        })
+      )
+
+      usedWeight = Math.max(...usedWeights)
+
+      this.debug('requested manual snapshots successfully for: %s, used weight: %s', symbolsBatch, usedWeight)
     }
-
-    this.debug('requested manual snapshots successfully for: %s ', depthSnapshotFilter.symbols)
+    this.debug('requested all manual snapshots successfully')
   }
 }
 
@@ -150,6 +223,8 @@ export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
   protected suffixes = {
     depth: '100ms'
   }
+
+  protected depthRequestRequestWeight = 10
 }
 
 export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
@@ -159,6 +234,8 @@ export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
   protected suffixes = {
     depth: '100ms'
   }
+
+  protected depthRequestRequestWeight = 10
 }
 
 export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
@@ -168,6 +245,8 @@ export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
   protected suffixes = {
     depth: '100ms'
   }
+
+  protected depthRequestRequestWeight = 10
 }
 
 export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
@@ -178,6 +257,8 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
     depth: '0ms',
     markPrice: '1s'
   }
+
+  protected depthRequestRequestWeight = 20
 }
 
 export class BinanceDeliveryRealTimeFeed extends BinanceRealTimeFeedBase {
@@ -189,4 +270,6 @@ export class BinanceDeliveryRealTimeFeed extends BinanceRealTimeFeedBase {
     markPrice: '1s',
     indexPrice: '1s'
   }
+
+  protected depthRequestRequestWeight = 20
 }
