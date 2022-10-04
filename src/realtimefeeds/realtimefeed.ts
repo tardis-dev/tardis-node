@@ -101,7 +101,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
             message = this.decompress(message)
           }
 
-          this.debug('(connection id: %d) trace message: %s', this._connectionId, message.toString())
+          if (process.env["TRACE_MESSAGES"]) {
+            this.debug('(connection id: %d) trace message: %s', this._connectionId, message.toString())
+          }
 
           const messageDeserialized = JSON.parse(message as any)
 
