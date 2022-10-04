@@ -80,8 +80,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         this.debug(
           '(connection id: %d) provided filters: %o mapped to subscribe messages: %o',
           this._connectionId,
-          this._filters,
-          subscribeMessages
+          JSON.stringify(this._filters),
+          JSON.stringify(subscribeMessages)
         )
 
         this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
@@ -100,6 +100,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           if (this.decompress !== undefined) {
             message = this.decompress(message)
           }
+
+          this.debug('(connection id: %d) trace message: %s', this._connectionId, message.toString())
 
           const messageDeserialized = JSON.parse(message as any)
 
@@ -292,6 +294,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       }
       // wait a second just in case before starting fetching the snapshots
       await wait(1 * ONE_SEC_IN_MS)
+
+      this.debug('(connection id: %d) waited for snapshots', this._connectionId)
 
       if (this._ws!.readyState === WebSocket.CLOSED) {
         return
