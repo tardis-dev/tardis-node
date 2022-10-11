@@ -3,6 +3,15 @@ import { batch, httpClient, wait } from '../handy'
 import { Filter } from '../types'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed'
 
+const binanceHttpOptions = {
+  timeout: 10 * 1000,
+  retry: {
+    limit: 10,
+    statusCodes: [408, 429, 500],
+    maxRetryAfter: 120 * 1000
+  }
+}
+
 abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
   protected abstract httpURL: string
@@ -46,9 +55,8 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
           if (outputStream.destroyed) {
             return
           }
-
           const openInterestResponse = (await httpClient
-            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, { timeout: 10000 })
+            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, binanceHttpOptions)
             .json()) as any
 
           const openInterestMessage = {
@@ -127,7 +135,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
     let currentWeightLimit: number = 0
 
-    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, { timeout: 10000, retry: 5 })
+    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
 
     const exchangeInfo = JSON.parse(exchangeInfoResponse.body)
 
@@ -191,10 +199,10 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
             await wait(secondsToWait * 1000)
           }
 
-          const depthSnapshotResponse = await httpClient.get(`${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`, {
-            timeout: 10000,
-            retry: 10
-          })
+          const depthSnapshotResponse = await httpClient.get(
+            `${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`,
+            binanceHttpOptions
+          )
 
           const snapshot = {
             stream: `${symbol}@depthSnapshot`,
