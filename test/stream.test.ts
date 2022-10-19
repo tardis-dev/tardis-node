@@ -111,7 +111,8 @@ describe('stream', () => {
             exchange === 'phemex' ||
             exchange === 'bybit-spot' ||
             exchange === 'coinbase' ||
-            exchange === 'crypto-com-derivatives'
+            exchange === 'crypto-com-derivatives' ||
+            exchange === 'mango'
           ) {
             return
           }
