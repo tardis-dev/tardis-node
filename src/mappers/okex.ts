@@ -242,9 +242,11 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
           symbols !== undefined
             ? symbols.map((s) => {
                 const symbolParts = s.split('-')
-                return `${symbolParts[0]}-${symbolParts[1]}`
+                const quotePart = symbolParts[1] === 'USDC' ? 'USD' : symbolParts[1]
+                return `${symbolParts[0]}-${quotePart}`
               })
             : undefined
+
         return {
           channel,
           symbols: indexes
@@ -278,7 +280,9 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
     for (const dataMessage of message.data) {
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(dataMessage.instId, this._exchange)
       const symbolParts = dataMessage.instId.split('-')
-      const indexSymbol = `${symbolParts[0]}-${symbolParts[1]}`
+      const quotePart = symbolParts[1] === 'USDC' ? 'USD' : symbolParts[1]
+
+      const indexSymbol = `${symbolParts[0]}-${quotePart}`
 
       const indexPrice = this._indexPrices.get(indexSymbol)
 
