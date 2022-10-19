@@ -7,7 +7,7 @@ const binanceHttpOptions = {
   timeout: 10 * 1000,
   retry: {
     limit: 10,
-    statusCodes: [408, 429, 500],
+    statusCodes: [418, 429, 500],
     maxRetryAfter: 120 * 1000
   }
 }
