@@ -66,13 +66,16 @@ export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
   },
 
   *map(message: DeltaL2OrderBook, localTimestamp: Date): IterableIterator<BookChange> {
+    if (message.buy === undefined && message.sell === undefined) {
+      return
+    }
     yield {
       type: 'book_change',
       symbol: message.symbol,
       exchange: 'delta',
       isSnapshot: true,
-      bids: message.buy.map(mapBookLevel),
-      asks: message.sell.map(mapBookLevel),
+      bids: message.buy !== undefined ? message.buy.map(mapBookLevel) : [],
+      asks: message.sell !== undefined ? message.sell.map(mapBookLevel) : [],
       timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
       localTimestamp
     }
