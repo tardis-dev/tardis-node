@@ -1,4 +1,5 @@
 export const EXCHANGES = [
+  'dummy',
   'bitmex',
   'deribit',
   'binance-futures',
@@ -47,6 +48,8 @@ export const EXCHANGES = [
   'crypto-com-derivatives',
   'kucoin'
 ] as const
+
+const DUMMY_CHANNELS = ['trade'] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot', 'ticker'] as const
@@ -384,6 +387,7 @@ const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index'
 const KUCOIN_CHANNELS = ['market/ticker', 'market/snapshot', 'market/level2', 'market/match', 'market/level2Snapshot']
 
 export const EXCHANGE_CHANNELS_INFO = {
+  dummy: DUMMY_CHANNELS,
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
   deribit: DERIBIT_CHANNELS,

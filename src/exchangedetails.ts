@@ -1,8 +1,18 @@
+import { DUMMY_EXCHANGE_HOST } from './dummy'
 import { httpClient } from './handy'
 import { getOptions } from './options'
 import { Exchange, FilterForExchange } from './types'
 
+async function getDummyExchangeDetails(): Promise<ExchangeDetails<'dummy'>> {
+  const response = await httpClient.get('http://' + DUMMY_EXCHANGE_HOST + '/exchange').json()
+  return response as ExchangeDetails<'dummy'>
+}
+
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
+  if (exchange === 'dummy') {
+    return getDummyExchangeDetails()
+  }
+
   const options = getOptions()
 
   const exchangeDetails = await httpClient.get(`${options.endpoint}/exchanges/${exchange}`).json()

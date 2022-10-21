@@ -48,6 +48,7 @@ import {
   deribitBookTickerMapper,
   deribitTradesMapper
 } from './deribit'
+import { DummyTradesMapper } from './dummy'
 import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
 import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
@@ -126,6 +127,7 @@ const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
 }
 
 const tradesMappers = {
+  dummy: () => new DummyTradesMapper(),
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
   'binance-us': () => new BinanceTradesMapper('binance-us'),

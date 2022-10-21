@@ -45,12 +45,14 @@ import { BybitSpotRealTimeFeed } from './bybitspot'
 import { CryptoComRealTimeFeed } from './cryptocom'
 import { CryptoComDerivativesRealTimeFeed } from './cryptocomderivatives'
 import { KucoinRealTimeFeed } from './kucoin'
+import { DummyRealTimeFeed } from './dummy'
 
 export * from './realtimefeed'
 
 const realTimeFeedsMap: {
   [key in Exchange]?: RealTimeFeed
 } = {
+  dummy: DummyRealTimeFeed,
   bitmex: BitmexRealTimeFeed,
   binance: BinanceRealTimeFeed,
   'binance-jersey': BinanceJerseyRealTimeFeed,
