@@ -6469,6 +6469,22 @@ Array [
 ]
 `;
 
+exports[`mappers map huobi-dm-linear-swap, messages 11`] = `
+Array [
+  Object {
+    "amount": 2,
+    "exchange": "huobi-dm-linear-swap",
+    "id": "1186558919990000",
+    "localTimestamp": 2020-12-01T00:00:01.275Z,
+    "price": 19425,
+    "side": "unknown",
+    "symbol": "BTC-USDT",
+    "timestamp": 2022-10-18T17:35:54.480Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map huobi-dm-options, messages 1`] = `
 Array [
   Object {

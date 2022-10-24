@@ -4953,6 +4953,17 @@ describe('mappers', () => {
           version: 64797873746,
           ch: 'market.BTC-USDT.bbo'
         }
+      },
+      {
+        ch: 'market.BTC-USDT.trade.detail',
+        ts: 1666114554581,
+        tick: {
+          id: 118655891999,
+          ts: 1666114554480,
+          data: [
+            { amount: 2, quantity: 0.002, trade_turnover: 38.85, ts: 1666114554480, id: 1186558919990000, price: 19425, direction: '' }
+          ]
+        }
       }
     ]
 

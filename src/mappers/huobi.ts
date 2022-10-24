@@ -38,7 +38,7 @@ export class HuobiTradesMapper
         id: String(huobiTrade.tradeId !== undefined ? huobiTrade.tradeId : huobiTrade.id),
         price: huobiTrade.price,
         amount: huobiTrade.amount,
-        side: huobiTrade.direction,
+        side: huobiTrade.direction === 'buy' ? 'buy' : huobiTrade.direction === 'sell' ? 'sell' : 'unknown',
         timestamp: new Date(huobiTrade.ts),
         localTimestamp: localTimestamp
       }
@@ -402,7 +402,7 @@ export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-sw
         id: undefined,
         price: huobiLiquidation.price,
         amount: huobiLiquidation.volume,
-        side: huobiLiquidation.direction,
+        side: huobiLiquidation.direction === 'buy' ? 'buy' : huobiLiquidation.direction === 'sell' ? 'sell' : 'unknown',
         timestamp: new Date(huobiLiquidation.created_at),
         localTimestamp: localTimestamp
       }
