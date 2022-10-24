@@ -117,7 +117,7 @@ export type Liquidation = {
   readonly id: string | undefined
   readonly price: number
   readonly amount: number
-  readonly side: 'buy' | 'sell'
+  readonly side: 'buy' | 'sell' | 'unknown'
   readonly timestamp: Date
   readonly localTimestamp: Date
 }
