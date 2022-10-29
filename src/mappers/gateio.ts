@@ -27,6 +27,10 @@ export class GateIOTradesMapper implements Mapper<'gate-io', Trade> {
   *map(tradesMessage: GateIOTrades, localTimestamp: Date): IterableIterator<Trade> {
     const symbol = tradesMessage.params[0]
 
+    if (!tradesMessage.params[1]) {
+      return
+    }
+
     // gate io sends trades from newest to oldest for some reason
     for (const gateIOTrade of tradesMessage.params[1].reverse()) {
       // always ignore first returned trade as it's a 'stale' trade, which has already been published before disconnect
