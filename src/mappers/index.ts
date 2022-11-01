@@ -283,7 +283,8 @@ const derivativeTickersMappers = {
   coinflex: () => new CoinflexDerivativeTickerMapper(),
   ascendex: () => new AscendexDerivativeTickerMapper(),
   dydx: () => new DydxDerivativeTickerMapper(),
-  'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives')
+  'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
+  'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com')
 }
 
 const optionsSummaryMappers = {

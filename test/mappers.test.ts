@@ -29,7 +29,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm-linear-swap',
   'ascendex',
   'dydx',
-  'crypto-com-derivatives'
+  'crypto-com-derivatives',
+  'crypto-com'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -7067,6 +7068,85 @@ test('map crypto-com messages', () => {
           { dataTime: 1659312000505, d: 2733854074994198560, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000503, i: 'BTC_USDT' },
           { dataTime: 1659312000480, d: 2733854074175694048, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000479, i: 'BTC_USDT' },
           { dataTime: 1659312000450, d: 2733854073183727584, s: 'SELL', p: 23297.35, q: 0.04, t: 1659312000449, i: 'BTC_USDT' }
+        ]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'ticker',
+        instrument_name: 'APEUSD-PERP',
+        subscription: 'ticker.APEUSD-PERP',
+        id: -1,
+        data: [
+          {
+            h: '4.7743',
+            l: '4.6082',
+            a: '4.6121',
+            c: '-0.0144',
+            b: '4.6121',
+            bs: '25',
+            k: '4.6148',
+            ks: '131',
+            i: 'APEUSD-PERP',
+            v: '123899',
+            vv: '580747.59',
+            oi: '55851',
+            t: 1667320303754
+          }
+        ]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'book.update',
+        subscription: 'book.DOGE_USDT.50',
+        instrument_name: 'DOGE_USDT',
+        depth: 50,
+        data: [
+          {
+            update: {
+              asks: [['0.136338', '1312', '1']],
+              bids: [['0.116116', '0', '0']]
+            },
+            t: 1667320303772,
+            tt: 1667320303761,
+            u: 41261686400,
+            pu: 41261671840,
+            cs: -807443798
+          }
+        ]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'trade',
+        subscription: 'trade.BTC_USDT',
+        instrument_name: 'BTC_USDT',
+        data: [{ d: '4611686018428108636', t: 1667320314770, p: '20432.51', q: '0.01163', s: 'SELL', i: 'BTC_USDT' }]
+      }
+    },
+    {
+      id: -1,
+      code: 0,
+      method: 'subscribe',
+      result: {
+        channel: 'trade',
+        subscription: 'trade.BTCUSD-PERP',
+        instrument_name: 'BTCUSD-PERP',
+        data: [
+          { d: '4611686018471467093', t: 1667320276193, p: '20439.5', q: '0.0050', s: 'SELL', i: 'BTCUSD-PERP' },
+          { d: '4611686018471467093', t: 1667320276193, p: '20439.5', q: '0.1000', s: 'SELL', i: 'BTCUSD-PERP' },
+          { d: '4611686018471467093', t: 1667320276193, p: '20439.5', q: '0.0050', s: 'SELL', i: 'BTCUSD-PERP' },
+          { d: '4611686018471467093', t: 1667320276193, p: '20439.5', q: '0.0244', s: 'SELL', i: 'BTCUSD-PERP' }
         ]
       }
     }

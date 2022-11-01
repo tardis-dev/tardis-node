@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class CryptoComRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://stream.crypto.com/v2/market'
+  protected wssURL = 'wss://stream.crypto.com/exchange/v1/market'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const channels = filters
@@ -12,7 +12,7 @@ export class CryptoComRealTimeFeed extends RealTimeFeedBase {
         }
 
         return filter.symbols.map((symbol) => {
-          const suffix = filter.channel === 'book' ? '.150' : ''
+          const suffix = filter.channel === 'book' ? '.50' : ''
           return `${filter.channel}.${symbol}${suffix}`
         })
       })
@@ -24,14 +24,15 @@ export class CryptoComRealTimeFeed extends RealTimeFeedBase {
         method: 'subscribe',
         nonce: new Date().valueOf(),
         params: {
-          channels: channels
+          channels: channels,
+          book_subscription_type: 'SNAPSHOT_AND_UPDATE'
         }
       }
     ]
   }
 
   protected messageIsError(message: any): boolean {
-    return message.code !== undefined && message.code !== 0
+    return message.code !== undefined && message.code !== 0 && message.code !== 40003
   }
 
   protected onMessage(msg: any) {

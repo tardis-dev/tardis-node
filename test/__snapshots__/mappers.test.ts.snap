@@ -218,6 +218,126 @@ Array [
 ]
 `;
 
+exports[`map crypto-com messages 8`] = `
+Array [
+  Object {
+    "exchange": "crypto-com",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4.6121,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "markPrice": undefined,
+    "openInterest": 55851,
+    "predictedFundingRate": undefined,
+    "symbol": "APEUSD-PERP",
+    "timestamp": 2022-11-01T16:31:43.754Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": 4.6148,
+    "bidAmount": undefined,
+    "bidPrice": 4.6121,
+    "exchange": "crypto-com",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "APEUSD-PERP",
+    "timestamp": 2022-11-01T16:31:43.754Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map crypto-com messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1312,
+        "price": 0.136338,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 0.116116,
+      },
+    ],
+    "exchange": "crypto-com",
+    "isSnapshot": false,
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "symbol": "DOGE_USDT",
+    "timestamp": 2022-11-01T16:31:43.772Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map crypto-com messages 10`] = `
+Array [
+  Object {
+    "amount": 0.01163,
+    "exchange": "crypto-com",
+    "id": "4611686018428108636",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 20432.51,
+    "side": "sell",
+    "symbol": "BTC_USDT",
+    "timestamp": 2022-11-01T16:31:54.770Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map crypto-com messages 11`] = `
+Array [
+  Object {
+    "amount": 0.0244,
+    "exchange": "crypto-com",
+    "id": "4611686018471467093",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 20439.5,
+    "side": "sell",
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-11-01T16:31:16.193Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.005,
+    "exchange": "crypto-com",
+    "id": "4611686018471467093",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 20439.5,
+    "side": "sell",
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-11-01T16:31:16.193Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.1,
+    "exchange": "crypto-com",
+    "id": "4611686018471467093",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 20439.5,
+    "side": "sell",
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-11-01T16:31:16.193Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.005,
+    "exchange": "crypto-com",
+    "id": "4611686018471467093",
+    "localTimestamp": 2021-05-22T00:00:59.464Z,
+    "price": 20439.5,
+    "side": "sell",
+    "symbol": "BTCUSD-PERP",
+    "timestamp": 2022-11-01T16:31:16.193Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`map crypto-com-derivatives messages 1`] = `Array []`;
 
 exports[`map crypto-com-derivatives messages 2`] = `

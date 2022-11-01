@@ -130,6 +130,19 @@ export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com-deriv
       return false
     }
 
+    if (message.result.instrument_name === undefined) {
+      return false
+    }
+
+    // spot symbols
+    if (message.result.instrument_name.includes('_')) {
+      return false
+    }
+    // options
+    if (message.result.instrument_name.split('-').length === 3) {
+      return false
+    }
+
     return (
       message.result.channel === 'ticker' ||
       message.result.channel === 'index' ||
