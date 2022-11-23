@@ -5893,7 +5893,77 @@ describe('mappers', () => {
       },
       { sequence: 1067555713, symbol: 'sETHUSDT', trades: [[1591268224163281134, 'Buy', 24025000000, 10576000]], type: 'incremental' },
       { sequence: 1067556417, symbol: 'sBTCUSDT', trades: [[1591268226414925245, 'Sell', 954488000000, 279100]], type: 'incremental' },
-      { sequence: 615011372, symbol: 'LINKUSD', trades: [[1591268230652613373, 'Sell', 43780, 6]], type: 'incremental' }
+      { sequence: 615011372, symbol: 'LINKUSD', trades: [[1591268230652613373, 'Sell', 43780, 6]], type: 'incremental' },
+      {
+        depth: 0,
+        orderbook_p: {
+          asks: [['16548', '1.453']],
+          bids: [
+            ['16543.7', '0.825'],
+
+            ['13244', '0.031'],
+            ['10750', '0.005']
+          ]
+        },
+        sequence: 80321058,
+        symbol: 'BTCUSDT',
+        timestamp: 1669198850490348246,
+        type: 'snapshot'
+      },
+      {
+        sequence: 79157171,
+        symbol: 'BTCUSDT',
+        trades_p: [[1669198793402790477, 'Buy', '16545.6', '0.7']],
+        type: 'incremental'
+      },
+      {
+        depth: 0,
+        orderbook_p: {
+          asks: [['16547.7', '1.138']],
+          bids: []
+        },
+        sequence: 80321070,
+        symbol: 'BTCUSDT',
+        timestamp: 1669198853605814582,
+        type: 'incremental'
+      },
+      {
+        data: [
+          [
+            'SOLUSDT',
+            '11.246',
+            '13.41',
+            '10.91',
+            '13.029',
+            '10445.82',
+            '127687.14224',
+            '0',
+            '13.03062296',
+            '13.03154351',
+            '0.0001',
+            '0.0001'
+          ],
+
+          [
+            'BTCUSDT',
+            '15713.1',
+            '16626',
+            '15685.7',
+            '16545.6',
+            '1374.476',
+            '22296790.4579',
+            '0',
+            '16553.56998432',
+            '16554.73942506',
+            '0.0001',
+            '0.0001'
+          ]
+        ],
+        method: 'perp_market24h_pack_p.update',
+        timestamp: 1669198855202180601,
+        type: 'incremental'
+      },
+      { sequence: 80321106, symbol: 'XRPUSDT', trades_p: [[1669198857616162039, 'Buy', '0.3758', '244.65']], type: 'incremental' }
     ]
     const phemex = createMapper('phemex')
 

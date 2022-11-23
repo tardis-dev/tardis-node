@@ -320,7 +320,7 @@ const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
 
 const BINANCE_OPTIONS_CHANNELS = ['TRADE', 'TICKER', 'DEPTH100', 'INDEX'] as const
 
-const PHEMEX_CHANNELS = ['book', 'trades', 'market24h', 'spot_market24h'] as const
+const PHEMEX_CHANNELS = ['book', 'orderbook_p', 'trades', 'trades_p', 'market24h', 'spot_market24h', 'perp_market24h_pack_p'] as const
 
 const BYBIT_CHANNELS = ['trade', 'instrument_info', 'orderBookL2_25', 'insurance', 'orderBook_200', 'liquidation'] as const
 

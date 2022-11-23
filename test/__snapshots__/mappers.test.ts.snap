@@ -9092,6 +9092,124 @@ Array [
 ]
 `;
 
+exports[`mappers map phemex messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1.453,
+        "price": 16548,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.825,
+        "price": 16543.7,
+      },
+      Object {
+        "amount": 0.031,
+        "price": 13244,
+      },
+      Object {
+        "amount": 0.005,
+        "price": 10750,
+      },
+    ],
+    "exchange": "phemex",
+    "isSnapshot": true,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2022-11-23T10:20:50.490348Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 12`] = `
+Array [
+  Object {
+    "amount": 0.7,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 16545.6,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2022-11-23T10:19:53.402790Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 13`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1.138,
+        "price": 16547.7,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "phemex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2022-11-23T10:20:53.605814Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 14`] = `
+Array [
+  Object {
+    "exchange": "phemex",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": undefined,
+    "indexPrice": 13.03062296,
+    "lastPrice": 13.029,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": 13.03154351,
+    "openInterest": 0,
+    "predictedFundingRate": 0.0001,
+    "symbol": "SOLUSDT",
+    "timestamp": 2022-11-23T10:20:55.202180Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "exchange": "phemex",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": undefined,
+    "indexPrice": 16553.56998432,
+    "lastPrice": 16545.6,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "markPrice": 16554.73942506,
+    "openInterest": 0,
+    "predictedFundingRate": 0.0001,
+    "symbol": "BTCUSDT",
+    "timestamp": 2022-11-23T10:20:55.202180Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map phemex messages 15`] = `
+Array [
+  Object {
+    "amount": 244.65,
+    "exchange": "phemex",
+    "id": undefined,
+    "localTimestamp": 2019-12-01T00:00:01.275Z,
+    "price": 0.3758,
+    "side": "buy",
+    "symbol": "XRPUSDT",
+    "timestamp": 2022-11-23T10:20:57.616162Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map poloniex messages 1`] = `
 Array [
   Object {
