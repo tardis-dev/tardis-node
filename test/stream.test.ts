@@ -112,7 +112,10 @@ describe('stream', () => {
             exchange === 'bybit-spot' ||
             exchange === 'coinbase' ||
             exchange === 'crypto-com-derivatives' ||
-            exchange === 'mango'
+            exchange === 'mango' ||
+            exchange === 'serum' ||
+            exchange === 'ftx' ||
+            exchange === 'ftx-us'
           ) {
             return
           }
