@@ -106,10 +106,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           if (this.messageIsError(messageDeserialized)) {
             if (this.isIgnoredError(messageDeserialized)) {
               if (this._onError !== undefined) {
-                this._onError(new Error(`Received ignored error message:${message.toString()}`))
+                this.debug(`Received ignored error message: ${message.toString()}`)
               }
             } else {
-              throw new Error(`Received error message:${message.toString()}`)
+              throw new Error(`Received error message: ${message.toString()}`)
             }
           }
 
