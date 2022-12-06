@@ -61,6 +61,14 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.event === 'error'
   }
+
+  protected isIgnoredError(message: any) {
+    if (message.msg.includes('channel') && message.msg.includes(`doesn't exist`)) {
+      return true
+    }
+
+    return false
+  }
 }
 
 export class OKCoinRealTimeFeed extends RealTimeFeedBase {
