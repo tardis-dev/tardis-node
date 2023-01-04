@@ -155,10 +155,10 @@ export const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
       type: 'book_ticker',
       symbol: message.product_id,
       exchange: 'coinbase',
-      askAmount: undefined,
+      askAmount: message.best_ask_size !== undefined ? Number(message.best_ask_size) : undefined,
       askPrice: message.best_ask !== undefined ? Number(message.best_ask) : undefined,
       bidPrice: message.best_bid !== undefined ? Number(message.best_bid) : undefined,
-      bidAmount: undefined,
+      bidAmount: message.best_bid_size !== undefined ? Number(message.best_bid_size) : undefined,
       timestamp,
       localTimestamp: localTimestamp
     }
@@ -193,12 +193,34 @@ type CoinbaseLevel2Update = {
   changes: CoinbaseUpdateBookLevel[]
 }
 
-type CoinbaseTicker = {
-  type: 'ticker'
-  sequence: 2349290585
-  product_id: 'CGLD-USD'
-  price: '5.415'
-  best_bid: '5.4149'
-  best_ask: '5.4150'
-  time: '2021-10-13T07:05:00.028961Z'
-}
+type CoinbaseTicker =
+  | {
+      type: 'ticker'
+      sequence: 2349290585
+      product_id: 'CGLD-USD'
+      price: '5.415'
+      best_bid: '5.4149'
+      best_ask: '5.4150'
+      time: '2021-10-13T07:05:00.028961Z'
+      best_bid_size: undefined
+      best_ask_size: undefined
+    }
+  | {
+      type: 'ticker'
+      sequence: 50978628538
+      product_id: 'BTC-USD'
+      price: '17165.16'
+      open_24h: '16437.94'
+      volume_24h: '42492.05081975'
+      low_24h: '16423.37'
+      high_24h: '17259.37'
+      volume_30d: '1093827.95195495'
+      best_bid: '17165.15'
+      best_bid_size: '0.61540890'
+      best_ask: '17167.76'
+      best_ask_size: '0.18528568'
+      side: 'sell'
+      time: '2022-12-01T00:00:00.122581Z'
+      trade_id: 463751434
+      last_size: '0.05'
+    }

@@ -3463,6 +3463,22 @@ Array [
 ]
 `;
 
+exports[`mappers map coinbase messages 9`] = `
+Array [
+  Object {
+    "askAmount": 0.18528568,
+    "askPrice": 17167.76,
+    "bidAmount": 0.6154089,
+    "bidPrice": 17165.15,
+    "exchange": "coinbase",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2022-12-01T00:00:00.122581Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map coinflex messages 1`] = `Array []`;
 
 exports[`mappers map coinflex messages 2`] = `Array []`;
