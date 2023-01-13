@@ -44,6 +44,7 @@ import { MangoRealTimeFeed } from './mango'
 import { BybitSpotRealTimeFeed } from './bybitspot'
 import { CryptoComRealTimeFeed } from './cryptocom'
 import { KucoinRealTimeFeed } from './kucoin'
+import { BitnomialRealTimeFeed } from './bitnomial'
 
 export * from './realtimefeed'
 
@@ -96,7 +97,8 @@ const realTimeFeedsMap: {
   'bybit-spot': BybitSpotRealTimeFeed,
   'crypto-com': CryptoComRealTimeFeed,
   'crypto-com-derivatives': CryptoComRealTimeFeed,
-  kucoin: KucoinRealTimeFeed
+  kucoin: KucoinRealTimeFeed,
+  bitnomial: BitnomialRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

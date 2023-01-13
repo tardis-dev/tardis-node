@@ -7581,3 +7581,54 @@ test('map kucoin messages', () => {
     expect(mappedMessages).toMatchSnapshot()
   }
 })
+
+test('map bitnomial messages', () => {
+  const messages = [
+    {
+      ack_id: '7187577067767395784',
+      asks: [
+        [19010, 1],
+        [19038, 1]
+      ],
+      bids: [[18835, 5]],
+      symbol: 'BUSH23',
+      timestamp: '2023-01-12T20:03:06.479197763Z',
+      type: 'book'
+    },
+
+    {
+      ack_id: '7187577067767395815',
+      price: 18861,
+      quantity: 0,
+      side: 'Bid',
+      symbol: 'BUIH23',
+      timestamp: '2023-01-12T20:03:10.190357785Z',
+      type: 'level'
+    },
+    {
+      ack_id: '7187577067767395832',
+      price: 19045,
+      quantity: 5,
+      side: 'Ask',
+      symbol: 'BUSH23',
+      timestamp: '2023-01-12T20:03:10.653716134Z',
+      type: 'level'
+    },
+    {
+      type: 'trade',
+      ack_id: '7148460953766461527',
+      price: 19000,
+      quantity: 10,
+      symbol: 'BUSZ2',
+      taker_side: 'Bid',
+      timestamp: '2022-09-28T16:06:39.022836179Z'
+    }
+  ]
+
+  const bitnomialMapper = createMapper('bitnomial', new Date('2022-08-16T00:00:00.4642130Z'))
+
+  for (const message of messages) {
+    const mappedMessages = bitnomialMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})

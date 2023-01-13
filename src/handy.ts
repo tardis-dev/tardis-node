@@ -179,7 +179,7 @@ export function* batch(symbols: string[], batchSize: number) {
 export function parseμs(dateString: string): number {
   // check if we have ISO 8601 format date string, e.g: 2019-06-01T00:03:03.1238784Z or 2020-07-22T00:09:16.836773Z
   // or 2020-03-01T00:00:24.893456+00:00
-  if (dateString.length === 27 || dateString.length === 28 || dateString.length === 32) {
+  if (dateString.length === 27 || dateString.length === 28 || dateString.length === 32 || dateString.length === 30) {
     return Number(dateString.slice(23, 26))
   }
 

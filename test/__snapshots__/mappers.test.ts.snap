@@ -1,5 +1,90 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`map bitnomial messages 1`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1,
+        "price": 19010,
+      },
+      Object {
+        "amount": 1,
+        "price": 19038,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 5,
+        "price": 18835,
+      },
+    ],
+    "exchange": "bitnomial",
+    "isSnapshot": true,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BUSH23",
+    "timestamp": 2023-01-12T20:03:06.479197Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitnomial messages 2`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 18861,
+      },
+    ],
+    "exchange": "bitnomial",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BUIH23",
+    "timestamp": 2023-01-12T20:03:10.190357Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitnomial messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 5,
+        "price": 19045,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bitnomial",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BUSH23",
+    "timestamp": 2023-01-12T20:03:10.653716Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitnomial messages 4`] = `
+Array [
+  Object {
+    "amount": 10,
+    "exchange": "bitnomial",
+    "id": "7148460953766461527",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 19000,
+    "side": "buy",
+    "symbol": "BUSZ2",
+    "timestamp": 2022-09-28T16:06:39.022836Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`map bybit spot messages 1`] = `Array []`;
 
 exports[`map bybit spot messages 2`] = `Array []`;

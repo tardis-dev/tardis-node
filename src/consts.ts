@@ -45,7 +45,8 @@ export const EXCHANGES = [
   'star-atlas',
   'crypto-com',
   'crypto-com-derivatives',
-  'kucoin'
+  'kucoin',
+  'bitnomial'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -383,6 +384,8 @@ const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index'
 
 const KUCOIN_CHANNELS = ['market/ticker', 'market/snapshot', 'market/level2', 'market/match', 'market/level2Snapshot']
 
+const BITNOMIAL_CHANNELS = ['trade', 'level', 'book', 'block', 'status']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -430,5 +433,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   mango: MANGO_CHANNELS,
   'crypto-com': CRYPTO_COM_CHANNELS,
   'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES,
-  kucoin: KUCOIN_CHANNELS
+  kucoin: KUCOIN_CHANNELS,
+  bitnomial: BITNOMIAL_CHANNELS
 }

@@ -26,6 +26,7 @@ import {
   bitmexBookTickerMapper,
   bitmexTradesMapper
 } from './bitmex'
+import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
 import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
@@ -181,7 +182,8 @@ const tradesMappers = {
   'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot'),
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
-  kucoin: () => new KucoinTradesMapper('kucoin')
+  kucoin: () => new KucoinTradesMapper('kucoin'),
+  bitnomial: () => bitnomialTradesMapper
 }
 
 const bookChangeMappers = {
@@ -254,7 +256,8 @@ const bookChangeMappers = {
   mango: () => new SerumBookChangeMapper('mango'),
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
-  kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false)
+  kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
+  bitnomial: () => new BitnomialBookChangMapper()
 }
 
 const derivativeTickersMappers = {
