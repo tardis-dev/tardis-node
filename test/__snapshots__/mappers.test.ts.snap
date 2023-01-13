@@ -845,7 +845,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSD_200925",
-    "timestamp": 2020-06-16T00:00:00.420Z,
+    "timestamp": 2020-06-16T00:00:00.422Z,
     "type": "book_change",
   },
 ]
@@ -886,7 +886,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSD_200925",
-    "timestamp": 2020-06-16T00:00:02.210Z,
+    "timestamp": 2020-06-16T00:00:02.212Z,
     "type": "book_change",
   },
 ]
@@ -1200,7 +1200,7 @@ Array [
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSDT",
-    "timestamp": 2019-11-17T00:00:21.948Z,
+    "timestamp": 2019-11-17T00:00:21.952Z,
     "type": "book_change",
   },
 ]

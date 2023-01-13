@@ -259,7 +259,7 @@ export class BinanceFuturesBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
-      timestamp: new Date(binanceDepthUpdateData.T),
+      timestamp: new Date(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
   }
