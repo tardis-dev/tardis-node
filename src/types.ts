@@ -1,8 +1,8 @@
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 
-export type Exchange = typeof EXCHANGES[number]
+export type Exchange = (typeof EXCHANGES)[number]
 
-export type FilterForExchange = { [key in Exchange]: Filter<typeof EXCHANGE_CHANNELS_INFO[key][number]> }
+export type FilterForExchange = { [key in Exchange]: Filter<(typeof EXCHANGE_CHANNELS_INFO)[key][number]> }
 
 export type Filter<T> = {
   channel: T
