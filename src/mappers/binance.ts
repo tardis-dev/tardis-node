@@ -395,7 +395,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
       symbol: binanceLiquidation.s,
       exchange: this._exchange,
       id: undefined,
-      price: Number(binanceLiquidation.ap), // use Average Price that matches trade
+      price: Number(binanceLiquidation.p),
       amount: Number(binanceLiquidation.z), // use  Order Filled Accumulated Quantity
       side: binanceLiquidation.S === 'SELL' ? 'sell' : 'buy',
       timestamp: new Date(binanceLiquidation.T),
