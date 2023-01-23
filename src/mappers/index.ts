@@ -90,6 +90,7 @@ import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMappe
 import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex'
 import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
+import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox'
 
 export * from './mapper'
 
@@ -183,7 +184,8 @@ const tradesMappers = {
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinTradesMapper('kucoin'),
-  bitnomial: () => bitnomialTradesMapper
+  bitnomial: () => bitnomialTradesMapper,
+  'woo-x': () => wooxTradesMapper
 }
 
 const bookChangeMappers = {
@@ -257,7 +259,8 @@ const bookChangeMappers = {
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
   kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
-  bitnomial: () => new BitnomialBookChangMapper()
+  bitnomial: () => new BitnomialBookChangMapper(),
+  'woo-x': () => new WooxBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -287,7 +290,8 @@ const derivativeTickersMappers = {
   ascendex: () => new AscendexDerivativeTickerMapper(),
   dydx: () => new DydxDerivativeTickerMapper(),
   'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
-  'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com')
+  'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
+  'woo-x': () => new WooxDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -367,7 +371,8 @@ const bookTickersMappers = {
   'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot'),
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives'),
-  kucoin: () => new KucoinBookTickerMapper('kucoin')
+  kucoin: () => new KucoinBookTickerMapper('kucoin'),
+  'woo-x': () => new WooxBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

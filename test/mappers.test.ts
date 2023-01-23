@@ -30,7 +30,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'ascendex',
   'dydx',
   'crypto-com-derivatives',
-  'crypto-com'
+  'crypto-com',
+  'woo-x'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -63,7 +64,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bybit-spot',
   'crypto-com',
   'crypto-com-derivatives',
-  'kucoin'
+  'kucoin',
+  'woo-x'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -7629,6 +7631,88 @@ test('map bitnomial messages', () => {
 
   for (const message of messages) {
     const mappedMessages = bitnomialMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map woo-x messages', () => {
+  const messages = [
+    {
+      topic: 'PERP_GALA_USDT@trade',
+      ts: 1674431999995,
+      data: { symbol: 'PERP_GALA_USDT', price: 0.048756, size: 4109, side: 'SELL', source: 0 }
+    },
+    {
+      topic: 'SPOT_ETH_USDT@trade',
+      ts: 1674135417986,
+      data: { symbol: 'SPOT_ETH_USDT', price: 1522.45, size: 0.0516, side: 'SELL', source: 0 }
+    },
+
+    {
+      topic: 'PERP_BTC_USDT@orderbookupdate',
+      ts: 1674432000020,
+      data: {
+        symbol: 'PERP_BTC_USDT',
+        prevTs: 1674432000030,
+        asks: [[22712.7, 15.4675]],
+        bids: [[22708.0, 4.503]]
+      }
+    },
+    {
+      id: 'PERP_BTC_USDT@orderbook',
+      event: 'request',
+      success: true,
+      ts: 1674432000034,
+      data: {
+        symbol: 'PERP_BTC_USDT',
+        ts: 1674432000020,
+        asks: [
+          [22712.7, 15.4675],
+          [26772.1, 0.248]
+        ],
+        bids: [
+          [22708.0, 4.503],
+          [18555.0, 0.002]
+        ]
+      }
+    },
+    {
+      topic: 'PERP_BTC_USDT@orderbookupdate',
+      ts: 1674432000220,
+      data: {
+        symbol: 'PERP_BTC_USDT',
+        prevTs: 1674432000020,
+        asks: [
+          [22712.7, 16.1625],
+          [28462.5, 0.008]
+        ],
+        bids: [[22708.0, 4.284]]
+      }
+    },
+    {
+      topic: 'SPOT_ATOM_USDT@bbo',
+      ts: 1674431999997,
+      data: { symbol: 'SPOT_ATOM_USDT', ask: 13.33, askSize: 38.2, bid: 13.322, bidSize: 21.137 }
+    },
+    { topic: 'PERP_BTC_USDT@markprice', ts: 1674432000007, data: { symbol: 'PERP_BTC_USDT', price: 22711.11 } },
+    {
+      topic: 'PERP_BTC_USDT@estfundingrate',
+      ts: 1674432059002,
+      data: { symbol: 'PERP_BTC_USDT', fundingRate: 0.00000782, fundingTs: 1674435600005 }
+    },
+    { topic: 'SPOT_BTC_USDT@indexprice', ts: 1674432000024, data: { symbol: 'SPOT_BTC_USDT', price: 22708.44 } },
+    {
+      topic: 'PERP_BTC_USDT@trade',
+      ts: 1674432059820,
+      data: { symbol: 'PERP_BTC_USDT', price: 22703.97, size: 0.09, side: 'SELL', source: 0 }
+    },
+    { topic: 'PERP_BTC_USDT@openinterest', ts: 1674432013624, data: { symbol: 'PERP_BTC_USDT', openInterest: 83.2241 } }
+  ]
+
+  const wooxMapper = createMapper('woo-x', new Date('2022-08-16T00:00:00.4642130Z'))
+
+  for (const message of messages) {
+    const mappedMessages = wooxMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

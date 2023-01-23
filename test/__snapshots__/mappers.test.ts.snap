@@ -726,6 +726,241 @@ Array [
 
 exports[`map kucoin messages 15`] = `Array []`;
 
+exports[`map woo-x messages 1`] = `
+Array [
+  Object {
+    "amount": 4109,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 0.048756,
+    "side": "sell",
+    "symbol": "PERP_GALA_USDT",
+    "timestamp": 2023-01-22T23:59:59.995Z,
+    "type": "trade",
+  },
+  Object {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 0.048756,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_GALA_USDT",
+    "timestamp": 2023-01-22T23:59:59.995Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x messages 2`] = `
+Array [
+  Object {
+    "amount": 0.0516,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 1522.45,
+    "side": "sell",
+    "symbol": "SPOT_ETH_USDT",
+    "timestamp": 2023-01-19T13:36:57.986Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map woo-x messages 3`] = `Array []`;
+
+exports[`map woo-x messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 15.4675,
+        "price": 22712.7,
+      },
+      Object {
+        "amount": 0.248,
+        "price": 26772.1,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4.503,
+        "price": 22708,
+      },
+      Object {
+        "amount": 0.002,
+        "price": 18555,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": true,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:00.020Z,
+    "type": "book_change",
+  },
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 15.4675,
+        "price": 22712.7,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4.503,
+        "price": 22708,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:00.020Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 16.1625,
+        "price": 22712.7,
+      },
+      Object {
+        "amount": 0.008,
+        "price": 28462.5,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 4.284,
+        "price": 22708,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:00.220Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x messages 6`] = `
+Array [
+  Object {
+    "askAmount": 38.2,
+    "askPrice": 13.33,
+    "bidAmount": 21.137,
+    "bidPrice": 13.322,
+    "exchange": "woo-x",
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "SPOT_ATOM_USDT",
+    "timestamp": 2023-01-22T23:59:59.997Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map woo-x messages 7`] = `
+Array [
+  Object {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "markPrice": 22711.11,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:00.007Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x messages 8`] = `
+Array [
+  Object {
+    "exchange": "woo-x",
+    "fundingRate": 0.00000782,
+    "fundingTimestamp": 2023-01-23T01:00:00.005Z,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "markPrice": 22711.11,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:59.002Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x messages 9`] = `Array []`;
+
+exports[`map woo-x messages 10`] = `
+Array [
+  Object {
+    "amount": 0.09,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "price": 22703.97,
+    "side": "sell",
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:59.820Z,
+    "type": "trade",
+  },
+  Object {
+    "exchange": "woo-x",
+    "fundingRate": 0.00000782,
+    "fundingTimestamp": 2023-01-23T01:00:00.005Z,
+    "indexPrice": 22708.44,
+    "lastPrice": 22703.97,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "markPrice": 22711.11,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:59.820Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x messages 11`] = `
+Array [
+  Object {
+    "exchange": "woo-x",
+    "fundingRate": 0.00000782,
+    "fundingTimestamp": 2023-01-23T01:00:00.005Z,
+    "indexPrice": 22708.44,
+    "lastPrice": 22703.97,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "markPrice": 22711.11,
+    "openInterest": 83.2241,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_BTC_USDT",
+    "timestamp": 2023-01-23T00:00:59.820Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map ascendex messages 1`] = `
 Array [
   Object {

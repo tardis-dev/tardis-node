@@ -46,7 +46,8 @@ export const EXCHANGES = [
   'crypto-com',
   'crypto-com-derivatives',
   'kucoin',
-  'bitnomial'
+  'bitnomial',
+  'woo-x'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -386,6 +387,18 @@ const KUCOIN_CHANNELS = ['market/ticker', 'market/snapshot', 'market/level2', 'm
 
 const BITNOMIAL_CHANNELS = ['trade', 'level', 'book', 'block', 'status']
 
+const WOOX_CHANNELS = [
+  'trade',
+  'orderbook',
+  'orderbookupdate',
+  'ticker',
+  'bbo',
+  'indexprice',
+  'markprice',
+  'openinterest',
+  'estfundingrate'
+]
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -434,5 +447,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'crypto-com': CRYPTO_COM_CHANNELS,
   'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES,
   kucoin: KUCOIN_CHANNELS,
-  bitnomial: BITNOMIAL_CHANNELS
+  bitnomial: BITNOMIAL_CHANNELS,
+  'woo-x': WOOX_CHANNELS
 }
