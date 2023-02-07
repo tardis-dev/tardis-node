@@ -1294,7 +1294,7 @@ Array [
     "exchange": "binance-delivery",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BNBUSD_PERP",
-    "timestamp": 2021-06-01T00:00:00.000Z,
+    "timestamp": 2021-06-01T00:00:00.005Z,
     "type": "book_ticker",
   },
 ]
@@ -1627,7 +1627,7 @@ Array [
     "exchange": "binance-futures",
     "localTimestamp": 2019-09-01T00:00:01.275Z,
     "symbol": "BTCUSDT",
-    "timestamp": 2021-02-01T00:00:03.568Z,
+    "timestamp": 2021-02-01T00:00:03.571Z,
     "type": "book_ticker",
   },
 ]

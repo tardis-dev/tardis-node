@@ -439,7 +439,7 @@ export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'bina
       askPrice: binanceBookTicker.a !== undefined ? Number(binanceBookTicker.a) : undefined,
       bidPrice: binanceBookTicker.b !== undefined ? Number(binanceBookTicker.b) : undefined,
       bidAmount: binanceBookTicker.B !== undefined ? Number(binanceBookTicker.B) : undefined,
-      timestamp: binanceBookTicker.T !== undefined ? new Date(binanceBookTicker.T) : localTimestamp,
+      timestamp: binanceBookTicker.E !== undefined ? new Date(binanceBookTicker.E) : localTimestamp,
       localTimestamp: localTimestamp
     }
 
@@ -545,5 +545,5 @@ type BinanceBookTickerData = {
   B: string // best bid qty
   a: string // best ask price
   A: string // best ask qty
-  T?: number // transaction time
+  E?: number // transaction time
 }
