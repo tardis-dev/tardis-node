@@ -131,7 +131,6 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
       // remove all buffered updates
       symbolDepthInfo.bufferedUpdates.clear()
 
-      console.log(JSON.stringify(message))
       const bookChange: BookChange = {
         type: 'book_change',
         symbol,
