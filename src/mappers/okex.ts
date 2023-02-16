@@ -303,7 +303,7 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
       if (message.arg.channel === 'open-interest') {
         const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
 
-        const openInterest = Number(openInterestMessage.oi)
+        const openInterest = Number(openInterestMessage.oiCcy)
         if (openInterest > 0) {
           pendingTickerInfo.updateOpenInterest(openInterest)
           pendingTickerInfo.updateTimestamp(new Date(Number(openInterestMessage.ts)))
