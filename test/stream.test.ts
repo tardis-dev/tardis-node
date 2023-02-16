@@ -86,7 +86,8 @@ describe('exchange-details', () => {
       'depthSnapshot',
       'bookTicker',
       'recentTrades',
-      'borrowInterest'
+      'borrowInterest',
+      'tokenNav'
     ])
   })
 })
