@@ -86,6 +86,12 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
       }
       // produce snapshot book_change
       const kucoinSnapshotData = message.data
+      if (!kucoinSnapshotData.asks) {
+        kucoinSnapshotData.asks = []
+      }
+      if (!kucoinSnapshotData.bids) {
+        kucoinSnapshotData.bids = []
+      }
 
       //  mark given symbol depth info that has snapshot processed
       symbolDepthInfo.lastUpdateId = Number(kucoinSnapshotData.sequence)
@@ -125,6 +131,7 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
       // remove all buffered updates
       symbolDepthInfo.bufferedUpdates.clear()
 
+      console.log(JSON.stringify(message))
       const bookChange: BookChange = {
         type: 'book_change',
         symbol,
@@ -297,8 +304,8 @@ type KucoinLevel2SnapshotMessage = {
   data: {
     time: 1660608003710
     sequence: '1636276324355'
-    bids: [string, string][]
-    asks: [string, string][]
+    bids: [string, string][] | null
+    asks: [string, string][] | null
   }
 }
 
