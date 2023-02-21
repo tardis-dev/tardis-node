@@ -69,7 +69,6 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
 
   *map(message: BitstampDiffOrderBookSnapshot | BitstampDiffOrderBook, localTimestamp: Date): IterableIterator<BookChange> {
     const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
-
     if (this._symbolToDepthInfoMapping[symbol] === undefined) {
       this._symbolToDepthInfoMapping[symbol] = {
         bufferedUpdates: []
@@ -97,8 +96,8 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
         symbol,
         exchange: 'bitstamp',
         isSnapshot: true,
-        bids: message.data.bids.map(this._mapBookLevel),
-        asks: message.data.asks.map(this._mapBookLevel),
+        bids: message.data.bids !== undefined ? message.data.bids.map(this._mapBookLevel) : [],
+        asks: message.data.asks !== undefined ? message.data.asks.map(this._mapBookLevel) : [],
         timestamp,
         localTimestamp
       }
@@ -155,8 +154,8 @@ export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> 
       symbol,
       exchange: 'bitstamp',
       isSnapshot: false,
-      bids: bitstampBookUpdate.data.bids.map(this._mapBookLevel),
-      asks: bitstampBookUpdate.data.asks.map(this._mapBookLevel),
+      bids: bitstampBookUpdate.data.bids !== undefined ? bitstampBookUpdate.data.bids.map(this._mapBookLevel) : [],
+      asks: bitstampBookUpdate.data.asks !== undefined ? bitstampBookUpdate.data.asks.map(this._mapBookLevel) : [],
       timestamp: timestamp,
       localTimestamp
     }
