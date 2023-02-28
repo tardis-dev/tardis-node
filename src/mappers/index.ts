@@ -119,6 +119,11 @@ const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= POLONIEX_V2_API_SWITCH_DATE.valueOf()
 }
 
+// see https://status.tardis.dev/incidents/ryjyv8tgdgkj
+const shouldUseOKXPublicBooksChannel = (localTimestamp: Date) => {
+  return localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf()
+}
+
 const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
   if (process.env.IGNORE_BOOK_SNAPSHOT_OVERLAP_ERROR) {
     return true
@@ -212,20 +217,20 @@ const bookChangeMappers = {
   kraken: () => krakenBookChangeMapper,
   okex: (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex', isRealTime(localTimestamp))
+      ? new OkexV5BookChangeMapper('okex', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
       : new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-futures', isRealTime(localTimestamp))
+      ? new OkexV5BookChangeMapper('okex-futures', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
       : new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
 
   'okex-swap': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-swap', isRealTime(localTimestamp))
+      ? new OkexV5BookChangeMapper('okex-swap', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
       : new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
   'okex-options': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-options', isRealTime(localTimestamp))
+      ? new OkexV5BookChangeMapper('okex-options', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
       : new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
 
   huobi: (localTimestamp: Date) =>
