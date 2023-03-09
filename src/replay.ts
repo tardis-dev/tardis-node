@@ -139,7 +139,14 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
               message: messageBuffer
             } as any
           } else {
-            const message = JSON.parse(messageBuffer as any)
+            let messageString = messageBuffer.toString()
+
+            // hack to handle huobi long numeric id for trades
+            if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
+              messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
+            }
+            const message = JSON.parse(messageString)
+
             const localTimestampString = localTimestampBuffer.toString()
             const localTimestamp = new Date(localTimestampString)
             if (withMicroseconds) {
@@ -262,6 +269,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   const fromDate = parseAsUTCDate(from)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
+
+  //TODO: zrovi replay dzien po dniu, tak ze kazdego dnia przekazuje swierze filters
 
   const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
   const mappers = createMappers(fromDate)
