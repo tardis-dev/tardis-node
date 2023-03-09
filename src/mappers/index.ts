@@ -121,7 +121,10 @@ const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
 
 // see https://status.tardis.dev/incidents/ryjyv8tgdgkj
 const shouldUseOKXPublicBooksChannel = (localTimestamp: Date) => {
-  return localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf()
+  return (
+    localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf() &&
+    localTimestamp.valueOf() < new Date('2023-03-09T00:00:00.000Z').valueOf()
+  )
 }
 
 const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
