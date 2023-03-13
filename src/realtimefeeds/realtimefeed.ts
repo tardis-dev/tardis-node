@@ -33,6 +33,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private _ws?: WebSocket
   private _connectionId = connectionCounter++
   private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
+  protected readonly originHeader: string | undefined = undefined
 
   constructor(
     protected readonly _exchange: string,
@@ -83,6 +84,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           this._filters,
           subscribeMessages
         )
+
+        if (this.originHeader !== undefined) {
+          this._wsClientOptions.headers!.origin = this.originHeader
+        }
 
         this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
         this._ws.onopen = this._onConnectionEstabilished

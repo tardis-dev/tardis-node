@@ -121,7 +121,8 @@ describe('stream', () => {
             exchange === 'binance-futures' ||
             exchange === 'binance-delivery' ||
             exchange === 'bitnomial' ||
-            exchange === 'woo-x'
+            exchange === 'woo-x' ||
+            exchange === 'blockchain-com'
           ) {
             return
           }

@@ -46,6 +46,7 @@ import { CryptoComRealTimeFeed } from './cryptocom'
 import { KucoinRealTimeFeed } from './kucoin'
 import { BitnomialRealTimeFeed } from './bitnomial'
 import { WooxRealTimeFeed } from './woox'
+import { BlockchainComRealTimeFeed } from './blockchaincom'
 
 export * from './realtimefeed'
 
@@ -100,7 +101,8 @@ const realTimeFeedsMap: {
   'crypto-com-derivatives': CryptoComRealTimeFeed,
   kucoin: KucoinRealTimeFeed,
   bitnomial: BitnomialRealTimeFeed,
-  'woo-x': WooxRealTimeFeed
+  'woo-x': WooxRealTimeFeed,
+  'blockchain-com': BlockchainComRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

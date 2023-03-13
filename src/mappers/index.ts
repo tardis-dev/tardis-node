@@ -28,6 +28,7 @@ import {
 } from './bitmex'
 import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
+import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom'
 import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
 import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
 import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
@@ -193,7 +194,8 @@ const tradesMappers = {
   'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinTradesMapper('kucoin'),
   bitnomial: () => bitnomialTradesMapper,
-  'woo-x': () => wooxTradesMapper
+  'woo-x': () => wooxTradesMapper,
+  'blockchain-com': () => new BlockchainComTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -268,7 +270,8 @@ const bookChangeMappers = {
   'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
   kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
   bitnomial: () => new BitnomialBookChangMapper(),
-  'woo-x': () => new WooxBookChangeMapper()
+  'woo-x': () => new WooxBookChangeMapper(),
+  'blockchain-com': () => new BlockchainComBookChangeMapper()
 }
 
 const derivativeTickersMappers = {

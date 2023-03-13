@@ -47,7 +47,8 @@ export const EXCHANGES = [
   'crypto-com-derivatives',
   'kucoin',
   'bitnomial',
-  'woo-x'
+  'woo-x',
+  'blockchain-com'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -129,7 +130,8 @@ const OKEX_CHANNELS = [
   'vip-interest-rate-loan-quota',
   'status',
   'instruments',
-  'taker-volume'
+  'taker-volume',
+  'public-struc-block-trades'
 ] as const
 
 const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
@@ -161,7 +163,8 @@ const OKEX_FUTURES_CHANNELS = [
   'index-tickers',
   'long-short-account-ratio',
   'taker-volume',
-  'liquidations'
+  'liquidations',
+  'public-struc-block-trades'
 ] as const
 
 const OKEX_SWAP_CHANNELS = [
@@ -193,7 +196,8 @@ const OKEX_SWAP_CHANNELS = [
   'index-tickers',
   'long-short-account-ratio',
   'taker-volume',
-  'liquidations'
+  'liquidations',
+  'public-struc-block-trades'
 ] as const
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -219,7 +223,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'index-tickers',
   'open-interest',
   'mark-price',
-  'price-limit'
+  'price-limit',
+  'public-struc-block-trades'
 ] as const
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
@@ -403,6 +408,8 @@ const WOOX_CHANNELS = [
   'estfundingrate'
 ]
 
+const BLOCKCHAIN_COM_CHANNELS = ['trades', 'l2', 'l3', 'ticker']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -452,5 +459,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES,
   kucoin: KUCOIN_CHANNELS,
   bitnomial: BITNOMIAL_CHANNELS,
-  'woo-x': WOOX_CHANNELS
+  'woo-x': WOOX_CHANNELS,
+  'blockchain-com': BLOCKCHAIN_COM_CHANNELS
 }
