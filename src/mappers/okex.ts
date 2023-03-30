@@ -97,6 +97,7 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
   }
 
   *map(okexDepthDataMessage: OkexV5BookMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    console.log(okexDepthDataMessage)
     for (const message of okexDepthDataMessage.data) {
       if (okexDepthDataMessage.action === 'update' && message.bids.length === 0 && message.asks.length === 0) {
         continue
@@ -344,13 +345,14 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
 }
 
 export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
+  private _isFirstMessage = true
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
       return false
     }
-    return message.arg.channel === 'liquidations'
+    return message.arg.channel === 'liquidations' || message.arg.channel === 'liquidation-orders'
   }
 
   getFilters(symbols?: string[]) {
@@ -360,24 +362,55 @@ export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidat
       {
         channel: 'liquidations',
         symbols
+      } as any,
+      {
+        channel: 'liquidation-orders',
+        symbols
       } as any
     ]
   }
 
-  *map(okexLiquidationMessage: OkexV5LiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
-    for (const okexLiquidation of okexLiquidationMessage.data) {
-      const liquidation: Liquidation = {
-        type: 'liquidation',
-        symbol: okexLiquidationMessage.arg.instId,
-        exchange: this._exchange,
-        id: undefined,
-        price: Number(okexLiquidation.bkPx),
-        amount: Number(okexLiquidation.sz),
-        side: okexLiquidation.side === 'buy' ? 'buy' : 'sell',
-        timestamp: new Date(Number(okexLiquidation.ts)),
-        localTimestamp: localTimestamp
+  *map(
+    okexLiquidationMessage: OkexV5LiquidationMessage | OkexV5LiquidationOrderMessage,
+    localTimestamp: Date
+  ): IterableIterator<Liquidation> {
+    if (okexLiquidationMessage.arg.channel === 'liquidation-orders') {
+      if (this._isFirstMessage) {
+        this._isFirstMessage = false
+        return
       }
-      yield liquidation
+
+      for (const okexLiquidation of (okexLiquidationMessage as OkexV5LiquidationOrderMessage).data) {
+        for (const detail of okexLiquidation.details) {
+          const liquidation: Liquidation = {
+            type: 'liquidation',
+            symbol: okexLiquidation.instId,
+            exchange: this._exchange,
+            id: undefined,
+            price: Number(detail.bkPx),
+            amount: Number(detail.sz),
+            side: detail.side === 'buy' ? 'buy' : 'sell',
+            timestamp: new Date(Number(detail.ts)),
+            localTimestamp: localTimestamp
+          }
+          yield liquidation
+        }
+      }
+    } else {
+      for (const okexLiquidation of (okexLiquidationMessage as OkexV5LiquidationMessage).data) {
+        const liquidation: Liquidation = {
+          type: 'liquidation',
+          symbol: okexLiquidationMessage.arg.instId,
+          exchange: this._exchange,
+          id: undefined,
+          price: Number(okexLiquidation.bkPx),
+          amount: Number(okexLiquidation.sz),
+          side: okexLiquidation.side === 'buy' ? 'buy' : 'sell',
+          timestamp: new Date(Number(okexLiquidation.ts)),
+          localTimestamp: localTimestamp
+        }
+        yield liquidation
+      }
     }
   }
 }
@@ -632,6 +665,19 @@ type OkexV5FundingRateMessage = {
 type OkexV5LiquidationMessage = {
   arg: { channel: 'liquidations'; instId: 'BTC-USDT-211231'; generated: true }
   data: [{ bkLoss: '0'; bkPx: '49674.2'; ccy: ''; posSide: 'short'; side: 'buy'; sz: '40'; ts: '1640140211925' }]
+}
+
+type OkexV5LiquidationOrderMessage = {
+  arg: { channel: 'liquidation-orders'; instType: 'FUTURES' }
+  data: [
+    {
+      details: [{ bkLoss: '0'; bkPx: '0.55205'; ccy: ''; posSide: 'short'; side: 'buy'; sz: '39'; ts: '1680173247614' }]
+      instFamily: 'XRP-USD'
+      instId: 'XRP-USD-230929'
+      instType: 'FUTURES'
+      uly: 'XRP-USD'
+    }
+  ]
 }
 
 type OkexV5SummaryMessage = {

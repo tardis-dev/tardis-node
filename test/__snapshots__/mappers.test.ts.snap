@@ -8177,6 +8177,24 @@ Array [
 ]
 `;
 
+exports[`mappers map okex-futures messages 30`] = `Array []`;
+
+exports[`mappers map okex-futures messages 31`] = `
+Array [
+  Object {
+    "amount": 39,
+    "exchange": "okex-futures",
+    "id": undefined,
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 0.55205,
+    "side": "buy",
+    "symbol": "XRP-USD-230929",
+    "timestamp": 2023-03-30T10:47:27.614Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map okex-options messages 1`] = `
 Array [
   Object {

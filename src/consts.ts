@@ -164,7 +164,8 @@ const OKEX_FUTURES_CHANNELS = [
   'long-short-account-ratio',
   'taker-volume',
   'liquidations',
-  'public-struc-block-trades'
+  'public-struc-block-trades',
+  'liquidation-orders'
 ] as const
 
 const OKEX_SWAP_CHANNELS = [
@@ -197,7 +198,8 @@ const OKEX_SWAP_CHANNELS = [
   'long-short-account-ratio',
   'taker-volume',
   'liquidations',
-  'public-struc-block-trades'
+  'public-struc-block-trades',
+  'liquidation-orders'
 ] as const
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -224,7 +226,8 @@ const OKEX_OPTIONS_CHANNELS = [
   'open-interest',
   'mark-price',
   'price-limit',
-  'public-struc-block-trades'
+  'public-struc-block-trades',
+  'option-trades'
 ] as const
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const

@@ -1491,6 +1491,30 @@ describe('mappers', () => {
       {
         arg: { channel: 'mark-price', instId: 'FIL-USDT-220325' },
         data: [{ instId: 'FIL-USDT-220325', instType: 'FUTURES', markPx: '36.662', ts: '1640140257676' }]
+      },
+      {
+        arg: { channel: 'liquidation-orders', instType: 'FUTURES' },
+        data: [
+          {
+            details: [{ bkLoss: '0', bkPx: '0.55205', ccy: '', posSide: 'short', side: 'buy', sz: '39', ts: '1680173247614' }],
+            instFamily: 'XRP-USD',
+            instId: 'XRP-USD-230929',
+            instType: 'FUTURES',
+            uly: 'XRP-USD'
+          }
+        ]
+      },
+      {
+        arg: { channel: 'liquidation-orders', instType: 'FUTURES' },
+        data: [
+          {
+            details: [{ bkLoss: '0', bkPx: '0.55205', ccy: '', posSide: 'short', side: 'buy', sz: '39', ts: '1680173247614' }],
+            instFamily: 'XRP-USD',
+            instId: 'XRP-USD-230929',
+            instType: 'FUTURES',
+            uly: 'XRP-USD'
+          }
+        ]
       }
     ]
 

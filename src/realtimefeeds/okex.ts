@@ -36,12 +36,19 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters
+      .filter((f) => f.channel != 'liquidations')
       .map((filter) => {
         if (!filter.symbols || filter.symbols.length === 0) {
           throw new Error(`${this._exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
         }
 
         return filter.symbols.map((symbol) => {
+          if (filter.channel === 'liquidation-orders') {
+            return {
+              channel: filter.channel,
+              instType: symbol.endsWith('SWAP') ? 'SWAP' : 'FUTURES'
+            }
+          }
           return {
             channel: filter.channel,
             instId: symbol
