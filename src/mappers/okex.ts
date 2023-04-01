@@ -97,7 +97,6 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
   }
 
   *map(okexDepthDataMessage: OkexV5BookMessage, localTimestamp: Date): IterableIterator<BookChange> {
-    console.log(okexDepthDataMessage)
     for (const message of okexDepthDataMessage.data) {
       if (okexDepthDataMessage.action === 'update' && message.bids.length === 0 && message.asks.length === 0) {
         continue
