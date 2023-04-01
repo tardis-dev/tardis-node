@@ -285,8 +285,8 @@ export async function download({
       let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
 
       if (tooManyRequests) {
-        // when too many requests received wait longer
-        nextAttemptDelayMS += 3 * ONE_SEC_IN_MS * attempts
+        // when too many requests received wait one minute
+        nextAttemptDelayMS += 60 * ONE_SEC_IN_MS
       }
 
       debug('download file error: %o, next attempt delay: %d, url %s, path: %s', error, nextAttemptDelayMS, url, downloadPath)

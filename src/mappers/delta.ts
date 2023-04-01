@@ -1,5 +1,5 @@
 import { upperCaseSymbols } from '../handy'
-import { BookChange, DerivativeTicker, Trade } from '../types'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 const fromMicroSecondsToDate = (micros: number) => {
@@ -49,13 +49,34 @@ const mapBookLevel = (level: DeltaBookLevel) => {
   }
 }
 
-export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
-  canHandle(message: DeltaL2OrderBook) {
+const mapL2Level = (level: DeltaL2Level) => {
+  return {
+    price: Number(level[0]),
+    amount: Number(level[1])
+  }
+}
+
+export class DeltaBookChangeMapper implements Mapper<'delta', BookChange> {
+  constructor(private readonly _useL2UpdatesChannel: boolean) {}
+
+  canHandle(message: DeltaL2OrderBook | DeltaL2UpdateMessage) {
+    if (this._useL2UpdatesChannel) {
+      return message.type === 'l2_updates'
+    }
     return message.type === 'l2_orderbook'
-  },
+  }
 
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
+
+    if (this._useL2UpdatesChannel) {
+      return [
+        {
+          channel: 'l2_updates',
+          symbols
+        } as const
+      ]
+    }
 
     return [
       {
@@ -63,21 +84,34 @@ export const deltaBookChangeMapper: Mapper<'delta', BookChange> = {
         symbols
       } as const
     ]
-  },
+  }
 
-  *map(message: DeltaL2OrderBook, localTimestamp: Date): IterableIterator<BookChange> {
-    if (message.buy === undefined && message.sell === undefined) {
-      return
-    }
-    yield {
-      type: 'book_change',
-      symbol: message.symbol,
-      exchange: 'delta',
-      isSnapshot: true,
-      bids: message.buy !== undefined ? message.buy.map(mapBookLevel) : [],
-      asks: message.sell !== undefined ? message.sell.map(mapBookLevel) : [],
-      timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
-      localTimestamp
+  *map(message: DeltaL2OrderBook | DeltaL2UpdateMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    if (message.type === 'l2_updates') {
+      yield {
+        type: 'book_change',
+        symbol: message.symbol,
+        exchange: 'delta',
+        isSnapshot: message.action === 'snapshot',
+        bids: message.bids !== undefined ? message.bids.map(mapL2Level) : [],
+        asks: message.asks !== undefined ? message.asks.map(mapL2Level) : [],
+        timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
+        localTimestamp
+      }
+    } else {
+      if (message.buy === undefined && message.sell === undefined) {
+        return
+      }
+      yield {
+        type: 'book_change',
+        symbol: message.symbol,
+        exchange: 'delta',
+        isSnapshot: true,
+        bids: message.buy !== undefined ? message.buy.map(mapBookLevel) : [],
+        asks: message.sell !== undefined ? message.sell.map(mapBookLevel) : [],
+        timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
+        localTimestamp
+      }
     }
   }
 }
@@ -146,6 +180,39 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
   }
 }
 
+export class DeltaBookTickerMapper implements Mapper<'delta', BookTicker> {
+  canHandle(message: DeltaL1Message) {
+    return message.type === 'l1_orderbook'
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'l1_orderbook',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: DeltaL1Message, localTimestamp: Date) {
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: message.symbol,
+      exchange: 'delta',
+      askAmount: message.ask_qty !== undefined ? Number(message.ask_qty) : undefined,
+      askPrice: message.best_ask !== undefined ? Number(message.best_ask) : undefined,
+      bidPrice: message.best_bid !== undefined ? Number(message.best_bid) : undefined,
+      bidAmount: message.bid_qty !== undefined ? Number(message.bid_qty) : undefined,
+      timestamp: message.timestamp !== undefined ? fromMicroSecondsToDate(message.timestamp) : localTimestamp,
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 type DeltaTrade = {
   buyer_role: 'taker' | 'maker'
   price: string
@@ -182,4 +249,40 @@ type DeltaFundingRate = {
   symbol: string
   timestamp: number
   type: 'funding_rate'
+}
+
+type DeltaL2Level = [string, string]
+type DeltaL2UpdateMessage =
+  | {
+      action: 'snapshot'
+      asks: DeltaL2Level[]
+      bids: DeltaL2Level[]
+      cs: 220729409
+      sequence_no: 3660223
+      symbol: string
+      timestamp: 1680307203021223
+      type: 'l2_updates'
+    }
+  | {
+      action: 'update'
+      asks: DeltaL2Level[]
+      bids: DeltaL2Level[]
+      cs: 2728204214
+      sequence_no: 3660224
+      symbol: string
+      timestamp: 1680307203771239
+      type: 'l2_updates'
+    }
+
+type DeltaL1Message = {
+  ask_qty: '1950'
+  best_ask: '4964.5'
+  best_bid: '4802'
+  bid_qty: '4356'
+  last_sequence_no: 1680307203966299
+  last_updated_at: 1680307203784000
+  product_id: 103877
+  symbol: 'P-BTC-33000-210423'
+  timestamp: 1680307203966299
+  type: 'l1_orderbook'
 }

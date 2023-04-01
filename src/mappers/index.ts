@@ -41,7 +41,7 @@ import {
   cryptofacilitiesBookTickerMapper,
   cryptofacilitiesTradesMapper
 } from './cryptofacilities'
-import { deltaBookChangeMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta'
+import { DeltaBookChangeMapper, DeltaBookTickerMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta'
 import {
   deribitBookChangeMapper,
   DeribitDerivativeTickerMapper,
@@ -253,7 +253,7 @@ const bookChangeMappers = {
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,
   phemex: () => phemexBookChangeMapper,
-  delta: () => deltaBookChangeMapper,
+  delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
   'gate-io': () => new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
@@ -383,7 +383,8 @@ const bookTickersMappers = {
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinBookTickerMapper('kucoin'),
-  'woo-x': () => new WooxBookTickerMapper()
+  'woo-x': () => new WooxBookTickerMapper(),
+  delta: () => new DeltaBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

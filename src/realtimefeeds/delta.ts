@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class DeltaRealTimeFeed extends RealTimeFeedBase {
-  protected readonly wssURL = 'wss://api.delta.exchange:2096'
+  protected readonly wssURL = 'wss://socket.delta.exchange'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters.map((filter) => {

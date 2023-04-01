@@ -4561,6 +4561,76 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 18`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1164,
+        "price": 89.6,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 900,
+        "price": 87,
+      },
+      Object {
+        "amount": 3500,
+        "price": 86.55,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-01T00:00:00.000Z,
+    "symbol": "C-ETH-1900-280423",
+    "timestamp": 2023-04-01T00:00:03.021223Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map delta messages 19`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1836,
+        "price": 704.8,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 668.3,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": false,
+    "localTimestamp": 2023-04-01T00:00:00.000Z,
+    "symbol": "C-ETH-1900-280423",
+    "timestamp": 2023-04-01T00:00:03.771239Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map delta messages 20`] = `
+Array [
+  Object {
+    "askAmount": 1950,
+    "askPrice": 4964.5,
+    "bidAmount": 4356,
+    "bidPrice": 4802,
+    "exchange": "delta",
+    "localTimestamp": 2023-04-01T00:00:00.000Z,
+    "symbol": "P-BTC-33000-210423",
+    "timestamp": 2023-04-01T00:00:03.966299Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {

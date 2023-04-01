@@ -65,7 +65,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'crypto-com',
   'crypto-com-derivatives',
   'kucoin',
-  'woo-x'
+  'woo-x',
+  'delta'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
@@ -3353,6 +3354,44 @@ describe('mappers', () => {
       }
     ]
 
+    const newOrderBookMessages = [
+      {
+        action: 'snapshot',
+        asks: [['89.60', '1164']],
+        bids: [
+          ['87.00', '900'],
+          ['86.55', '3500']
+        ],
+        cs: 220729409,
+        sequence_no: 3660223,
+        symbol: 'C-ETH-1900-280423',
+        timestamp: 1680307203021223,
+        type: 'l2_updates'
+      },
+      {
+        action: 'update',
+        asks: [['704.80', '1836']],
+        bids: [['668.30', '0']],
+        cs: 2728204214,
+        sequence_no: 3660224,
+        symbol: 'C-ETH-1900-280423',
+        timestamp: 1680307203771239,
+        type: 'l2_updates'
+      },
+      {
+        ask_qty: '1950',
+        best_ask: '4964.5',
+        best_bid: '4802',
+        bid_qty: '4356',
+        last_sequence_no: 1680307203966299,
+        last_updated_at: 1680307203784000,
+        product_id: 103877,
+        symbol: 'P-BTC-33000-210423',
+        timestamp: 1680307203966299,
+        type: 'l1_orderbook'
+      }
+    ]
+
     let deltaMapper = createMapper('delta', new Date('2020-10-13T00:00:01.2750543Z'))
     for (const message of messages) {
       const mappedMessages = deltaMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
@@ -3363,6 +3402,13 @@ describe('mappers', () => {
 
     for (const message of v2Messages) {
       const mappedMessages = deltaMapper.map(message, new Date('2020-10-14T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    deltaMapper = createMapper('delta', new Date('2023-04-01T00:00:00.000Z'))
+
+    for (const message of newOrderBookMessages) {
+      const mappedMessages = deltaMapper.map(message, new Date('2023-04-01T00:00:00.000Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

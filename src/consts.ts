@@ -352,7 +352,10 @@ const DELTA_CHANNELS = [
   'product_updates',
   'announcements',
   'all_trades',
-  'v2/ticker'
+  'v2/ticker',
+  'l1_orderbook',
+  'l2_updates',
+  'spot_30mtwap_price'
 ] as const
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker'] as const
