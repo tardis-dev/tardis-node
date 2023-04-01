@@ -21,7 +21,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bybit'
 ]
 
-describe.skip('replay', () => {
+describe('replay', () => {
   beforeEach(() => {
     return clearCache()
   }, 1000 * 60 * 10)
