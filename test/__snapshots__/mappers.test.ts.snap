@@ -4631,6 +4631,107 @@ Array [
 ]
 `;
 
+exports[`mappers map delta messages 21`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3894,
+        "price": 805,
+      },
+      Object {
+        "amount": 4697,
+        "price": 809,
+      },
+      Object {
+        "amount": 7091,
+        "price": 819,
+      },
+      Object {
+        "amount": 10706,
+        "price": 841,
+      },
+      Object {
+        "amount": 10022,
+        "price": 877,
+      },
+      Object {
+        "amount": 6143,
+        "price": 913,
+      },
+      Object {
+        "amount": 7047,
+        "price": 948,
+      },
+      Object {
+        "amount": 8084,
+        "price": 994,
+      },
+      Object {
+        "amount": 9274,
+        "price": 1055,
+      },
+      Object {
+        "amount": 10639,
+        "price": 1135,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 6490,
+        "price": 772,
+      },
+      Object {
+        "amount": 7828,
+        "price": 767,
+      },
+      Object {
+        "amount": 11819,
+        "price": 757,
+      },
+      Object {
+        "amount": 17844,
+        "price": 736,
+      },
+      Object {
+        "amount": 16703,
+        "price": 699,
+      },
+      Object {
+        "amount": 10238,
+        "price": 663,
+      },
+      Object {
+        "amount": 11745,
+        "price": 628,
+      },
+      Object {
+        "amount": 13473,
+        "price": 582,
+      },
+      Object {
+        "amount": 15457,
+        "price": 521,
+      },
+      Object {
+        "amount": 17732,
+        "price": 441,
+      },
+      Object {
+        "amount": 15000,
+        "price": 0.1,
+      },
+    ],
+    "exchange": "delta",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-01T00:00:00.000Z,
+    "symbol": "C-BTC-27700-010423",
+    "timestamp": 2023-04-01T00:13:19.563Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map deribit messages 1`] = `
 Array [
   Object {

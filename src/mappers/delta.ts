@@ -3,6 +3,12 @@ import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 const fromMicroSecondsToDate = (micros: number) => {
+  const isMicroseconds = micros > 1e15 // Check if the number is likely in microseconds
+
+  if (!isMicroseconds) {
+    return new Date(micros)
+  }
+
   const timestamp = new Date(micros / 1000)
   timestamp.μs = micros % 1000
 
