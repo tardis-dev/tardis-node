@@ -11,7 +11,7 @@ import { BitfinexRealTimeFeed } from './bitfinex'
 import { BitflyerRealTimeFeed } from './bitflyer'
 import { BitmexRealTimeFeed } from './bitmex'
 import { BitstampRealTimeFeed } from './bitstamp'
-import { BybitRealTimeDataFeed } from './bybit'
+import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed } from './bybit'
 import { CoinbaseRealTimeFeed } from './coinbase'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities'
 import { DeribitRealTimeDataFeed } from './deribit'
@@ -41,7 +41,6 @@ import { DydxRealTimeFeed } from './dydx'
 import { SerumRealTimeFeed } from './serum'
 import { StarAtlasRealTimeFeed } from './staratlas'
 import { MangoRealTimeFeed } from './mango'
-import { BybitSpotRealTimeFeed } from './bybitspot'
 import { CryptoComRealTimeFeed } from './cryptocom'
 import { KucoinRealTimeFeed } from './kucoin'
 import { BitnomialRealTimeFeed } from './bitnomial'
@@ -96,7 +95,8 @@ const realTimeFeedsMap: {
   'star-atlas': StarAtlasRealTimeFeed,
   'huobi-dm-options': HuobiDMOptionsRealTimeFeed,
   mango: MangoRealTimeFeed,
-  'bybit-spot': BybitSpotRealTimeFeed,
+  'bybit-spot': BybitSpotRealTimeDataFeed,
+  'bybit-options': BybitOptionsRealTimeDataFeed,
   'crypto-com': CryptoComRealTimeFeed,
   'crypto-com-derivatives': CryptoComRealTimeFeed,
   kucoin: KucoinRealTimeFeed,
