@@ -66,10 +66,11 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'crypto-com-derivatives',
   'kucoin',
   'woo-x',
-  'delta'
+  'delta',
+  'bybit'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options']
+const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options', 'bybit-options']
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -5826,6 +5827,368 @@ describe('mappers', () => {
       const mappedMessages = bybit.map(message, new Date('2019-12-14T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
+
+    const messagesV5 = [
+      {
+        topic: 'publicTrade.BTCUSD',
+        type: 'snapshot',
+        ts: 1680673823566,
+        data: [
+          {
+            T: 1680673823564,
+            s: 'BTCUSD',
+            S: 'Buy',
+            v: '5823',
+            p: '28560.50',
+            L: 'PlusTick',
+            i: '0cbf2330-952d-5d03-a462-4bf826c867af',
+            BT: false
+          },
+          {
+            T: 1680673823564,
+            s: 'BTCUSD',
+            S: 'Buy',
+            v: '3',
+            p: '28560.50',
+            L: 'ZeroPlusTick',
+            i: '912e56de-9ed6-5f4f-9421-f0ff5a42d84a',
+            BT: false
+          },
+          {
+            T: 1680673823564,
+            s: 'BTCUSD',
+            S: 'Buy',
+            v: '5593',
+            p: '28560.50',
+            L: 'ZeroPlusTick',
+            i: 'cb558b74-cf72-5157-b53b-93944db336ad',
+            BT: false
+          }
+        ]
+      },
+      {
+        topic: 'publicTrade.LTCUSDT',
+        type: 'snapshot',
+        ts: 1680688979985,
+        data: [
+          {
+            T: 1680688979983,
+            s: 'LTCUSDT',
+            S: 'Buy',
+            v: '0.4',
+            p: '94.53',
+            L: 'ZeroMinusTick',
+            i: '4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f',
+            BT: false
+          }
+        ]
+      },
+      {
+        topic: 'orderbook.1.BTCUSDT',
+        type: 'snapshot',
+        ts: 1680673820717,
+        data: { s: 'BTCUSDT', b: [['28552.00', '0.047']], a: [['28552.10', '25.433']], u: 7003305, seq: 50193540681 }
+      },
+      {
+        topic: 'orderbook.1.BTCUSDT',
+        type: 'delta',
+        ts: 1680673821137,
+        data: { s: 'BTCUSDT', b: [['28552.00', '0.012']], a: [], u: 7003306, seq: 50193543147 }
+      },
+      {
+        topic: 'orderbook.50.BTCPERP',
+        type: 'snapshot',
+        ts: 1680673821591,
+        data: {
+          s: 'BTCPERP',
+          b: [['28555.20', '0.597']],
+          a: [['28555.30', '0.225']],
+          u: 20683568,
+          seq: 10916156551
+        }
+      },
+      {
+        topic: 'orderbook.50.BTCPERP',
+        type: 'delta',
+        ts: 1680673821651,
+        data: { s: 'BTCPERP', b: [['28555.20', '0.677']], a: [['28555.30', '0.029']], u: 20683569, seq: 10916156553 }
+      },
+      {
+        topic: 'tickers.BTCUSD',
+        type: 'snapshot',
+        data: {
+          symbol: 'BTCUSD',
+          tickDirection: 'MinusTick',
+          price24hPcnt: '0.023362',
+          lastPrice: '28560.00',
+          prevPrice24h: '27908.00',
+          highPrice24h: '28815.00',
+          lowPrice24h: '27862.50',
+          prevPrice1h: '28500.50',
+          markPrice: '28560.00',
+          indexPrice: '28566.94',
+          openInterest: '449736676',
+          openInterestValue: '15747.08',
+          turnover24h: '23389.1894',
+          volume24h: '661543991',
+          nextFundingTime: '1680681600000',
+          fundingRate: '0.0001',
+          bid1Price: '28560.00',
+          bid1Size: '340549',
+          ask1Price: '28560.50',
+          ask1Size: '70817'
+        },
+        cs: 20856433578,
+        ts: 1680673822577
+      },
+      {
+        topic: 'tickers.BTCUSD',
+        type: 'delta',
+        data: {
+          symbol: 'BTCUSD',
+          price24hPcnt: '0.023362',
+          openInterest: '449736674',
+          fundingRate: '0.0001',
+          bid1Price: '28560.00',
+          bid1Size: '340549',
+          ask1Price: '28560.50',
+          ask1Size: '70817'
+        },
+        cs: 20856433603,
+        ts: 1680673822776
+      },
+      {
+        topic: 'tickers.BTCUSDU23',
+        type: 'snapshot',
+        data: {
+          symbol: 'BTCUSDU23',
+          tickDirection: 'MinusTick',
+          price24hPcnt: '0.023231',
+          lastPrice: '29026.00',
+          prevPrice24h: '28367.00',
+          highPrice24h: '29253.00',
+          lowPrice24h: '28350.00',
+          prevPrice1h: '28947.50',
+          markPrice: '29023.60',
+          indexPrice: '28566.94',
+          openInterest: '4547176',
+          openInterestValue: '156.67',
+          turnover24h: '279.6816',
+          volume24h: '8041559',
+          deliveryTime: '2023-09-29T08:00:00Z',
+          basisRate: '0.01600486',
+          deliveryFeeRate: '0.0005',
+          predictedDeliveryPrice: '0.00',
+          basis: '459.06',
+          nextFundingTime: '',
+          fundingRate: '',
+          bid1Price: '29025.00',
+          bid1Size: '3100',
+          ask1Price: '29027.00',
+          ask1Size: '3095'
+        },
+        cs: 12321470232,
+        ts: 1680673822099
+      },
+      {
+        topic: 'tickers.BTCUSDU23',
+        type: 'delta',
+        data: {
+          symbol: 'BTCUSDU23',
+          price24hPcnt: '0.023231',
+          bid1Price: '29025.00',
+          bid1Size: '3100',
+          ask1Price: '29027.00',
+          ask1Size: '3095',
+          basisRate: '0.01603111',
+          deliveryFeeRate: '0.0005'
+        },
+        cs: 12321470236,
+        ts: 1680673822199
+      },
+      {
+        topic: 'tickers.BTCUSDT',
+        type: 'snapshot',
+        data: {
+          symbol: 'BTCUSDT',
+          tickDirection: 'ZeroMinusTick',
+          price24hPcnt: '0.023333',
+          lastPrice: '28550.70',
+          prevPrice24h: '27899.70',
+          highPrice24h: '28797.10',
+          lowPrice24h: '27842.80',
+          prevPrice1h: '28474.70',
+          markPrice: '28552.81',
+          indexPrice: '28562.25',
+          openInterest: '52774.528',
+          openInterestValue: '1506861070.82',
+          turnover24h: '4273027716.4294',
+          volume24h: '151185.5160',
+          nextFundingTime: '1680681600000',
+          fundingRate: '0.0001',
+          bid1Price: '28550.70',
+          bid1Size: '2.049',
+          ask1Price: '28550.80',
+          ask1Size: '15.328'
+        },
+        cs: 50193544280,
+        ts: 1680673821770
+      },
+      {
+        data: {
+          price: '0.03803',
+          side: 'Buy',
+          size: '1637',
+          symbol: 'GALAUSDT',
+          updatedTime: 1673251091822
+        },
+        topic: 'liquidation.GALAUSDT',
+        ts: 1673251091822,
+        type: 'snapshot'
+      },
+      {
+        topic: 'liquidation.XRPUSD',
+        type: 'snapshot',
+        ts: 1680673944093,
+        data: { updatedTime: 1680673944093, symbol: 'XRPUSD', side: 'Sell', size: '6949', price: '0.5149' }
+      }
+    ]
+
+    bybit = createMapper('bybit', new Date('2023-04-05'))
+
+    for (const message of messagesV5) {
+      const mappedMessages = bybit.map(message, new Date('2023-04-05'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map bybit-options messages', () => {
+    const messages = [
+      {
+        id: 'publicTrade.BTC-3414637898-1680652922102',
+        topic: 'publicTrade.BTC',
+        ts: 1680652922102,
+        data: [
+          {
+            p: '985',
+            v: '0.01',
+            i: '0404c393-8419-5bac-95c3-5fea28404754',
+            T: 1680652922081,
+            BT: false,
+            s: 'BTC-28APR23-29500-C',
+            S: 'Sell'
+          }
+        ],
+        type: 'snapshot'
+      },
+      {
+        id: 'orderbook.25.BTC-30JUN23-45000-P-3032585156-1680652790918',
+        topic: 'orderbook.25.BTC-30JUN23-45000-P',
+        ts: 1680652790918,
+        data: { s: 'BTC-30JUN23-45000-P', b: [], a: [], u: 0 },
+        type: 'snapshot'
+      },
+      {
+        id: 'orderbook.25.SOL-28APR23-30-C-3360274030-1680652786355',
+        topic: 'orderbook.25.SOL-28APR23-30-C',
+        ts: 1680652786355,
+        data: {
+          s: 'SOL-28APR23-30-C',
+          b: [['0.01', '50']],
+          a: [['1.74', '46']],
+          u: 24641
+        },
+        type: 'snapshot'
+      },
+      {
+        id: 'orderbook.25.SOL-28APR23-30-C-3360275694-1680652799661',
+        topic: 'orderbook.25.SOL-28APR23-30-C',
+        ts: 1680652799661,
+        data: {
+          s: 'SOL-28APR23-30-C',
+          b: [],
+          a: [
+            ['1.74', '0'],
+            ['1.75', '46']
+          ],
+          u: 24642
+        },
+        type: 'delta'
+      },
+      {
+        id: 'tickers.SOL-28APR23-24-C-3414625745-1680652810254',
+        topic: 'tickers.SOL-28APR23-24-C',
+        ts: 1680652810254,
+        data: {
+          symbol: 'SOL-28APR23-24-C',
+          bidPrice: '0.34',
+          bidSize: '10',
+          bidIv: '0.6004',
+          askPrice: '3.11',
+          askSize: '51',
+          askIv: '2.0007',
+          lastPrice: '1.6',
+          highPrice24h: '1.6',
+          lowPrice24h: '1.6',
+          markPrice: '1.99054639',
+          indexPrice: '20.93',
+          markPriceIv: '1.4674',
+          underlyingPrice: '20.93',
+          openInterest: '20',
+          turnover24h: '211.8',
+          volume24h: '10',
+          totalVolume: '20',
+          totalTurnover: '421',
+          delta: '0.42723543',
+          gamma: '0.0505193',
+          vega: '0.02075941',
+          theta: '-0.06527514',
+          predictedDeliveryPrice: '0',
+          change24h: '-0.11111112'
+        },
+        type: 'snapshot'
+      },
+      {
+        id: 'tickers.ETH-30JUN23-200-P-3164908233-1680652859919',
+        topic: 'tickers.ETH-30JUN23-200-P',
+        ts: 1680652859919,
+        data: {
+          symbol: 'ETH-30JUN23-200-P',
+          bidPrice: '0.1',
+          bidSize: '5',
+          bidIv: '1.4744',
+          askPrice: '0',
+          askSize: '0',
+          askIv: '0',
+          lastPrice: '1',
+          highPrice24h: '0',
+          lowPrice24h: '0',
+          markPrice: '0.2548522',
+          indexPrice: '1871.27',
+          markPriceIv: '1.5991',
+          underlyingPrice: '1886.16',
+          openInterest: '231.5',
+          turnover24h: '0',
+          volume24h: '0',
+          totalVolume: '232',
+          totalTurnover: '362305',
+          delta: '-0.00052953',
+          gamma: '0.00000128',
+          vega: '0.01719155',
+          theta: '-0.0159208',
+          predictedDeliveryPrice: '0',
+          change24h: '0'
+        },
+        type: 'snapshot'
+      }
+    ]
+
+    const mapper = createMapper('bybit-options', new Date('2023-04-05'))
+
+    for (const message of messages) {
+      const mappedMessages = mapper.map(message, new Date('2023-04-05'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
   })
 
   test('map okcoin messages', () => {
@@ -7162,10 +7525,75 @@ test('map bybit spot messages', () => {
     }
   ]
 
-  const bybitSpotMapper = createMapper('bybit-spot')
+  let bybitSpotMapper = createMapper('bybit-spot', new Date('2021-05-22T00:00:59.4642130Z'))
 
   for (const message of messages) {
     const mappedMessages = bybitSpotMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+
+  const messagesV5 = [
+    {
+      topic: 'publicTrade.BTCUSDT',
+      ts: 1680652847526,
+      type: 'snapshot',
+      data: [
+        { i: '2290000000050703789', T: 1680652847524, p: '28165.38', v: '0.041732', S: 'Sell', s: 'BTCUSDT', BT: false },
+        { i: '2290000000050703790', T: 1680652847524, p: '28165.38', v: '0.008513', S: 'Sell', s: 'BTCUSDT', BT: false },
+        { i: '2290000000050703791', T: 1680652847524, p: '28165.38', v: '0.042384', S: 'Sell', s: 'BTCUSDT', BT: false },
+        { i: '2290000000050703792', T: 1680652847524, p: '28165.38', v: '0.055371', S: 'Sell', s: 'BTCUSDT', BT: false }
+      ]
+    },
+    {
+      topic: 'publicTrade.BTCUSDC',
+      ts: 1680688980000,
+      type: 'snapshot',
+      data: [{ i: '2240000000041223438', T: 1680688979998, p: '28528.98', v: '0.00433', S: 'Buy', s: 'BTCUSDC', BT: false }]
+    },
+    {
+      topic: 'orderbook.1.BTCUSDT',
+      ts: 1680652806504,
+      type: 'snapshot',
+      data: { s: 'BTCUSDT', b: [['28165.07', '0.175231']], a: [['28165.08', '0.996816']], u: 20404754, seq: 4281281856 }
+    },
+    {
+      topic: 'orderbook.1.BTCUSDT',
+      ts: 1680652806615,
+      type: 'delta',
+      data: { s: 'BTCUSDT', b: [['28165.07', '0.166754']], a: [], u: 20404755, seq: 4281281875 }
+    },
+    {
+      topic: 'orderbook.50.BTCUSDT',
+      ts: 1680652808065,
+      type: 'snapshot',
+      data: {
+        s: 'BTCUSDT',
+        b: [['28162.57', '0.07562']],
+        a: [['28162.58', '0.506829']],
+        u: 59438060,
+        seq: 4281282229
+      }
+    },
+    {
+      topic: 'orderbook.50.BTCUSDT',
+      ts: 1680652808085,
+      type: 'delta',
+      data: {
+        s: 'BTCUSDT',
+        b: [
+          ['28161.04', '0.177474'],
+          ['28145.71', '0']
+        ],
+        a: [['28184.33', '0']],
+        u: 59438061,
+        seq: 4281282232
+      }
+    }
+  ]
+  bybitSpotMapper = createMapper('bybit-spot', new Date('2023-04-05T00:00:59.4642130Z'))
+
+  for (const message of messagesV5) {
+    const mappedMessages = bybitSpotMapper.map(message, new Date('2023-04-05T00:00:59.4642130Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

@@ -29,7 +29,18 @@ import {
 import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
 import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom'
-import { BybitBookChangeMapper, BybitDerivativeTickerMapper, BybitLiquidationsMapper, BybitTradesMapper } from './bybit'
+import {
+  BybitBookChangeMapper,
+  BybitDerivativeTickerMapper,
+  BybitLiquidationsMapper,
+  BybitTradesMapper,
+  BybitV5BookChangeMapper,
+  BybitV5BookTickerMapper,
+  BybitV5DerivativeTickerMapper,
+  BybitV5LiquidationsMapper,
+  BybitV5OptionSummaryMapper,
+  BybitV5TradesMapper
+} from './bybit'
 import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
 import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
@@ -136,6 +147,12 @@ const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
   return isRealTime(date) === false
 }
 
+const BYBIT_V5_API_SWITCH_DATE = new Date('2023-04-05T00:00:00.000Z')
+
+const shouldUseBybitV5Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_SWITCH_DATE.valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -172,7 +189,8 @@ const tradesMappers = {
   'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiTradesMapper('huobi-dm-linear-swap'),
   'huobi-dm-options': () => new HuobiTradesMapper('huobi-dm-options'),
-  bybit: () => new BybitTradesMapper('bybit'),
+  bybit: (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit') : new BybitTradesMapper('bybit'),
   okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
@@ -189,13 +207,15 @@ const tradesMappers = {
   serum: () => new SerumTradesMapper('serum'),
   'star-atlas': () => new SerumTradesMapper('star-atlas'),
   mango: () => new SerumTradesMapper('mango'),
-  'bybit-spot': () => new BybitSpotTradesMapper('bybit-spot'),
+  'bybit-spot': (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit-spot') : new BybitSpotTradesMapper('bybit-spot'),
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinTradesMapper('kucoin'),
   bitnomial: () => bitnomialTradesMapper,
   'woo-x': () => wooxTradesMapper,
-  'blockchain-com': () => new BlockchainComTradesMapper()
+  'blockchain-com': () => new BlockchainComTradesMapper(),
+  'bybit-options': () => new BybitV5TradesMapper('bybit-options')
 }
 
 const bookChangeMappers = {
@@ -247,8 +267,10 @@ const bookChangeMappers = {
   'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
   'huobi-dm-options': () => new HuobiBookChangeMapper('huobi-dm-options'),
-  'bybit-spot': () => new BybitSpotBookChangeMapper('bybit-spot'),
-  bybit: () => new BybitBookChangeMapper('bybit', false),
+  'bybit-spot': (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookChangeMapper('bybit-spot', 50) : new BybitSpotBookChangeMapper('bybit-spot'),
+  bybit: (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookChangeMapper('bybit', 50) : new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
     new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,
@@ -271,7 +293,8 @@ const bookChangeMappers = {
   kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
   bitnomial: () => new BitnomialBookChangMapper(),
   'woo-x': () => new WooxBookChangeMapper(),
-  'blockchain-com': () => new BlockchainComBookChangeMapper()
+  'blockchain-com': () => new BlockchainComBookChangeMapper(),
+  'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25)
 }
 
 const derivativeTickersMappers = {
@@ -289,7 +312,8 @@ const derivativeTickersMappers = {
   'okex-swap': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5DerivativeTickerMapper('okex-swap') : new OkexDerivativeTickerMapper('okex-swap'),
 
-  bybit: () => new BybitDerivativeTickerMapper(),
+  bybit: (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5DerivativeTickerMapper() : new BybitDerivativeTickerMapper(),
   phemex: () => new PhemexDerivativeTickerMapper(),
   ftx: () => new FTXDerivativeTickerMapper('ftx'),
   delta: (localTimestamp: Date) => new DeltaDerivativeTickerMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
@@ -310,7 +334,8 @@ const optionsSummaryMappers = {
   'okex-options': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5OptionSummaryMapper() : new OkexOptionSummaryMapper(),
   'binance-options': () => new BinanceOptionSummaryMapper(),
-  'huobi-dm-options': () => new HuobiOptionsSummaryMapper()
+  'huobi-dm-options': () => new HuobiOptionsSummaryMapper(),
+  'bybit-options': () => new BybitV5OptionSummaryMapper()
 }
 
 const liquidationsMappers = {
@@ -324,7 +349,8 @@ const liquidationsMappers = {
   'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
-  bybit: () => new BybitLiquidationsMapper('bybit'),
+  bybit: (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5LiquidationsMapper('bybit') : new BybitLiquidationsMapper('bybit'),
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
       ? new OkexV5LiquidationsMapper('okex-futures')
@@ -379,12 +405,14 @@ const bookTickersMappers = {
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
   mango: () => new SerumBookTickerMapper('mango'),
   'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
-  'bybit-spot': () => new BybitSpotBookTickerMapper('bybit-spot'),
+  'bybit-spot': (localTimestamp: Date) =>
+    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookTickerMapper('bybit-spot') : new BybitSpotBookTickerMapper('bybit-spot'),
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinBookTickerMapper('kucoin'),
   'woo-x': () => new WooxBookTickerMapper(),
-  delta: () => new DeltaBookTickerMapper()
+  delta: () => new DeltaBookTickerMapper(),
+  bybit: () => new BybitV5BookTickerMapper('bybit')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

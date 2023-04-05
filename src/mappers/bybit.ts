@@ -1,6 +1,316 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, Liquidation, Trade } from '../types'
+import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
+
+// v5 https://bybit-exchange.github.io/docs/v5/ws/connect
+
+export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', Trade> {
+  constructor(private readonly _exchange: Exchange) {}
+
+  canHandle(message: BybitV5Trade) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('publicTrade.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'publicTrade',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5Trade, localTimestamp: Date): IterableIterator<Trade> {
+    for (const trade of message.data) {
+      yield {
+        type: 'trade',
+        symbol: trade.s,
+        exchange: this._exchange,
+        id: trade.i,
+        price: Number(trade.p),
+        amount: Number(trade.v),
+        side: trade.S == 'Buy' ? 'buy' : trade.S === 'Sell' ? 'sell' : 'unknown',
+        timestamp: new Date(trade.T),
+        localTimestamp
+      }
+    }
+  }
+}
+
+export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
+  constructor(protected readonly _exchange: Exchange, private readonly _depth: number) {}
+
+  canHandle(message: BybitV5OrderBookMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+    return message.topic.startsWith(`orderbook.${this._depth}.`)
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+    return [
+      {
+        channel: `orderbook.${this._depth}`,
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5OrderBookMessage, localTimestamp: Date) {
+    yield {
+      type: 'book_change',
+      symbol: message.data.s,
+      exchange: this._exchange,
+      isSnapshot: message.type === 'snapshot',
+      bids: message.data.b.map(this._mapBookLevel),
+      asks: message.data.a.map(this._mapBookLevel),
+      timestamp: new Date(message.ts),
+      localTimestamp
+    } as const
+  }
+
+  private _mapBookLevel(level: [string, string]) {
+    return { price: Number(level[0]), amount: Number(level[1]) }
+  }
+}
+
+export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', BookTicker> {
+  private _snapshots: {
+    [key: string]: {
+      askAmount: number | undefined
+      askPrice: number | undefined
+      bidPrice: number | undefined
+      bidAmount: number | undefined
+    }
+  } = {}
+
+  constructor(protected readonly _exchange: Exchange) {}
+
+  canHandle(message: BybitV5OrderBookMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+    return message.topic.startsWith(`orderbook.1.`)
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+    return [
+      {
+        channel: 'orderbook.1',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5OrderBookMessage, localTimestamp: Date) {
+    const bestAsk = message.data.a[0]
+    const bestBid = message.data.b[0]
+
+    if (message.type === 'snapshot') {
+      this._snapshots[message.data.s] = {
+        askAmount: bestAsk !== undefined ? Number(bestAsk[1]) : undefined,
+        askPrice: bestAsk !== undefined ? Number(bestAsk[0]) : undefined,
+        bidPrice: bestBid !== undefined ? Number(bestBid[0]) : undefined,
+        bidAmount: bestBid !== undefined ? Number(bestBid[1]) : undefined
+      }
+    }
+
+    const matchingSnapshot = this._snapshots[message.data.s]
+    if (!matchingSnapshot) {
+      return
+    }
+
+    const bookTicker: BookTicker = {
+      type: 'book_ticker',
+      symbol: message.data.s,
+      exchange: this._exchange,
+      askAmount: bestAsk !== undefined ? Number(bestAsk[1]) : matchingSnapshot.askAmount,
+      askPrice: bestAsk !== undefined ? Number(bestAsk[0]) : matchingSnapshot.askPrice,
+      bidPrice: bestBid !== undefined ? Number(bestBid[0]) : matchingSnapshot.bidPrice,
+      bidAmount: bestBid !== undefined ? Number(bestBid[1]) : matchingSnapshot.bidAmount,
+      timestamp: new Date(message.ts),
+      localTimestamp: localTimestamp
+    }
+
+    yield bookTicker
+  }
+}
+
+export class BybitV5DerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  canHandle(message: BybitV5DerivTickerMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('tickers.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'tickers',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5DerivTickerMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    const instrumentInfo = message.data
+
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(instrumentInfo.symbol, 'bybit')
+
+    if (instrumentInfo.fundingRate !== undefined && instrumentInfo.fundingRate !== '') {
+      pendingTickerInfo.updateFundingRate(Number(instrumentInfo.fundingRate))
+    }
+
+    if (instrumentInfo.nextFundingTime !== undefined && instrumentInfo.nextFundingTime !== '') {
+      pendingTickerInfo.updateFundingTimestamp(new Date(Number(instrumentInfo.nextFundingTime)))
+    }
+
+    if (instrumentInfo.indexPrice !== undefined && instrumentInfo.indexPrice !== '') {
+      pendingTickerInfo.updateIndexPrice(Number(instrumentInfo.indexPrice))
+    }
+
+    if (instrumentInfo.markPrice !== undefined && instrumentInfo.markPrice !== '') {
+      pendingTickerInfo.updateMarkPrice(Number(instrumentInfo.markPrice))
+    }
+
+    if (instrumentInfo.openInterest !== undefined && instrumentInfo.openInterest !== '') {
+      pendingTickerInfo.updateOpenInterest(Number(instrumentInfo.openInterest))
+    }
+
+    if (instrumentInfo.lastPrice !== undefined && instrumentInfo.lastPrice !== '') {
+      pendingTickerInfo.updateLastPrice(Number(instrumentInfo.lastPrice))
+    }
+
+    pendingTickerInfo.updateTimestamp(new Date(message.ts))
+
+    if (pendingTickerInfo.hasChanged()) {
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
+    }
+  }
+}
+
+export class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
+  constructor(private readonly _exchange: Exchange) {}
+  canHandle(message: BybitV5LiquidationMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('liquidation.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'liquidation',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5LiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    // from bybit telegram: When "side":"Buy", a long position was liquidated. Will fix the docs.
+
+    const bybitLiquidation = message.data
+    const liquidation: Liquidation = {
+      type: 'liquidation',
+      symbol: bybitLiquidation.symbol,
+      exchange: this._exchange,
+      id: undefined,
+      price: Number(bybitLiquidation.price),
+      amount: Number(bybitLiquidation.size),
+      side: bybitLiquidation.side == 'Buy' ? 'sell' : 'buy',
+      timestamp: new Date(message.ts),
+      localTimestamp
+    }
+
+    yield liquidation
+  }
+}
+
+export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', OptionSummary> {
+  canHandle(message: BybitV5OptionTickerMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('tickers.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'tickers',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5OptionTickerMessage, localTimestamp: Date) {
+    const symbolParts = message.data.symbol.split('-')
+
+    const isPut = symbolParts[3] === 'P'
+
+    const strikePrice = Number(symbolParts[2])
+
+    const expirationDate = new Date(symbolParts[1] + 'Z')
+    expirationDate.setUTCHours(8)
+
+    const optionSummary: OptionSummary = {
+      type: 'option_summary',
+      symbol: message.data.symbol,
+      exchange: 'bybit-options',
+      optionType: isPut ? 'put' : 'call',
+      strikePrice,
+      expirationDate,
+
+      bestBidPrice: asNumberIfValid(message.data.bidPrice),
+      bestBidAmount: asNumberIfValid(message.data.bidSize),
+      bestBidIV: asNumberIfValid(message.data.bidIv),
+
+      bestAskPrice: asNumberIfValid(message.data.askPrice),
+      bestAskAmount: asNumberIfValid(message.data.askSize),
+      bestAskIV: asNumberIfValid(message.data.askIv),
+
+      lastPrice: asNumberIfValid(message.data.lastPrice),
+      openInterest: asNumberIfValid(message.data.openInterest),
+
+      markPrice: asNumberIfValid(message.data.markPrice),
+      markIV: asNumberIfValid(message.data.markPriceIv),
+
+      delta: asNumberIfValid(message.data.delta),
+      gamma: asNumberIfValid(message.data.gamma),
+      vega: asNumberIfValid(message.data.vega),
+      theta: asNumberIfValid(message.data.theta),
+      rho: undefined,
+
+      underlyingPrice: asNumberIfValid(message.data.underlyingPrice),
+      underlyingIndex: '',
+      timestamp: new Date(message.ts),
+      localTimestamp: localTimestamp
+    }
+
+    yield optionSummary
+  }
+}
 
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/en/websocket.md
 
@@ -95,9 +405,6 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
           ? message.data.orderBook
           : message.data
         : [...message.data.delete, ...message.data.update, ...message.data.insert]
-
-    // TODO: test instrument info
-    // TODO: test liquidations?
 
     const timestampBybit = message.timestamp_e6 !== undefined ? Number(message.timestamp_e6) : Number(message.timestampE6)
     const timestamp = new Date(timestampBybit / 1000)
@@ -274,6 +581,122 @@ export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
       yield liquidation
     }
   }
+}
+
+type BybitV5Trade =
+  | {
+      topic: 'publicTrade.LTCUSDT'
+      type: 'snapshot'
+      ts: 1680688979985
+      data: [
+        {
+          T: 1680688979983
+          s: 'LTCUSDT'
+          S: 'Buy'
+          v: '0.4'
+          p: '94.53'
+          L: 'ZeroMinusTick'
+          i: '4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f'
+          BT: false
+        }
+      ]
+    }
+  | {
+      topic: 'publicTrade.BTCUSDC'
+      ts: 1680688980000
+      type: 'snapshot'
+      data: [{ i: '2240000000041223438'; T: 1680688979998; p: '28528.98'; v: '0.00433'; S: 'Buy'; s: 'BTCUSDC'; BT: false }]
+    }
+  | {
+      id: 'publicTrade.BTC-3414637898-1680652922102'
+      topic: 'publicTrade.BTC'
+      ts: 1680652922102
+      data: [
+        { p: '985'; v: '0.01'; i: '0404c393-8419-5bac-95c3-5fea28404754'; T: 1680652922081; BT: false; s: 'BTC-28APR23-29500-C'; S: 'Sell' }
+      ]
+      type: 'snapshot'
+    }
+
+type BybitV5OrderBookMessage = {
+  topic: 'orderbook.50.LTCUSD'
+  type: 'snapshot' | 'delta'
+  ts: 1680673822478
+  data: {
+    s: string
+    b: [string, string][]
+    a: [string, string][]
+    u: 11802648
+    seq: 941860281
+  }
+}
+
+type BybitV5DerivTickerMessage = {
+  topic: 'tickers.BTCUSD'
+  type: 'snapshot' | 'delta'
+  data: {
+    symbol: string
+    lastPrice?: string
+
+    markPrice?: string
+    indexPrice?: string
+    openInterest?: string
+    openInterestValue?: string
+    nextFundingTime?: string
+    fundingRate?: string
+    bid1Price?: string
+    bid1Size?: string
+    ask1Price?: string
+    ask1Size?: string
+  }
+  cs: 20856433578
+  ts: 1680673822577
+}
+
+type BybitV5LiquidationMessage = {
+  data: {
+    price: '0.03803'
+    side: 'Buy'
+    size: '1637'
+    symbol: 'GALAUSDT'
+    updatedTime: 1673251091822
+  }
+  topic: 'liquidation.GALAUSDT'
+  ts: 1673251091822
+  type: 'snapshot'
+}
+
+type BybitV5OptionTickerMessage = {
+  id: 'tickers.ETH-30JUN23-200-P-3164908233-1680652859919'
+  topic: 'tickers.ETH-30JUN23-200-P'
+  ts: 1680652859919
+  data: {
+    symbol: 'ETH-30JUN23-200-P'
+    bidPrice: '0.1'
+    bidSize: '5'
+    bidIv: '1.4744'
+    askPrice: '0'
+    askSize: '0'
+    askIv: '0'
+    lastPrice: '1'
+    highPrice24h: '0'
+    lowPrice24h: '0'
+    markPrice: '0.2548522'
+    indexPrice: '1871.27'
+    markPriceIv: '1.5991'
+    underlyingPrice: '1886.16'
+    openInterest: '231.5'
+    turnover24h: '0'
+    volume24h: '0'
+    totalVolume: '232'
+    totalTurnover: '362305'
+    delta: '-0.00052953'
+    gamma: '0.00000128'
+    vega: '0.01719155'
+    theta: '-0.0159208'
+    predictedDeliveryPrice: '0'
+    change24h: '0'
+  }
+  type: 'snapshot'
 }
 
 type BybitDataMessage = {

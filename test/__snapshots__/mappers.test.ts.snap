@@ -146,6 +146,157 @@ Array [
 ]
 `;
 
+exports[`map bybit spot messages 6`] = `
+Array [
+  Object {
+    "amount": 0.041732,
+    "exchange": "bybit-spot",
+    "id": "2290000000050703789",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "price": 28165.38,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:47.524Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.008513,
+    "exchange": "bybit-spot",
+    "id": "2290000000050703790",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "price": 28165.38,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:47.524Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.042384,
+    "exchange": "bybit-spot",
+    "id": "2290000000050703791",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "price": 28165.38,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:47.524Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 0.055371,
+    "exchange": "bybit-spot",
+    "id": "2290000000050703792",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "price": 28165.38,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:47.524Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bybit spot messages 7`] = `
+Array [
+  Object {
+    "amount": 0.00433,
+    "exchange": "bybit-spot",
+    "id": "2240000000041223438",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "price": 28528.98,
+    "side": "buy",
+    "symbol": "BTCUSDC",
+    "timestamp": 2023-04-05T10:02:59.998Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bybit spot messages 8`] = `
+Array [
+  Object {
+    "askAmount": 0.996816,
+    "askPrice": 28165.08,
+    "bidAmount": 0.175231,
+    "bidPrice": 28165.07,
+    "exchange": "bybit-spot",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:06.504Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bybit spot messages 9`] = `
+Array [
+  Object {
+    "askAmount": 0.996816,
+    "askPrice": 28165.08,
+    "bidAmount": 0.166754,
+    "bidPrice": 28165.07,
+    "exchange": "bybit-spot",
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:06.615Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bybit spot messages 10`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.506829,
+        "price": 28162.58,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.07562,
+        "price": 28162.57,
+      },
+    ],
+    "exchange": "bybit-spot",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:08.065Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bybit spot messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 28184.33,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.177474,
+        "price": 28161.04,
+      },
+      Object {
+        "amount": 0,
+        "price": 28145.71,
+      },
+    ],
+    "exchange": "bybit-spot",
+    "isSnapshot": false,
+    "localTimestamp": 2023-04-05T00:00:59.464Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T00:00:08.085Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`map crypto-com messages 1`] = `Array []`;
 
 exports[`map crypto-com messages 2`] = `
@@ -3616,6 +3767,396 @@ Array [
     "symbol": "BTCPERP",
     "timestamp": 2022-06-21T09:37:01.013058Z,
     "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 39`] = `
+Array [
+  Object {
+    "amount": 5823,
+    "exchange": "bybit",
+    "id": "0cbf2330-952d-5d03-a462-4bf826c867af",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 28560.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2023-04-05T05:50:23.564Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 3,
+    "exchange": "bybit",
+    "id": "912e56de-9ed6-5f4f-9421-f0ff5a42d84a",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 28560.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2023-04-05T05:50:23.564Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 5593,
+    "exchange": "bybit",
+    "id": "cb558b74-cf72-5157-b53b-93944db336ad",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 28560.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2023-04-05T05:50:23.564Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 40`] = `
+Array [
+  Object {
+    "amount": 0.4,
+    "exchange": "bybit",
+    "id": "4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 94.53,
+    "side": "buy",
+    "symbol": "LTCUSDT",
+    "timestamp": 2023-04-05T10:02:59.983Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 41`] = `
+Array [
+  Object {
+    "askAmount": 25.433,
+    "askPrice": 28552.1,
+    "bidAmount": 0.047,
+    "bidPrice": 28552,
+    "exchange": "bybit",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T05:50:20.717Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 42`] = `
+Array [
+  Object {
+    "askAmount": 25.433,
+    "askPrice": 28552.1,
+    "bidAmount": 0.012,
+    "bidPrice": 28552,
+    "exchange": "bybit",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T05:50:21.137Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 43`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.225,
+        "price": 28555.3,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.597,
+        "price": 28555.2,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTCPERP",
+    "timestamp": 2023-04-05T05:50:21.591Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 44`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.029,
+        "price": 28555.3,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.677,
+        "price": 28555.2,
+      },
+    ],
+    "exchange": "bybit",
+    "isSnapshot": false,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTCPERP",
+    "timestamp": 2023-04-05T05:50:21.651Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 45`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2023-04-05T08:00:00.000Z,
+    "indexPrice": 28566.94,
+    "lastPrice": 28560,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markPrice": 28560,
+    "openInterest": 449736676,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD",
+    "timestamp": 2023-04-05T05:50:22.577Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 46`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2023-04-05T08:00:00.000Z,
+    "indexPrice": 28566.94,
+    "lastPrice": 28560,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markPrice": 28560,
+    "openInterest": 449736674,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSD",
+    "timestamp": 2023-04-05T05:50:22.776Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 47`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 28566.94,
+    "lastPrice": 29026,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markPrice": 29023.6,
+    "openInterest": 4547176,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDU23",
+    "timestamp": 2023-04-05T05:50:22.099Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 48`] = `Array []`;
+
+exports[`mappers map bybit messages 49`] = `
+Array [
+  Object {
+    "exchange": "bybit",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2023-04-05T08:00:00.000Z,
+    "indexPrice": 28562.25,
+    "lastPrice": 28550.7,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markPrice": 28552.81,
+    "openInterest": 52774.528,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-05T05:50:21.770Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 50`] = `
+Array [
+  Object {
+    "amount": 1637,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 0.03803,
+    "side": "sell",
+    "symbol": "GALAUSDT",
+    "timestamp": 2023-01-09T07:58:11.822Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bybit messages 51`] = `
+Array [
+  Object {
+    "amount": 6949,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 0.5149,
+    "side": "buy",
+    "symbol": "XRPUSD",
+    "timestamp": 2023-04-05T05:52:24.093Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 1`] = `
+Array [
+  Object {
+    "amount": 0.01,
+    "exchange": "bybit-options",
+    "id": "0404c393-8419-5bac-95c3-5fea28404754",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "price": 985,
+    "side": "sell",
+    "symbol": "BTC-28APR23-29500-C",
+    "timestamp": 2023-04-05T00:02:02.081Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 2`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [],
+    "exchange": "bybit-options",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTC-30JUN23-45000-P",
+    "timestamp": 2023-04-04T23:59:50.918Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 46,
+        "price": 1.74,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 50,
+        "price": 0.01,
+      },
+    ],
+    "exchange": "bybit-options",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "SOL-28APR23-30-C",
+    "timestamp": 2023-04-04T23:59:46.355Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 1.74,
+      },
+      Object {
+        "amount": 46,
+        "price": 1.75,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "bybit-options",
+    "isSnapshot": false,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "SOL-28APR23-30-C",
+    "timestamp": 2023-04-04T23:59:59.661Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 5`] = `
+Array [
+  Object {
+    "bestAskAmount": 51,
+    "bestAskIV": 2.0007,
+    "bestAskPrice": 3.11,
+    "bestBidAmount": 10,
+    "bestBidIV": 0.6004,
+    "bestBidPrice": 0.34,
+    "delta": 0.42723543,
+    "exchange": "bybit-options",
+    "expirationDate": 2023-04-28T08:00:00.000Z,
+    "gamma": 0.0505193,
+    "lastPrice": 1.6,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markIV": 1.4674,
+    "markPrice": 1.99054639,
+    "openInterest": 20,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 24,
+    "symbol": "SOL-28APR23-24-C",
+    "theta": -0.06527514,
+    "timestamp": 2023-04-05T00:00:10.254Z,
+    "type": "option_summary",
+    "underlyingIndex": "",
+    "underlyingPrice": 20.93,
+    "vega": 0.02075941,
+  },
+]
+`;
+
+exports[`mappers map bybit-options messages 6`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": 5,
+    "bestBidIV": 1.4744,
+    "bestBidPrice": 0.1,
+    "delta": -0.00052953,
+    "exchange": "bybit-options",
+    "expirationDate": 2023-06-30T08:00:00.000Z,
+    "gamma": 0.00000128,
+    "lastPrice": 1,
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "markIV": 1.5991,
+    "markPrice": 0.2548522,
+    "openInterest": 231.5,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 200,
+    "symbol": "ETH-30JUN23-200-P",
+    "theta": -0.0159208,
+    "timestamp": 2023-04-05T00:00:59.919Z,
+    "type": "option_summary",
+    "underlyingIndex": "",
+    "underlyingPrice": 1886.16,
+    "vega": 0.01719155,
   },
 ]
 `;
