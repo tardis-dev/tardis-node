@@ -6051,6 +6051,24 @@ describe('mappers', () => {
         type: 'snapshot',
         ts: 1680673944093,
         data: { updatedTime: 1680673944093, symbol: 'XRPUSD', side: 'Sell', size: '6949', price: '0.5149' }
+      },
+      {
+        topic: 'orderbook.1.BTCUSDT',
+        type: 'delta',
+        ts: 1682092584425,
+        data: {
+          s: 'BTCUSDT',
+          b: [
+            ['27994.60', '0'],
+            ['27991.70', '0.777']
+          ],
+          a: [
+            ['27994.40', '0.058'],
+            ['27994.80', '0']
+          ],
+          u: 1188472,
+          seq: 11155892580
+        }
       }
     ]
 

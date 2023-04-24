@@ -4017,6 +4017,22 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 52`] = `
+Array [
+  Object {
+    "askAmount": 0.058,
+    "askPrice": 27994.4,
+    "bidAmount": 0.777,
+    "bidPrice": 27991.7,
+    "exchange": "bybit",
+    "localTimestamp": 2023-04-05T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2023-04-21T15:56:24.425Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map bybit-options messages 1`] = `
 Array [
   Object {
