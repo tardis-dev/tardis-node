@@ -111,8 +111,8 @@ export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', B
   }
 
   *map(message: BybitV5OrderBookMessage, localTimestamp: Date) {
-    const bestAsk = message.data.a[0]
-    const bestBid = message.data.b[0]
+    const bestAsk = message.data.a.filter((ask) => ask[1] != '0')[0]
+    const bestBid = message.data.b.filter((bid) => bid[1] != '0')[0]
 
     if (message.type === 'snapshot') {
       this._snapshots[message.data.s] = {
@@ -138,6 +138,13 @@ export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', B
       bidAmount: bestBid !== undefined ? Number(bestBid[1]) : matchingSnapshot.bidAmount,
       timestamp: new Date(message.ts),
       localTimestamp: localTimestamp
+    }
+
+    this._snapshots[message.data.s] = {
+      askAmount: bookTicker.askAmount,
+      askPrice: bookTicker.askPrice,
+      bidPrice: bookTicker.bidPrice,
+      bidAmount: bookTicker.bidAmount
     }
 
     yield bookTicker
