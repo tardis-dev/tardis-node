@@ -6761,6 +6761,54 @@ describe('mappers', () => {
         event: 'update',
         error: null,
         result: { t: 0, u: 0, s: 'BSW_USDT', b: '', B: 0, a: '', A: 0 }
+      },
+      {
+        time: 1614556850,
+        channel: 'futures.trades',
+        event: 'update',
+        error: null,
+        result: [
+          { size: 1, id: 13654526, create_time: 1614556850, create_time_ms: 1614556850860, price: '45300', contract: 'BTC_USDT' },
+          { size: 2000, id: 13654527, create_time: 1614556850, create_time_ms: 1614556850860, price: '45300', contract: 'BTC_USDT' },
+          { size: 999, id: 13654528, create_time: 1614556850, create_time_ms: 1614556850860, price: '45300', contract: 'BTC_USDT' }
+        ]
+      },
+      {
+        time: 1680307560,
+        channel: 'futures.order_book',
+        event: 'all',
+        result: {
+          t: 1680307560929,
+          id: 35064314497,
+          contract: 'BTC_USDT',
+          asks: [{ p: '28455.9', s: 19415 }],
+          bids: [{ p: '28455.8', s: 29510 }]
+        }
+      },
+      {
+        time: 1677629168,
+        time_ms: 1677629168840,
+        channel: 'futures.tickers',
+        event: 'update',
+        result: [
+          {
+            contract: 'BTC_USDT',
+            last: '23160.2',
+            change_percentage: '-1.3224',
+            total_size: '153482780',
+            volume_24h: '155496714',
+            volume_24h_base: '15549',
+            volume_24h_quote: '360157621',
+            volume_24h_settle: '360157621',
+            mark_price: '23175.64',
+            funding_rate: '0.0001',
+            funding_rate_indicative: '0.0001',
+            index_price: '23173.35',
+            quanto_base_rate: '',
+            low_24h: '23018.3',
+            high_24h: '23589.2'
+          }
+        ]
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')
