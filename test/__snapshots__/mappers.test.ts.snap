@@ -6732,6 +6732,88 @@ Array [
 
 exports[`mappers map gate-io-futures messages 18`] = `Array []`;
 
+exports[`mappers map gate-io-futures messages 19`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "gate-io-futures",
+    "id": "13654526",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 45300,
+    "side": "buy",
+    "symbol": "BTC_USDT",
+    "timestamp": 2021-03-01T00:00:50.860Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 2000,
+    "exchange": "gate-io-futures",
+    "id": "13654527",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 45300,
+    "side": "buy",
+    "symbol": "BTC_USDT",
+    "timestamp": 2021-03-01T00:00:50.860Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 999,
+    "exchange": "gate-io-futures",
+    "id": "13654528",
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "price": 45300,
+    "side": "buy",
+    "symbol": "BTC_USDT",
+    "timestamp": 2021-03-01T00:00:50.860Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 20`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 19415,
+        "price": 28455.9,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 29510,
+        "price": 28455.8,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2023-04-01T00:06:00.929Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures messages 21`] = `
+Array [
+  Object {
+    "exchange": "gate-io-futures",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": undefined,
+    "indexPrice": 23173.35,
+    "lastPrice": 23160.2,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "markPrice": 23175.64,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.0001,
+    "symbol": "BTC_USDT",
+    "timestamp": 2023-03-01T00:06:08.840Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {

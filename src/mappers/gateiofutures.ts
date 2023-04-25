@@ -24,7 +24,7 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
 
   *map(tradesMessage: GateIOFuturesTrades, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of tradesMessage.result) {
-      const timestamp = new Date(trade.create_time * 1000)
+      const timestamp = trade.create_time_ms !== undefined ? new Date(trade.create_time_ms) : new Date(trade.create_time * 1000)
 
       yield {
         type: 'trade',
@@ -67,6 +67,8 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
 
   *map(depthMessage: GateIOFuturesOrderBookSnapshot | GateIOFuturesOrderBookUpdate, localTimestamp: Date): IterableIterator<BookChange> {
     if (depthMessage.event === 'all') {
+      const timestamp = depthMessage.result.t !== undefined ? new Date(depthMessage.result.t) : new Date(depthMessage.time * 1000)
+
       // snapshot
       yield {
         type: 'book_change',
@@ -75,11 +77,13 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
         isSnapshot: true,
         bids: depthMessage.result.bids.map(mapBookLevel),
         asks: depthMessage.result.asks.map(mapBookLevel),
-        timestamp: new Date(depthMessage.time * 1000),
+        timestamp,
         localTimestamp: localTimestamp
       }
     } else if (depthMessage.result.length > 0) {
       // update
+      const timestamp = depthMessage.result[0].t !== undefined ? new Date(depthMessage.result[0].t) : new Date(depthMessage.time * 1000)
+
       yield {
         type: 'book_change',
         symbol: depthMessage.result[0].c,
@@ -87,7 +91,7 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
         isSnapshot: false,
         bids: depthMessage.result.filter((l) => l.s >= 0).map(mapBookLevel),
         asks: depthMessage.result.filter((l) => l.s <= 0).map(mapBookLevel),
-        timestamp: new Date(depthMessage.time * 1000),
+        timestamp,
         localTimestamp: localTimestamp
       }
     }
@@ -119,6 +123,8 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
       if (futuresTicker.contract === undefined) {
         return
       }
+      const timestamp = message.time_ms !== undefined ? new Date(message.time_ms) : new Date(message.time * 1000)
+
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(futuresTicker.contract, 'gate-io-futures')
 
       pendingTickerInfo.updateFundingRate(Number(futuresTicker.funding_rate))
@@ -126,7 +132,7 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
       pendingTickerInfo.updateIndexPrice(Number(futuresTicker.index_price))
       pendingTickerInfo.updateMarkPrice(Number(futuresTicker.mark_price))
       pendingTickerInfo.updateLastPrice(Number(futuresTicker.last))
-      pendingTickerInfo.updateTimestamp(new Date(message.time * 1000))
+      pendingTickerInfo.updateTimestamp(timestamp)
 
       if (pendingTickerInfo.hasChanged()) {
         yield pendingTickerInfo.getSnapshot(localTimestamp)
@@ -179,6 +185,7 @@ type GateIOFuturesTrade = {
   size: number
   id: number
   create_time: number
+  create_time_ms?: number
   price: string
   contract: string
 }
@@ -199,6 +206,7 @@ type GateIOFuturesOrderBookSnapshot = {
   event: 'all'
 
   result: {
+    t?: number
     contract: string
     asks: GateIOFuturesSnapshotLevel[]
     bids: GateIOFuturesSnapshotLevel[]
@@ -210,6 +218,7 @@ type GateIOFuturesOrderBookUpdate = {
   channel: 'futures.order_book'
   event: 'update'
   result: {
+    t?: number
     p: string
     s: number
     c: string
@@ -218,6 +227,7 @@ type GateIOFuturesOrderBookUpdate = {
 
 type GateIOFuturesTicker = {
   time: number
+  time_ms?: number
   channel: 'futures.tickers'
   event: 'update'
 
