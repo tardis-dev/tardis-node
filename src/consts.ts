@@ -135,7 +135,17 @@ const OKEX_CHANNELS = [
   'public-struc-block-trades'
 ] as const
 
-const OKCOIN_CHANNELS = ['spot/trade', 'spot/depth', 'spot/depth_l2_tbt', 'spot/ticker', 'system/status'] as const
+const OKCOIN_CHANNELS = [
+  'spot/trade',
+  'spot/depth',
+  'spot/depth_l2_tbt',
+  'spot/ticker',
+  'system/status',
+  'trades',
+  'books',
+  'bbo-tbt',
+  'tickers'
+] as const
 
 const OKEX_FUTURES_CHANNELS = [
   'futures/trade',
