@@ -78,39 +78,8 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
-export class OKCoinRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://real.okcoin.com:8443/ws/v3'
-
-  protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    const args = filters
-      .map((filter) => {
-        if (!filter.symbols || filter.symbols.length === 0) {
-          throw new Error(`${this._exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
-        }
-
-        return filter.symbols.map((symbol) => {
-          return `${filter.channel}:${symbol}`
-        })
-      })
-      .flatMap((s) => s)
-
-    return [
-      {
-        op: 'subscribe',
-        args: [...new Set(args)]
-      }
-    ]
-  }
-
-  protected messageIsError(message: any): boolean {
-    return message.event === 'error'
-  }
-
-  protected decompress = (message: any) => {
-    message = inflateRawSync(message) as Buffer
-
-    return message
-  }
+export class OKCoinRealTimeFeed extends OkexRealTimeFeed {
+  protected wssURL = 'wss://real.okcoin.com:8443/ws/v5/public'
 }
 
 export class OkexOptionsRealTimeFeed extends OkexRealTimeFeed {

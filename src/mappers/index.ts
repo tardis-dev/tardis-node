@@ -153,6 +153,11 @@ const shouldUseBybitV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_SWITCH_DATE.valueOf()
 }
 
+const OKCOIN_V5_API_SWITCH_DATE = new Date('2023-04-27T00:00:00.000Z')
+const shouldUseOkcoinV5Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKCOIN_V5_API_SWITCH_DATE.valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -191,7 +196,8 @@ const tradesMappers = {
   'huobi-dm-options': () => new HuobiTradesMapper('huobi-dm-options'),
   bybit: (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit') : new BybitTradesMapper('bybit'),
-  okcoin: () => new OkexTradesMapper('okcoin', 'spot'),
+  okcoin: (localTimestamp: Date) =>
+    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okcoin') : new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
   delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
@@ -272,7 +278,9 @@ const bookChangeMappers = {
   bybit: (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookChangeMapper('bybit', 50) : new BybitBookChangeMapper('bybit', false),
   okcoin: (localTimestamp: Date) =>
-    new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
+    shouldUseOkcoinV5Mappers(localTimestamp)
+      ? new OkexV5BookChangeMapper('okcoin', true)
+      : new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
   hitbtc: () => hitBtcBookChangeMapper,
   phemex: () => phemexBookChangeMapper,
   delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
@@ -400,7 +408,8 @@ const bookTickersMappers = {
       ? new OkexV5BookTickerMapper('okex-options', canUseOkexTbtBookTicker(localTimestamp))
       : new OkexBookTickerMapper('okex-options', 'option'),
 
-  okcoin: () => new OkexBookTickerMapper('okcoin', 'spot'),
+  okcoin: (localTimestamp: Date) =>
+    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okcoin', true) : new OkexBookTickerMapper('okcoin', 'spot'),
   serum: () => new SerumBookTickerMapper('serum'),
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
   mango: () => new SerumBookTickerMapper('mango'),
