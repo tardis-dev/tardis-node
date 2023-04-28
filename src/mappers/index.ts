@@ -63,7 +63,13 @@ import {
 } from './deribit'
 import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
-import { GateIOBookChangeMapper, GateIOTradesMapper } from './gateio'
+import {
+  GateIOBookChangeMapper,
+  GateIOTradesMapper,
+  GateIOV4BookChangeMapper,
+  GateIOV4BookTickerMapper,
+  GateIOV4TradesMapper
+} from './gateio'
 import {
   GateIOFuturesBookChangeMapper,
   GateIOFuturesBookTickerMapper,
@@ -158,6 +164,12 @@ const shouldUseOkcoinV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKCOIN_V5_API_SWITCH_DATE.valueOf()
 }
 
+const GATE_IO_V4_API_SWITCH_DATE = new Date('2023-04-29T00:00:00.000Z')
+
+const shouldUseGateIOV4Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_API_SWITCH_DATE.valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -201,7 +213,8 @@ const tradesMappers = {
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
   delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
-  'gate-io': () => new GateIOTradesMapper('gate-io'),
+  'gate-io': (localTimestamp: Date) =>
+    shouldUseGateIOV4Mappers(localTimestamp) ? new GateIOV4TradesMapper('gate-io') : new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2TradesMapper() : new PoloniexTradesMapper(),
@@ -284,7 +297,8 @@ const bookChangeMappers = {
   hitbtc: () => hitBtcBookChangeMapper,
   phemex: () => phemexBookChangeMapper,
   delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
-  'gate-io': () => new GateIOBookChangeMapper('gate-io'),
+  'gate-io': (localTimestamp: Date) =>
+    shouldUseGateIOV4Mappers(localTimestamp) ? new GateIOV4BookChangeMapper('gate-io') : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
@@ -421,7 +435,8 @@ const bookTickersMappers = {
   kucoin: () => new KucoinBookTickerMapper('kucoin'),
   'woo-x': () => new WooxBookTickerMapper(),
   delta: () => new DeltaBookTickerMapper(),
-  bybit: () => new BybitV5BookTickerMapper('bybit')
+  bybit: () => new BybitV5BookTickerMapper('bybit'),
+  'gate-io': () => new GateIOV4BookTickerMapper('gate-io')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

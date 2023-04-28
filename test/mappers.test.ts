@@ -67,7 +67,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'kucoin',
   'woo-x',
   'delta',
-  'bybit'
+  'bybit',
+  'gate-io'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options', 'bybit-options']
@@ -6541,10 +6542,73 @@ describe('mappers', () => {
         id: null
       }
     ]
-    const gateIOMapper = createMapper('gate-io')
+
+    let gateIOMapper = createMapper('gate-io', new Date('2023-04-20T00:00:00.2750543Z'))
 
     for (const message of messages) {
       const mappedMessages = gateIOMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const v4Messages = [
+      {
+        time: 1682689046,
+        time_ms: 1682689046133,
+        channel: 'spot.trades',
+        event: 'update',
+        result: {
+          id: 5541729598,
+          create_time: 1682689046,
+          create_time_ms: '1682689046123.0',
+          side: 'buy',
+          currency_pair: 'TLOS_BTC',
+          amount: '89.238',
+          price: '0.00000644'
+        }
+      },
+      {
+        time: 1682689046,
+        time_ms: 1682689046142,
+        channel: 'spot.book_ticker',
+        event: 'update',
+        result: { t: 1682689046131, u: 517377894, s: 'ETC_ETH', b: '0.010326', B: '0.001', a: '0.010366', A: '10' }
+      },
+
+      {
+        channel: 'spot.order_book_update',
+        event: 'snapshot',
+        generated: true,
+        symbol: 'BTC_USDT',
+        result: {
+          id: 13934528632,
+          current: 1682689052257,
+          update: 1682689052253,
+          asks: [['29303', '0.0068']],
+          bids: [['29302.9', '0.2483']]
+        }
+      },
+      {
+        time: 1682689045,
+        time_ms: 1682689045562,
+        channel: 'spot.order_book_update',
+        event: 'update',
+        result: {
+          t: 1682689045398,
+          e: 'depthUpdate',
+          E: 1682689045,
+          s: 'BTC_USDT',
+          U: 13934528633,
+          u: 13934528633,
+          b: [['29291.4', '0.5124']],
+          a: []
+        }
+      }
+    ]
+
+    gateIOMapper = createMapper('gate-io', new Date('2023-04-29T00:00:00.2750543Z'))
+
+    for (const message of v4Messages) {
+      const mappedMessages = gateIOMapper.map(message, new Date('2023-04-29T00:00:00.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

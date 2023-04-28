@@ -6380,6 +6380,83 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io messages 6`] = `
+Array [
+  Object {
+    "amount": 89.238,
+    "exchange": "gate-io",
+    "id": "5541729598",
+    "localTimestamp": 2023-04-29T00:00:00.275Z,
+    "price": 0.00000644,
+    "side": "buy",
+    "symbol": "TLOS_BTC",
+    "timestamp": 2023-04-28T13:37:26.123Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 7`] = `
+Array [
+  Object {
+    "askAmount": 10,
+    "askPrice": 0.010366,
+    "bidAmount": 0.001,
+    "bidPrice": 0.010326,
+    "exchange": "gate-io",
+    "localTimestamp": 2023-04-29T00:00:00.275Z,
+    "symbol": "ETC_ETH",
+    "timestamp": 2023-04-28T13:37:26.131Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 8`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0.0068,
+        "price": 29303,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.2483,
+        "price": 29302.9,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": true,
+    "localTimestamp": 2023-04-29T00:00:00.275Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2023-04-28T13:37:32.253Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 9`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0.5124,
+        "price": 29291.4,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": false,
+    "localTimestamp": 2023-04-29T00:00:00.275Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2023-04-28T13:37:25.398Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map gate-io-futures messages 1`] = `
 Array [
   Object {
