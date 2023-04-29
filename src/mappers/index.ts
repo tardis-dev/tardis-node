@@ -298,7 +298,9 @@ const bookChangeMappers = {
   phemex: () => phemexBookChangeMapper,
   delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
   'gate-io': (localTimestamp: Date) =>
-    shouldUseGateIOV4Mappers(localTimestamp) ? new GateIOV4BookChangeMapper('gate-io') : new GateIOBookChangeMapper('gate-io'),
+    shouldUseGateIOV4Mappers(localTimestamp)
+      ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
+      : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),

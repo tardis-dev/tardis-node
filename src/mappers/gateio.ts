@@ -1,3 +1,4 @@
+import { debug } from '../debug'
 import { CircularBuffer, upperCaseSymbols } from '../handy'
 import { BookChange, BookTicker, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
@@ -9,7 +10,7 @@ export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly exchange: Exchange) {}
+  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
 
   canHandle(message: GateV4OrderBookUpdate | Gatev4OrderBookSnapshot) {
     if (message.channel === undefined) {
@@ -133,7 +134,12 @@ export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
           depthUpdateData
         )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
 
-        throw new Error(message)
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthContext.validatedFirstUpdate = true
+          debug(message)
+        } else {
+          throw new Error(message)
+        }
       }
     }
 
