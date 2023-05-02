@@ -36,7 +36,8 @@ export class DydxTradesMapper implements Mapper<'dydx', Trade> {
 }
 
 export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
-  private _offsets: { [key: string]: { [key: string]: number | undefined } } = {}
+  private _bidsOffsets: { [key: string]: { [key: string]: number | undefined } } = {}
+  private _asksOffsets: { [key: string]: { [key: string]: number | undefined } } = {}
 
   canHandle(message: DyDxOrderbookSnapshot | DyDxOrderBookUpdate) {
     return message.channel === 'v3_orderbook'
@@ -55,7 +56,8 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
   *map(message: DyDxOrderbookSnapshot | DyDxOrderBookUpdate, localTimestamp: Date): IterableIterator<BookChange> {
     if (message.type === 'subscribed') {
-      this._offsets[message.id] = {}
+      this._bidsOffsets[message.id] = {}
+      this._asksOffsets[message.id] = {}
 
       yield {
         type: 'book_change',
@@ -63,7 +65,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
         exchange: 'dydx',
         isSnapshot: true,
         bids: message.contents.bids.map((bid) => {
-          this._offsets[message.id][bid.price] = Number(bid.offset)
+          this._bidsOffsets[message.id][bid.price] = Number(bid.offset)
           return {
             price: Number(bid.price),
             amount: Number(bid.size)
@@ -71,7 +73,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
         }),
 
         asks: message.contents.asks.map((ask) => {
-          this._offsets[message.id][ask.price] = Number(ask.offset)
+          this._asksOffsets[message.id][ask.price] = Number(ask.offset)
           return {
             price: Number(ask.price),
             amount: Number(ask.size)
@@ -92,7 +94,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
         bids: message.contents.bids
           .map((bid) => {
-            const lastPriceLevelOffset = this._offsets[message.id][bid[0]]
+            const lastPriceLevelOffset = this._bidsOffsets[message.id][bid[0]]
             if (lastPriceLevelOffset !== undefined && lastPriceLevelOffset >= updateOffset) {
               return
             }
@@ -106,7 +108,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
         asks: message.contents.asks
           .map((ask) => {
-            const lastPriceLevelOffset = this._offsets[message.id][ask[0]]
+            const lastPriceLevelOffset = this._asksOffsets[message.id][ask[0]]
             if (lastPriceLevelOffset !== undefined && lastPriceLevelOffset >= updateOffset) {
               return
             }
@@ -123,11 +125,11 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
       }
 
       for (const bid of message.contents.bids) {
-        this._offsets[message.id][bid[0]] = updateOffset
+        this._bidsOffsets[message.id][bid[0]] = updateOffset
       }
 
       for (const ask of message.contents.asks) {
-        this._offsets[message.id][ask[0]] = updateOffset
+        this._asksOffsets[message.id][ask[0]] = updateOffset
       }
 
       if (bookChange.bids.length > 0 || bookChange.asks.length > 0) {
