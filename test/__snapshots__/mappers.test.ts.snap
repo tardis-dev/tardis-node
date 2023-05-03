@@ -4812,6 +4812,22 @@ Array [
 ]
 `;
 
+exports[`mappers map cryptofacilities messages 14`] = `
+Array [
+  Object {
+    "askAmount": 0,
+    "askPrice": 0,
+    "bidAmount": 0,
+    "bidPrice": 0,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2019-09-01T00:00:01.275Z,
+    "symbol": "PF_SUIUSD",
+    "timestamp": 2023-05-03T12:20:02.169Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map delta messages 1`] = `Array []`;
 
 exports[`mappers map delta messages 2`] = `Array []`;

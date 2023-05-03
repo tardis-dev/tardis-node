@@ -3627,6 +3627,35 @@ describe('mappers', () => {
         relative_funding_rate: 0.000156359265625,
         relative_funding_rate_prediction: 0.000156359265625,
         next_funding_rate_time: 1617249600000
+      },
+      {
+        time: 1683116402169,
+        product_id: 'PF_SUIUSD',
+        funding_rate: 0.0,
+        funding_rate_prediction: 0.0,
+        relative_funding_rate: 0.0,
+        relative_funding_rate_prediction: 0.0,
+        next_funding_rate_time: 0,
+        feed: 'ticker',
+        bid: 0.0,
+        ask: 0.0,
+        bid_size: 0.0,
+        ask_size: 0.0,
+        volume: 0.0,
+        dtm: 0,
+        leverage: '10x',
+        index: 1.3336,
+        premium: 0.0,
+        last: 0.0,
+        change: 0.0,
+        suspended: false,
+        tag: 'perpetual',
+        pair: 'SUI:USD',
+        openInterest: 0.0,
+        markPrice: 1.3336,
+        maturityTime: 0,
+        post_only: true,
+        volumeQuote: 0.0
       }
     ]
 

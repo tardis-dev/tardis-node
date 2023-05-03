@@ -114,6 +114,10 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
   *map(ticker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(ticker.product_id, 'cryptofacilities')
 
+    if (ticker.next_funding_rate_time === 0) {
+      return
+    }
+
     pendingTickerInfo.updateFundingRate(ticker.funding_rate)
     pendingTickerInfo.updatePredictedFundingRate(ticker.funding_rate_prediction)
     pendingTickerInfo.updateFundingTimestamp(
