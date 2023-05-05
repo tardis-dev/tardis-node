@@ -67,6 +67,9 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
 
   *map(depthMessage: GateIOFuturesOrderBookSnapshot | GateIOFuturesOrderBookUpdate, localTimestamp: Date): IterableIterator<BookChange> {
     if (depthMessage.event === 'all') {
+      if (depthMessage.result.t === 0) {
+        return
+      }
       const timestamp = depthMessage.result.t !== undefined ? new Date(depthMessage.result.t) : new Date(depthMessage.time * 1000)
 
       // snapshot

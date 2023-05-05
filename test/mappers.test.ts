@@ -6902,6 +6902,13 @@ describe('mappers', () => {
             high_24h: '23589.2'
           }
         ]
+      },
+      {
+        time: 1683303594,
+        time_ms: 1683303594244,
+        channel: 'futures.order_book',
+        event: 'all',
+        result: { asks: [], bids: [], contract: 'ALICE_USDT', id: 0, t: 0 }
       }
     ]
     const gateIOFuturesMapper = createMapper('gate-io-futures')

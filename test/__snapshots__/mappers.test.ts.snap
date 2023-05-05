@@ -6907,6 +6907,8 @@ Array [
 ]
 `;
 
+exports[`mappers map gate-io-futures messages 22`] = `Array []`;
+
 exports[`mappers map gemini messages 1`] = `
 Array [
   Object {
