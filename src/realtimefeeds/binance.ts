@@ -141,6 +141,8 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
     const REQUEST_WEIGHT_LIMIT_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_REQUEST_WEIGHT_LIMIT`
 
+    const DELAY_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_SNAPSHOTS_DELAY_MS`
+
     if (process.env[REQUEST_WEIGHT_LIMIT_ENV] !== undefined) {
       currentWeightLimit = Number.parseInt(process.env[REQUEST_WEIGHT_LIMIT_ENV] as string)
     }
@@ -211,6 +213,12 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
           }
 
           this.manualSnapshotsBuffer.push(snapshot)
+
+          if (process.env[DELAY_ENV] !== undefined) {
+            const msToWait = Number.parseInt(process.env[DELAY_ENV] as string)
+
+            await wait(msToWait)
+          }
 
           return Number.parseInt(depthSnapshotResponse.headers['x-mbx-used-weight-1m'] as string)
         })
