@@ -87,6 +87,18 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
 
   *map(message: CoinbaseLevel2Update | CoinbaseLevel2Snapshot, localTimestamp: Date): IterableIterator<BookChange> {
     if (message.type === 'snapshot') {
+      let timestamp
+      if (message.time !== undefined) {
+        timestamp = new Date(message.time)
+        if (timestamp.valueOf() < 0) {
+          timestamp = localTimestamp
+        } else {
+          timestamp.μs = parseμs(message.time)
+        }
+      } else {
+        timestamp = localTimestamp
+      }
+
       yield {
         type: 'book_change',
         symbol: message.product_id,
@@ -94,7 +106,7 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
         isSnapshot: true,
         bids: message.bids.map(mapSnapshotBookLevel).filter(validAmountsOnly),
         asks: message.asks.map(mapSnapshotBookLevel).filter(validAmountsOnly),
-        timestamp: localTimestamp,
+        timestamp,
         localTimestamp
       }
     } else {
@@ -182,6 +194,7 @@ type CoinbaseLevel2Snapshot = {
   product_id: string
   bids: CoinbaseSnapshotBookLevel[]
   asks: CoinbaseSnapshotBookLevel[]
+  time?: string
 }
 
 type CoinbaseUpdateBookLevel = ['buy' | 'sell', string, string]
