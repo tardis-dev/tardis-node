@@ -79,7 +79,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         this.debug('(connection id: %d) estabilishing connection to %s', this._connectionId, finalWssUrl)
 
         this.debug(
-          '(connection id: %d) provided filters: %o mapped to subscribe messages: %o',
+          '(connection id: %d) provided filters: %o mapped to subscribe messages: %j',
           this._connectionId,
           this._filters,
           subscribeMessages
