@@ -877,6 +877,26 @@ Array [
 
 exports[`map kucoin messages 15`] = `Array []`;
 
+exports[`map kucoin messages 16`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0.35127929,
+        "price": 27309.8,
+      },
+    ],
+    "exchange": "kucoin",
+    "isSnapshot": false,
+    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "symbol": "BTC-USDT",
+    "timestamp": 2023-06-01T00:23:00.002Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`map woo-x messages 1`] = `
 Array [
   Object {

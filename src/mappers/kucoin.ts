@@ -194,6 +194,7 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
       return
     }
 
+    const timestamp = l2UpdateMessage.data.time !== undefined ? new Date(l2UpdateMessage.data.time) : localTimestamp
     return {
       type: 'book_change',
       symbol: l2UpdateMessage.data.symbol,
@@ -201,7 +202,7 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
       isSnapshot: false,
       bids,
       asks,
-      timestamp: localTimestamp,
+      timestamp: timestamp,
       localTimestamp: localTimestamp
     }
   }
@@ -308,14 +309,28 @@ type KucoinLevel2SnapshotMessage = {
   }
 }
 
-type KucoinLevel2UpdateMessage = {
-  type: 'message'
-  topic: '/market/level2:BTC-USDT'
-  subject: 'trade.l2update'
-  data: {
-    sequenceStart: 1636276324710
-    symbol: 'BTC-USDT'
-    changes: { asks: [string, string, string][]; bids: [string, string, string][] }
-    sequenceEnd: 1636276324710
-  }
-}
+type KucoinLevel2UpdateMessage =
+  | {
+      type: 'message'
+      topic: '/market/level2:BTC-USDT'
+      subject: 'trade.l2update'
+      data: {
+        sequenceStart: 1636276324710
+        symbol: 'BTC-USDT'
+        changes: { asks: [string, string, string][]; bids: [string, string, string][] }
+        sequenceEnd: 1636276324710
+        time: undefined
+      }
+    }
+  | {
+      type: 'message'
+      topic: '/market/level2:BTC-USDT'
+      subject: 'trade.l2update'
+      data: {
+        changes: { asks: []; bids: [['27309.8', '0.35127929', '8005280396']] }
+        sequenceEnd: 8005280396
+        sequenceStart: 8005280396
+        symbol: 'BTC-USDT'
+        time: 1685578980002
+      }
+    }
