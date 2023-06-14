@@ -331,6 +331,9 @@ export class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
     const isSnapshot = depthMessage.params[0]
     const bids = Array.isArray(depthMessage.params[1].bids) ? depthMessage.params[1].bids : []
     const asks = Array.isArray(depthMessage.params[1].asks) ? depthMessage.params[1].asks : []
+
+    const timestamp = depthMessage.params[1].current !== undefined ? new Date(depthMessage.params[1].current * 1000) : localTimestamp
+
     yield {
       type: 'book_change',
       symbol,
@@ -338,7 +341,7 @@ export class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
       isSnapshot,
       bids: bids.map(mapBookLevel),
       asks: asks.map(mapBookLevel),
-      timestamp: localTimestamp,
+      timestamp: timestamp,
       localTimestamp: localTimestamp
     }
   }
@@ -365,6 +368,8 @@ type GateIODepth = {
     {
       bids?: GateIODepthLevel[]
       asks?: GateIODepthLevel[]
+      current: 1669860180.632
+      update: 1669860180.632
     },
     string
   ]

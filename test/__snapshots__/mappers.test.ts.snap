@@ -6419,6 +6419,31 @@ Array [
 exports[`mappers map gate-io messages 6`] = `
 Array [
   Object {
+    "asks": Array [
+      Object {
+        "amount": 0.002,
+        "price": 17132.2,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 0.0057,
+        "price": 17131,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": true,
+    "localTimestamp": 2020-07-01T00:00:01.275Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2022-12-01T02:03:02.101Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 7`] = `
+Array [
+  Object {
     "amount": 89.238,
     "exchange": "gate-io",
     "id": "5541729598",
@@ -6432,7 +6457,7 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io messages 7`] = `
+exports[`mappers map gate-io messages 8`] = `
 Array [
   Object {
     "askAmount": 10,
@@ -6448,7 +6473,7 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io messages 8`] = `
+exports[`mappers map gate-io messages 9`] = `
 Array [
   Object {
     "asks": Array [
@@ -6473,7 +6498,7 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io messages 9`] = `
+exports[`mappers map gate-io messages 10`] = `
 Array [
   Object {
     "asks": Array [],

@@ -6569,6 +6569,22 @@ describe('mappers', () => {
           'TRX_USDT'
         ],
         id: null
+      },
+      {
+        method: 'depth.update',
+        params: [
+          true,
+          {
+            id: 9295517054,
+            bids: [['17131', '0.0057']],
+            asks: [['17132.2', '0.002']],
+            current: 1669860182.101,
+            update: 1669860182.101
+          },
+          'BTC_USDT'
+        ],
+        id: null,
+        v: 3
       }
     ]
 
@@ -8269,6 +8285,18 @@ test('map kucoin messages', () => {
         symbol: 'BTC-USDT',
         changes: { asks: [['0', '0', '1636276324361']], bids: [] },
         sequenceEnd: 1636276324365
+      }
+    },
+    {
+      type: 'message',
+      topic: '/market/level2:BTC-USDT',
+      subject: 'trade.l2update',
+      data: {
+        changes: { asks: [], bids: [['27309.8', '0.35127929', '8005280396']] },
+        sequenceEnd: 1636276324363,
+        sequenceStart: 1636276324364,
+        symbol: 'BTC-USDT',
+        time: 1685578980002
       }
     }
   ]
