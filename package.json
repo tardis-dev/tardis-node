@@ -1,6 +1,6 @@
 {
   "name": "tardis-dev",
-  "version": "13.22.1",
+  "version": "13.22.2",
   "engines": {
     "node": ">=12"
   },
