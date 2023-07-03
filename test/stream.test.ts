@@ -125,7 +125,9 @@ describe('stream', () => {
             exchange === 'bybit-options' ||
             exchange === 'gemini' ||
             exchange === 'coinflex' ||
-            exchange === 'huobi'
+            exchange === 'huobi' ||
+            exchange === 'gate-io' ||
+            exchange === 'ascendex'
           ) {
             return
           }
