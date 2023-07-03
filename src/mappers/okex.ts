@@ -67,6 +67,7 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
   private _hasVip5Access = process.env.OKX_API_VIP_5 !== undefined
+  private _hasColoAccess = process.env.OKX_API_COLO !== undefined
 
   private _getBooksChannelName(usePublicBooksChannel: boolean) {
     if (usePublicBooksChannel === false) {
@@ -75,6 +76,10 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
     }
 
     if (this._hasCredentials && this._hasVip5Access) {
+      return 'books-l2-tbt'
+    }
+
+    if (this._hasColoAccess) {
       return 'books-l2-tbt'
     }
 
