@@ -1,5 +1,5 @@
 import { debug } from '../debug'
-import { CircularBuffer, upperCaseSymbols } from '../handy'
+import { CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy'
 import { BookChange, BookTicker, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -151,7 +151,7 @@ export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
 
       bids: depthUpdateData.b.map(this.mapBookLevel),
       asks: depthUpdateData.a.map(this.mapBookLevel),
-      timestamp: new Date(depthUpdateData.t),
+      timestamp: fromMicroSecondsToDate(depthUpdateData.t),
       localTimestamp: localTimestamp
     }
   }

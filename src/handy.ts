@@ -475,3 +475,16 @@ export function lowerCaseSymbols(symbols?: string[]) {
 }
 
 export const httpClient = got.extend(gotDefaultOptions)
+
+export const fromMicroSecondsToDate = (micros: number) => {
+  const isMicroseconds = micros > 1e15 // Check if the number is likely in microseconds
+
+  if (!isMicroseconds) {
+    return new Date(micros)
+  }
+
+  const timestamp = new Date(micros / 1000)
+  timestamp.μs = micros % 1000
+
+  return timestamp
+}
