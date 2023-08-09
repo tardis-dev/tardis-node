@@ -7396,6 +7396,31 @@ describe('mappers', () => {
         change_price: 0.9,
         sequential_id: 1614729599000000,
         stream_type: 'REALTIME'
+      },
+      {
+        type: 'orderbook',
+        code: 'USDT-ETC',
+        timestamp: 1691530805062000,
+        total_ask_size: 426.46961964,
+        total_bid_size: 923.86058218,
+        orderbook_units: [
+          { ask_price: 18.14783928, bid_price: 17.56010719, ask_size: 8.3912024, bid_size: 10.76125737 },
+          { ask_price: 19.06366929, bid_price: 17.56008962, ask_size: 114.26866982, bid_size: 0.60098647 },
+          { ask_price: 19.06385993, bid_price: 17.46376733, ask_size: 68.19185642, bid_size: 40.08298935 },
+          { ask_price: 19.12, bid_price: 17.46376727, ask_size: 0.72930705, bid_size: 85.89212039 },
+          { ask_price: 19.21804586, bid_price: 17.46351855, ask_size: 2.43102349, bid_size: 10.37437886 },
+          { ask_price: 19.38409889, bid_price: 17.46323533, ask_size: 3.99384271, bid_size: 458.10526221 },
+          { ask_price: 19.47096205, bid_price: 17.46323528, ask_size: 7.56318421, bid_size: 258.85092546 },
+          { ask_price: 19.5, bid_price: 17.4250661, ask_size: 10.0, bid_size: 0.22290428 },
+          { ask_price: 20.0, bid_price: 17.4018, ask_size: 10.0, bid_size: 43.70611632 },
+          { ask_price: 20.3795999, bid_price: 17.07913668, ask_size: 24.02061287, bid_size: 10.35403701 },
+          { ask_price: 20.5, bid_price: 15.835, ask_size: 11.0, bid_size: 1.19942792 },
+          { ask_price: 20.86938843, bid_price: 15.33571539, ask_size: 16.54438329, bid_size: 0.52467383 },
+          { ask_price: 20.945925, bid_price: 15.045, ask_size: 0.7249055, bid_size: 1.25611255 },
+          { ask_price: 21.77325748, bid_price: 15.0, ask_size: 104.42260532, bid_size: 1.44779497 },
+          { ask_price: 22.0, bid_price: 14.994004, ask_size: 44.18802656, bid_size: 0.48159519 }
+        ],
+        stream_type: 'REALTIME'
       }
     ]
 

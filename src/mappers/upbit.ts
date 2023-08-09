@@ -1,4 +1,4 @@
-import { upperCaseSymbols } from '../handy'
+import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy'
 import { BookChange, BookPriceLevel, Trade } from '../types'
 import { Mapper } from './mapper'
 
@@ -27,7 +27,7 @@ export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
       price: message.trade_price,
       amount: message.trade_volume,
       side: message.ask_bid === 'ASK' ? 'sell' : 'buy',
-      timestamp: new Date(message.trade_timestamp),
+      timestamp: fromMicroSecondsToDate(message.trade_timestamp),
       localTimestamp: localTimestamp
     }
   }
@@ -75,7 +75,7 @@ export class UpbitBookChangeMapper implements Mapper<'upbit', BookChange> {
       isSnapshot: true,
       bids,
       asks,
-      timestamp: new Date(message.timestamp),
+      timestamp: fromMicroSecondsToDate(message.timestamp),
       localTimestamp
     }
   }

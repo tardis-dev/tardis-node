@@ -10899,3 +10899,140 @@ Array [
   },
 ]
 `;
+
+exports[`mappers map upbit messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 8.3912024,
+        "price": 18.14783928,
+      },
+      Object {
+        "amount": 114.26866982,
+        "price": 19.06366929,
+      },
+      Object {
+        "amount": 68.19185642,
+        "price": 19.06385993,
+      },
+      Object {
+        "amount": 0.72930705,
+        "price": 19.12,
+      },
+      Object {
+        "amount": 2.43102349,
+        "price": 19.21804586,
+      },
+      Object {
+        "amount": 3.99384271,
+        "price": 19.38409889,
+      },
+      Object {
+        "amount": 7.56318421,
+        "price": 19.47096205,
+      },
+      Object {
+        "amount": 10,
+        "price": 19.5,
+      },
+      Object {
+        "amount": 10,
+        "price": 20,
+      },
+      Object {
+        "amount": 24.02061287,
+        "price": 20.3795999,
+      },
+      Object {
+        "amount": 11,
+        "price": 20.5,
+      },
+      Object {
+        "amount": 16.54438329,
+        "price": 20.86938843,
+      },
+      Object {
+        "amount": 0.7249055,
+        "price": 20.945925,
+      },
+      Object {
+        "amount": 104.42260532,
+        "price": 21.77325748,
+      },
+      Object {
+        "amount": 44.18802656,
+        "price": 22,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 10.76125737,
+        "price": 17.56010719,
+      },
+      Object {
+        "amount": 0.60098647,
+        "price": 17.56008962,
+      },
+      Object {
+        "amount": 40.08298935,
+        "price": 17.46376733,
+      },
+      Object {
+        "amount": 85.89212039,
+        "price": 17.46376727,
+      },
+      Object {
+        "amount": 10.37437886,
+        "price": 17.46351855,
+      },
+      Object {
+        "amount": 458.10526221,
+        "price": 17.46323533,
+      },
+      Object {
+        "amount": 258.85092546,
+        "price": 17.46323528,
+      },
+      Object {
+        "amount": 0.22290428,
+        "price": 17.4250661,
+      },
+      Object {
+        "amount": 43.70611632,
+        "price": 17.4018,
+      },
+      Object {
+        "amount": 10.35403701,
+        "price": 17.07913668,
+      },
+      Object {
+        "amount": 1.19942792,
+        "price": 15.835,
+      },
+      Object {
+        "amount": 0.52467383,
+        "price": 15.33571539,
+      },
+      Object {
+        "amount": 1.25611255,
+        "price": 15.045,
+      },
+      Object {
+        "amount": 1.44779497,
+        "price": 15,
+      },
+      Object {
+        "amount": 0.48159519,
+        "price": 14.994004,
+      },
+    ],
+    "exchange": "upbit",
+    "isSnapshot": true,
+    "localTimestamp": 2021-03-02T23:59:59.000Z,
+    "symbol": "USDT-ETC",
+    "timestamp": 2023-08-08T21:40:05.062000Z,
+    "type": "book_change",
+  },
+]
+`;
