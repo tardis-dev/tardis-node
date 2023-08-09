@@ -26,7 +26,9 @@ jobs:
         run: npm install
 
       - name: Configure Git
-        run: git config --global user.name "GitHub Release Bot"
+        run: |
+          git config --global user.name "GitHub Release Bot"
+          git config --global user.email "deploy@tardis.dev"
 
       - name: Update package version
         run: npm version ${{ github.event.release.tag_name }}
