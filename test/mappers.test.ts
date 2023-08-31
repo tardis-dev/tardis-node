@@ -3659,10 +3659,48 @@ describe('mappers', () => {
       }
     ]
 
-    const cryptofacilitiesMapper = createMapper('cryptofacilities')
+    let cryptofacilitiesMapper = createMapper('cryptofacilities', new Date('2019-09-01T00:00:01.2750543Z'))
 
     for (const message of messages) {
       const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const newerMessages = [
+      {
+        time: 1680307198986,
+        product_id: 'PI_BCHUSD',
+        funding_rate: -1.26108093245e-7,
+        funding_rate_prediction: -1.43435165757e-7,
+        relative_funding_rate: -0.000015670191666667,
+        relative_funding_rate_prediction: -0.000017773051388889,
+        next_funding_rate_time: 1680307200000,
+        feed: 'ticker',
+        bid: 123.8,
+        ask: 123.9,
+        bid_size: 30410.0,
+        ask_size: 1000.0,
+        volume: 66303.0,
+        dtm: 0,
+        leverage: '25x',
+        index: 123.91,
+        premium: -0.0,
+        last: 123.8,
+        change: 1.4754098360655776,
+        suspended: false,
+        tag: 'perpetual',
+        pair: 'BCH:USD',
+        openInterest: 488789.0,
+        markPrice: 123.83534812969,
+        maturityTime: 0,
+        post_only: false,
+        volumeQuote: 66303.0
+      }
+    ]
+    cryptofacilitiesMapper = createMapper('cryptofacilities', new Date('2022-09-30T00:00:01.2750543Z'))
+
+    for (const message of newerMessages) {
+      const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2022-09-30T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

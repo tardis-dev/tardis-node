@@ -95,6 +95,7 @@ export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookCh
 }
 
 export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities', DerivativeTicker> {
+  constructor(private readonly _useRelativeFundingRate: boolean) {}
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
     return message.feed === 'ticker' && message.event === undefined
@@ -118,8 +119,13 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
       return
     }
 
-    pendingTickerInfo.updateFundingRate(ticker.funding_rate)
-    pendingTickerInfo.updatePredictedFundingRate(ticker.funding_rate_prediction)
+    if (this._useRelativeFundingRate) {
+      pendingTickerInfo.updateFundingRate(ticker.relative_funding_rate)
+      pendingTickerInfo.updatePredictedFundingRate(ticker.relative_funding_rate_prediction)
+    } else {
+      pendingTickerInfo.updateFundingRate(ticker.funding_rate)
+      pendingTickerInfo.updatePredictedFundingRate(ticker.funding_rate_prediction)
+    }
     pendingTickerInfo.updateFundingTimestamp(
       ticker.next_funding_rate_time !== undefined ? new Date(ticker.next_funding_rate_time) : undefined
     )
@@ -213,23 +219,56 @@ type CryptofacilitiesTrade = {
   price: number
 }
 
-type CryptofacilitiesTicker = {
-  feed: 'ticker'
-  event: undefined
-  product_id: string
-  index: number
-  last: number
-  openInterest: number
-  markPrice: number
-  funding_rate: number | undefined
-  funding_rate_prediction: number | undefined
-  next_funding_rate_time: number | undefined
-  time: number
-  bid: number | undefined
-  ask: number | undefined
-  bid_size: number | undefined
-  ask_size: number | undefined
-}
+type CryptofacilitiesTicker =
+  | {
+      feed: 'ticker'
+      event: undefined
+      product_id: string
+      index: number
+      last: number
+      openInterest: number
+      markPrice: number
+      funding_rate: number | undefined
+      funding_rate_prediction: number | undefined
+      next_funding_rate_time: number | undefined
+      time: number
+      bid: number | undefined
+      ask: number | undefined
+      bid_size: number | undefined
+      ask_size: number | undefined
+      relative_funding_rate: undefined
+      relative_funding_rate_prediction: undefined
+    }
+  | {
+      time: 1680307200005
+      product_id: 'PF_1INCHUSD'
+      event: undefined
+      funding_rate: -1.861241614653e-6
+      funding_rate_prediction: -4.87669653882e-6
+      relative_funding_rate: number | undefined
+      relative_funding_rate_prediction: number | undefined
+      next_funding_rate_time: 1680307200000
+      feed: 'ticker'
+      bid: 0.5609
+      ask: 0.5621
+      bid_size: 1123.0
+      ask_size: 8931.0
+      volume: 10902.0
+      dtm: 0
+      leverage: '10x'
+      index: 0.56158
+      premium: -0.0
+      last: 0.5594
+      change: -1.0086710316758118
+      suspended: false
+      tag: 'perpetual'
+      pair: '1INCH:USD'
+      openInterest: 27481.0
+      markPrice: 0.56147544277
+      maturityTime: 0
+      post_only: false
+      volumeQuote: 6028.1795
+    }
 
 type CryptofacilitiesBookLevel = {
   price: number

@@ -170,6 +170,10 @@ const shouldUseGateIOV4Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_API_SWITCH_DATE.valueOf()
 }
 
+const shouldUseCFRelativeFunding = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2022-09-29T00:00:00.000Z').valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -326,7 +330,7 @@ const derivativeTickersMappers = {
   'binance-futures': () => new BinanceFuturesDerivativeTickerMapper('binance-futures'),
   'binance-delivery': () => new BinanceFuturesDerivativeTickerMapper('binance-delivery'),
   'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
-  cryptofacilities: () => new CryptofacilitiesDerivativeTickerMapper(),
+  cryptofacilities: (localTimestamp: Date) => new CryptofacilitiesDerivativeTickerMapper(shouldUseCFRelativeFunding(localTimestamp)),
   deribit: () => new DeribitDerivativeTickerMapper(),
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)

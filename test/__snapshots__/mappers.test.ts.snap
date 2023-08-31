@@ -4848,6 +4848,36 @@ Array [
 ]
 `;
 
+exports[`mappers map cryptofacilities messages 15`] = `
+Array [
+  Object {
+    "exchange": "cryptofacilities",
+    "fundingRate": -0.000015670191666667,
+    "fundingTimestamp": 2023-04-01T00:00:00.000Z,
+    "indexPrice": 123.91,
+    "lastPrice": 123.8,
+    "localTimestamp": 2022-09-30T00:00:01.275Z,
+    "markPrice": 123.83534812969,
+    "openInterest": 488789,
+    "predictedFundingRate": -0.000017773051388889,
+    "symbol": "PI_BCHUSD",
+    "timestamp": 2023-03-31T23:59:58.986Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "askAmount": 1000,
+    "askPrice": 123.9,
+    "bidAmount": 30410,
+    "bidPrice": 123.8,
+    "exchange": "cryptofacilities",
+    "localTimestamp": 2022-09-30T00:00:01.275Z,
+    "symbol": "PI_BCHUSD",
+    "timestamp": 2023-03-31T23:59:58.986Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map delta messages 1`] = `Array []`;
 
 exports[`mappers map delta messages 2`] = `Array []`;
