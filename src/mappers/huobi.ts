@@ -545,6 +545,9 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
     const symbol = message.ch.split('.')[1].toUpperCase()
 
     if ('quoteTime' in message.tick) {
+      if (message.tick.quoteTime === 0) {
+        return
+      }
       yield {
         type: 'book_ticker',
         symbol,
@@ -767,7 +770,7 @@ type HuobiBBOMessage =
         askSize: 2.323241
         bid: 7541.16
         bidSize: 0.002329
-        quoteTime: 1575158404057
+        quoteTime: number
         symbol: 'btcusdt'
       }
     }
