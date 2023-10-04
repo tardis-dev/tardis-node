@@ -10,6 +10,11 @@ import {
   BinanceTradesMapper
 } from './binance'
 import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex'
+import {
+  BinanceEuropeanOptionsBookChangeMapper,
+  BinanceEuropeanOptionsTradesMapper,
+  BinanceEuropeanOptionSummaryMapper
+} from './binanceeuropeanoptions'
 import { BinanceOptionsBookChangeMapper, BinanceOptionsTradesMapper, BinanceOptionSummaryMapper } from './binanceoptions'
 import {
   BitfinexBookChangeMapper,
@@ -238,7 +243,8 @@ const tradesMappers = {
   bitnomial: () => bitnomialTradesMapper,
   'woo-x': () => wooxTradesMapper,
   'blockchain-com': () => new BlockchainComTradesMapper(),
-  'bybit-options': () => new BybitV5TradesMapper('bybit-options')
+  'bybit-options': () => new BybitV5TradesMapper('bybit-options'),
+  'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -322,7 +328,8 @@ const bookChangeMappers = {
   bitnomial: () => new BitnomialBookChangMapper(),
   'woo-x': () => new WooxBookChangeMapper(),
   'blockchain-com': () => new BlockchainComBookChangeMapper(),
-  'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25)
+  'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25),
+  'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -363,7 +370,8 @@ const optionsSummaryMappers = {
     shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5OptionSummaryMapper() : new OkexOptionSummaryMapper(),
   'binance-options': () => new BinanceOptionSummaryMapper(),
   'huobi-dm-options': () => new HuobiOptionsSummaryMapper(),
-  'bybit-options': () => new BybitV5OptionSummaryMapper()
+  'bybit-options': () => new BybitV5OptionSummaryMapper(),
+  'binance-european-options': () => new BinanceEuropeanOptionSummaryMapper()
 }
 
 const liquidationsMappers = {

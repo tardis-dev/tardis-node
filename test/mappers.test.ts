@@ -71,7 +71,14 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'gate-io'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'binance-options', 'huobi-dm-options', 'bybit-options']
+const exchangesWithOptionsSummary: Exchange[] = [
+  'deribit',
+  'okex-options',
+  'binance-options',
+  'huobi-dm-options',
+  'bybit-options',
+  'binance-european-options'
+]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -8501,6 +8508,152 @@ test('map woo-x messages', () => {
 
   for (const message of messages) {
     const mappedMessages = wooxMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map binance-european-options messages', () => {
+  const messages = [
+    {
+      stream: 'DOGE-231006-0.06-C@trade',
+      data: {
+        e: 'trade',
+        E: 1696118408137,
+        s: 'DOGE-231006-0.06-C',
+        t: '15',
+        p: '2.64',
+        q: '0.01',
+        b: '4647850284614262784',
+        a: '4719907951072796672',
+        T: 1696118408134,
+        S: '-1'
+      }
+    },
+    {
+      stream: 'BTC-231001-27500-C@trade',
+      data: {
+        e: 'trade',
+        E: 1696118425335,
+        s: 'BTC-231001-27500-C',
+        t: '144',
+        p: '5',
+        q: '0.1',
+        b: '4674871954869534720',
+        a: '4665864737475194880',
+        T: 1696118425333,
+        S: '1'
+      }
+    },
+    {
+      stream: 'BTC-231027-34000-C@depth100@100ms',
+      data: {
+        e: 'depth',
+        E: 1696118400038,
+        T: 1696118399082,
+        s: 'BTC-231027-34000-C',
+        u: 1925729,
+        pu: 1925729,
+        b: [['60', '7.31']],
+        a: [
+          ['65', '8.28'],
+          ['70', '38.88']
+        ]
+      }
+    },
+    { stream: 'BTCUSDT@index', data: { e: 'index', E: 1696118400040, s: 'BTCUSDT', p: '26963.13461538' } },
+    {
+      stream: 'XRP@markPrice',
+      data: [{ e: 'markPrice', E: 1696118400043, s: 'XRP-231006-0.44-C', mp: '7.949' }]
+    },
+
+    {
+      stream: 'BTC-240927-25000-P@ticker',
+      data: {
+        e: '24hrTicker',
+        E: 1696118400043,
+        T: 1696118400000,
+        s: 'BTC-240927-25000-P',
+        o: '0',
+        h: '0',
+        l: '0',
+        c: '0',
+        V: '0',
+        A: '0',
+        P: '0',
+        p: '0',
+        Q: '0',
+        F: '0',
+        L: '0',
+        n: 0,
+        bo: '3000',
+        ao: '3950',
+        bq: '2.55',
+        aq: '5.8',
+        b: '0.3804034',
+        a: '0.47609568',
+        d: '-0.34807987',
+        t: '-5.86856986',
+        g: '0.00003213',
+        v: '99.30558193',
+        vo: '0.42824954',
+        mp: '3475',
+        hl: '6990',
+        ll: '5',
+        eep: '0'
+      }
+    },
+    {
+      stream: 'BTC@openInterest@240927',
+      data: [{ e: 'openInterest', E: 1696118400046, s: 'BTC-240927-25000-P', o: '1.0', h: '0.0' }]
+    },
+    { stream: 'BTCUSDT@index', data: { e: 'index', E: 1696118413035, s: 'BTCUSDT', p: '26960.90703297' } },
+
+    {
+      stream: 'BTC@openInterest@240927',
+      data: [{ e: 'openInterest', E: 1696118400046, s: 'BTC-240927-25000-P', o: '7.0', h: '0.0' }]
+    },
+    {
+      stream: 'BTC-240927-25000-P@ticker',
+      data: {
+        e: '24hrTicker',
+        E: 1696118448036,
+        T: 1696118448000,
+        s: 'BTC-240927-25000-P',
+        o: '0',
+        h: '0',
+        l: '0',
+        c: '0',
+        V: '0',
+        A: '0',
+        P: '0',
+        p: '0',
+        Q: '0',
+        F: '0',
+        L: '0',
+        n: 0,
+        bo: '3000',
+        ao: '3950',
+        bq: '2.55',
+        aq: '5.8',
+        b: '0.38032115',
+        a: '0.47601342',
+        d: '-0.3481579',
+        t: '-5.86741979',
+        g: '0.00003214',
+        v: '99.30504228',
+        vo: '0.42816728',
+        mp: '3475',
+        hl: '6989',
+        ll: '5',
+        eep: '0'
+      }
+    }
+  ]
+
+  const mapper = createMapper('binance-european-options', new Date('2023-10-01T00:00:00.0816546Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2023-10-01T00:00:00.0816546Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

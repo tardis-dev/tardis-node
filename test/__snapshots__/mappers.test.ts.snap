@@ -1,5 +1,140 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`map binance-european-options messages 1`] = `
+Array [
+  Object {
+    "amount": 0.01,
+    "exchange": "binance-european-options",
+    "id": "15",
+    "localTimestamp": 2023-10-01T00:00:00.081Z,
+    "price": 2.64,
+    "side": "sell",
+    "symbol": "DOGE-231006-0.06-C",
+    "timestamp": 2023-10-01T00:00:08.134Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map binance-european-options messages 2`] = `
+Array [
+  Object {
+    "amount": 0.1,
+    "exchange": "binance-european-options",
+    "id": "144",
+    "localTimestamp": 2023-10-01T00:00:00.081Z,
+    "price": 5,
+    "side": "buy",
+    "symbol": "BTC-231001-27500-C",
+    "timestamp": 2023-10-01T00:00:25.333Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map binance-european-options messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 8.28,
+        "price": 65,
+      },
+      Object {
+        "amount": 38.88,
+        "price": 70,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 7.31,
+        "price": 60,
+      },
+    ],
+    "exchange": "binance-european-options",
+    "isSnapshot": true,
+    "localTimestamp": 2023-10-01T00:00:00.081Z,
+    "symbol": "BTC-231027-34000-C",
+    "timestamp": 2023-10-01T00:00:00.038Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map binance-european-options messages 4`] = `Array []`;
+
+exports[`map binance-european-options messages 5`] = `Array []`;
+
+exports[`map binance-european-options messages 6`] = `
+Array [
+  Object {
+    "bestAskAmount": 5.8,
+    "bestAskIV": 0.47609568,
+    "bestAskPrice": 3950,
+    "bestBidAmount": 2.55,
+    "bestBidIV": 0.3804034,
+    "bestBidPrice": 3000,
+    "delta": -0.34807987,
+    "exchange": "binance-european-options",
+    "expirationDate": 2024-09-27T08:00:00.000Z,
+    "gamma": 0.00003213,
+    "lastPrice": undefined,
+    "localTimestamp": 2023-10-01T00:00:00.081Z,
+    "markIV": undefined,
+    "markPrice": 3475,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 25000,
+    "symbol": "BTC-240927-25000-P",
+    "theta": -5.86856986,
+    "timestamp": 2023-10-01T00:00:00.043Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTCUSDT",
+    "underlyingPrice": 26963.13461538,
+    "vega": 99.30558193,
+  },
+]
+`;
+
+exports[`map binance-european-options messages 7`] = `Array []`;
+
+exports[`map binance-european-options messages 8`] = `Array []`;
+
+exports[`map binance-european-options messages 9`] = `Array []`;
+
+exports[`map binance-european-options messages 10`] = `
+Array [
+  Object {
+    "bestAskAmount": 5.8,
+    "bestAskIV": 0.47601342,
+    "bestAskPrice": 3950,
+    "bestBidAmount": 2.55,
+    "bestBidIV": 0.38032115,
+    "bestBidPrice": 3000,
+    "delta": -0.3481579,
+    "exchange": "binance-european-options",
+    "expirationDate": 2024-09-27T08:00:00.000Z,
+    "gamma": 0.00003214,
+    "lastPrice": undefined,
+    "localTimestamp": 2023-10-01T00:00:00.081Z,
+    "markIV": undefined,
+    "markPrice": 3475,
+    "openInterest": 7,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 25000,
+    "symbol": "BTC-240927-25000-P",
+    "theta": -5.86741979,
+    "timestamp": 2023-10-01T00:00:48.036Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTCUSDT",
+    "underlyingPrice": 26960.90703297,
+    "vega": 99.30504228,
+  },
+]
+`;
+
 exports[`map bitnomial messages 1`] = `
 Array [
   Object {

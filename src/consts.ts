@@ -4,6 +4,7 @@ export const EXCHANGES = [
   'binance-futures',
   'binance-delivery',
   'binance-options',
+  'binance-european-options',
   'binance',
   'ftx',
   'okex-futures',
@@ -448,6 +449,7 @@ const WOOX_CHANNELS = [
 ]
 
 const BLOCKCHAIN_COM_CHANNELS = ['trades', 'l2', 'l3', 'ticker']
+const BINANCE_EUROPEAN_OPTIONS_CHANNELS = ['trade', 'depth100', 'index', 'markPrice', 'ticker', 'openInterest']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
@@ -500,5 +502,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   kucoin: KUCOIN_CHANNELS,
   bitnomial: BITNOMIAL_CHANNELS,
   'woo-x': WOOX_CHANNELS,
-  'blockchain-com': BLOCKCHAIN_COM_CHANNELS
+  'blockchain-com': BLOCKCHAIN_COM_CHANNELS,
+  'binance-european-options': BINANCE_EUROPEAN_OPTIONS_CHANNELS
 }
