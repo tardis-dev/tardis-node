@@ -69,7 +69,7 @@ export class BinanceEuropeanOptionsBookChangeMapper implements Mapper<'binance-e
       isSnapshot: true,
       bids: message.data.b.map(this.mapBookLevel),
       asks: message.data.a.map(this.mapBookLevel),
-      timestamp: new Date(message.data.E),
+      timestamp: message.data.E !== undefined ? new Date(message.data.E) : new Date(message.data.T),
       localTimestamp
     }
 
