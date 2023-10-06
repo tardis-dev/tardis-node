@@ -137,6 +137,10 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
       pendingTickerInfo.updateLastPrice(Number(futuresTicker.last))
       pendingTickerInfo.updateTimestamp(timestamp)
 
+      if (futuresTicker.total_size !== undefined) {
+        pendingTickerInfo.updateOpenInterest(Number(futuresTicker.total_size))
+      }
+
       if (pendingTickerInfo.hasChanged()) {
         yield pendingTickerInfo.getSnapshot(localTimestamp)
       }
@@ -243,6 +247,7 @@ type GateIOFuturesTicker = {
           mark_price: string
           index_price: string
           funding_rate_indicative: string
+          total_size: string | undefined
         }
       ]
     | {
@@ -252,6 +257,7 @@ type GateIOFuturesTicker = {
         mark_price: string
         index_price: string
         funding_rate_indicative: string
+        total_size: string | undefined
       }
 }
 
