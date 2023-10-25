@@ -1221,17 +1221,6 @@ exports[`map woo-x messages 9`] = `Array []`;
 exports[`map woo-x messages 10`] = `
 Array [
   Object {
-    "amount": 0.09,
-    "exchange": "woo-x",
-    "id": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
-    "price": 22703.97,
-    "side": "sell",
-    "symbol": "PERP_BTC_USDT",
-    "timestamp": 2023-01-23T00:00:59.820Z,
-    "type": "trade",
-  },
-  Object {
     "exchange": "woo-x",
     "fundingRate": 0.00000782,
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,

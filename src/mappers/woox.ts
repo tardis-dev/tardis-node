@@ -20,6 +20,10 @@ export const wooxTradesMapper: Mapper<'woo-x', Trade> = {
 
   *map(message: WooxTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
     const timestamp = new Date(message.ts)
+    // any trade with source = 0 is mainly for informational purposes for our users, not actual trades printed on WOO X
+    if (message.data.source === 0) {
+      return
+    }
 
     yield {
       type: 'trade',

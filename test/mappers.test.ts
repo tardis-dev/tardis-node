@@ -8439,12 +8439,12 @@ test('map woo-x messages', () => {
     {
       topic: 'PERP_GALA_USDT@trade',
       ts: 1674431999995,
-      data: { symbol: 'PERP_GALA_USDT', price: 0.048756, size: 4109, side: 'SELL', source: 0 }
+      data: { symbol: 'PERP_GALA_USDT', price: 0.048756, size: 4109, side: 'SELL', source: 1 }
     },
     {
       topic: 'SPOT_ETH_USDT@trade',
       ts: 1674135417986,
-      data: { symbol: 'SPOT_ETH_USDT', price: 1522.45, size: 0.0516, side: 'SELL', source: 0 }
+      data: { symbol: 'SPOT_ETH_USDT', price: 1522.45, size: 0.0516, side: 'SELL', source: 1 }
     },
 
     {
