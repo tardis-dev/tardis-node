@@ -3,7 +3,14 @@ import { Filter, FilterForExchange } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://www.deribit.com/ws/api/v2'
+  protected get wssURL() {
+    if (this._hasCredentials) {
+      return 'wss://www.deribit.com/ws/api/v2'
+    } else {
+      return 'wss://streams.deribit.com/ws/api/v2'
+    }
+  }
+
   private _hasCredentials = process.env.DERIBIT_API_CLIENT_ID !== undefined && process.env.DERIBIT_API_CLIENT_SECRET !== undefined
 
   protected channelsWithIntervals: FilterForExchange['deribit']['channel'][] = ['book', 'perpetual', 'trades', 'ticker']
