@@ -1,11 +1,34 @@
-import { inflateRawSync } from 'zlib'
 import crypto from 'crypto'
 import { wait } from '../handy'
 import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed'
 
-export class OkexRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ws.okx.com:8443/ws/v5/public'
+export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
+
+    if (nonBusinessFilters.length > 0) {
+      yield new OkexSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/public', exchange, nonBusinessFilters, timeoutIntervalMS, onError)
+    }
+
+    const businessFilters = filters.filter((f) => f.channel === 'trades-all')
+
+    if (businessFilters.length > 0) {
+      yield new OkexSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
+    }
+  }
+}
+
+class OkexSingleRealTimeFeed extends RealTimeFeedBase {
+  constructor(
+    protected wssURL: string,
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void
+  ) {
+    super(exchange, filters, timeoutIntervalMS, onError)
+  }
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
 
@@ -78,11 +101,45 @@ export class OkexRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
-export class OKCoinRealTimeFeed extends OkexRealTimeFeed {
-  protected wssURL = 'wss://real.okcoin.com:8443/ws/v5/public'
+export class OKCoinRealTimeFeed extends OkexSingleRealTimeFeed {
+  constructor(exchange: string, filters: Filter<string>[], timeoutIntervalMS: number | undefined, onError?: (error: Error) => void) {
+    super('wss://real.okcoin.com:8443/ws/v5/public', exchange, filters, timeoutIntervalMS, onError)
+  }
 }
 
-export class OkexOptionsRealTimeFeed extends OkexRealTimeFeed {
+export class OkexOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
+
+    if (nonBusinessFilters.length > 0) {
+      yield new OkexOptionsSingleRealTimeFeed(
+        'wss://ws.okx.com:8443/ws/v5/public',
+        exchange,
+        nonBusinessFilters,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    const businessFilters = filters.filter((f) => f.channel === 'trades-all')
+
+    if (businessFilters.length > 0) {
+      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
+    }
+  }
+}
+
+class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
+  constructor(
+    protected wssURL: string,
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void
+  ) {
+    super(wssURL, exchange, filters, timeoutIntervalMS, onError)
+  }
+
   private _defaultIndexes = ['BTC-USD', 'ETH-USD']
 
   private _channelRequiresIndexNotSymbol(channel: string) {
@@ -114,7 +171,7 @@ export class OkexOptionsRealTimeFeed extends OkexRealTimeFeed {
           return {
             channel: filter.channel,
             instId: filter.channel !== 'opt-summary' ? finalSymbol : undefined,
-            uly: filter.channel === 'opt-summary' ? finalSymbol : undefined
+            instFamily: filter.channel === 'opt-summary' ? finalSymbol : undefined
           }
         })
       })

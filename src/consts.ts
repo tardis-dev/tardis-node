@@ -124,6 +124,7 @@ const OKEX_CHANNELS = [
 
   // v5
   'trades',
+  'trades-all',
   'books-l2-tbt',
   'bbo-tbt',
   'books',
@@ -163,6 +164,7 @@ const OKEX_FUTURES_CHANNELS = [
 
   // v5
   'trades',
+  'trades-all',
   'books-l2-tbt',
   'bbo-tbt',
   'books',
@@ -196,6 +198,7 @@ const OKEX_SWAP_CHANNELS = [
 
   //v5
   'trades',
+  'trades-all',
   'books-l2-tbt',
   'bbo-tbt',
   'books',
@@ -227,6 +230,7 @@ const OKEX_OPTIONS_CHANNELS = [
 
   //v5
   'trades',
+  'trades-all',
   'books-l2-tbt',
   'bbo-tbt',
   'books',

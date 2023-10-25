@@ -1124,6 +1124,10 @@ describe('mappers', () => {
             ts: '1639999318686'
           }
         ]
+      },
+      {
+        arg: { channel: 'trades-all', instId: 'BSV-USDT' },
+        data: [{ instId: 'BSV-USDT', tradeId: '84834539', px: '42.52', sz: '3.75', side: 'buy', ts: '1697760012017' }]
       }
     ]
 

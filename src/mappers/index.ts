@@ -179,6 +179,10 @@ const shouldUseCFRelativeFunding = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2022-09-29T00:00:00.000Z').valueOf()
 }
 
+const shouldUseOKXTradesAllChannel = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2023-10-19T00:00:00.000Z').valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -199,16 +203,24 @@ const tradesMappers = {
   gemini: () => geminiTradesMapper,
   kraken: () => krakenTradesMapper,
   okex: (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex') : new OkexTradesMapper('okex', 'spot'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5TradesMapper('okex', shouldUseOKXTradesAllChannel(localTimestamp))
+      : new OkexTradesMapper('okex', 'spot'),
 
   'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-futures') : new OkexTradesMapper('okex-futures', 'futures'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5TradesMapper('okex-futures', shouldUseOKXTradesAllChannel(localTimestamp))
+      : new OkexTradesMapper('okex-futures', 'futures'),
 
   'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-swap') : new OkexTradesMapper('okex-swap', 'swap'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5TradesMapper('okex-swap', shouldUseOKXTradesAllChannel(localTimestamp))
+      : new OkexTradesMapper('okex-swap', 'swap'),
 
   'okex-options': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okex-options') : new OkexTradesMapper('okex-options', 'option'),
+    shouldUseOkexV5Mappers(localTimestamp)
+      ? new OkexV5TradesMapper('okex-options', shouldUseOKXTradesAllChannel(localTimestamp))
+      : new OkexTradesMapper('okex-options', 'option'),
 
   huobi: () => new HuobiTradesMapper('huobi'),
   'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
@@ -218,7 +230,7 @@ const tradesMappers = {
   bybit: (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit') : new BybitTradesMapper('bybit'),
   okcoin: (localTimestamp: Date) =>
-    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okcoin') : new OkexTradesMapper('okcoin', 'spot'),
+    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okcoin', false) : new OkexTradesMapper('okcoin', 'spot'),
   hitbtc: () => hitBtcTradesMapper,
   phemex: () => phemexTradesMapper,
   delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),

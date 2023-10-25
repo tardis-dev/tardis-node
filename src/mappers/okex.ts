@@ -6,17 +6,26 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 // https://www.okex.com/docs-v5/en/#websocket-api-public-channel-trades-channel
 
 export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange, private readonly _useTradesAll: boolean) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
       return false
     }
-    return message.arg.channel === 'trades'
+    return message.arg.channel === 'trades' || message.arg.channel === 'trades-all'
   }
 
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
+
+    if (this._useTradesAll) {
+      return [
+        {
+          channel: `trades-all` as const,
+          symbols
+        }
+      ]
+    }
 
     return [
       {
@@ -26,7 +35,7 @@ export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
     ]
   }
 
-  *map(okexTradesMessage: OkexV5TradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+  *map(okexTradesMessage: OkexV5TradeMessage | OkexV5TradesAllMessage, localTimestamp: Date): IterableIterator<Trade> {
     for (const okexTrade of okexTradesMessage.data) {
       yield {
         type: 'trade',
@@ -587,6 +596,11 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
 type OkexV5TradeMessage = {
   arg: { channel: 'trades'; instId: 'CRV-USDT' }
   data: [{ instId: 'CRV-USDT'; tradeId: '21300150'; px: '3.973'; sz: '13.491146'; side: 'buy'; ts: '1639999319938' }]
+}
+
+type OkexV5TradesAllMessage = {
+  arg: { channel: 'trades-all'; instId: string }
+  data: [{ instId: 'WAXP-USDT'; tradeId: '2251300'; px: '0.05566'; sz: '838.714488'; side: 'sell'; ts: '1697760000083' }]
 }
 
 type OkexV5BookLevel = [string, string, string, string]

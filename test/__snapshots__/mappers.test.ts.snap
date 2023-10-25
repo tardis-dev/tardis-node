@@ -8793,6 +8793,22 @@ Array [
 ]
 `;
 
+exports[`mappers map okex messages 13`] = `
+Array [
+  Object {
+    "amount": 3.75,
+    "exchange": "okex",
+    "id": "84834539",
+    "localTimestamp": 2021-12-23T00:00:00.000Z,
+    "price": 42.52,
+    "side": "buy",
+    "symbol": "BSV-USDT",
+    "timestamp": 2023-10-20T00:00:12.017Z,
+    "type": "trade",
+  },
+]
+`;
+
 exports[`mappers map okex-futures messages 1`] = `
 Array [
   Object {
