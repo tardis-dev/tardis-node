@@ -1880,7 +1880,7 @@ Array [
 exports[`mappers map binance futures messages 13`] = `
 Array [
   Object {
-    "amount": 0.014,
+    "amount": 0.015,
     "exchange": "binance-futures",
     "id": undefined,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
