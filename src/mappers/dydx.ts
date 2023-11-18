@@ -83,6 +83,9 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
         localTimestamp
       }
     } else {
+      if (!message.contents) {
+        return
+      }
       // https://docs.dydx.exchange/#orderbook
       const updateOffset = Number(message.contents.offset)
 
