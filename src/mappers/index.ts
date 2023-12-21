@@ -109,6 +109,7 @@ import {
   OkexV5OptionSummaryMapper,
   OkexV5TradesMapper
 } from './okex'
+import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads'
 import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
 import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex'
 import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum'
@@ -256,7 +257,8 @@ const tradesMappers = {
   'woo-x': () => wooxTradesMapper,
   'blockchain-com': () => new BlockchainComTradesMapper(),
   'bybit-options': () => new BybitV5TradesMapper('bybit-options'),
-  'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper()
+  'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper(),
+  'okex-spreads': () => new OkexSpreadsTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -341,7 +343,8 @@ const bookChangeMappers = {
   'woo-x': () => new WooxBookChangeMapper(),
   'blockchain-com': () => new BlockchainComBookChangeMapper(),
   'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25),
-  'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper()
+  'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper(),
+  'okex-spreads': () => new OkexSpreadsBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -462,7 +465,8 @@ const bookTickersMappers = {
   'woo-x': () => new WooxBookTickerMapper(),
   delta: () => new DeltaBookTickerMapper(),
   bybit: () => new BybitV5BookTickerMapper('bybit'),
-  'gate-io': () => new GateIOV4BookTickerMapper('gate-io')
+  'gate-io': () => new GateIOV4BookTickerMapper('gate-io'),
+  'okex-spreads': () => new OkexSpreadsBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

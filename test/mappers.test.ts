@@ -68,7 +68,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'woo-x',
   'delta',
   'bybit',
-  'gate-io'
+  'gate-io',
+  'okex-spreads'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -8658,6 +8659,48 @@ test('map binance-european-options messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2023-10-01T00:00:00.0816546Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map okex-spreads messages', () => {
+  const messages = [
+    {
+      arg: { channel: 'sprd-public-trades', sprdId: 'ETH-USD-SWAP_ETH-USD-240329' },
+      data: [
+        {
+          sprdId: 'ETH-USD-SWAP_ETH-USD-240329',
+          tradeId: '2102504804202430464',
+          px: '64.9',
+          sz: '13430',
+          side: 'sell',
+          ts: '1703155852033'
+        }
+      ]
+    },
+    {
+      arg: { channel: 'sprd-books5', sprdId: 'BTC-USD-231229_BTC-USD-240329' },
+      data: [
+        {
+          bids: [
+            ['1314', '18100', '1'],
+            ['1313.5', '50000', '1']
+          ],
+          asks: [['1328', '11000', '2']],
+          ts: '1703155859507'
+        }
+      ]
+    },
+    {
+      arg: { channel: 'sprd-bbo-tbt', sprdId: 'BTC-USD-SWAP_BTC-USD-231229' },
+      data: [{ bids: [['168', '4000', '1']], asks: [['170.5', '14200', '1']], ts: '1703155859224' }]
+    }
+  ]
+
+  const mapper = createMapper('okex-spreads', new Date('2023-12-22T00:00:00.0816546Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2023-12-22T00:00:00.0816546Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

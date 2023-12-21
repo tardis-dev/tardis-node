@@ -1032,6 +1032,67 @@ Array [
 ]
 `;
 
+exports[`map okex-spreads messages 1`] = `
+Array [
+  Object {
+    "amount": 13430,
+    "exchange": "okex-spreads",
+    "id": "2102504804202430464",
+    "localTimestamp": 2023-12-22T00:00:00.081Z,
+    "price": 64.9,
+    "side": "sell",
+    "symbol": "ETH-USD-SWAP_ETH-USD-240329",
+    "timestamp": 2023-12-21T10:50:52.033Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map okex-spreads messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 11000,
+        "price": 1328,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 18100,
+        "price": 1314,
+      },
+      Object {
+        "amount": 50000,
+        "price": 1313.5,
+      },
+    ],
+    "exchange": "okex-spreads",
+    "isSnapshot": true,
+    "localTimestamp": 2023-12-22T00:00:00.081Z,
+    "symbol": "BTC-USD-231229_BTC-USD-240329",
+    "timestamp": 2023-12-21T10:50:59.507Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map okex-spreads messages 3`] = `
+Array [
+  Object {
+    "askAmount": 14200,
+    "askPrice": 170.5,
+    "bidAmount": 4000,
+    "bidPrice": 168,
+    "exchange": "okex-spreads",
+    "localTimestamp": 2023-12-22T00:00:00.081Z,
+    "symbol": "BTC-USD-SWAP_BTC-USD-231229",
+    "timestamp": 2023-12-21T10:50:59.224Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map woo-x messages 1`] = `
 Array [
   Object {

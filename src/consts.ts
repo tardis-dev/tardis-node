@@ -11,6 +11,7 @@ export const EXCHANGES = [
   'okex-options',
   'okex-swap',
   'okex',
+  'okex-spreads',
   'huobi-dm',
   'huobi-dm-swap',
   'huobi-dm-linear-swap',
@@ -455,6 +456,8 @@ const WOOX_CHANNELS = [
 const BLOCKCHAIN_COM_CHANNELS = ['trades', 'l2', 'l3', 'ticker']
 const BINANCE_EUROPEAN_OPTIONS_CHANNELS = ['trade', 'depth100', 'index', 'markPrice', 'ticker', 'openInterest']
 
+const OKEX_SPREADS_CHANNELS = ['sprd-public-trades', 'sprd-bbo-tbt', 'sprd-books5', 'sprd-tickers']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -507,5 +510,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   bitnomial: BITNOMIAL_CHANNELS,
   'woo-x': WOOX_CHANNELS,
   'blockchain-com': BLOCKCHAIN_COM_CHANNELS,
-  'binance-european-options': BINANCE_EUROPEAN_OPTIONS_CHANNELS
+  'binance-european-options': BINANCE_EUROPEAN_OPTIONS_CHANNELS,
+  'okex-spreads': OKEX_SPREADS_CHANNELS
 }
