@@ -121,15 +121,16 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      this.send({
-        id: '1',
-        req: `market.${symbol}.mbp.150`
-      })
+      setInterval(() => {
+        this.send({
+          id: '1',
+          req: `market.${symbol}.mbp.400`
+        })
+        this.debug('sent mbp.400 "req" for: %s', mbpFilter.symbols)
+      }, 3000)
 
       await wait(50)
     }
-
-    this.debug('sent mbp.150 "req" for: %s', mbpFilter.symbols)
   }
 
   protected decompress = (message: any) => {
@@ -340,13 +341,13 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
 }
 
 export class HuobiRealTimeFeed extends HuobiRealTimeFeedBase {
-  protected wssURL = 'wss://api.huobi.pro/ws'
+  protected wssURL = 'wss://api-aws.huobi.pro/ws'
   protected httpURL = 'https://api.huobi.pro/v1'
 
   protected suffixes = {
     trade: '.detail',
     depth: '.step0',
-    mbp: '.150'
+    mbp: '.400'
   }
 }
 
