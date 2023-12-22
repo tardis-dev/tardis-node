@@ -121,7 +121,7 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      setInterval(() => {
+      setTimeout(() => {
         this.send({
           id: '1',
           req: `market.${symbol}.mbp.400`
