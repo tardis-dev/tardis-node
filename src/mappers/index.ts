@@ -181,6 +181,10 @@ const shouldUseCFRelativeFunding = (localTimestamp: Date) => {
 }
 
 const shouldUseOKXTradesAllChannel = (localTimestamp: Date) => {
+  if (process.env.OKX_USE_TRADES_CHANNEL) {
+    return false
+  }
+
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2023-10-19T00:00:00.000Z').valueOf()
 }
 
