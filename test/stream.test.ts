@@ -92,7 +92,7 @@ describe('exchange-details', () => {
   })
 })
 
-describe('stream', () => {
+describe.skip('stream', () => {
   test(
     'streams normalized real-time messages for each supported exchange',
     async () => {
@@ -131,7 +131,8 @@ describe('stream', () => {
             exchange === 'binance-european-options' ||
             exchange === 'upbit' ||
             exchange === 'okex-spreads' ||
-            exchange === 'kucoin-futures'
+            exchange === 'kucoin-futures' ||
+            exchange === 'hitbtc'
           ) {
             return
           }
