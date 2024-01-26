@@ -94,6 +94,12 @@ import {
 } from './huobi'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
+import {
+  KucoinFuturesBookChangeMapper,
+  KucoinFuturesBookTickerMapper,
+  KucoinFuturesDerivativeTickerMapper,
+  KucoinFuturesTradesMapper
+} from './kucoinfutures'
 import { Mapper } from './mapper'
 import {
   OkexBookChangeMapper,
@@ -257,6 +263,7 @@ const tradesMappers = {
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinTradesMapper('kucoin'),
+  'kucoin-futures': () => new KucoinFuturesTradesMapper(),
   bitnomial: () => bitnomialTradesMapper,
   'woo-x': () => wooxTradesMapper,
   'blockchain-com': () => new BlockchainComTradesMapper(),
@@ -343,6 +350,7 @@ const bookChangeMappers = {
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
   'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
   kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
+  'kucoin-futures': (localTimestamp: Date) => new KucoinFuturesBookChangeMapper(isRealTime(localTimestamp) === false),
   bitnomial: () => new BitnomialBookChangMapper(),
   'woo-x': () => new WooxBookChangeMapper(),
   'blockchain-com': () => new BlockchainComBookChangeMapper(),
@@ -380,7 +388,8 @@ const derivativeTickersMappers = {
   dydx: () => new DydxDerivativeTickerMapper(),
   'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
-  'woo-x': () => new WooxDerivativeTickerMapper()
+  'woo-x': () => new WooxDerivativeTickerMapper(),
+  'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -470,7 +479,8 @@ const bookTickersMappers = {
   delta: () => new DeltaBookTickerMapper(),
   bybit: () => new BybitV5BookTickerMapper('bybit'),
   'gate-io': () => new GateIOV4BookTickerMapper('gate-io'),
-  'okex-spreads': () => new OkexSpreadsBookTickerMapper()
+  'okex-spreads': () => new OkexSpreadsBookTickerMapper(),
+  'kucoin-futures': () => new KucoinFuturesBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

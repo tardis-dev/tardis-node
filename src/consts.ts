@@ -49,6 +49,7 @@ export const EXCHANGES = [
   'crypto-com',
   'crypto-com-derivatives',
   'kucoin',
+  'kucoin-futures',
   'bitnomial',
   'woo-x',
   'blockchain-com'
@@ -458,6 +459,16 @@ const BINANCE_EUROPEAN_OPTIONS_CHANNELS = ['trade', 'depth100', 'index', 'markPr
 
 const OKEX_SPREADS_CHANNELS = ['sprd-public-trades', 'sprd-bbo-tbt', 'sprd-books5', 'sprd-tickers']
 
+const KUCOIN_FUTURES_CHANNELS = [
+  'contractMarket/execution',
+  'contractMarket/level2',
+  'contractMarket/level2Snapshot',
+  'contractMarket/tickerV2',
+  'contract/instrument',
+  'contract/details',
+  'contractMarket/snapshot'
+]
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -511,5 +522,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'woo-x': WOOX_CHANNELS,
   'blockchain-com': BLOCKCHAIN_COM_CHANNELS,
   'binance-european-options': BINANCE_EUROPEAN_OPTIONS_CHANNELS,
-  'okex-spreads': OKEX_SPREADS_CHANNELS
+  'okex-spreads': OKEX_SPREADS_CHANNELS,
+  'kucoin-futures': KUCOIN_FUTURES_CHANNELS
 }

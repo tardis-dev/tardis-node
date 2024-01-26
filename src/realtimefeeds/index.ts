@@ -48,6 +48,7 @@ import { WooxRealTimeFeed } from './woox'
 import { BlockchainComRealTimeFeed } from './blockchaincom'
 import { BinanceEuropeanOptionsRealTimeFeed } from './binanceeuropeanoptions'
 import { OkexSpreadsRealTimeFeed } from './okexspreads'
+import { KucoinFuturesRealTimeFeed } from './kucoinfutures'
 
 export * from './realtimefeed'
 
@@ -106,7 +107,8 @@ const realTimeFeedsMap: {
   'woo-x': WooxRealTimeFeed,
   'blockchain-com': BlockchainComRealTimeFeed,
   'binance-european-options': BinanceEuropeanOptionsRealTimeFeed,
-  'okex-spreads': OkexSpreadsRealTimeFeed
+  'okex-spreads': OkexSpreadsRealTimeFeed,
+  'kucoin-futures': KucoinFuturesRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

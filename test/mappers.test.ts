@@ -31,7 +31,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'dydx',
   'crypto-com-derivatives',
   'crypto-com',
-  'woo-x'
+  'woo-x',
+  'kucoin-futures'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -69,7 +70,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'delta',
   'bybit',
   'gate-io',
-  'okex-spreads'
+  'okex-spreads',
+  'kucoin-futures'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -8701,6 +8703,212 @@ test('map okex-spreads messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2023-12-22T00:00:00.0816546Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map kucoin-futures messages', () => {
+  const messages = [
+    {
+      topic: '/contractMarket/execution:SOLUSDTM',
+      type: 'message',
+      subject: 'match',
+      sn: 1701197946092,
+      data: {
+        symbol: 'SOLUSDTM',
+        sequence: 1701197946092,
+        makerUserId: '654ddd2be2cf300001e6e012',
+        side: 'sell',
+        size: 10,
+        price: '93.624',
+        takerOrderId: '137974138147991552',
+        takerUserId: '61dd97ead5fb7a00018a9af1',
+        makerOrderId: '137972015297474560',
+        tradeId: '1701197946092',
+        ts: 1705708799998000000
+      }
+    },
+    {
+      topic: '/contractMarket/level2:MYROUSDTM',
+      type: 'message',
+      subject: 'level2',
+      sn: 1705386314549,
+      data: { sequence: 1705386314549, change: '0.21506,sell,0', timestamp: 1705708800010 }
+    },
+    {
+      topic: '/contractMarket/level2:MYROUSDTM',
+      type: 'message',
+      subject: 'level2',
+      sn: 1705411242392,
+      data: { sequence: 1705411242392, change: '0.2166,sell,0', timestamp: 1705708800009 }
+    },
+    {
+      topic: '/contractMarket/level2:MYROUSDTM',
+      type: 'message',
+      subject: 'level2',
+      sn: 1705411242393,
+      data: { sequence: 1705411242393, change: '0.20645,buy,1', timestamp: 1705708800010 }
+    },
+    {
+      type: 'message',
+      generated: true,
+      topic: '/contractMarket/level2Snapshot:MYROUSDTM',
+      subject: 'level2Snapshot',
+      code: '200000',
+      data: {
+        sequence: 1705411242391,
+        symbol: 'MYROUSDTM',
+        bids: [[0.21557, 30]],
+        asks: [[0.2166, 62]],
+        ts: 1705881600412000000
+      }
+    },
+    {
+      topic: '/contractMarket/level2:MYROUSDTM',
+      type: 'message',
+      subject: 'level2',
+      sn: 1705411242394,
+      data: { sequence: 1705411242394, change: '0.3,buy,3', timestamp: 1705708800010 }
+    },
+    {
+      topic: '/contractMarket/tickerV2:AUCTIONUSDTM',
+      type: 'message',
+      subject: 'tickerV2',
+      sn: 1702237470700,
+      data: {
+        symbol: 'AUCTIONUSDTM',
+        sequence: 1702237470700,
+        bestBidSize: 260,
+        bestBidPrice: '24.067',
+        bestAskPrice: '24.08',
+        bestAskSize: 250,
+        ts: 1705708800078000000
+      }
+    },
+
+    {
+      topic: '/contract/details:XBTUSDTM',
+      type: 'message',
+      subject: 'contractDetails',
+      generated: true,
+      data: {
+        symbol: 'XBTUSDTM',
+        rootSymbol: 'USDT',
+        type: 'FFWCSX',
+        firstOpenDate: 1585555200000,
+        baseCurrency: 'XBT',
+        quoteCurrency: 'USDT',
+        settleCurrency: 'USDT',
+        maxOrderQty: 1000000,
+        maxPrice: 1000000.0,
+        lotSize: 1,
+        tickSize: 0.1,
+        indexPriceTickSize: 0.01,
+        multiplier: 0.001,
+        initialMargin: 0.008,
+        maintainMargin: 0.004,
+        maxRiskLimit: 25000,
+        minRiskLimit: 25000,
+        riskStep: 12500,
+        makerFeeRate: 2.0e-4,
+        takerFeeRate: 6.0e-4,
+        takerFixFee: 0.0,
+        makerFixFee: 0.0,
+        isDeleverage: true,
+        isQuanto: true,
+        isInverse: false,
+        markMethod: 'FairPrice',
+        fairMethod: 'FundingRate',
+        fundingBaseSymbol: '.XBTINT8H',
+        fundingQuoteSymbol: '.USDTINT8H',
+        fundingRateSymbol: '.XBTUSDTMFPI8H',
+        indexSymbol: '.KXBTUSDT',
+        settlementSymbol: '',
+        status: 'Open',
+        fundingFeeRate: 3.8e-5,
+        predictedFundingFeeRate: 9.6e-5,
+        fundingRateGranularity: 28800000,
+        openInterest: '9295921',
+        turnoverOf24h: 5.94135187191124e8,
+        volumeOf24h: 15131.243,
+        markPrice: 39995.94,
+        indexPrice: 39999.2,
+        lastTradePrice: 39996.6,
+        nextFundingRateTime: 10561278,
+        maxLeverage: 125,
+        sourceExchanges: ['okex', 'binance', 'kucoin', 'bybit', 'bitget', 'bitmart', 'gateio'],
+        premiumsSymbol1M: '.XBTUSDTMPI',
+        premiumsSymbol8H: '.XBTUSDTMPI8H',
+        fundingBaseSymbol1M: '.XBTINT',
+        fundingQuoteSymbol1M: '.USDTINT',
+        lowPrice: 38560.0,
+        highPrice: 40253.0,
+        priceChgPct: 0.0132,
+        priceChg: 523.4
+      }
+    },
+    {
+      topic: '/contractMarket/execution:XBTUSDTM',
+      type: 'message',
+      subject: 'match',
+      sn: 1728107666597,
+      data: {
+        symbol: 'XBTUSDTM',
+        sequence: 1728107666597,
+        makerUserId: '64c104280b64e30001557202',
+        side: 'sell',
+        size: 1,
+        price: '39615',
+        takerOrderId: '139484352366002178',
+        takerUserId: '6508585da44dc2000175cb24',
+        makerOrderId: '139484331675557890',
+        tradeId: '1728107666597',
+        ts: 1706068863101000000
+      }
+    },
+
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'funding.rate',
+      data: { granularity: 60000, fundingRate: 0.000038, timestamp: 1706068800000 }
+    },
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'mark.index.price',
+      data: { markPrice: 39610.11, indexPrice: 39615.44, granularity: 1000, timestamp: 1706068801000 }
+    },
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'funding.rate',
+      data: { granularity: 28800000, fundingRate: 0.000039, timestamp: 1706068800000 }
+    },
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'mark.index.price',
+      data: { markPrice: 39612.67, indexPrice: 39618.0, granularity: 1000, timestamp: 1706068802000 }
+    },
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'funding.rate',
+      data: { granularity: 28800000, fundingRate: 0.000038, timestamp: 1706068800000 }
+    },
+    {
+      topic: '/contract/instrument:XBTUSDTM',
+      type: 'message',
+      subject: 'funding.rate',
+      data: { granularity: 60000, fundingRate: 0.000032, timestamp: 1706068800000 }
+    }
+  ]
+
+  const mapper = createMapper('kucoin-futures', new Date('2024-01-22T00:00:00.0816546Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-01-22T00:00:00.0816546Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

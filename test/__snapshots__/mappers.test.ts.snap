@@ -1032,6 +1032,220 @@ Array [
 ]
 `;
 
+exports[`map kucoin-futures messages 1`] = `
+Array [
+  Object {
+    "amount": 10,
+    "exchange": "kucoin-futures",
+    "id": "1701197946092",
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "price": 93.624,
+    "side": "sell",
+    "symbol": "SOLUSDTM",
+    "timestamp": 2024-01-19T23:59:59.998Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 2`] = `Array []`;
+
+exports[`map kucoin-futures messages 3`] = `Array []`;
+
+exports[`map kucoin-futures messages 4`] = `Array []`;
+
+exports[`map kucoin-futures messages 5`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 30,
+        "price": 0.21557,
+      },
+      Object {
+        "amount": 1,
+        "price": 0.20645,
+      },
+    ],
+    "exchange": "kucoin-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "symbol": "MYROUSDTM",
+    "timestamp": 2024-01-22T00:00:00.081Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 6`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 3,
+        "price": 0.3,
+      },
+    ],
+    "exchange": "kucoin-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "symbol": "MYROUSDTM",
+    "timestamp": 2024-01-20T00:00:00.010Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 7`] = `
+Array [
+  Object {
+    "askAmount": 250,
+    "askPrice": 24.08,
+    "bidAmount": 260,
+    "bidPrice": 24.067,
+    "exchange": "kucoin-futures",
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "symbol": "AUCTIONUSDTM",
+    "timestamp": 2024-01-20T00:00:00.078Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 8`] = `Array []`;
+
+exports[`map kucoin-futures messages 9`] = `
+Array [
+  Object {
+    "amount": 1,
+    "exchange": "kucoin-futures",
+    "id": "1728107666597",
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "price": 39615,
+    "side": "sell",
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:01:03.101Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 10`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000038,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": undefined,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 11`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000038,
+    "fundingTimestamp": undefined,
+    "indexPrice": 39615.44,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": 39610.11,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 12`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000039,
+    "fundingTimestamp": undefined,
+    "indexPrice": 39615.44,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": 39610.11,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 13`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000039,
+    "fundingTimestamp": undefined,
+    "indexPrice": 39618,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": 39612.67,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 14`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000038,
+    "fundingTimestamp": undefined,
+    "indexPrice": 39618,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": 39612.67,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map kucoin-futures messages 15`] = `
+Array [
+  Object {
+    "exchange": "kucoin-futures",
+    "fundingRate": 0.000032,
+    "fundingTimestamp": undefined,
+    "indexPrice": 39618,
+    "lastPrice": 39615,
+    "localTimestamp": 2024-01-22T00:00:00.081Z,
+    "markPrice": 39612.67,
+    "openInterest": 9295921,
+    "predictedFundingRate": undefined,
+    "symbol": "XBTUSDTM",
+    "timestamp": 2024-01-24T04:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`map okex-spreads messages 1`] = `
 Array [
   Object {

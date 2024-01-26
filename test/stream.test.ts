@@ -130,7 +130,8 @@ describe('stream', () => {
             exchange === 'ascendex' ||
             exchange === 'binance-european-options' ||
             exchange === 'upbit' ||
-            exchange === 'okex-spreads'
+            exchange === 'okex-spreads' ||
+            exchange === 'kucoin-futures'
           ) {
             return
           }
