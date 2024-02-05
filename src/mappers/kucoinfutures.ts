@@ -83,6 +83,11 @@ export class KucoinFuturesBookChangeMapper implements Mapper<'kucoin-futures', B
       }
       // produce snapshot book_change
       const kucoinSnapshotData = message.data
+
+      if (!message.data) {
+        return
+      }
+
       if (!kucoinSnapshotData.asks) {
         kucoinSnapshotData.asks = []
       }
