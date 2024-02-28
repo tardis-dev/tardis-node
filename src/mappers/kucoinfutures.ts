@@ -1,5 +1,5 @@
 import { debug } from '../debug'
-import { CircularBuffer, upperCaseSymbols } from '../handy'
+import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
@@ -310,7 +310,12 @@ export class KucoinFuturesDerivativeTickerMapper implements Mapper<'kucoin-futur
     }
 
     if (message.subject === 'contractDetails') {
-      this._openInterests.set(symbol, Number(message.data.openInterest))
+      const openInterestValue = asNumberIfValid(message.data.openInterest)
+      if (openInterestValue === undefined) {
+        return
+      }
+
+      this._openInterests.set(symbol, openInterestValue)
       return
     }
     const lastPrice = this._lastPrices.get(symbol)
