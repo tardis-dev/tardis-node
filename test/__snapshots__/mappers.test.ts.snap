@@ -6282,6 +6282,49 @@ Array [
 ]
 `;
 
+exports[`mappers map deribit messages 18`] = `
+Array [
+  Object {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.7869,
+    "exchange": "deribit",
+    "expirationDate": 2024-03-09T08:00:00.000Z,
+    "gamma": 1.70098,
+    "lastPrice": undefined,
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "markIV": 209.64,
+    "markPrice": 0.139,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": 0.00004,
+    "strikePrice": 1.02,
+    "symbol": "MATIC_USDC-9MAR24-1d02-C",
+    "theta": -0.01323,
+    "timestamp": 2024-03-07T10:57:00.064Z,
+    "type": "option_summary",
+    "underlyingIndex": "index_price",
+    "underlyingPrice": 1.1367,
+    "vega": 0.00024,
+  },
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "deribit",
+    "localTimestamp": 2019-06-01T00:00:28.619Z,
+    "symbol": "MATIC_USDC-9MAR24-1d02-C",
+    "timestamp": 2024-03-07T10:57:00.064Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map dydx messages 1`] = `Array []`;
 
 exports[`mappers map dydx messages 2`] = `

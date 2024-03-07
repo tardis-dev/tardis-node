@@ -582,6 +582,37 @@ describe('mappers', () => {
             ask_iv: 0.0
           }
         }
+      },
+      {
+        jsonrpc: '2.0',
+        method: 'subscription',
+        params: {
+          channel: 'ticker.MATIC_USDC-9MAR24-1d02-C.raw',
+          data: {
+            estimated_delivery_price: 1.1367,
+            best_bid_amount: 0.0,
+            best_ask_amount: 0.0,
+            bid_iv: 0.0,
+            ask_iv: 0.0,
+            underlying_index: 'index_price',
+            underlying_price: 1.1367,
+            mark_iv: 209.64,
+            best_bid_price: 0.0,
+            best_ask_price: 0.0,
+            interest_rate: 0,
+            open_interest: 0.0,
+            max_price: 60.139,
+            min_price: 0.0005,
+            last_price: null,
+            instrument_name: 'MATIC_USDC-9MAR24-1d02-C',
+            mark_price: 0.139,
+            index_price: 1.1367,
+            greeks: { rho: 0.00004, theta: -0.01323, vega: 0.00024, gamma: 1.70098, delta: 0.7869 },
+            stats: { volume_notional: 0.0, volume_usd: 0.0, volume: 0.0, price_change: null, low: null, high: null },
+            state: 'open',
+            timestamp: 1709809020064
+          }
+        }
       }
     ]
     const deribitMapper = createMapper('deribit')

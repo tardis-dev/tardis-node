@@ -156,6 +156,7 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
   }
 
   *map(message: DeribitOptionTickerMessage, localTimestamp: Date) {
+    //MATIC_USDC-9MAR24-1d02-C
     const optionInfo = message.params.data
 
     //e.g., BTC-8JUN20-8750-P
@@ -163,7 +164,11 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
 
     const isPut = symbolParts[3] === 'P'
 
-    const strikePrice = Number(symbolParts[2])
+    let strikePriceString = symbolParts[2]
+    if (strikePriceString.includes('d')) {
+      strikePriceString = strikePriceString.replace('d', '.')
+    }
+    const strikePrice = Number(strikePriceString)
     const expirationDate = new Date(symbolParts[1] + 'Z')
     expirationDate.setUTCHours(8)
 
