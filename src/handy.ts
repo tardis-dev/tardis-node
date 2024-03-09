@@ -88,6 +88,7 @@ export function* take(iterable: Iterable<any>, length: number) {
 
 export async function* normalizeMessages(
   exchange: Exchange,
+  symbols: string[] | undefined,
   messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
   mappers: Mapper<any, any>[],
   createMappers: (localTimestamp: Date) => Mapper<any, any>[],
@@ -112,7 +113,8 @@ export async function* normalizeMessages(
         const disconnect: Disconnect = {
           type: 'disconnect',
           exchange,
-          localTimestamp: previousLocalTimestamp
+          localTimestamp: previousLocalTimestamp,
+          symbols
         }
         yield disconnect as any
       }

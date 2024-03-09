@@ -295,7 +295,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
   }
 
-  return normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter)
+  return normalizeMessages(exchange, undefined, messages, mappers, createMappers, withDisconnectMessages, filter)
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {

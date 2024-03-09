@@ -126,6 +126,7 @@ export type Disconnect = {
   readonly type: 'disconnect'
   readonly exchange: Exchange
   readonly localTimestamp: Date
+  readonly symbols: string[] | undefined
 }
 
 export type TradeBar = {

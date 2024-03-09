@@ -83,7 +83,16 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
         return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
       }
 
-      const normalizedMessages = normalizeMessages(exchange, messages, mappers, createMappers, withDisconnectMessages, filter, new Date())
+      const normalizedMessages = normalizeMessages(
+        exchange,
+        symbols,
+        messages,
+        mappers,
+        createMappers,
+        withDisconnectMessages,
+        filter,
+        new Date()
+      )
 
       for await (const message of normalizedMessages) {
         yield message
@@ -98,7 +107,8 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
         const disconnect: Disconnect = {
           type: 'disconnect',
           exchange,
-          localTimestamp: new Date()
+          localTimestamp: new Date(),
+          symbols
         }
 
         yield disconnect as any
