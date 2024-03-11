@@ -261,7 +261,7 @@ export class BinanceFuturesBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
-      uid: binanceDepthUpdateData.lastUpdateId,
+      uid: binanceDepthUpdateData.u,
       timestamp: new Date(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
