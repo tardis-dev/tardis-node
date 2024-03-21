@@ -29,7 +29,7 @@ export const deribitTradesMapper: Mapper<'deribit', Trade> = {
     for (const deribitTrade of message.params.data) {
       yield {
         type: 'trade',
-        symbol: deribitTrade.instrument_name,
+        symbol: deribitTrade.instrument_name.toUpperCase(),
         exchange: 'deribit',
         id: deribitTrade.trade_id,
         price: deribitTrade.price,
@@ -80,7 +80,7 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
 
     yield {
       type: 'book_change',
-      symbol: deribitBookChange.instrument_name,
+      symbol: deribitBookChange.instrument_name.toUpperCase(),
       exchange: 'deribit',
       isSnapshot,
       bids: deribitBookChange.bids.map(mapBookLevel),
@@ -174,7 +174,7 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
 
     const optionSummary: OptionSummary = {
       type: 'option_summary',
-      symbol: optionInfo.instrument_name,
+      symbol: optionInfo.instrument_name.toUpperCase(),
       exchange: 'deribit',
       optionType: isPut ? 'put' : 'call',
       strikePrice,
@@ -245,7 +245,7 @@ export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
         }
         yield {
           type: 'liquidation',
-          symbol: deribitTrade.instrument_name,
+          symbol: deribitTrade.instrument_name.toUpperCase(),
           exchange: 'deribit',
           id: deribitTrade.trade_id,
           price: deribitTrade.price,
@@ -285,7 +285,7 @@ export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
 
     const ticker: BookTicker = {
       type: 'book_ticker',
-      symbol: deribitTicker.instrument_name,
+      symbol: deribitTicker.instrument_name.toUpperCase(),
       exchange: 'deribit',
 
       askAmount: asNumberIfValid(deribitTicker.best_ask_amount),
