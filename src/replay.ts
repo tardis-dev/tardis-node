@@ -145,6 +145,11 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
             if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
               messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
             }
+            // hack to handle upbit long numeric id for trades
+            if (exchange === 'upbit' && messageString.includes('sequential_id')) {
+              messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
+            }
+
             const message = JSON.parse(messageString)
 
             const localTimestampString = localTimestampBuffer.toString()
