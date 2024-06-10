@@ -97,7 +97,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
         bids: message.contents.bids
           .map((bid) => {
-            const lastPriceLevelOffset = this._bidsOffsets[message.id][bid[0]]
+            const lastPriceLevelOffset = this._bidsOffsets[message.id] && this._bidsOffsets[message.id][bid[0]]
             if (lastPriceLevelOffset !== undefined && lastPriceLevelOffset >= updateOffset) {
               return
             }
@@ -111,7 +111,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
 
         asks: message.contents.asks
           .map((ask) => {
-            const lastPriceLevelOffset = this._asksOffsets[message.id][ask[0]]
+            const lastPriceLevelOffset = this._asksOffsets[message.id] && this._asksOffsets[message.id][ask[0]]
             if (lastPriceLevelOffset !== undefined && lastPriceLevelOffset >= updateOffset) {
               return
             }
