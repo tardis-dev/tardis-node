@@ -127,10 +127,16 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
         localTimestamp
       }
 
+      if (!this._bidsOffsets[message.id]) {
+        this._bidsOffsets[message.id] = {}
+      }
       for (const bid of message.contents.bids) {
         this._bidsOffsets[message.id][bid[0]] = updateOffset
       }
 
+      if (!this._asksOffsets[message.id]) {
+        this._asksOffsets[message.id] = {}
+      }
       for (const ask of message.contents.asks) {
         this._asksOffsets[message.id][ask[0]] = updateOffset
       }
