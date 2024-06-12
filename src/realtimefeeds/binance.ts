@@ -45,7 +45,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
 
 class BinanceFuturesOpenInterestClient extends PoolingClientBase {
   constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
-    super(exchange, 30)
+    super(exchange, 3)
   }
 
   protected async poolDataToStream(outputStream: Writable) {
