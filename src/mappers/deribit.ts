@@ -1,8 +1,28 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy'
+import { asNumberIfValid } from '../handy'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 // https://docs.deribit.com/v2/#subscriptions
+
+function deribitCasing(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map((symbol) => {
+      if (symbol.endsWith('-C') || symbol.endsWith('-P')) {
+        const parts = symbol.split('-')
+        if (parts[2] !== undefined && parts[2].toUpperCase().includes('D')) {
+          parts[2] = parts[2].replace('D', 'd')
+          return parts.join('-')
+        } else {
+          return symbol.toUpperCase()
+        }
+      } else {
+        return symbol.toUpperCase()
+      }
+    })
+  }
+
+  return
+}
 
 export const deribitTradesMapper: Mapper<'deribit', Trade> = {
   canHandle(message: any) {
@@ -15,7 +35,7 @@ export const deribitTradesMapper: Mapper<'deribit', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
@@ -60,7 +80,7 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
@@ -78,6 +98,7 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
       deribitBookChange.prev_change_id === undefined ||
       deribitBookChange.prev_change_id === 0
 
+    console.log(JSON.stringify(message))
     yield {
       type: 'book_change',
       symbol: deribitBookChange.instrument_name.toUpperCase(),
@@ -104,7 +125,7 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
   }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
@@ -133,7 +154,7 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
 
 export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSummary> {
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
@@ -222,7 +243,7 @@ export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
@@ -270,7 +291,7 @@ export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = deribitCasing(symbols)
 
     return [
       {
