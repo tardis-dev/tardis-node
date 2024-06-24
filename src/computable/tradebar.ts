@@ -23,7 +23,7 @@ class TradeBarComputable implements Computable<TradeBar> {
   // so logic `compute` would not execute
   // assumption is that if one subscribes to book changes too then there's pretty good chance that
   // even if there are no trades, there's plenty of book changes that trigger computing new trade bar if time passess
-  public readonly sourceDataTypes = ['trade', 'book_change']
+  public readonly sourceDataTypes = ['trade']
 
   private _inProgressBar: Writeable<TradeBar>
   private readonly _kind: BarKind
@@ -84,6 +84,7 @@ class TradeBarComputable implements Computable<TradeBar> {
     }
 
     if (this._kind === 'time') {
+      // TODO: push initial bar at a start?
       const currentTimestampTimeBucket = this._getTimeBucket(timestamp)
       const openTimestampTimeBucket = this._getTimeBucket(this._inProgressBar.openTimestamp)
       if (currentTimestampTimeBucket > openTimestampTimeBucket) {
