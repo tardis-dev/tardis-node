@@ -98,7 +98,6 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
       deribitBookChange.prev_change_id === undefined ||
       deribitBookChange.prev_change_id === 0
 
-    console.log(JSON.stringify(message))
     yield {
       type: 'book_change',
       symbol: deribitBookChange.instrument_name.toUpperCase(),
