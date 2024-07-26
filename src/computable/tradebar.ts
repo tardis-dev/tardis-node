@@ -133,7 +133,10 @@ class TradeBarComputable implements Computable<TradeBar> {
     inProgressBar.vwap = (inProgressBar.vwap * inProgressBar.volume + trade.price * trade.amount) / (inProgressBar.volume + trade.amount)
     // volume needs to be updated after vwap otherwise vwap calc will go wrong
     inProgressBar.volume += trade.amount
-    inProgressBar.timestamp = trade.timestamp
+
+    if (trade.timestamp.valueOf() > inProgressBar.timestamp.valueOf()) {
+      inProgressBar.timestamp = trade.timestamp
+    }
   }
 
   private _reset() {
