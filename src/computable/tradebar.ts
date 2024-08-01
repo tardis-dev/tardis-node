@@ -111,6 +111,9 @@ class TradeBarComputable implements Computable<TradeBar> {
   private _update(trade: Trade) {
     const inProgressBar = this._inProgressBar
     const isNotOpenedYet = inProgressBar.trades === 0
+    // some exchanges (like dydx) sometimes publish trade data out of order (older trades published after newer ones)
+
+    const tradeIsInCorrectTimeOrder = trade.timestamp.valueOf() >= inProgressBar.timestamp.valueOf()
 
     if (isNotOpenedYet) {
       inProgressBar.open = trade.price
@@ -124,8 +127,11 @@ class TradeBarComputable implements Computable<TradeBar> {
       inProgressBar.low = trade.price
     }
 
-    inProgressBar.close = trade.price
-    inProgressBar.closeTimestamp = trade.timestamp
+    if (tradeIsInCorrectTimeOrder) {
+      inProgressBar.close = trade.price
+      inProgressBar.closeTimestamp = trade.timestamp
+      inProgressBar.timestamp = trade.timestamp
+    }
 
     inProgressBar.buyVolume += trade.side === 'buy' ? trade.amount : 0
     inProgressBar.sellVolume += trade.side === 'sell' ? trade.amount : 0
@@ -133,10 +139,6 @@ class TradeBarComputable implements Computable<TradeBar> {
     inProgressBar.vwap = (inProgressBar.vwap * inProgressBar.volume + trade.price * trade.amount) / (inProgressBar.volume + trade.amount)
     // volume needs to be updated after vwap otherwise vwap calc will go wrong
     inProgressBar.volume += trade.amount
-
-    if (trade.timestamp.valueOf() > inProgressBar.timestamp.valueOf()) {
-      inProgressBar.timestamp = trade.timestamp
-    }
   }
 
   private _reset() {

@@ -221,4 +221,76 @@ describe('compute(messages, types)', () => {
 
     expect(bufferedMessages).toMatchSnapshot()
   })
+
+  test('should produce correct trade bars based on provided messages', async () => {
+    let messages = async function* (): AsyncIterableIterator<Trade> {
+      yield {
+        id: undefined,
+        type: 'trade',
+
+        symbol: 'CRV-USD',
+
+        exchange: 'dydx',
+
+        price: 0.3394,
+
+        amount: 1273,
+
+        side: 'buy',
+
+        timestamp: new Date('2024-06-23T03:05:59.988Z'),
+
+        localTimestamp: new Date('2024-06-23T03:06:00.158521Z')
+      }
+
+      yield {
+        id: undefined,
+
+        type: 'trade',
+
+        symbol: 'CRV-USD',
+
+        exchange: 'dydx',
+
+        price: 0.3387,
+
+        amount: 65,
+
+        side: 'buy',
+
+        timestamp: new Date('2024-06-23T03:05:59.981Z'),
+
+        localTimestamp: new Date('2024-06-23T03:06:00.173614Z')
+      },
+        yield {
+          id: undefined,
+
+          type: 'trade',
+
+          symbol: 'CRV-USD',
+
+          exchange: 'dydx',
+
+          price: 0.3387,
+
+          amount: 65,
+
+          side: 'buy',
+
+          timestamp: new Date('2024-06-23T03:06:01.981Z'),
+
+          localTimestamp: new Date('2024-06-23T03:06:02.173614Z')
+        }
+    }
+
+    const withComputedTypes = compute(messages(), computeTradeBars({ kind: 'time', interval: 60 * 1000, name: 'trade_bar_1_minute' }))
+
+    const bufferedMessages = []
+
+    for await (const message of withComputedTypes) {
+      bufferedMessages.push(message)
+    }
+
+    expect(bufferedMessages).toMatchSnapshot()
+  })
 })
