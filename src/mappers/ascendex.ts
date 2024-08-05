@@ -54,6 +54,10 @@ export class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> 
   }
 
   *map(message: AscendexDepthRealTime | AscendexDepthRealTimeSnapshot, localTimestamp: Date): IterableIterator<BookChange> {
+    if (!message.symbol || !message.data.bids || !message.data.asks) {
+      return
+    }
+
     yield {
       type: 'book_change',
       symbol: message.symbol,
