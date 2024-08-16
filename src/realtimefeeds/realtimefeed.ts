@@ -31,7 +31,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   private readonly _filters: Filter<string>[]
   private _receivedMessagesCount = 0
   private _ws?: WebSocket
-  private _connectionId = connectionCounter++
+  private _connectionId = -1
   private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
   protected readonly originHeader: string | undefined = undefined
 
@@ -73,6 +73,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
     while (true) {
       try {
+        this._connectionId = connectionCounter++
         const subscribeMessages = this.mapToSubscribeMessages(this._filters)
         const finalWssUrl = await this.getWebSocketUrl()
 
@@ -294,7 +295,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         }
       }
 
-      this.debug('(connection id: %d) estabilished connection', this._connectionId)
+      this.debug('(connection id: %d) established connection', this._connectionId)
 
       //wait before fetching snapshots until we're sure we've got proper connection estabilished (received some messages)
       while (this._receivedMessagesCount < symbolsCount * 2) {
