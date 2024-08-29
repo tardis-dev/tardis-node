@@ -112,6 +112,12 @@ export class OkexSpreadsBookTickerMapper implements Mapper<'okex-spreads', BookT
     }
 
     for (const tbtTicker of message.data) {
+      const timestamp = new Date(Number(tbtTicker.ts))
+
+      if (timestamp.valueOf() === 0) {
+        continue
+      }
+
       const bestAsk = tbtTicker.asks !== undefined && tbtTicker.asks[0] ? mapBookLevel(tbtTicker.asks[0]) : undefined
       const bestBid = tbtTicker.bids !== undefined && tbtTicker.bids[0] ? mapBookLevel(tbtTicker.bids[0]) : undefined
 
@@ -124,7 +130,7 @@ export class OkexSpreadsBookTickerMapper implements Mapper<'okex-spreads', BookT
 
         bidPrice: bestBid?.price,
         bidAmount: bestBid?.amount,
-        timestamp: new Date(Number(tbtTicker.ts)),
+        timestamp,
         localTimestamp: localTimestamp
       }
 
