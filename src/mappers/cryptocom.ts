@@ -174,6 +174,10 @@ export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com-deriv
       {
         channel: 'funding',
         symbols
+      } as const,
+      {
+        channel: 'estimatedfunding',
+        symbols
       } as const
     ]
 
@@ -181,7 +185,12 @@ export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com-deriv
   }
 
   *map(
-    message: CryptoComDerivativesTickerMessage | CryptoComIndexMessage | CryptoComMarkPriceMessage | CryptoComFundingMessage,
+    message:
+      | CryptoComDerivativesTickerMessage
+      | CryptoComIndexMessage
+      | CryptoComMarkPriceMessage
+      | CryptoComFundingMessage
+      | CryptoComEstFundingMessage,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
     if (message.result.channel === 'index') {
@@ -218,6 +227,11 @@ export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com-deriv
         nextFundingTimestamp.setUTCHours(nextFundingTimestamp.getUTCHours() + 1)
         nextFundingTimestamp.setUTCMinutes(0, 0, 0)
         pendingTickerInfo.updateFundingTimestamp(nextFundingTimestamp)
+      }
+    }
+    if (message.result.channel === 'estimatedfunding') {
+      if (message.result.data[0] && message.result.data[0].v !== null && message.result.data[0].v !== undefined) {
+        pendingTickerInfo.updatePredictedFundingRate(Number(message.result.data[0].v))
       }
     }
 
@@ -404,5 +418,17 @@ type CryptoComFundingMessage = {
     subscription: 'funding.BTCUSD-PERP'
     channel: 'funding'
     data: [{ v: '0.00000700'; t: 1653992579000 }]
+  }
+}
+
+type CryptoComEstFundingMessage = {
+  id: 1
+  method: 'subscribe'
+  code: 0
+  result: {
+    instrument_name: 'AAVEUSD-PERP'
+    subscription: 'estimatedfunding.AAVEUSD-PERP'
+    channel: 'estimatedfunding'
+    data: [{ v: '0.000039493'; t: 1727308799000 }]
   }
 }

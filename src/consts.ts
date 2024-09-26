@@ -434,7 +434,7 @@ const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_inte
 
 const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt']
 
-const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding']
+const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding', 'estimatedfunding']
 
 const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding']
 
