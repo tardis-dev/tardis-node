@@ -5,7 +5,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 // v5 https://bybit-exchange.github.io/docs/v5/ws/connect
 
 export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', Trade> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
 
   canHandle(message: BybitV5Trade) {
     if (message.topic === undefined) {
@@ -44,7 +44,7 @@ export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'byb
 }
 
 export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _depth: number) {}
+  constructor(protected readonly _exchange: Exchange, private readonly _depth: number) { }
 
   canHandle(message: BybitV5OrderBookMessage) {
     if (message.topic === undefined) {
@@ -71,6 +71,7 @@ export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 
       isSnapshot: message.type === 'snapshot',
       bids: message.data.b.map(this._mapBookLevel),
       asks: message.data.a.map(this._mapBookLevel),
+      uid: message.data.seq,
       timestamp: new Date(message.ts),
       localTimestamp
     } as const
@@ -91,7 +92,7 @@ export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', B
     }
   } = {}
 
-  constructor(protected readonly _exchange: Exchange) {}
+  constructor(protected readonly _exchange: Exchange) { }
 
   canHandle(message: BybitV5OrderBookMessage) {
     if (message.topic === undefined) {
@@ -211,7 +212,7 @@ export class BybitV5DerivativeTickerMapper implements Mapper<'bybit', Derivative
 }
 
 export class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
   canHandle(message: BybitV5LiquidationMessage) {
     if (message.topic === undefined) {
       return false
@@ -322,7 +323,7 @@ export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', Optio
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/en/websocket.md
 
 export class BybitTradesMapper implements Mapper<'bybit', Trade> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
       return false
@@ -348,8 +349,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
         'trade_time_ms' in trade
           ? new Date(Number(trade.trade_time_ms))
           : 'tradeTimeMs' in trade
-          ? new Date(Number(trade.tradeTimeMs))
-          : new Date(trade.timestamp)
+            ? new Date(Number(trade.tradeTimeMs))
+            : new Date(trade.timestamp)
 
       yield {
         type: 'trade',
@@ -367,7 +368,7 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 }
 
 export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _canUseBook200Channel: boolean) {}
+  constructor(protected readonly _exchange: Exchange, private readonly _canUseBook200Channel: boolean) { }
 
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -409,8 +410,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
         ? 'order_book' in message.data
           ? message.data.order_book
           : 'orderBook' in message.data
-          ? message.data.orderBook
-          : message.data
+            ? message.data.orderBook
+            : message.data
         : [...message.data.delete, ...message.data.update, ...message.data.insert]
 
     const timestampBybit = message.timestamp_e6 !== undefined ? Number(message.timestamp_e6) : Number(message.timestampE6)
@@ -533,7 +534,7 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
 }
 
 export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
       return false
@@ -592,37 +593,37 @@ export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
 
 type BybitV5Trade =
   | {
-      topic: 'publicTrade.LTCUSDT'
-      type: 'snapshot'
-      ts: 1680688979985
-      data: [
-        {
-          T: 1680688979983
-          s: 'LTCUSDT'
-          S: 'Buy'
-          v: '0.4'
-          p: '94.53'
-          L: 'ZeroMinusTick'
-          i: '4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f'
-          BT: false
-        }
-      ]
-    }
+    topic: 'publicTrade.LTCUSDT'
+    type: 'snapshot'
+    ts: 1680688979985
+    data: [
+      {
+        T: 1680688979983
+        s: 'LTCUSDT'
+        S: 'Buy'
+        v: '0.4'
+        p: '94.53'
+        L: 'ZeroMinusTick'
+        i: '4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f'
+        BT: false
+      }
+    ]
+  }
   | {
-      topic: 'publicTrade.BTCUSDC'
-      ts: 1680688980000
-      type: 'snapshot'
-      data: [{ i: '2240000000041223438'; T: 1680688979998; p: '28528.98'; v: '0.00433'; S: 'Buy'; s: 'BTCUSDC'; BT: false }]
-    }
+    topic: 'publicTrade.BTCUSDC'
+    ts: 1680688980000
+    type: 'snapshot'
+    data: [{ i: '2240000000041223438'; T: 1680688979998; p: '28528.98'; v: '0.00433'; S: 'Buy'; s: 'BTCUSDC'; BT: false }]
+  }
   | {
-      id: 'publicTrade.BTC-3414637898-1680652922102'
-      topic: 'publicTrade.BTC'
-      ts: 1680652922102
-      data: [
-        { p: '985'; v: '0.01'; i: '0404c393-8419-5bac-95c3-5fea28404754'; T: 1680652922081; BT: false; s: 'BTC-28APR23-29500-C'; S: 'Sell' }
-      ]
-      type: 'snapshot'
-    }
+    id: 'publicTrade.BTC-3414637898-1680652922102'
+    topic: 'publicTrade.BTC'
+    ts: 1680652922102
+    data: [
+      { p: '985'; v: '0.01'; i: '0404c393-8419-5bac-95c3-5fea28404754'; T: 1680652922081; BT: false; s: 'BTC-28APR23-29500-C'; S: 'Sell' }
+    ]
+    type: 'snapshot'
+  }
 
 type BybitV5OrderBookMessage = {
   topic: 'orderbook.50.LTCUSD'
@@ -712,31 +713,31 @@ type BybitDataMessage = {
 
 type BybitTradeDataMessage =
   | (BybitDataMessage & {
-      data: {
-        timestamp: string
-        trade_time_ms?: number | string
-        symbol: string
-        side: 'Buy' | 'Sell'
-        size: number
-        price: number | string
-        trade_id: string
-      }[]
-    })
+    data: {
+      timestamp: string
+      trade_time_ms?: number | string
+      symbol: string
+      side: 'Buy' | 'Sell'
+      size: number
+      price: number | string
+      trade_id: string
+    }[]
+  })
   | {
-      topic: 'trade.BTCPERP'
-      data: [
-        {
-          symbol: 'BTCPERP'
-          tickDirection: 'PlusTick'
-          price: '21213.00'
-          size: 0.007
-          timestamp: '2022-06-21T09:36:58.000Z'
-          tradeTimeMs: '1655804218524'
-          side: 'Sell'
-          tradeId: '7aad7741-f763-5f78-bf43-c38b29a40f67'
-        }
-      ]
-    }
+    topic: 'trade.BTCPERP'
+    data: [
+      {
+        symbol: 'BTCPERP'
+        tickDirection: 'PlusTick'
+        price: '21213.00'
+        size: 0.007
+        timestamp: '2022-06-21T09:36:58.000Z'
+        tradeTimeMs: '1655804218524'
+        side: 'Sell'
+        tradeId: '7aad7741-f763-5f78-bf43-c38b29a40f67'
+      }
+    ]
+  }
 
 type BybitBookLevel = {
   price: string
@@ -813,14 +814,14 @@ type BybitInstrumentUpdate = {
 
 type BybitInstrumentDataMessage =
   | BybitDataMessage & {
-      timestamp_e6: string
-      timestampE6: string
-      data:
-        | BybitInstrumentUpdate
-        | {
-            update: [BybitInstrumentUpdate]
-          }
+    timestamp_e6: string
+    timestampE6: string
+    data:
+    | BybitInstrumentUpdate
+    | {
+      update: [BybitInstrumentUpdate]
     }
+  }
 
 type BybitLiquidationMessage = BybitDataMessage & {
   generated: true
