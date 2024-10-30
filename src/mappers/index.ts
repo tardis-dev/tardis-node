@@ -67,6 +67,7 @@ import {
   deribitTradesMapper
 } from './deribit'
 import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
+import { DydxV4BookChangeMapper, DydxV4DerivativeTickerMapper, DydxV4LiquidationsMapper, DydxV4TradesMapper } from './dydxv4'
 import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
 import {
   GateIOBookChangeMapper,
@@ -255,6 +256,7 @@ const tradesMappers = {
   upbit: () => new UpbitTradesMapper(),
   ascendex: () => new AscendexTradesMapper(),
   dydx: () => new DydxTradesMapper(),
+  'dydx-v4': () => new DydxV4TradesMapper(),
   serum: () => new SerumTradesMapper('serum'),
   'star-atlas': () => new SerumTradesMapper('star-atlas'),
   mango: () => new SerumTradesMapper('mango'),
@@ -344,6 +346,7 @@ const bookChangeMappers = {
   upbit: () => new UpbitBookChangeMapper(),
   ascendex: () => new AscendexBookChangeMapper(),
   dydx: () => new DydxBookChangeMapper(),
+  'dydx-v4': () => new DydxV4BookChangeMapper(),
   serum: () => new SerumBookChangeMapper('serum'),
   'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
   mango: () => new SerumBookChangeMapper('mango'),
@@ -386,6 +389,7 @@ const derivativeTickersMappers = {
   coinflex: () => new CoinflexDerivativeTickerMapper(),
   ascendex: () => new AscendexDerivativeTickerMapper(),
   dydx: () => new DydxDerivativeTickerMapper(),
+  'dydx-v4': () => new DydxV4DerivativeTickerMapper(),
   'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
   'woo-x': () => new WooxDerivativeTickerMapper(),
@@ -411,6 +415,7 @@ const liquidationsMappers = {
   'bitfinex-derivatives': () => new BitfinexLiquidationsMapper('bitfinex-derivatives'),
   cryptofacilities: () => cryptofacilitiesLiquidationsMapper,
   'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
+  'dydx-v4': () => new DydxV4LiquidationsMapper(),
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
   bybit: (localTimestamp: Date) =>

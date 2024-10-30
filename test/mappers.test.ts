@@ -29,6 +29,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm-linear-swap',
   'ascendex',
   'dydx',
+  'dydx-v4',
   'crypto-com-derivatives',
   'crypto-com',
   'woo-x',
@@ -96,7 +97,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'huobi-dm-linear-swap',
   'bybit',
   'okex-futures',
-  'okex-swap'
+  'okex-swap',
+  'dydx-v4'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -8940,6 +8942,171 @@ test('map kucoin-futures messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-01-22T00:00:00.0816546Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map dydx-v4 messages', () => {
+  const messages = [
+    {
+      type: 'channel_data',
+      connection_id: '2ddf629d-ee78-4cf3-8278-fe0900b59537',
+      message_id: 99,
+      id: 'AVAX-USD',
+      channel: 'v4_trades',
+      version: '2.1.0',
+      contents: {
+        trades: [
+          {
+            id: '0165e5e30000000200000002',
+            size: '79.2',
+            price: '25.22',
+            side: 'BUY',
+            createdAt: '2024-08-22T23:59:58.855Z',
+            type: 'LIMIT'
+          }
+        ]
+      }
+    },
+    {
+      type: 'channel_data',
+      connection_id: '3a2e4c0c-7579-4bf6-a570-e0979418bbe9',
+      message_id: 424,
+      id: 'BTC-USD',
+      channel: 'v4_trades',
+      version: '2.1.0',
+      contents: {
+        trades: [
+          {
+            id: '0165e5e40000000200000002',
+            size: '0.002',
+            price: '60397',
+            side: 'BUY',
+            createdAt: '2024-08-22T23:59:59.851Z',
+            type: 'LIMIT'
+          },
+          {
+            id: '014f495a0000000200000005',
+            side: 'SELL',
+            size: '3.9',
+            price: '22.87',
+            type: 'LIQUIDATED',
+            createdAt: '2024-08-04T07:34:50.628Z'
+          }
+        ]
+      }
+    },
+    {
+      type: 'subscribed',
+      connection_id: '67838890-75de-4bf3-a638-d7bcdea5f245',
+      message_id: 7,
+      channel: 'v4_orderbook',
+      id: 'GRT-USD',
+      contents: {
+        bids: [{ price: '0.1547', size: '35520' }],
+        asks: [{ price: '0.155', size: '3220' }]
+      }
+    },
+    {
+      type: 'channel_data',
+      connection_id: '86052893-19bc-46c9-a1af-e9f5ff4f6572',
+      message_id: 5814,
+      id: 'GRT-USD',
+      channel: 'v4_orderbook',
+      version: '1.0.0',
+      contents: { bids: [['11.21', '0']] }
+    },
+    {
+      type: 'channel_data',
+      connection_id: '86052893-19bc-46c9-a1af-e9f5ff4f6572',
+      message_id: 5820,
+      id: 'EGLD-USD',
+      channel: 'v4_orderbook',
+      version: '1.0.0',
+      contents: { asks: [['66.12', '0']] }
+    },
+    {
+      type: 'subscribed',
+      connection_id: '3a2e4c0c-7579-4bf6-a570-e0979418bbe9',
+      message_id: 17,
+      channel: 'v4_markets',
+      contents: {
+        markets: {
+          'BTC-USD': {
+            clobPairId: '0',
+            ticker: 'BTC-USD',
+            status: 'ACTIVE',
+            oraclePrice: '60387.51779',
+            priceChange24H: '-782.58326',
+            volume24H: '247515340.0835',
+            trades24H: 73556,
+            nextFundingRate: '0.00001351666666666667',
+            initialMarginFraction: '0.05',
+            maintenanceMarginFraction: '0.03',
+            openInterest: '648.2389',
+            atomicResolution: -10,
+            quantumConversionExponent: -9,
+            tickSize: '1',
+            stepSize: '0.0001',
+            stepBaseQuantums: 1000000,
+            subticksPerTick: 100000,
+            marketType: 'CROSS',
+            openInterestLowerCap: '0',
+            openInterestUpperCap: '0',
+            baseOpenInterest: '648.4278'
+          },
+          'ETH-USD': {
+            clobPairId: '1',
+            ticker: 'ETH-USD',
+            status: 'ACTIVE',
+            oraclePrice: '2623.2521',
+            priceChange24H: '-8.251913',
+            volume24H: '214358009.6882',
+            trades24H: 67980,
+            nextFundingRate: '0.00001051666666666667',
+            initialMarginFraction: '0.05',
+            maintenanceMarginFraction: '0.03',
+            openInterest: '15395.279',
+            atomicResolution: -9,
+            quantumConversionExponent: -9,
+            tickSize: '0.1',
+            stepSize: '0.001',
+            stepBaseQuantums: 1000000,
+            subticksPerTick: 100000,
+            marketType: 'CROSS',
+            openInterestLowerCap: '0',
+            openInterestUpperCap: '0',
+            baseOpenInterest: '15399.72'
+          }
+        }
+      }
+    },
+    {
+      type: 'channel_data',
+      connection_id: '3a2e4c0c-7579-4bf6-a570-e0979418bbe9',
+      message_id: 15871,
+      channel: 'v4_markets',
+      version: '1.0.0',
+      contents: { trading: { 'ETH-USD': { id: '1', openInterest: '15398.406' } } }
+    },
+    {
+      type: 'channel_data',
+      connection_id: '3a2e4c0c-7579-4bf6-a570-e0979418bbe9',
+      message_id: 15162,
+      channel: 'v4_markets',
+      version: '1.0.0',
+      contents: {
+        oraclePrices: {
+          'ETH-USD': { oraclePrice: '2623.3521', effectiveAt: '2024-08-23T00:00:54.301Z', effectiveAtHeight: '23455252', marketId: 86 }
+        }
+      }
+    }
+  ]
+
+  const mapper = createMapper('dydx-v4', new Date('2024-08-23T00:00:00.4985250Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

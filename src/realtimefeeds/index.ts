@@ -49,6 +49,7 @@ import { BlockchainComRealTimeFeed } from './blockchaincom'
 import { BinanceEuropeanOptionsRealTimeFeed } from './binanceeuropeanoptions'
 import { OkexSpreadsRealTimeFeed } from './okexspreads'
 import { KucoinFuturesRealTimeFeed } from './kucoinfutures'
+import { DydxV4RealTimeFeed } from './dydx_v4'
 
 export * from './realtimefeed'
 
@@ -108,7 +109,8 @@ const realTimeFeedsMap: {
   'blockchain-com': BlockchainComRealTimeFeed,
   'binance-european-options': BinanceEuropeanOptionsRealTimeFeed,
   'okex-spreads': OkexSpreadsRealTimeFeed,
-  'kucoin-futures': KucoinFuturesRealTimeFeed
+  'kucoin-futures': KucoinFuturesRealTimeFeed,
+  'dydx-v4': DydxV4RealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

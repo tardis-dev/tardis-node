@@ -132,7 +132,9 @@ describe.skip('stream', () => {
             exchange === 'upbit' ||
             exchange === 'okex-spreads' ||
             exchange === 'kucoin-futures' ||
-            exchange === 'hitbtc'
+            exchange === 'hitbtc' ||
+            exchange === 'dydx' ||
+            exchange === 'dydx-v4'
           ) {
             return
           }

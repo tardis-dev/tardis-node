@@ -42,6 +42,7 @@ export const EXCHANGES = [
   'upbit',
   'ascendex',
   'dydx',
+  'dydx-v4',
   'serum',
   'mango',
   'huobi-dm-options',
@@ -111,7 +112,8 @@ const DERIBIT_CHANNELS = [
   'trades',
   'ticker',
   'quote',
-  'platform_state'
+  'platform_state',
+  'instrument.state.any'
 ] as const
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
@@ -404,6 +406,7 @@ const POLONIEX_CHANNELS = ['price_aggregated_book', 'trades', 'ticker', 'book_lv
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data'] as const
 const DYDX_CHANNELS = ['v3_trades', 'v3_orderbook', 'v3_markets'] as const
+const DYDX_V4_CHANNELS = ['v4_trades', 'v4_orderbook', 'v4_markets'] as const
 const SERUM_CHANNELS = [
   'recent_trades',
   'trade',
@@ -511,6 +514,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   upbit: UPBIT_CHANNELS,
   ascendex: ASCENDEX_CHANNELS,
   dydx: DYDX_CHANNELS,
+  'dydx-v4': DYDX_V4_CHANNELS,
   serum: SERUM_CHANNELS,
   'star-atlas': SERUM_CHANNELS,
   'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS,
