@@ -873,6 +873,196 @@ Array [
 ]
 `;
 
+exports[`map dydx-v4 messages 1`] = `
+Array [
+  Object {
+    "amount": 79.2,
+    "exchange": "dydx-v4",
+    "id": "0165e5e30000000200000002",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 25.22,
+    "side": "buy",
+    "symbol": "AVAX-USD",
+    "timestamp": 2024-08-22T23:59:58.855Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 2`] = `
+Array [
+  Object {
+    "amount": 0.002,
+    "exchange": "dydx-v4",
+    "id": "0165e5e40000000200000002",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 60397,
+    "side": "buy",
+    "symbol": "BTC-USD",
+    "timestamp": 2024-08-22T23:59:59.851Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 3.9,
+    "exchange": "dydx-v4",
+    "id": "014f495a0000000200000005",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 22.87,
+    "side": "sell",
+    "symbol": "BTC-USD",
+    "timestamp": 2024-08-04T07:34:50.628Z,
+    "type": "trade",
+  },
+  Object {
+    "amount": 3.9,
+    "exchange": "dydx-v4",
+    "id": "014f495a0000000200000005",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 22.87,
+    "side": "sell",
+    "symbol": "BTC-USD",
+    "timestamp": 2024-08-04T07:34:50.628Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 3`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 3220,
+        "price": 0.155,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 35520,
+        "price": 0.1547,
+      },
+    ],
+    "exchange": "dydx-v4",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "GRT-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 4`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 0,
+        "price": 11.21,
+      },
+    ],
+    "exchange": "dydx-v4",
+    "isSnapshot": false,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "GRT-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 0,
+        "price": 66.12,
+      },
+    ],
+    "bids": Array [],
+    "exchange": "dydx-v4",
+    "isSnapshot": false,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "EGLD-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 6`] = `
+Array [
+  Object {
+    "exchange": "dydx-v4",
+    "fundingRate": 0.00001351666666666667,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 22.87,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 60387.51779,
+    "openInterest": 648.2389,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "derivative_ticker",
+  },
+  Object {
+    "exchange": "dydx-v4",
+    "fundingRate": 0.00001051666666666667,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 2623.2521,
+    "openInterest": 15395.279,
+    "predictedFundingRate": undefined,
+    "symbol": "ETH-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 7`] = `
+Array [
+  Object {
+    "exchange": "dydx-v4",
+    "fundingRate": 0.00001051666666666667,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 2623.2521,
+    "openInterest": 15398.406,
+    "predictedFundingRate": undefined,
+    "symbol": "ETH-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map dydx-v4 messages 8`] = `
+Array [
+  Object {
+    "exchange": "dydx-v4",
+    "fundingRate": 0.00001051666666666667,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 2623.3521,
+    "openInterest": 15398.406,
+    "predictedFundingRate": undefined,
+    "symbol": "ETH-USD",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`map kucoin messages 1`] = `Array []`;
 
 exports[`map kucoin messages 2`] = `Array []`;
