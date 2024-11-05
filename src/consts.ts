@@ -53,7 +53,9 @@ export const EXCHANGES = [
   'kucoin-futures',
   'bitnomial',
   'woo-x',
-  'blockchain-com'
+  'blockchain-com',
+  'bitget',
+  'bitget-futures'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -472,6 +474,9 @@ const KUCOIN_FUTURES_CHANNELS = [
   'contractMarket/snapshot'
 ]
 
+const BITGET_CHANNELS = ['trade', 'books1', 'books']
+const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books', 'ticker']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -527,5 +532,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'blockchain-com': BLOCKCHAIN_COM_CHANNELS,
   'binance-european-options': BINANCE_EUROPEAN_OPTIONS_CHANNELS,
   'okex-spreads': OKEX_SPREADS_CHANNELS,
-  'kucoin-futures': KUCOIN_FUTURES_CHANNELS
+  'kucoin-futures': KUCOIN_FUTURES_CHANNELS,
+  bitget: BITGET_CHANNELS,
+  'bitget-futures': BITGET_FUTURES_CHANNELS
 }

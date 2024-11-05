@@ -24,6 +24,7 @@ import {
   BitfinexTradesMapper
 } from './bitfinex'
 import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer'
+import { BitgetBookChangeMapper, BitgetBookTickerMapper, BitgetDerivativeTickerMapper, BitgetTradesMapper } from './bitget'
 import {
   BitmexBookChangeMapper,
   BitmexDerivativeTickerMapper,
@@ -271,7 +272,9 @@ const tradesMappers = {
   'blockchain-com': () => new BlockchainComTradesMapper(),
   'bybit-options': () => new BybitV5TradesMapper('bybit-options'),
   'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper(),
-  'okex-spreads': () => new OkexSpreadsTradesMapper()
+  'okex-spreads': () => new OkexSpreadsTradesMapper(),
+  bitget: () => new BitgetTradesMapper('bitget'),
+  'bitget-futures': () => new BitgetTradesMapper('bitget-futures')
 }
 
 const bookChangeMappers = {
@@ -359,7 +362,9 @@ const bookChangeMappers = {
   'blockchain-com': () => new BlockchainComBookChangeMapper(),
   'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25),
   'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper(),
-  'okex-spreads': () => new OkexSpreadsBookChangeMapper()
+  'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
+  bitget: () => new BitgetBookChangeMapper('bitget'),
+  'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures')
 }
 
 const derivativeTickersMappers = {
@@ -393,7 +398,8 @@ const derivativeTickersMappers = {
   'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
   'woo-x': () => new WooxDerivativeTickerMapper(),
-  'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper()
+  'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
+  'bitget-futures': () => new BitgetDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -485,7 +491,9 @@ const bookTickersMappers = {
   bybit: () => new BybitV5BookTickerMapper('bybit'),
   'gate-io': () => new GateIOV4BookTickerMapper('gate-io'),
   'okex-spreads': () => new OkexSpreadsBookTickerMapper(),
-  'kucoin-futures': () => new KucoinFuturesBookTickerMapper()
+  'kucoin-futures': () => new KucoinFuturesBookTickerMapper(),
+  bitget: () => new BitgetBookTickerMapper('bitget'),
+  'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures')
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

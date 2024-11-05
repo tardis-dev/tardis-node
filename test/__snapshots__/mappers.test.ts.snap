@@ -135,6 +135,239 @@ Array [
 ]
 `;
 
+exports[`map bitget messages 1`] = `
+Array [
+  Object {
+    "amount": 0.001373,
+    "exchange": "bitget",
+    "id": "1235671058980749319",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 72389.99,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2024-10-31T00:00:58.796Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget messages 2`] = `Array []`;
+
+exports[`map bitget messages 3`] = `Array []`;
+
+exports[`map bitget messages 4`] = `
+Array [
+  Object {
+    "amount": 22.75,
+    "exchange": "bitget",
+    "id": "1235671063632220170",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 4.987,
+    "side": "sell",
+    "symbol": "RENDERUSDT",
+    "timestamp": 2024-10-31T00:00:59.905Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget messages 5`] = `Array []`;
+
+exports[`map bitget messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 1600,
+        "price": 0.09707,
+      },
+      Object {
+        "amount": 511.87,
+        "price": 0.09711,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 1213.91,
+        "price": 0.09694,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "BRETTUSDT",
+    "timestamp": 2024-10-31T00:00:00.391Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget messages 7`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 3326.85,
+        "price": 0.12306,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": false,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "LMWRUSDT",
+    "timestamp": 2024-10-31T00:00:59.981Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget messages 8`] = `
+Array [
+  Object {
+    "askAmount": 0.00408,
+    "askPrice": 72377.25,
+    "bidAmount": 1.1646,
+    "bidPrice": 72354.67,
+    "exchange": "bitget",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "BTCUSDC",
+    "timestamp": 2024-10-31T00:00:59.984Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 1`] = `Array []`;
+
+exports[`map bitget-futures messages 2`] = `Array []`;
+
+exports[`map bitget-futures messages 3`] = `
+Array [
+  Object {
+    "amount": 447,
+    "exchange": "bitget-futures",
+    "id": "1235671063871070209",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 0.168385,
+    "side": "buy",
+    "symbol": "DOGEUSD",
+    "timestamp": 2024-10-31T00:00:59.962Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 4`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 51,
+        "price": 0.5426,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 468,
+        "price": 0.542,
+      },
+      Object {
+        "amount": 1576,
+        "price": 0.5419,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "BELUSDT",
+    "timestamp": 2024-10-31T00:00:00.303Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 5`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 144.6,
+        "price": 5.085,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 536.2,
+        "price": 5.081,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "AXSUSDT",
+    "timestamp": 2024-10-31T00:00:59.988Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 6`] = `
+Array [
+  Object {
+    "askAmount": 10230,
+    "askPrice": 0.3555,
+    "bidAmount": 112096,
+    "bidPrice": 0.3553,
+    "exchange": "bitget-futures",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "ADAUSDT",
+    "timestamp": 2024-10-31T00:00:59.988Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 7`] = `Array []`;
+
+exports[`map bitget-futures messages 8`] = `
+Array [
+  Object {
+    "exchange": "bitget-futures",
+    "fundingRate": 0.0001,
+    "fundingTimestamp": 2024-10-31T08:00:00.000Z,
+    "indexPrice": 0.47080586,
+    "lastPrice": 0.4706,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 0.4705,
+    "openInterest": 8572031.1,
+    "predictedFundingRate": undefined,
+    "symbol": "STORJUSDT",
+    "timestamp": 2024-10-31T00:00:23.155Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 9`] = `
+Array [
+  Object {
+    "exchange": "bitget-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 72327.926666,
+    "lastPrice": 73733.7,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 73731.8,
+    "openInterest": 57.714,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDZ24",
+    "timestamp": 2024-10-31T00:00:23.217Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`map bitnomial messages 1`] = `
 Array [
   Object {

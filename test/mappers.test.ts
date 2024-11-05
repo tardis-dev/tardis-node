@@ -33,7 +33,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'crypto-com-derivatives',
   'crypto-com',
   'woo-x',
-  'kucoin-futures'
+  'kucoin-futures',
+  'bitget-futures'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -72,7 +73,9 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bybit',
   'gate-io',
   'okex-spreads',
-  'kucoin-futures'
+  'kucoin-futures',
+  'bitget',
+  'bitget-futures'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -9104,6 +9107,182 @@ test('map dydx-v4 messages', () => {
   ]
 
   const mapper = createMapper('dydx-v4', new Date('2024-08-23T00:00:00.4985250Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bitget messages', () => {
+  const messages = [
+    {
+      action: 'update',
+      arg: { instType: 'SPOT', channel: 'trade', instId: 'BTCUSDT' },
+      data: [{ ts: '1730332858796', price: '72389.99', size: '0.001373', side: 'buy', tradeId: '1235671058980749319' }],
+      ts: 1730332858805
+    },
+    { event: 'subscribe', arg: { instType: 'SPOT', channel: 'trade', instId: 'XAUTUSDT' } },
+    {
+      action: 'snapshot',
+      arg: { instType: 'SPOT', channel: 'trade', instId: 'SNEKUSDT' },
+      data: [{ ts: '1730332799292', price: '0.0010074', size: '23617.11', side: 'sell', tradeId: '1235670809402884097' }],
+      ts: 1730332800338
+    },
+    {
+      action: 'update',
+      arg: { instType: 'SPOT', channel: 'trade', instId: 'RENDERUSDT' },
+      data: [{ ts: '1730332859905', price: '4.987', size: '22.75', side: 'sell', tradeId: '1235671063632220170' }],
+      ts: 1730332859917
+    },
+    { event: 'subscribe', arg: { instType: 'SPOT', channel: 'books', instId: 'LUMIAUSDT' } },
+    {
+      action: 'snapshot',
+      arg: { instType: 'SPOT', channel: 'books', instId: 'BRETTUSDT' },
+      data: [
+        {
+          asks: [
+            ['0.09707', '1600.00'],
+            ['0.09711', '511.87']
+          ],
+          bids: [['0.09694', '1213.91']],
+          checksum: 0,
+          ts: '1730332800391'
+        }
+      ],
+      ts: 1730332800436
+    },
+    {
+      action: 'update',
+      arg: { instType: 'SPOT', channel: 'books', instId: 'LMWRUSDT' },
+      data: [{ asks: [], bids: [['0.12306', '3326.85']], checksum: 1073441524, ts: '1730332859981' }],
+      ts: 1730332859983
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'SPOT', channel: 'books1', instId: 'BTCUSDC' },
+      data: [{ asks: [['72377.25', '0.00408']], bids: [['72354.67', '1.16460']], checksum: 0, ts: '1730332859984' }],
+      ts: 1730332859985
+    }
+  ]
+  const mapper = createMapper('bitget', new Date('2024-08-23T00:00:00.4985250Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bitget-futures messages', () => {
+  const messages = [
+    { event: 'subscribe', arg: { instType: 'USDT-FUTURES', channel: 'trade', instId: 'LTCUSDT' } },
+    { event: 'subscribe', arg: { instType: 'USDC-FUTURES', channel: 'trade', instId: 'BTCPERP' } },
+    {
+      action: 'update',
+      arg: { instType: 'COIN-FUTURES', channel: 'trade', instId: 'DOGEUSD' },
+      data: [{ ts: '1730332859962', price: '0.168385', size: '447', side: 'buy', tradeId: '1235671063871070209' }],
+      ts: 1730332859979
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'USDT-FUTURES', channel: 'books', instId: 'BELUSDT' },
+      data: [
+        {
+          asks: [['0.5426', '51']],
+          bids: [
+            ['0.5420', '468'],
+            ['0.5419', '1576']
+          ],
+          checksum: 0,
+          ts: '1730332800303'
+        }
+      ],
+      ts: 1730332800315
+    },
+    {
+      action: 'update',
+      arg: { instType: 'USDT-FUTURES', channel: 'books', instId: 'AXSUSDT' },
+      data: [
+        {
+          asks: [['5.085', '144.6']],
+          bids: [['5.081', '536.2']],
+          checksum: -1258619028,
+          ts: '1730332859988'
+        }
+      ],
+      ts: 1730332859991
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'USDT-FUTURES', channel: 'books1', instId: 'ADAUSDT' },
+      data: [{ asks: [['0.3555', '10230']], bids: [['0.3553', '112096']], checksum: 0, ts: '1730332859988' }],
+      ts: 1730332859989
+    },
+    { event: 'subscribe', arg: { instType: 'USDT-FUTURES', channel: 'ticker', instId: 'BTCUSDT' } },
+    {
+      action: 'snapshot',
+      arg: { instType: 'USDT-FUTURES', channel: 'ticker', instId: 'STORJUSDT' },
+      data: [
+        {
+          instId: 'STORJUSDT',
+          lastPr: '0.4706',
+          bidPr: '0.4705',
+          askPr: '0.4708',
+          bidSz: '1367.3',
+          askSz: '2535.3',
+          open24h: '0.4737',
+          high24h: '0.4784',
+          low24h: '0.463',
+          change24h: '-0.01569',
+          fundingRate: '0.0001',
+          nextFundingTime: '1730361600000',
+          markPrice: '0.4705',
+          indexPrice: '0.47080586',
+          holdingAmount: '8572031.1',
+          baseVolume: '2878355.9',
+          quoteVolume: '1355483.45089',
+          openUtc: '0.4706',
+          symbolType: '1',
+          symbol: 'STORJUSDT',
+          deliveryPrice: '0',
+          ts: '1730332823155'
+        }
+      ],
+      ts: 1730332823157
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'COIN-FUTURES', channel: 'ticker', instId: 'BTCUSDZ24' },
+      data: [
+        {
+          instId: 'BTCUSDZ24',
+          lastPr: '73733.7',
+          bidPr: '73737.6',
+          askPr: '73742.1',
+          bidSz: '0.246',
+          askSz: '0.094',
+          open24h: '73465.6',
+          high24h: '74358.2',
+          low24h: '72872.2',
+          change24h: '-0.00612',
+          fundingRate: '0',
+          nextFundingTime: '0',
+          markPrice: '73731.8',
+          indexPrice: '72327.926666',
+          holdingAmount: '57.714',
+          baseVolume: '21.427',
+          quoteVolume: '1579692.8012',
+          openUtc: '73731.0',
+          symbolType: '2',
+          symbol: 'BTCUSDZ24',
+          ts: '1730332823217'
+        }
+      ],
+      ts: 1730332823221
+    }
+  ]
+
+  const mapper = createMapper('bitget-futures', new Date('2024-08-23T00:00:00.4985250Z'))
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))

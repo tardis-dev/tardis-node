@@ -177,6 +177,11 @@ export function* batch(symbols: string[], batchSize: number) {
     yield symbols.slice(i, i + batchSize)
   }
 }
+export function* batchObjects<T>(payload: T[], batchSize: number) {
+  for (let i = 0; i < payload.length; i += batchSize) {
+    yield payload.slice(i, i + batchSize)
+  }
+}
 
 export function parseμs(dateString: string): number {
   // check if we have ISO 8601 format date string, e.g: 2019-06-01T00:03:03.1238784Z or 2020-07-22T00:09:16.836773Z
