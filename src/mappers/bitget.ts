@@ -102,11 +102,11 @@ export class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures
         symbol: message.arg.instId,
         exchange: this._exchange,
 
-        askAmount: Number(bboMessage.asks[0][1]),
-        askPrice: Number(bboMessage.asks[0][0]),
+        askAmount: bboMessage.asks[0] ? Number(bboMessage.asks[0][1]) : undefined,
+        askPrice: bboMessage.asks[0] ? Number(bboMessage.asks[0][0]) : undefined,
 
-        bidPrice: Number(bboMessage.bids[0][0]),
-        bidAmount: Number(bboMessage.bids[0][1]),
+        bidPrice: bboMessage.bids[0] ? Number(bboMessage.bids[0][0]) : undefined,
+        bidAmount: bboMessage.bids[0] ? Number(bboMessage.bids[0][1]) : undefined,
         timestamp: new Date(Number(bboMessage.ts)),
         localTimestamp: localTimestamp
       }

@@ -368,6 +368,22 @@ Array [
 ]
 `;
 
+exports[`map bitget-futures messages 10`] = `
+Array [
+  Object {
+    "askAmount": 4.58,
+    "askPrice": 1.4138,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "bitget-futures",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "AQTUSDT",
+    "timestamp": 2024-11-06T02:32:10.169Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map bitnomial messages 1`] = `
 Array [
   Object {

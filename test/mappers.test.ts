@@ -9279,6 +9279,12 @@ test('map bitget-futures messages', () => {
         }
       ],
       ts: 1730332823221
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'SPOT', channel: 'books1', instId: 'AQTUSDT' },
+      data: [{ asks: [['1.4138', '4.58']], bids: [], checksum: 0, ts: '1730860330169' }],
+      ts: 1730860330170
     }
   ]
 
