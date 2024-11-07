@@ -47,7 +47,7 @@ export class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetOrderbookMessage) {
-    return message.arg.channel === 'books' && (message.action === 'update' || message.action === 'snapshot')
+    return message.arg.channel === 'books15' && message.action === 'snapshot'
   }
 
   getFilters(symbols?: string[]) {
@@ -55,7 +55,7 @@ export class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures
 
     return [
       {
-        channel: 'books',
+        channel: 'books15',
         symbols
       } as const
     ]
@@ -162,33 +162,19 @@ type BitgetTradeMessage = {
   ts: 1730332800989
 }
 
-type BitgetOrderbookMessage =
-  | {
-      action: 'snapshot'
-      arg: { instType: 'SPOT'; channel: 'books'; instId: 'SYLOUSDT' }
-      data: [
-        {
-          asks: [string, string][]
-          bids: [string, string][]
-          checksum: 0
-          ts: '1730331046984'
-        }
-      ]
-      ts: 1730332800437
+type BitgetOrderbookMessage = {
+  action: 'snapshot'
+  arg: { instType: 'SPOT'; channel: 'books15'; instId: 'GEMSUSDT' }
+  data: [
+    {
+      asks: [['0.22816', '155.25']]
+      bids: [['0.22785', '73.41']]
+      checksum: 0
+      ts: '1730963759993'
     }
-  | {
-      action: 'update'
-      arg: { instType: 'SPOT'; channel: 'books'; instId: 'BANDUSDT' }
-      data: [
-        {
-          asks: [string, string][]
-          bids: [string, string][]
-          checksum: 79466786
-          ts: '1730332859977'
-        }
-      ]
-      ts: 1730332859979
-    }
+  ]
+  ts: 1730963759997
+}
 
 type BitgetBBoMessage = {
   action: 'snapshot'

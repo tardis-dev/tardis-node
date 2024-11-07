@@ -173,54 +173,9 @@ Array [
 
 exports[`map bitget messages 5`] = `Array []`;
 
-exports[`map bitget messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 1600,
-        "price": 0.09707,
-      },
-      Object {
-        "amount": 511.87,
-        "price": 0.09711,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 1213.91,
-        "price": 0.09694,
-      },
-    ],
-    "exchange": "bitget",
-    "isSnapshot": true,
-    "localTimestamp": 2024-08-23T00:00:00.498Z,
-    "symbol": "BRETTUSDT",
-    "timestamp": 2024-10-31T00:00:00.391Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bitget messages 6`] = `Array []`;
 
-exports[`map bitget messages 7`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
-        "amount": 3326.85,
-        "price": 0.12306,
-      },
-    ],
-    "exchange": "bitget",
-    "isSnapshot": false,
-    "localTimestamp": 2024-08-23T00:00:00.498Z,
-    "symbol": "LMWRUSDT",
-    "timestamp": 2024-10-31T00:00:59.981Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bitget messages 7`] = `Array []`;
 
 exports[`map bitget messages 8`] = `
 Array [
@@ -234,6 +189,31 @@ Array [
     "symbol": "BTCUSDC",
     "timestamp": 2024-10-31T00:00:59.984Z,
     "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget messages 9`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 7.03,
+        "price": 0.7146,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 20.98,
+        "price": 0.7139,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "MANTAUSDT",
+    "timestamp": 2024-11-07T07:15:59.993Z,
+    "type": "book_change",
   },
 ]
 `;
@@ -258,59 +238,9 @@ Array [
 ]
 `;
 
-exports[`map bitget-futures messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 51,
-        "price": 0.5426,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 468,
-        "price": 0.542,
-      },
-      Object {
-        "amount": 1576,
-        "price": 0.5419,
-      },
-    ],
-    "exchange": "bitget-futures",
-    "isSnapshot": true,
-    "localTimestamp": 2024-08-23T00:00:00.498Z,
-    "symbol": "BELUSDT",
-    "timestamp": 2024-10-31T00:00:00.303Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bitget-futures messages 4`] = `Array []`;
 
-exports[`map bitget-futures messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
-        "amount": 144.6,
-        "price": 5.085,
-      },
-    ],
-    "bids": Array [
-      Object {
-        "amount": 536.2,
-        "price": 5.081,
-      },
-    ],
-    "exchange": "bitget-futures",
-    "isSnapshot": false,
-    "localTimestamp": 2024-08-23T00:00:00.498Z,
-    "symbol": "AXSUSDT",
-    "timestamp": 2024-10-31T00:00:59.988Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bitget-futures messages 5`] = `Array []`;
 
 exports[`map bitget-futures messages 6`] = `
 Array [
@@ -380,6 +310,39 @@ Array [
     "symbol": "AQTUSDT",
     "timestamp": 2024-11-06T02:32:10.169Z,
     "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures messages 11`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 641.4443,
+        "price": 0.47256,
+      },
+      Object {
+        "amount": 3074.3765,
+        "price": 0.47257,
+      },
+      Object {
+        "amount": 2677.56,
+        "price": 0.47377,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 18.7835,
+        "price": 0.47242,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "YGGUSDT",
+    "timestamp": 2024-11-07T07:15:59.972Z,
+    "type": "book_change",
   },
 ]
 `;

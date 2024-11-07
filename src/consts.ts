@@ -474,8 +474,8 @@ const KUCOIN_FUTURES_CHANNELS = [
   'contractMarket/snapshot'
 ]
 
-const BITGET_CHANNELS = ['trade', 'books1', 'books']
-const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books', 'ticker']
+const BITGET_CHANNELS = ['trade', 'books1', 'books15']
+const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
