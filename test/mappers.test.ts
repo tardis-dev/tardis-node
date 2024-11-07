@@ -9163,6 +9163,19 @@ test('map bitget messages', () => {
       arg: { instType: 'SPOT', channel: 'books1', instId: 'BTCUSDC' },
       data: [{ asks: [['72377.25', '0.00408']], bids: [['72354.67', '1.16460']], checksum: 0, ts: '1730332859984' }],
       ts: 1730332859985
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'SPOT', channel: 'books15', instId: 'MANTAUSDT' },
+      data: [
+        {
+          asks: [['0.7146', '7.03']],
+          bids: [['0.7139', '20.98']],
+          checksum: 0,
+          ts: '1730963759993'
+        }
+      ],
+      ts: 1730963759994
     }
   ]
   const mapper = createMapper('bitget', new Date('2024-08-23T00:00:00.4985250Z'))
@@ -9282,9 +9295,27 @@ test('map bitget-futures messages', () => {
     },
     {
       action: 'snapshot',
-      arg: { instType: 'SPOT', channel: 'books1', instId: 'AQTUSDT' },
+      arg: { instType: 'USDT-FUTURES', channel: 'books1', instId: 'AQTUSDT' },
       data: [{ asks: [['1.4138', '4.58']], bids: [], checksum: 0, ts: '1730860330169' }],
       ts: 1730860330170
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'USDT-FUTURES', channel: 'books15', instId: 'YGGUSDT' },
+      data: [
+        {
+          asks: [
+            ['0.47256', '641.4443'],
+            ['0.47257', '3074.3765'],
+
+            ['0.47377', '2677.5600']
+          ],
+          bids: [['0.47242', '18.7835']],
+          checksum: 0,
+          ts: '1730963759972'
+        }
+      ],
+      ts: 1730963759998
     }
   ]
 
