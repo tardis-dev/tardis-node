@@ -9400,6 +9400,18 @@ test('map coinbase-international messages', () => {
       type: 'UPDATE',
       time: '2024-11-06T02:00:00Z',
       product_id: 'SOL-PERP'
+    },
+    {
+      sequence: 32,
+      limit_up: '1.0888',
+      limit_down: '0.9852',
+      index_price: '1.03709828725',
+      mark_price: '1.0344',
+      settlement_price: '1.0409',
+      channel: 'RISK',
+      type: 'SNAPSHOT',
+      time: '2024-10-31T09:36:02.342Z',
+      product_id: 'APE-PERP'
     }
   ]
 

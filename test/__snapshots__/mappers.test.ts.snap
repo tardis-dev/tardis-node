@@ -778,6 +778,25 @@ Array [
 ]
 `;
 
+exports[`map coinbase-international messages 8`] = `
+Array [
+  Object {
+    "exchange": "coinbase-international",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 1.03709828725,
+    "lastPrice": undefined,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 1.0344,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "APE-PERP",
+    "timestamp": 2024-10-31T09:36:02.342Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`map crypto-com messages 1`] = `Array []`;
 
 exports[`map crypto-com messages 2`] = `

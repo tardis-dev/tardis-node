@@ -209,9 +209,15 @@ export class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coin
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.product_id, 'coinbase-international')
 
     if (message.channel === 'RISK') {
-      pendingTickerInfo.updateIndexPrice(Number(message.index_price))
-      pendingTickerInfo.updateMarkPrice(Number(message.mark_price))
-      pendingTickerInfo.updateOpenInterest(Number(message.open_interest))
+      if (message.index_price !== undefined) {
+        pendingTickerInfo.updateIndexPrice(Number(message.index_price))
+      }
+      if (message.mark_price !== undefined) {
+        pendingTickerInfo.updateMarkPrice(Number(message.mark_price))
+      }
+      if (message.open_interest !== undefined) {
+        pendingTickerInfo.updateOpenInterest(Number(message.open_interest))
+      }
     }
 
     if (message.channel === 'FUNDING') {
