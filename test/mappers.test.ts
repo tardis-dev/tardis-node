@@ -34,7 +34,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'crypto-com',
   'woo-x',
   'kucoin-futures',
-  'bitget-futures'
+  'bitget-futures',
+  'coinbase-international'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -75,7 +76,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okex-spreads',
   'kucoin-futures',
   'bitget',
-  'bitget-futures'
+  'bitget-futures',
+  'coinbase-international'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -9320,6 +9322,88 @@ test('map bitget-futures messages', () => {
   ]
 
   const mapper = createMapper('bitget-futures', new Date('2024-08-23T00:00:00.4985250Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+test('map coinbase-international messages', () => {
+  const messages = [
+    {
+      sequence: 101,
+      match_id: '374491378496831495',
+      trade_price: '177.202',
+      trade_qty: '3.584',
+      aggressor_side: 'BUY',
+      channel: 'MATCH',
+      type: 'UPDATE',
+      time: '2024-10-30T10:55:02.347Z',
+      product_id: 'SOL-PERP'
+    },
+    {
+      sequence: 81053124,
+      bids: [['4.802', '58.5']],
+      asks: [['6.66', '2969.1']],
+      channel: 'LEVEL2',
+      type: 'SNAPSHOT',
+      time: '2024-11-07T00:00:00.015Z',
+      product_id: 'TON-PERP'
+    },
+    {
+      sequence: 111760281,
+      changes: [['BUY', '0.3444', '15468']],
+      channel: 'LEVEL2',
+      type: 'UPDATE',
+      time: '2024-11-07T00:00:59.974Z',
+      product_id: 'CATI-PERP'
+    },
+    {
+      sequence: 106920921,
+      bid_price: '0.19717',
+      bid_qty: '5116',
+      ask_price: '0.19724',
+      ask_qty: '6000',
+      channel: 'LEVEL1',
+      type: 'UPDATE',
+      time: '2024-11-07T00:00:59.965Z',
+      product_id: 'DOGE-PERP'
+    },
+    {
+      sequence: 84533756,
+      limit_up: '4.121',
+      limit_down: '3.729',
+      index_price: '3.925562264285714',
+      mark_price: '3.927',
+      settlement_price: '3.938',
+      open_interest: '76677.9',
+      channel: 'RISK',
+      type: 'UPDATE',
+      time: '2024-11-06T01:59:59.155Z',
+      product_id: 'SOL-PERP'
+    },
+
+    {
+      sequence: 64190393,
+      funding_rate: '0.000005',
+      is_final: false,
+      channel: 'FUNDING',
+      type: 'UPDATE',
+      time: '2024-11-06T01:59:59.155Z',
+      product_id: 'SOL-PERP'
+    },
+    {
+      sequence: 90311075,
+      funding_rate: '-0.000017',
+      is_final: true,
+      channel: 'FUNDING',
+      type: 'UPDATE',
+      time: '2024-11-06T02:00:00Z',
+      product_id: 'SOL-PERP'
+    }
+  ]
+
+  const mapper = createMapper('coinbase-international', new Date('2024-08-23T00:00:00.4985250Z'))
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))

@@ -1,4 +1,4 @@
-import crypto, { sign } from 'crypto'
+import crypto from 'crypto'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 

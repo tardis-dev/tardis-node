@@ -19,6 +19,7 @@ export const EXCHANGES = [
   'bitfinex-derivatives',
   'bitfinex',
   'coinbase',
+  'coinbase-international',
   'cryptofacilities',
   'kraken',
   'bitstamp',
@@ -476,10 +477,11 @@ const KUCOIN_FUTURES_CHANNELS = [
 
 const BITGET_CHANNELS = ['trade', 'books1', 'books15']
 const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
-
+const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RISK', 'LEVEL1', 'LEVEL2', 'CANDLES_ONE_MINUTE']
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
+  'coinbase-international': COINBASE_INTERNATIONAL_CHANNELS,
   deribit: DERIBIT_CHANNELS,
   cryptofacilities: CRYPTOFACILITIES_CHANNELS,
   bitstamp: BITSTAMP_CHANNELS,

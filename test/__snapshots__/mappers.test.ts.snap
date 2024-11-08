@@ -644,6 +644,140 @@ Array [
 ]
 `;
 
+exports[`map coinbase-international messages 1`] = `
+Array [
+  Object {
+    "amount": 3.584,
+    "exchange": "coinbase-international",
+    "id": "374491378496831495",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 177.202,
+    "side": "buy",
+    "symbol": "SOL-PERP",
+    "timestamp": 2024-10-30T10:55:02.347Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 2`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2969.1,
+        "price": 6.66,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 58.5,
+        "price": 4.802,
+      },
+    ],
+    "exchange": "coinbase-international",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "TON-PERP",
+    "timestamp": 2024-11-07T00:00:00.015Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 3`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [
+      Object {
+        "amount": 15468,
+        "price": 0.3444,
+      },
+    ],
+    "exchange": "coinbase-international",
+    "isSnapshot": false,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "CATI-PERP",
+    "timestamp": 2024-11-07T00:00:59.974Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 4`] = `
+Array [
+  Object {
+    "askAmount": 6000,
+    "askPrice": 0.19724,
+    "bidAmount": 5116,
+    "bidPrice": 0.19717,
+    "exchange": "coinbase-international",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "DOGE-PERP",
+    "timestamp": 2024-11-07T00:00:59.965Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 5`] = `
+Array [
+  Object {
+    "exchange": "coinbase-international",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 3.925562264285714,
+    "lastPrice": 177.202,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 3.927,
+    "openInterest": 76677.9,
+    "predictedFundingRate": undefined,
+    "symbol": "SOL-PERP",
+    "timestamp": 2024-11-06T01:59:59.155Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 6`] = `
+Array [
+  Object {
+    "exchange": "coinbase-international",
+    "fundingRate": 0.000005,
+    "fundingTimestamp": 2024-11-06T02:00:00.000Z,
+    "indexPrice": 3.925562264285714,
+    "lastPrice": 177.202,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 3.927,
+    "openInterest": 76677.9,
+    "predictedFundingRate": undefined,
+    "symbol": "SOL-PERP",
+    "timestamp": 2024-11-06T01:59:59.155Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map coinbase-international messages 7`] = `
+Array [
+  Object {
+    "exchange": "coinbase-international",
+    "fundingRate": -0.000017,
+    "fundingTimestamp": 2024-11-06T02:00:00.000Z,
+    "indexPrice": 3.925562264285714,
+    "lastPrice": 177.202,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 3.927,
+    "openInterest": 76677.9,
+    "predictedFundingRate": undefined,
+    "symbol": "SOL-PERP",
+    "timestamp": 2024-11-06T02:00:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`map crypto-com messages 1`] = `Array []`;
 
 exports[`map crypto-com messages 2`] = `

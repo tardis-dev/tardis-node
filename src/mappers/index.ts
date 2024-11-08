@@ -49,6 +49,12 @@ import {
 } from './bybit'
 import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
 import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
+import {
+  CoinbaseInternationalBookChangMapper,
+  coinbaseInternationalBookTickerMapper,
+  CoinbaseInternationalDerivativeTickerMapper,
+  coinbaseInternationalTradesMapper
+} from './coinbaseinternational'
 import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
 import { CryptoComBookChangeMapper, CryptoComBookTickerMapper, CryptoComDerivativeTickerMapper, CryptoComTradesMapper } from './cryptocom'
 import {
@@ -274,7 +280,8 @@ const tradesMappers = {
   'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper(),
   'okex-spreads': () => new OkexSpreadsTradesMapper(),
   bitget: () => new BitgetTradesMapper('bitget'),
-  'bitget-futures': () => new BitgetTradesMapper('bitget-futures')
+  'bitget-futures': () => new BitgetTradesMapper('bitget-futures'),
+  'coinbase-international': () => coinbaseInternationalTradesMapper
 }
 
 const bookChangeMappers = {
@@ -364,7 +371,8 @@ const bookChangeMappers = {
   'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper(),
   'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
   bitget: () => new BitgetBookChangeMapper('bitget'),
-  'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures')
+  'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures'),
+  'coinbase-international': () => new CoinbaseInternationalBookChangMapper()
 }
 
 const derivativeTickersMappers = {
@@ -399,7 +407,8 @@ const derivativeTickersMappers = {
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
   'woo-x': () => new WooxDerivativeTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
-  'bitget-futures': () => new BitgetDerivativeTickerMapper()
+  'bitget-futures': () => new BitgetDerivativeTickerMapper(),
+  'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -493,7 +502,8 @@ const bookTickersMappers = {
   'okex-spreads': () => new OkexSpreadsBookTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesBookTickerMapper(),
   bitget: () => new BitgetBookTickerMapper('bitget'),
-  'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures')
+  'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
+  'coinbase-international': () => coinbaseInternationalBookTickerMapper
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

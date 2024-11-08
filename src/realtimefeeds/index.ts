@@ -51,6 +51,7 @@ import { OkexSpreadsRealTimeFeed } from './okexspreads'
 import { KucoinFuturesRealTimeFeed } from './kucoinfutures'
 import { DydxV4RealTimeFeed } from './dydx_v4'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget'
+import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational'
 
 export * from './realtimefeed'
 
@@ -113,7 +114,8 @@ const realTimeFeedsMap: {
   'kucoin-futures': KucoinFuturesRealTimeFeed,
   'dydx-v4': DydxV4RealTimeFeed,
   bitget: BitgetRealTimeFeed,
-  'bitget-futures': BitgetFuturesRealTimeFeed
+  'bitget-futures': BitgetFuturesRealTimeFeed,
+  'coinbase-international': CoinbaseInternationalRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
