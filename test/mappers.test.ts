@@ -35,7 +35,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'woo-x',
   'kucoin-futures',
   'bitget-futures',
-  'coinbase-international'
+  'coinbase-international',
+  'hyperliquid'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -9416,6 +9417,143 @@ test('map coinbase-international messages', () => {
   ]
 
   const mapper = createMapper('coinbase-international', new Date('2024-08-23T00:00:00.4985250Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map hyperliquid messages', () => {
+  const messages = [
+    {
+      channel: 'trades',
+      data: [
+        {
+          coin: 'FXS',
+          side: 'A',
+          px: '1.9008',
+          sz: '10.5',
+          time: 1730160015113,
+          hash: '0xdde3d6b67214c97cb88704156eee8e016e010eb52dcf2a855bdaea517a5b45a9',
+          tid: 611279506717453
+        }
+      ]
+    },
+    {
+      channel: 'trades',
+      data: [
+        {
+          coin: 'FXS',
+          side: 'A',
+          px: '1.9014',
+          sz: '9.1',
+          time: 1730160059558,
+          hash: '0xebc3cc3fd23dac2eb64204156ef14a01e2005ddadaba6efe617eef218f1accc0',
+          tid: 809065877559592
+        }
+      ]
+    },
+    {
+      channel: 'trades',
+      data: [
+        {
+          coin: 'BTC',
+          side: 'B',
+          px: '69997.0',
+          sz: '0.38111',
+          time: 1730160006192,
+          hash: '0x40d169aa50ad8a32b44a04156eee0201d8002e5c6456b7c1ae175e381f73f9dd',
+          tid: 1016375172059570
+        },
+        {
+          coin: 'BTC',
+          side: 'B',
+          px: '69997.0',
+          sz: '0.33458',
+          time: 1730160006192,
+          hash: '0x40d169aa50ad8a32b44a04156eee0201d8002e5c6456b7c1ae175e381f73f9dd',
+          tid: 479312521152049
+        },
+        {
+          coin: 'BTC',
+          side: 'B',
+          px: '69997.0',
+          sz: '0.83613',
+          time: 1730160006192,
+          hash: '0x40d169aa50ad8a32b44a04156eee0201d8002e5c6456b7c1ae175e381f73f9dd',
+          tid: 229986151112628
+        }
+      ]
+    },
+    {
+      channel: 'trades',
+      data: [
+        {
+          coin: 'BTC',
+          side: 'B',
+          px: '69998.0',
+          sz: '0.00714',
+          time: 1730160007572,
+          hash: '0xb2628bf07a30ffa6267904156eee1801610085114d2758aec6a6784d14463055',
+          tid: 696560709859024
+        }
+      ]
+    },
+    { channel: 'l2Book', data: { coin: 'SHIA', time: 1730160007687, levels: [[], []] } },
+
+    {
+      channel: 'l2Book',
+      data: {
+        coin: 'BANANA',
+        time: 1730160007687,
+        levels: [
+          [
+            { px: '59.8', sz: '3.4', n: 1 },
+            { px: '59.778', sz: '1.6', n: 1 }
+          ],
+          [
+            { px: '59.811', sz: '2.9', n: 1 },
+            { px: '59.832', sz: '17.6', n: 1 }
+          ]
+        ]
+      }
+    },
+
+    {
+      channel: 'activeAssetCtx',
+      data: {
+        coin: 'MOODENG',
+        ctx: {
+          funding: '0.00004863',
+          openInterest: '18617460.0',
+          prevDayPx: '0.20296',
+          dayNtlVlm: '7665220.55613',
+          premium: '0.00008521',
+          oraclePx: '0.1995',
+          markPx: '0.19963',
+          midPx: '0.19957',
+          impactPxs: ['0.199517', '0.199725']
+        }
+      }
+    },
+    {
+      channel: 'activeSpotAssetCtx',
+      data: {
+        coin: '@2',
+        ctx: {
+          prevDayPx: '0.000031',
+          dayNtlVlm: '24629.86429498',
+          markPx: '0.00005299',
+          midPx: '0.00005307',
+          circulatingSupply: '6879553815.3455801',
+          coin: '@2'
+        }
+      }
+    }
+  ]
+
+  const mapper = createMapper('hyperliquid', new Date('2024-08-23T00:00:00.4985250Z'))
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))

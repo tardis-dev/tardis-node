@@ -52,6 +52,7 @@ import { KucoinFuturesRealTimeFeed } from './kucoinfutures'
 import { DydxV4RealTimeFeed } from './dydx_v4'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational'
+import { HyperliquidRealTimeFeed } from './hyperliquid'
 
 export * from './realtimefeed'
 
@@ -115,7 +116,8 @@ const realTimeFeedsMap: {
   'dydx-v4': DydxV4RealTimeFeed,
   bitget: BitgetRealTimeFeed,
   'bitget-futures': BitgetFuturesRealTimeFeed,
-  'coinbase-international': CoinbaseInternationalRealTimeFeed
+  'coinbase-international': CoinbaseInternationalRealTimeFeed,
+  hyperliquid: HyperliquidRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

@@ -1428,6 +1428,111 @@ Array [
 ]
 `;
 
+exports[`map hyperliquid messages 1`] = `Array []`;
+
+exports[`map hyperliquid messages 2`] = `
+Array [
+  Object {
+    "amount": 9.1,
+    "exchange": "hyperliquid",
+    "id": "809065877559592",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 1.9014,
+    "side": "sell",
+    "symbol": "FXS",
+    "timestamp": 2024-10-29T00:00:59.558Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 3`] = `Array []`;
+
+exports[`map hyperliquid messages 4`] = `
+Array [
+  Object {
+    "amount": 0.00714,
+    "exchange": "hyperliquid",
+    "id": "696560709859024",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "price": 69998,
+    "side": "buy",
+    "symbol": "BTC",
+    "timestamp": 2024-10-29T00:00:07.572Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 5`] = `
+Array [
+  Object {
+    "asks": Array [],
+    "bids": Array [],
+    "exchange": "hyperliquid",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "SHIA",
+    "timestamp": 2024-10-29T00:00:07.687Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 6`] = `
+Array [
+  Object {
+    "asks": Array [
+      Object {
+        "amount": 2.9,
+        "price": 59.811,
+      },
+      Object {
+        "amount": 17.6,
+        "price": 59.832,
+      },
+    ],
+    "bids": Array [
+      Object {
+        "amount": 3.4,
+        "price": 59.8,
+      },
+      Object {
+        "amount": 1.6,
+        "price": 59.778,
+      },
+    ],
+    "exchange": "hyperliquid",
+    "isSnapshot": true,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "BANANA",
+    "timestamp": 2024-10-29T00:00:07.687Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 7`] = `
+Array [
+  Object {
+    "exchange": "hyperliquid",
+    "fundingRate": 0.00004863,
+    "fundingTimestamp": undefined,
+    "indexPrice": 0.1995,
+    "lastPrice": undefined,
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "markPrice": 0.19963,
+    "openInterest": 18617460,
+    "predictedFundingRate": undefined,
+    "symbol": "MOODENG",
+    "timestamp": 2024-08-23T00:00:00.498Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 8`] = `Array []`;
+
 exports[`map kucoin messages 1`] = `Array []`;
 
 exports[`map kucoin messages 2`] = `Array []`;

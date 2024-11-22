@@ -56,7 +56,8 @@ export const EXCHANGES = [
   'woo-x',
   'blockchain-com',
   'bitget',
-  'bitget-futures'
+  'bitget-futures',
+  'hyperliquid'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -478,6 +479,9 @@ const KUCOIN_FUTURES_CHANNELS = [
 const BITGET_CHANNELS = ['trade', 'books1', 'books15']
 const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
 const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RISK', 'LEVEL1', 'LEVEL2', 'CANDLES_ONE_MINUTE']
+
+const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -536,5 +540,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'okex-spreads': OKEX_SPREADS_CHANNELS,
   'kucoin-futures': KUCOIN_FUTURES_CHANNELS,
   bitget: BITGET_CHANNELS,
-  'bitget-futures': BITGET_FUTURES_CHANNELS
+  'bitget-futures': BITGET_FUTURES_CHANNELS,
+  hyperliquid: HYPERLIQUID_CHANNELS
 }

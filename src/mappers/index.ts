@@ -100,6 +100,7 @@ import {
   HuobiBookTickerMapper,
   HuobiTradesMapper
 } from './huobi'
+import { HyperliquidBookChangeMapper, HyperliquidDerivativeTickerMapper, HyperliquidTradesMapper } from './hyperliquid'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
 import {
@@ -281,7 +282,8 @@ const tradesMappers = {
   'okex-spreads': () => new OkexSpreadsTradesMapper(),
   bitget: () => new BitgetTradesMapper('bitget'),
   'bitget-futures': () => new BitgetTradesMapper('bitget-futures'),
-  'coinbase-international': () => coinbaseInternationalTradesMapper
+  'coinbase-international': () => coinbaseInternationalTradesMapper,
+  hyperliquid: () => new HyperliquidTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -372,7 +374,8 @@ const bookChangeMappers = {
   'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
   bitget: () => new BitgetBookChangeMapper('bitget'),
   'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures'),
-  'coinbase-international': () => new CoinbaseInternationalBookChangMapper()
+  'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
+  hyperliquid: () => new HyperliquidBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -408,7 +411,8 @@ const derivativeTickersMappers = {
   'woo-x': () => new WooxDerivativeTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
   'bitget-futures': () => new BitgetDerivativeTickerMapper(),
-  'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper()
+  'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper(),
+  hyperliquid: () => new HyperliquidDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
