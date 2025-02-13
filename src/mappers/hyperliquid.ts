@@ -117,6 +117,7 @@ export class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', 
     }
 
     if (pendingTickerInfo.hasChanged()) {
+      pendingTickerInfo.updateTimestamp(localTimestamp)
       yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
