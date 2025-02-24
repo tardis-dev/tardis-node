@@ -8,7 +8,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper'
 export class BinanceTradesMapper
   implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', Trade>
 {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -60,7 +60,7 @@ export class BinanceBookChangeMapper
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
+  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) { }
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -144,6 +144,7 @@ export class BinanceBookChangeMapper
         isSnapshot: true,
         bids: binanceDepthSnapshotData.bids.map(this.mapBookLevel),
         asks: binanceDepthSnapshotData.asks.map(this.mapBookLevel),
+        uid: binanceDepthSnapshotData.lastUpdateId,
         timestamp: binanceDepthSnapshotData.T !== undefined ? new Date(binanceDepthSnapshotData.T) : localTimestamp,
         localTimestamp
       }
@@ -201,6 +202,7 @@ export class BinanceBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
+      uid: binanceDepthUpdateData.u,
       timestamp: new Date(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
@@ -259,6 +261,7 @@ export class BinanceFuturesBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
+      uid: binanceDepthUpdateData.u,
       timestamp: new Date(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
@@ -269,7 +272,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
-  constructor(protected readonly exchange: Exchange) {}
+  constructor(protected readonly exchange: Exchange) { }
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -362,7 +365,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
 }
 
 export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'binance-delivery', Liquidation> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -407,7 +410,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
 }
 
 export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', BookTicker> {
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(private readonly _exchange: Exchange) { }
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {

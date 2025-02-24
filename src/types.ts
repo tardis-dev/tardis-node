@@ -44,7 +44,7 @@ export type BookChange = {
   readonly isSnapshot: boolean
   readonly bids: BookPriceLevel[]
   readonly asks: BookPriceLevel[]
-
+  readonly uid?: number,
   readonly timestamp: Date
   readonly localTimestamp: Date
 }
