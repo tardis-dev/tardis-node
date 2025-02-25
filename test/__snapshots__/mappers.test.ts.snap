@@ -5112,6 +5112,24 @@ Array [
 ]
 `;
 
+exports[`mappers map bybit messages 53`] = `Array []`;
+
+exports[`mappers map bybit messages 54`] = `
+Array [
+  Object {
+    "amount": 2846,
+    "exchange": "bybit",
+    "id": undefined,
+    "localTimestamp": 2025-02-26T00:00:00.000Z,
+    "price": 0.02456,
+    "side": "buy",
+    "symbol": "PIPPINUSDT",
+    "timestamp": 2025-02-25T10:43:27.110Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`mappers map bybit-options messages 1`] = `
 Array [
   Object {

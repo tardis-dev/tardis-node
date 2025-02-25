@@ -379,7 +379,8 @@ const BYBIT_CHANNELS = [
   'orderbook.500',
   'publicTrade',
   'tickers',
-  'liquidation'
+  'liquidation',
+  'allLiquidation'
 ] as const
 
 const BYBIT_OPTIONS_CHANNELS = ['orderbook.25', 'orderbook.100', 'publicTrade', 'tickers']

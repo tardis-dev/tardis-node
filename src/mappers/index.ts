@@ -40,6 +40,7 @@ import {
   BybitDerivativeTickerMapper,
   BybitLiquidationsMapper,
   BybitTradesMapper,
+  BybitV5AllLiquidationsMapper,
   BybitV5BookChangeMapper,
   BybitV5BookTickerMapper,
   BybitV5DerivativeTickerMapper,
@@ -176,8 +177,14 @@ const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
 
 const BYBIT_V5_API_SWITCH_DATE = new Date('2023-04-05T00:00:00.000Z')
 
+const BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE = new Date('2025-02-26T00:00:00.000Z')
+
 const shouldUseBybitV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_SWITCH_DATE.valueOf()
+}
+
+const shouldUseBybitAllLiquidationFeed = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE.valueOf()
 }
 
 const OKCOIN_V5_API_SWITCH_DATE = new Date('2023-04-27T00:00:00.000Z')
@@ -438,7 +445,11 @@ const liquidationsMappers = {
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
   bybit: (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5LiquidationsMapper('bybit') : new BybitLiquidationsMapper('bybit'),
+    shouldUseBybitV5Mappers(localTimestamp)
+      ? shouldUseBybitAllLiquidationFeed(localTimestamp)
+        ? new BybitV5AllLiquidationsMapper('bybit')
+        : new BybitV5LiquidationsMapper('bybit')
+      : new BybitLiquidationsMapper('bybit'),
   'okex-futures': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp)
       ? new OkexV5LiquidationsMapper('okex-futures')

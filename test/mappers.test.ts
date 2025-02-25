@@ -6190,6 +6190,12 @@ describe('mappers', () => {
           u: 1188472,
           seq: 11155892580
         }
+      },
+      {
+        topic: 'allLiquidation.PIPPINUSDT',
+        type: 'snapshot',
+        ts: 1740480207578,
+        data: [{ T: 1740480207110, s: 'PIPPINUSDT', S: 'Sell', v: '2846', p: '0.02456' }]
       }
     ]
 
@@ -6197,6 +6203,21 @@ describe('mappers', () => {
 
     for (const message of messagesV5) {
       const mappedMessages = bybit.map(message, new Date('2023-04-05'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+
+    const messagesAllLiquidation = [
+      {
+        topic: 'allLiquidation.PIPPINUSDT',
+        type: 'snapshot',
+        ts: 1740480207578,
+        data: [{ T: 1740480207110, s: 'PIPPINUSDT', S: 'Sell', v: '2846', p: '0.02456' }]
+      }
+    ]
+    bybit = createMapper('bybit', new Date('2025-02-26'))
+
+    for (const message of messagesAllLiquidation) {
+      const mappedMessages = bybit.map(message, new Date('2025-02-26'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

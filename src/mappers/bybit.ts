@@ -251,6 +251,46 @@ export class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
   }
 }
 
+export class BybitV5AllLiquidationsMapper implements Mapper<'bybit', Liquidation> {
+  constructor(private readonly _exchange: Exchange) {}
+  canHandle(message: BybitV5AllLiquidationMessage) {
+    if (message.topic === undefined) {
+      return false
+    }
+
+    return message.topic.startsWith('allLiquidation.')
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'allLiquidation',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: BybitV5AllLiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const bybitLiquidation of message.data) {
+      const liquidation: Liquidation = {
+        type: 'liquidation',
+        symbol: bybitLiquidation.s,
+        exchange: this._exchange,
+        id: undefined,
+        price: Number(bybitLiquidation.p),
+        amount: Number(bybitLiquidation.v),
+        //  from bybit docs  Position side. Buy,Sell. When you receive a Buy update, this means that a long position has been liquidated
+        side: bybitLiquidation.S == 'Buy' ? 'sell' : 'buy',
+        timestamp: new Date(bybitLiquidation.T),
+        localTimestamp
+      }
+
+      yield liquidation
+    }
+  }
+}
 export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', OptionSummary> {
   canHandle(message: BybitV5OptionTickerMessage) {
     if (message.topic === undefined) {
@@ -670,6 +710,13 @@ type BybitV5LiquidationMessage = {
   topic: 'liquidation.GALAUSDT'
   ts: 1673251091822
   type: 'snapshot'
+}
+
+type BybitV5AllLiquidationMessage = {
+  topic: 'allLiquidation.KAITOUSDT'
+  type: 'snapshot'
+  ts: 1740480190078
+  data: [{ T: 1740480189987; s: 'KAITOUSDT'; S: 'Buy'; v: '43'; p: '1.7531' }]
 }
 
 type BybitV5OptionTickerMessage = {
