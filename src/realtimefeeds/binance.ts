@@ -233,7 +233,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 }
 
 export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://stream.binance.com:9443/stream'
+  protected wssURL = 'wss://stream.binance.com/stream?timeUnit=microsecond'
   protected httpURL = 'https://api.binance.com/api/v1'
 
   protected suffixes = {

@@ -1,5 +1,5 @@
 import { debug } from '../debug'
-import { CircularBuffer, lowerCaseSymbols } from '../handy'
+import { CircularBuffer, fromMicroSecondsToDate, lowerCaseSymbols } from '../handy'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
@@ -45,7 +45,7 @@ export class BinanceTradesMapper
       price: Number(binanceTrade.p),
       amount: Number(binanceTrade.q),
       side: binanceTrade.m ? 'sell' : 'buy',
-      timestamp: new Date(binanceTrade.T),
+      timestamp: fromMicroSecondsToDate(binanceTrade.T),
       localTimestamp: localTimestamp
     }
 
@@ -144,7 +144,7 @@ export class BinanceBookChangeMapper
         isSnapshot: true,
         bids: binanceDepthSnapshotData.bids.map(this.mapBookLevel),
         asks: binanceDepthSnapshotData.asks.map(this.mapBookLevel),
-        timestamp: binanceDepthSnapshotData.T !== undefined ? new Date(binanceDepthSnapshotData.T) : localTimestamp,
+        timestamp: binanceDepthSnapshotData.T !== undefined ? fromMicroSecondsToDate(binanceDepthSnapshotData.T) : localTimestamp,
         localTimestamp
       }
 
@@ -201,7 +201,7 @@ export class BinanceBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
-      timestamp: new Date(binanceDepthUpdateData.E),
+      timestamp: fromMicroSecondsToDate(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
   }
@@ -259,7 +259,7 @@ export class BinanceFuturesBookChangeMapper
 
       bids: binanceDepthUpdateData.b.map(this.mapBookLevel),
       asks: binanceDepthUpdateData.a.map(this.mapBookLevel),
-      timestamp: new Date(binanceDepthUpdateData.E),
+      timestamp: fromMicroSecondsToDate(binanceDepthUpdateData.E),
       localTimestamp: localTimestamp
     }
   }
@@ -342,12 +342,12 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
         }
 
         pendingTickerInfo.updateMarkPrice(Number(message.data.p))
-        pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+        pendingTickerInfo.updateTimestamp(fromMicroSecondsToDate(message.data.E))
       }
 
       if (message.data.e === '24hrTicker') {
         pendingTickerInfo.updateLastPrice(Number(message.data.c))
-        pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+        pendingTickerInfo.updateTimestamp(fromMicroSecondsToDate(message.data.E))
       }
 
       if ('openInterest' in message.data) {
@@ -398,7 +398,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
       price: Number(binanceLiquidation.p),
       amount: Number(binanceLiquidation.l), //  Order Last Filled Quantity
       side: binanceLiquidation.S === 'SELL' ? 'sell' : 'buy',
-      timestamp: new Date(binanceLiquidation.T),
+      timestamp: fromMicroSecondsToDate(binanceLiquidation.T),
       localTimestamp: localTimestamp
     }
 
@@ -439,7 +439,7 @@ export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'bina
       askPrice: binanceBookTicker.a !== undefined ? Number(binanceBookTicker.a) : undefined,
       bidPrice: binanceBookTicker.b !== undefined ? Number(binanceBookTicker.b) : undefined,
       bidAmount: binanceBookTicker.B !== undefined ? Number(binanceBookTicker.B) : undefined,
-      timestamp: binanceBookTicker.E !== undefined ? new Date(binanceBookTicker.E) : localTimestamp,
+      timestamp: binanceBookTicker.E !== undefined ? fromMicroSecondsToDate(binanceBookTicker.E) : localTimestamp,
       localTimestamp: localTimestamp
     }
 
