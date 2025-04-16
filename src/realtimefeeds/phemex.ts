@@ -2,7 +2,7 @@ import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
 export class PhemexRealTimeFeed extends RealTimeFeedBase {
-  protected readonly wssURL = 'wss://phemex.com/ws'
+  protected readonly wssURL = 'wss://ws.phemex.com/'
   protected readonly throttleSubscribeMS = 100
 
   protected readonly channelsMap = {
