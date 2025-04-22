@@ -1,7 +1,21 @@
-import { upperCaseSymbols } from '../handy'
 import { BookChange, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
+const KILO_SYMBOLS = ['kPEPE', 'kSHIB', 'kBONK', 'kFLOKI', 'kLUNC', 'kDOGS', 'kNEIRO']
+
+function getApiSymbolId(symbol: string) {
+  const potentialKSymbol = symbol.charAt(0).toLowerCase() + symbol.slice(1)
+  if (KILO_SYMBOLS.includes(potentialKSymbol)) {
+    return potentialKSymbol
+  }
+  return symbol
+}
+function getSymbols(symbols?: string[]) {
+  if (symbols !== undefined) {
+    return symbols.map(getApiSymbolId)
+  }
+  return
+}
 export class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
   private readonly _seenSymbols = new Set<string>()
 
@@ -10,7 +24,7 @@ export class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
   }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = getSymbols(symbols)
 
     return [
       {
@@ -28,7 +42,7 @@ export class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
       }
       yield {
         type: 'trade',
-        symbol: hyperliquidTrade.coin,
+        symbol: hyperliquidTrade.coin.toUpperCase(),
         exchange: 'hyperliquid',
         id: hyperliquidTrade.tid.toString(),
         price: Number(hyperliquidTrade.px),
@@ -53,7 +67,7 @@ export class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookCh
   }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = getSymbols(symbols)
 
     return [
       {
@@ -66,7 +80,7 @@ export class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookCh
   *map(message: HyperliquidWsBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     yield {
       type: 'book_change',
-      symbol: message.data.coin,
+      symbol: message.data.coin.toUpperCase(),
       exchange: 'hyperliquid',
       isSnapshot: true,
       bids: (message.data.levels[0] ? message.data.levels[0] : []).map(mapHyperliquidLevel),
@@ -85,7 +99,7 @@ export class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', 
   }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
+    symbols = getSymbols(symbols)
 
     return [
       {
@@ -96,7 +110,7 @@ export class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', 
   }
 
   *map(message: HyperliquidContextMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    const symbol = message.data.coin
+    const symbol = message.data.coin.toUpperCase()
 
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'hyperliquid')
 
