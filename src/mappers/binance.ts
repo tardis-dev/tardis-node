@@ -396,7 +396,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
       exchange: this._exchange,
       id: undefined,
       price: Number(binanceLiquidation.p),
-      amount: Number(binanceLiquidation.l), //  Order Last Filled Quantity
+      amount: Number(binanceLiquidation.z), //   Order Filled Accumulated Quantity
       side: binanceLiquidation.S === 'SELL' ? 'sell' : 'buy',
       timestamp: fromMicroSecondsToDate(binanceLiquidation.T),
       localTimestamp: localTimestamp
