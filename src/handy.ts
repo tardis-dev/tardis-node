@@ -495,3 +495,7 @@ export const fromMicroSecondsToDate = (micros: number) => {
 
   return timestamp
 }
+
+export function onlyUnique(value: string, index: number, array: string[]) {
+  return array.indexOf(value) === index
+}
