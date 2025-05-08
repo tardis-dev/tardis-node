@@ -1,3 +1,4 @@
+import { onlyUnique } from '../handy'
 import { Filter } from '../types'
 import { RealTimeFeedBase } from './realtimefeed'
 
@@ -15,6 +16,21 @@ export class BinanceEuropeanOptionsRealTimeFeed extends RealTimeFeedBase {
         params: filter.symbols.map((symbol) => {
           if (filter.channel === 'depth100') {
             return `${symbol}@${filter.channel}@100ms`
+          }
+
+          if (filter.channel === 'openInterest') {
+            const matchingTickerChannel = filters.find((f) => f.channel === 'ticker')
+
+            if (matchingTickerChannel !== undefined && matchingTickerChannel.symbols !== undefined) {
+              const expirations = matchingTickerChannel.symbols
+                .map((s) => {
+                  const symbolParts = s.split('-')
+                  return `${symbolParts[1]}`
+                })
+                .filter(onlyUnique)
+
+              return `${symbol}@${filter.channel}@${expirations}`
+            }
           }
 
           return `${symbol}@${filter.channel}`
