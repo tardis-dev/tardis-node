@@ -145,7 +145,7 @@ export class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-europ
     if (message.stream.includes('@openInterest')) {
       for (let data of message.data as BinanceOptionsOpenInterestData[]) {
         const openInterest = Number(data.o)
-        if (openInterest > 0) {
+        if (openInterest >= 0) {
           this._openInterests.set(data.s, openInterest)
         }
       }

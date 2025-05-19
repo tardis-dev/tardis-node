@@ -13,28 +13,33 @@ export class BinanceEuropeanOptionsRealTimeFeed extends RealTimeFeedBase {
 
       return {
         method: 'SUBSCRIBE',
-        params: filter.symbols.map((symbol) => {
-          if (filter.channel === 'depth100') {
-            return `${symbol}@${filter.channel}@100ms`
-          }
-
-          if (filter.channel === 'openInterest') {
-            const matchingTickerChannel = filters.find((f) => f.channel === 'ticker')
-
-            if (matchingTickerChannel !== undefined && matchingTickerChannel.symbols !== undefined) {
-              const expirations = matchingTickerChannel.symbols
-                .map((s) => {
-                  const symbolParts = s.split('-')
-                  return `${symbolParts[1]}`
-                })
-                .filter(onlyUnique)
-
-              return `${symbol}@${filter.channel}@${expirations}`
+        params: filter.symbols
+          .map((symbol) => {
+            if (filter.channel === 'depth100') {
+              return [`${symbol}@${filter.channel}@100ms`]
             }
-          }
 
-          return `${symbol}@${filter.channel}`
-        }),
+            if (filter.channel === 'openInterest') {
+              const matchingTickerChannel = filters.find((f) => f.channel === 'ticker')
+
+              if (matchingTickerChannel !== undefined) {
+                const expirations = matchingTickerChannel
+                  .symbols!.filter((s) => s.startsWith(symbol))
+                  .map((s) => {
+                    const symbolParts = s.split('-')
+                    return `${symbolParts[1]}`
+                  })
+                  .filter(onlyUnique)
+
+                return expirations.map((expiration) => {
+                  return `${symbol}@${filter.channel}@${expiration}`
+                })
+              }
+            }
+
+            return [`${symbol}@${filter.channel}`]
+          })
+          .flatMap((s) => s),
         id: index + 1
       }
     })
