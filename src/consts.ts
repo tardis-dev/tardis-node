@@ -481,7 +481,7 @@ const BITGET_CHANNELS = ['trade', 'books1', 'books15']
 const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
 const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RISK', 'LEVEL1', 'LEVEL2', 'CANDLES_ONE_MINUTE']
 
-const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx']
+const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,

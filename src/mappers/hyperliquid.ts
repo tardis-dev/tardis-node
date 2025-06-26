@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Trade } from '../types'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
 const KILO_SYMBOLS = ['kPEPE', 'kSHIB', 'kBONK', 'kFLOKI', 'kLUNC', 'kDOGS', 'kNEIRO']
@@ -91,6 +91,43 @@ export class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookCh
   }
 }
 
+export class HyperliquidBookTickerMapper implements Mapper<'hyperliquid', BookTicker> {
+  canHandle(message: HyperliquidBboMessage) {
+    return message.channel === 'bbo'
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = getSymbols(symbols)
+
+    return [
+      {
+        channel: 'bbo',
+        symbols
+      }
+    ]
+  }
+
+  *map(message: HyperliquidBboMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    const bbo = message.data.bbo
+    const bestBid = bbo[0]
+    const bestAsk = bbo[1]
+
+    const ticker: BookTicker = {
+      type: 'book_ticker',
+      symbol: message.data.coin.toUpperCase(),
+      exchange: 'hyperliquid',
+      bidPrice: bestBid ? Number(bestBid.px) : undefined,
+      bidAmount: bestBid ? Number(bestBid.sz) : undefined,
+      askPrice: bestAsk ? Number(bestAsk.px) : undefined,
+      askAmount: bestAsk ? Number(bestAsk.sz) : undefined,
+      timestamp: new Date(message.data.time),
+      localTimestamp: localTimestamp
+    }
+
+    yield ticker
+  }
+}
+
 export class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
@@ -165,6 +202,15 @@ type HyperliquidWsLevel = {
   px: string // price
   sz: string // size
   n: number // number of orders
+}
+
+type HyperliquidBboMessage = {
+  channel: 'bbo'
+  data: {
+    coin: string
+    time: number
+    bbo: [HyperliquidWsLevel, HyperliquidWsLevel]
+  }
 }
 
 type HyperliquidContextMessage = {

@@ -1533,6 +1533,38 @@ Array [
 
 exports[`map hyperliquid messages 8`] = `Array []`;
 
+exports[`map hyperliquid messages 9`] = `
+Array [
+  Object {
+    "askAmount": 50,
+    "askPrice": 0.97934,
+    "bidAmount": 4144.6,
+    "bidPrice": 0.97925,
+    "exchange": "hyperliquid",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "@162",
+    "timestamp": 2025-06-26T14:41:59.838Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map hyperliquid messages 10`] = `
+Array [
+  Object {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": 3.87947,
+    "bidPrice": 107575,
+    "exchange": "hyperliquid",
+    "localTimestamp": 2024-08-23T00:00:00.498Z,
+    "symbol": "BTC",
+    "timestamp": 2025-06-26T14:41:59.838Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map kucoin messages 1`] = `Array []`;
 
 exports[`map kucoin messages 2`] = `Array []`;

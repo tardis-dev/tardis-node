@@ -282,6 +282,7 @@ export async function download({
         error instanceof HttpError &&
         ((error.status === 400 && error.message.includes('ISO 8601 format') === false) || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
+      const internalServiceError = error instanceof HttpError && error.status === 500
       // do not retry when we've got bad or unauthorized request or enough attempts
       if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
         throw error
@@ -294,6 +295,9 @@ export async function download({
       if (tooManyRequests) {
         // when too many requests received wait one minute
         nextAttemptDelayMS += 60 * ONE_SEC_IN_MS
+      }
+      if (internalServiceError) {
+        nextAttemptDelayMS = nextAttemptDelayMS * 2
       }
 
       debug('download file error: %o, next attempt delay: %d, url %s, path: %s', error, nextAttemptDelayMS, url, downloadPath)

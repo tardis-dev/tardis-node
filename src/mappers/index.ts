@@ -101,7 +101,7 @@ import {
   HuobiBookTickerMapper,
   HuobiTradesMapper
 } from './huobi'
-import { HyperliquidBookChangeMapper, HyperliquidDerivativeTickerMapper, HyperliquidTradesMapper } from './hyperliquid'
+import { HyperliquidBookChangeMapper, HyperliquidBookTickerMapper, HyperliquidDerivativeTickerMapper, HyperliquidTradesMapper } from './hyperliquid'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
 import {
@@ -518,7 +518,8 @@ const bookTickersMappers = {
   'kucoin-futures': () => new KucoinFuturesBookTickerMapper(),
   bitget: () => new BitgetBookTickerMapper('bitget'),
   'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
-  'coinbase-international': () => coinbaseInternationalBookTickerMapper
+  'coinbase-international': () => coinbaseInternationalBookTickerMapper,
+  hyperliquid: () => new HyperliquidBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

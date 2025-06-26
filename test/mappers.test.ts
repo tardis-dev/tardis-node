@@ -78,7 +78,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'kucoin-futures',
   'bitget',
   'bitget-futures',
-  'coinbase-international'
+  'coinbase-international',
+  'hyperliquid'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -9570,6 +9571,25 @@ test('map hyperliquid messages', () => {
           circulatingSupply: '6879553815.3455801',
           coin: '@2'
         }
+      }
+    },
+    {
+      channel: 'bbo',
+      data: {
+        coin: '@162',
+        time: 1750948919838,
+        bbo: [
+          { px: '0.97925', sz: '4144.6', n: 1 },
+          { px: '0.97934', sz: '50.0', n: 1 }
+        ]
+      }
+    },
+    {
+      channel: 'bbo',
+      data: {
+        coin: 'BTC',
+        time: 1750948919838,
+        bbo: [{ px: '107575.0', sz: '3.87947', n: 17 }]
       }
     }
   ]
