@@ -101,7 +101,12 @@ import {
   HuobiBookTickerMapper,
   HuobiTradesMapper
 } from './huobi'
-import { HyperliquidBookChangeMapper, HyperliquidBookTickerMapper, HyperliquidDerivativeTickerMapper, HyperliquidTradesMapper } from './hyperliquid'
+import {
+  HyperliquidBookChangeMapper,
+  HyperliquidBookTickerMapper,
+  HyperliquidDerivativeTickerMapper,
+  HyperliquidTradesMapper
+} from './hyperliquid'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
 import {
