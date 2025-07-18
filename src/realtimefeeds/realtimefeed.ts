@@ -87,7 +87,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         )
 
         if (this.originHeader !== undefined) {
-          this._wsClientOptions.headers!.origin = this.originHeader
+          ;(this._wsClientOptions as any).headers['origin'] = this.originHeader
         }
 
         this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)

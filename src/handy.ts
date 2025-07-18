@@ -2,7 +2,7 @@ import crypto, { createHash } from 'crypto'
 import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
 import { RequestOptions, Agent } from 'https'
 import { https } from 'follow-redirects'
-import createHttpsProxyAgent from 'https-proxy-agent'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 import got, { ExtendOptions } from 'got'
 import path from 'path'
 import { debug } from './debug'
@@ -244,7 +244,7 @@ const httpsAgent = new https.Agent({
 
 export const httpsProxyAgent: Agent | undefined =
   process.env.HTTP_PROXY !== undefined
-    ? createHttpsProxyAgent(process.env.HTTP_PROXY)
+    ? new HttpsProxyAgent(process.env.HTTP_PROXY)
     : process.env.SOCKS_PROXY !== undefined
     ? new SocksProxyAgent(process.env.SOCKS_PROXY)
     : undefined
