@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`map binance-european-options messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.01,
     "exchange": "binance-european-options",
     "id": "15",
@@ -17,8 +17,8 @@ Array [
 `;
 
 exports[`map binance-european-options messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "binance-european-options",
     "id": "144",
@@ -33,20 +33,20 @@ Array [
 `;
 
 exports[`map binance-european-options messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 8.28,
         "price": 65,
       },
-      Object {
+      {
         "amount": 38.88,
         "price": 70,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 7.31,
         "price": 60,
       },
@@ -61,13 +61,13 @@ Array [
 ]
 `;
 
-exports[`map binance-european-options messages 4`] = `Array []`;
+exports[`map binance-european-options messages 4`] = `[]`;
 
-exports[`map binance-european-options messages 5`] = `Array []`;
+exports[`map binance-european-options messages 5`] = `[]`;
 
 exports[`map binance-european-options messages 6`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 5.8,
     "bestAskIV": 0.47609568,
     "bestAskPrice": 3950,
@@ -97,15 +97,15 @@ Array [
 ]
 `;
 
-exports[`map binance-european-options messages 7`] = `Array []`;
+exports[`map binance-european-options messages 7`] = `[]`;
 
-exports[`map binance-european-options messages 8`] = `Array []`;
+exports[`map binance-european-options messages 8`] = `[]`;
 
-exports[`map binance-european-options messages 9`] = `Array []`;
+exports[`map binance-european-options messages 9`] = `[]`;
 
 exports[`map binance-european-options messages 10`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 5.8,
     "bestAskIV": 0.47601342,
     "bestAskPrice": 3950,
@@ -136,8 +136,8 @@ Array [
 `;
 
 exports[`map bitget messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.001373,
     "exchange": "bitget",
     "id": "1235671058980749319",
@@ -151,13 +151,13 @@ Array [
 ]
 `;
 
-exports[`map bitget messages 2`] = `Array []`;
+exports[`map bitget messages 2`] = `[]`;
 
-exports[`map bitget messages 3`] = `Array []`;
+exports[`map bitget messages 3`] = `[]`;
 
 exports[`map bitget messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 22.75,
     "exchange": "bitget",
     "id": "1235671063632220170",
@@ -171,15 +171,15 @@ Array [
 ]
 `;
 
-exports[`map bitget messages 5`] = `Array []`;
+exports[`map bitget messages 5`] = `[]`;
 
-exports[`map bitget messages 6`] = `Array []`;
+exports[`map bitget messages 6`] = `[]`;
 
-exports[`map bitget messages 7`] = `Array []`;
+exports[`map bitget messages 7`] = `[]`;
 
 exports[`map bitget messages 8`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.00408,
     "askPrice": 72377.25,
     "bidAmount": 1.1646,
@@ -194,16 +194,16 @@ Array [
 `;
 
 exports[`map bitget messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 7.03,
         "price": 0.7146,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 20.98,
         "price": 0.7139,
       },
@@ -218,13 +218,13 @@ Array [
 ]
 `;
 
-exports[`map bitget-futures messages 1`] = `Array []`;
+exports[`map bitget-futures messages 1`] = `[]`;
 
-exports[`map bitget-futures messages 2`] = `Array []`;
+exports[`map bitget-futures messages 2`] = `[]`;
 
 exports[`map bitget-futures messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 447,
     "exchange": "bitget-futures",
     "id": "1235671063871070209",
@@ -238,13 +238,13 @@ Array [
 ]
 `;
 
-exports[`map bitget-futures messages 4`] = `Array []`;
+exports[`map bitget-futures messages 4`] = `[]`;
 
-exports[`map bitget-futures messages 5`] = `Array []`;
+exports[`map bitget-futures messages 5`] = `[]`;
 
 exports[`map bitget-futures messages 6`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 10230,
     "askPrice": 0.3555,
     "bidAmount": 112096,
@@ -258,11 +258,11 @@ Array [
 ]
 `;
 
-exports[`map bitget-futures messages 7`] = `Array []`;
+exports[`map bitget-futures messages 7`] = `[]`;
 
 exports[`map bitget-futures messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitget-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2024-10-31T08:00:00.000Z,
@@ -280,8 +280,8 @@ Array [
 `;
 
 exports[`map bitget-futures messages 9`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitget-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -299,8 +299,8 @@ Array [
 `;
 
 exports[`map bitget-futures messages 10`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 4.58,
     "askPrice": 1.4138,
     "bidAmount": undefined,
@@ -315,24 +315,24 @@ Array [
 `;
 
 exports[`map bitget-futures messages 11`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 641.4443,
         "price": 0.47256,
       },
-      Object {
+      {
         "amount": 3074.3765,
         "price": 0.47257,
       },
-      Object {
+      {
         "amount": 2677.56,
         "price": 0.47377,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 18.7835,
         "price": 0.47242,
       },
@@ -348,20 +348,20 @@ Array [
 `;
 
 exports[`map bitnomial messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1,
         "price": 19010,
       },
-      Object {
+      {
         "amount": 1,
         "price": 19038,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 5,
         "price": 18835,
       },
@@ -377,11 +377,11 @@ Array [
 `;
 
 exports[`map bitnomial messages 2`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 18861,
       },
@@ -397,15 +397,15 @@ Array [
 `;
 
 exports[`map bitnomial messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 5,
         "price": 19045,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitnomial",
     "isSnapshot": false,
     "localTimestamp": 2022-08-16T00:00:00.464Z,
@@ -417,8 +417,8 @@ Array [
 `;
 
 exports[`map bitnomial messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 10,
     "exchange": "bitnomial",
     "id": "7148460953766461527",
@@ -432,21 +432,21 @@ Array [
 ]
 `;
 
-exports[`map bybit spot messages 1`] = `Array []`;
+exports[`map bybit spot messages 1`] = `[]`;
 
-exports[`map bybit spot messages 2`] = `Array []`;
+exports[`map bybit spot messages 2`] = `[]`;
 
 exports[`map bybit spot messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 555.8,
         "price": 0.00002951,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 25862.5,
         "price": 0.00002949,
       },
@@ -462,8 +462,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1.4,
     "exchange": "bybit-spot",
     "id": "2280000000007453966",
@@ -478,8 +478,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 5`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.001651,
     "askPrice": 23293.37,
     "bidAmount": 0.052479,
@@ -494,8 +494,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.041732,
     "exchange": "bybit-spot",
     "id": "2290000000050703789",
@@ -506,7 +506,7 @@ Array [
     "timestamp": 2023-04-05T00:00:47.524Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.008513,
     "exchange": "bybit-spot",
     "id": "2290000000050703790",
@@ -517,7 +517,7 @@ Array [
     "timestamp": 2023-04-05T00:00:47.524Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.042384,
     "exchange": "bybit-spot",
     "id": "2290000000050703791",
@@ -528,7 +528,7 @@ Array [
     "timestamp": 2023-04-05T00:00:47.524Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.055371,
     "exchange": "bybit-spot",
     "id": "2290000000050703792",
@@ -543,8 +543,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00433,
     "exchange": "bybit-spot",
     "id": "2240000000041223438",
@@ -559,8 +559,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 8`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.996816,
     "askPrice": 28165.08,
     "bidAmount": 0.175231,
@@ -575,8 +575,8 @@ Array [
 `;
 
 exports[`map bybit spot messages 9`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.996816,
     "askPrice": 28165.08,
     "bidAmount": 0.166754,
@@ -591,16 +591,16 @@ Array [
 `;
 
 exports[`map bybit spot messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.506829,
         "price": 28162.58,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.07562,
         "price": 28162.57,
       },
@@ -616,20 +616,20 @@ Array [
 `;
 
 exports[`map bybit spot messages 11`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 28184.33,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.177474,
         "price": 28161.04,
       },
-      Object {
+      {
         "amount": 0,
         "price": 28145.71,
       },
@@ -645,8 +645,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3.584,
     "exchange": "coinbase-international",
     "id": "374491378496831495",
@@ -661,16 +661,16 @@ Array [
 `;
 
 exports[`map coinbase-international messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2969.1,
         "price": 6.66,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 58.5,
         "price": 4.802,
       },
@@ -686,11 +686,11 @@ Array [
 `;
 
 exports[`map coinbase-international messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 15468,
         "price": 0.3444,
       },
@@ -706,8 +706,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 4`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 6000,
     "askPrice": 0.19724,
     "bidAmount": 5116,
@@ -722,8 +722,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinbase-international",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -741,8 +741,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinbase-international",
     "fundingRate": 0.000005,
     "fundingTimestamp": 2024-11-06T02:00:00.000Z,
@@ -760,8 +760,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinbase-international",
     "fundingRate": -0.000017,
     "fundingTimestamp": 2024-11-06T02:00:00.000Z,
@@ -779,8 +779,8 @@ Array [
 `;
 
 exports[`map coinbase-international messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinbase-international",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -797,11 +797,11 @@ Array [
 ]
 `;
 
-exports[`map crypto-com messages 1`] = `Array []`;
+exports[`map crypto-com messages 1`] = `[]`;
 
 exports[`map crypto-com messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "crypto-com",
     "id": "2552833531650627600",
@@ -812,7 +812,7 @@ Array [
     "timestamp": 2022-05-30T13:26:07.912Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 6.9,
     "exchange": "crypto-com",
     "id": "2552833547970376700",
@@ -827,8 +827,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.04,
     "exchange": "crypto-com",
     "id": "2733854056108316700",
@@ -843,8 +843,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 4`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 7905.8,
     "bidAmount": undefined,
@@ -859,20 +859,20 @@ Array [
 `;
 
 exports[`map crypto-com messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 9.8577,
         "price": 97.685,
       },
-      Object {
+      {
         "amount": 0.005,
         "price": 302.01,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 7.5202,
         "price": 97.44,
       },
@@ -888,20 +888,20 @@ Array [
 `;
 
 exports[`map crypto-com messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 696.434,
         "price": 8.6427,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4.694,
         "price": 8.6143,
       },
-      Object {
+      {
         "amount": 0,
         "price": 8.6135,
       },
@@ -917,8 +917,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.04,
     "exchange": "crypto-com",
     "id": "2733854073183727600",
@@ -929,7 +929,7 @@ Array [
     "timestamp": 2022-08-01T00:00:00.449Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.04,
     "exchange": "crypto-com",
     "id": "2733854074175694000",
@@ -940,7 +940,7 @@ Array [
     "timestamp": 2022-08-01T00:00:00.479Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.04,
     "exchange": "crypto-com",
     "id": "2733854074994198500",
@@ -955,8 +955,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "crypto-com",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -970,7 +970,7 @@ Array [
     "timestamp": 2022-11-01T16:31:43.754Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 4.6148,
     "bidAmount": undefined,
@@ -985,16 +985,16 @@ Array [
 `;
 
 exports[`map crypto-com messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1312,
         "price": 0.136338,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 0.116116,
       },
@@ -1010,8 +1010,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.01163,
     "exchange": "crypto-com",
     "id": "4611686018428108636",
@@ -1026,8 +1026,8 @@ Array [
 `;
 
 exports[`map crypto-com messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0244,
     "exchange": "crypto-com",
     "id": "4611686018471467093",
@@ -1038,7 +1038,7 @@ Array [
     "timestamp": 2022-11-01T16:31:16.193Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.005,
     "exchange": "crypto-com",
     "id": "4611686018471467093",
@@ -1049,7 +1049,7 @@ Array [
     "timestamp": 2022-11-01T16:31:16.193Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.1,
     "exchange": "crypto-com",
     "id": "4611686018471467093",
@@ -1060,7 +1060,7 @@ Array [
     "timestamp": 2022-11-01T16:31:16.193Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.005,
     "exchange": "crypto-com",
     "id": "4611686018471467093",
@@ -1074,11 +1074,11 @@ Array [
 ]
 `;
 
-exports[`map crypto-com-derivatives messages 1`] = `Array []`;
+exports[`map crypto-com-derivatives messages 1`] = `[]`;
 
 exports[`map crypto-com-derivatives messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "crypto-com-derivatives",
     "id": "4611686018427711803",
@@ -1089,7 +1089,7 @@ Array [
     "timestamp": 2022-05-31T10:21:11.408Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.1,
     "exchange": "crypto-com-derivatives",
     "id": "4611686018427711804",
@@ -1104,16 +1104,16 @@ Array [
 `;
 
 exports[`map crypto-com-derivatives messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 451,
         "price": 0.9801,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 5303,
         "price": 0.9787,
       },
@@ -1129,15 +1129,15 @@ Array [
 `;
 
 exports[`map crypto-com-derivatives messages 4`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 50,
         "price": 7.581,
       },
-      Object {
+      {
         "amount": 0,
         "price": 7.584,
       },
@@ -1153,8 +1153,8 @@ Array [
 `;
 
 exports[`map crypto-com-derivatives messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "crypto-com-derivatives",
     "id": "4611686018439397540",
@@ -1169,8 +1169,8 @@ Array [
 `;
 
 exports[`map crypto-com-derivatives messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "crypto-com-derivatives",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -1184,7 +1184,7 @@ Array [
     "timestamp": 2022-05-31T10:22:23.383Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 31613.5,
     "bidAmount": undefined,
@@ -1198,11 +1198,11 @@ Array [
 ]
 `;
 
-exports[`map crypto-com-derivatives messages 7`] = `Array []`;
+exports[`map crypto-com-derivatives messages 7`] = `[]`;
 
 exports[`map crypto-com-derivatives messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "crypto-com-derivatives",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -1220,8 +1220,8 @@ Array [
 `;
 
 exports[`map crypto-com-derivatives messages 9`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "crypto-com-derivatives",
     "fundingRate": 0.000007,
     "fundingTimestamp": 2022-05-31T11:00:00.000Z,
@@ -1239,8 +1239,8 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 79.2,
     "exchange": "dydx-v4",
     "id": "0165e5e30000000200000002",
@@ -1255,8 +1255,8 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.002,
     "exchange": "dydx-v4",
     "id": "0165e5e40000000200000002",
@@ -1267,7 +1267,7 @@ Array [
     "timestamp": 2024-08-22T23:59:59.851Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 3.9,
     "exchange": "dydx-v4",
     "id": "014f495a0000000200000005",
@@ -1278,7 +1278,7 @@ Array [
     "timestamp": 2024-08-04T07:34:50.628Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 3.9,
     "exchange": "dydx-v4",
     "id": "014f495a0000000200000005",
@@ -1293,16 +1293,16 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3220,
         "price": 0.155,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 35520,
         "price": 0.1547,
       },
@@ -1318,11 +1318,11 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 4`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 11.21,
       },
@@ -1338,15 +1338,15 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 66.12,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "dydx-v4",
     "isSnapshot": false,
     "localTimestamp": 2024-08-23T00:00:00.498Z,
@@ -1358,8 +1358,8 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "dydx-v4",
     "fundingRate": 0.00001351666666666667,
     "fundingTimestamp": undefined,
@@ -1373,7 +1373,7 @@ Array [
     "timestamp": 2024-08-23T00:00:00.498Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "exchange": "dydx-v4",
     "fundingRate": 0.00001051666666666667,
     "fundingTimestamp": undefined,
@@ -1391,8 +1391,8 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "dydx-v4",
     "fundingRate": 0.00001051666666666667,
     "fundingTimestamp": undefined,
@@ -1410,8 +1410,8 @@ Array [
 `;
 
 exports[`map dydx-v4 messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "dydx-v4",
     "fundingRate": 0.00001051666666666667,
     "fundingTimestamp": undefined,
@@ -1428,11 +1428,11 @@ Array [
 ]
 `;
 
-exports[`map hyperliquid messages 1`] = `Array []`;
+exports[`map hyperliquid messages 1`] = `[]`;
 
 exports[`map hyperliquid messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 9.1,
     "exchange": "hyperliquid",
     "id": "809065877559592",
@@ -1446,11 +1446,11 @@ Array [
 ]
 `;
 
-exports[`map hyperliquid messages 3`] = `Array []`;
+exports[`map hyperliquid messages 3`] = `[]`;
 
 exports[`map hyperliquid messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00714,
     "exchange": "hyperliquid",
     "id": "696560709859024",
@@ -1465,10 +1465,10 @@ Array [
 `;
 
 exports[`map hyperliquid messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [],
+[
+  {
+    "asks": [],
+    "bids": [],
     "exchange": "hyperliquid",
     "isSnapshot": true,
     "localTimestamp": 2024-08-23T00:00:00.498Z,
@@ -1480,24 +1480,24 @@ Array [
 `;
 
 exports[`map hyperliquid messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2.9,
         "price": 59.811,
       },
-      Object {
+      {
         "amount": 17.6,
         "price": 59.832,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 3.4,
         "price": 59.8,
       },
-      Object {
+      {
         "amount": 1.6,
         "price": 59.778,
       },
@@ -1513,8 +1513,8 @@ Array [
 `;
 
 exports[`map hyperliquid messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "hyperliquid",
     "fundingRate": 0.00004863,
     "fundingTimestamp": undefined,
@@ -1531,11 +1531,11 @@ Array [
 ]
 `;
 
-exports[`map hyperliquid messages 8`] = `Array []`;
+exports[`map hyperliquid messages 8`] = `[]`;
 
 exports[`map hyperliquid messages 9`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 50,
     "askPrice": 0.97934,
     "bidAmount": 4144.6,
@@ -1550,8 +1550,8 @@ Array [
 `;
 
 exports[`map hyperliquid messages 10`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": 3.87947,
@@ -1565,15 +1565,15 @@ Array [
 ]
 `;
 
-exports[`map kucoin messages 1`] = `Array []`;
+exports[`map kucoin messages 1`] = `[]`;
 
-exports[`map kucoin messages 2`] = `Array []`;
+exports[`map kucoin messages 2`] = `[]`;
 
-exports[`map kucoin messages 3`] = `Array []`;
+exports[`map kucoin messages 3`] = `[]`;
 
 exports[`map kucoin messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00001255,
     "exchange": "kucoin",
     "id": "62fade002e113d292303a18b",
@@ -1588,8 +1588,8 @@ Array [
 `;
 
 exports[`map kucoin messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 12.9629,
     "exchange": "kucoin",
     "id": "455391760226305",
@@ -1604,8 +1604,8 @@ Array [
 `;
 
 exports[`map kucoin messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 66.5603,
     "exchange": "kucoin",
     "id": "62fade212e113d325d5cf21d",
@@ -1620,8 +1620,8 @@ Array [
 `;
 
 exports[`map kucoin messages 7`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 404.3024,
     "askPrice": 0.9052,
     "bidAmount": 202.2365,
@@ -1635,39 +1635,39 @@ Array [
 ]
 `;
 
-exports[`map kucoin messages 8`] = `Array []`;
+exports[`map kucoin messages 8`] = `[]`;
 
-exports[`map kucoin messages 9`] = `Array []`;
+exports[`map kucoin messages 9`] = `[]`;
 
-exports[`map kucoin messages 10`] = `Array []`;
+exports[`map kucoin messages 10`] = `[]`;
 
-exports[`map kucoin messages 11`] = `Array []`;
+exports[`map kucoin messages 11`] = `[]`;
 
-exports[`map kucoin messages 12`] = `Array []`;
+exports[`map kucoin messages 12`] = `[]`;
 
 exports[`map kucoin messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.64205639,
         "price": 24088.7,
       },
-      Object {
+      {
         "amount": 0,
         "price": 24088.8,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 7.07264171,
         "price": 24088.6,
       },
-      Object {
+      {
         "amount": 0.00007756,
         "price": 24046,
       },
-      Object {
+      {
         "amount": 0.12,
         "price": 12,
       },
@@ -1683,15 +1683,15 @@ Array [
 `;
 
 exports[`map kucoin messages 14`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 12,
         "price": 24088.8,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "kucoin",
     "isSnapshot": false,
     "localTimestamp": 2022-08-16T00:00:00.464Z,
@@ -1702,14 +1702,14 @@ Array [
 ]
 `;
 
-exports[`map kucoin messages 15`] = `Array []`;
+exports[`map kucoin messages 15`] = `[]`;
 
 exports[`map kucoin messages 16`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0.35127929,
         "price": 27309.8,
       },
@@ -1725,8 +1725,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 10,
     "exchange": "kucoin-futures",
     "id": "1701197946092",
@@ -1740,22 +1740,22 @@ Array [
 ]
 `;
 
-exports[`map kucoin-futures messages 2`] = `Array []`;
+exports[`map kucoin-futures messages 2`] = `[]`;
 
-exports[`map kucoin-futures messages 3`] = `Array []`;
+exports[`map kucoin-futures messages 3`] = `[]`;
 
-exports[`map kucoin-futures messages 4`] = `Array []`;
+exports[`map kucoin-futures messages 4`] = `[]`;
 
 exports[`map kucoin-futures messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 30,
         "price": 0.21557,
       },
-      Object {
+      {
         "amount": 1,
         "price": 0.20645,
       },
@@ -1771,11 +1771,11 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 6`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 3,
         "price": 0.3,
       },
@@ -1791,8 +1791,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 7`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 250,
     "askPrice": 24.08,
     "bidAmount": 260,
@@ -1806,11 +1806,11 @@ Array [
 ]
 `;
 
-exports[`map kucoin-futures messages 8`] = `Array []`;
+exports[`map kucoin-futures messages 8`] = `[]`;
 
 exports[`map kucoin-futures messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "kucoin-futures",
     "id": "1728107666597",
@@ -1825,8 +1825,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000038,
     "fundingTimestamp": undefined,
@@ -1844,8 +1844,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 11`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000038,
     "fundingTimestamp": undefined,
@@ -1863,8 +1863,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 12`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000039,
     "fundingTimestamp": undefined,
@@ -1882,8 +1882,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 13`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000039,
     "fundingTimestamp": undefined,
@@ -1901,8 +1901,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 14`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000038,
     "fundingTimestamp": undefined,
@@ -1920,8 +1920,8 @@ Array [
 `;
 
 exports[`map kucoin-futures messages 15`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "kucoin-futures",
     "fundingRate": 0.000032,
     "fundingTimestamp": undefined,
@@ -1939,8 +1939,8 @@ Array [
 `;
 
 exports[`map okex-spreads messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 13430,
     "exchange": "okex-spreads",
     "id": "2102504804202430464",
@@ -1955,20 +1955,20 @@ Array [
 `;
 
 exports[`map okex-spreads messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 11000,
         "price": 1328,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 18100,
         "price": 1314,
       },
-      Object {
+      {
         "amount": 50000,
         "price": 1313.5,
       },
@@ -1984,8 +1984,8 @@ Array [
 `;
 
 exports[`map okex-spreads messages 3`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 14200,
     "askPrice": 170.5,
     "bidAmount": 4000,
@@ -2000,8 +2000,8 @@ Array [
 `;
 
 exports[`map woo-x messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 4109,
     "exchange": "woo-x",
     "id": undefined,
@@ -2012,7 +2012,7 @@ Array [
     "timestamp": 2023-01-22T23:59:59.995Z,
     "type": "trade",
   },
-  Object {
+  {
     "exchange": "woo-x",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2030,8 +2030,8 @@ Array [
 `;
 
 exports[`map woo-x messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0516,
     "exchange": "woo-x",
     "id": undefined,
@@ -2045,27 +2045,27 @@ Array [
 ]
 `;
 
-exports[`map woo-x messages 3`] = `Array []`;
+exports[`map woo-x messages 3`] = `[]`;
 
 exports[`map woo-x messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 15.4675,
         "price": 22712.7,
       },
-      Object {
+      {
         "amount": 0.248,
         "price": 26772.1,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4.503,
         "price": 22708,
       },
-      Object {
+      {
         "amount": 0.002,
         "price": 18555,
       },
@@ -2077,15 +2077,15 @@ Array [
     "timestamp": 2023-01-23T00:00:00.020Z,
     "type": "book_change",
   },
-  Object {
-    "asks": Array [
-      Object {
+  {
+    "asks": [
+      {
         "amount": 15.4675,
         "price": 22712.7,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4.503,
         "price": 22708,
       },
@@ -2101,20 +2101,20 @@ Array [
 `;
 
 exports[`map woo-x messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 16.1625,
         "price": 22712.7,
       },
-      Object {
+      {
         "amount": 0.008,
         "price": 28462.5,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4.284,
         "price": 22708,
       },
@@ -2130,8 +2130,8 @@ Array [
 `;
 
 exports[`map woo-x messages 6`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 38.2,
     "askPrice": 13.33,
     "bidAmount": 21.137,
@@ -2146,8 +2146,8 @@ Array [
 `;
 
 exports[`map woo-x messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "woo-x",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2165,8 +2165,8 @@ Array [
 `;
 
 exports[`map woo-x messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "woo-x",
     "fundingRate": 0.00000782,
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
@@ -2183,11 +2183,11 @@ Array [
 ]
 `;
 
-exports[`map woo-x messages 9`] = `Array []`;
+exports[`map woo-x messages 9`] = `[]`;
 
 exports[`map woo-x messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "woo-x",
     "fundingRate": 0.00000782,
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
@@ -2205,8 +2205,8 @@ Array [
 `;
 
 exports[`map woo-x messages 11`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "woo-x",
     "fundingRate": 0.00000782,
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
@@ -2224,8 +2224,8 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.3,
     "exchange": "ascendex",
     "id": undefined,
@@ -2240,8 +2240,8 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.03393,
     "exchange": "ascendex",
     "id": undefined,
@@ -2252,7 +2252,7 @@ Array [
     "timestamp": 2021-03-26T00:00:01.842Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.00457,
     "exchange": "ascendex",
     "id": undefined,
@@ -2267,11 +2267,11 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 0.7892,
       },
@@ -2287,20 +2287,20 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1899,
         "price": 0.7898,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 498,
         "price": 0.78958,
       },
-      Object {
+      {
         "amount": 499,
         "price": 0.78952,
       },
@@ -2316,11 +2316,11 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 0.78721,
       },
@@ -2336,8 +2336,8 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.05,
     "exchange": "ascendex",
     "id": undefined,
@@ -2352,8 +2352,8 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "ascendex",
     "fundingRate": 0.000093927,
     "fundingTimestamp": 2021-05-24T00:00:00.000Z,
@@ -2371,8 +2371,8 @@ Array [
 `;
 
 exports[`mappers map ascendex messages 8`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 21,
     "askPrice": 17.67664,
     "bidAmount": 2,
@@ -2386,19 +2386,19 @@ Array [
 ]
 `;
 
-exports[`mappers map binance delivery messages 1`] = `Array []`;
+exports[`mappers map binance delivery messages 1`] = `[]`;
 
 exports[`mappers map binance delivery messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 4090,
         "price": 99999,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 181,
         "price": 9504.8,
       },
@@ -2414,11 +2414,11 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 13,
         "price": 9498.9,
       },
@@ -2434,8 +2434,8 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-delivery",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2452,14 +2452,14 @@ Array [
 ]
 `;
 
-exports[`mappers map binance delivery messages 5`] = `Array []`;
+exports[`mappers map binance delivery messages 5`] = `[]`;
 
 exports[`mappers map binance delivery messages 6`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 181,
         "price": 9504.8,
       },
@@ -2475,8 +2475,8 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-delivery",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2494,8 +2494,8 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-delivery",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2513,8 +2513,8 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "binance-delivery",
     "id": "173906",
@@ -2529,8 +2529,8 @@ Array [
 `;
 
 exports[`mappers map binance delivery messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3,
     "exchange": "binance-delivery",
     "id": undefined,
@@ -2544,11 +2544,11 @@ Array [
 ]
 `;
 
-exports[`mappers map binance delivery messages 11`] = `Array []`;
+exports[`mappers map binance delivery messages 11`] = `[]`;
 
 exports[`mappers map binance delivery messages 12`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 6,
     "askPrice": 353.477,
     "bidAmount": 271,
@@ -2563,16 +2563,16 @@ Array [
 `;
 
 exports[`mappers map binance dex messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 29900,
         "price": 0.00005325,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 7000,
         "price": 0.00003212,
       },
@@ -2588,20 +2588,20 @@ Array [
 `;
 
 exports[`mappers map binance dex messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 0.00005253,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 0.000004,
       },
-      Object {
+      {
         "amount": 350000,
         "price": 5e-8,
       },
@@ -2617,8 +2617,8 @@ Array [
 `;
 
 exports[`mappers map binance dex messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2070,
     "exchange": "binance-dex",
     "id": "16927042-0",
@@ -2629,7 +2629,7 @@ Array [
     "timestamp": 2019-07-01T00:00:22.635Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 2930,
     "exchange": "binance-dex",
     "id": "16927042-1",
@@ -2644,8 +2644,8 @@ Array [
 `;
 
 exports[`mappers map binance dex messages 4`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 646900,
     "askPrice": 0.00008414,
     "bidAmount": 394500,
@@ -2660,8 +2660,8 @@ Array [
 `;
 
 exports[`mappers map binance dex messages 5`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 2110,
     "askPrice": 0.000111,
     "bidAmount": 200,
@@ -2675,11 +2675,11 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 1`] = `Array []`;
+exports[`mappers map binance futures messages 1`] = `[]`;
 
 exports[`mappers map binance futures messages 2`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2697,8 +2697,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 3`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2019-10-01T08:00:00.000Z,
@@ -2715,11 +2715,11 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 4`] = `Array []`;
+exports[`mappers map binance futures messages 4`] = `[]`;
 
 exports[`mappers map binance futures messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.044,
     "exchange": "binance-futures",
     "id": "10934580",
@@ -2733,27 +2733,27 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 6`] = `Array []`;
+exports[`mappers map binance futures messages 6`] = `[]`;
 
 exports[`mappers map binance futures messages 7`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2.31652,
         "price": 4095.99,
       },
-      Object {
+      {
         "amount": 2.425419,
         "price": 4096,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1.501,
         "price": 8488.36,
       },
-      Object {
+      {
         "amount": 0.162,
         "price": 8493.78,
       },
@@ -2769,11 +2769,11 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 8`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0.162,
         "price": 8493.78,
       },
@@ -2789,8 +2789,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 9`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2019-10-01T08:00:00.000Z,
@@ -2808,8 +2808,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-futures",
     "fundingRate": 0.0001564,
     "fundingTimestamp": 2020-08-16T08:00:00.000Z,
@@ -2826,11 +2826,11 @@ Array [
 ]
 `;
 
-exports[`mappers map binance futures messages 11`] = `Array []`;
+exports[`mappers map binance futures messages 11`] = `[]`;
 
 exports[`mappers map binance futures messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.467,
     "exchange": "binance-futures",
     "id": "173525189",
@@ -2845,8 +2845,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 13`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.014,
     "exchange": "binance-futures",
     "id": undefined,
@@ -2861,8 +2861,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 14`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "binance-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -2880,8 +2880,8 @@ Array [
 `;
 
 exports[`mappers map binance futures messages 15`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.38,
     "askPrice": 33139.39,
     "bidAmount": 0.17,
@@ -2896,8 +2896,8 @@ Array [
 `;
 
 exports[`mappers map binance messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 33.82,
     "exchange": "binance",
     "id": "40756030",
@@ -2912,8 +2912,8 @@ Array [
 `;
 
 exports[`mappers map binance messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6.48,
     "exchange": "binance",
     "id": "60276726",
@@ -2928,8 +2928,8 @@ Array [
 `;
 
 exports[`mappers map binance messages 3`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.031201,
     "askPrice": 8012.15,
     "bidAmount": 0.142459,
@@ -2943,27 +2943,27 @@ Array [
 ]
 `;
 
-exports[`mappers map binance messages 4`] = `Array []`;
+exports[`mappers map binance messages 4`] = `[]`;
 
 exports[`mappers map binance messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2.31652,
         "price": 4095.99,
       },
-      Object {
+      {
         "amount": 1.425419,
         "price": 4096,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.009765,
         "price": 4091.92,
       },
-      Object {
+      {
         "amount": 0.763931,
         "price": 4089.09,
       },
@@ -2979,16 +2979,16 @@ Array [
 `;
 
 exports[`mappers map binance messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 4111.84,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 4084.88,
       },
@@ -3003,45 +3003,45 @@ Array [
 ]
 `;
 
-exports[`mappers map binance messages 7`] = `Array []`;
+exports[`mappers map binance messages 7`] = `[]`;
 
-exports[`mappers map binance messages 8`] = `Array []`;
+exports[`mappers map binance messages 8`] = `[]`;
 
 exports[`mappers map binance messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3945,
         "price": 0.00002253,
       },
-      Object {
+      {
         "amount": 50641,
         "price": 0.00002256,
       },
-      Object {
+      {
         "amount": 1777,
         "price": 0.00002258,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 114,
         "price": 0.00002248,
       },
-      Object {
+      {
         "amount": 375,
         "price": 0.00002246,
       },
-      Object {
+      {
         "amount": 2673,
         "price": 0.00002245,
       },
-      Object {
+      {
         "amount": 390,
         "price": 0.00002244,
       },
-      Object {
+      {
         "amount": 3425,
         "price": 0.00002243,
       },
@@ -3057,19 +3057,19 @@ Array [
 `;
 
 exports[`mappers map binance messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 0.00002257,
       },
-      Object {
+      {
         "amount": 6080,
         "price": 0.00002262,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "binance",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -3081,8 +3081,8 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 1`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 1.7478,
     "bestAskPrice": 90.36,
@@ -3112,11 +3112,11 @@ Array [
 ]
 `;
 
-exports[`mappers map binance-options messages 2`] = `Array []`;
+exports[`mappers map binance-options messages 2`] = `[]`;
 
 exports[`mappers map binance-options messages 3`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 1.7475,
     "bestAskPrice": 90.36,
@@ -3147,40 +3147,40 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.02,
         "price": 8256.82,
       },
-      Object {
+      {
         "amount": 0.4547,
         "price": 8327.7,
       },
-      Object {
+      {
         "amount": 0.4969,
         "price": 8464.46,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.3018,
         "price": 5652.36,
       },
-      Object {
+      {
         "amount": 0.4192,
         "price": 5583.89,
       },
-      Object {
+      {
         "amount": 0.005,
         "price": 4500,
       },
-      Object {
+      {
         "amount": 0.08,
         "price": 2100,
       },
-      Object {
+      {
         "amount": 0.001,
         "price": 1001,
       },
@@ -3196,16 +3196,16 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.02,
         "price": 8256.82,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.001,
         "price": 1001,
       },
@@ -3221,8 +3221,8 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0008,
     "exchange": "binance-options",
     "id": "744",
@@ -3237,8 +3237,8 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0206,
     "exchange": "binance-options",
     "id": "745",
@@ -3249,7 +3249,7 @@ Array [
     "timestamp": 2021-05-18T04:43:11.000Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.0154,
     "exchange": "binance-options",
     "id": "746",
@@ -3264,8 +3264,8 @@ Array [
 `;
 
 exports[`mappers map binance-options messages 8`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 2.9884,
     "bestAskPrice": 8456.93,
@@ -3295,11 +3295,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 1`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 1`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 2`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitfinex-derivatives",
     "fundingRate": undefined,
     "fundingTimestamp": 2019-09-29T08:00:00.000Z,
@@ -3316,11 +3316,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 3`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 3`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitfinex-derivatives",
     "fundingRate": 0.00196337,
     "fundingTimestamp": 2019-09-30T08:00:00.000Z,
@@ -3338,8 +3338,8 @@ Array [
 `;
 
 exports[`mappers map bitfinex derivatives messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitfinex-derivatives",
     "fundingRate": 0,
     "fundingTimestamp": 2019-10-08T08:00:00.000Z,
@@ -3357,8 +3357,8 @@ Array [
 `;
 
 exports[`mappers map bitfinex derivatives messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitfinex-derivatives",
     "fundingRate": 0,
     "fundingTimestamp": 2019-10-08T08:00:00.000Z,
@@ -3375,14 +3375,14 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 7`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 7`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 8`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 9163.7,
       },
@@ -3397,11 +3397,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 9`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 9`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitfinex-derivatives",
     "fundingRate": 0,
     "fundingTimestamp": 2020-05-28T00:00:00.000Z,
@@ -3418,11 +3418,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 11`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 11`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.005,
     "exchange": "bitfinex-derivatives",
     "id": "452025730",
@@ -3436,11 +3436,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 13`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 13`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 14`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00268657,
     "exchange": "bitfinex-derivatives",
     "id": "143683674",
@@ -3454,15 +3454,15 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 15`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 15`] = `[]`;
 
-exports[`mappers map bitfinex derivatives messages 16`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 16`] = `[]`;
 
-exports[`mappers map bitfinex derivatives messages 17`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 17`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 18`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00268657,
     "exchange": "bitfinex-derivatives",
     "id": "143683674",
@@ -3476,11 +3476,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex derivatives messages 19`] = `Array []`;
+exports[`mappers map bitfinex derivatives messages 19`] = `[]`;
 
 exports[`mappers map bitfinex derivatives messages 20`] = `
-Array [
-  Object {
+[
+  {
     "amount": 8.6007,
     "exchange": "bitfinex-derivatives",
     "id": "143679087",
@@ -3494,15 +3494,15 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex messages 1`] = `Array []`;
+exports[`mappers map bitfinex messages 1`] = `[]`;
 
-exports[`mappers map bitfinex messages 2`] = `Array []`;
+exports[`mappers map bitfinex messages 2`] = `[]`;
 
-exports[`mappers map bitfinex messages 3`] = `Array []`;
+exports[`mappers map bitfinex messages 3`] = `[]`;
 
 exports[`mappers map bitfinex messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.00705845,
     "exchange": "bitfinex",
     "id": "382489563",
@@ -3516,25 +3516,25 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex messages 5`] = `Array []`;
+exports[`mappers map bitfinex messages 5`] = `[]`;
 
-exports[`mappers map bitfinex messages 6`] = `Array []`;
+exports[`mappers map bitfinex messages 6`] = `[]`;
 
 exports[`mappers map bitfinex messages 7`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 13.33333333,
         "price": 218.75,
       },
-      Object {
+      {
         "amount": 2,
         "price": 218.76,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 31.52,
         "price": 216,
       },
@@ -3550,15 +3550,15 @@ Array [
 `;
 
 exports[`mappers map bitfinex messages 8`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 18.10913638,
         "price": 219.11,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitfinex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
@@ -3570,15 +3570,15 @@ Array [
 `;
 
 exports[`mappers map bitfinex messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 218.99,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitfinex",
     "isSnapshot": false,
     "localTimestamp": 2019-08-01T00:00:02.496Z,
@@ -3590,11 +3590,11 @@ Array [
 `;
 
 exports[`mappers map bitfinex messages 10`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 218.03,
       },
@@ -3609,13 +3609,13 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex messages 11`] = `Array []`;
+exports[`mappers map bitfinex messages 11`] = `[]`;
 
-exports[`mappers map bitfinex messages 12`] = `Array []`;
+exports[`mappers map bitfinex messages 12`] = `[]`;
 
 exports[`mappers map bitfinex messages 13`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 197418.99101772,
     "askPrice": 0.00002274,
     "bidAmount": 657877.4673439099,
@@ -3629,21 +3629,21 @@ Array [
 ]
 `;
 
-exports[`mappers map bitfinex messages 14`] = `Array []`;
+exports[`mappers map bitfinex messages 14`] = `[]`;
 
-exports[`mappers map bitfinex messages 15`] = `Array []`;
+exports[`mappers map bitfinex messages 15`] = `[]`;
 
 exports[`mappers map bitflyer messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.14,
         "price": 0.02919,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.022,
         "price": 0.0146,
       },
@@ -3659,16 +3659,16 @@ Array [
 `;
 
 exports[`mappers map bitflyer messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 1046603,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.05,
         "price": 1043400,
       },
@@ -3684,8 +3684,8 @@ Array [
 `;
 
 exports[`mappers map bitflyer messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.01,
     "exchange": "bitflyer",
     "id": "1246449270",
@@ -3696,7 +3696,7 @@ Array [
     "timestamp": 2019-09-01T00:00:11.225681Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.002,
     "exchange": "bitflyer",
     "id": "1246449271",
@@ -3711,8 +3711,8 @@ Array [
 `;
 
 exports[`mappers map bitflyer messages 4`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.2,
     "askPrice": 1020332,
     "bidAmount": 0.03,
@@ -3727,8 +3727,8 @@ Array [
 `;
 
 exports[`mappers map bitflyer messages 5`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.4,
     "askPrice": 376676,
     "bidAmount": 0.01,
@@ -3743,8 +3743,8 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1000,
     "exchange": "bitmex",
     "id": "f73b6f28-075a-3548-a81c-8c843afd2746",
@@ -3758,13 +3758,13 @@ Array [
 ]
 `;
 
-exports[`mappers map bitmex messages 2`] = `Array []`;
+exports[`mappers map bitmex messages 2`] = `[]`;
 
-exports[`mappers map bitmex messages 3`] = `Array []`;
+exports[`mappers map bitmex messages 3`] = `[]`;
 
 exports[`mappers map bitmex messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitmex",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -3778,7 +3778,7 @@ Array [
     "timestamp": 2019-05-31T23:59:30.000Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "exchange": "bitmex",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -3796,8 +3796,8 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bitmex",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -3815,8 +3815,8 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 6`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 62427,
     "askPrice": 267.75,
     "bidAmount": 701,
@@ -3831,23 +3831,23 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 7`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 501,
         "price": 88846.5,
       },
-      Object {
+      {
         "amount": 40,
         "price": 9780.5,
       },
-      Object {
+      {
         "amount": 61227,
         "price": 8586,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitmex",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
@@ -3855,10 +3855,10 @@ Array [
     "timestamp": 2019-06-01T00:00:28.619Z,
     "type": "book_change",
   },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 417,
         "price": 0.0010102,
       },
@@ -3874,15 +3874,15 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 8`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 91227,
         "price": 8586,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitmex",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
@@ -3894,15 +3894,15 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 8586,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitmex",
     "isSnapshot": false,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
@@ -3914,11 +3914,11 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 10`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 416,
         "price": 0.0010102,
       },
@@ -3933,11 +3933,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitmex messages 11`] = `Array []`;
+exports[`mappers map bitmex messages 11`] = `[]`;
 
 exports[`mappers map bitmex messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 9214,
     "exchange": "bitmex",
     "id": "dd9cea25-207c-0dab-15b5-b88da776f500",
@@ -3951,11 +3951,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitmex messages 13`] = `Array []`;
+exports[`mappers map bitmex messages 13`] = `[]`;
 
 exports[`mappers map bitmex messages 14`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 205100,
     "askPrice": 55411.5,
     "bidAmount": 2700,
@@ -3966,7 +3966,7 @@ Array [
     "timestamp": 2021-10-13T07:07:00.106Z,
     "type": "book_ticker",
   },
-  Object {
+  {
     "askAmount": 241500,
     "askPrice": 55400.5,
     "bidAmount": 700,
@@ -3981,10 +3981,10 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 15`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [],
+[
+  {
+    "asks": [],
+    "bids": [],
     "exchange": "bitmex",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
@@ -3996,23 +3996,23 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 16`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1000000,
         "price": 42362,
       },
-      Object {
+      {
         "amount": 10000,
         "price": 662520,
       },
-      Object {
+      {
         "amount": 20000,
         "price": 658900,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitmex",
     "isSnapshot": true,
     "localTimestamp": 2019-06-01T00:00:28.619Z,
@@ -4024,11 +4024,11 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 17`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 20000,
         "price": 42362,
       },
@@ -4044,16 +4044,16 @@ Array [
 `;
 
 exports[`mappers map bitmex messages 18`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 662520,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 658900,
       },
@@ -4068,11 +4068,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bitstamp messages 1`] = `Array []`;
+exports[`mappers map bitstamp messages 1`] = `[]`;
 
 exports[`mappers map bitstamp messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.001643,
     "exchange": "bitstamp",
     "id": "84550458",
@@ -4086,27 +4086,27 @@ Array [
 ]
 `;
 
-exports[`mappers map bitstamp messages 3`] = `Array []`;
+exports[`mappers map bitstamp messages 3`] = `[]`;
 
 exports[`mappers map bitstamp messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2,
         "price": 168.75,
       },
-      Object {
+      {
         "amount": 0.49428809,
         "price": 168.76,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.04249473,
         "price": 51046.31,
       },
-      Object {
+      {
         "amount": 0.00040718,
         "price": 60000,
       },
@@ -4118,14 +4118,14 @@ Array [
     "timestamp": 2019-04-01T00:00:00.000Z,
     "type": "book_change",
   },
-  Object {
-    "asks": Array [
-      Object {
+  {
+    "asks": [
+      {
         "amount": 2,
         "price": 168.75,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitstamp",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -4137,24 +4137,24 @@ Array [
 `;
 
 exports[`mappers map bitstamp messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2,
         "price": 168.75,
       },
-      Object {
+      {
         "amount": 0.49428809,
         "price": 168.76,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.04249473,
         "price": 51046.31,
       },
-      Object {
+      {
         "amount": 0.00040718,
         "price": 60000,
       },
@@ -4170,19 +4170,19 @@ Array [
 `;
 
 exports[`mappers map bitstamp messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 180,
         "price": 169.28,
       },
-      Object {
+      {
         "amount": 360,
         "price": 170.16,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bitstamp",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -4194,8 +4194,8 @@ Array [
 `;
 
 exports[`mappers map bitstamp messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.02834,
     "exchange": "bitstamp",
     "id": "98000129",
@@ -4209,11 +4209,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 1`] = `Array []`;
+exports[`mappers map bybit messages 1`] = `[]`;
 
 exports[`mappers map bybit messages 2`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2019-11-06T16:00:00.000Z,
@@ -4231,16 +4231,16 @@ Array [
 `;
 
 exports[`mappers map bybit messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 704729,
         "price": 9366,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 58486,
         "price": 9353.5,
       },
@@ -4256,15 +4256,15 @@ Array [
 `;
 
 exports[`mappers map bybit messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 674462,
         "price": 9367,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
@@ -4276,8 +4276,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6000,
     "exchange": "bybit",
     "id": "8c53dd53-2df5-563d-8e3b-e0dbba7c55a0",
@@ -4292,20 +4292,20 @@ Array [
 `;
 
 exports[`mappers map bybit messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 0.3013,
       },
-      Object {
+      {
         "amount": 41761,
         "price": 0.3038,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 224986,
         "price": 0.301,
       },
@@ -4320,11 +4320,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 7`] = `Array []`;
+exports[`mappers map bybit messages 7`] = `[]`;
 
 exports[`mappers map bybit messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4341,18 +4341,18 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 9`] = `Array []`;
+exports[`mappers map bybit messages 9`] = `[]`;
 
 exports[`mappers map bybit messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 9.95,
         "price": 9452.5,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
@@ -4364,8 +4364,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.001,
     "exchange": "bybit",
     "id": "bfbbb893-0971-5733-8eb2-aab164d0a552",
@@ -4380,8 +4380,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 12`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4399,8 +4399,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 13`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "bybit",
     "id": "52079383-86f0-52bf-ab1f-f943a34a8aeb",
@@ -4415,15 +4415,15 @@ Array [
 `;
 
 exports[`mappers map bybit messages 14`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 183205,
         "price": 0.1984,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
@@ -4435,8 +4435,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 15`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.001,
     "exchange": "bybit",
     "id": "b79bae67-1526-5ee6-adee-cf88e8a691a6",
@@ -4451,15 +4451,15 @@ Array [
 `;
 
 exports[`mappers map bybit messages 16`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 9.16,
         "price": 9483,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": true,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
@@ -4471,11 +4471,11 @@ Array [
 `;
 
 exports[`mappers map bybit messages 17`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 35140,
         "price": 9462.5,
       },
@@ -4491,20 +4491,20 @@ Array [
 `;
 
 exports[`mappers map bybit messages 18`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 121205,
         "price": 9480.5,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 101535,
         "price": 9465.5,
       },
-      Object {
+      {
         "amount": 46177,
         "price": 9467.5,
       },
@@ -4520,11 +4520,11 @@ Array [
 `;
 
 exports[`mappers map bybit messages 19`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 214147,
         "price": 9474.5,
       },
@@ -4540,19 +4540,19 @@ Array [
 `;
 
 exports[`mappers map bybit messages 20`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 22.390999,
         "price": 9472.5,
       },
-      Object {
+      {
         "amount": 2.17,
         "price": 9466,
       },
-      Object {
+      {
         "amount": 3.331,
         "price": 9469.5,
       },
@@ -4567,11 +4567,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 21`] = `Array []`;
+exports[`mappers map bybit messages 21`] = `[]`;
 
 exports[`mappers map bybit messages 22`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": 0.000093,
     "fundingTimestamp": undefined,
@@ -4589,15 +4589,15 @@ Array [
 `;
 
 exports[`mappers map bybit messages 23`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 43624,
         "price": 9360,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": false,
     "localTimestamp": 2019-12-14T00:00:01.275Z,
@@ -4608,11 +4608,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 24`] = `Array []`;
+exports[`mappers map bybit messages 24`] = `[]`;
 
 exports[`mappers map bybit messages 25`] = `
-Array [
-  Object {
+[
+  {
     "amount": 836,
     "exchange": "bybit",
     "id": "3422858",
@@ -4627,8 +4627,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 26`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4646,8 +4646,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 27`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4665,8 +4665,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 28`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4684,8 +4684,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 29`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1257079,
     "exchange": "bybit",
     "id": "10759329",
@@ -4696,7 +4696,7 @@ Array [
     "timestamp": 2021-09-20T07:34:52.903Z,
     "type": "liquidation",
   },
-  Object {
+  {
     "amount": 2314,
     "exchange": "bybit",
     "id": "10759323",
@@ -4707,7 +4707,7 @@ Array [
     "timestamp": 2021-09-20T07:34:54.901Z,
     "type": "liquidation",
   },
-  Object {
+  {
     "amount": 650,
     "exchange": "bybit",
     "id": "10759328",
@@ -4722,8 +4722,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 30`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3655,
     "exchange": "bybit",
     "id": undefined,
@@ -4738,8 +4738,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 31`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2329,
     "exchange": "bybit",
     "id": undefined,
@@ -4754,8 +4754,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 32`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.009,
     "exchange": "bybit",
     "id": undefined,
@@ -4770,8 +4770,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 33`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -4789,11 +4789,11 @@ Array [
 `;
 
 exports[`mappers map bybit messages 34`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0.274,
         "price": 21039,
       },
@@ -4809,15 +4809,15 @@ Array [
 `;
 
 exports[`mappers map bybit messages 35`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 4.651,
         "price": 21203,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit",
     "isSnapshot": false,
     "localTimestamp": 2019-12-14T00:00:01.275Z,
@@ -4829,8 +4829,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 36`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.007,
     "exchange": "bybit",
     "id": "7aad7741-f763-5f78-bf43-c38b29a40f67",
@@ -4845,8 +4845,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 37`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": -0.0009,
     "fundingTimestamp": 2022-06-21T16:00:00.000Z,
@@ -4864,8 +4864,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 38`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": -0.0009,
     "fundingTimestamp": 2022-06-21T16:00:00.000Z,
@@ -4883,8 +4883,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 39`] = `
-Array [
-  Object {
+[
+  {
     "amount": 5823,
     "exchange": "bybit",
     "id": "0cbf2330-952d-5d03-a462-4bf826c867af",
@@ -4895,7 +4895,7 @@ Array [
     "timestamp": 2023-04-05T05:50:23.564Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 3,
     "exchange": "bybit",
     "id": "912e56de-9ed6-5f4f-9421-f0ff5a42d84a",
@@ -4906,7 +4906,7 @@ Array [
     "timestamp": 2023-04-05T05:50:23.564Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 5593,
     "exchange": "bybit",
     "id": "cb558b74-cf72-5157-b53b-93944db336ad",
@@ -4921,8 +4921,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 40`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.4,
     "exchange": "bybit",
     "id": "4c7b6bdc-b4a3-5716-9c7b-bbe01dc7072f",
@@ -4937,8 +4937,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 41`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 25.433,
     "askPrice": 28552.1,
     "bidAmount": 0.047,
@@ -4953,8 +4953,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 42`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 25.433,
     "askPrice": 28552.1,
     "bidAmount": 0.012,
@@ -4969,16 +4969,16 @@ Array [
 `;
 
 exports[`mappers map bybit messages 43`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.225,
         "price": 28555.3,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.597,
         "price": 28555.2,
       },
@@ -4994,16 +4994,16 @@ Array [
 `;
 
 exports[`mappers map bybit messages 44`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.029,
         "price": 28555.3,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.677,
         "price": 28555.2,
       },
@@ -5019,8 +5019,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 45`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2023-04-05T08:00:00.000Z,
@@ -5038,8 +5038,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 46`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2023-04-05T08:00:00.000Z,
@@ -5057,8 +5057,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 47`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -5075,11 +5075,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 48`] = `Array []`;
+exports[`mappers map bybit messages 48`] = `[]`;
 
 exports[`mappers map bybit messages 49`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "bybit",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2023-04-05T08:00:00.000Z,
@@ -5097,8 +5097,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 50`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1637,
     "exchange": "bybit",
     "id": undefined,
@@ -5113,8 +5113,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 51`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6949,
     "exchange": "bybit",
     "id": undefined,
@@ -5129,8 +5129,8 @@ Array [
 `;
 
 exports[`mappers map bybit messages 52`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.058,
     "askPrice": 27994.4,
     "bidAmount": 0.777,
@@ -5144,11 +5144,11 @@ Array [
 ]
 `;
 
-exports[`mappers map bybit messages 53`] = `Array []`;
+exports[`mappers map bybit messages 53`] = `[]`;
 
 exports[`mappers map bybit messages 54`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2846,
     "exchange": "bybit",
     "id": undefined,
@@ -5163,8 +5163,8 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.01,
     "exchange": "bybit-options",
     "id": "0404c393-8419-5bac-95c3-5fea28404754",
@@ -5179,10 +5179,10 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 2`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [],
+[
+  {
+    "asks": [],
+    "bids": [],
     "exchange": "bybit-options",
     "isSnapshot": true,
     "localTimestamp": 2023-04-05T00:00:00.000Z,
@@ -5194,16 +5194,16 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 46,
         "price": 1.74,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 50,
         "price": 0.01,
       },
@@ -5219,19 +5219,19 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 1.74,
       },
-      Object {
+      {
         "amount": 46,
         "price": 1.75,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "bybit-options",
     "isSnapshot": false,
     "localTimestamp": 2023-04-05T00:00:00.000Z,
@@ -5243,8 +5243,8 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 5`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 51,
     "bestAskIV": 2.0007,
     "bestAskPrice": 3.11,
@@ -5275,8 +5275,8 @@ Array [
 `;
 
 exports[`mappers map bybit-options messages 6`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -5307,8 +5307,8 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.97133855,
     "exchange": "coinbase",
     "id": "216544",
@@ -5323,15 +5323,15 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.432,
         "price": 9202.54,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "coinbase",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -5343,11 +5343,11 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 20.79816319,
         "price": 218.21,
       },
@@ -5363,16 +5363,16 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 12,
         "price": 0.257175,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 5299,
         "price": 0.247175,
       },
@@ -5388,16 +5388,16 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.00459825,
         "price": 9222.39,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.5866786,
         "price": 9202.7,
       },
@@ -5413,16 +5413,16 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.039985,
         "price": 40584.89,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.020416,
         "price": 40533.24,
       },
@@ -5438,8 +5438,8 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 7`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 4095,
     "bidAmount": undefined,
@@ -5454,8 +5454,8 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 8`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 58800.01,
     "bidAmount": undefined,
@@ -5470,8 +5470,8 @@ Array [
 `;
 
 exports[`mappers map coinbase messages 9`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.18528568,
     "askPrice": 17167.76,
     "bidAmount": 0.6154089,
@@ -5485,31 +5485,31 @@ Array [
 ]
 `;
 
-exports[`mappers map coinflex messages 1`] = `Array []`;
+exports[`mappers map coinflex messages 1`] = `[]`;
 
-exports[`mappers map coinflex messages 2`] = `Array []`;
+exports[`mappers map coinflex messages 2`] = `[]`;
 
-exports[`mappers map coinflex messages 3`] = `Array []`;
+exports[`mappers map coinflex messages 3`] = `[]`;
 
 exports[`mappers map coinflex messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1,
         "price": 9241,
       },
-      Object {
+      {
         "amount": 0.967,
         "price": 9243.5,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.46,
         "price": 9239.9,
       },
-      Object {
+      {
         "amount": 0.5,
         "price": 9238.1,
       },
@@ -5525,8 +5525,8 @@ Array [
 `;
 
 exports[`mappers map coinflex messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.4999,
     "exchange": "coinflex",
     "id": "160061323905884640",
@@ -5541,8 +5541,8 @@ Array [
 `;
 
 exports[`mappers map coinflex messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinflex",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -5560,8 +5560,8 @@ Array [
 `;
 
 exports[`mappers map coinflex messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.258,
     "exchange": "coinflex",
     "id": "160061323905902676",
@@ -5576,8 +5576,8 @@ Array [
 `;
 
 exports[`mappers map coinflex messages 8`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.817,
     "exchange": "coinflex",
     "id": "160061323905902717",
@@ -5591,11 +5591,11 @@ Array [
 ]
 `;
 
-exports[`mappers map coinflex messages 9`] = `Array []`;
+exports[`mappers map coinflex messages 9`] = `[]`;
 
 exports[`mappers map coinflex messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "coinflex",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -5613,15 +5613,15 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 60.58,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "cryptofacilities",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -5633,8 +5633,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 2`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -5648,7 +5648,7 @@ Array [
     "timestamp": 2019-04-01T00:00:00.684Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 150,
     "askPrice": 60.62,
     "bidAmount": 10000,
@@ -5663,8 +5663,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 3`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": 0.000001739491032443,
     "fundingTimestamp": 2019-04-01T04:00:00.000Z,
@@ -5678,7 +5678,7 @@ Array [
     "timestamp": 2019-04-01T00:00:00.695Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 20000,
     "askPrice": 60.38,
     "bidAmount": 10000,
@@ -5693,8 +5693,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3,
     "exchange": "cryptofacilities",
     "id": undefined,
@@ -5709,8 +5709,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 166,
     "exchange": "cryptofacilities",
     "id": "06842286-3a57-412c-8cb5-b61db36903d3",
@@ -5725,8 +5725,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": -8.92730506785e-7,
     "fundingTimestamp": 2019-09-01T04:00:00.000Z,
@@ -5740,7 +5740,7 @@ Array [
     "timestamp": 2019-09-01T00:00:52.217Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 7,
     "askPrice": 64.28,
     "bidAmount": 2996,
@@ -5755,24 +5755,24 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 7`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1,
         "price": 64.28,
       },
-      Object {
+      {
         "amount": 9216,
         "price": 64.31,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2978,
         "price": 64.27,
       },
-      Object {
+      {
         "amount": 5000,
         "price": 64.26,
       },
@@ -5788,15 +5788,15 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 8`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 14912,
         "price": 64.41,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "cryptofacilities",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -5808,11 +5808,11 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 9`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 64.24,
       },
@@ -5828,8 +5828,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 12000,
     "exchange": "cryptofacilities",
     "id": "3ee209b8-bc9f-4ed5-965b-8c6208b26411",
@@ -5840,7 +5840,7 @@ Array [
     "timestamp": 2020-07-01T00:06:05.283Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 12000,
     "exchange": "cryptofacilities",
     "id": "3ee209b8-bc9f-4ed5-965b-8c6208b26411",
@@ -5855,8 +5855,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 250,
     "exchange": "cryptofacilities",
     "id": "e7f3a144-5c04-4ed6-999e-5922cd0b6160",
@@ -5867,7 +5867,7 @@ Array [
     "timestamp": 2020-07-01T16:27:33.613Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 250,
     "exchange": "cryptofacilities",
     "id": "e7f3a144-5c04-4ed6-999e-5922cd0b6160",
@@ -5882,8 +5882,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 12`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -5897,7 +5897,7 @@ Array [
     "timestamp": 2019-03-31T23:59:58.897Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 5873,
     "askPrice": 141.5,
     "bidAmount": 10000,
@@ -5912,8 +5912,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 13`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": 7.94427729016e-7,
     "fundingTimestamp": 2021-04-01T04:00:00.000Z,
@@ -5927,7 +5927,7 @@ Array [
     "timestamp": 2021-04-01T00:00:00.598Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 839,
     "askPrice": 197.21,
     "bidAmount": 2875,
@@ -5942,8 +5942,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 14`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0,
     "askPrice": 0,
     "bidAmount": 0,
@@ -5958,8 +5958,8 @@ Array [
 `;
 
 exports[`mappers map cryptofacilities messages 15`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "cryptofacilities",
     "fundingRate": -0.000015670191666667,
     "fundingTimestamp": 2023-04-01T00:00:00.000Z,
@@ -5973,7 +5973,7 @@ Array [
     "timestamp": 2023-03-31T23:59:58.986Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 1000,
     "askPrice": 123.9,
     "bidAmount": 30410,
@@ -5987,21 +5987,21 @@ Array [
 ]
 `;
 
-exports[`mappers map delta messages 1`] = `Array []`;
+exports[`mappers map delta messages 1`] = `[]`;
 
-exports[`mappers map delta messages 2`] = `Array []`;
+exports[`mappers map delta messages 2`] = `[]`;
 
 exports[`mappers map delta messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 11100,
         "price": 9522.5,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 449313,
         "price": 9522,
       },
@@ -6017,8 +6017,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6036,8 +6036,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": -0.01,
     "fundingTimestamp": undefined,
@@ -6055,8 +6055,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 4662,
     "exchange": "delta",
     "id": undefined,
@@ -6067,7 +6067,7 @@ Array [
     "timestamp": 2020-06-17T00:00:02.423123Z,
     "type": "trade",
   },
-  Object {
+  {
     "exchange": "delta",
     "fundingRate": -0.01,
     "fundingTimestamp": undefined,
@@ -6085,16 +6085,16 @@ Array [
 `;
 
 exports[`mappers map delta messages 7`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 8,
         "price": 12536.5,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1,
         "price": 85,
       },
@@ -6110,8 +6110,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": 0.08354928018352789,
     "fundingTimestamp": undefined,
@@ -6129,8 +6129,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 9`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": 0.010000000000000002,
     "fundingTimestamp": 2020-07-22T08:00:00.000000Z,
@@ -6148,8 +6148,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": undefined,
     "fundingTimestamp": 2020-07-10T16:00:00.000000Z,
@@ -6166,11 +6166,11 @@ Array [
 ]
 `;
 
-exports[`mappers map delta messages 11`] = `Array []`;
+exports[`mappers map delta messages 11`] = `[]`;
 
 exports[`mappers map delta messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 46,
     "exchange": "delta",
     "id": undefined,
@@ -6181,7 +6181,7 @@ Array [
     "timestamp": 2020-10-13T10:34:11.855645Z,
     "type": "trade",
   },
-  Object {
+  {
     "exchange": "delta",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6198,11 +6198,11 @@ Array [
 ]
 `;
 
-exports[`mappers map delta messages 13`] = `Array []`;
+exports[`mappers map delta messages 13`] = `[]`;
 
 exports[`mappers map delta messages 14`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": 0.01,
     "fundingTimestamp": 2020-10-13T16:00:00.000000Z,
@@ -6220,8 +6220,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 15`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "delta",
     "fundingRate": 0.01,
     "fundingTimestamp": 2020-10-13T16:00:00.000000Z,
@@ -6239,16 +6239,16 @@ Array [
 `;
 
 exports[`mappers map delta messages 16`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1,
         "price": 344.327,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1,
         "price": 344.191,
       },
@@ -6264,8 +6264,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 17`] = `
-Array [
-  Object {
+[
+  {
     "amount": 215.45,
     "exchange": "delta",
     "id": undefined,
@@ -6276,7 +6276,7 @@ Array [
     "timestamp": 2021-03-31T14:04:59.982823Z,
     "type": "trade",
   },
-  Object {
+  {
     "exchange": "delta",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6294,20 +6294,20 @@ Array [
 `;
 
 exports[`mappers map delta messages 18`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1164,
         "price": 89.6,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 900,
         "price": 87,
       },
-      Object {
+      {
         "amount": 3500,
         "price": 86.55,
       },
@@ -6323,16 +6323,16 @@ Array [
 `;
 
 exports[`mappers map delta messages 19`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1836,
         "price": 704.8,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 668.3,
       },
@@ -6348,8 +6348,8 @@ Array [
 `;
 
 exports[`mappers map delta messages 20`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 1950,
     "askPrice": 4964.5,
     "bidAmount": 4356,
@@ -6364,92 +6364,92 @@ Array [
 `;
 
 exports[`mappers map delta messages 21`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3894,
         "price": 805,
       },
-      Object {
+      {
         "amount": 4697,
         "price": 809,
       },
-      Object {
+      {
         "amount": 7091,
         "price": 819,
       },
-      Object {
+      {
         "amount": 10706,
         "price": 841,
       },
-      Object {
+      {
         "amount": 10022,
         "price": 877,
       },
-      Object {
+      {
         "amount": 6143,
         "price": 913,
       },
-      Object {
+      {
         "amount": 7047,
         "price": 948,
       },
-      Object {
+      {
         "amount": 8084,
         "price": 994,
       },
-      Object {
+      {
         "amount": 9274,
         "price": 1055,
       },
-      Object {
+      {
         "amount": 10639,
         "price": 1135,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 6490,
         "price": 772,
       },
-      Object {
+      {
         "amount": 7828,
         "price": 767,
       },
-      Object {
+      {
         "amount": 11819,
         "price": 757,
       },
-      Object {
+      {
         "amount": 17844,
         "price": 736,
       },
-      Object {
+      {
         "amount": 16703,
         "price": 699,
       },
-      Object {
+      {
         "amount": 10238,
         "price": 663,
       },
-      Object {
+      {
         "amount": 11745,
         "price": 628,
       },
-      Object {
+      {
         "amount": 13473,
         "price": 582,
       },
-      Object {
+      {
         "amount": 15457,
         "price": 521,
       },
-      Object {
+      {
         "amount": 17732,
         "price": 441,
       },
-      Object {
+      {
         "amount": 15000,
         "price": 0.1,
       },
@@ -6465,8 +6465,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2000,
     "exchange": "deribit",
     "id": "39355898",
@@ -6477,7 +6477,7 @@ Array [
     "timestamp": 2019-09-01T00:00:22.565Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 50,
     "exchange": "deribit",
     "id": "39355899",
@@ -6491,27 +6491,27 @@ Array [
 ]
 `;
 
-exports[`mappers map deribit messages 2`] = `Array []`;
+exports[`mappers map deribit messages 2`] = `[]`;
 
 exports[`mappers map deribit messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 179803,
         "price": 218.6,
       },
-      Object {
+      {
         "amount": 7887,
         "price": 218.65,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1895,
         "price": 217.8,
       },
-      Object {
+      {
         "amount": 712,
         "price": 217.75,
       },
@@ -6527,20 +6527,20 @@ Array [
 `;
 
 exports[`mappers map deribit messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 64903,
         "price": 219.2,
       },
-      Object {
+      {
         "amount": 19343,
         "price": 219.1,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 217.8,
       },
@@ -6556,8 +6556,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "deribit",
     "fundingRate": 0,
     "fundingTimestamp": undefined,
@@ -6571,7 +6571,7 @@ Array [
     "timestamp": 2019-08-01T00:00:04.229Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 250,
     "askPrice": 10095.5,
     "bidAmount": 7000,
@@ -6586,8 +6586,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "deribit",
     "fundingRate": 0,
     "fundingTimestamp": undefined,
@@ -6601,7 +6601,7 @@ Array [
     "timestamp": 2019-10-01T00:00:03.897Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 5260,
     "askPrice": 8304.5,
     "bidAmount": 267900,
@@ -6616,8 +6616,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 7`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 500,
     "bestAskPrice": undefined,
@@ -6644,7 +6644,7 @@ Array [
     "underlyingPrice": 9724.48,
     "vega": 0,
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -6659,8 +6659,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 8`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 4.8,
     "bestAskIV": 66.9,
     "bestAskPrice": 0.04,
@@ -6687,7 +6687,7 @@ Array [
     "underlyingPrice": 9440.73,
     "vega": 3.88497,
   },
-  Object {
+  {
     "askAmount": 4.8,
     "askPrice": 0.04,
     "bidAmount": 15.4,
@@ -6702,8 +6702,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 9`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -6730,7 +6730,7 @@ Array [
     "underlyingPrice": 231.7,
     "vega": 0.0092,
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -6745,8 +6745,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 10`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -6773,7 +6773,7 @@ Array [
     "underlyingPrice": 244.14,
     "vega": 0.01246,
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -6788,8 +6788,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1120,
     "exchange": "deribit",
     "id": "66460463",
@@ -6800,7 +6800,7 @@ Array [
     "timestamp": 2020-03-13T00:07:24.032Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 1120,
     "exchange": "deribit",
     "id": "66460463",
@@ -6815,8 +6815,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2500,
     "exchange": "deribit",
     "id": "66460626",
@@ -6827,7 +6827,7 @@ Array [
     "timestamp": 2020-03-13T00:07:47.675Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 2500,
     "exchange": "deribit",
     "id": "66460626",
@@ -6842,16 +6842,16 @@ Array [
 `;
 
 exports[`mappers map deribit messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 93,
         "price": 0.037,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 93,
         "price": 0.019,
       },
@@ -6867,27 +6867,27 @@ Array [
 `;
 
 exports[`mappers map deribit messages 14`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 34,
         "price": 7.562,
       },
-      Object {
+      {
         "amount": 329,
         "price": 7.561,
       },
-      Object {
+      {
         "amount": 401,
         "price": 7.56,
       },
-      Object {
+      {
         "amount": 133,
         "price": 7.559,
       },
-      Object {
+      {
         "amount": 660,
         "price": 7.558,
       },
@@ -6903,8 +6903,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 15`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "deribit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6918,7 +6918,7 @@ Array [
     "timestamp": 2022-08-23T17:03:00.291Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -6933,8 +6933,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 16`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "deribit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6948,7 +6948,7 @@ Array [
     "timestamp": 2022-09-09T00:00:59.203Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 300000,
     "askPrice": -5,
     "bidAmount": 300000,
@@ -6963,8 +6963,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 17`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "deribit",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -6978,7 +6978,7 @@ Array [
     "timestamp": 2022-09-09T00:00:56.186Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 18,
     "askPrice": 0.008,
     "bidAmount": 18,
@@ -6993,8 +6993,8 @@ Array [
 `;
 
 exports[`mappers map deribit messages 18`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -7021,7 +7021,7 @@ Array [
     "underlyingPrice": 1.1367,
     "vega": 0.00024,
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": undefined,
     "bidAmount": undefined,
@@ -7035,11 +7035,11 @@ Array [
 ]
 `;
 
-exports[`mappers map dydx messages 1`] = `Array []`;
+exports[`mappers map dydx messages 1`] = `[]`;
 
 exports[`mappers map dydx messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.075,
     "exchange": "dydx",
     "id": undefined,
@@ -7050,7 +7050,7 @@ Array [
     "timestamp": 2021-05-01T00:00:34.046Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.425,
     "exchange": "dydx",
     "id": undefined,
@@ -7065,16 +7065,16 @@ Array [
 `;
 
 exports[`mappers map dydx messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 20,
         "price": 7,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 50,
         "price": 5,
       },
@@ -7090,19 +7090,19 @@ Array [
 `;
 
 exports[`mappers map dydx messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3000,
         "price": 5.664,
       },
-      Object {
+      {
         "amount": 0,
         "price": 5.666,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "dydx",
     "isSnapshot": false,
     "localTimestamp": 2021-05-01T00:00:37.000Z,
@@ -7113,11 +7113,11 @@ Array [
 ]
 `;
 
-exports[`mappers map dydx messages 5`] = `Array []`;
+exports[`mappers map dydx messages 5`] = `[]`;
 
 exports[`mappers map dydx messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "dydx",
     "fundingRate": 0.000058726,
     "fundingTimestamp": 2021-05-01T00:00:00.000Z,
@@ -7135,8 +7135,8 @@ Array [
 `;
 
 exports[`mappers map dydx messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "dydx",
     "fundingRate": 0.000058726,
     "fundingTimestamp": 2021-05-01T00:00:00.000Z,
@@ -7154,15 +7154,15 @@ Array [
 `;
 
 exports[`mappers map dydx messages 8`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 2531.2,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "dydx",
     "isSnapshot": true,
     "localTimestamp": 2021-05-01T00:00:37.000Z,
@@ -7174,15 +7174,15 @@ Array [
 `;
 
 exports[`mappers map dydx messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2.5,
         "price": 2531.2,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "dydx",
     "isSnapshot": false,
     "localTimestamp": 2021-05-01T00:00:37.000Z,
@@ -7194,16 +7194,16 @@ Array [
 `;
 
 exports[`mappers map dydx messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 2531.2,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 9.35,
         "price": 2531.2,
       },
@@ -7219,8 +7219,8 @@ Array [
 `;
 
 exports[`mappers map dydx messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2.5,
     "exchange": "dydx",
     "id": undefined,
@@ -7234,19 +7234,19 @@ Array [
 ]
 `;
 
-exports[`mappers map ftx messages 1`] = `Array []`;
+exports[`mappers map ftx messages 1`] = `[]`;
 
 exports[`mappers map ftx messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 20.1695,
         "price": 9807.75,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 15.5629,
         "price": 9805,
       },
@@ -7262,15 +7262,15 @@ Array [
 `;
 
 exports[`mappers map ftx messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 21.0125,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "ftx",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -7282,8 +7282,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.03,
     "exchange": "ftx",
     "id": undefined,
@@ -7298,8 +7298,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.13,
     "exchange": "ftx",
     "id": "1139499",
@@ -7314,8 +7314,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "ftx",
     "fundingRate": 0,
     "fundingTimestamp": 2020-05-12T13:00:00.000Z,
@@ -7333,8 +7333,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "ftx",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -7352,8 +7352,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "ftx",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -7371,8 +7371,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0149,
     "exchange": "ftx",
     "id": "114724653",
@@ -7383,7 +7383,7 @@ Array [
     "timestamp": 2020-09-15T00:02:05.787437Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.0149,
     "exchange": "ftx",
     "id": "114724653",
@@ -7398,8 +7398,8 @@ Array [
 `;
 
 exports[`mappers map ftx messages 10`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.0048,
     "askPrice": 54411,
     "bidAmount": 0.0919,
@@ -7413,27 +7413,27 @@ Array [
 ]
 `;
 
-exports[`mappers map ftx messages 11`] = `Array []`;
+exports[`mappers map ftx messages 11`] = `[]`;
 
 exports[`mappers map ftx messages 12`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 5.9795,
         "price": 36043,
       },
-      Object {
+      {
         "amount": 9.7243,
         "price": 36046,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2.3987,
         "price": 36006,
       },
-      Object {
+      {
         "amount": 8.8432,
         "price": 35958,
       },
@@ -7448,19 +7448,19 @@ Array [
 ]
 `;
 
-exports[`mappers map ftx us messages 1`] = `Array []`;
+exports[`mappers map ftx us messages 1`] = `[]`;
 
 exports[`mappers map ftx us messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2.393,
         "price": 231.09,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2.456,
         "price": 231.08,
       },
@@ -7475,19 +7475,19 @@ Array [
 ]
 `;
 
-exports[`mappers map ftx us messages 3`] = `Array []`;
+exports[`mappers map ftx us messages 3`] = `[]`;
 
 exports[`mappers map ftx us messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3.1373,
         "price": 9400,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 3.4959,
         "price": 9398.5,
       },
@@ -7503,8 +7503,8 @@ Array [
 `;
 
 exports[`mappers map ftx us messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.031,
     "exchange": "ftx-us",
     "id": "1711",
@@ -7518,11 +7518,11 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io messages 1`] = `Array []`;
+exports[`mappers map gate-io messages 1`] = `[]`;
 
 exports[`mappers map gate-io messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.0019152098,
     "exchange": "gate-io",
     "id": "259066876",
@@ -7533,7 +7533,7 @@ Array [
     "timestamp": 2020-07-01T00:00:00.655988Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.002736014,
     "exchange": "gate-io",
     "id": "259066877",
@@ -7547,19 +7547,19 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io messages 3`] = `Array []`;
+exports[`mappers map gate-io messages 3`] = `[]`;
 
 exports[`mappers map gate-io messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 14.4232,
         "price": 10.95,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 26.681457246,
         "price": 10.53,
       },
@@ -7575,15 +7575,15 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 1134158.88940972,
         "price": 0.01631,
       },
-      Object {
+      {
         "amount": 41254.93309,
         "price": 0.01625,
       },
@@ -7599,16 +7599,16 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.002,
         "price": 17132.2,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.0057,
         "price": 17131,
       },
@@ -7624,8 +7624,8 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 89.238,
     "exchange": "gate-io",
     "id": "5541729598",
@@ -7640,8 +7640,8 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 8`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 10,
     "askPrice": 0.010366,
     "bidAmount": 0.001,
@@ -7656,16 +7656,16 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 9`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.0068,
         "price": 29303,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.2483,
         "price": 29302.9,
       },
@@ -7681,11 +7681,11 @@ Array [
 `;
 
 exports[`mappers map gate-io messages 10`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0.5124,
         "price": 29291.4,
       },
@@ -7701,16 +7701,16 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 108,
         "price": 0.3351,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 10,
         "price": 0.2728,
       },
@@ -7726,20 +7726,20 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 390,
         "price": 222.25,
       },
-      Object {
+      {
         "amount": 0,
         "price": 222.25,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 222.25,
       },
@@ -7755,16 +7755,16 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 0.01643,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 0.01643,
       },
@@ -7780,16 +7780,16 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2500,
         "price": 223.35,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 12405,
         "price": 221.3,
       },
@@ -7805,8 +7805,8 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "gate-io-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": undefined,
@@ -7824,8 +7824,8 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "gate-io-futures",
     "id": "31615",
@@ -7840,8 +7840,8 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 22,
     "exchange": "gate-io-futures",
     "id": "1696009",
@@ -7855,23 +7855,23 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io-futures messages 8`] = `Array []`;
+exports[`mappers map gate-io-futures messages 8`] = `[]`;
 
-exports[`mappers map gate-io-futures messages 9`] = `Array []`;
+exports[`mappers map gate-io-futures messages 9`] = `[]`;
 
-exports[`mappers map gate-io-futures messages 10`] = `Array []`;
+exports[`mappers map gate-io-futures messages 10`] = `[]`;
 
 exports[`mappers map gate-io-futures messages 11`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 117,
         "price": 4.2907,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 117,
         "price": 4.2201,
       },
@@ -7887,16 +7887,16 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 12`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 93,
         "price": 0.1996,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 17,
         "price": 0.1954,
       },
@@ -7912,36 +7912,36 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 227.2,
       },
-      Object {
+      {
         "amount": 4925,
         "price": 227.55,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4884,
         "price": 227.2,
       },
-      Object {
+      {
         "amount": 4881,
         "price": 227.2,
       },
-      Object {
+      {
         "amount": 2440,
         "price": 227.2,
       },
-      Object {
+      {
         "amount": 1155,
         "price": 227.2,
       },
-      Object {
+      {
         "amount": 0,
         "price": 227.2,
       },
@@ -7957,48 +7957,48 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 14`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 223.75,
       },
-      Object {
+      {
         "amount": 0,
         "price": 223.7,
       },
-      Object {
+      {
         "amount": 0,
         "price": 223.6,
       },
-      Object {
+      {
         "amount": 20,
         "price": 223.6,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 14,
         "price": 223.75,
       },
-      Object {
+      {
         "amount": 0,
         "price": 223.75,
       },
-      Object {
+      {
         "amount": 0,
         "price": 223.7,
       },
-      Object {
+      {
         "amount": 0,
         "price": 223.6,
       },
-      Object {
+      {
         "amount": 15039,
         "price": 223.55,
       },
-      Object {
+      {
         "amount": 15089,
         "price": 223.55,
       },
@@ -8013,11 +8013,11 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io-futures messages 15`] = `Array []`;
+exports[`mappers map gate-io-futures messages 15`] = `[]`;
 
 exports[`mappers map gate-io-futures messages 16`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "gate-io-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": undefined,
@@ -8035,8 +8035,8 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 17`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 15227,
     "askPrice": 45534.8,
     "bidAmount": 2500,
@@ -8050,11 +8050,11 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io-futures messages 18`] = `Array []`;
+exports[`mappers map gate-io-futures messages 18`] = `[]`;
 
 exports[`mappers map gate-io-futures messages 19`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "gate-io-futures",
     "id": "13654526",
@@ -8065,7 +8065,7 @@ Array [
     "timestamp": 2021-03-01T00:00:50.860Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 2000,
     "exchange": "gate-io-futures",
     "id": "13654527",
@@ -8076,7 +8076,7 @@ Array [
     "timestamp": 2021-03-01T00:00:50.860Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 999,
     "exchange": "gate-io-futures",
     "id": "13654528",
@@ -8091,16 +8091,16 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 20`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 19415,
         "price": 28455.9,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 29510,
         "price": 28455.8,
       },
@@ -8116,8 +8116,8 @@ Array [
 `;
 
 exports[`mappers map gate-io-futures messages 21`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "gate-io-futures",
     "fundingRate": 0.0001,
     "fundingTimestamp": undefined,
@@ -8134,23 +8134,23 @@ Array [
 ]
 `;
 
-exports[`mappers map gate-io-futures messages 22`] = `Array []`;
+exports[`mappers map gate-io-futures messages 22`] = `[]`;
 
 exports[`mappers map gemini messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.078285,
         "price": 15,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 51.55728,
         "price": 0.688,
       },
-      Object {
+      {
         "amount": 1.168083,
         "price": 0.686,
       },
@@ -8166,8 +8166,8 @@ Array [
 `;
 
 exports[`mappers map gemini messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "gemini",
     "id": "8280715334",
@@ -8182,27 +8182,27 @@ Array [
 `;
 
 exports[`mappers map gemini messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 88.236,
         "price": 0.02189,
       },
-      Object {
+      {
         "amount": 4,
         "price": 0.02184,
       },
-      Object {
+      {
         "amount": 0,
         "price": 0.02185,
       },
-      Object {
+      {
         "amount": 149.57,
         "price": 0.02188,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "gemini",
     "isSnapshot": false,
     "localTimestamp": 2019-09-01T00:00:01.275Z,
@@ -8214,8 +8214,8 @@ Array [
 `;
 
 exports[`mappers map gemini messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 100,
     "exchange": "gemini",
     "id": "9608228023",
@@ -8229,19 +8229,19 @@ Array [
 ]
 `;
 
-exports[`mappers map hitbtc messages 1`] = `Array []`;
+exports[`mappers map hitbtc messages 1`] = `[]`;
 
 exports[`mappers map hitbtc messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 31400,
         "price": 4.255e-8,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2200,
         "price": 4.245e-8,
       },
@@ -8257,15 +8257,15 @@ Array [
 `;
 
 exports[`mappers map hitbtc messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 0.000104487,
       },
-      Object {
+      {
         "amount": 8865,
         "price": 0.000073314,
       },
@@ -8280,11 +8280,11 @@ Array [
 ]
 `;
 
-exports[`mappers map hitbtc messages 4`] = `Array []`;
+exports[`mappers map hitbtc messages 4`] = `[]`;
 
 exports[`mappers map hitbtc messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.03,
     "exchange": "hitbtc",
     "id": "712213931",
@@ -8298,29 +8298,29 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 1`] = `Array []`;
+exports[`mappers map huobi messages 1`] = `[]`;
 
-exports[`mappers map huobi messages 2`] = `Array []`;
+exports[`mappers map huobi messages 2`] = `[]`;
 
 exports[`mappers map huobi messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 20,
         "price": 9469.88,
       },
-      Object {
+      {
         "amount": 8,
         "price": 9470.38,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 35,
         "price": 9467.21,
       },
-      Object {
+      {
         "amount": 132,
         "price": 9467.2,
       },
@@ -8336,8 +8336,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 62,
     "exchange": "huobi",
     "id": "251029750220000",
@@ -8352,20 +8352,20 @@ Array [
 `;
 
 exports[`mappers map huobi messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 734,
         "price": 299.375,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1,
         "price": 290.864,
       },
-      Object {
+      {
         "amount": 0,
         "price": 290.966,
       },
@@ -8381,24 +8381,24 @@ Array [
 `;
 
 exports[`mappers map huobi messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1033141.41,
         "price": 6.35e-8,
       },
-      Object {
+      {
         "amount": 269808.94,
         "price": 6.4e-8,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 45542.05,
         "price": 6.22e-8,
       },
-      Object {
+      {
         "amount": 663504.55,
         "price": 6.21e-8,
       },
@@ -8414,8 +8414,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1569.86,
     "exchange": "huobi",
     "id": "100027416191",
@@ -8430,8 +8430,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 8`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1569.86,
     "exchange": "huobi",
     "id": "100027416192",
@@ -8445,23 +8445,23 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 9`] = `Array []`;
+exports[`mappers map huobi messages 9`] = `[]`;
 
 exports[`mappers map huobi messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1.07,
         "price": 0.9087,
       },
-      Object {
+      {
         "amount": 1760.6161,
         "price": 0.9088,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1877.1994,
         "price": 0.9073,
       },
@@ -8477,8 +8477,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6.5286,
     "exchange": "huobi",
     "id": "10020171792852100010452",
@@ -8493,8 +8493,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6.5286,
     "exchange": "huobi",
     "id": "100201717928521000104525",
@@ -8509,20 +8509,20 @@ Array [
 `;
 
 exports[`mappers map huobi messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 437407.32,
         "price": 1.55e-7,
       },
-      Object {
+      {
         "amount": 0,
         "price": 4.75e-8,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 731389.72,
         "price": 4.37e-8,
       },
@@ -8538,24 +8538,24 @@ Array [
 `;
 
 exports[`mappers map huobi messages 14`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 137,
         "price": 10866.01,
       },
-      Object {
+      {
         "amount": 35,
         "price": 10900.06,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 3166,
         "price": 10866,
       },
-      Object {
+      {
         "amount": 30,
         "price": 10847.44,
       },
@@ -8571,15 +8571,15 @@ Array [
 `;
 
 exports[`mappers map huobi messages 15`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 10489.55,
       },
-      Object {
+      {
         "amount": 385,
         "price": 10361.14,
       },
@@ -8594,119 +8594,119 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi messages 16`] = `Array []`;
+exports[`mappers map huobi messages 16`] = `[]`;
 
-exports[`mappers map huobi messages 17`] = `Array []`;
+exports[`mappers map huobi messages 17`] = `[]`;
 
-exports[`mappers map huobi messages 18`] = `Array []`;
+exports[`mappers map huobi messages 18`] = `[]`;
 
-exports[`mappers map huobi messages 19`] = `Array []`;
+exports[`mappers map huobi messages 19`] = `[]`;
 
-exports[`mappers map huobi messages 20`] = `Array []`;
+exports[`mappers map huobi messages 20`] = `[]`;
 
 exports[`mappers map huobi messages 21`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.190075,
         "price": 9137.68,
       },
-      Object {
+      {
         "amount": 0.01,
         "price": 9137.75,
       },
-      Object {
+      {
         "amount": 0.010945,
         "price": 9138.23,
       },
-      Object {
+      {
         "amount": 0.131941,
         "price": 9138.27,
       },
-      Object {
+      {
         "amount": 0.003,
         "price": 9138.47,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9138.6,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9138.61,
       },
-      Object {
+      {
         "amount": 0.0074,
         "price": 9138.62,
       },
-      Object {
+      {
         "amount": 0.042194,
         "price": 9138.67,
       },
-      Object {
+      {
         "amount": 0.069238,
         "price": 9144,
       },
-      Object {
+      {
         "amount": 1,
         "price": 9146.84,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9146.9,
       },
-      Object {
+      {
         "amount": 0.030582,
         "price": 9145.4,
       },
-      Object {
+      {
         "amount": 0.132209,
         "price": 9146.18,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4.683547,
         "price": 9137.67,
       },
-      Object {
+      {
         "amount": 0.0089,
         "price": 9137.35,
       },
-      Object {
+      {
         "amount": 0.00606,
         "price": 9137.17,
       },
-      Object {
+      {
         "amount": 0.11,
         "price": 9137.06,
       },
-      Object {
+      {
         "amount": 0.002232,
         "price": 9134.5,
       },
-      Object {
+      {
         "amount": 0.164064,
         "price": 9134.4,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9126.94,
       },
-      Object {
+      {
         "amount": 0.0622,
         "price": 9135.96,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9135.78,
       },
-      Object {
+      {
         "amount": 0.007665,
         "price": 9131.7,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9127,
       },
@@ -8722,16 +8722,16 @@ Array [
 `;
 
 exports[`mappers map huobi messages 22`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3.691799,
         "price": 9137.68,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2.389677,
         "price": 9137.67,
       },
@@ -8747,8 +8747,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 23`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 2.323241,
     "askPrice": 7543.59,
     "bidAmount": 0.002329,
@@ -8763,8 +8763,8 @@ Array [
 `;
 
 exports[`mappers map huobi messages 24`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.3,
     "askPrice": 9434.09,
     "bidAmount": 0.3,
@@ -8778,14 +8778,14 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm, messages 1`] = `Array []`;
+exports[`mappers map huobi-dm, messages 1`] = `[]`;
 
 exports[`mappers map huobi-dm, messages 2`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 7999,
         "price": 228.191,
       },
@@ -8801,8 +8801,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm, messages 3`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -8820,8 +8820,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm, messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -8838,15 +8838,15 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm, messages 5`] = `Array []`;
+exports[`mappers map huobi-dm, messages 5`] = `[]`;
 
-exports[`mappers map huobi-dm, messages 6`] = `Array []`;
+exports[`mappers map huobi-dm, messages 6`] = `[]`;
 
-exports[`mappers map huobi-dm, messages 7`] = `Array []`;
+exports[`mappers map huobi-dm, messages 7`] = `[]`;
 
 exports[`mappers map huobi-dm, messages 8`] = `
-Array [
-  Object {
+[
+  {
     "amount": 319,
     "exchange": "huobi-dm",
     "id": undefined,
@@ -8861,8 +8861,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm, messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 218,
     "exchange": "huobi-dm",
     "id": undefined,
@@ -8877,8 +8877,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm, messages 10`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 68,
     "askPrice": 9142.13,
     "bidAmount": 6091,
@@ -8893,8 +8893,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm, messages 11`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 3,
     "askPrice": 43829.95,
     "bidAmount": 7,
@@ -8908,13 +8908,13 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm-linear-swap, messages 1`] = `Array []`;
+exports[`mappers map huobi-dm-linear-swap, messages 1`] = `[]`;
 
-exports[`mappers map huobi-dm-linear-swap, messages 2`] = `Array []`;
+exports[`mappers map huobi-dm-linear-swap, messages 2`] = `[]`;
 
 exports[`mappers map huobi-dm-linear-swap, messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6,
     "exchange": "huobi-dm-linear-swap",
     "id": "2918913650000",
@@ -8929,8 +8929,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 30,
     "exchange": "huobi-dm-linear-swap",
     "id": "2918924670000",
@@ -8945,19 +8945,19 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 118,
         "price": 6.7918,
       },
-      Object {
+      {
         "amount": 0,
         "price": 6.7941,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "huobi-dm-linear-swap",
     "isSnapshot": false,
     "localTimestamp": 2020-12-01T00:00:01.275Z,
@@ -8969,8 +8969,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-linear-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -8988,8 +8988,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-linear-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9007,8 +9007,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-linear-swap",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2020-12-01T00:00:00.000Z,
@@ -9026,8 +9026,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 227,
     "exchange": "huobi-dm-linear-swap",
     "id": undefined,
@@ -9042,8 +9042,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 10`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 9249,
     "askPrice": 47176.6,
     "bidAmount": 1,
@@ -9058,8 +9058,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-linear-swap, messages 11`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2,
     "exchange": "huobi-dm-linear-swap",
     "id": "1186558919990000",
@@ -9074,8 +9074,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-options, messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 8,
     "exchange": "huobi-dm-options",
     "id": "2634626360000",
@@ -9086,7 +9086,7 @@ Array [
     "timestamp": 2020-11-30T13:30:05.993Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 20,
     "exchange": "huobi-dm-options",
     "id": "2634626360001",
@@ -9101,20 +9101,20 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-options, messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 74,
         "price": 106,
       },
-      Object {
+      {
         "amount": 3613,
         "price": 239.94,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 5,
         "price": 51,
       },
@@ -9130,15 +9130,15 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-options, messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 578,
         "price": 4116.94,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "huobi-dm-options",
     "isSnapshot": false,
     "localTimestamp": 2021-05-03T00:00:00.130Z,
@@ -9149,13 +9149,13 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm-options, messages 4`] = `Array []`;
+exports[`mappers map huobi-dm-options, messages 4`] = `[]`;
 
-exports[`mappers map huobi-dm-options, messages 5`] = `Array []`;
+exports[`mappers map huobi-dm-options, messages 5`] = `[]`;
 
 exports[`mappers map huobi-dm-options, messages 6`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 1.64869787,
     "bestAskPrice": 2000,
@@ -9185,13 +9185,13 @@ Array [
 ]
 `;
 
-exports[`mappers map huobi-dm-swap, messages 1`] = `Array []`;
+exports[`mappers map huobi-dm-swap, messages 1`] = `[]`;
 
-exports[`mappers map huobi-dm-swap, messages 2`] = `Array []`;
+exports[`mappers map huobi-dm-swap, messages 2`] = `[]`;
 
 exports[`mappers map huobi-dm-swap, messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 8,
     "exchange": "huobi-dm-swap",
     "id": "95306843320000",
@@ -9206,8 +9206,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 80,
     "exchange": "huobi-dm-swap",
     "id": "95307123240000",
@@ -9222,11 +9222,11 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 1021,
         "price": 239.34,
       },
@@ -9242,8 +9242,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 6`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9261,8 +9261,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9280,8 +9280,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "huobi-dm-swap",
     "fundingRate": 0.0001,
     "fundingTimestamp": 2020-06-23T12:00:00.000Z,
@@ -9299,8 +9299,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 231,
     "exchange": "huobi-dm-swap",
     "id": undefined,
@@ -9315,8 +9315,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3,
     "exchange": "huobi-dm-swap",
     "id": undefined,
@@ -9331,8 +9331,8 @@ Array [
 `;
 
 exports[`mappers map huobi-dm-swap, messages 11`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 4635,
     "askPrice": 47152.4,
     "bidAmount": 1436,
@@ -9347,8 +9347,8 @@ Array [
 `;
 
 exports[`mappers map kraken messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 2.51146536,
     "exchange": "kraken",
     "id": undefined,
@@ -9363,8 +9363,8 @@ Array [
 `;
 
 exports[`mappers map kraken messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.01596347,
     "exchange": "kraken",
     "id": undefined,
@@ -9375,7 +9375,7 @@ Array [
     "timestamp": 2019-07-01T00:00:58.512503Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 0.28522465,
     "exchange": "kraken",
     "id": undefined,
@@ -9390,11 +9390,11 @@ Array [
 `;
 
 exports[`mappers map kraken messages 3`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 35.02658459,
         "price": 87.6,
       },
@@ -9410,24 +9410,24 @@ Array [
 `;
 
 exports[`mappers map kraken messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 27.71904764,
         "price": 413.9,
       },
-      Object {
+      {
         "amount": 0,
         "price": 403.5,
       },
-      Object {
+      {
         "amount": 0,
         "price": 400.3,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 3.38983321,
         "price": 400,
       },
@@ -9443,15 +9443,15 @@ Array [
 `;
 
 exports[`mappers map kraken messages 5`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 33.955,
         "price": 352,
       },
-      Object {
+      {
         "amount": 5.895279,
         "price": 351.5,
       },
@@ -9467,16 +9467,16 @@ Array [
 `;
 
 exports[`mappers map kraken messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 3,
         "price": 0.102987,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2,
         "price": 0.10281,
       },
@@ -9492,8 +9492,8 @@ Array [
 `;
 
 exports[`mappers map kraken messages 7`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 0.3167044,
     "askPrice": 43770.3,
     "bidAmount": 0.00917717,
@@ -9507,19 +9507,19 @@ Array [
 ]
 `;
 
-exports[`mappers map kraken messages 8`] = `Array []`;
+exports[`mappers map kraken messages 8`] = `[]`;
 
 exports[`mappers map okcoin messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.0425,
         "price": 7624.75,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1.359,
         "price": 766,
       },
@@ -9534,11 +9534,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okcoin messages 2`] = `Array []`;
+exports[`mappers map okcoin messages 2`] = `[]`;
 
 exports[`mappers map okcoin messages 3`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 5.51,
     "bidAmount": undefined,
@@ -9553,15 +9553,15 @@ Array [
 `;
 
 exports[`mappers map okcoin messages 4`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.5985,
         "price": 6914.33,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "okcoin",
     "isSnapshot": false,
     "localTimestamp": 2019-11-09T00:00:01.275Z,
@@ -9573,8 +9573,8 @@ Array [
 `;
 
 exports[`mappers map okcoin messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "okcoin",
     "id": "459",
@@ -9589,8 +9589,8 @@ Array [
 `;
 
 exports[`mappers map okcoin messages 6`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.1,
     "exchange": "okcoin",
     "id": "460",
@@ -9605,8 +9605,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.12,
     "exchange": "okex",
     "id": "423886239",
@@ -9621,24 +9621,24 @@ Array [
 `;
 
 exports[`mappers map okex messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 38,
         "price": 4084.57,
       },
-      Object {
+      {
         "amount": 20,
         "price": 4085,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4,
         "price": 4084.56,
       },
-      Object {
+      {
         "amount": 29,
         "price": 4084.5,
       },
@@ -9654,8 +9654,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 3`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 0.0001659,
     "bidAmount": undefined,
@@ -9669,11 +9669,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 4`] = `Array []`;
+exports[`mappers map okex messages 4`] = `[]`;
 
 exports[`mappers map okex messages 5`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.12,
     "exchange": "okex",
     "id": "423886240",
@@ -9688,8 +9688,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 6`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 849.6017,
     "askPrice": 2.585,
     "bidAmount": 1574.0289,
@@ -9704,8 +9704,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 7`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 235,
     "askPrice": 3.9385,
     "bidAmount": 0.350812,
@@ -9719,11 +9719,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex messages 8`] = `Array []`;
+exports[`mappers map okex messages 8`] = `[]`;
 
 exports[`mappers map okex messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 13.491146,
     "exchange": "okex",
     "id": "21300150",
@@ -9738,28 +9738,28 @@ Array [
 `;
 
 exports[`mappers map okex messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0.02250534,
         "price": 46167.8,
       },
-      Object {
+      {
         "amount": 0.00455491,
         "price": 46167.9,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.00375882,
         "price": 46043.4,
       },
-      Object {
+      {
         "amount": 0.00238905,
         "price": 46043.3,
       },
-      Object {
+      {
         "amount": 0.0435796,
         "price": 45906.8,
       },
@@ -9775,11 +9775,11 @@ Array [
 `;
 
 exports[`mappers map okex messages 11`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 3.5,
         "price": 0.00895,
       },
@@ -9795,8 +9795,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 12`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 54969.407534,
     "askPrice": 0.0072,
     "bidAmount": 4092.326,
@@ -9811,8 +9811,8 @@ Array [
 `;
 
 exports[`mappers map okex messages 13`] = `
-Array [
-  Object {
+[
+  {
     "amount": 3.75,
     "exchange": "okex",
     "id": "84834539",
@@ -9827,8 +9827,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 4,
     "exchange": "okex-futures",
     "id": "2578238628528131",
@@ -9843,8 +9843,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 5,
     "exchange": "okex-futures",
     "id": "3269040623943685",
@@ -9859,8 +9859,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 4,
     "exchange": "okex-futures",
     "id": "2578238628528132",
@@ -9875,8 +9875,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 5,
     "exchange": "okex-futures",
     "id": "3269040623943686",
@@ -9891,24 +9891,24 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 38,
         "price": 4084.57,
       },
-      Object {
+      {
         "amount": 20,
         "price": 4085,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 4,
         "price": 4084.56,
       },
-      Object {
+      {
         "amount": 29,
         "price": 4084.5,
       },
@@ -9923,11 +9923,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 6`] = `Array []`;
+exports[`mappers map okex-futures messages 6`] = `[]`;
 
 exports[`mappers map okex-futures messages 7`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9945,8 +9945,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9960,7 +9960,7 @@ Array [
     "timestamp": 2019-08-01T00:02:00.429Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 0.02255,
     "bidAmount": undefined,
@@ -9974,11 +9974,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 9`] = `Array []`;
+exports[`mappers map okex-futures messages 9`] = `[]`;
 
 exports[`mappers map okex-futures messages 10`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -9992,7 +9992,7 @@ Array [
     "timestamp": 2019-12-31T23:59:59.382Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 7181.95,
     "bidAmount": undefined,
@@ -10007,8 +10007,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 11`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": undefined,
     "askPrice": 7181.95,
     "bidAmount": undefined,
@@ -10023,8 +10023,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 12`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -10038,7 +10038,7 @@ Array [
     "timestamp": 2021-09-30T23:59:59.965Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 20,
     "askPrice": 47.837,
     "bidAmount": 112,
@@ -10053,16 +10053,16 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 74,
         "price": 8581.44,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 37,
         "price": 8581.38,
       },
@@ -10078,11 +10078,11 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 14`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 1459,
         "price": 2.25,
       },
@@ -10097,11 +10097,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 15`] = `Array []`;
+exports[`mappers map okex-futures messages 15`] = `[]`;
 
 exports[`mappers map okex-futures messages 16`] = `
-Array [
-  Object {
+[
+  {
     "amount": 475,
     "exchange": "okex-futures",
     "id": undefined,
@@ -10116,8 +10116,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 17`] = `
-Array [
-  Object {
+[
+  {
     "amount": 8,
     "exchange": "okex-futures",
     "id": undefined,
@@ -10131,23 +10131,23 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 18`] = `Array []`;
+exports[`mappers map okex-futures messages 18`] = `[]`;
 
 exports[`mappers map okex-futures messages 19`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 65,
         "price": 1.27898,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2,
         "price": 1.27803,
       },
-      Object {
+      {
         "amount": 65,
         "price": 1.27802,
       },
@@ -10163,8 +10163,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 20`] = `
-Array [
-  Object {
+[
+  {
     "amount": 11,
     "exchange": "okex-futures",
     "id": "1271987",
@@ -10179,8 +10179,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 21`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -10198,8 +10198,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 22`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -10216,11 +10216,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 23`] = `Array []`;
+exports[`mappers map okex-futures messages 23`] = `[]`;
 
 exports[`mappers map okex-futures messages 24`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -10234,7 +10234,7 @@ Array [
     "timestamp": 2021-12-22T00:00:09.045Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 900,
     "askPrice": 36.251,
     "bidAmount": 240,
@@ -10249,15 +10249,15 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 25`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 6,
         "price": 161.26,
       },
-      Object {
+      {
         "amount": 0,
         "price": 161.24,
       },
@@ -10273,8 +10273,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 26`] = `
-Array [
-  Object {
+[
+  {
     "amount": 12,
     "exchange": "okex-futures",
     "id": undefined,
@@ -10289,8 +10289,8 @@ Array [
 `;
 
 exports[`mappers map okex-futures messages 27`] = `
-Array [
-  Object {
+[
+  {
     "amount": 40,
     "exchange": "okex-futures",
     "id": undefined,
@@ -10304,11 +10304,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 28`] = `Array []`;
+exports[`mappers map okex-futures messages 28`] = `[]`;
 
 exports[`mappers map okex-futures messages 29`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-futures",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -10325,11 +10325,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-futures messages 30`] = `Array []`;
+exports[`mappers map okex-futures messages 30`] = `[]`;
 
 exports[`mappers map okex-futures messages 31`] = `
-Array [
-  Object {
+[
+  {
     "amount": 39,
     "exchange": "okex-futures",
     "id": undefined,
@@ -10344,15 +10344,15 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 305,
         "price": 0.0005,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "okex-options",
     "isSnapshot": true,
     "localTimestamp": 2019-08-01T00:00:02.997Z,
@@ -10363,11 +10363,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 2`] = `Array []`;
+exports[`mappers map okex-options messages 2`] = `[]`;
 
 exports[`mappers map okex-options messages 3`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 505,
     "bestAskIV": 0.7813,
     "bestAskPrice": 0.153,
@@ -10397,11 +10397,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 4`] = `Array []`;
+exports[`mappers map okex-options messages 4`] = `[]`;
 
 exports[`mappers map okex-options messages 5`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 505,
     "bestAskIV": 0.7813,
     "bestAskPrice": 0.153,
@@ -10432,8 +10432,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 6`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 55,
     "bestAskIV": 0.8814,
     "bestAskPrice": 0.3325,
@@ -10464,8 +10464,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 7`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 4,
     "bestAskIV": 0.6348,
     "bestAskPrice": 0.018,
@@ -10495,11 +10495,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 8`] = `Array []`;
+exports[`mappers map okex-options messages 8`] = `[]`;
 
 exports[`mappers map okex-options messages 9`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -10530,8 +10530,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 10`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -10562,8 +10562,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 11`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 305,
     "askPrice": 0.0305,
     "bidAmount": 405,
@@ -10577,22 +10577,22 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 12`] = `Array []`;
+exports[`mappers map okex-options messages 12`] = `[]`;
 
 exports[`mappers map okex-options messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 0.234,
       },
-      Object {
+      {
         "amount": 100,
         "price": 0.2345,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "okex-options",
     "isSnapshot": false,
     "localTimestamp": 2020-02-08T00:00:02.997Z,
@@ -10604,8 +10604,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 14`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 505,
     "bestAskIV": 0.7813,
     "bestAskPrice": 0.153,
@@ -10635,11 +10635,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 15`] = `Array []`;
+exports[`mappers map okex-options messages 15`] = `[]`;
 
 exports[`mappers map okex-options messages 16`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 505,
     "bestAskIV": 0.7813,
     "bestAskPrice": 0.153,
@@ -10670,8 +10670,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 17`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 55,
     "bestAskIV": 0.8814,
     "bestAskPrice": 0.3325,
@@ -10702,8 +10702,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 18`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": 4,
     "bestAskIV": 0.6348,
     "bestAskPrice": 0.018,
@@ -10733,11 +10733,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 19`] = `Array []`;
+exports[`mappers map okex-options messages 19`] = `[]`;
 
 exports[`mappers map okex-options messages 20`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -10768,8 +10768,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 21`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -10800,8 +10800,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 22`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 305,
     "askPrice": 0.0305,
     "bidAmount": 405,
@@ -10816,19 +10816,19 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 23`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 500,
         "price": 0.1795,
       },
-      Object {
+      {
         "amount": 0,
         "price": 0.18,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "okex-options",
     "isSnapshot": false,
     "localTimestamp": 2021-12-23T00:00:00.000Z,
@@ -10839,15 +10839,15 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-options messages 24`] = `Array []`;
+exports[`mappers map okex-options messages 24`] = `[]`;
 
-exports[`mappers map okex-options messages 25`] = `Array []`;
+exports[`mappers map okex-options messages 25`] = `[]`;
 
-exports[`mappers map okex-options messages 26`] = `Array []`;
+exports[`mappers map okex-options messages 26`] = `[]`;
 
 exports[`mappers map okex-options messages 27`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 111,
     "askPrice": 0.0005,
     "bidAmount": undefined,
@@ -10862,8 +10862,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 28`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 0.8203208593,
     "bestAskPrice": undefined,
@@ -10890,7 +10890,7 @@ Array [
     "underlyingPrice": 3814.05,
     "vega": 0.0002005415,
   },
-  Object {
+  {
     "bestAskAmount": 111,
     "bestAskIV": 1.9531310937,
     "bestAskPrice": 0.0005,
@@ -10921,8 +10921,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 29`] = `
-Array [
-  Object {
+[
+  {
     "amount": 1,
     "exchange": "okex-options",
     "id": "376",
@@ -10937,8 +10937,8 @@ Array [
 `;
 
 exports[`mappers map okex-options messages 30`] = `
-Array [
-  Object {
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": 5,
     "bestAskPrice": undefined,
@@ -10969,8 +10969,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 1`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.12,
     "exchange": "okex-swap",
     "id": "423886239",
@@ -10985,28 +10985,28 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 264,
         "price": 0.3198,
       },
-      Object {
+      {
         "amount": 222,
         "price": 0.3199,
       },
-      Object {
+      {
         "amount": 2014,
         "price": 0.3219,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1646,
         "price": 0.3196,
       },
-      Object {
+      {
         "amount": 1672,
         "price": 0.3195,
       },
@@ -11022,8 +11022,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 3`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -11037,7 +11037,7 @@ Array [
     "timestamp": 2019-08-01T00:00:02.483Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 329.3,
     "bidAmount": undefined,
@@ -11052,8 +11052,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 4`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00023534,
     "fundingTimestamp": 2019-08-01T04:00:00.000Z,
@@ -11071,8 +11071,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 5`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00023534,
     "fundingTimestamp": 2019-08-01T04:00:00.000Z,
@@ -11089,11 +11089,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 6`] = `Array []`;
+exports[`mappers map okex-swap messages 6`] = `[]`;
 
 exports[`mappers map okex-swap messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.12,
     "exchange": "okex-swap",
     "id": "423886240",
@@ -11108,8 +11108,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 8`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -11123,7 +11123,7 @@ Array [
     "timestamp": 2020-01-31T23:59:53.276Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": undefined,
     "askPrice": 9336.7,
     "bidAmount": undefined,
@@ -11138,8 +11138,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 9`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -11153,7 +11153,7 @@ Array [
     "timestamp": 2020-09-01T00:00:00.453Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 2190,
     "askPrice": 11654.6,
     "bidAmount": 3690,
@@ -11168,15 +11168,15 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 10`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 11.749,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "okex-swap",
     "isSnapshot": false,
     "localTimestamp": 2020-02-08T00:00:02.997Z,
@@ -11187,11 +11187,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 11`] = `Array []`;
+exports[`mappers map okex-swap messages 11`] = `[]`;
 
 exports[`mappers map okex-swap messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 8,
     "exchange": "okex-swap",
     "id": undefined,
@@ -11206,8 +11206,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 13`] = `
-Array [
-  Object {
+[
+  {
     "amount": 30,
     "exchange": "okex-swap",
     "id": undefined,
@@ -11222,20 +11222,20 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 14`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 14,
         "price": 0.65442,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 1,
         "price": 0.65441,
       },
-      Object {
+      {
         "amount": 0,
         "price": 0.65418,
       },
@@ -11251,8 +11251,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 15`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00048105,
     "fundingTimestamp": 2021-12-22T00:00:00.000Z,
@@ -11270,8 +11270,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 16`] = `
-Array [
-  Object {
+[
+  {
     "amount": 5,
     "exchange": "okex-swap",
     "id": "148266905",
@@ -11286,8 +11286,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 17`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00048105,
     "fundingTimestamp": 2021-12-22T00:00:00.000Z,
@@ -11301,7 +11301,7 @@ Array [
     "timestamp": 2021-12-23T00:00:00.000Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "askAmount": 168,
     "askPrice": 2.1738,
     "bidAmount": 2,
@@ -11315,11 +11315,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 18`] = `Array []`;
+exports[`mappers map okex-swap messages 18`] = `[]`;
 
 exports[`mappers map okex-swap messages 19`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00048105,
     "fundingTimestamp": 2021-12-22T00:00:00.000Z,
@@ -11337,8 +11337,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 20`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": 0.00048105,
     "fundingTimestamp": 2021-12-22T00:00:00.000Z,
@@ -11356,8 +11356,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 21`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": undefined,
     "fundingTimestamp": 2021-12-30T08:00:00.000Z,
@@ -11374,11 +11374,11 @@ Array [
 ]
 `;
 
-exports[`mappers map okex-swap messages 22`] = `Array []`;
+exports[`mappers map okex-swap messages 22`] = `[]`;
 
 exports[`mappers map okex-swap messages 23`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 727,
     "askPrice": 38632.4,
     "bidAmount": 990,
@@ -11393,8 +11393,8 @@ Array [
 `;
 
 exports[`mappers map okex-swap messages 24`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "okex-swap",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
@@ -11412,8 +11412,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 1`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "phemex",
     "fundingRate": -0.00039075,
     "fundingTimestamp": undefined,
@@ -11431,11 +11431,11 @@ Array [
 `;
 
 exports[`mappers map phemex messages 2`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 46385,
         "price": 5879.5,
       },
@@ -11451,20 +11451,20 @@ Array [
 `;
 
 exports[`mappers map phemex messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 62442,
         "price": 1.473,
       },
-      Object {
+      {
         "amount": 7957,
         "price": 1.484,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 64579,
         "price": 1.468,
       },
@@ -11480,8 +11480,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 4`] = `
-Array [
-  Object {
+[
+  {
     "amount": 56,
     "exchange": "phemex",
     "id": undefined,
@@ -11495,19 +11495,19 @@ Array [
 ]
 `;
 
-exports[`mappers map phemex messages 5`] = `Array []`;
+exports[`mappers map phemex messages 5`] = `[]`;
 
 exports[`mappers map phemex messages 6`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 237505,
         "price": 5869,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 328758,
         "price": 5868.5,
       },
@@ -11523,15 +11523,15 @@ Array [
 `;
 
 exports[`mappers map phemex messages 7`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0.088633,
         "price": 9545.32,
       },
-      Object {
+      {
         "amount": 0,
         "price": 9545.28,
       },
@@ -11547,8 +11547,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 8`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.10576,
     "exchange": "phemex",
     "id": undefined,
@@ -11563,8 +11563,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 9`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.002791,
     "exchange": "phemex",
     "id": undefined,
@@ -11579,8 +11579,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 6,
     "exchange": "phemex",
     "id": undefined,
@@ -11595,24 +11595,24 @@ Array [
 `;
 
 exports[`mappers map phemex messages 11`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1.453,
         "price": 16548,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0.825,
         "price": 16543.7,
       },
-      Object {
+      {
         "amount": 0.031,
         "price": 13244,
       },
-      Object {
+      {
         "amount": 0.005,
         "price": 10750,
       },
@@ -11628,8 +11628,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 12`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.7,
     "exchange": "phemex",
     "id": undefined,
@@ -11644,15 +11644,15 @@ Array [
 `;
 
 exports[`mappers map phemex messages 13`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1.138,
         "price": 16547.7,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "phemex",
     "isSnapshot": false,
     "localTimestamp": 2019-12-01T00:00:01.275Z,
@@ -11664,8 +11664,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 14`] = `
-Array [
-  Object {
+[
+  {
     "exchange": "phemex",
     "fundingRate": 0.0001,
     "fundingTimestamp": undefined,
@@ -11679,7 +11679,7 @@ Array [
     "timestamp": 2022-11-23T10:20:55.202180Z,
     "type": "derivative_ticker",
   },
-  Object {
+  {
     "exchange": "phemex",
     "fundingRate": 0.0001,
     "fundingTimestamp": undefined,
@@ -11697,8 +11697,8 @@ Array [
 `;
 
 exports[`mappers map phemex messages 15`] = `
-Array [
-  Object {
+[
+  {
     "amount": 244.65,
     "exchange": "phemex",
     "id": undefined,
@@ -11713,20 +11713,20 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 11210.09190734,
         "price": 0.00000253,
       },
-      Object {
+      {
         "amount": 264.83225116,
         "price": 0.00000254,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 184.56548785,
         "price": 0.00000252,
       },
@@ -11742,11 +11742,11 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 2`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 84147.13099837,
         "price": 0.00000249,
       },
@@ -11762,8 +11762,8 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 0.16519127,
     "exchange": "poloniex",
     "id": "572068",
@@ -11774,14 +11774,14 @@ Array [
     "timestamp": 2020-07-01T00:00:02.000Z,
     "type": "trade",
   },
-  Object {
-    "asks": Array [
-      Object {
+  {
+    "asks": [
+      {
         "amount": 3.74516873,
         "price": 158.19075628,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "poloniex",
     "isSnapshot": false,
     "localTimestamp": 2020-07-01T00:00:01.275Z,
@@ -11793,15 +11793,15 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 4`] = `
-Array [
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+[
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 2075.23326384,
         "price": 0.0364702,
       },
-      Object {
+      {
         "amount": 2174.03060057,
         "price": 0.03647022,
       },
@@ -11817,19 +11817,19 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 5`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 8597.42720734,
         "price": 0.00000253,
       },
-      Object {
+      {
         "amount": 2877.49695116,
         "price": 0.00000254,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "poloniex",
     "isSnapshot": false,
     "localTimestamp": 2020-07-01T00:00:01.275Z,
@@ -11840,11 +11840,11 @@ Array [
 ]
 `;
 
-exports[`mappers map poloniex messages 6`] = `Array []`;
+exports[`mappers map poloniex messages 6`] = `[]`;
 
 exports[`mappers map poloniex messages 7`] = `
-Array [
-  Object {
+[
+  {
     "amount": 98.5515349,
     "exchange": "poloniex",
     "id": "20441515",
@@ -11855,7 +11855,7 @@ Array [
     "timestamp": 2020-07-01T00:00:36.000Z,
     "type": "trade",
   },
-  Object {
+  {
     "amount": 1.72607982,
     "exchange": "poloniex",
     "id": "20441516",
@@ -11866,14 +11866,14 @@ Array [
     "timestamp": 2020-07-01T00:00:36.000Z,
     "type": "trade",
   },
-  Object {
-    "asks": Array [],
-    "bids": Array [
-      Object {
+  {
+    "asks": [],
+    "bids": [
+      {
         "amount": 0,
         "price": 0.00695218,
       },
-      Object {
+      {
         "amount": 0,
         "price": 0.00695217,
       },
@@ -11889,8 +11889,8 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 8`] = `
-Array [
-  Object {
+[
+  {
     "amount": 299.99145733,
     "exchange": "poloniex",
     "id": "10384654",
@@ -11904,11 +11904,11 @@ Array [
 ]
 `;
 
-exports[`mappers map poloniex messages 9`] = `Array []`;
+exports[`mappers map poloniex messages 9`] = `[]`;
 
 exports[`mappers map poloniex messages 10`] = `
-Array [
-  Object {
+[
+  {
     "amount": 53.0866,
     "exchange": "poloniex",
     "id": "60100203",
@@ -11923,16 +11923,16 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 11`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 145.01703,
         "price": 245.688,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 510.51612,
         "price": 0.062,
       },
@@ -11948,15 +11948,15 @@ Array [
 `;
 
 exports[`mappers map poloniex messages 12`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 1.18,
         "price": 0.004387,
       },
     ],
-    "bids": Array [],
+    "bids": [],
     "exchange": "poloniex",
     "isSnapshot": false,
     "localTimestamp": 2022-08-02T00:00:01.275Z,
@@ -11968,20 +11968,20 @@ Array [
 `;
 
 exports[`mappers map serum messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 2571.1,
         "price": 5.235,
       },
-      Object {
+      {
         "amount": 992.7,
         "price": 5.24,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 2405.1,
         "price": 5.202,
       },
@@ -11997,16 +11997,16 @@ Array [
 `;
 
 exports[`mappers map serum messages 2`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 0,
         "price": 37905.7,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 0,
         "price": 36304.8,
       },
@@ -12022,8 +12022,8 @@ Array [
 `;
 
 exports[`mappers map serum messages 3`] = `
-Array [
-  Object {
+[
+  {
     "amount": 185.8,
     "exchange": "serum",
     "id": "96845406386975144808722|185.8|1621641659448",
@@ -12038,8 +12038,8 @@ Array [
 `;
 
 exports[`mappers map serum messages 4`] = `
-Array [
-  Object {
+[
+  {
     "askAmount": 995,
     "askPrice": 2.2417,
     "bidAmount": 3051,
@@ -12054,20 +12054,20 @@ Array [
 `;
 
 exports[`mappers map upbit messages 1`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 103.6,
         "price": 41840,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 47.62562404,
         "price": 41730,
       },
-      Object {
+      {
         "amount": 250,
         "price": 41720,
       },
@@ -12083,8 +12083,8 @@ Array [
 `;
 
 exports[`mappers map upbit messages 2`] = `
-Array [
-  Object {
+[
+  {
     "amount": 836.12040133,
     "exchange": "upbit",
     "id": "1614729599000000",
@@ -12099,128 +12099,128 @@ Array [
 `;
 
 exports[`mappers map upbit messages 3`] = `
-Array [
-  Object {
-    "asks": Array [
-      Object {
+[
+  {
+    "asks": [
+      {
         "amount": 8.3912024,
         "price": 18.14783928,
       },
-      Object {
+      {
         "amount": 114.26866982,
         "price": 19.06366929,
       },
-      Object {
+      {
         "amount": 68.19185642,
         "price": 19.06385993,
       },
-      Object {
+      {
         "amount": 0.72930705,
         "price": 19.12,
       },
-      Object {
+      {
         "amount": 2.43102349,
         "price": 19.21804586,
       },
-      Object {
+      {
         "amount": 3.99384271,
         "price": 19.38409889,
       },
-      Object {
+      {
         "amount": 7.56318421,
         "price": 19.47096205,
       },
-      Object {
+      {
         "amount": 10,
         "price": 19.5,
       },
-      Object {
+      {
         "amount": 10,
         "price": 20,
       },
-      Object {
+      {
         "amount": 24.02061287,
         "price": 20.3795999,
       },
-      Object {
+      {
         "amount": 11,
         "price": 20.5,
       },
-      Object {
+      {
         "amount": 16.54438329,
         "price": 20.86938843,
       },
-      Object {
+      {
         "amount": 0.7249055,
         "price": 20.945925,
       },
-      Object {
+      {
         "amount": 104.42260532,
         "price": 21.77325748,
       },
-      Object {
+      {
         "amount": 44.18802656,
         "price": 22,
       },
     ],
-    "bids": Array [
-      Object {
+    "bids": [
+      {
         "amount": 10.76125737,
         "price": 17.56010719,
       },
-      Object {
+      {
         "amount": 0.60098647,
         "price": 17.56008962,
       },
-      Object {
+      {
         "amount": 40.08298935,
         "price": 17.46376733,
       },
-      Object {
+      {
         "amount": 85.89212039,
         "price": 17.46376727,
       },
-      Object {
+      {
         "amount": 10.37437886,
         "price": 17.46351855,
       },
-      Object {
+      {
         "amount": 458.10526221,
         "price": 17.46323533,
       },
-      Object {
+      {
         "amount": 258.85092546,
         "price": 17.46323528,
       },
-      Object {
+      {
         "amount": 0.22290428,
         "price": 17.4250661,
       },
-      Object {
+      {
         "amount": 43.70611632,
         "price": 17.4018,
       },
-      Object {
+      {
         "amount": 10.35403701,
         "price": 17.07913668,
       },
-      Object {
+      {
         "amount": 1.19942792,
         "price": 15.835,
       },
-      Object {
+      {
         "amount": 0.52467383,
         "price": 15.33571539,
       },
-      Object {
+      {
         "amount": 1.25611255,
         "price": 15.045,
       },
-      Object {
+      {
         "amount": 1.44779497,
         "price": 15,
       },
-      Object {
+      {
         "amount": 0.48159519,
         "price": 14.994004,
       },

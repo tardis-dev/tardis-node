@@ -1,61 +1,61 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`combine(...asyncIterators) should correctly combine iterables based on localTimestamp value 1`] = `
-Array [
-  Object {
+[
+  {
     "localTimestamp": 2019-08-01T00:52:00.132Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T00:52:00.133Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:52:00.132Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:53:00.130Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:53:00.130Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:53:00.131Z,
   },
 ]
 `;
 
 exports[`combine(...asyncIterators) should correctly combine iterables based on localTimestamp value 2`] = `
-Array [
-  Object {
+[
+  {
     "localTimestamp": 2019-08-01T00:52:00.102Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T00:52:00.132Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T00:52:00.133Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T00:53:00.130Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:53:00.130Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T08:53:00.131Z,
   },
-  Object {
+  {
     "localTimestamp": 2019-08-02T08:53:00.131Z,
   },
 ]
 `;
 
 exports[`combine(...asyncIterators) should correctly combine iterables based on localTimestamp value 3`] = `
-Array [
-  Object {
+[
+  {
     "localTimestamp": 2019-08-01T00:52:00.102102Z,
     "name": "iter2",
   },
-  Object {
+  {
     "localTimestamp": 2019-08-01T00:52:00.102202Z,
     "name": "iter1",
   },
