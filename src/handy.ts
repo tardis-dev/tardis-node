@@ -1,6 +1,7 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
-import https, { RequestOptions } from 'https'
+import { RequestOptions, Agent } from 'https'
+import { https } from 'follow-redirects'
 import createHttpsProxyAgent from 'https-proxy-agent'
 import got, { ExtendOptions } from 'got'
 import path from 'path'
@@ -241,7 +242,7 @@ const httpsAgent = new https.Agent({
   maxSockets: 120
 })
 
-export const httpsProxyAgent: https.Agent | undefined =
+export const httpsProxyAgent: Agent | undefined =
   process.env.HTTP_PROXY !== undefined
     ? createHttpsProxyAgent(process.env.HTTP_PROXY)
     : process.env.SOCKS_PROXY !== undefined
@@ -276,7 +277,12 @@ export async function download({
     // simple retry logic when fetching from the network...
     attempts++
     try {
-      return await _downloadFile(httpRequestOptions, url, downloadPath)
+      const addRetryAttempt = attempts - 1 > 0 && url.endsWith('gz')
+      if (addRetryAttempt) {
+        return await _downloadFile(httpRequestOptions, `${url}?retryAttempt=${attempts - 1}`, downloadPath)
+      } else {
+        return await _downloadFile(httpRequestOptions, url, downloadPath)
+      }
     } catch (error) {
       const badOrUnauthorizedRequest =
         error instanceof HttpError &&
@@ -420,7 +426,7 @@ export class CappedSet<T> {
 
   public add(value: T) {
     if (this._set.size >= this._maxSize) {
-      this._set.delete(this._set.keys().next().value)
+      this._set.delete(this._set.keys().next().value!)
     }
     this._set.add(value)
   }

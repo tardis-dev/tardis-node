@@ -16,10 +16,10 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Use Node.js v16
+      - name: Use Node.js v22
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 22.x
           registry-url: https://registry.npmjs.org/
 
       - name: Install Dependencies And Compile TS
