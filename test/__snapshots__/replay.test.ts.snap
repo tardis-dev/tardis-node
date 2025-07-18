@@ -1,5 +1,1300 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`replay replays normalized data for each supported exchange: binance 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 4.367317,
+        "price": 4103.93,
+      },
+      {
+        "amount": 0,
+        "price": 4103.95,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.461763,
+        "price": 4102.36,
+      },
+      {
+        "amount": 0,
+        "price": 4102.34,
+      },
+      {
+        "amount": 0.5,
+        "price": 4101.59,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.816921Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:01.697Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.022208,
+    "exchange": "binance",
+    "id": "109344068",
+    "localTimestamp": 2019-04-01T00:00:02.112665Z,
+    "price": 4102.44,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:01.991Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.109121,
+        "price": 4103,
+      },
+      {
+        "amount": 1,
+        "price": 4103.92,
+      },
+      {
+        "amount": 0,
+        "price": 4103.96,
+      },
+      {
+        "amount": 0,
+        "price": 4103.99,
+      },
+      {
+        "amount": 0.029246,
+        "price": 4104.07,
+      },
+      {
+        "amount": 0.5,
+        "price": 4104.11,
+      },
+      {
+        "amount": 0,
+        "price": 4104.13,
+      },
+      {
+        "amount": 0,
+        "price": 4106.3,
+      },
+      {
+        "amount": 0.002914,
+        "price": 4924.71,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.679675,
+        "price": 4102.44,
+      },
+      {
+        "amount": 0,
+        "price": 4102.32,
+      },
+      {
+        "amount": 0,
+        "price": 4101.55,
+      },
+      {
+        "amount": 0.5,
+        "price": 4098.12,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.816631Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:02.697Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.408524,
+    "exchange": "binance",
+    "id": "109344069",
+    "localTimestamp": 2019-04-01T00:00:03.004749Z,
+    "price": 4102.44,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:02.886Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.137889,
+    "exchange": "binance",
+    "id": "109344070",
+    "localTimestamp": 2019-04-01T00:00:03.108274Z,
+    "price": 4102.44,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:02.989Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.076189,
+    "exchange": "binance",
+    "id": "109344071",
+    "localTimestamp": 2019-04-01T00:00:03.133299Z,
+    "price": 4103,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:03.014Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.010627,
+    "exchange": "binance",
+    "id": "109344072",
+    "localTimestamp": 2019-04-01T00:00:03.173236Z,
+    "price": 4103,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:03.054Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.137889,
+    "exchange": "binance",
+    "id": "109344073",
+    "localTimestamp": 2019-04-01T00:00:03.209482Z,
+    "price": 4102.44,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:03.089Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.034679,
+    "exchange": "binance",
+    "id": "109344074",
+    "localTimestamp": 2019-04-01T00:00:03.313916Z,
+    "price": 4102.43,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:03.195Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.022305,
+        "price": 4103,
+      },
+      {
+        "amount": 0,
+        "price": 4104.07,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4102.44,
+      },
+      {
+        "amount": 0.689473,
+        "price": 4102.43,
+      },
+      {
+        "amount": 0,
+        "price": 4101.54,
+      },
+      {
+        "amount": 0,
+        "price": 4100.26,
+      },
+      {
+        "amount": 0,
+        "price": 3942.01,
+      },
+    ],
+    "exchange": "binance",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:03.817699Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-04-01T00:00:03.698Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: binance-dex 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 12999.9,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:01.094711Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:01.094711Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10648.8,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.020406Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:02.020406Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.0117177,
+        "price": 10694.5,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.842449Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:02.842449Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.05058,
+        "price": 9682,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:43.257414Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:43.257414Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.023959,
+        "price": 10220,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:45.528521Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:45.528521Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.015697,
+        "price": 10399,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:48.363038Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:48.363038Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.011672,
+        "price": 10489,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:50.474668Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:50.474668Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.0092902,
+        "price": 10543,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:52.793488Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:52.793488Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.0077156,
+        "price": 10578,
+      },
+    ],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:54.909588Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:54.909588Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.05313,
+        "price": 11834,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-dex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:56.390430Z,
+    "symbol": "BTCB-1DE_USDSB-1AC",
+    "timestamp": 2019-07-01T00:00:56.390430Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: binance-jersey 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.043783,
+        "price": 8168.27,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:06.811876Z,
+    "symbol": "BTCEUR",
+    "timestamp": 2019-11-01T00:00:06.805Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 7042.04,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:07.311948Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:07.305Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.008475,
+        "price": 7042,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:07.411118Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:07.405Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1,
+        "price": 8183.77,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:08.011796Z,
+    "symbol": "BTCEUR",
+    "timestamp": 2019-11-01T00:00:08.005Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.008197,
+        "price": 7004.45,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:09.013405Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:09.007Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1.180913,
+        "price": 7004.45,
+      },
+      {
+        "amount": 0,
+        "price": 6975.01,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:09.113312Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:09.107Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.027087,
+        "price": 7004.45,
+      },
+      {
+        "amount": 1.228838,
+        "price": 6975.01,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:09.313574Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:09.307Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1.25076,
+        "price": 7004.45,
+      },
+      {
+        "amount": 0,
+        "price": 6975.01,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:09.513781Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:09.507Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.05,
+        "price": 7187,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:09.814252Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:09.807Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1.251853,
+        "price": 7004.45,
+      },
+    ],
+    "exchange": "binance-jersey",
+    "isSnapshot": false,
+    "localTimestamp": 2019-11-01T00:00:10.014452Z,
+    "symbol": "BTCGBP",
+    "timestamp": 2019-11-01T00:00:10.007Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: binance-us 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.04,
+        "price": 8316.17,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:14.333162Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:14.292Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8314.17,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 8295.16,
+      },
+      {
+        "amount": 0,
+        "price": 8141.04,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:14.432510Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:14.392Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.023253,
+    "exchange": "binance-us",
+    "id": "8122",
+    "localTimestamp": 2019-10-01T00:00:14.509645Z,
+    "price": 8313.22,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:14.466Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 1.109555,
+        "price": 8313.22,
+      },
+      {
+        "amount": 0,
+        "price": 8315.42,
+      },
+      {
+        "amount": 0,
+        "price": 8316.67,
+      },
+      {
+        "amount": 0,
+        "price": 8332.71,
+      },
+      {
+        "amount": 0.146991,
+        "price": 8333.53,
+      },
+      {
+        "amount": 0,
+        "price": 8334.14,
+      },
+      {
+        "amount": 0.734967,
+        "price": 8479.33,
+      },
+      {
+        "amount": 0.385772,
+        "price": 8480.67,
+      },
+      {
+        "amount": 0.261,
+        "price": 8482.77,
+      },
+      {
+        "amount": 0.284586,
+        "price": 8484.49,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.118869,
+        "price": 8310.39,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:14.532324Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:14.492Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.04,
+        "price": 8301.16,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:14.633443Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:14.592Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 8289.2,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:15.032564Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:14.992Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 8288.31,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:15.033018Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:14.992Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 8277.32,
+      },
+      {
+        "amount": 0,
+        "price": 8272.21,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:15.733405Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:15.693Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8298.06,
+      },
+      {
+        "amount": 0,
+        "price": 8304.98,
+      },
+      {
+        "amount": 0,
+        "price": 8318.7,
+      },
+      {
+        "amount": 0.186495,
+        "price": 8318.88,
+      },
+      {
+        "amount": 0.303088,
+        "price": 8502.34,
+      },
+      {
+        "amount": 0.259136,
+        "price": 8504.81,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.055753,
+        "price": 8292.8,
+      },
+      {
+        "amount": 0.151793,
+        "price": 8277.32,
+      },
+      {
+        "amount": 0.110347,
+        "price": 8272.21,
+      },
+      {
+        "amount": 0,
+        "price": 8269,
+      },
+      {
+        "amount": 0.313073,
+        "price": 8268.65,
+      },
+      {
+        "amount": 0.13162,
+        "price": 8257.03,
+      },
+      {
+        "amount": 0,
+        "price": 8256.14,
+      },
+      {
+        "amount": 0.267607,
+        "price": 8255.78,
+      },
+      {
+        "amount": 0,
+        "price": 8240.03,
+      },
+      {
+        "amount": 0,
+        "price": 8191.89,
+      },
+    ],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:15.833864Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:15.793Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8298.81,
+      },
+    ],
+    "bids": [],
+    "exchange": "binance-us",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:15.933832Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2019-10-01T00:00:15.893Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: bitfinex 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 8328.5,
+      },
+    ],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010923Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8350.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010941Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8360.9,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010949Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8371.3,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010954Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1.93930625,
+        "price": 8331.1,
+      },
+    ],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010958Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 3.60417531,
+        "price": 8274.7,
+      },
+    ],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010962Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 5.96629,
+        "price": 8363.3,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010966Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 1.5,
+        "price": 8364.7,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010970Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 1,
+        "price": 8376.4,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010974Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.00144562,
+        "price": 8378.3,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:07.010978Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-10-01T00:00:07.003Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: bitfinex-derivatives 1`] = `
+[
+  {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": -0.0025,
+    "fundingTimestamp": 2019-10-01T08:00:00.000Z,
+    "indexPrice": 8288.75,
+    "lastPrice": 8243.3,
+    "localTimestamp": 2019-10-01T00:00:00.853487Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0.00023044,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:00.846Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "bitfinex-derivatives",
+    "fundingRate": -0.0025,
+    "fundingTimestamp": 2019-10-01T08:00:00.000Z,
+    "indexPrice": 8288.85,
+    "lastPrice": 8243.25,
+    "localTimestamp": 2019-10-01T00:00:02.688238Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": 0,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:02.679Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9528.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:03.700356Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:03.690Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.1,
+        "price": 8302.1,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:03.700381Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:03.690Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8302.1,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:03.833739Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:03.826Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.81140447,
+        "price": 9528.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:03.833756Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:03.826Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8322.4,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:04.041609Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:04.034Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.8947033,
+        "price": 9542.8,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:04.041634Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:04.034Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8299.8,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:04.228271Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:04.221Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 8313.7,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitfinex-derivatives",
+    "isSnapshot": false,
+    "localTimestamp": 2019-10-01T00:00:04.228500Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2019-10-01T00:00:04.221Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: bitflyer 1`] = `
+[
+  {
+    "amount": 0.01,
+    "exchange": "bitflyer",
+    "id": "1246448971",
+    "localTimestamp": 2019-09-01T00:00:04.340575Z,
+    "price": 1020378,
+    "side": "buy",
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.083442Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.30650541,
+    "exchange": "bitflyer",
+    "id": "1246448972",
+    "localTimestamp": 2019-09-01T00:00:04.340575Z,
+    "price": 1020379,
+    "side": "buy",
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.083442Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.19349459,
+    "exchange": "bitflyer",
+    "id": "1246448973",
+    "localTimestamp": 2019-09-01T00:00:04.340575Z,
+    "price": 1020395,
+    "side": "buy",
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.083442Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 1020378,
+      },
+      {
+        "amount": 0,
+        "price": 1020379,
+      },
+      {
+        "amount": 0.13650541,
+        "price": 1020395,
+      },
+      {
+        "amount": 0,
+        "price": 1021333,
+      },
+      {
+        "amount": 0.2,
+        "price": 1020810,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 1019187,
+      },
+      {
+        "amount": 1.44,
+        "price": 1013327,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:04.788591Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.788591Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.2,
+        "price": 1020330,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:04.789519Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.789519Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.30000013,
+        "price": 1019501,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:04.789789Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.789789Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 1021299,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:04.789904Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.789904Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.2500029,
+        "price": 1019636,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:04.892461Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:04.892461Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 1020933,
+      },
+      {
+        "amount": 0.30000013,
+        "price": 1021299,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.01,
+        "price": 1017000,
+      },
+      {
+        "amount": 0,
+        "price": 1017369,
+      },
+    ],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:05.053796Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:05.053796Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.2499971,
+        "price": 1020895,
+      },
+    ],
+    "bids": [],
+    "exchange": "bitflyer",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:05.206747Z,
+    "symbol": "BTC_JPY",
+    "timestamp": 2019-09-01T00:00:05.206747Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`replay replays normalized data for each supported exchange: bitmex 1`] = `
 [
   {
@@ -451,6 +1746,2862 @@ exports[`replay replays normalized data for each supported exchange: bitmex 1`] 
     "symbol": "XBTUSD",
     "timestamp": 2019-07-01T00:00:03.293867Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: bitstamp 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 4.63565946,
+        "price": 4092.99,
+      },
+      {
+        "amount": 2,
+        "price": 4093.79,
+      },
+      {
+        "amount": 0.75921098,
+        "price": 4094.08,
+      },
+      {
+        "amount": 0,
+        "price": 4094.18,
+      },
+      {
+        "amount": 3,
+        "price": 4096.23,
+      },
+      {
+        "amount": 4.00550984,
+        "price": 4100.53,
+      },
+      {
+        "amount": 0,
+        "price": 4100.88,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.19661846,
+        "price": 4092.01,
+      },
+      {
+        "amount": 2.5,
+        "price": 4091.56,
+      },
+      {
+        "amount": 2.54143057,
+        "price": 4090.5,
+      },
+      {
+        "amount": 2,
+        "price": 4090.13,
+      },
+      {
+        "amount": 2,
+        "price": 4090.04,
+      },
+      {
+        "amount": 3,
+        "price": 4089.99,
+      },
+      {
+        "amount": 2,
+        "price": 4089.95,
+      },
+      {
+        "amount": 5.6622,
+        "price": 4089.81,
+      },
+      {
+        "amount": 0,
+        "price": 4089.63,
+      },
+      {
+        "amount": 0,
+        "price": 4089.54,
+      },
+      {
+        "amount": 0,
+        "price": 4089.33,
+      },
+      {
+        "amount": 0,
+        "price": 4087.51,
+      },
+      {
+        "amount": 0,
+        "price": 4082.3,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.196139Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:00.045621Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.02742352,
+    "exchange": "bitstamp",
+    "id": "84550457",
+    "localTimestamp": 2019-04-01T00:00:02.360385Z,
+    "price": 4092.02,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:02.303145Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 3654.98,
+      },
+      {
+        "amount": 0.045,
+        "price": 3654.99,
+      },
+      {
+        "amount": 0.029,
+        "price": 3657.38,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 14.657,
+        "price": 3644,
+      },
+      {
+        "amount": 0,
+        "price": 3643.91,
+      },
+      {
+        "amount": 0.209,
+        "price": 3639.24,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.548694Z,
+    "symbol": "BTCEUR",
+    "timestamp": 2019-04-01T00:00:02.054085Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.001643,
+    "exchange": "bitstamp",
+    "id": "84550458",
+    "localTimestamp": 2019-04-01T00:00:03.269614Z,
+    "price": 3651.3,
+    "side": "buy",
+    "symbol": "BTCEUR",
+    "timestamp": 2019-04-01T00:00:03.243152Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 4092.99,
+      },
+      {
+        "amount": 0,
+        "price": 4093.11,
+      },
+      {
+        "amount": 0.157,
+        "price": 4095.79,
+      },
+      {
+        "amount": 3.659,
+        "price": 4096.13,
+      },
+      {
+        "amount": 0,
+        "price": 4097.55,
+      },
+      {
+        "amount": 3,
+        "price": 4097.72,
+      },
+      {
+        "amount": 0,
+        "price": 4108.2,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.80345325,
+        "price": 4092.01,
+      },
+      {
+        "amount": 2,
+        "price": 4090.75,
+      },
+      {
+        "amount": 3.6599,
+        "price": 4090.14,
+      },
+      {
+        "amount": 2,
+        "price": 4089.81,
+      },
+      {
+        "amount": 0,
+        "price": 4089.72,
+      },
+      {
+        "amount": 2,
+        "price": 4088.43,
+      },
+      {
+        "amount": 2,
+        "price": 4085.87,
+      },
+      {
+        "amount": 0,
+        "price": 4084.41,
+      },
+      {
+        "amount": 17.10580238,
+        "price": 4081,
+      },
+      {
+        "amount": 0,
+        "price": 4076.39,
+      },
+      {
+        "amount": 3,
+        "price": 4076.13,
+      },
+      {
+        "amount": 61.18917395,
+        "price": 3000,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:03.334916Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:02.158261Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.040804,
+    "exchange": "bitstamp",
+    "id": "84550464",
+    "localTimestamp": 2019-04-01T00:00:04.988740Z,
+    "price": 4092.01,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:04.949418Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.96505239,
+        "price": 3651.3,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 3644,
+      },
+      {
+        "amount": 14.656,
+        "price": 3643.77,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:05.043855Z,
+    "symbol": "BTCEUR",
+    "timestamp": 2019-04-01T00:00:04.265861Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.3460871,
+        "price": 4092.02,
+      },
+      {
+        "amount": 0.35360893,
+        "price": 4092.81,
+      },
+      {
+        "amount": 0,
+        "price": 4094.08,
+      },
+      {
+        "amount": 1,
+        "price": 4108.2,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4090.55,
+      },
+      {
+        "amount": 0,
+        "price": 4088.43,
+      },
+      {
+        "amount": 61.19167395,
+        "price": 3000,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:05.386031Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:04.135232Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 3646.03,
+      },
+      {
+        "amount": 0,
+        "price": 3644.91,
+      },
+      {
+        "amount": 8.15694,
+        "price": 3644.64,
+      },
+      {
+        "amount": 0,
+        "price": 3643.97,
+      },
+      {
+        "amount": 0,
+        "price": 3643.96,
+      },
+      {
+        "amount": 0,
+        "price": 3639.82,
+      },
+      {
+        "amount": 0.4,
+        "price": 3637.41,
+      },
+      {
+        "amount": 0,
+        "price": 3636.91,
+      },
+      {
+        "amount": 2,
+        "price": 3636.88,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.331527Z,
+    "symbol": "BTCEUR",
+    "timestamp": 2019-04-01T00:00:06.619892Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 4.63565946,
+        "price": 4093.05,
+      },
+      {
+        "amount": 2,
+        "price": 4093.14,
+      },
+      {
+        "amount": 0,
+        "price": 4093.27,
+      },
+      {
+        "amount": 0,
+        "price": 4093.36,
+      },
+      {
+        "amount": 2,
+        "price": 4093.88,
+      },
+      {
+        "amount": 2,
+        "price": 4093.97,
+      },
+      {
+        "amount": 3.9166,
+        "price": 4094.75,
+      },
+      {
+        "amount": 0,
+        "price": 4096.23,
+      },
+      {
+        "amount": 0,
+        "price": 4096.99,
+      },
+      {
+        "amount": 8.9002,
+        "price": 4104.99,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.76264925,
+        "price": 4092.01,
+      },
+      {
+        "amount": 0,
+        "price": 4090.75,
+      },
+      {
+        "amount": 2,
+        "price": 4090.5,
+      },
+      {
+        "amount": 2,
+        "price": 4090.26,
+      },
+      {
+        "amount": 0,
+        "price": 4090.14,
+      },
+      {
+        "amount": 3.6591,
+        "price": 4090.05,
+      },
+      {
+        "amount": 0,
+        "price": 4089.99,
+      },
+      {
+        "amount": 0,
+        "price": 4089.81,
+      },
+      {
+        "amount": 0,
+        "price": 4089.68,
+      },
+      {
+        "amount": 5,
+        "price": 4089.28,
+      },
+    ],
+    "exchange": "bitstamp",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:07.683967Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-04-01T00:00:06.458715Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: coinbase 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4092.02,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.243185Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:00.686000Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.03572127,
+    "exchange": "coinbase",
+    "id": "61165587",
+    "localTimestamp": 2019-04-01T00:00:01.243487Z,
+    "price": 4095,
+    "side": "buy",
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:00.691000Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 12.92602169,
+        "price": 4095,
+      },
+    ],
+    "bids": [],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.243492Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:00.702000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.47609365,
+        "price": 4092.02,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.243650Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:00.711000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4090.44,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.255613Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.002000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 5,
+        "price": 4089.6,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.255724Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.057000Z,
+    "type": "book_change",
+  },
+  {
+    "amount": 0.01506752,
+    "exchange": "coinbase",
+    "id": "61165588",
+    "localTimestamp": 2019-04-01T00:00:01.267794Z,
+    "price": 4095,
+    "side": "buy",
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.208000Z,
+    "type": "trade",
+  },
+  {
+    "asks": [
+      {
+        "amount": 12.91095417,
+        "price": 4095,
+      },
+    ],
+    "bids": [],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.268166Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.201000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4088.36,
+      },
+    ],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.443719Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.374000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 4096.54,
+      },
+    ],
+    "bids": [],
+    "exchange": "coinbase",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:01.443755Z,
+    "symbol": "BTC-USD",
+    "timestamp": 2019-04-01T00:00:01.376000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: cryptofacilities 1`] = `
+[
+  {
+    "exchange": "cryptofacilities",
+    "fundingRate": -6.916949965e-9,
+    "fundingTimestamp": 2019-04-01T04:00:00.000Z,
+    "indexPrice": 4093.89,
+    "lastPrice": 4093,
+    "localTimestamp": 2019-04-01T00:00:00.355406Z,
+    "markPrice": 4093.25,
+    "openInterest": 4884493,
+    "predictedFundingRate": -6.916949965e-9,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.135Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "cryptofacilities",
+    "fundingRate": 0.00018970853102633,
+    "fundingTimestamp": 2019-04-01T00:00:00.000Z,
+    "indexPrice": 0.30826,
+    "lastPrice": 0.3082,
+    "localTimestamp": 2019-04-01T00:00:00.355420Z,
+    "markPrice": 0.3083,
+    "openInterest": 1826145,
+    "predictedFundingRate": 0.000226080102369057,
+    "symbol": "PI_XRPUSD",
+    "timestamp": 2019-04-01T00:00:00.006Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 329218,
+        "price": 4093,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.355523Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.355523Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 18050,
+        "price": 4095,
+      },
+    ],
+    "bids": [],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.355527Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.355527Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 8100,
+        "price": 4085.5,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.569127Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.569127Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 4103.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.570215Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.570215Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 100,
+        "price": 4101,
+      },
+    ],
+    "bids": [],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.571894Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.571894Z,
+    "type": "book_change",
+  },
+  {
+    "exchange": "cryptofacilities",
+    "fundingRate": 0.000226094770512986,
+    "fundingTimestamp": 2019-04-01T04:00:00.000Z,
+    "indexPrice": 0.30826,
+    "lastPrice": 0.3082,
+    "localTimestamp": 2019-04-01T00:00:00.692287Z,
+    "markPrice": 0.3083,
+    "openInterest": 1826145,
+    "predictedFundingRate": 0.000226094770512986,
+    "symbol": "PI_XRPUSD",
+    "timestamp": 2019-04-01T00:00:00.670Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 10000,
+        "price": 0.3072,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.787323Z,
+    "symbol": "PI_XRPUSD",
+    "timestamp": 2019-04-01T00:00:00.787323Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 311168,
+        "price": 4093,
+      },
+    ],
+    "exchange": "cryptofacilities",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.811859Z,
+    "symbol": "PI_XBTUSD",
+    "timestamp": 2019-04-01T00:00:00.811859Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: deribit 1`] = `
+[
+  {
+    "exchange": "deribit",
+    "fundingRate": 0,
+    "fundingTimestamp": undefined,
+    "indexPrice": 4094.32,
+    "lastPrice": 4092.25,
+    "localTimestamp": 2019-04-01T00:00:00.244531Z,
+    "markPrice": 4092.39,
+    "openInterest": 27124991,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.180Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [
+      {
+        "amount": 42750,
+        "price": 4093.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336181Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.189Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 29100,
+        "price": 4093.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336230Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.215Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 130180,
+        "price": 4092.75,
+      },
+      {
+        "amount": 90700,
+        "price": 4093,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336278Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.294Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 59490,
+        "price": 4094.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336349Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.306Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 91750,
+        "price": 4094,
+      },
+      {
+        "amount": 89490,
+        "price": 4094.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336793Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.315Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 61750,
+        "price": 4094,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.336803Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.316Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 51780,
+        "price": 4094.5,
+      },
+      {
+        "amount": 57750,
+        "price": 4093.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.421310Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.410Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 119490,
+        "price": 4094.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.432085Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.417Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 114950,
+        "price": 4094.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "deribit",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:00.436038Z,
+    "symbol": "BTC-PERPETUAL",
+    "timestamp": 2019-04-01T00:00:00.425Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: ftx 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9649.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:02.805223Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:02.690336Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 1.6462,
+        "price": 9610.5,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.4935,
+        "price": 9599,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:02.853016Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2019-09-01T00:00:02.739477Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 33.9609,
+        "price": 9604.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:02.961133Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:02.846662Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.001,
+        "price": 9606,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.070758Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:02.957080Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9606,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.208130Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:03.094028Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9609,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 6.6513,
+        "price": 9598,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.246250Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2019-09-01T00:00:03.133512Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 8.67,
+        "price": 9611.5,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.285479Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2019-09-01T00:00:03.171374Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9603.5,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.9897,
+        "price": 9600,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.352356Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2019-09-01T00:00:03.235074Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9603.25,
+      },
+    ],
+    "bids": [],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.358188Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:03.243794Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0.001,
+        "price": 9648.75,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 7700,
+      },
+      {
+        "amount": 34.9625,
+        "price": 9603.25,
+      },
+    ],
+    "exchange": "ftx",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.482975Z,
+    "symbol": "BTC-PERP",
+    "timestamp": 2019-09-01T00:00:03.352118Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: gemini 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.02082953,
+        "price": 9556.14,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.542940Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.542940Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9604.59,
+      },
+      {
+        "amount": 2.5944,
+        "price": 9604.08,
+      },
+      {
+        "amount": 0,
+        "price": 9606.15,
+      },
+      {
+        "amount": 2.20676953,
+        "price": 9604.07,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.20676953,
+        "price": 9594.64,
+      },
+      {
+        "amount": 0,
+        "price": 9596.6,
+      },
+      {
+        "amount": 0,
+        "price": 9563.26,
+      },
+      {
+        "amount": 2.5962,
+        "price": 9596.84,
+      },
+      {
+        "amount": 0,
+        "price": 9597.64,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.542945Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.542945Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 2.26336912,
+        "price": 9604.04,
+      },
+      {
+        "amount": 0,
+        "price": 9605.09,
+      },
+      {
+        "amount": 2,
+        "price": 9604.03,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.542967Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.542967Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 9604.08,
+      },
+      {
+        "amount": 0,
+        "price": 9605.06,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 2.5923,
+        "price": 9596.6,
+      },
+      {
+        "amount": 1,
+        "price": 9563.24,
+      },
+      {
+        "amount": 0,
+        "price": 9596.84,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.542971Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.542971Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 4.84946912,
+        "price": 9604.04,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.542997Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.542997Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 9596.6,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:01.547506Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:01.547506Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 2.604,
+        "price": 9595.59,
+      },
+      {
+        "amount": 0,
+        "price": 9563.24,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:02.346573Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:02.346573Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 2.26336912,
+        "price": 9604.04,
+      },
+      {
+        "amount": 4.5997,
+        "price": 9604.03,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:02.447528Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:02.447528Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1,
+        "price": 9560.85,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.047170Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:03.047170Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 2,
+        "price": 9604.03,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": false,
+    "localTimestamp": 2019-09-01T00:00:03.247087Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2019-09-01T00:00:03.247087Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: kraken 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 1,
+        "price": 10689.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.435284Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:00.999327Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10786.3,
+      },
+      {
+        "amount": 0.02797,
+        "price": 18300,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10735.5,
+      },
+      {
+        "amount": 0.025,
+        "price": 9221.5,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.435461Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:01.183480Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10795.8,
+      },
+      {
+        "amount": 0.1,
+        "price": 18368.1,
+      },
+      {
+        "amount": 0.03388228,
+        "price": 10759.1,
+      },
+      {
+        "amount": 6,
+        "price": 10804.8,
+      },
+      {
+        "amount": 0,
+        "price": 10762.3,
+      },
+      {
+        "amount": 0.02797,
+        "price": 18300,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.93600202,
+        "price": 10725.3,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.435623Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:01.339084Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 1.05,
+        "price": 10809.2,
+      },
+    ],
+    "bids": [],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.435863Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:01.437096Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10734.2,
+      },
+      {
+        "amount": 0.025,
+        "price": 9221.5,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.437689Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:01.654798Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10798.6,
+      },
+      {
+        "amount": 0.02797,
+        "price": 18300,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10718.3,
+      },
+      {
+        "amount": 0.00867584,
+        "price": 9221,
+      },
+      {
+        "amount": 0,
+        "price": 10308.3,
+      },
+      {
+        "amount": 1,
+        "price": 9220,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.437939Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:01.878841Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10759.2,
+      },
+      {
+        "amount": 0.1,
+        "price": 18368.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10709.4,
+      },
+      {
+        "amount": 1.1,
+        "price": 9215,
+      },
+      {
+        "amount": 0,
+        "price": 10696.5,
+      },
+      {
+        "amount": 20,
+        "price": 9214,
+      },
+      {
+        "amount": 1.392,
+        "price": 10744.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.438160Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:02.041242Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10769.8,
+      },
+      {
+        "amount": 3.505,
+        "price": 18400,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 10710.8,
+      },
+      {
+        "amount": 20,
+        "price": 9214,
+      },
+      {
+        "amount": 15.1,
+        "price": 10294.1,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.445531Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:02.073269Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 1140001,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.593840Z,
+    "symbol": "XBT/JPY",
+    "timestamp": 2019-07-01T00:00:02.281059Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 10770.4,
+      },
+      {
+        "amount": 0.00701,
+        "price": 18431.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.556975,
+        "price": 10722.5,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2019-07-01T00:00:02.598821Z,
+    "symbol": "XBT/USD",
+    "timestamp": 2019-07-01T00:00:02.311790Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: okex 1`] = `
+[
+  {
+    "amount": 0.00865209,
+    "exchange": "okex",
+    "id": "1219300011",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.2,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.535Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.01,
+    "exchange": "okex",
+    "id": "1219300013",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.535Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.016,
+    "exchange": "okex",
+    "id": "1219300015",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.535Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.051,
+    "exchange": "okex",
+    "id": "1219300017",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.535Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.01734791,
+    "exchange": "okex",
+    "id": "1219300019",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.535Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.02891277,
+    "exchange": "okex",
+    "id": "1219300024",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.573Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.05790102,
+    "exchange": "okex",
+    "id": "1219300026",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.573Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.08398831,
+    "exchange": "okex",
+    "id": "1219300028",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.573Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.15766401,
+    "exchange": "okex",
+    "id": "1219300030",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.573Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.08559255,
+    "exchange": "okex",
+    "id": "1219300032",
+    "localTimestamp": 2019-04-01T00:00:02.666125Z,
+    "price": 4103.1,
+    "side": "sell",
+    "symbol": "BTC-USDT",
+    "timestamp": 2019-04-01T00:00:00.573Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: okex-futures 1`] = `
+[
+  {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4084.81,
+    "localTimestamp": 2019-04-01T00:00:01.801231Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:00.209Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "amount": 91,
+    "exchange": "okex-futures",
+    "id": "2578234853523461",
+    "localTimestamp": 2019-04-01T00:00:01.801242Z,
+    "price": 4084.81,
+    "side": "sell",
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-03-31T23:59:01.786Z,
+    "type": "trade",
+  },
+  {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4084.81,
+    "localTimestamp": 2019-04-01T00:00:01.801273Z,
+    "markPrice": 4084.59,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:00.209Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [
+      {
+        "amount": 4,
+        "price": 4086.74,
+      },
+      {
+        "amount": 25,
+        "price": 4086.78,
+      },
+      {
+        "amount": 3,
+        "price": 4086.79,
+      },
+      {
+        "amount": 17,
+        "price": 4086.82,
+      },
+      {
+        "amount": 19,
+        "price": 4087.24,
+      },
+      {
+        "amount": 9,
+        "price": 4087.62,
+      },
+      {
+        "amount": 9,
+        "price": 4087.64,
+      },
+      {
+        "amount": 24,
+        "price": 4087.83,
+      },
+      {
+        "amount": 47,
+        "price": 4088.27,
+      },
+      {
+        "amount": 0,
+        "price": 4088.38,
+      },
+      {
+        "amount": 20,
+        "price": 4090.26,
+      },
+      {
+        "amount": 4,
+        "price": 4104.47,
+      },
+      {
+        "amount": 0,
+        "price": 4104.75,
+      },
+      {
+        "amount": 0,
+        "price": 4233.08,
+      },
+      {
+        "amount": 0,
+        "price": 4237.5,
+      },
+      {
+        "amount": 0,
+        "price": 4250,
+      },
+      {
+        "amount": 0,
+        "price": 4250.11,
+      },
+      {
+        "amount": 0,
+        "price": 4267.54,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 25,
+        "price": 4083.29,
+      },
+      {
+        "amount": 0,
+        "price": 4083.16,
+      },
+      {
+        "amount": 7,
+        "price": 4082.99,
+      },
+      {
+        "amount": 4,
+        "price": 4082.78,
+      },
+      {
+        "amount": 7,
+        "price": 4082.59,
+      },
+      {
+        "amount": 18,
+        "price": 4082.34,
+      },
+      {
+        "amount": 50,
+        "price": 4082.31,
+      },
+      {
+        "amount": 25,
+        "price": 4080.46,
+      },
+      {
+        "amount": 20,
+        "price": 4077.52,
+      },
+      {
+        "amount": 0,
+        "price": 4008.5,
+      },
+      {
+        "amount": 0,
+        "price": 4008.36,
+      },
+      {
+        "amount": 0,
+        "price": 4007,
+      },
+      {
+        "amount": 0,
+        "price": 4006,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.375675Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:01.525Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 20,
+        "price": 4085.54,
+      },
+      {
+        "amount": 0,
+        "price": 4085.77,
+      },
+      {
+        "amount": 0,
+        "price": 4086.62,
+      },
+      {
+        "amount": 0,
+        "price": 4086.74,
+      },
+      {
+        "amount": 0,
+        "price": 4086.78,
+      },
+      {
+        "amount": 0,
+        "price": 4086.79,
+      },
+      {
+        "amount": 0,
+        "price": 4086.82,
+      },
+      {
+        "amount": 0,
+        "price": 4087,
+      },
+      {
+        "amount": 25,
+        "price": 4087.06,
+      },
+      {
+        "amount": 0,
+        "price": 4087.24,
+      },
+      {
+        "amount": 6,
+        "price": 4087.37,
+      },
+      {
+        "amount": 0,
+        "price": 4087.43,
+      },
+      {
+        "amount": 31,
+        "price": 4087.64,
+      },
+      {
+        "amount": 124,
+        "price": 4087.83,
+      },
+      {
+        "amount": 20,
+        "price": 4089.84,
+      },
+      {
+        "amount": 0,
+        "price": 4090.26,
+      },
+      {
+        "amount": 9,
+        "price": 4233.08,
+      },
+      {
+        "amount": 85,
+        "price": 4237.5,
+      },
+      {
+        "amount": 255,
+        "price": 4250,
+      },
+      {
+        "amount": 2,
+        "price": 4250.11,
+      },
+      {
+        "amount": 11,
+        "price": 4267.54,
+      },
+      {
+        "amount": 4,
+        "price": 4278,
+      },
+      {
+        "amount": 11,
+        "price": 4299.12,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4083.29,
+      },
+      {
+        "amount": 15,
+        "price": 4083.16,
+      },
+      {
+        "amount": 25,
+        "price": 4083.08,
+      },
+      {
+        "amount": 15,
+        "price": 4082.99,
+      },
+      {
+        "amount": 0,
+        "price": 4082.78,
+      },
+      {
+        "amount": 37,
+        "price": 4082.75,
+      },
+      {
+        "amount": 0,
+        "price": 4082.59,
+      },
+      {
+        "amount": 0,
+        "price": 4082.51,
+      },
+      {
+        "amount": 15,
+        "price": 4082.34,
+      },
+      {
+        "amount": 54,
+        "price": 4082.31,
+      },
+      {
+        "amount": 6,
+        "price": 4082.27,
+      },
+      {
+        "amount": 0,
+        "price": 4082.13,
+      },
+      {
+        "amount": 0,
+        "price": 4081.5,
+      },
+      {
+        "amount": 0,
+        "price": 4080.74,
+      },
+      {
+        "amount": 0,
+        "price": 4080.46,
+      },
+      {
+        "amount": 25,
+        "price": 4080.09,
+      },
+      {
+        "amount": 0,
+        "price": 4077.52,
+      },
+      {
+        "amount": 20,
+        "price": 4077.04,
+      },
+      {
+        "amount": 40,
+        "price": 4008.5,
+      },
+      {
+        "amount": 40,
+        "price": 4008.36,
+      },
+      {
+        "amount": 97,
+        "price": 4007,
+      },
+      {
+        "amount": 120,
+        "price": 4006,
+      },
+      {
+        "amount": 96,
+        "price": 4005.8,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.668042Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:02.064Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 4,
+        "price": 4086.74,
+      },
+      {
+        "amount": 40,
+        "price": 4086.83,
+      },
+      {
+        "amount": 4,
+        "price": 4087,
+      },
+      {
+        "amount": 0,
+        "price": 4087.06,
+      },
+      {
+        "amount": 0,
+        "price": 4087.31,
+      },
+      {
+        "amount": 6,
+        "price": 4087.42,
+      },
+      {
+        "amount": 0,
+        "price": 4087.62,
+      },
+      {
+        "amount": 22,
+        "price": 4087.64,
+      },
+      {
+        "amount": 6,
+        "price": 4088.46,
+      },
+      {
+        "amount": 40,
+        "price": 4089.3,
+      },
+      {
+        "amount": 2,
+        "price": 4089.77,
+      },
+      {
+        "amount": 0,
+        "price": 4089.84,
+      },
+      {
+        "amount": 40,
+        "price": 4097.5,
+      },
+      {
+        "amount": 0,
+        "price": 4097.92,
+      },
+      {
+        "amount": 0,
+        "price": 4299.12,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4083.77,
+      },
+      {
+        "amount": 0,
+        "price": 4083.08,
+      },
+      {
+        "amount": 4,
+        "price": 4082.78,
+      },
+      {
+        "amount": 0,
+        "price": 4082.58,
+      },
+      {
+        "amount": 4,
+        "price": 4082.31,
+      },
+      {
+        "amount": 0,
+        "price": 4082.29,
+      },
+      {
+        "amount": 5,
+        "price": 4082.13,
+      },
+      {
+        "amount": 0,
+        "price": 4082,
+      },
+      {
+        "amount": 5,
+        "price": 4081.5,
+      },
+      {
+        "amount": 0,
+        "price": 4081.24,
+      },
+      {
+        "amount": 0,
+        "price": 4080.87,
+      },
+      {
+        "amount": 5,
+        "price": 4080.74,
+      },
+      {
+        "amount": 60,
+        "price": 4080.35,
+      },
+      {
+        "amount": 0,
+        "price": 4080.09,
+      },
+      {
+        "amount": 0,
+        "price": 4079.68,
+      },
+      {
+        "amount": 20,
+        "price": 4079.61,
+      },
+      {
+        "amount": 0,
+        "price": 4079.45,
+      },
+      {
+        "amount": 120,
+        "price": 4077.06,
+      },
+      {
+        "amount": 0,
+        "price": 4077.04,
+      },
+      {
+        "amount": 0,
+        "price": 4076.17,
+      },
+      {
+        "amount": 0,
+        "price": 4073.84,
+      },
+      {
+        "amount": 5,
+        "price": 4005.78,
+      },
+      {
+        "amount": 140,
+        "price": 4005.4,
+      },
+      {
+        "amount": 120,
+        "price": 4005,
+      },
+      {
+        "amount": 1,
+        "price": 4003,
+      },
+      {
+        "amount": 40,
+        "price": 4002.53,
+      },
+      {
+        "amount": 33,
+        "price": 4002.3,
+      },
+      {
+        "amount": 1,
+        "price": 4002.27,
+      },
+      {
+        "amount": 434,
+        "price": 4001,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.748097Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:02.599Z,
+    "type": "book_change",
+  },
+  {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4084.81,
+    "localTimestamp": 2019-04-01T00:00:02.944573Z,
+    "markPrice": 4083.59,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:02.652Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4084.81,
+    "localTimestamp": 2019-04-01T00:00:03.010797Z,
+    "markPrice": 4083.61,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:02.862Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "okex-futures",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4084.81,
+    "localTimestamp": 2019-04-01T00:00:03.216020Z,
+    "markPrice": 4083.63,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:03.077Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [
+      {
+        "amount": 3,
+        "price": 4086.79,
+      },
+      {
+        "amount": 4,
+        "price": 4087,
+      },
+      {
+        "amount": 0,
+        "price": 4087.27,
+      },
+      {
+        "amount": 7,
+        "price": 4087.37,
+      },
+      {
+        "amount": 9,
+        "price": 4087.62,
+      },
+      {
+        "amount": 32,
+        "price": 4087.64,
+      },
+      {
+        "amount": 24,
+        "price": 4087.83,
+      },
+      {
+        "amount": 0,
+        "price": 4087.95,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 4083.47,
+      },
+      {
+        "amount": 7,
+        "price": 4083.18,
+      },
+      {
+        "amount": 0,
+        "price": 4083.17,
+      },
+      {
+        "amount": 37,
+        "price": 4082.75,
+      },
+      {
+        "amount": 9,
+        "price": 4082.58,
+      },
+      {
+        "amount": 4,
+        "price": 4082.41,
+      },
+      {
+        "amount": 18,
+        "price": 4082.34,
+      },
+      {
+        "amount": 7,
+        "price": 4082.27,
+      },
+      {
+        "amount": 23,
+        "price": 4082.2,
+      },
+      {
+        "amount": 5,
+        "price": 4082.13,
+      },
+      {
+        "amount": 7,
+        "price": 4082,
+      },
+      {
+        "amount": 42,
+        "price": 4080.82,
+      },
+      {
+        "amount": 20,
+        "price": 4080.35,
+      },
+      {
+        "amount": 40,
+        "price": 4079.45,
+      },
+      {
+        "amount": 40,
+        "price": 4077.06,
+      },
+      {
+        "amount": 80,
+        "price": 4076.17,
+      },
+      {
+        "amount": 50,
+        "price": 4073.51,
+      },
+      {
+        "amount": 0,
+        "price": 4002.53,
+      },
+      {
+        "amount": 0,
+        "price": 4002.3,
+      },
+      {
+        "amount": 0,
+        "price": 4002.27,
+      },
+      {
+        "amount": 0,
+        "price": 4001,
+      },
+    ],
+    "exchange": "okex-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:03.288948Z,
+    "symbol": "BTC-USD-190405",
+    "timestamp": 2019-04-01T00:00:03.145Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`replay replays normalized data for each supported exchange: okex-swap 1`] = `
+[
+  {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 4092.1,
+    "localTimestamp": 2019-04-01T00:00:02.374697Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-03-31T23:59:02.722Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "amount": 44,
+    "exchange": "okex-swap",
+    "id": "202322746506944513",
+    "localTimestamp": 2019-04-01T00:00:02.374711Z,
+    "price": 4092.1,
+    "side": "buy",
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-03-31T23:58:10.871Z,
+    "type": "trade",
+  },
+  {
+    "exchange": "okex-swap",
+    "fundingRate": -0.00054,
+    "fundingTimestamp": 2019-04-01T02:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": 4092.1,
+    "localTimestamp": 2019-04-01T00:00:02.374739Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-03-31T23:59:02.722Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "okex-swap",
+    "fundingRate": -0.00054,
+    "fundingTimestamp": 2019-04-01T02:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": 4092.1,
+    "localTimestamp": 2019-04-01T00:00:02.374762Z,
+    "markPrice": 4090.8,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:00.499Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 4091.7,
+      },
+      {
+        "amount": 0,
+        "price": 4092.9,
+      },
+      {
+        "amount": 2,
+        "price": 4094.9,
+      },
+      {
+        "amount": 590,
+        "price": 4111.5,
+      },
+      {
+        "amount": 20,
+        "price": 4208,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 13,
+        "price": 4088.8,
+      },
+      {
+        "amount": 23,
+        "price": 4086.8,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.375711Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:01.555Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 25,
+        "price": 4091.5,
+      },
+      {
+        "amount": 2,
+        "price": 4091.7,
+      },
+      {
+        "amount": 0,
+        "price": 4092,
+      },
+      {
+        "amount": 2,
+        "price": 4092.7,
+      },
+      {
+        "amount": 2,
+        "price": 4094.6,
+      },
+      {
+        "amount": 40,
+        "price": 4128.1,
+      },
+      {
+        "amount": 0,
+        "price": 4129.3,
+      },
+      {
+        "amount": 0,
+        "price": 4205,
+      },
+      {
+        "amount": 0,
+        "price": 4208,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 4,
+        "price": 4089,
+      },
+      {
+        "amount": 2,
+        "price": 4087.1,
+      },
+      {
+        "amount": 80,
+        "price": 4081.1,
+      },
+      {
+        "amount": 0,
+        "price": 4079.8,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.667362Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:01.750Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 621,
+        "price": 4090.9,
+      },
+      {
+        "amount": 107,
+        "price": 4091.5,
+      },
+      {
+        "amount": 0,
+        "price": 4091.7,
+      },
+      {
+        "amount": 0,
+        "price": 4092.7,
+      },
+      {
+        "amount": 22,
+        "price": 4093.4,
+      },
+      {
+        "amount": 0,
+        "price": 4094.6,
+      },
+      {
+        "amount": 0,
+        "price": 4111.5,
+      },
+      {
+        "amount": 0,
+        "price": 4122.4,
+      },
+      {
+        "amount": 21,
+        "price": 4205,
+      },
+      {
+        "amount": 20,
+        "price": 4208,
+      },
+      {
+        "amount": 64,
+        "price": 4210,
+      },
+      {
+        "amount": 21,
+        "price": 4215,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 410,
+        "price": 4090.8,
+      },
+      {
+        "amount": 2,
+        "price": 4089,
+      },
+      {
+        "amount": 0,
+        "price": 4087.1,
+      },
+      {
+        "amount": 102,
+        "price": 4081.2,
+      },
+      {
+        "amount": 204,
+        "price": 4079.9,
+      },
+      {
+        "amount": 2240,
+        "price": 4000,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:02.675617Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:02.235Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 25,
+        "price": 4091.5,
+      },
+      {
+        "amount": 2,
+        "price": 4091.8,
+      },
+      {
+        "amount": 2,
+        "price": 4092.9,
+      },
+      {
+        "amount": 4,
+        "price": 4094.9,
+      },
+      {
+        "amount": 590,
+        "price": 4111.5,
+      },
+      {
+        "amount": 0,
+        "price": 4208,
+      },
+      {
+        "amount": 0,
+        "price": 4210,
+      },
+      {
+        "amount": 0,
+        "price": 4215,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 15,
+        "price": 4088.8,
+      },
+      {
+        "amount": 4,
+        "price": 4086.4,
+      },
+      {
+        "amount": 0,
+        "price": 4081.9,
+      },
+      {
+        "amount": 20,
+        "price": 4081.2,
+      },
+      {
+        "amount": 40,
+        "price": 4079.9,
+      },
+      {
+        "amount": 0,
+        "price": 4077.2,
+      },
+      {
+        "amount": 21,
+        "price": 3999.4,
+      },
+      {
+        "amount": 710,
+        "price": 3999,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:03.018275Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:02.646Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 703,
+        "price": 4090.9,
+      },
+      {
+        "amount": 0,
+        "price": 4091.8,
+      },
+      {
+        "amount": 0,
+        "price": 4092.3,
+      },
+      {
+        "amount": 0,
+        "price": 4092.9,
+      },
+      {
+        "amount": 2,
+        "price": 4094.9,
+      },
+      {
+        "amount": 20,
+        "price": 4208,
+      },
+      {
+        "amount": 64,
+        "price": 4210,
+      },
+      {
+        "amount": 21,
+        "price": 4215,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 13,
+        "price": 4088.8,
+      },
+      {
+        "amount": 2,
+        "price": 4086.4,
+      },
+      {
+        "amount": 41,
+        "price": 4081.7,
+      },
+      {
+        "amount": 99,
+        "price": 4081.6,
+      },
+      {
+        "amount": 88,
+        "price": 4081,
+      },
+      {
+        "amount": 164,
+        "price": 4079.6,
+      },
+      {
+        "amount": 360,
+        "price": 4076.9,
+      },
+      {
+        "amount": 0,
+        "price": 3999.4,
+      },
+      {
+        "amount": 0,
+        "price": 3999,
+      },
+    ],
+    "exchange": "okex-swap",
+    "isSnapshot": false,
+    "localTimestamp": 2019-04-01T00:00:03.360535Z,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:03.174Z,
+    "type": "book_change",
+  },
+  {
+    "exchange": "okex-swap",
+    "fundingRate": -0.00054,
+    "fundingTimestamp": 2019-04-01T02:00:00.000Z,
+    "indexPrice": undefined,
+    "lastPrice": 4090.9,
+    "localTimestamp": 2019-04-01T00:00:03.613913Z,
+    "markPrice": 4090.8,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD-SWAP",
+    "timestamp": 2019-04-01T00:00:03.474Z,
+    "type": "derivative_ticker",
   },
 ]
 `;
