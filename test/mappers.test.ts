@@ -6769,6 +6769,76 @@ describe('mappers', () => {
       const mappedMessages = gateIOMapper.map(message, new Date('2023-04-29T00:00:00.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
+
+    // Test GateIOV4OrderBookV2ChangeMapper for dates >= 2025-08-01
+    const v4OrderBookV2Messages = [
+      // Subscribe message (should be ignored)
+      {
+        time: 1754006400,
+        time_ms: 1754006400138,
+        conn_id: '06a3248d8f02479a',
+        trace_id: '1dc9df8b7bf583c0d0e9e18079d504ec',
+        channel: 'spot.obu',
+        event: 'subscribe',
+        payload: ['ob.MAF_USDT.400'],
+        result: { status: 'success' },
+        requestId: '1dc9df8b7bf583c0d0e9e18079d504ec'
+      },
+      // Full snapshot message
+      {
+        channel: 'spot.obu',
+        result: {
+          t: 1754006400261,
+          full: true,
+          s: 'ob.BTC_USDT.400',
+          u: 25847113075,
+          b: [
+            ['115765.1', '0.337839'],
+            ['115764.2', '0.005'],
+            ['115763.3', '0.004365']
+          ],
+          a: [
+            ['115765.2', '0.631155'],
+            ['115765.9', '0.001534'],
+            ['115769.4', '0.005014']
+          ]
+        },
+        time_ms: 1754006400264,
+        event: 'update'
+      },
+      // Incremental update message
+      {
+        channel: 'spot.obu',
+        result: {
+          t: 1754006460600,
+          s: 'ob.BTC_USDT.400',
+          u: 25847129996,
+          U: 25847129970,
+          b: [
+            ['115576.7', '0.050772'],
+            ['115275.2', '0.000039'],
+            ['115717.7', '0'],
+            ['115578.5', '0']
+          ],
+          a: [
+            ['115731.3', '0.687304'],
+            ['115733.8', '0.000864'],
+            ['115745.7', '0.025922'],
+            ['115742.9', '0'],
+            ['115746.1', '0']
+          ]
+        },
+        time_ms: 1754006460601,
+        event: 'update'
+      }
+    ]
+
+    gateIOMapper = createMapper('gate-io', new Date('2025-08-01T00:00:00.000Z'))
+
+    for (const message of v4OrderBookV2Messages) {
+      const mappedMessages = gateIOMapper.map(message, new Date('2025-08-01T00:00:00.000Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
   })
 
   test('map gate-io-futures messages', () => {

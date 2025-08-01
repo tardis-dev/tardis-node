@@ -7700,6 +7700,102 @@ exports[`mappers map gate-io messages 10`] = `
 ]
 `;
 
+exports[`mappers map gate-io messages 11`] = `[]`;
+
+exports[`mappers map gate-io messages 12`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.631155,
+        "price": 115765.2,
+      },
+      {
+        "amount": 0.001534,
+        "price": 115765.9,
+      },
+      {
+        "amount": 0.005014,
+        "price": 115769.4,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.337839,
+        "price": 115765.1,
+      },
+      {
+        "amount": 0.005,
+        "price": 115764.2,
+      },
+      {
+        "amount": 0.004365,
+        "price": 115763.3,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": true,
+    "localTimestamp": 2025-08-01T00:00:00.000Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2025-08-01T00:00:00.261Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gate-io messages 13`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.687304,
+        "price": 115731.3,
+      },
+      {
+        "amount": 0.000864,
+        "price": 115733.8,
+      },
+      {
+        "amount": 0.025922,
+        "price": 115745.7,
+      },
+      {
+        "amount": 0,
+        "price": 115742.9,
+      },
+      {
+        "amount": 0,
+        "price": 115746.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.050772,
+        "price": 115576.7,
+      },
+      {
+        "amount": 0.000039,
+        "price": 115275.2,
+      },
+      {
+        "amount": 0,
+        "price": 115717.7,
+      },
+      {
+        "amount": 0,
+        "price": 115578.5,
+      },
+    ],
+    "exchange": "gate-io",
+    "isSnapshot": false,
+    "localTimestamp": 2025-08-01T00:00:00.000Z,
+    "symbol": "BTC_USDT",
+    "timestamp": 2025-08-01T00:01:00.600Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map gate-io-futures messages 1`] = `
 [
   {

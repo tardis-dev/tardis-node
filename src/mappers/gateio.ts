@@ -3,6 +3,56 @@ import { CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../han
 import { BookChange, BookTicker, Exchange, Trade } from '../types'
 import { Mapper } from './mapper'
 
+export class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookChange> {
+  constructor(protected readonly exchange: Exchange) {}
+
+  canHandle(message: GateV4OrderBookV2Message) {
+    return message.channel === 'spot.obu' && message.event === 'update'
+  }
+
+  getFilters(symbols?: string[]) {
+    symbols = upperCaseSymbols(symbols)
+
+    return [
+      {
+        channel: 'obu',
+        symbols
+      } as const
+    ]
+  }
+
+  *map(message: GateV4OrderBookV2Message, localTimestamp: Date) {
+    const result = message.result
+    const symbol = this.extractSymbolFromStream(result.s)
+
+    const isSnapshot = result.full === true
+
+    const bookChange: BookChange = {
+      type: 'book_change',
+      symbol,
+      exchange: this.exchange,
+      isSnapshot,
+      bids: (result.b || []).map(this.mapBookLevel),
+      asks: (result.a || []).map(this.mapBookLevel),
+      timestamp: new Date(result.t),
+      localTimestamp
+    }
+
+    yield bookChange
+  }
+
+  protected mapBookLevel(level: [string, string]) {
+    const price = Number(level[0])
+    const amount = Number(level[1])
+    return { price, amount }
+  }
+
+  private extractSymbolFromStream(streamName: string): string {
+    const lastDotIndex = streamName.lastIndexOf('.')
+
+    return streamName.slice(3, lastDotIndex)
+  }
+}
 //v4
 
 export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
@@ -446,4 +496,19 @@ type DepthData = {
   u: number
   b: [string, string][]
   a: [string, string][]
+}
+
+type GateV4OrderBookV2Message = {
+  channel: 'spot.obu'
+  event: 'update'
+  time_ms: number
+  result: {
+    t: number
+    s: string
+    u: number
+    U?: number
+    full?: boolean
+    b?: [string, string][]
+    a?: [string, string][]
+  }
 }

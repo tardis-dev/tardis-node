@@ -82,6 +82,7 @@ import {
   GateIOTradesMapper,
   GateIOV4BookChangeMapper,
   GateIOV4BookTickerMapper,
+  GateIOV4OrderBookV2ChangeMapper,
   GateIOV4TradesMapper
 } from './gateio'
 import {
@@ -198,9 +199,14 @@ const shouldUseOkcoinV5Mappers = (localTimestamp: Date) => {
 }
 
 const GATE_IO_V4_API_SWITCH_DATE = new Date('2023-04-29T00:00:00.000Z')
+const GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE = new Date('2025-08-01T00:00:00.000Z')
 
 const shouldUseGateIOV4Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_API_SWITCH_DATE.valueOf()
+}
+
+const shouldUseGateIOV4OrderBookV2Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE.valueOf()
 }
 
 const shouldUseCFRelativeFunding = (localTimestamp: Date) => {
@@ -359,7 +365,9 @@ const bookChangeMappers = {
   phemex: () => phemexBookChangeMapper,
   delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
   'gate-io': (localTimestamp: Date) =>
-    shouldUseGateIOV4Mappers(localTimestamp)
+    shouldUseGateIOV4OrderBookV2Mappers(localTimestamp)
+      ? new GateIOV4OrderBookV2ChangeMapper('gate-io')
+      : shouldUseGateIOV4Mappers(localTimestamp)
       ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
       : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),

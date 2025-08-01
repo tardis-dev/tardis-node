@@ -405,7 +405,7 @@ const DELTA_CHANNELS = [
   'spot_30mtwap_price'
 ] as const
 
-const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update'] as const
+const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
 const POLONIEX_CHANNELS = ['price_aggregated_book', 'trades', 'ticker', 'book_lv2'] as const
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
