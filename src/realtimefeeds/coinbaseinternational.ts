@@ -39,7 +39,7 @@ export class CoinbaseInternationalRealTimeFeed extends RealTimeFeedBase {
   }
 
   private getAuthParams() {
-    const time = Date.now().valueOf() / 1000
+    const time = Math.floor(Date.now().valueOf() / 1000)
     const apiSecret = process.env.COINBASE_INTERNATIONAL_API_SECRET!
     const message = `${time}${process.env.COINBASE_INTERNATIONAL_API_KEY}CBINTLMD${process.env.COINBASE_INTERNATIONAL_API_PASSPHRASE}`
 

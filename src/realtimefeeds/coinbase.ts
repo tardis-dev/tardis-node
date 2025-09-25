@@ -89,7 +89,7 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
   }
 
   private getAuthParams() {
-    const timestamp = Date.now().valueOf() / 1000
+    const timestamp = Math.floor(Date.now().valueOf() / 1000)
     const apiSecret = process.env.COINBASE_API_SECRET!
     const message = `${timestamp}GET/users/self/verify`
     const hmac = crypto.createHmac('sha256', Buffer.from(apiSecret, 'base64'))
