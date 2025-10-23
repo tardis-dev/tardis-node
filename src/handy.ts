@@ -369,7 +369,8 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
         .on('error', reject)
         .on('timeout', () => {
           debug('download file request timeout, %s', url)
-          req.abort()
+          reject(new Error('Request timed out'))
+          req.destroy()
         })
     })
 
