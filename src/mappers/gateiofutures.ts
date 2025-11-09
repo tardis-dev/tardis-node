@@ -70,7 +70,12 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
       if (depthMessage.result.t === 0) {
         return
       }
-      const timestamp = depthMessage.result.t !== undefined ? new Date(depthMessage.result.t) : new Date(depthMessage.time * 1000)
+      const timestamp =
+        depthMessage.time_ms !== undefined
+          ? new Date(depthMessage.time_ms)
+          : depthMessage.result.t !== undefined
+          ? new Date(depthMessage.result.t)
+          : new Date(depthMessage.time * 1000)
 
       // snapshot
       yield {
@@ -211,7 +216,7 @@ type GateIOFuturesOrderBookSnapshot = {
   time: number
   channel: 'futures.order_book'
   event: 'all'
-
+  time_ms: number | undefined
   result: {
     t?: number
     contract: string
