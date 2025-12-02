@@ -8,6 +8,12 @@ function getApiSymbolId(symbol: string) {
   if (KILO_SYMBOLS.includes(potentialKSymbol)) {
     return potentialKSymbol
   }
+
+  if (symbol.includes(':')) {
+    const [prefix, suffix] = symbol.split(':')
+    return prefix.toLowerCase() + ':' + suffix
+  }
+
   return symbol
 }
 function getSymbols(symbols?: string[]) {
