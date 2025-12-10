@@ -971,9 +971,9 @@ exports[`map crypto-com messages 8`] = `
     "type": "derivative_ticker",
   },
   {
-    "askAmount": undefined,
+    "askAmount": 131,
     "askPrice": 4.6148,
-    "bidAmount": undefined,
+    "bidAmount": 25,
     "bidPrice": 4.6121,
     "exchange": "crypto-com",
     "localTimestamp": 2021-05-22T00:00:59.464Z,
