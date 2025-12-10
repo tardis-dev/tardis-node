@@ -106,10 +106,10 @@ export class CryptoComBookTickerMapper implements Mapper<'crypto-com' | 'crypto-
         symbol: message.result.instrument_name,
         exchange: this._exchange,
 
-        askAmount: undefined,
+        askAmount: item.ks !== undefined && item.ks !== null ? Number(item.ks) : undefined,
         askPrice: item.k !== undefined && item.k !== null ? Number(item.k) : undefined,
         bidPrice: item.b !== undefined && item.b !== null ? Number(item.b) : undefined,
-        bidAmount: undefined,
+        bidAmount: item.bs !== undefined && item.bs !== null ? Number(item.bs) : undefined,
         timestamp: new Date(item.t),
         localTimestamp: localTimestamp
       }
@@ -344,7 +344,9 @@ type CryptoComTickerMessage =
           {
             i: 'GODS_USDT'
             b: 0.4262
+            bs?: 0.1
             k: 0.4272
+            ks?: 0.2
             a: 0.4272
             t: 1659311999946
             v: 100623.01
@@ -359,31 +361,89 @@ type CryptoComTickerMessage =
     }
   | CryptoComDerivativesTickerMessage
 
-type CryptoComDerivativesTickerMessage = {
-  id: -1
-  code: 0
-  method: 'subscribe'
-  result: {
-    channel: 'ticker'
-    instrument_name: 'BTCUSD-PERP'
-    subscription: 'ticker.BTCUSD-PERP'
-    data: [
-      {
-        h: '32222.5'
-        l: '30240.0'
-        a: '31611.0'
-        c: '0.0320'
-        b: '31613.0'
-        k: '31613.5'
-        i: 'BTCUSD-PERP'
-        v: '13206.4884'
-        vv: '433945264.39'
-        oi: '318.5162'
-        t: 1653992543383
+type CryptoComDerivativesTickerMessage =
+  | {
+      id: -1
+      code: 0
+      method: 'subscribe'
+      result: {
+        channel: 'ticker'
+        instrument_name: 'BTCUSD-PERP'
+        subscription: 'ticker.BTCUSD-PERP'
+        data: [
+          {
+            h: '32222.5'
+            l: '30240.0'
+            a: '31611.0'
+            c: '0.0320'
+            b: '31613.0'
+            bs?: '0.1000'
+            k: '31613.5'
+            ks?: '0.2000'
+            i: 'BTCUSD-PERP'
+            v: '13206.4884'
+            vv: '433945264.39'
+            oi: '318.5162'
+            t: 1653992543383
+          }
+        ]
       }
-    ]
-  }
-}
+    }
+  | {
+      id: 2
+      method: 'subscribe'
+      code: 0
+      result: {
+        instrument_name: 'ESUSD-PERP'
+        subscription: 'ticker.ESUSD-PERP'
+        channel: 'ticker'
+        data: [
+          {
+            h: '0.09625'
+            l: '0.09230'
+            a: '0.09481'
+            c: '-0.0038'
+            b: '0.09451'
+            bs: '1'
+            k: '0.09452'
+            ks: '8461'
+            i: 'ESUSD-PERP'
+            v: '115'
+            vv: '10.84'
+            oi: '78522'
+            t: 1765238404604
+          }
+        ]
+      }
+    }
+  | {
+      id: -1
+      code: 0
+      method: 'subscribe'
+      result: {
+        channel: 'ticker'
+        instrument_name: 'MATIC_USD'
+        subscription: 'ticker.MATIC_USD'
+        id: 1
+        data: [
+          {
+            h: '1.24383'
+            l: '1.18086'
+            a: '1.19604'
+            c: '-0.0315'
+            b: '1.19591'
+            bs: '0.1'
+            k: '1.19643'
+            ks: '0.7'
+            i: 'MATIC_USD'
+            v: '854908.9'
+            vv: '1043976.96'
+            oi: '0'
+            t: 1677628802241
+          }
+        ]
+      }
+    }
 
 type CryptoComIndexMessage = {
   id: -1
