@@ -19,6 +19,7 @@ export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeF
         'wss://fstream.binance.com/public/stream',
         exchange,
         publicFilters,
+        filters, // Pass all filters so we can look up optionTicker when processing optionOpenInterest
         timeoutIntervalMS,
         onError
       )
@@ -29,6 +30,7 @@ export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeF
         'wss://fstream.binance.com/market/stream',
         exchange,
         marketFilters,
+        filters, // Pass all filters so we can look up optionTicker when processing optionOpenInterest
         timeoutIntervalMS,
         onError
       )
@@ -41,6 +43,7 @@ class BinanceEuropeanOptionsSingleFeed extends RealTimeFeedBase {
     protected wssURL: string,
     exchange: string,
     filters: Filter<string>[],
+    private readonly _allFilters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
     onError?: (error: Error) => void
   ) {
@@ -87,14 +90,14 @@ class BinanceEuropeanOptionsSingleFeed extends RealTimeFeedBase {
               // The symbol here is the underlying (e.g., 'btcusdt')
               // We need to find all option symbols that match this underlying to extract expirations
 
-              // Look for optionTrade filter to get actual option symbols
-              const optionTradeFilter = filters.find((f) => f.channel === 'optionTrade')
+              // Look for optionTicker filter in all filters to get actual option symbols
+              const optionTickerFilter = this._allFilters.find((f) => f.channel === 'optionTicker')
 
-              if (optionTradeFilter !== undefined) {
+              if (optionTickerFilter !== undefined) {
                 // Extract expirations from option symbols that match this underlying
                 const underlyingBase = lowerSymbol.replace('usdt', '').toUpperCase()
 
-                const expirations = optionTradeFilter
+                const expirations = optionTickerFilter
                   .symbols!.filter((s) => s.toUpperCase().startsWith(underlyingBase + '-'))
                   .map((s) => {
                     const symbolParts = s.split('-')
