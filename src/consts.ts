@@ -465,7 +465,22 @@ const WOOX_CHANNELS = [
 ]
 
 const BLOCKCHAIN_COM_CHANNELS = ['trades', 'l2', 'l3', 'ticker']
-const BINANCE_EUROPEAN_OPTIONS_CHANNELS = ['trade', 'depth100', 'index', 'markPrice', 'ticker', 'openInterest']
+const BINANCE_EUROPEAN_OPTIONS_CHANNELS = [
+  'trade',
+  'depth100',
+  'index',
+  'markPrice',
+  'ticker',
+  'openInterest',
+  'optionTrade',
+  'optionTicker',
+  'depth20',
+  'bookTicker',
+  'optionIndexPrice',
+  'optionMarkPrice',
+  'optionOpenInterest',
+  '!optionSymbol'
+]
 
 const OKEX_SPREADS_CHANNELS = ['sprd-public-trades', 'sprd-bbo-tbt', 'sprd-books5', 'sprd-tickers']
 

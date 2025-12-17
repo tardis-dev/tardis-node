@@ -45,6 +45,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'binance-futures',
   'binance-delivery',
   'binance-dex',
+  'binance-european-options',
   'bitfinex',
   'bitfinex-derivatives',
   'bitflyer',
@@ -8792,6 +8793,178 @@ test('map binance-european-options messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2023-10-01T00:00:00.0816546Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map binance-european-options messages v2', () => {
+  const messages = [
+    {
+      stream: 'btc-251219-89000-c@optionTrade',
+      data: {
+        e: 'trade',
+        E: 1765983420778,
+        T: 1765983420778,
+        s: 'BTC-251219-89000-C',
+        t: 200,
+        p: '1420.000',
+        q: '1.54',
+        X: 'MARKET',
+        S: 'BUY',
+        m: false
+      }
+    },
+    {
+      stream: 'btc-251218-89000-p@optionTrade',
+      data: {
+        e: 'trade',
+        E: 1765983422509,
+        T: 1765983422509,
+        s: 'BTC-251218-89000-P',
+        t: 18,
+        p: '600.000',
+        q: '3.90',
+        X: 'MARKET',
+        S: 'SELL',
+        m: true
+      }
+    },
+    {
+      stream: 'eth-251219-3100-c@depth20@100ms',
+      data: {
+        e: 'depthUpdate',
+        E: 1765983419936,
+        T: 1765983419928,
+        s: 'ETH-251219-3100-C',
+        U: 121508743,
+        u: 121509455,
+        pu: 121508733,
+        b: [
+          ['16.6000', '150.23'],
+          ['16.4000', '10.00']
+        ],
+        a: [
+          ['18.8000', '70.00'],
+          ['20.6000', '240.88']
+        ]
+      }
+    },
+    {
+      stream: 'eth-251218-3100-c@bookTicker',
+      data: {
+        e: 'bookTicker',
+        u: 121509445,
+        s: 'ETH-251218-3100-C',
+        b: '5.8000',
+        B: '38.47',
+        a: '6.4000',
+        A: '96.37',
+        T: 1765983419927,
+        E: 1765983419927
+      }
+    },
+    {
+      stream: 'xrpusdt@optionMarkPrice',
+      data: [
+        {
+          s: 'XRP-251219-2.05-P',
+          mp: '19.0314',
+          E: 1765983420260,
+          e: 'markPrice',
+          i: '1.96239445',
+          P: '0.0000',
+          bo: '0.0000',
+          ao: '0.0000',
+          bq: '0.00',
+          aq: '0.00',
+          b: '-1.0',
+          a: '-1.0',
+          hl: '34.2565',
+          ll: '3.8062',
+          vo: '2.6',
+          rf: '0.0',
+          d: '-0.56213899',
+          t: '-0.04023754',
+          g: '1.12832706',
+          v: '0.00052941'
+        }
+      ]
+    },
+    {
+      stream: 'btc-251219-89000-c@optionTicker',
+      data: {
+        e: '24hrTicker',
+        E: 1765983420778,
+        s: 'BTC-251219-89000-C',
+        p: '695.000',
+        P: '95.862',
+        w: '636.186',
+        c: '1420.000',
+        Q: '1.54',
+        o: '725.000',
+        h: '1420.000',
+        l: '235.000',
+        v: '44.43',
+        q: '28265.750',
+        O: 1765899660000,
+        C: 1765983420778,
+        F: 94,
+        L: 200,
+        n: 107
+      }
+    },
+    {
+      stream: 'btcusdt@optionOpenInterest@251219',
+      data: [
+        {
+          e: 'openInterest',
+          E: 1765983420500,
+          s: 'BTC-251219-89000-C',
+          o: '123.45',
+          h: '11025678.90'
+        },
+        {
+          e: 'openInterest',
+          E: 1765983420500,
+          s: 'BTC-251218-89000-P',
+          o: '67.89',
+          h: '6070901.23'
+        }
+      ]
+    },
+    {
+      stream: 'btcusdt@optionMarkPrice',
+      data: [
+        {
+          s: 'BTC-251219-89000-C',
+          mp: '1450.5',
+          E: 1765983421000,
+          e: 'markPrice',
+          i: '104334.60217391',
+          P: '0.0000',
+          bo: '1440.0',
+          ao: '1460.0',
+          bq: '5.00',
+          aq: '3.50',
+          b: '0.85',
+          a: '0.88',
+          hl: '2000.0',
+          ll: '500.0',
+          vo: '0.86',
+          rf: '0.0',
+          d: '0.75',
+          t: '-0.05',
+          g: '0.002',
+          v: '0.15'
+        }
+      ]
+    }
+  ]
+
+  const mapper = createMapper('binance-european-options', new Date('2025-12-17T00:00:00.0816546Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2025-12-17T00:00:00.0816546Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

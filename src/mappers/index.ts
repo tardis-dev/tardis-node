@@ -12,8 +12,12 @@ import {
 import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex'
 import {
   BinanceEuropeanOptionsBookChangeMapper,
+  BinanceEuropeanOptionsBookChangeMapperV2,
+  BinanceEuropeanOptionsBookTickerMapper,
   BinanceEuropeanOptionsTradesMapper,
-  BinanceEuropeanOptionSummaryMapper
+  BinanceEuropeanOptionsTradesMapperV2,
+  BinanceEuropeanOptionSummaryMapper,
+  BinanceEuropeanOptionSummaryMapperV2
 } from './binanceeuropeanoptions'
 import { BinanceOptionsBookChangeMapper, BinanceOptionsTradesMapper, BinanceOptionSummaryMapper } from './binanceoptions'
 import {
@@ -221,6 +225,12 @@ const shouldUseOKXTradesAllChannel = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2023-10-19T00:00:00.000Z').valueOf()
 }
 
+const BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE = new Date('2025-12-17T00:00:00.000Z')
+
+const shouldUseBinanceEuropeanOptionsV2Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE.valueOf()
+}
+
 const tradesMappers = {
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
@@ -296,7 +306,10 @@ const tradesMappers = {
   'woo-x': () => wooxTradesMapper,
   'blockchain-com': () => new BlockchainComTradesMapper(),
   'bybit-options': () => new BybitV5TradesMapper('bybit-options'),
-  'binance-european-options': () => new BinanceEuropeanOptionsTradesMapper(),
+  'binance-european-options': (localTimestamp: Date) =>
+    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
+      ? new BinanceEuropeanOptionsTradesMapperV2()
+      : new BinanceEuropeanOptionsTradesMapper(),
   'okex-spreads': () => new OkexSpreadsTradesMapper(),
   bitget: () => new BitgetTradesMapper('bitget'),
   'bitget-futures': () => new BitgetTradesMapper('bitget-futures'),
@@ -390,7 +403,10 @@ const bookChangeMappers = {
   'woo-x': () => new WooxBookChangeMapper(),
   'blockchain-com': () => new BlockchainComBookChangeMapper(),
   'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25),
-  'binance-european-options': () => new BinanceEuropeanOptionsBookChangeMapper(),
+  'binance-european-options': (localTimestamp: Date) =>
+    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
+      ? new BinanceEuropeanOptionsBookChangeMapperV2()
+      : new BinanceEuropeanOptionsBookChangeMapper(),
   'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
   bitget: () => new BitgetBookChangeMapper('bitget'),
   'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures'),
@@ -442,7 +458,10 @@ const optionsSummaryMappers = {
   'binance-options': () => new BinanceOptionSummaryMapper(),
   'huobi-dm-options': () => new HuobiOptionsSummaryMapper(),
   'bybit-options': () => new BybitV5OptionSummaryMapper(),
-  'binance-european-options': () => new BinanceEuropeanOptionSummaryMapper()
+  'binance-european-options': (localTimestamp: Date) =>
+    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
+      ? new BinanceEuropeanOptionSummaryMapperV2()
+      : new BinanceEuropeanOptionSummaryMapper()
 }
 
 const liquidationsMappers = {
@@ -532,7 +551,8 @@ const bookTickersMappers = {
   bitget: () => new BitgetBookTickerMapper('bitget'),
   'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
-  hyperliquid: () => new HyperliquidBookTickerMapper()
+  hyperliquid: () => new HyperliquidBookTickerMapper(),
+  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

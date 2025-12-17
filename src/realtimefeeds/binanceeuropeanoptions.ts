@@ -1,9 +1,51 @@
 import { onlyUnique } from '../handy'
 import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed'
 
-export class BinanceEuropeanOptionsRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://nbstream.binance.com/eoptions/stream'
+export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    // V2 API uses two separate WebSocket endpoints:
+    // 1. Public path: for optionTrade, depth20, bookTicker, optionTicker
+    // 2. Market path: for optionIndexPrice, optionMarkPrice, optionOpenInterest
+
+    const publicChannels = ['optionTrade', 'depth20', 'bookTicker', 'optionTicker']
+    const marketChannels = ['optionIndexPrice', 'optionMarkPrice', 'optionOpenInterest']
+
+    const publicFilters = filters.filter((f) => publicChannels.includes(f.channel))
+    const marketFilters = filters.filter((f) => marketChannels.includes(f.channel))
+
+    if (publicFilters.length > 0) {
+      yield new BinanceEuropeanOptionsSingleFeed(
+        'wss://fstream.binance.com/public/stream',
+        exchange,
+        publicFilters,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    if (marketFilters.length > 0) {
+      yield new BinanceEuropeanOptionsSingleFeed(
+        'wss://fstream.binance.com/market/stream',
+        exchange,
+        marketFilters,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+  }
+}
+
+class BinanceEuropeanOptionsSingleFeed extends RealTimeFeedBase {
+  constructor(
+    protected wssURL: string,
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void
+  ) {
+    super(exchange, filters, timeoutIntervalMS, onError)
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters.map((filter, index) => {
@@ -15,29 +57,59 @@ export class BinanceEuropeanOptionsRealTimeFeed extends RealTimeFeedBase {
         method: 'SUBSCRIBE',
         params: filter.symbols
           .map((symbol) => {
-            if (filter.channel === 'depth100') {
-              return [`${symbol}@${filter.channel}@100ms`]
+            const lowerSymbol = symbol.toLowerCase()
+
+            // Public path channels - use lowercase symbol directly
+            if (filter.channel === 'optionTrade') {
+              return [`${lowerSymbol}@${filter.channel}`]
             }
 
-            if (filter.channel === 'openInterest') {
-              const matchingTickerChannel = filters.find((f) => f.channel === 'ticker')
+            if (filter.channel === 'depth20') {
+              return [`${lowerSymbol}@${filter.channel}@100ms`]
+            }
 
-              if (matchingTickerChannel !== undefined) {
-                const expirations = matchingTickerChannel
-                  .symbols!.filter((s) => s.startsWith(symbol))
+            if (filter.channel === 'bookTicker') {
+              return [`${lowerSymbol}@${filter.channel}`]
+            }
+
+            if (filter.channel === 'optionTicker') {
+              return [`${lowerSymbol}@${filter.channel}`]
+            }
+
+            // Market path channels - use lowercase underlying
+            if (filter.channel === 'optionIndexPrice' || filter.channel === 'optionMarkPrice') {
+              // Symbol is the underlying (e.g., 'btcusdt')
+              return [`${lowerSymbol}@${filter.channel}`]
+            }
+
+            if (filter.channel === 'optionOpenInterest') {
+              // Need to extract expirations from option symbols
+              // The symbol here is the underlying (e.g., 'btcusdt')
+              // We need to find all option symbols that match this underlying to extract expirations
+
+              // Look for optionTrade filter to get actual option symbols
+              const optionTradeFilter = filters.find((f) => f.channel === 'optionTrade')
+
+              if (optionTradeFilter !== undefined) {
+                // Extract expirations from option symbols that match this underlying
+                const underlyingBase = lowerSymbol.replace('usdt', '').toUpperCase()
+
+                const expirations = optionTradeFilter
+                  .symbols!.filter((s) => s.toUpperCase().startsWith(underlyingBase + '-'))
                   .map((s) => {
                     const symbolParts = s.split('-')
-                    return `${symbolParts[1]}`
+                    return symbolParts[1] // Extract expiration (e.g., '251219')
                   })
                   .filter(onlyUnique)
+                  .map((exp) => exp.toLowerCase())
 
                 return expirations.map((expiration) => {
-                  return `${symbol}@${filter.channel}@${expiration}`
+                  return `${lowerSymbol}@${filter.channel}@${expiration}`
                 })
               }
             }
 
-            return [`${symbol}@${filter.channel}`]
+            return [`${lowerSymbol}@${filter.channel}`]
           })
           .flatMap((s) => s),
         id: index + 1

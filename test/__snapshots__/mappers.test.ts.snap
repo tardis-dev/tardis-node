@@ -135,6 +135,155 @@ exports[`map binance-european-options messages 10`] = `
 ]
 `;
 
+exports[`map binance-european-options messages v2 1`] = `
+[
+  {
+    "amount": 1.54,
+    "exchange": "binance-european-options",
+    "id": "200",
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "price": 1420,
+    "side": "buy",
+    "symbol": "BTC-251219-89000-C",
+    "timestamp": 2025-12-17T14:57:00.778Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map binance-european-options messages v2 2`] = `
+[
+  {
+    "amount": 3.9,
+    "exchange": "binance-european-options",
+    "id": "18",
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "price": 600,
+    "side": "sell",
+    "symbol": "BTC-251218-89000-P",
+    "timestamp": 2025-12-17T14:57:02.509Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map binance-european-options messages v2 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 70,
+        "price": 18.8,
+      },
+      {
+        "amount": 240.88,
+        "price": 20.6,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 150.23,
+        "price": 16.6,
+      },
+      {
+        "amount": 10,
+        "price": 16.4,
+      },
+    ],
+    "exchange": "binance-european-options",
+    "isSnapshot": true,
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "symbol": "ETH-251219-3100-C",
+    "timestamp": 2025-12-17T14:56:59.936Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map binance-european-options messages v2 4`] = `
+[
+  {
+    "askAmount": 96.37,
+    "askPrice": 6.4,
+    "bidAmount": 38.47,
+    "bidPrice": 5.8,
+    "exchange": "binance-european-options",
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "symbol": "ETH-251218-3100-C",
+    "timestamp": 2025-12-17T14:56:59.927Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map binance-european-options messages v2 5`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": -0.56213899,
+    "exchange": "binance-european-options",
+    "expirationDate": 2025-12-19T08:00:00.000Z,
+    "gamma": 1.12832706,
+    "lastPrice": undefined,
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "markIV": 2.6,
+    "markPrice": 19.0314,
+    "openInterest": undefined,
+    "optionType": "put",
+    "rho": undefined,
+    "strikePrice": 2.05,
+    "symbol": "XRP-251219-2.05-P",
+    "theta": -0.04023754,
+    "timestamp": 2025-12-17T14:57:00.260Z,
+    "type": "option_summary",
+    "underlyingIndex": "XRPUSDT",
+    "underlyingPrice": 1.96239445,
+    "vega": 0.00052941,
+  },
+]
+`;
+
+exports[`map binance-european-options messages v2 6`] = `[]`;
+
+exports[`map binance-european-options messages v2 7`] = `[]`;
+
+exports[`map binance-european-options messages v2 8`] = `
+[
+  {
+    "bestAskAmount": 3.5,
+    "bestAskIV": 0.88,
+    "bestAskPrice": 1460,
+    "bestBidAmount": 5,
+    "bestBidIV": 0.85,
+    "bestBidPrice": 1440,
+    "delta": 0.75,
+    "exchange": "binance-european-options",
+    "expirationDate": 2025-12-19T08:00:00.000Z,
+    "gamma": 0.002,
+    "lastPrice": 1420,
+    "localTimestamp": 2025-12-17T00:00:00.081Z,
+    "markIV": 0.86,
+    "markPrice": 1450.5,
+    "openInterest": 123.45,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 89000,
+    "symbol": "BTC-251219-89000-C",
+    "theta": -0.05,
+    "timestamp": 2025-12-17T14:57:01.000Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTCUSDT",
+    "underlyingPrice": 104334.60217391,
+    "vega": 0.15,
+  },
+]
+`;
+
 exports[`map bitget messages 1`] = `
 [
   {
