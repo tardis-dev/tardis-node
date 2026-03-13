@@ -382,9 +382,11 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
 
   protected abstract poolDataToStream(outputStream: Writable): Promise<void>
 
-  private async _startPooling(outputStream: Writable) {
-    const timeoutInterval = this._poolingIntervalSeconds * ONE_SEC_IN_MS
+  protected getPoolingDelayMS() {
+    return this._poolingIntervalSeconds * ONE_SEC_IN_MS
+  }
 
+  private async _startPooling(outputStream: Writable) {
     const pool = async () => {
       try {
         await this.poolDataToStream(outputStream)
@@ -396,7 +398,7 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
     const poolAndSchedule = () => {
       pool().then(() => {
         if (!outputStream.destroyed) {
-          this._tid = setTimeout(poolAndSchedule, timeoutInterval)
+          this._tid = setTimeout(poolAndSchedule, this.getPoolingDelayMS())
         }
       })
     }

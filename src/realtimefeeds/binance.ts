@@ -12,6 +12,35 @@ const binanceHttpOptions = {
   }
 }
 
+const DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER = 100
+const DEFAULT_OPEN_INTEREST_POLLING_INTERVAL_MS = 5 * 1000
+const OPEN_INTEREST_POLLING_RECOVERY_MS = 1000
+const OPEN_INTEREST_MAX_POLLING_INTERVAL_MS = 60 * 1000
+
+function parseBinanceWeightHeader(headerValue: string | string[] | undefined) {
+  if (headerValue === undefined) {
+    return undefined
+  }
+
+  const header = Array.isArray(headerValue) ? headerValue[0] : headerValue
+  const parsed = Number.parseInt(header, 10)
+
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function getExchangeScopedNumberEnv(exchange: string, suffix: string, fallback: number) {
+  const envName = `${exchange.toUpperCase().replace(/-/g, '_')}_${suffix}`
+  const rawValue = process.env[envName]
+
+  if (rawValue === undefined) {
+    return fallback
+  }
+
+  const parsed = Number.parseInt(rawValue, 10)
+
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
 abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
   protected abstract httpURL: string
@@ -38,39 +67,147 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     if (openInterestFilters.length > 0) {
       const instruments = openInterestFilters.flatMap((s) => s.symbols!)
 
-      yield new BinanceFuturesOpenInterestClient(exchange, this.httpURL, instruments)
+      yield new BinanceFuturesOpenInterestClient(exchange, this.httpURL, instruments, onError)
     }
   }
 }
 
 class BinanceFuturesOpenInterestClient extends PoolingClientBase {
-  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
-    super(exchange, 3)
+  private readonly _minPollingIntervalMS: number
+  private readonly _minAvailableWeightBuffer: number
+  private _currentPollingIntervalMS: number
+  private _requestWeightLimit: number
+  private _usedWeight = 0
+
+  constructor(
+    exchange: string,
+    private readonly _httpURL: string,
+    private readonly _instruments: string[],
+    onError?: (error: Error) => void
+  ) {
+    const minPollingIntervalMS = Math.max(
+      getExchangeScopedNumberEnv(exchange, 'OPEN_INTEREST_POLLING_INTERVAL_MS', DEFAULT_OPEN_INTEREST_POLLING_INTERVAL_MS),
+      1000
+    )
+
+    super(exchange, minPollingIntervalMS / 1000, onError)
+
+    this._minPollingIntervalMS = minPollingIntervalMS
+    this._currentPollingIntervalMS = minPollingIntervalMS
+    this._requestWeightLimit = getExchangeScopedNumberEnv(exchange, 'REQUEST_WEIGHT_LIMIT', 0)
+    this._minAvailableWeightBuffer = getExchangeScopedNumberEnv(
+      exchange,
+      'MIN_AVAILABLE_WEIGHT_BUFFER',
+      DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER
+    )
+  }
+
+  protected getPoolingDelayMS() {
+    return this._currentPollingIntervalMS
   }
 
   protected async poolDataToStream(outputStream: Writable) {
-    for (const instruments of batch(this._instruments, 10)) {
-      await Promise.allSettled(
-        instruments.map(async (instrument) => {
-          if (outputStream.destroyed) {
-            return
-          }
-          const openInterestResponse = (await httpClient
-            .get(`${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`, binanceHttpOptions)
-            .json()) as any
+    let waitedForRateLimit = false
 
-          const openInterestMessage = {
-            stream: `${instrument.toLocaleLowerCase()}@openInterest`,
-            generated: true,
-            data: openInterestResponse
-          }
+    if (!this._requestWeightLimit) {
+      await this._initializeRateLimitInfo()
+    }
 
-          if (outputStream.writable) {
-            outputStream.write(openInterestMessage)
-          }
-        })
+    for (const instrument of this._instruments) {
+      if (outputStream.destroyed) {
+        return
+      }
+
+      waitedForRateLimit = (await this._waitForAvailableWeight()) || waitedForRateLimit
+
+      const openInterestResponse = await httpClient.get(
+        `${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`,
+        binanceHttpOptions
+      )
+      const usedWeight = parseBinanceWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m'] as string | string[] | undefined)
+      this._updateUsedWeight(usedWeight)
+
+      const openInterestMessage = {
+        stream: `${instrument.toLocaleLowerCase()}@openInterest`,
+        generated: true,
+        data: JSON.parse(openInterestResponse.body)
+      }
+
+      if (outputStream.writable) {
+        outputStream.write(openInterestMessage)
+      }
+    }
+
+    if (waitedForRateLimit) {
+      this._currentPollingIntervalMS = Math.min(
+        this._currentPollingIntervalMS + this._minPollingIntervalMS,
+        Math.max(this._minPollingIntervalMS, OPEN_INTEREST_MAX_POLLING_INTERVAL_MS)
+      )
+    } else {
+      this._currentPollingIntervalMS = Math.max(
+        this._minPollingIntervalMS,
+        this._currentPollingIntervalMS - OPEN_INTEREST_POLLING_RECOVERY_MS
       )
     }
+  }
+
+  private async _waitForAvailableWeight() {
+    if (this._requestWeightLimit <= 0 || this._requestWeightLimit - this._usedWeight >= this._minAvailableWeightBuffer) {
+      return false
+    }
+
+    const delayMS = this._getDelayToNextMinuteMS()
+    this.debug(
+      'open interest reached rate limit (limit: %s, used: %s, minimum available buffer: %s), waiting %s ms',
+      this._requestWeightLimit,
+      this._usedWeight,
+      this._minAvailableWeightBuffer,
+      delayMS
+    )
+
+    await wait(delayMS)
+
+    // Binance request weight is tracked in a rolling 1-minute window. After waiting for the next minute
+    // we can resume and let the next REST response header refresh the exact current usage.
+    this._usedWeight = 0
+
+    return true
+  }
+
+  private async _initializeRateLimitInfo() {
+    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
+    const exchangeInfo = JSON.parse(exchangeInfoResponse.body)
+
+    const requestWeightLimit = exchangeInfo.rateLimits.find((d: any) => d.rateLimitType === 'REQUEST_WEIGHT')?.limit as
+      | number
+      | undefined
+
+    if (!requestWeightLimit) {
+      throw new Error('Failed to determine Binance REQUEST_WEIGHT limit for openInterest polling')
+    }
+
+    this._requestWeightLimit = requestWeightLimit
+
+    this._updateUsedWeight(
+      parseBinanceWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m'] as string | string[] | undefined)
+    )
+  }
+
+  private _updateUsedWeight(usedWeight: number | undefined) {
+    if (usedWeight !== undefined) {
+      this._usedWeight = usedWeight
+      return
+    }
+
+    if (this._requestWeightLimit > 0) {
+      this._usedWeight++
+    }
+  }
+
+  private _getDelayToNextMinuteMS() {
+    const now = new Date()
+
+    return Math.max((61 - now.getUTCSeconds()) * 1000 - now.getUTCMilliseconds(), 1)
   }
 }
 

@@ -2,7 +2,7 @@
   "name": "tardis-dev",
   "version": "14.1.5",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "description": "Convenient access to tick-level historical and real-time cryptocurrency market data via Node.js",
   "main": "dist/index.js",
@@ -65,7 +65,7 @@
     "@types/follow-redirects": "^1.14.4",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^29.0.0",
-    "@types/node": "^24.0.0",
+    "@types/node": "^25.3.5",
     "@types/ws": "^8.18.1",
     "cross-var": "^1.1.0",
     "husky": "^7.0.4",
