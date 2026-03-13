@@ -1,5 +1,6 @@
 import { Transform, TransformCallback } from 'stream'
-// inspired by https://github.com/maxogden/binary-split/blob/master/index.js
+
+// Inspired by https://github.com/maxogden/binary-split/blob/master/index.js
 export class BinarySplitStream extends Transform {
   private readonly _NEW_LINE_BYTE: number
   private _buffered?: Buffer
@@ -14,29 +15,37 @@ export class BinarySplitStream extends Transform {
   }
 
   _transform(chunk: Buffer, _: string, callback: TransformCallback) {
-    let offset = 0
-    let lastMatch = 0
-    let bufferToSplit = chunk
-    // if we already had something remaining in the buffer let's concat it with current chunk
-    if (this._buffered) {
-      bufferToSplit = Buffer.concat([this._buffered, chunk])
+    let chunkStart = 0
 
-      offset = this._buffered.length
+    if (this._buffered !== undefined) {
+      const firstNewLineIndex = chunk.indexOf(this._NEW_LINE_BYTE)
+
+      if (firstNewLineIndex === -1) {
+        this._buffered = Buffer.concat([this._buffered, chunk])
+        callback()
+        return
+      }
+
+      this.push(Buffer.concat([this._buffered, chunk.subarray(0, firstNewLineIndex)]))
       this._buffered = undefined
+      chunkStart = firstNewLineIndex + 1
     }
+
+    let offset = chunkStart
+    let lineStart = chunkStart
 
     while (true) {
-      let newLineIndex = bufferToSplit.indexOf(this._NEW_LINE_BYTE, offset)
-      if (newLineIndex !== -1) {
-        this.push(bufferToSplit.slice(lastMatch, newLineIndex))
-        offset = newLineIndex + 1
-        lastMatch = offset
-      } else {
-        this._buffered = bufferToSplit.slice(lastMatch)
+      const newLineIndex = chunk.indexOf(this._NEW_LINE_BYTE, offset)
+      if (newLineIndex === -1) {
         break
       }
+
+      this.push(chunk.subarray(lineStart, newLineIndex))
+      offset = newLineIndex + 1
+      lineStart = offset
     }
 
+    this._buffered = lineStart < chunk.length ? chunk.subarray(lineStart) : undefined
     callback()
   }
 }

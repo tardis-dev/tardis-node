@@ -3,7 +3,6 @@ export const EXCHANGES = [
   'deribit',
   'binance-futures',
   'binance-delivery',
-  'binance-options',
   'binance-european-options',
   'binance',
   'ftx',
@@ -49,7 +48,6 @@ export const EXCHANGES = [
   'huobi-dm-options',
   'star-atlas',
   'crypto-com',
-  'crypto-com-derivatives',
   'kucoin',
   'kucoin-futures',
   'bitnomial',
@@ -102,7 +100,8 @@ const COINBASE_CHANNELS = [
   'ticker',
   'snapshot',
   'last_match',
-  'full_snapshot'
+  'full_snapshot',
+  'rfq_matches'
 ] as const
 
 const DERIBIT_CHANNELS = [
@@ -142,7 +141,10 @@ const OKEX_CHANNELS = [
   'status',
   'instruments',
   'taker-volume',
-  'public-struc-block-trades'
+  'public-struc-block-trades',
+  'liquidations',
+  'loan-ratio',
+  'public-block-trades'
 ] as const
 
 const OKCOIN_CHANNELS = [
@@ -187,7 +189,13 @@ const OKEX_FUTURES_CHANNELS = [
   'taker-volume',
   'liquidations',
   'public-struc-block-trades',
-  'liquidation-orders'
+  'liquidation-orders',
+  'estimated-price',
+  'long-short-account-ratio-contract',
+  'long-short-account-ratio-contract-top-trader',
+  'long-short-position-ratio-contract-top-trader',
+  'public-block-trades',
+  'taker-volume-contract'
 ] as const
 
 const OKEX_SWAP_CHANNELS = [
@@ -222,7 +230,12 @@ const OKEX_SWAP_CHANNELS = [
   'taker-volume',
   'liquidations',
   'public-struc-block-trades',
-  'liquidation-orders'
+  'liquidation-orders',
+  'long-short-account-ratio-contract',
+  'long-short-account-ratio-contract-top-trader',
+  'long-short-position-ratio-contract-top-trader',
+  'public-block-trades',
+  'taker-volume-contract'
 ] as const
 
 const OKEX_OPTIONS_CHANNELS = [
@@ -251,7 +264,9 @@ const OKEX_OPTIONS_CHANNELS = [
   'mark-price',
   'price-limit',
   'public-struc-block-trades',
-  'option-trades'
+  'option-trades',
+  'estimated-price',
+  'public-block-trades'
 ] as const
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
@@ -268,7 +283,8 @@ const FTX_CHANNELS = [
   'borrowRate',
   'borrowSummary',
   'ticker',
-  'leveragedTokenInfo'
+  'leveragedTokenInfo',
+  'busy'
 ] as const
 
 const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
@@ -291,7 +307,8 @@ const BINANCE_FUTURES_CHANNELS = [
   'topLongShortPositionRatio',
   'globalLongShortAccountRatio',
   'takerlongshortRatio',
-  '!contractInfo'
+  '!contractInfo',
+  'assetIndex'
 ] as const
 
 const BINANCE_DELIVERY_CHANNELS = [
@@ -315,7 +332,7 @@ const BINANCE_DELIVERY_CHANNELS = [
 
 const BITFINEX_DERIV_CHANNELS = ['trades', 'book', 'raw_book', 'status', 'liquidations', 'ticker'] as const
 
-const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp', 'etp'] as const
+const HUOBI_CHANNELS = ['depth', 'detail', 'trade', 'bbo', 'mbp', 'etp', 'mbp.20'] as const
 
 const HUOBI_DM_CHANNELS = [
   'depth',
@@ -358,8 +375,6 @@ const HUOBI_DM_LINEAR_SWAP_CHANNELS = [
   'elite_position_ratio'
 ] as const
 
-const BINANCE_OPTIONS_CHANNELS = ['TRADE', 'TICKER', 'DEPTH100', 'INDEX'] as const
-
 const PHEMEX_CHANNELS = ['book', 'orderbook_p', 'trades', 'trades_p', 'market24h', 'spot_market24h', 'perp_market24h_pack_p'] as const
 
 const BYBIT_CHANNELS = [
@@ -382,7 +397,8 @@ const BYBIT_CHANNELS = [
   'publicTrade',
   'tickers',
   'liquidation',
-  'allLiquidation'
+  'allLiquidation',
+  'orderbook.1000'
 ] as const
 
 const BYBIT_OPTIONS_CHANNELS = ['orderbook.25', 'orderbook.100', 'publicTrade', 'tickers']
@@ -442,11 +458,9 @@ const MANGO_CHANNELS = [
 
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
-const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt']
+const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt', 'orderbook.200']
 
 const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding', 'estimatedfunding']
-
-const CRYPTO_COM_DERIVATIVES = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding']
 
 const KUCOIN_CHANNELS = ['market/ticker', 'market/snapshot', 'market/level2', 'market/match', 'market/level2Snapshot']
 
@@ -539,7 +553,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
   poloniex: POLONIEX_CHANNELS,
-  'binance-options': BINANCE_OPTIONS_CHANNELS,
   upbit: UPBIT_CHANNELS,
   ascendex: ASCENDEX_CHANNELS,
   dydx: DYDX_CHANNELS,
@@ -549,7 +562,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm-options': HUOBI_DM_OPTIONS_CHANNELS,
   mango: MANGO_CHANNELS,
   'crypto-com': CRYPTO_COM_CHANNELS,
-  'crypto-com-derivatives': CRYPTO_COM_DERIVATIVES,
   kucoin: KUCOIN_CHANNELS,
   bitnomial: BITNOMIAL_CHANNELS,
   'woo-x': WOOX_CHANNELS,

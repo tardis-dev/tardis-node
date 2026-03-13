@@ -176,6 +176,144 @@ describe('replay', () => {
   )
 
   test(
+    'replays raw Binance data feed and matches manual decode of raw feed',
+    async () => {
+      const replayOptions: ReplayOptions<'binance'> = {
+        exchange: 'binance',
+        from: '2019-06-01T00:00:00.000Z',
+        to: '2019-06-01T00:02:00.000Z',
+        filters: [
+          {
+            channel: 'trade',
+            symbols: ['batpax']
+          }
+        ]
+      }
+
+      const decodedMessages = []
+      const decodedTimestamps = []
+
+      for await (const { message, localTimestamp } of replay(replayOptions)) {
+        decodedMessages.push(message)
+        decodedTimestamps.push(localTimestamp.toISOString())
+      }
+
+      const rawMessages = []
+      const rawTimestamps = []
+
+      for await (const { message, localTimestamp } of replay({ ...replayOptions, skipDecoding: true })) {
+        rawMessages.push(JSON.parse(message.toString()))
+        rawTimestamps.push(new Date(localTimestamp.toString()).toISOString())
+      }
+
+      expect(decodedMessages).toEqual(rawMessages)
+      expect(decodedTimestamps).toEqual(rawTimestamps)
+    },
+    1000 * 60 * 10
+  )
+
+  test(
+    'replays raw Binance data feed with microseconds and matches manual decode of raw feed timestamps',
+    async () => {
+      const replayOptions: ReplayOptions<'binance'> = {
+        exchange: 'binance',
+        from: '2019-06-01T00:00:00.000Z',
+        to: '2019-06-01T00:02:00.000Z',
+        filters: [
+          {
+            channel: 'trade',
+            symbols: ['batpax']
+          }
+        ]
+      }
+
+      const decodedTimestamps = []
+
+      for await (const { localTimestamp } of replay({ ...replayOptions, withMicroseconds: true })) {
+        decodedTimestamps.push({
+          iso: localTimestamp.toISOString(),
+          μs: (localTimestamp as Date & { μs?: number }).μs
+        })
+      }
+
+      const rawTimestamps = []
+
+      for await (const { localTimestamp } of replay({ ...replayOptions, skipDecoding: true })) {
+        const localTimestampString = localTimestamp.toString()
+        rawTimestamps.push({
+          iso: new Date(localTimestampString).toISOString(),
+          μs: Number(localTimestampString.slice(23, 26))
+        })
+      }
+
+      expect(decodedTimestamps).toEqual(rawTimestamps)
+    },
+    1000 * 60 * 10
+  )
+
+  test(
+    'replays raw Binance data feed with microseconds and disconnects and matches manual decode of raw feed',
+    async () => {
+      const replayOptions: ReplayOptions<'binance'> = {
+        exchange: 'binance',
+        from: '2019-06-01T00:00:00.000Z',
+        to: '2019-06-01T00:02:00.000Z',
+        filters: [
+          {
+            channel: 'trade',
+            symbols: ['batpax']
+          }
+        ]
+      }
+
+      const decodedMessages = []
+      const decodedTimestamps = []
+      let decodedDisconnects = 0
+
+      for await (const replayMessage of replay({ ...replayOptions, withMicroseconds: true, withDisconnects: true })) {
+        if (replayMessage === undefined) {
+          decodedDisconnects++
+          continue
+        }
+
+        decodedMessages.push(replayMessage.message)
+        decodedTimestamps.push({
+          iso: replayMessage.localTimestamp.toISOString(),
+          μs: (replayMessage.localTimestamp as Date & { μs?: number }).μs
+        })
+      }
+
+      const rawMessages = []
+      const rawTimestamps = []
+      let rawDisconnects = 0
+
+      for await (const replayMessage of replay({
+        ...replayOptions,
+        skipDecoding: true,
+        withMicroseconds: true,
+        withDisconnects: true
+      })) {
+        if (replayMessage === undefined) {
+          rawDisconnects++
+          continue
+        }
+
+        rawMessages.push(JSON.parse(replayMessage.message.toString()))
+        const localTimestampString = replayMessage.localTimestamp.toString()
+        rawTimestamps.push({
+          iso: new Date(localTimestampString).toISOString(),
+          μs: Number(localTimestampString.slice(23, 26))
+        })
+      }
+
+      expect(decodedDisconnects).toEqual(rawDisconnects)
+      expect(decodedMessages).toEqual(rawMessages)
+      expect(decodedTimestamps).toEqual(rawTimestamps)
+    },
+    1000 * 60 * 10
+  )
+
+  test(
     'unauthorizedAccess',
     async () => {
       const dataFeedWithUnautorizedAccesss = replay({

@@ -19,7 +19,6 @@ import {
   BinanceEuropeanOptionSummaryMapper,
   BinanceEuropeanOptionSummaryMapperV2
 } from './binanceeuropeanoptions'
-import { BinanceOptionsBookChangeMapper, BinanceOptionsTradesMapper, BinanceOptionSummaryMapper } from './binanceoptions'
 import {
   BitfinexBookChangeMapper,
   BitfinexDerivativeTickerMapper,
@@ -288,7 +287,6 @@ const tradesMappers = {
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2TradesMapper() : new PoloniexTradesMapper(),
   coinflex: () => coinflexTradesMapper,
-  'binance-options': () => new BinanceOptionsTradesMapper(),
   upbit: () => new UpbitTradesMapper(),
   ascendex: () => new AscendexTradesMapper(),
   dydx: () => new DydxTradesMapper(),
@@ -299,7 +297,6 @@ const tradesMappers = {
   'bybit-spot': (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit-spot') : new BybitSpotTradesMapper('bybit-spot'),
   'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComTradesMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinTradesMapper('kucoin'),
   'kucoin-futures': () => new KucoinFuturesTradesMapper(),
   bitnomial: () => bitnomialTradesMapper,
@@ -387,7 +384,6 @@ const bookChangeMappers = {
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
   coinflex: () => coinflexBookChangeMapper,
-  'binance-options': () => new BinanceOptionsBookChangeMapper(),
   upbit: () => new UpbitBookChangeMapper(),
   ascendex: () => new AscendexBookChangeMapper(),
   dydx: () => new DydxBookChangeMapper(),
@@ -396,7 +392,6 @@ const bookChangeMappers = {
   'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
   mango: () => new SerumBookChangeMapper('mango'),
   'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComBookChangeMapper('crypto-com-derivatives'),
   kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
   'kucoin-futures': (localTimestamp: Date) => new KucoinFuturesBookChangeMapper(isRealTime(localTimestamp) === false),
   bitnomial: () => new BitnomialBookChangMapper(),
@@ -442,7 +437,6 @@ const derivativeTickersMappers = {
   ascendex: () => new AscendexDerivativeTickerMapper(),
   dydx: () => new DydxDerivativeTickerMapper(),
   'dydx-v4': () => new DydxV4DerivativeTickerMapper(),
-  'crypto-com-derivatives': () => new CryptoComDerivativeTickerMapper('crypto-com-derivatives'),
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
   'woo-x': () => new WooxDerivativeTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
@@ -455,7 +449,6 @@ const optionsSummaryMappers = {
   deribit: () => new DeribitOptionSummaryMapper(),
   'okex-options': (localTimestamp: Date) =>
     shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5OptionSummaryMapper() : new OkexOptionSummaryMapper(),
-  'binance-options': () => new BinanceOptionSummaryMapper(),
   'huobi-dm-options': () => new HuobiOptionsSummaryMapper(),
   'bybit-options': () => new BybitV5OptionSummaryMapper(),
   'binance-european-options': (localTimestamp: Date) =>
@@ -540,7 +533,6 @@ const bookTickersMappers = {
   'bybit-spot': (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookTickerMapper('bybit-spot') : new BybitSpotBookTickerMapper('bybit-spot'),
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
-  'crypto-com-derivatives': () => new CryptoComBookTickerMapper('crypto-com-derivatives'),
   kucoin: () => new KucoinBookTickerMapper('kucoin'),
   'woo-x': () => new WooxBookTickerMapper(),
   delta: () => new DeltaBookTickerMapper(),

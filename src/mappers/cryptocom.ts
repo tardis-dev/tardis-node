@@ -2,7 +2,7 @@ import { upperCaseSymbols } from '../handy'
 import { BookChange, Exchange, BookTicker, Trade, DerivativeTicker } from '../types'
 import { Mapper, PendingTickerInfoHelper } from './mapper'
 
-export class CryptoComTradesMapper implements Mapper<'crypto-com' | 'crypto-com-derivatives', Trade> {
+export class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: CryptoComTradeMessage) {
     return message.result !== undefined && message.result.channel === 'trade'
@@ -40,7 +40,7 @@ export class CryptoComTradesMapper implements Mapper<'crypto-com' | 'crypto-com-
   }
 }
 
-export class CryptoComBookChangeMapper implements Mapper<'crypto-com' | 'crypto-com-derivatives', BookChange> {
+export class CryptoComBookChangeMapper implements Mapper<'crypto-com', BookChange> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: CryptoComBookMessage) {
@@ -82,7 +82,7 @@ export class CryptoComBookChangeMapper implements Mapper<'crypto-com' | 'crypto-
   }
 }
 
-export class CryptoComBookTickerMapper implements Mapper<'crypto-com' | 'crypto-com-derivatives', BookTicker> {
+export class CryptoComBookTickerMapper implements Mapper<'crypto-com', BookTicker> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: CryptoComTickerMessage) {
@@ -119,7 +119,7 @@ export class CryptoComBookTickerMapper implements Mapper<'crypto-com' | 'crypto-
   }
 }
 
-export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com-derivatives', DerivativeTicker> {
+export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
