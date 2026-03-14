@@ -85,7 +85,7 @@ describe('exchange-details', () => {
       'bookTicker',
       'aggTrade',
       'ticker',
-      'borrowInterest',
+      'borrowInterest'
     ])
   })
 })
