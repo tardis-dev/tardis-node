@@ -30,7 +30,6 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'ascendex',
   'dydx',
   'dydx-v4',
-  'crypto-com-derivatives',
   'crypto-com',
   'woo-x',
   'kucoin-futures',
@@ -69,7 +68,6 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'gate-io-futures',
   'bybit-spot',
   'crypto-com',
-  'crypto-com-derivatives',
   'kucoin',
   'woo-x',
   'delta',
@@ -86,7 +84,6 @@ const exchangesWithBookTickerInfo: Exchange[] = [
 const exchangesWithOptionsSummary: Exchange[] = [
   'deribit',
   'okex-options',
-  'binance-options',
   'huobi-dm-options',
   'bybit-options',
   'binance-european-options'
@@ -7387,170 +7384,6 @@ describe('mappers', () => {
     }
   })
 
-  test('map binance-options messages', () => {
-    const messages = [
-      {
-        stream: 'BTC-210528-85000-C@TICKER',
-        data: {
-          e: 'ticker',
-          E: 1621327140324,
-          s: 'BTC-210528-85000-C',
-          o: '74.17',
-          h: '74.17',
-          l: '74.17',
-          c: '74.17',
-          V: '0',
-          A: '0',
-          p: '0',
-          Q: '0',
-          F: '0',
-          L: '0',
-          n: 0,
-          bo: '3.1',
-          ao: '90.36',
-          b: '1.2244',
-          a: '1.7478',
-          d: '0.00254',
-          t: '-3.86009',
-          g: '0.00001',
-          v: '0.58677',
-          vo: '1.31217',
-          mp: '6.96',
-          hl: '1810.56',
-          ll: '0.01',
-          eep: '0'
-        }
-      },
-      { stream: 'BTCUSDT@INDEX', data: { e: 'index', E: 1621327140322, s: 'BTCUSDT', p: '45208.90734296' } },
-      {
-        stream: 'BTC-210528-85000-C@TICKER',
-        data: {
-          e: 'ticker',
-          E: 1621327141478,
-          s: 'BTC-210528-85000-C',
-          o: '74.17',
-          h: '74.17',
-          l: '74.17',
-          c: '74.17',
-          V: '0',
-          A: '0',
-          p: '0',
-          Q: '0',
-          F: '0',
-          L: '0',
-          n: 0,
-          bo: '3.1',
-          ao: '90.36',
-          b: '1.2242',
-          a: '1.7475',
-          d: '0.00254',
-          t: '-3.86272',
-          g: '0.00001',
-          v: '0.5872',
-          vo: '1.31209',
-          mp: '6.97',
-          hl: '1810.74',
-          ll: '0.01',
-          eep: '0'
-        }
-      },
-      {
-        stream: 'BTC-210528-40000-C@DEPTH100',
-        data: {
-          e: 'depth',
-          E: 1621327140126,
-          s: 'BTC-210528-40000-C',
-          b: [
-            ['5652.36', '0.3018'],
-            ['5583.89', '0.4192'],
-            ['4500', '0.005'],
-            ['2100', '0.08'],
-            ['1001', '0.001']
-          ],
-          a: [
-            ['8256.82', '0.02'],
-            ['8327.7', '0.4547'],
-            ['8464.46', '0.4969']
-          ]
-        }
-      },
-      {
-        stream: 'BTC-210528-40000-C@DEPTH100',
-        data: {
-          e: 'depth',
-          E: 1621327140336,
-          s: 'BTC-210528-40000-C',
-          b: [['1001', '0.001']],
-          a: [['8256.82', '0.02']]
-        }
-      },
-      {
-        stream: 'BTC-210521-44000-C@TRADE',
-        data: {
-          e: 'trade',
-          E: 1621327175890,
-          s: 'BTC-210521-44000-C',
-          t: [
-            { t: '649', p: '1710.4', q: '0.0005', b: '4612097235776182706', a: '4612111529500577664', T: 1621293897000, s: '-1' },
-            { t: '744', p: '2448.96', q: '0.0008', b: '4612108230892458593', a: '4612111529502760966', T: 1621309281000, s: '1' }
-          ]
-        }
-      },
-      {
-        stream: 'BTC-210521-44000-C@TRADE',
-        data: {
-          e: 'trade',
-          E: 1621327175890,
-          s: 'BTC-210521-44000-C',
-          t: [
-            { t: '744', p: '2448.96', q: '0.0008', b: '4612108230892458593', a: '4612111529502760966', T: 1621309281000, s: '1' },
-            { t: '745', p: '2577.4', q: '0.0206', b: '4612111529503286820', a: '4612099434799438240', T: 1621312991000, s: '-1' },
-            { t: '746', p: '2577.4', q: '0.0154', b: '4612111529503286820', a: '4612096136264555013', T: 1621313012000, s: '-1' }
-          ]
-        }
-      },
-      {
-        stream: 'BTC-210305-40000-C@TICKER',
-        data: {
-          e: 'ticker',
-          E: 1614556802373,
-          s: 'BTC-210305-40000-C',
-          o: '8210',
-          h: '8210',
-          l: '8210',
-          c: '8210',
-          V: '0',
-          A: '0',
-          p: '0',
-          Q: '0.01',
-          F: '0',
-          L: '0',
-          n: 0,
-          bo: '0',
-          ao: '8456.93',
-          b: '-1',
-          a: '2.9884',
-          d: '0.83519',
-          t: '-172.50456',
-          g: '0.00005',
-          v: '12.20434',
-          vo: '1.225',
-          mp: '5714.97',
-          hl: '6392.28',
-          ll: '5037.66',
-          eep: '0'
-        }
-      }
-    ]
-
-    const binanceOptionsMapper = createMapper('binance-options')
-
-    for (const message of messages) {
-      const mappedMessages = binanceOptionsMapper.map(message, new Date('2021-05-18T03:41:21.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
-    }
-  })
-
   test('map upbit messages', () => {
     const messages = [
       {
@@ -8169,151 +8002,6 @@ test('map crypto-com messages', () => {
 
   for (const message of messages) {
     const mappedMessages = cryptoComMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
-  }
-})
-
-test('map crypto-com-derivatives messages', () => {
-  const messages = [
-    { id: 1, method: 'subscribe', code: 0 },
-
-    {
-      id: 1,
-      code: 0,
-      method: 'subscribe',
-      result: {
-        channel: 'trade',
-        subscription: 'trade.ATOMUSD-PERP',
-        instrument_name: 'ATOMUSD-PERP',
-        data: [
-          { d: '4611686018427711804', t: 1653992510011, p: '10.361', q: '0.1', s: 'BUY', i: 'ATOMUSD-PERP' },
-          { d: '4611686018427711803', t: 1653992471408, p: '10.364', q: '0.1', s: 'BUY', i: 'ATOMUSD-PERP' }
-        ]
-      }
-    },
-    {
-      id: 1,
-      code: 0,
-      method: 'subscribe',
-      result: {
-        channel: 'book',
-        subscription: 'book.1INCHUSD-PERP.50',
-        instrument_name: '1INCHUSD-PERP',
-        depth: 50,
-        data: [
-          {
-            asks: [['0.9801', '451', '2']],
-            bids: [['0.9787', '5303', '3']],
-            t: 1653992543210,
-            tt: 1653992543165,
-            u: 68541606944,
-            cs: 1386851553
-          }
-        ]
-      }
-    },
-    {
-      id: -1,
-      code: 0,
-      method: 'subscribe',
-      result: {
-        channel: 'book.update',
-        subscription: 'book.BALUSD-PERP.50',
-        instrument_name: 'BALUSD-PERP',
-        depth: 50,
-        data: [
-          {
-            update: {
-              asks: [],
-              bids: [
-                ['7.581', '50.0', '1'],
-                ['7.584', '0', '0']
-              ]
-            },
-            t: 1653992543272,
-            tt: 1653992543265,
-            u: 68541671328,
-            pu: 68541637184,
-            cs: 509555332
-          }
-        ]
-      }
-    },
-    {
-      id: -1,
-      code: 0,
-      method: 'subscribe',
-      result: {
-        channel: 'trade',
-        subscription: 'trade.BTCUSD-PERP',
-        instrument_name: 'BTCUSD-PERP',
-        data: [{ d: '4611686018439397540', t: 1653992578435, p: '31603.5', q: '0.1000', s: 'BUY', i: 'BTCUSD-PERP' }]
-      }
-    },
-    {
-      id: -1,
-      code: 0,
-      method: 'subscribe',
-      result: {
-        channel: 'ticker',
-        instrument_name: 'BTCUSD-PERP',
-        subscription: 'ticker.BTCUSD-PERP',
-        data: [
-          {
-            h: '32222.5',
-            l: '30240.0',
-            a: '31611.0',
-            c: '0.0320',
-            b: '31613.0',
-            k: '31613.5',
-            i: 'BTCUSD-PERP',
-            v: '13206.4884',
-            vv: '433945264.39',
-            oi: '318.5162',
-            t: 1653992543383
-          }
-        ]
-      }
-    },
-    {
-      id: -1,
-      method: 'subscribe',
-      code: 0,
-      result: {
-        instrument_name: 'BTCUSD-INDEX',
-        subscription: 'index.BTCUSD-INDEX',
-        channel: 'index',
-        data: [{ v: '31601.35', t: 1653992545000 }]
-      }
-    },
-    {
-      id: 1,
-      method: 'subscribe',
-      code: 0,
-      result: {
-        instrument_name: 'BTCUSD-PERP',
-        subscription: 'mark.BTCUSD-PERP',
-        channel: 'mark',
-        data: [{ v: '31606.3', t: 1653992543000 }]
-      }
-    },
-    {
-      id: -1,
-      method: 'subscribe',
-      code: 0,
-      result: {
-        instrument_name: 'BTCUSD-PERP',
-        subscription: 'funding.BTCUSD-PERP',
-        channel: 'funding',
-        data: [{ v: '0.00000700', t: 1653992579000 }]
-      }
-    }
-  ]
-
-  const cryptoComDerivativesMapper = createMapper('crypto-com-derivatives')
-
-  for (const message of messages) {
-    const mappedMessages = cryptoComDerivativesMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

@@ -80,14 +80,12 @@ describe('exchange-details', () => {
 
     expect(exchangeDetails.availableChannels).toEqual([
       'trade',
-      'aggTrade',
-      'ticker',
       'depth',
       'depthSnapshot',
       'bookTicker',
-      'recentTrades',
+      'aggTrade',
+      'ticker',
       'borrowInterest',
-      'tokenNav'
     ])
   })
 })
