@@ -104,7 +104,6 @@ describe.skip('stream', () => {
             exchange === 'binance-jersey' ||
             exchange === 'huobi-dm-options' ||
             exchange === 'star-atlas' ||
-            exchange === 'binance-options' ||
             exchange === 'okex-futures' ||
             exchange === 'okex-options' ||
             exchange === 'delta' ||
@@ -112,7 +111,6 @@ describe.skip('stream', () => {
             exchange === 'phemex' ||
             exchange === 'bybit-spot' ||
             exchange === 'coinbase' ||
-            exchange === 'crypto-com-derivatives' ||
             exchange === 'mango' ||
             exchange === 'serum' ||
             exchange === 'ftx' ||
