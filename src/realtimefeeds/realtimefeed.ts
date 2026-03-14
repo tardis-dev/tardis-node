@@ -391,7 +391,13 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
       try {
         await this.poolDataToStream(outputStream)
       } catch (e) {
-        this.debug('pooling error %o', e)
+        const error = e instanceof Error ? e : new Error(String(e))
+
+        this.debug('pooling error %o', error)
+
+        if (this.onError !== undefined) {
+          this.onError(error)
+        }
       }
     }
 
