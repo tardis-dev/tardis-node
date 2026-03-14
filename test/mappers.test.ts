@@ -81,13 +81,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'hyperliquid'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = [
-  'deribit',
-  'okex-options',
-  'huobi-dm-options',
-  'bybit-options',
-  'binance-european-options'
-]
+const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'huobi-dm-options', 'bybit-options', 'binance-european-options']
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
