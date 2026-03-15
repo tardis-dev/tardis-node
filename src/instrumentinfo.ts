@@ -79,6 +79,8 @@ export type ContractType =
 export interface InstrumentInfo {
   /** symbol id */
   id: string
+  /** dataset symbol id, may differ from id */
+  datasetId?: string
   /** exchange id */
   exchange: string
   /** normalized, so for example bitmex XBTUSD has base currency set to BTC not XBT */
@@ -86,20 +88,30 @@ export interface InstrumentInfo {
   /** normalized, so for example bitfinex BTCUST has quote currency set to USDT, not UST */
   quoteCurrency: string
   type: SymbolType
+  /** derivative contract type */
+  contractType?: ContractType
   /** indicates if the instrument can currently be traded. */
   active: boolean
   /** date in ISO format */
   availableSince: string
   /** date in ISO format */
   availableTo?: string
+  /** date in ISO format, when the instrument was first listed on the exchange */
+  listing?: string
   /** in ISO format, only for futures and options */
   expiry?: string
+  /** expiration schedule type */
+  expirationType?: 'daily' | 'weekly' | 'next_week' | 'quarter' | 'next_quarter'
+  /** the underlying index for derivatives */
+  underlyingIndex?: string
   /** price tick size, price precision can be calculated from it */
   priceIncrement: number
   /** amount tick size, amount/size precision can be calculated from it */
   amountIncrement: number
   /** min order size */
   minTradeAmount: number
+  /** minimum notional value */
+  minNotional?: number
   /** consider it as illustrative only, as it depends in practice on account traded volume levels, different categories, VIP levels, owning exchange currency etc */
   makerFee: number
   /** consider it as illustrative only, as it depends in practice on account traded volume levels, different categories, VIP levels, owning exchange currency etc */
@@ -116,11 +128,27 @@ export interface InstrumentInfo {
   strikePrice?: number
   /** option type, only for options */
   optionType?: 'call' | 'put'
-  /** date in ISO format */
+  /** margin mode */
+  marginMode?: 'isolated' | 'cross'
+  /** whether margin trading is supported (spot) */
+  margin?: boolean
+  /** if this instrument is an alias for another */
+  aliasFor?: string
+  /** historical changes to instrument parameters */
   changes?: {
     until: string
     priceIncrement?: number
     amountIncrement?: number
     contractMultiplier?: number
+    minTradeAmount?: number
+    makerFee?: number
+    takerFee?: number
+    quanto?: boolean
+    inverse?: boolean
+    settlementCurrency?: string
+    underlyingIndex?: string
+    contractType?: ContractType
+    quoteCurrency?: string
+    type?: string
   }[]
 }

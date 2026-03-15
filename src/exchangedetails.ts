@@ -10,36 +10,89 @@ export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   return exchangeDetails as ExchangeDetails<T>
 }
 
-export type SymbolType = 'spot' | 'future' | 'perpetual' | 'option'
+export type SymbolType = 'spot' | 'future' | 'perpetual' | 'option' | 'combo'
+
+export type DatasetType =
+  | 'trades'
+  | 'incremental_book_L2'
+  | 'quotes'
+  | 'derivative_ticker'
+  | 'options_chain'
+  | 'book_snapshot_25'
+  | 'book_snapshot_5'
+  | 'liquidations'
+  | 'book_ticker'
 
 export type Stats = {
   trades: number
   bookChanges: number
 }
 
-export type DatasetType = 'trades' | 'incremental_book_L2' | 'quotes' | 'derivative_ticker' | 'options_chain'
-
 type Datasets = {
-  dataTypes: DatasetType[]
   formats: ['csv']
-  exportedFrom: Date
-  exportedUntil: Date
+  exportedFrom: string
+  exportedUntil: string
   stats: Stats
   symbols: {
     id: string
     type: SymbolType
     availableSince: string
-    availableTo: string
-    stats: Stats
+    availableTo?: string
+    dataTypes: DatasetType[]
+  }[]
+}
+
+type ChannelDetails = {
+  name: string
+  description: string
+  frequency: string
+  frequencySource: string
+  exchangeDocsUrl?: string
+  sourceFor?: string[]
+  availableSince: string
+  availableTo?: string
+  apiVersion?: string
+  additionalInfo?: string
+  generated?: true
+}
+
+type DataCenter = {
+  host: string
+  regionId: string
+  location: string
+}
+
+type DataCollectionDetails = {
+  recorderDataCenter: DataCenter
+  recorderDataCenterChanges?: {
+    until: string
+    dataCenter: DataCenter
+  }[]
+  wssConnection?: {
+    url: string
+    apiVersion?: string
+    proxiedViaCloudflare?: boolean
+  }
+  wssConnectionChanges?: {
+    until: string
+    url?: string
+    apiVersion?: string
+    proxiedViaCloudflare?: boolean
+  }[]
+  exchangeDataCenter?: DataCenter
+  exchangeDataCenterChanges?: {
+    until: string
+    dataCenter: DataCenter
   }[]
 }
 
 export type ExchangeDetailsBase<T extends Exchange> = {
   id: T
   name: string
-  filterable: boolean
   enabled: boolean
+  delisted?: boolean
   availableSince: string
+  availableTo?: string
 
   availableChannels: FilterForExchange[T]['channel'][]
 
@@ -54,11 +107,14 @@ export type ExchangeDetailsBase<T extends Exchange> = {
   incidentReports: {
     from: string
     to: string
-    status: 'resolved' | 'wontfix'
+    status: 'resolved' | 'wontfix' | 'unresolved'
     details: string
-  }
+  }[]
+
+  channelDetails: ChannelDetails[]
+  apiDocsUrl?: string
+  dataCollectionDetails?: DataCollectionDetails
+  datasets: Datasets
 }
 
-type ExchangeDetails<T extends Exchange> =
-  | (ExchangeDetailsBase<T> & { supportsDatasets: false })
-  | (ExchangeDetailsBase<T> & { supportsDatasets: true; datasets: Datasets })
+type ExchangeDetails<T extends Exchange> = ExchangeDetailsBase<T>
