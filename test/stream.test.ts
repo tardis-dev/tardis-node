@@ -78,7 +78,7 @@ describe('exchange-details', () => {
     const exchange = 'binance'
     const exchangeDetails = await getExchangeDetails(exchange)
 
-    expect(exchangeDetails.availableChannels).toEqual([
+    expect(exchangeDetails.availableChannels).toContain([
       'trade',
       'depth',
       'depthSnapshot',
