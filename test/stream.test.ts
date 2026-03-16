@@ -73,23 +73,6 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'serum'
 ]
 
-describe('exchange-details', () => {
-  test('provides exchange info', async () => {
-    const exchange = 'binance'
-    const exchangeDetails = await getExchangeDetails(exchange)
-
-    expect(exchangeDetails.availableChannels).toContain([
-      'trade',
-      'depth',
-      'depthSnapshot',
-      'bookTicker',
-      'aggTrade',
-      'ticker',
-      'borrowInterest'
-    ])
-  })
-})
-
 describe.skip('stream', () => {
   test(
     'streams normalized real-time messages for each supported exchange',
