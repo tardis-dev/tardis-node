@@ -23,7 +23,7 @@ async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?:
 
   let url = `${options.endpoint}/instruments/${exchange}`
   if (typeof filterOrSymbol === 'string') {
-    url += `/${filterOrSymbol}`
+    url += `/${encodeURIComponent(filterOrSymbol)}`
   } else if (typeof filterOrSymbol === 'object') {
     url += `?filter=${encodeURIComponent(JSON.stringify(filterOrSymbol))}`
   }

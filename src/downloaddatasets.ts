@@ -118,7 +118,7 @@ function getDownloadOptions({
   const month = doubleDigit(date.getUTCMonth() + 1)
   const day = doubleDigit(date.getUTCDate())
 
-  const url = `${options.datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${symbol}.${format}.gz`
+  const url = `${options.datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${encodeURIComponent(symbol)}.${format}.gz`
   const filename = getFilename({
     dataType,
     date,
@@ -139,8 +139,12 @@ function getDownloadOptions({
 
 type DownloadOptions = Parameters<typeof download>[0]
 
+export function sanitizeForFilename(s: string) {
+  return s.replace(/[\\/?*<>|"]/g, '-')
+}
+
 function getFilenameDefault({ exchange, dataType, format, date, symbol }: GetFilenameOptions) {
-  return `${exchange}_${dataType}_${date.toISOString().split('T')[0]}_${symbol}.${format}.gz`
+  return `${exchange}_${dataType}_${date.toISOString().split('T')[0]}_${sanitizeForFilename(symbol)}.${format}.gz`
 }
 
 function getDownloadDateRange({ from, to }: DownloadDatasetsOptions) {
