@@ -75,7 +75,13 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract depthRequestRequestWeight: number
 
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
-    const wsFilters = filters.filter((f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades')
+    const wsFilters = filters.filter(
+      (f) =>
+        f.channel !== 'openInterest' &&
+        f.channel !== 'recentTrades' &&
+        f.channel !== 'fundingInfo' &&
+        f.channel !== 'insuranceBalance'
+    )
 
     if (wsFilters.length > 0) {
       yield new BinanceSingleConnectionRealTimeFeed(
