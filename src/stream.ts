@@ -4,6 +4,11 @@ import { MapperFactory } from './mappers'
 import { createRealTimeFeed } from './realtimefeeds'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
 
+type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
+type StreamNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
+  ? MapperOutput<U[number]> | Disconnect
+  : MapperOutput<U[number]>
+
 async function* _stream<T extends Exchange, U extends boolean = false>({
   exchange,
   filters,
@@ -52,15 +57,7 @@ export function stream<T extends Exchange, U extends boolean = false>({
 async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
-): AsyncIterableIterator<
-  Z extends true
-    ? U extends MapperFactory<infer _, infer X>[]
-      ? X | Disconnect
-      : never
-    : U extends MapperFactory<infer _, infer X>[]
-    ? X
-    : never
-> {
+): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
   while (true) {
     try {
       const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
@@ -150,15 +147,7 @@ export type StreamNormalizedOptions<T extends Exchange, U extends boolean = fals
 export function streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
-): AsyncIterableIterator<
-  Z extends true
-    ? U extends MapperFactory<infer _, infer X>[]
-      ? X | Disconnect
-      : never
-    : U extends MapperFactory<infer _, infer X>[]
-    ? X
-    : never
-> {
+): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
   let _iterator = _streamNormalized({ exchange, symbols, timeoutIntervalMS, withDisconnectMessages, onError }, ...normalizers)
 
   ;(_iterator as any).__realtime__ = true

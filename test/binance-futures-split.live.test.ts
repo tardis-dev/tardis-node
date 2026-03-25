@@ -2,14 +2,13 @@ import { normalizeBookChanges, normalizeBookTickers, normalizeDerivativeTickers,
 import { streamNormalized } from '../src/stream'
 import { BookChange, BookTicker, DerivativeTicker, Disconnect, Trade } from '../src/types'
 
-type BinanceFuturesLiveMessage = Trade | BookChange | DerivativeTicker | BookTicker | Disconnect
 const testTimeoutMS = 40_000
 
 describe('binance futures supported channels live', () => {
   test(
     'streams normalized BTCUSDT data for supported channels without disconnects',
     async () => {
-      const messages: AsyncIterableIterator<BinanceFuturesLiveMessage> = streamNormalized(
+      const messages = streamNormalized(
         {
           exchange: 'binance-futures',
           symbols: ['btcusdt'],

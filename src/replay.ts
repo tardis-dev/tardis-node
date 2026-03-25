@@ -13,6 +13,11 @@ import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker'
 
+type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
+type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
+  ? MapperOutput<U[number]> | Disconnect
+  : MapperOutput<U[number]>
+
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
   from,
@@ -261,15 +266,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     waitWhenDataNotYetAvailable = undefined
   }: ReplayNormalizedOptions<T, Z>,
   ...normalizers: U
-): AsyncIterableIterator<
-  Z extends true
-    ? U extends MapperFactory<infer _, infer X>[]
-      ? X | Disconnect
-      : never
-    : U extends MapperFactory<infer _, infer X>[]
-    ? X
-    : never
-> {
+): AsyncIterableIterator<ReplayNormalizedMessage<U, Z>> {
   const fromDate = parseAsUTCDate(from)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
