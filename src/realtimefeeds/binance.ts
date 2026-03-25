@@ -18,6 +18,12 @@ const OPEN_INTEREST_BATCH_SIZE = 10
 const OPEN_INTEREST_REQUEST_WEIGHT = 1
 const OPEN_INTEREST_POLLING_RECOVERY_MS = 1000
 const OPEN_INTEREST_MAX_POLLING_INTERVAL_MS = 60 * 1000
+const BINANCE_FUTURES_PUBLIC_CHANNELS = new Set(['bookTicker', 'depth', 'depthSnapshot', 'trade'])
+const BINANCE_FUTURES_DEFAULT_WS_BASE_URL = 'wss://fstream.binance.com'
+const BINANCE_FUTURES_PUBLIC_STREAM_PATH = '/public/stream'
+const BINANCE_FUTURES_MARKET_STREAM_PATH = '/market/stream'
+
+type BinanceFuturesStreamPath = typeof BINANCE_FUTURES_PUBLIC_STREAM_PATH | typeof BINANCE_FUTURES_MARKET_STREAM_PATH
 
 function parseBinanceWeightHeader(headerValue: string | string[] | undefined) {
   if (headerValue === undefined) {
@@ -41,6 +47,26 @@ function getExchangeScopedNumberEnv(exchange: string, suffix: string, fallback: 
   const parsed = Number.parseInt(rawValue, 10)
 
   return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function getExchangeScopedWssUrlEnv(exchange: string) {
+  const envName = `WSS_URL_${exchange.toUpperCase().replace(/-/g, '_')}`
+
+  return process.env[envName]
+}
+
+function normalizeBinanceSplitWsBaseUrl(wssUrl: string) {
+  return wssUrl
+    .replace(/\/(public|market|private)\/stream$/u, '')
+    .replace(/\/stream$/u, '')
+    .replace(/\/(public|market|private)$/u, '')
+}
+
+function getBinanceFuturesWebSocketUrl(exchange: string, streamPath: BinanceFuturesStreamPath) {
+  const configuredWssUrl = getExchangeScopedWssUrlEnv(exchange) ?? BINANCE_FUTURES_DEFAULT_WS_BASE_URL
+  const normalizedBaseUrl = normalizeBinanceSplitWsBaseUrl(configuredWssUrl)
+
+  return `${normalizedBaseUrl}${streamPath}`
 }
 
 function getBinanceRequestWeightLimit(exchange: string, exchangeInfo: any) {
@@ -417,6 +443,34 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
+class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
+  constructor(
+    exchange: string,
+    filters: Filter<string>[],
+    private readonly _streamPath: BinanceFuturesStreamPath,
+    httpURL: string,
+    suffixes: { [key: string]: string },
+    depthRequestRequestWeight: number,
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void
+  ) {
+    super(
+      exchange,
+      filters,
+      getBinanceFuturesWebSocketUrl(exchange, _streamPath),
+      httpURL,
+      suffixes,
+      depthRequestRequestWeight,
+      timeoutIntervalMS,
+      onError
+    )
+  }
+
+  protected async getWebSocketUrl() {
+    return getBinanceFuturesWebSocketUrl(this._exchange, this._streamPath)
+  }
+}
+
 export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
   protected wssURL = 'wss://stream.binance.com/stream?timeUnit=microsecond'
   protected httpURL = 'https://api.binance.com/api/v1'
@@ -451,7 +505,7 @@ export class BinanceUSRealTimeFeed extends BinanceRealTimeFeedBase {
 }
 
 export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
-  protected wssURL = 'wss://fstream.binance.com/stream'
+  protected wssURL = `${BINANCE_FUTURES_DEFAULT_WS_BASE_URL}${BINANCE_FUTURES_PUBLIC_STREAM_PATH}`
   protected httpURL = 'https://fapi.binance.com/fapi/v1'
 
   protected suffixes = {
@@ -460,6 +514,47 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
   }
 
   protected depthRequestRequestWeight = 20
+
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    const wsFilters = filters.filter(
+      (f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades' && f.channel !== 'fundingInfo' && f.channel !== 'insuranceBalance'
+    )
+
+    const publicWsFilters = wsFilters.filter((f) => BINANCE_FUTURES_PUBLIC_CHANNELS.has(f.channel))
+    if (publicWsFilters.length > 0) {
+      yield new BinanceFuturesSingleConnectionRealTimeFeed(
+        exchange,
+        publicWsFilters,
+        BINANCE_FUTURES_PUBLIC_STREAM_PATH,
+        this.httpURL,
+        this.suffixes,
+        this.depthRequestRequestWeight,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    const marketWsFilters = wsFilters.filter((f) => BINANCE_FUTURES_PUBLIC_CHANNELS.has(f.channel) === false)
+    if (marketWsFilters.length > 0) {
+      yield new BinanceFuturesSingleConnectionRealTimeFeed(
+        exchange,
+        marketWsFilters,
+        BINANCE_FUTURES_MARKET_STREAM_PATH,
+        this.httpURL,
+        this.suffixes,
+        this.depthRequestRequestWeight,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    const openInterestFilters = filters.filter((f) => f.channel === 'openInterest')
+    if (openInterestFilters.length > 0) {
+      const instruments = openInterestFilters.flatMap((s) => s.symbols!)
+
+      yield new BinanceFuturesOpenInterestClient(exchange, this.httpURL, instruments, onError)
+    }
+  }
 }
 
 export class BinanceDeliveryRealTimeFeed extends BinanceRealTimeFeedBase {
