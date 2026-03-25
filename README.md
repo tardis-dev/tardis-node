@@ -1,7 +1,6 @@
 # tardis-dev
 
 [![Version](https://img.shields.io/npm/v/tardis-dev.svg)](https://www.npmjs.org/package/tardis-dev)
-[![Try on RunKit](https://badge.runkitcdn.com/tardis-dev.svg)](https://runkit.com/npm/tardis-dev)
 
 <br/>
 
@@ -28,9 +27,7 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-replay-market-data-normalized)
 
-<br/>
 <br/>
 
 ## Features
@@ -43,7 +40,7 @@ for await (const message of messages) {
 
 <br/>
 
-- support for both [exchange-native](https://docs.tardis.dev/faq/data#what-is-a-difference-between-exchange-native-and-normalized-data-format) and [normalized market data](https://docs.tardis.dev/faq/data#what-is-a-difference-between-exchange-native-and-normalized-data-format) formats (unified format for accessing market data across all supported exchanges — normalized trades, order book and ticker data)
+- support for both [exchange-native and normalized market data](https://docs.tardis.dev/documentation/core-concepts/raw-vs-normalized) formats (unified format for accessing market data across all supported exchanges — normalized trades, order book and ticker data)
 
 <br/>
 
@@ -55,7 +52,7 @@ for await (const message of messages) {
 
 <br/>
 
-- support for top cryptocurrency exchanges: BitMEX, Deribit, Binance, FTX, OKEx, Huobi Futures, Huobi Global, Bitfinex, Coinbase Pro, Kraken Futures, Kraken, Bitstamp, Gemini, Poloniex, Bybit, Phemex, Delta Exchange, FTX US, Binance US, Gate.io, OKCoin, bitFlyer, HitBTC, CoinFLEX (2.0), Binance Jersey and more
+- support for many cryptocurrency exchanges — see [docs.tardis.dev](https://docs.tardis.dev) for the full list
 
 <br/>
 
@@ -63,15 +60,15 @@ for await (const message of messages) {
 
 <br/>
 
-- [combining multiple exchanges feeds into single one](https://docs.tardis.dev/api/node-js#combining-data-streams) via [`combine`](https://docs.tardis.dev/api/node-js#combine-iterators) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
+- [combining multiple exchanges feeds into single one](https://docs.tardis.dev/api/node-js#combining-data-streams) via [`combine`](https://docs.tardis.dev/api/node-js#combining-data-streams) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
 
 <br/>
 
-- [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) like order book imbalance, custom trade bars, book snapshots and more via [`compute`](https://docs.tardis.dev/api/node-js#compute-iterator-computables) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
+- [computing derived data locally](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) like order book imbalance, custom trade bars, book snapshots and more via [`compute`](https://docs.tardis.dev/api/node-js#computing-derived-data-locally) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
 
 <br/>
 
-- [full limit order book reconstruction](https://docs.tardis.dev/api/node-js#limit-order-book-reconstruction) both for real-time and historical data via `OrderBook` object
+- [full limit order book reconstruction](https://docs.tardis.dev/api/node-js#order-book-reconstruction) both for real-time and historical data via `OrderBook` object
 
 <br/>
 
@@ -83,7 +80,7 @@ for await (const message of messages) {
 
 <br/>
 
-- [built-in TypeScript support](https://docs.tardis.dev/api/node-js#usage-with-typescript)
+- [built-in TypeScript support](https://docs.tardis.dev/api/node-js#typescript-usage)
 
 <br/>
 <br/>
@@ -91,7 +88,7 @@ for await (const message of messages) {
 
 ## Installation
 
-Requires Node.js v12+ installed.
+Requires Node.js v24+ installed.
 
 ```bash
 npm install tardis-dev --save
@@ -163,7 +160,6 @@ for await (const message of messagesWithQuotes) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-real-time-spread-for-multiple-exchanges)
 
 <br/>
 
@@ -215,7 +211,6 @@ await produceVolumeBasedTradeBars(historicalMessages)
 //  await produceVolumeBasedTradeBars(realTimeMessages)
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-c?color=5558be)](https://runkit.com/thad/tardis-dev-seamless-switching-between-real-time-streaming-and-historical-market-data-replay)
 
 <br/>
 
@@ -237,7 +232,6 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-dev-stream-market-data)
 
 <br/>
 
@@ -261,7 +255,6 @@ for await (const message of messages) {
 }
 ```
 
-[![Try this code live on RunKit](https://img.shields.io/badge/-Try%20this%20code%20live%20on%20RunKit-b?color=5558be)](https://runkit.com/thad/tardis-dev-replay-market-data)
 
 <br/>
 <br/>
