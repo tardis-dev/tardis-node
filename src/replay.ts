@@ -7,7 +7,7 @@ import { BinarySplitStream } from './binarysplit'
 import { clearCacheSync } from './clearcache'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
 import { debug } from './debug'
-import { addDays, getFilters, normalizeMessages, parseAsUTCDate, parseμs, wait } from './handy'
+import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy'
 import { MapperFactory, normalizeBookChanges } from './mappers'
 import { getOptions } from './options'
 import { Disconnect, Exchange, FilterForExchange } from './types'
@@ -77,7 +77,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     // see https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239
 
     const ZLIB_OPTIONS = {
-      chunkSize: 128 * 1024,
+      chunkSize: 256 * 1024,
       flush: constants.Z_SYNC_FLUSH,
       finishFlush: constants.Z_SYNC_FLUSH
     }
@@ -110,7 +110,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       }
 
       // response is a path to file on disk let' read it as stream
-      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 128 * 1024 })
+      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 256 * 1024 })
         // unzip it
         .pipe(createGunzip(ZLIB_OPTIONS))
         .on('error', function onGunzipError(err) {
@@ -130,16 +130,14 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
         linesCount++
         if (bufferLine.length > 0) {
           lastMessageWasUndefined = false
-          const localTimestampBuffer = bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX)
-          const messageBuffer = bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           // as any due to https://github.com/Microsoft/TypeScript/issues/24929
           if (skipDecoding === true) {
             yield {
-              localTimestamp: localTimestampBuffer,
-              message: messageBuffer
+              localTimestamp: bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX),
+              message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
             } as any
           } else {
-            let messageString = messageBuffer.toString()
+            let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
 
             // hack to handle huobi long numeric id for trades
             if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
@@ -152,12 +150,9 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
             const message = JSON.parse(messageString)
 
-            const localTimestampString = localTimestampBuffer.toString()
-            const localTimestamp = new Date(localTimestampString)
+            const localTimestamp = new Date(bufferLine.toString('utf8', 0, DATE_MESSAGE_SPLIT_INDEX))
             if (withMicroseconds) {
-              // provide additionally fractions of millisecond at microsecond resolution
-              // local timestamp always has format like this 2019-06-01T00:03:03.1238784Z
-              localTimestamp.μs = parseμs(localTimestampString)
+              localTimestamp.μs = parseReplayMicroseconds(bufferLine)
             }
 
             yield {
@@ -231,6 +226,10 @@ async function cleanupSlice(slicePath: string) {
   } catch (e) {
     debug('cleanupSlice error %s %o', slicePath, e)
   }
+}
+
+function parseReplayMicroseconds(bufferLine: Buffer) {
+  return (bufferLine[23] - 48) * 100 + (bufferLine[24] - 48) * 10 + (bufferLine[25] - 48)
 }
 
 // gracefully terminate worker
