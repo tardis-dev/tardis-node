@@ -7566,6 +7566,63 @@ exports[`mappers map gate-io messages 13`] = `
 ]
 `;
 
+exports[`mappers map gate-io-futures decimal size messages 1`] = `
+[
+  {
+    "amount": 0.25,
+    "exchange": "gate-io-futures",
+    "id": "1",
+    "localTimestamp": 2026-03-25T12:53:00.000Z,
+    "price": 2171.44,
+    "side": "sell",
+    "symbol": "ETH_USDT",
+    "timestamp": 2026-03-25T12:53:03.399Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures decimal size messages 2`] = `
+[
+  {
+    "askAmount": 1053.5,
+    "askPrice": 2172.85,
+    "bidAmount": undefined,
+    "bidPrice": 2172.82,
+    "exchange": "gate-io-futures",
+    "localTimestamp": 2026-03-25T12:53:00.000Z,
+    "symbol": "ETH_USDT",
+    "timestamp": 2026-03-25T12:53:34.909Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map gate-io-futures decimal size messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 1053.5,
+        "price": 2172.85,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.25,
+        "price": 2172.82,
+      },
+    ],
+    "exchange": "gate-io-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2026-03-25T12:53:00.000Z,
+    "symbol": "ETH_USDT",
+    "timestamp": 2026-03-25T12:53:34.909Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map gate-io-futures messages 1`] = `
 [
   {

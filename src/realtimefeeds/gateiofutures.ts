@@ -42,6 +42,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL: string
+  protected readonly extraHeaders = { 'X-Gate-Size-Decimal': '1' }
 
   constructor(
     wsURLSuffix: string,

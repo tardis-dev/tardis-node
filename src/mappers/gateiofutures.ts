@@ -25,6 +25,7 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
   *map(tradesMessage: GateIOFuturesTrades, localTimestamp: Date): IterableIterator<Trade> {
     for (const trade of tradesMessage.result) {
       const timestamp = trade.create_time_ms !== undefined ? new Date(trade.create_time_ms) : new Date(trade.create_time * 1000)
+      const size = Number(trade.size)
 
       yield {
         type: 'trade',
@@ -32,8 +33,8 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
         exchange: this._exchange,
         id: trade.id.toString(),
         price: Number(trade.price),
-        amount: Math.abs(trade.size),
-        side: trade.size < 0 ? 'sell' : 'buy',
+        amount: Math.abs(size),
+        side: size < 0 ? 'sell' : 'buy',
         timestamp,
         localTimestamp: localTimestamp
       }
@@ -43,8 +44,9 @@ export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trad
 
 const mapBookLevel = (level: GateIOFuturesSnapshotLevel) => {
   const price = Number(level.p)
+  const size = Number(level.s)
 
-  return { price, amount: Math.abs(level.s) }
+  return { price, amount: Math.abs(size) }
 }
 
 export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', BookChange> {
@@ -97,8 +99,8 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
         symbol: depthMessage.result[0].c,
         exchange: this._exchange,
         isSnapshot: false,
-        bids: depthMessage.result.filter((l) => l.s >= 0).map(mapBookLevel),
-        asks: depthMessage.result.filter((l) => l.s <= 0).map(mapBookLevel),
+        bids: depthMessage.result.filter((l) => Number(l.s) >= 0).map(mapBookLevel),
+        asks: depthMessage.result.filter((l) => Number(l.s) <= 0).map(mapBookLevel),
         timestamp,
         localTimestamp: localTimestamp
       }
@@ -173,6 +175,8 @@ export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', 
 
   *map(gateIoFuturesBookTickerMessage: GateIOFuturesBookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
     const gateIoFuturesBookTicker = gateIoFuturesBookTickerMessage.result
+    const askAmount = Number(gateIoFuturesBookTicker.A)
+    const bidAmount = Number(gateIoFuturesBookTicker.B)
 
     if (gateIoFuturesBookTicker.t === 0) {
       return
@@ -181,10 +185,10 @@ export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', 
       type: 'book_ticker',
       symbol: gateIoFuturesBookTicker.s,
       exchange: this._exchange,
-      askAmount: gateIoFuturesBookTicker.A !== 0 ? gateIoFuturesBookTicker.A : undefined,
+      askAmount: askAmount !== 0 ? askAmount : undefined,
       askPrice: gateIoFuturesBookTicker.a !== '' ? Number(gateIoFuturesBookTicker.a) : undefined,
       bidPrice: gateIoFuturesBookTicker.b !== '' ? Number(gateIoFuturesBookTicker.b) : undefined,
-      bidAmount: gateIoFuturesBookTicker.B !== 0 ? gateIoFuturesBookTicker.B : undefined,
+      bidAmount: bidAmount !== 0 ? bidAmount : undefined,
       timestamp: gateIoFuturesBookTicker.t !== undefined ? new Date(gateIoFuturesBookTicker.t) : localTimestamp,
       localTimestamp: localTimestamp
     }
@@ -194,7 +198,7 @@ export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', 
 }
 
 type GateIOFuturesTrade = {
-  size: number
+  size: number | string
   id: number
   create_time: number
   create_time_ms?: number
@@ -210,7 +214,7 @@ type GateIOFuturesTrades = {
   result: GateIOFuturesTrade[]
 }
 
-type GateIOFuturesSnapshotLevel = { p: string; s: number }
+type GateIOFuturesSnapshotLevel = { p: string; s: number | string }
 
 type GateIOFuturesOrderBookSnapshot = {
   time: number
@@ -232,7 +236,7 @@ type GateIOFuturesOrderBookUpdate = {
   result: {
     t?: number
     p: string
-    s: number
+    s: number | string
     c: string
   }[]
 }
@@ -272,5 +276,5 @@ type GateIOFuturesBookTicker = {
   channel: 'futures.book_ticker'
   event: 'update'
   error: null
-  result: { t: number; u: 3502782378; s: 'BTC_USD'; b: string; B: number; a: string; A: number }
+  result: { t: number; u: 3502782378; s: 'BTC_USD'; b: string; B: number | string; a: string; A: number | string }
 }

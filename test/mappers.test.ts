@@ -7110,6 +7110,60 @@ describe('mappers', () => {
     }
   })
 
+  test('map gate-io-futures decimal size messages', () => {
+    const gateIOFuturesMapper = createMapper('gate-io-futures')
+    const localTimestamp = new Date('2026-03-25T12:53:00.000Z')
+
+    const tradeMessages = Array.from(
+      gateIOFuturesMapper.map(
+        {
+          time: 1774443183,
+          channel: 'futures.trades',
+          event: 'update',
+          result: [{ size: '-0.25', id: 1, create_time: 1774443183, create_time_ms: 1774443183399, price: '2171.44', contract: 'ETH_USDT' }]
+        },
+        localTimestamp
+      )
+    )
+
+    expect(tradeMessages).toMatchSnapshot()
+
+    const bookTickerMessages = Array.from(
+      gateIOFuturesMapper.map(
+        {
+          id: null,
+          time: 1774443214,
+          channel: 'futures.book_ticker',
+          event: 'update',
+          error: null,
+          result: { t: 1774443214909, u: 92738902534, s: 'ETH_USDT', b: '2172.82', B: '0', a: '2172.85', A: '1053.5' }
+        },
+        localTimestamp
+      )
+    )
+
+    expect(bookTickerMessages).toMatchSnapshot()
+
+    const bookChangeMessages = Array.from(
+      gateIOFuturesMapper.map(
+        {
+          time: 1774443214,
+          channel: 'futures.order_book',
+          event: 'all',
+          result: {
+            t: 1774443214909,
+            contract: 'ETH_USDT',
+            asks: [{ p: '2172.85', s: '1053.5' }],
+            bids: [{ p: '2172.82', s: '0.25' }]
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    expect(bookChangeMessages).toMatchSnapshot()
+  })
+
   test('map poloniex messages', () => {
     const messages = [
       [
