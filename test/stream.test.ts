@@ -75,6 +75,56 @@ const exchangesWithBookTickerInfo: Exchange[] = [
 
 describe.skip('stream', () => {
   test(
+    'streams normalized BTCUSDT data for supported channels without disconnects',
+    async () => {
+      const exchange: Exchange = 'binance-futures'
+      const symbols = ['BTCUSDT']
+
+      const normalizers: any[] = [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers, normalizeBookTickers]
+
+      const messages = streamNormalized(
+        {
+          exchange,
+          symbols,
+          withDisconnectMessages: true,
+          timeoutIntervalMS: 30 * 1000,
+          onError: (err) => {
+            throw new Error(`Unexpected error for ${exchange} BTCUSDT: ${err}`)
+          }
+        },
+        ...normalizers
+      )
+
+      const messagesWithComputables = compute(
+        messages,
+        computeTradeBars({ interval: 10, kind: 'time' }),
+        computeBookSnapshots({ interval: 0, depth: 3 })
+      )
+
+      const seenTypes = new Set<string>()
+      let count = 0
+
+      for await (const msg of messagesWithComputables) {
+        if (msg.type === 'disconnect') {
+          throw new Error('Unexpected disconnect received for BTCUSDT stream')
+        }
+
+        seenTypes.add(msg.type)
+        count++
+
+        if (count >= 100) {
+          break
+        }
+      }
+
+      expect(seenTypes.has('trade')).toBe(true)
+      expect(seenTypes.has('book_change')).toBe(true)
+      expect(seenTypes.has('derivative_ticker')).toBe(true)
+    },
+    1000 * 60 * 2
+  )
+
+  test(
     'streams normalized real-time messages for each supported exchange',
     async () => {
       const exchanges: Exchange[] = []
