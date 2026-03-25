@@ -27,7 +27,6 @@ for await (const message of messages) {
 }
 ```
 
-
 <br/>
 
 ## Features
@@ -160,7 +159,6 @@ for await (const message of messagesWithQuotes) {
 }
 ```
 
-
 <br/>
 
 ### Seamless switching between real-time streaming and historical market data replay
@@ -211,7 +209,6 @@ await produceVolumeBasedTradeBars(historicalMessages)
 //  await produceVolumeBasedTradeBars(realTimeMessages)
 ```
 
-
 <br/>
 
 ### Stream real-time market data in exchange native data format
@@ -231,7 +228,6 @@ for await (const message of messages) {
   console.log(message)
 }
 ```
-
 
 <br/>
 
@@ -254,7 +250,6 @@ for await (const message of messages) {
   console.log(message)
 }
 ```
-
 
 <br/>
 <br/>

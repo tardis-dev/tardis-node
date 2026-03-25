@@ -12,14 +12,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Use Node.js v22
-        uses: actions/setup-node@v1
+      - name: Use Node.js v24
+        uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 24.x
           registry-url: https://registry.npmjs.org/
 
       - name: Install Dependencies And Compile TS

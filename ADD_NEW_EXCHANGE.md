@@ -9,6 +9,7 @@ Adding an exchange to tardis-node requires three things: mappers (transform raw 
 ### 1. Add exchange constants
 
 In `src/consts.ts`:
+
 - Add exchange ID to the exchanges array
 - Add channel info (list of available channels for the exchange)
 
@@ -23,6 +24,7 @@ Register mapper factory in `src/mappers/index.ts`.
 ### 3. Create real-time feed
 
 Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
+
 - WebSocket URL
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
