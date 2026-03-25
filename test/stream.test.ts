@@ -12,6 +12,7 @@ import {
   streamNormalized,
   normalizeBookTickers
 } from '../dist'
+import { describeLive } from './live'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -73,7 +74,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'serum'
 ]
 
-describe.skip('stream', () => {
+describeLive('stream', () => {
   test(
     'streams normalized BTCUSDT data for supported channels without disconnects',
     async () => {

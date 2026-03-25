@@ -1,10 +1,11 @@
 import { normalizeBookChanges, normalizeBookTickers, normalizeTrades } from '../src/mappers'
 import { streamNormalized } from '../src/stream'
 import { BookChange, BookTicker, Disconnect, Trade } from '../src/types'
+import { describeLive } from './live'
 
 type GateIOFuturesLiveMessage = Trade | BookChange | BookTicker | Disconnect
 
-describe('gate-io-futures decimal size live', () => {
+describeLive('gate-io-futures decimal size live', () => {
   test('streams ETH_USDT data with non-zero decimal quantities and without disconnects', async () => {
     const messages: AsyncIterableIterator<GateIOFuturesLiveMessage> = streamNormalized(
       {

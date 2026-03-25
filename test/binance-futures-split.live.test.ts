@@ -1,10 +1,10 @@
 import { normalizeBookChanges, normalizeBookTickers, normalizeDerivativeTickers, normalizeTrades } from '../src/mappers'
 import { streamNormalized } from '../src/stream'
-import { BookChange, BookTicker, DerivativeTicker, Disconnect, Trade } from '../src/types'
+import { describeLive } from './live'
 
 const testTimeoutMS = 40_000
 
-describe('binance futures supported channels live', () => {
+describeLive('binance futures supported channels live', () => {
   test(
     'streams normalized BTCUSDT data for supported channels without disconnects',
     async () => {

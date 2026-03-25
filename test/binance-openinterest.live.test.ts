@@ -1,7 +1,6 @@
 import { normalizeDerivativeTickers } from '../src/mappers'
 import { streamNormalized } from '../src/stream'
-
-const describeLive = process.env.RUN_LIVE_BINANCE_TESTS === '1' ? describe : describe.skip
+import { describeLive } from './live'
 
 describeLive('binance open interest live', () => {
   const originalPollingInterval = process.env.BINANCE_FUTURES_OPEN_INTEREST_POLLING_INTERVAL_MS
