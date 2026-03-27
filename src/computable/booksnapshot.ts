@@ -1,7 +1,7 @@
-import { decimalPlaces } from '../handy'
-import { OrderBook, OnLevelRemovedCB } from '../orderbook'
-import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types'
-import { Computable } from './computable'
+import { decimalPlaces } from '../handy.ts'
+import { OrderBook, OnLevelRemovedCB } from '../orderbook.ts'
+import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types.ts'
+import { Computable } from './computable.ts'
 
 type BookSnapshotComputableOptions = {
   name?: string

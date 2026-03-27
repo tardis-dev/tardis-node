@@ -1,7 +1,7 @@
-import { debug } from '../debug'
-import { CircularBuffer, fromMicroSecondsToDate, lowerCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { debug } from '../debug.ts'
+import { CircularBuffer, fromMicroSecondsToDate, lowerCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 

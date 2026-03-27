@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://docs.coinflex.com/v2/#websocket-api-subscriptions-public
 

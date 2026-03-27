@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
-import { batch, httpClient, wait } from '../handy'
-import { Filter } from '../types'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed'
+import { batch, getJSON, wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 const binanceHttpOptions = {
   timeout: 10 * 1000,
@@ -25,13 +25,12 @@ const BINANCE_FUTURES_MARKET_STREAM_PATH = '/market/stream'
 
 type BinanceFuturesStreamPath = typeof BINANCE_FUTURES_PUBLIC_STREAM_PATH | typeof BINANCE_FUTURES_MARKET_STREAM_PATH
 
-function parseBinanceWeightHeader(headerValue: string | string[] | undefined) {
+function parseBinanceWeightHeader(headerValue: string | undefined) {
   if (headerValue === undefined) {
     return undefined
   }
 
-  const header = Array.isArray(headerValue) ? headerValue[0] : headerValue
-  const parsed = Number.parseInt(header, 10)
+  const parsed = Number.parseInt(headerValue, 10)
 
   return Number.isFinite(parsed) ? parsed : undefined
 }
@@ -187,15 +186,15 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
 
       const results = await Promise.allSettled(
         instrumentsBatch.map(async (instrument) => {
-          const openInterestResponse = await httpClient.get(
+          const openInterestResponse = await getJSON<any>(
             `${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`,
             binanceHttpOptions
           )
 
           return {
             instrument,
-            usedWeight: parseBinanceWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m'] as string | string[] | undefined),
-            data: JSON.parse(openInterestResponse.body)
+            usedWeight: parseBinanceWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m']),
+            data: openInterestResponse.data
           }
         })
       )
@@ -260,15 +259,12 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
   }
 
   private async _initializeRateLimitInfo() {
-    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
-    const exchangeInfo = JSON.parse(exchangeInfoResponse.body)
+    const exchangeInfoResponse = await getJSON<any>(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
+    const exchangeInfo = exchangeInfoResponse.data
 
     this._requestWeightLimit = getBinanceRequestWeightLimit(this._exchange, exchangeInfo)
 
-    this._updateUsedWeight(
-      parseBinanceWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m'] as string | string[] | undefined),
-      OPEN_INTEREST_REQUEST_WEIGHT
-    )
+    this._updateUsedWeight(parseBinanceWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m']), OPEN_INTEREST_REQUEST_WEIGHT)
   }
 
   private _getBatchSize() {
@@ -358,8 +354,8 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
-    const exchangeInfoResponse = await httpClient.get(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
-    const exchangeInfo = JSON.parse(exchangeInfoResponse.body)
+    const exchangeInfoResponse = await getJSON<any>(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
+    const exchangeInfo = exchangeInfoResponse.data
 
     const DELAY_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_SNAPSHOTS_DELAY_MS`
     const currentWeightLimit = getBinanceRequestWeightLimit(this._exchange, exchangeInfo)
@@ -412,7 +408,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
             await wait(delayMS)
           }
 
-          const depthSnapshotResponse = await httpClient.get(
+          const depthSnapshotResponse = await getJSON<any>(
             `${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`,
             binanceHttpOptions
           )
@@ -420,7 +416,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
           const snapshot = {
             stream: `${symbol}@depthSnapshot`,
             generated: true,
-            data: JSON.parse(depthSnapshotResponse.body)
+            data: depthSnapshotResponse.data
           }
 
           this.manualSnapshotsBuffer.push(snapshot)

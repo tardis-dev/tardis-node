@@ -1,5 +1,5 @@
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class DydxRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://api.dydx.exchange/v3/ws'

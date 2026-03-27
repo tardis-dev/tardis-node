@@ -1,5 +1,5 @@
-import { BookChange, NormalizedData, Trade, TradeBar, Writeable } from '../types'
-import { Computable } from './computable'
+import { BookChange, NormalizedData, Trade, TradeBar, Writeable } from '../types.ts'
+import { Computable } from './computable.ts'
 
 const DATE_MIN = new Date(-1)
 

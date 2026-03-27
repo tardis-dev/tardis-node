@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class BlockchainComTradesMapper implements Mapper<'blockchain-com', Trade> {
   canHandle(message: BlockchainComTradeMessage) {

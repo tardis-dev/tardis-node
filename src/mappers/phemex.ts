@@ -1,5 +1,5 @@
-import { Mapper, PendingTickerInfoHelper } from './mapper'
-import { Trade, BookChange, DerivativeTicker } from '../types'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { Trade, BookChange, DerivativeTicker } from '../types.ts'
 
 // phemex provides timestamps in nanoseconds
 const fromNanoSecondsToDate = (nanos: number) => {

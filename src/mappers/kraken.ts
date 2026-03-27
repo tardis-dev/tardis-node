@@ -1,6 +1,6 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, Trade } from '../types'
-import { Mapper } from './mapper'
+import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 // https://www.kraken.com/features/websocket-api
 

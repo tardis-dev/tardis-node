@@ -1,10 +1,10 @@
 import dbg from 'debug'
 import WebSocket from 'ws'
-import { ClientRequestArgs } from 'http'
+import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
-import { httpsProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy'
-import { Exchange, Filter } from '../types'
+import { httpsProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy.ts'
+import { Exchange, Filter } from '../types.ts'
 
 export type RealTimeFeed = {
   new (

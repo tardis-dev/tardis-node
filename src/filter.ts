@@ -1,5 +1,5 @@
-import { NormalizedData, Disconnect, Trade } from './types'
-import { CappedSet } from './handy'
+import { NormalizedData, Disconnect, Trade } from './types.ts'
+import { CappedSet } from './handy.ts'
 
 export async function* filter<T extends NormalizedData | Disconnect>(messages: AsyncIterableIterator<T>, filter: (message: T) => boolean) {
   for await (const message of messages) {

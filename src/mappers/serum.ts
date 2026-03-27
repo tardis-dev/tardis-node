@@ -1,6 +1,6 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, Exchange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Exchange, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
   constructor(private readonly _exchange: Exchange) {}

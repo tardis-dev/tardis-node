@@ -1,6 +1,6 @@
-import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en

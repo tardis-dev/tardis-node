@@ -1,5 +1,5 @@
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class HitBtcRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://api.hitbtc.com/api/2/ws'

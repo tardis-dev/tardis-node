@@ -1,6 +1,6 @@
-import { httpClient } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { getJSON } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://dex.binance.org/api/ws'
@@ -42,14 +42,14 @@ export class BinanceDexRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = (await httpClient.get(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`).json()) as any
+      const { data } = await getJSON<any>(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`)
 
       const snapshot = {
         stream: `depthSnapshot`,
         generated: true,
         data: {
           symbol,
-          ...depthSnapshotResponse
+          ...data
         }
       }
 

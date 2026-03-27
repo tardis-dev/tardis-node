@@ -1,6 +1,6 @@
-import { parseμs, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, Trade } from '../types'
-import { Mapper } from './mapper'
+import { parseμs, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   canHandle(message: BitflyerExecutions | BitflyerBoard) {

@@ -1,7 +1,7 @@
 import crypto from 'crypto'
-import { wait } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class OkexSpreadsRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.okx.com:8443/ws/v5/business'

@@ -1,10 +1,9 @@
 import dbg from 'debug'
-import { existsSync } from 'fs-extra'
+import { existsSync } from 'node:fs'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy'
-import { Exchange, Filter } from './types'
-
+import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy.ts'
+import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
 
 if (isMainThread) {

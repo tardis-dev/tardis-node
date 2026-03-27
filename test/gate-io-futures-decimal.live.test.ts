@@ -1,6 +1,5 @@
-import { normalizeBookChanges, normalizeBookTickers, normalizeTrades } from '../src/mappers'
-import { streamNormalized } from '../src/stream'
-import { describeLive } from './live'
+import { normalizeBookChanges, normalizeBookTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
+import { describeLive } from './live.js'
 
 describeLive('gate-io-futures decimal size live', () => {
   test('streams ETH_USDT data with non-zero decimal quantities and without disconnects', async () => {

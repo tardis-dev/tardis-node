@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class BitgetTradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}

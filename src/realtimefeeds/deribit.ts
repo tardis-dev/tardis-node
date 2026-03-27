@@ -1,6 +1,6 @@
-import { wait } from '../handy'
-import { Filter, FilterForExchange } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter, FilterForExchange } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected get wssURL() {

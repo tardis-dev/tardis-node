@@ -1,7 +1,7 @@
 import crypto from 'crypto'
-import { wait } from '../handy'
-import { Filter } from '../types'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {

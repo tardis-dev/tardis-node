@@ -1,6 +1,6 @@
-import { wait } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class WooxRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://wss.woo.org/ws/stream/OqdphuyCtYWxwzhxyLLjOWNdFP7sQt8RPWzmb5xY'

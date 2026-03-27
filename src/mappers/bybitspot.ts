@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, Exchange, BookTicker, Trade } from '../types'
-import { Mapper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, Exchange, BookTicker, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class BybitSpotTradesMapper implements Mapper<'bybit-spot', Trade> {
   constructor(private readonly _exchange: Exchange) {}

@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, Trade } from '../types'
-import { Mapper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class OkexSpreadsTradesMapper implements Mapper<'okex-spreads', Trade> {
   canHandle(message: any) {

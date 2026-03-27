@@ -1,6 +1,6 @@
 import crypto from 'crypto'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
   private _hasCredentials =

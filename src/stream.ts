@@ -1,8 +1,8 @@
-import { debug } from './debug'
-import { getFilters, normalizeMessages } from './handy'
-import { MapperFactory } from './mappers'
-import { createRealTimeFeed } from './realtimefeeds'
-import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
+import { debug } from './debug.ts'
+import { getFilters, normalizeMessages } from './handy.ts'
+import { MapperFactory } from './mappers/index.ts'
+import { createRealTimeFeed } from './realtimefeeds/index.ts'
+import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
 
 type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type StreamNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true

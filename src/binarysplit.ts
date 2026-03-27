@@ -1,4 +1,5 @@
-import { Transform, TransformCallback } from 'stream'
+import { Transform } from 'stream'
+import type { TransformCallback } from 'stream'
 
 // Inspired by https://github.com/maxogden/binary-split/blob/master/index.js
 export class BinarySplitStream extends Transform {

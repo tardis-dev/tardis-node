@@ -1,6 +1,6 @@
-import { lowerCaseSymbols } from '../handy'
-import { BookChange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { lowerCaseSymbols } from '../handy.ts'
+import { BookChange, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 // https://www.bitstamp.net/websocket/v2/
 

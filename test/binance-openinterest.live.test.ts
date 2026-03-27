@@ -1,6 +1,5 @@
-import { normalizeDerivativeTickers } from '../src/mappers'
-import { streamNormalized } from '../src/stream'
-import { describeLive } from './live'
+import { normalizeDerivativeTickers, streamNormalized } from '../dist/index.js'
+import { describeLive } from './live.js'
 
 describeLive('binance open interest live', () => {
   const originalPollingInterval = process.env.BINANCE_FUTURES_OPEN_INTEREST_POLLING_INTERVAL_MS

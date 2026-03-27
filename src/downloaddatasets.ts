@@ -1,10 +1,10 @@
-import { existsSync } from 'fs-extra'
+import { existsSync } from 'node:fs'
 import pMap from 'p-map'
-import { debug } from './debug'
-import { DatasetType } from './exchangedetails'
-import { addDays, doubleDigit, download, parseAsUTCDate, sequence } from './handy'
-import { getOptions } from './options'
-import { Exchange } from './types'
+import { debug } from './debug.ts'
+import { DatasetType } from './exchangedetails.ts'
+import { addDays, doubleDigit, download, parseAsUTCDate, sequence } from './handy.ts'
+import { getOptions } from './options.ts'
+import { Exchange } from './types.ts'
 
 const CONCURRENCY_LIMIT = 20
 const MILLISECONDS_IN_SINGLE_DAY = 24 * 60 * 60 * 1000
@@ -140,7 +140,7 @@ function getDownloadOptions({
 type DownloadOptions = Parameters<typeof download>[0]
 
 export function sanitizeForFilename(s: string) {
-  return s.replace(/[\\/?*<>|"]/g, '-')
+  return s.replace(/[:\\/?*<>|"]/g, '-')
 }
 
 function getFilenameDefault({ exchange, dataType, format, date, symbol }: GetFilenameOptions) {

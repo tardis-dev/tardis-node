@@ -1,7 +1,7 @@
-import { getOptions } from './options'
-import type { SymbolType } from './exchangedetails'
-import type { Exchange } from './types'
-import { httpClient } from './handy'
+import { getOptions } from './options.ts'
+import type { SymbolType } from './exchangedetails.ts'
+import type { Exchange } from './types.ts'
+import { getJSON } from './handy.ts'
 
 export async function getInstrumentInfo(exchange: Exchange): Promise<InstrumentInfo[]>
 export async function getInstrumentInfo(exchange: Exchange | Exchange[], filter: InstrumentInfoFilter): Promise<InstrumentInfo[]>
@@ -29,11 +29,11 @@ async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?:
   }
 
   try {
-    return await httpClient
-      .get(url, {
-        headers: { Authorization: `Bearer ${options.apiKey}` }
-      })
-      .json()
+    const { data } = await getJSON(url, {
+      headers: { Authorization: `Bearer ${options.apiKey}` }
+    })
+
+    return data
   } catch (e: any) {
     // expose 400 error message from server
     if (e.response?.statusCode === 400) {

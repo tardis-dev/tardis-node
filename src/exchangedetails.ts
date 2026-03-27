@@ -1,13 +1,13 @@
-import { httpClient } from './handy'
-import { getOptions } from './options'
-import { Exchange, FilterForExchange } from './types'
+import { getJSON } from './handy.ts'
+import { getOptions } from './options.ts'
+import { Exchange, FilterForExchange } from './types.ts'
 
 export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   const options = getOptions()
 
-  const exchangeDetails = await httpClient.get(`${options.endpoint}/exchanges/${exchange}`).json()
+  const { data } = await getJSON(`${options.endpoint}/exchanges/${exchange}`)
 
-  return exchangeDetails as ExchangeDetails<T>
+  return data as ExchangeDetails<T>
 }
 
 export type SymbolType = 'spot' | 'future' | 'perpetual' | 'option' | 'combo'

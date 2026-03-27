@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API
 

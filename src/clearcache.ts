@@ -1,8 +1,9 @@
-import { remove, removeSync } from 'fs-extra'
-import { debug } from './debug'
-import { getOptions } from './options'
-import { Filter, Exchange } from './types'
-import { sha256, optimizeFilters, doubleDigit } from './handy'
+import { rmSync } from 'node:fs'
+import { rm } from 'node:fs/promises'
+import { debug } from './debug.ts'
+import { getOptions } from './options.ts'
+import { Filter, Exchange } from './types.ts'
+import { sha256, optimizeFilters, doubleDigit } from './handy.ts'
 
 export async function clearCache(exchange?: Exchange, filters?: Filter<any>[], year?: number, month?: number, day?: number) {
   try {
@@ -10,7 +11,7 @@ export async function clearCache(exchange?: Exchange, filters?: Filter<any>[], y
 
     debug('clearing cache dir: %s', dirToRemove)
 
-    await remove(dirToRemove)
+    await rm(dirToRemove, { force: true, recursive: true })
 
     debug('cleared cache dir: %s', dirToRemove)
   } catch (e) {
@@ -24,7 +25,7 @@ export function clearCacheSync(exchange?: Exchange, filters?: Filter<any>[], yea
 
     debug('clearing cache (sync) dir: %s', dirToRemove)
 
-    removeSync(dirToRemove)
+    rmSync(dirToRemove, { force: true, recursive: true })
 
     debug('cleared cache(sync) dir: %s', dirToRemove)
   } catch (e) {

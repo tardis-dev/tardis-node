@@ -1,4 +1,4 @@
-import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
+import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 
 export type Exchange = (typeof EXCHANGES)[number]
 

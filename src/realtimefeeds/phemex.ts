@@ -1,5 +1,5 @@
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class PhemexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.phemex.com/'

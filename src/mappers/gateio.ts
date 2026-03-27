@@ -1,7 +1,7 @@
-import { debug } from '../debug'
-import { CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, Exchange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { debug } from '../debug.ts'
+import { CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Exchange, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookChange> {
   constructor(protected readonly exchange: Exchange) {}

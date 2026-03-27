@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, BookPriceLevel, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookPriceLevel, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class DydxTradesMapper implements Mapper<'dydx', Trade> {
   canHandle(message: DyDxTrade) {

@@ -1,6 +1,6 @@
-import { batch } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed'
+import { batch } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
 
 export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {

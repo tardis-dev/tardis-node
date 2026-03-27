@@ -1,21 +1,24 @@
 import crypto, { createHash } from 'crypto'
-import { createWriteStream, ensureDirSync, rename, removeSync } from 'fs-extra'
-import { RequestOptions, Agent } from 'https'
-import { https } from 'follow-redirects'
-import { HttpsProxyAgent } from 'https-proxy-agent'
-import got, { ExtendOptions } from 'got'
+import { createWriteStream, mkdirSync, rmSync } from 'node:fs'
+import { rename } from 'node:fs/promises'
+import type { RequestOptions, Agent } from 'https'
+import followRedirects from 'follow-redirects'
+import * as httpsProxyAgentPkg from 'https-proxy-agent'
 import path from 'path'
-import { debug } from './debug'
-import { Mapper } from './mappers'
-import { Disconnect, Exchange, Filter, FilterForExchange } from './types'
-import { SocksProxyAgent } from 'socks-proxy-agent'
+import { debug } from './debug.ts'
+import { Mapper } from './mappers/index.ts'
+import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
+import * as socksProxyAgentPkg from 'socks-proxy-agent'
+const { http, https } = followRedirects
+const { HttpsProxyAgent } = httpsProxyAgentPkg
+const { SocksProxyAgent } = socksProxyAgentPkg
 
 export function parseAsUTCDate(val: string) {
-  // not sure about this one, but it should force parsing date as UTC date not as local timezone
+  // Treat date-only and minute-level strings as UTC instead of local time.
   if (val.endsWith('Z') === false) {
     val += 'Z'
   }
-  var date = new Date(val)
+  const date = new Date(val)
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes()))
 }
 
@@ -70,6 +73,12 @@ export const ONE_SEC_IN_MS = 1000
 export class HttpError extends Error {
   constructor(public readonly status: number, public readonly responseText: string, public readonly url: string) {
     super(`HttpError: status code: ${status}, response text: ${responseText}`)
+  }
+}
+
+class HttpClientError extends Error {
+  constructor(public readonly response: HttpResponse, public readonly method: string, public readonly url: string) {
+    super(`HTTP ${method} ${url} failed with status ${response.statusCode}`)
   }
 }
 
@@ -249,6 +258,270 @@ export const httpsProxyAgent: Agent | undefined =
     ? new SocksProxyAgent(process.env.SOCKS_PROXY)
     : undefined
 
+const DEFAULT_FETCH_RETRY_LIMIT = 2
+
+type HttpRetryOptions =
+  | number
+  | {
+      limit?: number
+      statusCodes?: number[]
+      maxRetryAfter?: number
+    }
+
+type HttpRequestOptions = {
+  headers?: Record<string, string>
+  body?: string | object
+  timeout?: number
+  retry?: HttpRetryOptions
+}
+
+type HttpResponse = {
+  statusCode: number
+  headers: Record<string, string>
+  body: string
+}
+
+type JSONResponse<T> = {
+  data: T
+  headers: Record<string, string>
+  statusCode: number
+}
+
+type RetrySettings = {
+  limit: number
+  maxRetryAfter?: number
+  statusCodes?: Set<number>
+}
+
+function getRetrySettings(method: string, retry?: HttpRetryOptions): RetrySettings {
+  const retryOptions = typeof retry === 'object' ? retry : undefined
+  const retryEnabled = method === 'GET' || retry !== undefined
+  const limit = typeof retry === 'number' ? retry : retryOptions?.limit ?? (retryEnabled ? DEFAULT_FETCH_RETRY_LIMIT : 0)
+
+  return {
+    limit,
+    maxRetryAfter: retryOptions?.maxRetryAfter,
+    statusCodes: retryOptions?.statusCodes ? new Set(retryOptions.statusCodes) : undefined
+  }
+}
+
+function parseResponseHeaders(headers: Headers) {
+  return Object.fromEntries(headers.entries())
+}
+
+function parseNodeResponseHeaders(headers: Record<string, string | string[] | undefined>) {
+  return Object.fromEntries(
+    Object.entries(headers).flatMap(([key, value]) => {
+      if (value === undefined) {
+        return []
+      }
+
+      return [[key.toLowerCase(), Array.isArray(value) ? value.join(', ') : value]]
+    })
+  )
+}
+
+function createHttpResponse(statusCode: number, headers: Record<string, string>, body: string): HttpResponse {
+  return {
+    statusCode,
+    headers,
+    body
+  }
+}
+
+function prepareRequest(method: string, options: HttpRequestOptions) {
+  if (options.body === undefined) {
+    return {
+      headers: options.headers,
+      body: undefined
+    }
+  }
+
+  const headers = { ...options.headers }
+  const body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body)
+
+  if (method !== 'GET' && headers['Content-Type'] === undefined && headers['content-type'] === undefined) {
+    headers['Content-Type'] = 'application/json'
+  }
+
+  return {
+    headers,
+    body
+  }
+}
+
+function getRetryAfterDelayMS(headers: Record<string, string>, maxRetryAfter?: number) {
+  const retryAfterHeader = headers['retry-after']
+  if (retryAfterHeader === undefined) {
+    return
+  }
+
+  const parsedSeconds = Number.parseFloat(retryAfterHeader)
+  let delayMS: number | undefined
+
+  if (Number.isFinite(parsedSeconds)) {
+    delayMS = parsedSeconds * ONE_SEC_IN_MS
+  } else {
+    const parsedDate = Date.parse(retryAfterHeader)
+    if (Number.isFinite(parsedDate)) {
+      delayMS = parsedDate - Date.now()
+    }
+  }
+
+  if (delayMS === undefined || delayMS < 0) {
+    return
+  }
+
+  if (maxRetryAfter !== undefined && delayMS > maxRetryAfter) {
+    return
+  }
+
+  return delayMS
+}
+
+function getRetryDelayMS(attempt: number, headers: Record<string, string>, maxRetryAfter?: number) {
+  const retryAfterDelayMS = getRetryAfterDelayMS(headers, maxRetryAfter)
+  if (retryAfterDelayMS !== undefined) {
+    return retryAfterDelayMS
+  }
+
+  return Math.min(250 * 2 ** (attempt - 1), 5000)
+}
+
+function isRetryableStatus(statusCode: number, retrySettings: RetrySettings) {
+  if (retrySettings.statusCodes !== undefined) {
+    return retrySettings.statusCodes.has(statusCode)
+  }
+
+  return statusCode === 408 || statusCode === 429 || statusCode >= 500
+}
+
+function shouldRetryHttpStatus(attempt: number, response: HttpResponse, retrySettings: RetrySettings) {
+  return attempt <= retrySettings.limit && isRetryableStatus(response.statusCode, retrySettings)
+}
+
+function shouldRetryHttpError(attempt: number, retrySettings: RetrySettings) {
+  return attempt <= retrySettings.limit
+}
+
+async function requestViaFetch(method: string, url: string, options: HttpRequestOptions): Promise<HttpResponse> {
+  const controller = new AbortController()
+  const timeoutMS = options.timeout
+  const timeoutId = timeoutMS !== undefined ? setTimeout(() => controller.abort(), timeoutMS) : undefined
+  const preparedRequest = prepareRequest(method, options)
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: preparedRequest.headers,
+      body: preparedRequest.body,
+      signal: controller.signal
+    })
+    const body = await response.text()
+
+    return createHttpResponse(response.status, parseResponseHeaders(response.headers), body)
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error('Request timed out')
+    }
+
+    throw error
+  } finally {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId)
+    }
+  }
+}
+
+async function requestViaProxy(method: string, url: string, options: HttpRequestOptions): Promise<HttpResponse> {
+  const requestClient = new URL(url).protocol === 'http:' ? http : https
+  const preparedRequest = prepareRequest(method, options)
+
+  return await new Promise<HttpResponse>((resolve, reject) => {
+    const request = requestClient
+      .request(
+        url,
+        {
+          method,
+          agent: httpsProxyAgent,
+          headers: preparedRequest.headers,
+          timeout: options.timeout
+        },
+        (response) => {
+          response.setEncoding('utf8')
+          let body = ''
+          response.on('error', reject)
+          response.on('data', (chunk) => (body += chunk))
+          response.on('end', () => {
+            resolve(createHttpResponse(response.statusCode ?? 0, parseNodeResponseHeaders(response.headers), body))
+          })
+        }
+      )
+      .on('error', reject)
+      .on('timeout', () => {
+        reject(new Error('Request timed out'))
+        request.destroy()
+      })
+
+    if (preparedRequest.body !== undefined) {
+      request.write(preparedRequest.body)
+    }
+
+    request.end()
+  })
+}
+
+async function request(method: string, url: string, options: HttpRequestOptions = {}) {
+  const retrySettings = getRetrySettings(method, options.retry)
+
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      const response =
+        httpsProxyAgent === undefined ? await requestViaFetch(method, url, options) : await requestViaProxy(method, url, options)
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response
+      }
+
+      if (shouldRetryHttpStatus(attempt, response, retrySettings)) {
+        await wait(getRetryDelayMS(attempt, response.headers, retrySettings.maxRetryAfter))
+        continue
+      }
+
+      throw new HttpClientError(response, method, url)
+    } catch (error) {
+      if (error instanceof HttpClientError) {
+        throw error
+      }
+
+      if (shouldRetryHttpError(attempt, retrySettings)) {
+        await wait(Math.min(250 * 2 ** (attempt - 1), 5000))
+        continue
+      }
+
+      throw error
+    }
+  }
+}
+
+async function requestJSON<T>(method: string, url: string, options?: HttpRequestOptions): Promise<JSONResponse<T>> {
+  const response = await request(method, url, options)
+
+  return {
+    data: JSON.parse(response.body) as T,
+    headers: response.headers,
+    statusCode: response.statusCode
+  }
+}
+
+export function getJSON<T>(url: string, options?: HttpRequestOptions) {
+  return requestJSON<T>('GET', url, options)
+}
+
+export function postJSON<T>(url: string, options?: HttpRequestOptions) {
+  return requestJSON<T>('POST', url, options)
+}
+
 export async function download({
   apiKey,
   downloadPath,
@@ -321,7 +594,7 @@ export function cleanTempFiles() {
 
 async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string) {
   // first ensure that directory where we want to download file exists
-  ensureDirSync(path.dirname(downloadPath))
+  mkdirSync(path.dirname(downloadPath), { recursive: true })
 
   // create write file stream that we'll write data into - first as unconfirmed temp file
 
@@ -330,7 +603,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
   const cleanup = () => {
     try {
       fileWriteStream.destroy()
-      removeSync(tmpFilePath)
+      rmSync(tmpFilePath, { force: true })
     } catch {}
   }
   tmpFileCleanups.set(tmpFilePath, cleanup)
@@ -470,14 +743,6 @@ export function asNumberIfValid(val: string | number | undefined | null) {
   return asNumber
 }
 
-const gotDefaultOptions: ExtendOptions = {}
-
-if (httpsProxyAgent !== undefined) {
-  gotDefaultOptions.agent = {
-    https: httpsProxyAgent
-  }
-}
-
 export function upperCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => s.toUpperCase())
@@ -491,8 +756,6 @@ export function lowerCaseSymbols(symbols?: string[]) {
   }
   return
 }
-
-export const httpClient = got.extend(gotDefaultOptions)
 
 export const fromMicroSecondsToDate = (micros: number) => {
   const isMicroseconds = micros > 1e15 // Check if the number is likely in microseconds

@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
-import { httpClient, getRandomString, wait } from '../handy'
-import { Filter } from '../types'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed'
+import { getJSON, getRandomString, postJSON } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 const kucoinHttpOptions = {
   timeout: 10 * 1000,
@@ -42,9 +42,9 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
   protected wssURL = ''
 
   protected async getWebSocketUrl() {
-    const response = (await httpClient.post(`${this._httpURL}/v1/bullet-public`, { retry: 3, timeout: 10000 }).json()) as any
+    const { data: body } = await postJSON<any>(`${this._httpURL}/v1/bullet-public`, { retry: 3, timeout: 10000 })
 
-    return `${response.data.instanceServers[0].endpoint}?token=${response.data.token}&connectId=${getRandomString()}`
+    return `${body.data.instanceServers[0].endpoint}?token=${body.data.token}&connectId=${getRandomString()}`
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -76,16 +76,14 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
         return
       }
 
-      const depthSnapshotResponse = (await httpClient
-        .get(`${this._httpURL}/v1/level2/snapshot?symbol=${symbol}`, kucoinHttpOptions)
-        .json()) as any
+      const { data } = await getJSON<any>(`${this._httpURL}/v1/level2/snapshot?symbol=${symbol}`, kucoinHttpOptions)
 
       const snapshot = {
         type: 'message',
         generated: true,
         topic: `/contractMarket/level2Snapshot:${symbol}`,
         subject: 'level2Snapshot',
-        ...depthSnapshotResponse
+        ...data
       }
 
       this.manualSnapshotsBuffer.push(snapshot)
@@ -116,9 +114,9 @@ class KucoinFuturesContractDetailsClient extends PoolingClientBase {
   }
 
   protected async poolDataToStream(outputStream: Writable) {
-    const openInterestResponse = (await httpClient.get(`${this._httpURL}/v1/contracts/active`, kucoinHttpOptions).json()) as any
+    const { data: body } = await getJSON<any>(`${this._httpURL}/v1/contracts/active`, kucoinHttpOptions)
 
-    for (const instrument of openInterestResponse.data) {
+    for (const instrument of body.data) {
       const openInterestMessage = {
         topic: `/contract/details:${instrument.symbol}`,
         type: 'message',

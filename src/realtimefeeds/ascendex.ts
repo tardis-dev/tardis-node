@@ -1,6 +1,6 @@
-import { wait } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class AscendexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ascendex.com/api/pro/v2/stream'

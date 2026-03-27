@@ -1,7 +1,7 @@
-import { debug } from '../debug'
-import { CircularBuffer, upperCaseSymbols } from '../handy'
-import { BookChange, Exchange, BookTicker, Trade, BookPriceLevel } from '../types'
-import { Mapper } from './mapper'
+import { debug } from '../debug.ts'
+import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { BookChange, Exchange, BookTicker, Trade, BookPriceLevel } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
   constructor(private readonly _exchange: Exchange) {}

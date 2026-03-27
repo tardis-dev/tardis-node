@@ -1,6 +1,6 @@
-import { addMinutes, upperCaseSymbols } from '../handy'
-import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { addMinutes, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export const coinbaseInternationalTradesMapper: Mapper<'coinbase-international', Trade> = {
   canHandle(message: CoinbaseInternationalTradeMessage) {

@@ -1,6 +1,6 @@
-import { asNumberIfValid, lowerCaseSymbols, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, OptionSummary, Trade } from '../types'
-import { Mapper } from './mapper'
+import { asNumberIfValid, lowerCaseSymbols, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, OptionSummary, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 // https://binance-docs.github.io/apidocs/voptions/en/#websocket-market-streams
 

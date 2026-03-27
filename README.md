@@ -9,14 +9,14 @@ Node.js `tardis-dev` library provides convenient access to tick-level real-time 
 <br/>
 
 ```javascript
-const { replayNormalized, normalizeTrades, normalizeBookChanges } = require('tardis-dev')
+import { replayNormalized, normalizeTrades, normalizeBookChanges } from 'tardis-dev'
 
 const messages = replayNormalized(
   {
-    exchange: 'bitmex',
-    symbols: ['XBTUSD', 'ETHUSD'],
-    from: '2019-05-01',
-    to: '2019-05-02'
+    exchange: 'binance',
+    symbols: ['btcusdt'],
+    from: '2024-03-01',
+    to: '2024-03-02'
   },
   normalizeTrades,
   normalizeBookChanges
@@ -79,7 +79,7 @@ for await (const message of messages) {
 
 <br/>
 
-- [built-in TypeScript support](https://docs.tardis.dev/api/node-js/quickstart#usage-with-typescript)
+- [built-in TypeScript support](https://docs.tardis.dev/api/node-js/quickstart#es-modules-and-typescript)
 
 <br/>
 <br/>
@@ -92,6 +92,8 @@ Requires Node.js v24+ installed.
 ```bash
 npm install tardis-dev --save
 ```
+
+`tardis-dev` is ESM-only. Examples in this README use ES modules and top-level await. Save snippets as `.mjs` or set `"type": "module"` in your `package.json`.
 
 <br/>
 <br/>
@@ -110,8 +112,7 @@ npm install tardis-dev --save
 Example showing how to quickly display real-time spread and best bid/ask info across multiple exchanges at once. It can be easily adapted to do the same for historical data \(`replayNormalized` instead of `streamNormalized`).
 
 ```javascript
-const tardis = require('tardis-dev')
-const { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } = tardis
+import { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } from 'tardis-dev'
 
 const exchangesToStream = [
   { exchange: 'bitmex', symbols: ['XBTUSD'] },
@@ -166,23 +167,22 @@ for await (const message of messagesWithQuotes) {
 Example showing simple pattern of providing `async iterable` of market data messages to the function that can process them no matter if it's is real-time or historical market data. That effectively enables having the same 'data pipeline' for backtesting and live trading.
 
 ```javascript
-const tardis = require('tardis-dev')
-const { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } = tardis
+import { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } from 'tardis-dev'
 
 const historicalMessages = replayNormalized(
   {
-    exchange: 'bitmex',
-    symbols: ['XBTUSD'],
-    from: '2019-08-01',
-    to: '2019-08-02'
+    exchange: 'binance',
+    symbols: ['btcusdt'],
+    from: '2024-03-01',
+    to: '2024-03-02'
   },
   normalizeTrades
 )
 
 const realTimeMessages = streamNormalized(
   {
-    exchange: 'bitmex',
-    symbols: ['XBTUSD']
+    exchange: 'binance',
+    symbols: ['btcusdt']
   },
   normalizeTrades
 )
@@ -192,7 +192,7 @@ async function produceVolumeBasedTradeBars(messages) {
     messages,
     computeTradeBars({
       kind: 'volume',
-      interval: 100 * 1000 // aggregate by 100k contracts volume
+      interval: 1 // aggregate by 1 BTC traded volume
     })
   )
 
@@ -214,18 +214,18 @@ await produceVolumeBasedTradeBars(historicalMessages)
 ### Stream real-time market data in exchange native data format
 
 ```javascript
-const { stream } = require('tardis-dev')
+import { stream } from 'tardis-dev'
 
 const messages = stream({
-  exchange: 'bitmex',
+  exchange: 'binance',
   filters: [
-    { channel: 'trade', symbols: ['XBTUSD'] },
-    { channel: 'orderBookL2', symbols: ['XBTUSD'] }
+    { channel: 'trade', symbols: ['btcusdt'] },
+    { channel: 'depth', symbols: ['btcusdt'] }
   ]
 })
 
-for await (const message of messages) {
-  console.log(message)
+for await (const { localTimestamp, message } of messages) {
+  console.log(localTimestamp, message)
 }
 ```
 
@@ -234,20 +234,20 @@ for await (const message of messages) {
 ### Replay historical market data in exchange native data format
 
 ```javascript
-const { replay } = require('tardis-dev')
+import { replay } from 'tardis-dev'
 
 const messages = replay({
-  exchange: 'bitmex',
+  exchange: 'binance',
   filters: [
-    { channel: 'trade', symbols: ['XBTUSD'] },
-    { channel: 'orderBookL2', symbols: ['XBTUSD'] }
+    { channel: 'trade', symbols: ['btcusdt'] },
+    { channel: 'depth', symbols: ['btcusdt'] }
   ],
-  from: '2019-05-01',
-  to: '2019-05-02'
+  from: '2024-03-01',
+  to: '2024-03-02'
 })
 
-for await (const message of messages) {
-  console.log(message)
+for await (const { localTimestamp, message } of messages) {
+  console.log(localTimestamp, message)
 }
 ```
 

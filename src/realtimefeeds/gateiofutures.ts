@@ -1,5 +1,5 @@
-import { Filter } from '../types'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
 
 export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {

@@ -1,4 +1,4 @@
-import { Disconnect, Exchange, NormalizedData } from '../types'
+import { Disconnect, Exchange, NormalizedData } from '../types.ts'
 
 export type Computable<T extends NormalizedData> = {
   readonly sourceDataTypes: string[]

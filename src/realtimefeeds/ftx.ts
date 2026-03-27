@@ -1,8 +1,8 @@
 import { Writable } from 'stream'
 
-import { Filter } from '../types'
-import { RealTimeFeedBase, PoolingClientBase, MultiConnectionRealTimeFeedBase } from './realtimefeed'
-import { batch, httpClient } from '../handy'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase, PoolingClientBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
+import { batch, getJSON } from '../handy.ts'
 
 abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
@@ -93,11 +93,11 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
 
           try {
             const responses = await Promise.all([
-              httpClient.get(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }).json() as any,
-              httpClient.get(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 }).json() as any
+              getJSON<any>(`${this._httpURL}/futures/${instrument}/stats`, { timeout: 10000 }),
+              getJSON<any>(`${this._httpURL}/futures/${instrument}`, { timeout: 10000 })
             ])
 
-            if (responses.some((r) => r.success === false)) {
+            if (responses.some((response) => response.data.success === false)) {
               return
             }
 
@@ -107,8 +107,8 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
               market: instrument,
               type: 'update',
               data: {
-                stats: responses[0].result,
-                info: responses[1].result
+                stats: responses[0].data.result,
+                info: responses[1].data.result
               }
             }
 

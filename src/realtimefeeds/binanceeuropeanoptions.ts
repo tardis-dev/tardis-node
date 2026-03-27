@@ -1,6 +1,6 @@
-import { onlyUnique } from '../handy'
-import { Filter } from '../types'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed'
+import { onlyUnique } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {

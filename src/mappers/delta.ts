@@ -1,6 +1,6 @@
-import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class DeltaTradesMapper implements Mapper<'delta', Trade> {
   constructor(private _useV2Channels: boolean) {}

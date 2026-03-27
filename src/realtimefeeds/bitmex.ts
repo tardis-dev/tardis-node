@@ -1,6 +1,6 @@
-import { batch } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { batch } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BitmexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.bitmex.com/realtime'

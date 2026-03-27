@@ -11,8 +11,8 @@ import {
   normalizeTrades,
   streamNormalized,
   normalizeBookTickers
-} from '../dist'
-import { describeLive } from './live'
+} from '../dist/index.js'
+import { describeLive } from './live.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',

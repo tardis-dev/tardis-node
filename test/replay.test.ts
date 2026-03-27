@@ -8,7 +8,7 @@ import {
   replay,
   replayNormalized,
   ReplayOptions
-} from '../dist'
+} from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',

@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   canHandle(message: AscendexTrade) {

@@ -1,6 +1,6 @@
-import { asNumberIfValid, parseμs, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { asNumberIfValid, parseμs, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://docs.ftx.com/#websocket-api
 

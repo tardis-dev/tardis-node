@@ -1,5 +1,5 @@
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 const KILO_SYMBOLS = ['kPEPE', 'kSHIB', 'kBONK', 'kFLOKI', 'kLUNC', 'kDOGS', 'kNEIRO']
 

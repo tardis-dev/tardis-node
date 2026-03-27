@@ -1,6 +1,6 @@
-import { asNumberIfValid } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { asNumberIfValid } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://docs.deribit.com/v2/#subscriptions
 

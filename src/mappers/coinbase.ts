@@ -1,6 +1,6 @@
-import { parseμs, upperCaseSymbols } from '../handy'
-import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types'
-import { Mapper } from './mapper'
+import { parseμs, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 // https://docs.pro.coinbase.com/#websocket-feed
 

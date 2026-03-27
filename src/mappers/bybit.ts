@@ -1,6 +1,6 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // v5 https://bybit-exchange.github.io/docs/v5/ws/connect
 

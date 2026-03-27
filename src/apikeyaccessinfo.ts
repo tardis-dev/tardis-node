@@ -1,20 +1,18 @@
-import { httpClient } from './handy'
-import { getOptions } from './options'
-import { Exchange } from './types'
+import { getJSON } from './handy.ts'
+import { getOptions } from './options.ts'
+import { Exchange } from './types.ts'
 
 export async function getApiKeyAccessInfo(apiKey?: string) {
   const options = getOptions()
   const apiKeyToCheck = apiKey || options.apiKey
 
-  const apiKeyAccessInfo = await httpClient
-    .get(`${options.endpoint}/api-key-info`, {
-      headers: {
-        Authorization: `Bearer ${apiKeyToCheck}`
-      }
-    })
-    .json()
+  const { data } = await getJSON<ApiKeyAccessInfo>(`${options.endpoint}/api-key-info`, {
+    headers: {
+      Authorization: `Bearer ${apiKeyToCheck}`
+    }
+  })
 
-  return apiKeyAccessInfo as ApiKeyAccessInfo
+  return data
 }
 
 export type ApiKeyAccessInfo = {

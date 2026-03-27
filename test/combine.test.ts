@@ -1,4 +1,4 @@
-import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist'
+import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist/index.js'
 
 describe('combine(...asyncIterators)', () => {
   test(

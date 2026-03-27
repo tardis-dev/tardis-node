@@ -1,6 +1,6 @@
-import { parseμs, upperCaseSymbols } from '../handy'
-import { BookChange, Trade } from '../types'
-import { Mapper } from './mapper'
+import { parseμs, upperCaseSymbols } from '../handy.ts'
+import { BookChange, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export const bitnomialTradesMapper: Mapper<'bitnomial', Trade> = {
   canHandle(message: BitnomialTrade) {

@@ -1,5 +1,6 @@
 import { RBTree } from 'bintrees'
-import { BookChange, BookPriceLevel, Writeable } from './types'
+import type { RBTree as RBTreeType } from 'bintrees'
+import { BookChange, BookPriceLevel, Writeable } from './types.ts'
 
 export type OnLevelRemovedCB = (
   bookChange: BookChange,
@@ -146,7 +147,7 @@ export class OrderBook {
   }
 }
 
-function applyPriceLevelChanges(tree: RBTree<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
+function applyPriceLevelChanges(tree: RBTreeType<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
   for (const priceLevel of priceLevelChanges) {
     const node = tree.find(priceLevel) as Writeable<BookPriceLevel>
     const nodeExists = node !== null

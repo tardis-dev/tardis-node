@@ -1,7 +1,7 @@
 import { unzipSync } from 'zlib'
-import { Filter } from '../types'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase } from './realtimefeed'
-import { wait, ONE_SEC_IN_MS, batch, httpClient } from '../handy'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase } from './realtimefeed.ts'
+import { wait, ONE_SEC_IN_MS, batch, getJSON } from '../handy.ts'
 import { Writable } from 'stream'
 
 abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
@@ -248,17 +248,17 @@ class HuobiOpenInterestClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/${this._getURLPath(instrument)}`
-          const openInterestResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
+          const { data: body } = await getJSON<any>(url, { timeout: 10000 })
 
-          if (openInterestResponse.status !== 'ok') {
-            throw new Error(`open interest response error:${JSON.stringify(openInterestResponse)}, url:${url}`)
+          if (body.status !== 'ok') {
+            throw new Error(`open interest response error:${JSON.stringify(body)}, url:${url}`)
           }
 
           const openInterestMessage = {
             ch: `market.${instrument}.open_interest`,
             generated: true,
-            data: openInterestResponse.data,
-            ts: openInterestResponse.ts
+            data: body.data,
+            ts: body.ts
           }
 
           if (outputStream.writable) {
@@ -283,17 +283,17 @@ class HuobiOptionsMarketIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_market_index?contract_code=${instrument}`
-          const marketIndexResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
+          const { data: body } = await getJSON<any>(url, { timeout: 10000 })
 
-          if (marketIndexResponse.status !== 'ok') {
-            throw new Error(`open interest response error:${JSON.stringify(marketIndexResponse)}, url:${url}`)
+          if (body.status !== 'ok') {
+            throw new Error(`open interest response error:${JSON.stringify(body)}, url:${url}`)
           }
 
           const marketIndexMessage = {
             ch: `market.${instrument}.option_market_index`,
             generated: true,
-            data: marketIndexResponse.data[0],
-            ts: marketIndexResponse.ts
+            data: body.data[0],
+            ts: body.ts
           }
 
           if (outputStream.writable) {
@@ -318,17 +318,17 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
             return
           }
           const url = `${this._httpURL}/option_index?symbol=${instrument}`
-          const optionIndexResponse = (await httpClient.get(url, { timeout: 10000 }).json()) as any
+          const { data: body } = await getJSON<any>(url, { timeout: 10000 })
 
-          if (optionIndexResponse.status !== 'ok') {
-            throw new Error(`open interest response error:${JSON.stringify(optionIndexResponse)}, url:${url}`)
+          if (body.status !== 'ok') {
+            throw new Error(`open interest response error:${JSON.stringify(body)}, url:${url}`)
           }
 
           const optionIndexMessage = {
             ch: `market.${instrument}.option_index`,
             generated: true,
-            data: optionIndexResponse.data[0],
-            ts: optionIndexResponse.ts
+            data: body.data[0],
+            ts: body.ts
           }
 
           if (outputStream.writable) {

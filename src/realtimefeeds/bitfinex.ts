@@ -1,5 +1,5 @@
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 const TIMESTAMP = 32768
 const SEQ_ALL = 65536
 

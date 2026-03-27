@@ -7,7 +7,7 @@ import {
   normalizeOptionsSummary,
   normalizeLiquidations,
   normalizeBookTickers
-} from '../src'
+} from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',

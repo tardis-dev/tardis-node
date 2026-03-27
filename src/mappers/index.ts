@@ -1,6 +1,6 @@
-import { ONE_SEC_IN_MS } from '../handy'
-import { BookChange, DerivativeTicker, Liquidation, OptionSummary, BookTicker, Trade } from '../types'
-import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexBookTickerMapper, AscendexTradesMapper } from './ascendex'
+import { ONE_SEC_IN_MS } from '../handy.ts'
+import { BookChange, DerivativeTicker, Liquidation, OptionSummary, BookTicker, Trade } from '../types.ts'
+import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexBookTickerMapper, AscendexTradesMapper } from './ascendex.ts'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -8,8 +8,8 @@ import {
   BinanceLiquidationsMapper,
   BinanceBookTickerMapper,
   BinanceTradesMapper
-} from './binance'
-import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex'
+} from './binance.ts'
+import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex.ts'
 import {
   BinanceEuropeanOptionsBookChangeMapper,
   BinanceEuropeanOptionsBookChangeMapperV2,
@@ -18,26 +18,26 @@ import {
   BinanceEuropeanOptionsTradesMapperV2,
   BinanceEuropeanOptionSummaryMapper,
   BinanceEuropeanOptionSummaryMapperV2
-} from './binanceeuropeanoptions'
+} from './binanceeuropeanoptions.ts'
 import {
   BitfinexBookChangeMapper,
   BitfinexDerivativeTickerMapper,
   BitfinexLiquidationsMapper,
   BitfinexBookTickerMapper,
   BitfinexTradesMapper
-} from './bitfinex'
-import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer'
-import { BitgetBookChangeMapper, BitgetBookTickerMapper, BitgetDerivativeTickerMapper, BitgetTradesMapper } from './bitget'
+} from './bitfinex.ts'
+import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer.ts'
+import { BitgetBookChangeMapper, BitgetBookTickerMapper, BitgetDerivativeTickerMapper, BitgetTradesMapper } from './bitget.ts'
 import {
   BitmexBookChangeMapper,
   BitmexDerivativeTickerMapper,
   bitmexLiquidationsMapper,
   bitmexBookTickerMapper,
   bitmexTradesMapper
-} from './bitmex'
-import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial'
-import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp'
-import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom'
+} from './bitmex.ts'
+import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial.ts'
+import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp.ts'
+import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom.ts'
 import {
   BybitBookChangeMapper,
   BybitDerivativeTickerMapper,
@@ -50,25 +50,30 @@ import {
   BybitV5LiquidationsMapper,
   BybitV5OptionSummaryMapper,
   BybitV5TradesMapper
-} from './bybit'
-import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot'
-import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase'
+} from './bybit.ts'
+import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot.ts'
+import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase.ts'
 import {
   CoinbaseInternationalBookChangMapper,
   coinbaseInternationalBookTickerMapper,
   CoinbaseInternationalDerivativeTickerMapper,
   coinbaseInternationalTradesMapper
-} from './coinbaseinternational'
-import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex'
-import { CryptoComBookChangeMapper, CryptoComBookTickerMapper, CryptoComDerivativeTickerMapper, CryptoComTradesMapper } from './cryptocom'
+} from './coinbaseinternational.ts'
+import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex.ts'
+import {
+  CryptoComBookChangeMapper,
+  CryptoComBookTickerMapper,
+  CryptoComDerivativeTickerMapper,
+  CryptoComTradesMapper
+} from './cryptocom.ts'
 import {
   cryptofacilitiesBookChangeMapper,
   CryptofacilitiesDerivativeTickerMapper,
   cryptofacilitiesLiquidationsMapper,
   cryptofacilitiesBookTickerMapper,
   cryptofacilitiesTradesMapper
-} from './cryptofacilities'
-import { DeltaBookChangeMapper, DeltaBookTickerMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta'
+} from './cryptofacilities.ts'
+import { DeltaBookChangeMapper, DeltaBookTickerMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta.ts'
 import {
   deribitBookChangeMapper,
   DeribitDerivativeTickerMapper,
@@ -76,10 +81,10 @@ import {
   DeribitOptionSummaryMapper,
   deribitBookTickerMapper,
   deribitTradesMapper
-} from './deribit'
-import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx'
-import { DydxV4BookChangeMapper, DydxV4DerivativeTickerMapper, DydxV4LiquidationsMapper, DydxV4TradesMapper } from './dydxv4'
-import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx'
+} from './deribit.ts'
+import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx.ts'
+import { DydxV4BookChangeMapper, DydxV4DerivativeTickerMapper, DydxV4LiquidationsMapper, DydxV4TradesMapper } from './dydxv4.ts'
+import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx.ts'
 import {
   GateIOBookChangeMapper,
   GateIOTradesMapper,
@@ -87,15 +92,15 @@ import {
   GateIOV4BookTickerMapper,
   GateIOV4OrderBookV2ChangeMapper,
   GateIOV4TradesMapper
-} from './gateio'
+} from './gateio.ts'
 import {
   GateIOFuturesBookChangeMapper,
   GateIOFuturesBookTickerMapper,
   GateIOFuturesDerivativeTickerMapper,
   GateIOFuturesTradesMapper
-} from './gateiofutures'
-import { geminiBookChangeMapper, geminiTradesMapper } from './gemini'
-import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc'
+} from './gateiofutures.ts'
+import { geminiBookChangeMapper, geminiTradesMapper } from './gemini.ts'
+import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc.ts'
 import {
   HuobiBookChangeMapper,
   HuobiDerivativeTickerMapper,
@@ -104,22 +109,22 @@ import {
   HuobiOptionsSummaryMapper,
   HuobiBookTickerMapper,
   HuobiTradesMapper
-} from './huobi'
+} from './huobi.ts'
 import {
   HyperliquidBookChangeMapper,
   HyperliquidBookTickerMapper,
   HyperliquidDerivativeTickerMapper,
   HyperliquidTradesMapper
-} from './hyperliquid'
-import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken'
-import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin'
+} from './hyperliquid.ts'
+import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
+import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
 import {
   KucoinFuturesBookChangeMapper,
   KucoinFuturesBookTickerMapper,
   KucoinFuturesDerivativeTickerMapper,
   KucoinFuturesTradesMapper
-} from './kucoinfutures'
-import { Mapper } from './mapper'
+} from './kucoinfutures.ts'
+import { Mapper } from './mapper.ts'
 import {
   OkexBookChangeMapper,
   OkexBookTickerMapper,
@@ -133,15 +138,15 @@ import {
   OkexV5LiquidationsMapper,
   OkexV5OptionSummaryMapper,
   OkexV5TradesMapper
-} from './okex'
-import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads'
-import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex'
-import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex'
-import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum'
-import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit'
-import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox'
+} from './okex.ts'
+import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads.ts'
+import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex.ts'
+import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex.ts'
+import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum.ts'
+import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit.ts'
+import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox.ts'
 
-export * from './mapper'
+export * from './mapper.ts'
 
 const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
 

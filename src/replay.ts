@@ -1,17 +1,17 @@
-import { createReadStream, remove } from 'fs-extra'
-import path from 'path'
-import { EventEmitter } from 'stream'
+import { createReadStream } from 'node:fs'
+import { rm } from 'node:fs/promises'
+import { EventEmitter } from 'events'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip } from 'zlib'
-import { BinarySplitStream } from './binarysplit'
-import { clearCacheSync } from './clearcache'
-import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts'
-import { debug } from './debug'
-import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy'
-import { MapperFactory, normalizeBookChanges } from './mappers'
-import { getOptions } from './options'
-import { Disconnect, Exchange, FilterForExchange } from './types'
-import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker'
+import { BinarySplitStream } from './binarysplit.ts'
+import { clearCacheSync } from './clearcache.ts'
+import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
+import { debug } from './debug.ts'
+import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy.ts'
+import { MapperFactory, normalizeBookChanges } from './mappers/index.ts'
+import { getOptions } from './options.ts'
+import { Disconnect, Exchange, FilterForExchange } from './types.ts'
+import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
 
 type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
@@ -227,7 +227,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
 async function cleanupSlice(slicePath: string) {
   try {
-    await remove(slicePath)
+    await rm(slicePath, { force: true })
   } catch (e) {
     debug('cleanupSlice error %s %o', slicePath, e)
   }
@@ -355,7 +355,7 @@ class ReliableWorker extends EventEmitter {
   }
 
   private _initWorker() {
-    this._worker = new Worker(path.resolve(__dirname, 'worker.js'), {
+    this._worker = new Worker(new URL('./worker.js', import.meta.url), {
       workerData: this._payload
     })
 

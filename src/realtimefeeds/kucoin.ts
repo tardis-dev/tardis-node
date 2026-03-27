@@ -1,15 +1,15 @@
-import { httpClient, getRandomString, wait } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { getRandomString, getJSON, postJSON, wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class KucoinRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = ''
   private _httpURL = 'https://api.kucoin.com/api'
 
   protected async getWebSocketUrl() {
-    const response = (await httpClient.post(`${this._httpURL}/v1/bullet-public`, { retry: 3, timeout: 10000 }).json()) as any
+    const { data: body } = await postJSON<any>(`${this._httpURL}/v1/bullet-public`, { retry: 3, timeout: 10000 })
 
-    return `${response.data.instanceServers[0].endpoint}?token=${response.data.token}&connectId=${getRandomString()}`
+    return `${body.data.instanceServers[0].endpoint}?token=${body.data.token}&connectId=${getRandomString()}`
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -42,16 +42,16 @@ export class KucoinRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = (await httpClient
-        .get(`${this._httpURL}/v1/market/orderbook/level2_100?symbol=${symbol}`, { timeout: 10000 })
-        .json()) as any
+      const { data } = await getJSON<any>(`${this._httpURL}/v1/market/orderbook/level2_100?symbol=${symbol}`, {
+        timeout: 10000
+      })
 
       const snapshot = {
         type: 'message',
         generated: true,
         topic: `/market/level2Snapshot:${symbol}`,
         subject: 'trade.l2Snapshot',
-        ...depthSnapshotResponse
+        ...data
       }
 
       this.manualSnapshotsBuffer.push(snapshot)

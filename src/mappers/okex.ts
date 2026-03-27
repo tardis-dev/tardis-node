@@ -1,6 +1,6 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // V5 Okex API mappers
 // https://www.okex.com/docs-v5/en/#websocket-api-public-channel-trades-channel

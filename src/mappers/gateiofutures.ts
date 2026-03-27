@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://www.gate.io/docs/futures/ws/index.html
 

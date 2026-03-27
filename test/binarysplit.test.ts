@@ -1,5 +1,5 @@
 import { Readable } from 'stream'
-import { BinarySplitStream } from '../src/binarysplit'
+import { BinarySplitStream } from '../dist/binarysplit.js'
 
 async function collectLines(chunks: Buffer[]) {
   const lines: string[] = []

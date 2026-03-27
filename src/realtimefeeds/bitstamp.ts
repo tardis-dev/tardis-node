@@ -1,6 +1,6 @@
-import { httpClient } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { getJSON } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BitstampRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.bitstamp.net'
@@ -50,10 +50,10 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
         return
       }
 
-      const depthSnapshotResponse = await httpClient.get(`${this.httpURL}/order_book/${symbol}?group=1`).json()
+      const { data } = await getJSON(`${this.httpURL}/order_book/${symbol}?group=1`)
 
       const snapshot = {
-        data: depthSnapshotResponse,
+        data,
         event: 'snapshot',
         channel: `diff_order_book_${symbol}`,
         generated: true

@@ -1,6 +1,5 @@
-import { normalizeBookChanges, normalizeBookTickers, normalizeDerivativeTickers, normalizeTrades } from '../src/mappers'
-import { streamNormalized } from '../src/stream'
-import { describeLive } from './live'
+import { normalizeBookChanges, normalizeBookTickers, normalizeDerivativeTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
+import { describeLive } from './live.js'
 
 const testTimeoutMS = 40_000
 

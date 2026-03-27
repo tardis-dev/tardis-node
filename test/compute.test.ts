@@ -7,7 +7,7 @@ import {
   normalizeTrades,
   replayNormalized,
   Trade
-} from '../dist'
+} from '../dist/index.js'
 
 describe('compute(messages, types)', () => {
   test(

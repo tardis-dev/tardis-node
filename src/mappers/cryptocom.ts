@@ -1,6 +1,6 @@
-import { upperCaseSymbols } from '../handy'
-import { BookChange, Exchange, BookTicker, Trade, DerivativeTicker } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { upperCaseSymbols } from '../handy.ts'
+import { BookChange, Exchange, BookTicker, Trade, DerivativeTicker } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
   constructor(private readonly _exchange: Exchange) {}

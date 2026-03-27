@@ -1,6 +1,6 @@
-import { batchObjects } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { batchObjects } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
   protected throttleSubscribeMS = 100

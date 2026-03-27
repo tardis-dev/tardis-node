@@ -1,7 +1,7 @@
-import { debug } from '../debug'
-import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy'
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types'
-import { Mapper, PendingTickerInfoHelper } from './mapper'
+import { debug } from '../debug.ts'
+import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class KucoinFuturesTradesMapper implements Mapper<'kucoin-futures', Trade> {
   canHandle(message: KucoinFuturesTradeMessage) {

@@ -1,4 +1,4 @@
-import { OrderBook } from '../src'
+import { OrderBook } from '../dist/index.js'
 
 describe('orderbook', () => {
   test('should update levels', () => {

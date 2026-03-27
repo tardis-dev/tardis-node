@@ -1,6 +1,6 @@
-import { wait } from '../handy'
-import { Filter } from '../types'
-import { RealTimeFeedBase } from './realtimefeed'
+import { wait } from '../handy.ts'
+import { Filter } from '../types.ts'
+import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BlockchainComRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.blockchain.info/mercury-gateway/v1/ws'

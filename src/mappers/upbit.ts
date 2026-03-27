@@ -1,6 +1,6 @@
-import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy'
-import { BookChange, BookPriceLevel, Trade } from '../types'
-import { Mapper } from './mapper'
+import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookPriceLevel, Trade } from '../types.ts'
+import { Mapper } from './mapper.ts'
 
 export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
   canHandle(message: UpbitTrade) {
