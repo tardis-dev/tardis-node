@@ -4,7 +4,7 @@
 
 <br/>
 
-Node.js `tardis-dev` library provides convenient access to tick-level real-time and historical cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) enabling composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/api/node-js/normalization#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/api/node-js/normalization#computing-derived-data-locally).
+Node.js `tardis-dev` library provides convenient access to tick-level real-time and historical cryptocurrency market data both in exchange native and normalized formats. Instead of callbacks it relies on [async iteration (for await ...of)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) enabling composability features like [seamless switching between real-time data streaming and historical data replay](https://docs.tardis.dev/node-client/normalization#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) or [computing derived data locally](https://docs.tardis.dev/node-client/normalization#computing-derived-data-locally).
 
 <br/>
 
@@ -31,11 +31,11 @@ for await (const message of messages) {
 
 ## Features
 
-- historical tick-level [market data replay](https://docs.tardis.dev/api/node-js/replaying-historical-data) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http-api-reference#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
+- historical tick-level [market data replay](https://docs.tardis.dev/node-client/replaying-historical-data) backed by [tardis.dev HTTP API](https://docs.tardis.dev/api/http-api-reference#data-feeds-exchange) — includes full order book depth snapshots plus incremental updates, tick-by-tick trades, historical open interest, funding, index, mark prices, liquidations and more
 
   <br/>
 
-- consolidated [real-time data streaming API](https://docs.tardis.dev/api/node-js/streaming-real-time-data) connecting directly to exchanges' public WebSocket APIs
+- consolidated [real-time data streaming API](https://docs.tardis.dev/node-client/streaming-real-time-data) connecting directly to exchanges' public WebSocket APIs
 
 <br/>
 
@@ -43,7 +43,7 @@ for await (const message of messages) {
 
 <br/>
 
-- [seamless switching between real-time streaming and historical market data replay](https://docs.tardis.dev/api/node-js/normalization#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) thanks to [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) providing unified way of consuming data messages
+- [seamless switching between real-time streaming and historical market data replay](https://docs.tardis.dev/node-client/normalization#seamless-switching-between-real-time-streaming-and-historical-market-data-replay) thanks to [`async iterables`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) providing unified way of consuming data messages
 
 <br/>
 
@@ -59,15 +59,15 @@ for await (const message of messages) {
 
 <br/>
 
-- [combining multiple exchanges feeds into single one](https://docs.tardis.dev/api/node-js/normalization#combining-data-streams) via [`combine`](https://docs.tardis.dev/api/node-js/normalization#combining-data-streams) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
+- [combining multiple exchanges feeds into single one](https://docs.tardis.dev/node-client/normalization#combining-data-streams) via [`combine`](https://docs.tardis.dev/node-client/normalization#combining-data-streams) helper function — synchronized historical market data replay and consolidated real-time data streaming from multiple exchanges
 
 <br/>
 
-- [computing derived data locally](https://docs.tardis.dev/api/node-js/normalization#computing-derived-data-locally) like order book imbalance, custom trade bars, book snapshots and more via [`compute`](https://docs.tardis.dev/api/node-js/normalization#computing-derived-data-locally) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
+- [computing derived data locally](https://docs.tardis.dev/node-client/normalization#computing-derived-data-locally) like order book imbalance, custom trade bars, book snapshots and more via [`compute`](https://docs.tardis.dev/node-client/normalization#computing-derived-data-locally) helper function and `computables`, e.g., volume based bars, top 20 levels order book snapshots taken every 10 ms etc.
 
 <br/>
 
-- [full limit order book reconstruction](https://docs.tardis.dev/api/node-js/normalization#limit-order-book-reconstruction) both for real-time and historical data via `OrderBook` object
+- [full limit order book reconstruction](https://docs.tardis.dev/node-client/normalization#limit-order-book-reconstruction) both for real-time and historical data via `OrderBook` object
 
 <br/>
 
@@ -75,11 +75,11 @@ for await (const message of messages) {
 
 <br/>
 
-- [extensible mapping logic](https://docs.tardis.dev/api/node-js/normalization#modifying-built-in-and-adding-custom-normalizers) that allows adjusting normalized formats for specific needs
+- [extensible mapping logic](https://docs.tardis.dev/node-client/normalization#modifying-built-in-and-adding-custom-normalizers) that allows adjusting normalized formats for specific needs
 
 <br/>
 
-- [built-in TypeScript support](https://docs.tardis.dev/api/node-js/quickstart#es-modules-and-typescript)
+- [built-in TypeScript support](https://docs.tardis.dev/node-client/quickstart#es-modules-and-typescript)
 
 <br/>
 <br/>
@@ -100,7 +100,7 @@ npm install tardis-dev --save
 
 ## Documentation
 
-### [See official docs](https://docs.tardis.dev/api/node-js).
+### [See official docs](https://docs.tardis.dev/node-client/quickstart).
 
 <br/>
 <br/>
@@ -254,4 +254,4 @@ for await (const { localTimestamp, message } of messages) {
 <br/>
 <br/>
 
-## See the [tardis-dev docs](https://docs.tardis.dev/api/node-js) for more examples.
+## See the [tardis-dev docs](https://docs.tardis.dev/node-client/quickstart) for more examples.

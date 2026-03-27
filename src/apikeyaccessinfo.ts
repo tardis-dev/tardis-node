@@ -17,7 +17,9 @@ export async function getApiKeyAccessInfo(apiKey?: string) {
 
 export type ApiKeyAccessInfo = {
   exchange: Exchange
+  accessType: string
   from: string
   to: string
   symbols: string[]
+  dataPlan: string
 }[]
