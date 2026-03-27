@@ -103,21 +103,30 @@ describeLive('stream', () => {
       )
 
       const seenTypes = new Set<string>()
-      let count = 0
+      let didTimeout = false
+      const timeoutId = setTimeout(() => {
+        didTimeout = true
+        void messages.return?.()
+      }, 30_000)
 
-      for await (const msg of messagesWithComputables) {
-        if (msg.type === 'disconnect') {
-          throw new Error('Unexpected disconnect received for BTCUSDT stream')
+      try {
+        for await (const msg of messagesWithComputables) {
+          if (msg.type === 'disconnect') {
+            throw new Error('Unexpected disconnect received for BTCUSDT stream')
+          }
+
+          seenTypes.add(msg.type)
+
+          if (seenTypes.has('trade') && seenTypes.has('book_change') && seenTypes.has('derivative_ticker')) {
+            break
+          }
         }
-
-        seenTypes.add(msg.type)
-        count++
-
-        if (count >= 100) {
-          break
-        }
+      } finally {
+        clearTimeout(timeoutId)
+        await messages.return?.()
       }
 
+      expect(didTimeout).toBe(false)
       expect(seenTypes.has('trade')).toBe(true)
       expect(seenTypes.has('book_change')).toBe(true)
       expect(seenTypes.has('derivative_ticker')).toBe(true)

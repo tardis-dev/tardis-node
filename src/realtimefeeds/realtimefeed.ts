@@ -1,5 +1,5 @@
 import dbg from 'debug'
-import WebSocket from 'ws'
+import WebSocket, { createWebSocketStream } from 'ws'
 import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
@@ -102,10 +102,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         staleConnectionTimerId = this._monitorConnectionIfStale()
         pingTimerId = this._sendPeriodicPing()
 
-        const realtimeMessagesStream = (WebSocket as any).createWebSocketStream(this._ws, {
+        const realtimeMessagesStream = createWebSocketStream(this._ws, {
           readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
           readableHighWaterMark: 8096 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
-        }) as AsyncIterableIterator<Buffer>
+        }) as unknown as AsyncIterableIterator<Buffer>
 
         for await (let message of realtimeMessagesStream) {
           if (this.decompress !== undefined) {
