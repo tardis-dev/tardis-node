@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import { EventEmitter } from 'events'
 import { Worker } from 'worker_threads'
-import { constants, createGunzip } from 'zlib'
+import { constants, createGunzip, createZstdDecompress } from 'zlib'
 import { BinarySplitStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
@@ -81,8 +81,9 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     // more lenient gzip decompression
     // see https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239
 
-    const ZLIB_OPTIONS = {
-      chunkSize: 256 * 1024,
+    const CHUNK_SIZE = 256 * 1024
+    const GZIP_OPTIONS = {
+      chunkSize: CHUNK_SIZE,
       flush: constants.Z_SYNC_FLUSH,
       finishFlush: constants.Z_SYNC_FLUSH
     }
@@ -115,11 +116,12 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       }
 
       // response is a path to file on disk let' read it as stream
-      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: 256 * 1024 })
-        // unzip it
-        .pipe(createGunzip(ZLIB_OPTIONS))
-        .on('error', function onGunzipError(err) {
-          debug('gunzip error %o', err)
+      const isZstdSlice = cachedSlicePath.endsWith('.zst')
+      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE })
+        // decompress it while preserving the on-disk cache in the negotiated wire format
+        .pipe(isZstdSlice ? createZstdDecompress({ chunkSize: CHUNK_SIZE }) : createGunzip(GZIP_OPTIONS))
+        .on('error', function onDecompressionError(err) {
+          debug('%s decompression error %o', isZstdSlice ? 'zstd' : 'gzip', err)
           linesStream.destroy(err)
         })
         // and split by new line

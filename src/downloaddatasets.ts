@@ -90,6 +90,7 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
 async function downloadDataSet(downloadOptions: DownloadOptions, skipIfExists: boolean) {
   if (skipIfExists && existsSync(downloadOptions.downloadPath)) {
     debug('dataset %s already exists, skipping download', downloadOptions.downloadPath)
+    return
   } else {
     return await download(downloadOptions)
   }

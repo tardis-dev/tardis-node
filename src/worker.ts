@@ -5,6 +5,7 @@ import { isMainThread, parentPort, workerData } from 'worker_threads'
 import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy.ts'
 import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
+const ACCEPT_ENCODING = 'zstd, gzip'
 
 if (isMainThread) {
   debug('existing, worker is not meant to run in main thread')
@@ -98,8 +99,10 @@ async function getDataFeedSlice(
 ) {
   const sliceTimestamp = addMinutes(fromDate, offset)
   const sliceKey = sliceTimestamp.toISOString()
-  const slicePath = `${cacheDir}/${formatDateToPath(sliceTimestamp)}.json.gz`
-  const isCached = existsSync(slicePath)
+  const sliceBasePath = `${cacheDir}/${formatDateToPath(sliceTimestamp)}.json`
+  const zstdSlicePath = `${sliceBasePath}.zst`
+  const gzipSlicePath = `${sliceBasePath}.gz`
+  const cachedSlicePath = existsSync(zstdSlicePath) ? zstdSlicePath : existsSync(gzipSlicePath) ? gzipSlicePath : undefined
 
   let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}`
 
@@ -107,18 +110,25 @@ async function getDataFeedSlice(
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
   }
 
-  if (!isCached) {
-    await download({
-      apiKey,
-      downloadPath: slicePath,
-      url,
-      userAgent
-    })
+  const slicePath =
+    cachedSlicePath ||
+    (
+      await download({
+        apiKey,
+        downloadPath: sliceBasePath,
+        url,
+        userAgent,
+        appendContentEncodingExtension: true,
+        acceptEncoding: ACCEPT_ENCODING
+      })
+    ).downloadPath
 
+  if (cachedSlicePath === undefined) {
     debug('getDataFeedSlice fetched from API and cached, %s', sliceKey)
   } else {
     debug('getDataFeedSlice already cached: %s', sliceKey)
   }
+
   // everything went well (already cached or successfull cached) let's communicate it to parent thread
   const message: WorkerMessage = {
     sliceKey,

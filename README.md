@@ -47,7 +47,7 @@ for await (const message of messages) {
 
 <br/>
 
-- transparent historical local data caching \(cached data is stored on disk in compressed GZIP format and decompressed on demand when reading the data\)
+- transparent historical local data caching \(cached data is stored on disk per slice in compressed format and decompressed on demand when reading the data\)
 
 <br/>
 

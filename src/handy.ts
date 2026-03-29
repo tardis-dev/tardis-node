@@ -526,18 +526,22 @@ export async function download({
   apiKey,
   downloadPath,
   url,
-  userAgent
+  userAgent,
+  appendContentEncodingExtension = false,
+  acceptEncoding = 'gzip'
 }: {
   url: string
   downloadPath: string
   userAgent: string
   apiKey: string
+  appendContentEncodingExtension?: boolean
+  acceptEncoding?: string
 }) {
   const httpRequestOptions = {
     agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
     timeout: 90 * ONE_SEC_IN_MS,
     headers: {
-      'Accept-Encoding': 'gzip',
+      'Accept-Encoding': acceptEncoding,
       'User-Agent': userAgent,
       Authorization: apiKey ? `Bearer ${apiKey}` : ''
     }
@@ -552,18 +556,19 @@ export async function download({
     try {
       const addRetryAttempt = attempts - 1 > 0 && url.endsWith('gz')
       if (addRetryAttempt) {
-        return await _downloadFile(httpRequestOptions, `${url}?retryAttempt=${attempts - 1}`, downloadPath)
+        return await _downloadFile(httpRequestOptions, `${url}?retryAttempt=${attempts - 1}`, downloadPath, appendContentEncodingExtension)
       } else {
-        return await _downloadFile(httpRequestOptions, url, downloadPath)
+        return await _downloadFile(httpRequestOptions, url, downloadPath, appendContentEncodingExtension)
       }
     } catch (error) {
+      const unsupportedDataFeedEncoding = error instanceof Error && error.message.startsWith('Unsupported data feed content encoding')
       const badOrUnauthorizedRequest =
         error instanceof HttpError &&
         ((error.status === 400 && error.message.includes('ISO 8601 format') === false) || error.status === 401)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       const internalServiceError = error instanceof HttpError && error.status === 500
       // do not retry when we've got bad or unauthorized request or enough attempts
-      if (badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
+      if (unsupportedDataFeedEncoding || badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
@@ -592,7 +597,7 @@ export function cleanTempFiles() {
   tmpFileCleanups.forEach((cleanup) => cleanup())
 }
 
-async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string) {
+async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string, appendContentEncodingExtension: boolean) {
   // first ensure that directory where we want to download file exists
   mkdirSync(path.dirname(downloadPath), { recursive: true })
 
@@ -607,6 +612,8 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     } catch {}
   }
   tmpFileCleanups.set(tmpFilePath, cleanup)
+
+  let finalDownloadPath = downloadPath
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
@@ -624,6 +631,18 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
               reject(new HttpError(statusCode!, body, url))
             })
           } else {
+            if (appendContentEncodingExtension) {
+              const contentEncoding = asSingleHeaderValue(res.headers['content-encoding'])
+              if (contentEncoding === 'zstd') {
+                finalDownloadPath = `${downloadPath}.zst`
+              } else if (contentEncoding === 'gzip') {
+                finalDownloadPath = `${downloadPath}.gz`
+              } else {
+                reject(new Error(`Unsupported data feed content encoding: ${contentEncoding}`))
+                return
+              }
+            }
+
             // consume the response stream by writing it to the file
             res
               .on('error', reject)
@@ -649,11 +668,23 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
     // finally when saving from the network to file has succeded, rename tmp file to normal name
     // then we're sure that responses is 100% saved and also even if different process was doing the same we're good
-    await rename(tmpFilePath, downloadPath)
+    await rename(tmpFilePath, finalDownloadPath)
+
+    return {
+      downloadPath: finalDownloadPath
+    }
   } finally {
     tmpFileCleanups.delete(tmpFilePath)
     cleanup()
   }
+}
+
+function asSingleHeaderValue(headerValue: string | string[] | undefined) {
+  if (Array.isArray(headerValue)) {
+    return headerValue[0]
+  }
+
+  return headerValue
 }
 
 export class CircularBuffer<T> {
