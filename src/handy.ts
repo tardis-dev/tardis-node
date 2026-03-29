@@ -635,7 +635,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
               const contentEncoding = asSingleHeaderValue(res.headers['content-encoding'])
               if (contentEncoding === 'zstd') {
                 finalDownloadPath = `${downloadPath}.zst`
-              } else if (contentEncoding === 'gzip') {
+              } else if (contentEncoding === undefined || contentEncoding === 'gzip') {
                 finalDownloadPath = `${downloadPath}.gz`
               } else {
                 reject(new Error(`Unsupported data feed content encoding: ${contentEncoding}`))
