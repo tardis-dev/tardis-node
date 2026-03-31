@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [24.x]
+        node-version: ['25.8.2']
 
     steps:
       - name: Checkout
@@ -27,7 +27,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies And Compile TS
-        run: npm install
+        run: npm ci --ignore-scripts
+
+      - name: Verify Registry Signatures
+        run: npm audit signatures
+
+      - name: Audit Production Dependencies
+        run: npm audit --omit=dev --audit-level=critical
 
       - name: Check Code Format
         run: npm run check-format

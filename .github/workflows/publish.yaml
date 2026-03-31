@@ -5,6 +5,10 @@ on:
     # This specifies that the build will be triggered when we publish a release
     types: [published]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish:
     name: Publish New Release To NPM
@@ -16,14 +20,20 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Use Node.js v24
+      - name: Use Node.js v25.8.2
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 25.8.2
           registry-url: https://registry.npmjs.org/
 
       - name: Install Dependencies And Compile TS
-        run: npm install
+        run: npm ci --ignore-scripts
+
+      - name: Verify Registry Signatures
+        run: npm audit signatures
+
+      - name: Audit Production Dependencies
+        run: npm audit --omit=dev --audit-level=critical
 
       - name: Configure Git
         run: |
@@ -38,8 +48,6 @@ jobs:
 
       - name: Publish Package
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push Version Changes To GitHub
         run: git push

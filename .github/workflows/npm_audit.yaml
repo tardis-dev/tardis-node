@@ -1,0 +1,65 @@
+name: Full NPM Audit
+
+on:
+  schedule:
+    - cron: '25 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Full NPM Audit Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Use Node.js v25.8.2
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25.8.2
+
+      - name: Generate Full Audit Report
+        id: audit
+        run: |
+          set +e
+          npm audit --package-lock-only --json > npm-audit.json
+          exit_code=$?
+          set -e
+          if [ ! -f npm-audit.json ]; then
+            echo '{}' > npm-audit.json
+          fi
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Audit Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
+
+      - name: Summarize Audit Report
+        env:
+          AUDIT_EXIT_CODE: ${{ steps.audit.outputs.exit_code }}
+        run: |
+          node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+
+          const report = JSON.parse(fs.readFileSync('npm-audit.json', 'utf8'));
+          const vulnerabilities = report.metadata?.vulnerabilities ?? {};
+          const lines = [
+            `Full npm audit exit code: ${process.env.AUDIT_EXIT_CODE}`,
+            `info: ${vulnerabilities.info ?? 0}`,
+            `low: ${vulnerabilities.low ?? 0}`,
+            `moderate: ${vulnerabilities.moderate ?? 0}`,
+            `high: ${vulnerabilities.high ?? 0}`,
+            `critical: ${vulnerabilities.critical ?? 0}`,
+            `total: ${vulnerabilities.total ?? 0}`,
+            '',
+            'Download the npm-audit-report artifact for the full JSON report.'
+          ];
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          EOF
