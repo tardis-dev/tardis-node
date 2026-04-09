@@ -8,7 +8,7 @@ const debug = dbg('tardis-dev')
 const ACCEPT_ENCODING = 'zstd, gzip'
 
 if (isMainThread) {
-  debug('existing, worker is not meant to run in main thread')
+  debug('exiting, worker is not meant to run in main thread')
 } else {
   parentPort!.on('message', (signal: WorkerSignal) => {
     if (signal === WorkerSignal.BEFORE_TERMINATE) {
