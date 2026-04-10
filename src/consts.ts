@@ -297,6 +297,7 @@ const BINANCE_FUTURES_CHANNELS = [
   'ticker',
   'depth',
   'markPrice',
+  'premiumIndex',
   'depthSnapshot',
   'bookTicker',
   'forceOrder',
