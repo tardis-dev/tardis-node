@@ -2208,6 +2208,8 @@ exports[`map woo-x messages 11`] = `
 ]
 `;
 
+exports[`mappers ignore bitfinex funding ticker messages for book ticker 1`] = `[]`;
+
 exports[`mappers map ascendex messages 1`] = `
 [
   {
@@ -3061,6 +3063,38 @@ exports[`mappers map binance messages 10`] = `
     "symbol": "GNTBTC",
     "timestamp": 2019-04-01T00:00:09.699Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitfinex book ticker messages with trailing null placeholder 1`] = `
+[
+  {
+    "askAmount": 1.22665447,
+    "askPrice": 71760,
+    "bidAmount": 0.26742262,
+    "bidPrice": 71741,
+    "exchange": "bitfinex",
+    "localTimestamp": 2026-04-10T00:00:00.164Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-10T00:00:00.144Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bitfinex derivatives book ticker messages with trailing null placeholder 1`] = `
+[
+  {
+    "askAmount": 6.16257014,
+    "askPrice": 71847,
+    "bidAmount": 7.47322491,
+    "bidPrice": 71800,
+    "exchange": "bitfinex-derivatives",
+    "localTimestamp": 2026-04-10T00:00:00.152Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2026-04-10T00:00:00.139Z,
+    "type": "book_ticker",
   },
 ]
 `;

@@ -2398,6 +2398,57 @@ describe('mappers', () => {
     }
   })
 
+  test('map bitfinex book ticker messages with trailing null placeholder', () => {
+    const bitfinex = createMapper('bitfinex')
+    const mappedMessages = bitfinex.map(
+      [
+        147794,
+        [71741, 0.26742262, 71760, 1.22665447, 647, 0.00909896, 71754, 900.8715945, 73120, 70434, null],
+        1,
+        1775779200144,
+        'ticker',
+        'BTCUSD'
+      ],
+      new Date('2026-04-10T00:00:00.164Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
+  })
+
+  test('ignore bitfinex funding ticker messages for book ticker', () => {
+    const bitfinex = createMapper('bitfinex')
+    const mappedMessages = bitfinex.map(
+      [
+        129136,
+        [
+          0.000012589041095890411,
+          0.00000788,
+          90,
+          150.27107061000004,
+          4.5e-7,
+          2,
+          1775.8614332800003,
+          -0.00000245,
+          -0.0245,
+          9e-7,
+          6320.78681972,
+          0.00001729,
+          1e-8,
+          null,
+          null,
+          14121.77787059
+        ],
+        92,
+        1633910430074,
+        'ticker',
+        'BTC'
+      ],
+      new Date('2021-10-10T23:20:30.074Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
+  })
+
   test('map bitfinex derivatives messages', () => {
     const messages = [
       { event: 'subscribed', channel: 'status', chanId: 127758, key: 'deriv:tBTCF0:USTF0' },
@@ -2558,6 +2609,23 @@ describe('mappers', () => {
 
       expect(mappedMessages).toMatchSnapshot()
     }
+  })
+
+  test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
+    const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
+    const mappedMessages = bitfinexDerivativesMapper.map(
+      [
+        138325,
+        [71800, 7.47322491, 71847, 6.16257014, 671, 0.00942826, 71840, 1393.02703679, 73198, 70493, null],
+        1,
+        1775779200139,
+        'ticker',
+        'BTCF0:USTF0'
+      ],
+      new Date('2026-04-10T00:00:00.152Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
   })
 
   test('map binance messages', () => {

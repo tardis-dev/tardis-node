@@ -366,7 +366,6 @@ export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-d
     const symbolFromMessage = message[message.length - 1]
     const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
 
-    // ignore if we don't have matching symbol
     if (symbol === undefined) {
       return
     }
@@ -375,13 +374,14 @@ export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-d
     if (message[1] === 'hb') {
       return
     }
-    // ignore funding tickers
 
-    if (message[1].length > 10) {
+    // ignore funding tickers
+    const tickerData = message[1]
+    if (tickerData.length > 11) {
       return
     }
 
-    const [bidPrice, bidAmount, askPrice, askAmount, _, __] = message[1]
+    const [bidPrice, bidAmount, askPrice, askAmount] = tickerData
 
     const ticker: BookTicker = {
       type: 'book_ticker',
@@ -424,18 +424,32 @@ type BitfinexLiquidation =
 type BitfinexTicker =
   | [
       CHANNEL_ID: number,
-      ITEMS: [
-        BID: number,
-        BID_SIZE: number,
-        ASK: number,
-        ASK_SIZE: number,
-        DAILY_CHANGE: number,
-        DAILY_CHANGE_RELATIVE: number,
-        LAST_PRICE: number,
-        VOLUME: number,
-        HIGH: number,
-        LOW: number
-      ],
+      ITEMS:
+        | [
+            BID: number,
+            BID_SIZE: number,
+            ASK: number,
+            ASK_SIZE: number,
+            DAILY_CHANGE: number,
+            DAILY_CHANGE_RELATIVE: number,
+            LAST_PRICE: number,
+            VOLUME: number,
+            HIGH: number,
+            LOW: number
+          ]
+        | [
+            BID: number,
+            BID_SIZE: number,
+            ASK: number,
+            ASK_SIZE: number,
+            DAILY_CHANGE: number,
+            DAILY_CHANGE_RELATIVE: number,
+            LAST_PRICE: number,
+            VOLUME: number,
+            HIGH: number,
+            LOW: number,
+            EXTRA: null
+          ],
       SEQ_ID: number,
       TIMESTAMP: number
     ]
