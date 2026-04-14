@@ -8,7 +8,7 @@ import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 import { debug } from './debug.ts'
 import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy.ts'
-import { MapperFactory, normalizeBookChanges } from './mappers/index.ts'
+import { createMappersFactory, MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
@@ -256,7 +256,7 @@ async function terminateWorker(worker: Worker, waitTimeout: number) {
   await worker.terminate()
 }
 
-export function replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
+export async function* replayNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   {
     exchange,
     symbols,
@@ -275,8 +275,8 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
 
   //TODO: zrovi replay dzien po dniu, tak ze kazdego dnia przekazuje swierze filters
 
-  const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
-  const mappers = createMappers(fromDate)
+  const createMappers = createMappersFactory(exchange, normalizers)
+  const mappers = await createMappers(fromDate)
   const filters = getFilters(mappers, symbols)
 
   const messages = replay({
@@ -298,7 +298,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
   }
 
-  return normalizeMessages(exchange, undefined, messages, mappers, createMappers, withDisconnectMessages, filter)
+  yield* normalizeMessages(exchange, undefined, messages, createMappers, withDisconnectMessages, filter)
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {

@@ -14,7 +14,7 @@ describe('package exports', () => {
     mkdirSync(packageDir, { recursive: true })
     cpSync(path.join(repoRoot, 'package.json'), path.join(packageDir, 'package.json'))
     cpSync(path.join(repoRoot, 'dist'), path.join(packageDir, 'dist'), { recursive: true })
-    symlinkSync(path.join(repoRoot, 'node_modules'), path.join(packageDir, 'node_modules'), 'dir')
+    symlinkSync(path.join(repoRoot, 'node_modules'), path.join(packageDir, 'node_modules'), 'junction')
 
     writeFileSync(
       path.join(tempDir, 'import-test.mjs'),

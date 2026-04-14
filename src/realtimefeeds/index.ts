@@ -52,6 +52,7 @@ import { DydxV4RealTimeFeed } from './dydx_v4.ts'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
+import { LighterRealTimeFeed } from './lighter.ts'
 
 export * from './realtimefeed.ts'
 
@@ -114,7 +115,8 @@ const realTimeFeedsMap: {
   bitget: BitgetRealTimeFeed,
   'bitget-futures': BitgetFuturesRealTimeFeed,
   'coinbase-international': CoinbaseInternationalRealTimeFeed,
-  hyperliquid: HyperliquidRealTimeFeed
+  hyperliquid: HyperliquidRealTimeFeed,
+  lighter: LighterRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
