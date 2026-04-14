@@ -53,6 +53,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     cacheDir: options.cacheDir,
     endpoint: options.endpoint,
     apiKey: apiKey || options.apiKey,
+    dataFeedCompression: options.dataFeedCompression,
     userAgent: options._userAgent,
     fromDate,
     toDate,

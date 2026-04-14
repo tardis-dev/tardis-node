@@ -3,9 +3,9 @@ import { existsSync } from 'node:fs'
 import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
 import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy.ts'
+import type { DataFeedCompression } from './options.ts'
 import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
-const ACCEPT_ENCODING = 'zstd, gzip'
 
 if (isMainThread) {
   debug('existing, worker is not meant to run in main thread')
@@ -92,7 +92,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
 }
 
 async function getDataFeedSlice(
-  { exchange, fromDate, endpoint, apiKey, userAgent }: WorkerJobPayload,
+  { exchange, fromDate, endpoint, apiKey, dataFeedCompression, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
   cacheDir: string
@@ -104,7 +104,7 @@ async function getDataFeedSlice(
   const gzipSlicePath = `${sliceBasePath}.gz`
   const cachedSlicePath = existsSync(zstdSlicePath) ? zstdSlicePath : existsSync(gzipSlicePath) ? gzipSlicePath : undefined
 
-  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}`
+  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${dataFeedCompression}`
 
   if (filters.length > 0) {
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
@@ -119,7 +119,7 @@ async function getDataFeedSlice(
         url,
         userAgent,
         appendContentEncodingExtension: true,
-        acceptEncoding: ACCEPT_ENCODING
+        acceptEncoding: dataFeedCompression === 'gzip' ? 'gzip' : 'zstd, gzip'
       })
     ).downloadPath
 
@@ -146,6 +146,7 @@ export type WorkerJobPayload = {
   cacheDir: string
   endpoint: string
   apiKey: string
+  dataFeedCompression: DataFeedCompression
   userAgent: string
   fromDate: Date
   toDate: Date
