@@ -55,7 +55,8 @@ export const EXCHANGES = [
   'blockchain-com',
   'bitget',
   'bitget-futures',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -518,6 +519,8 @@ const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RIS
 
 const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']
 
+const LIGHTER_CHANNELS = ['order_book', 'trade', 'market_stats']
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -575,5 +578,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'kucoin-futures': KUCOIN_FUTURES_CHANNELS,
   bitget: BITGET_CHANNELS,
   'bitget-futures': BITGET_FUTURES_CHANNELS,
-  hyperliquid: HYPERLIQUID_CHANNELS
+  hyperliquid: HYPERLIQUID_CHANNELS,
+  lighter: LIGHTER_CHANNELS
 }
