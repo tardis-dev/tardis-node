@@ -100,13 +100,17 @@ export async function* normalizeMessages(
   exchange: Exchange,
   symbols: string[] | undefined,
   messages: AsyncIterableIterator<{ localTimestamp: Date; message: any } | undefined>,
-  createMappers: (localTimestamp: Date) => Promise<Mapper<any, any>[]>,
+  mappers: Mapper<any, any>[],
+  createMappers: (localTimestamp: Date) => Mapper<any, any>[],
   withDisconnectMessages: boolean | undefined,
   filter?: (symbol: string) => boolean,
   currentTimestamp?: Date | undefined
 ) {
   let previousLocalTimestamp: Date | undefined = currentTimestamp
-  let mappersForExchange: Mapper<any, any>[] | undefined = undefined
+  let mappersForExchange: Mapper<any, any>[] | undefined = mappers
+  if (mappersForExchange.length === 0) {
+    throw new Error(`Can't normalize data without any normalizers provided`)
+  }
 
   for await (const messageWithTimestamp of messages) {
     if (messageWithTimestamp === undefined) {
@@ -129,7 +133,7 @@ export async function* normalizeMessages(
     }
 
     if (mappersForExchange === undefined) {
-      mappersForExchange = await createMappers(messageWithTimestamp.localTimestamp)
+      mappersForExchange = createMappers(messageWithTimestamp.localTimestamp)
     }
 
     previousLocalTimestamp = messageWithTimestamp.localTimestamp

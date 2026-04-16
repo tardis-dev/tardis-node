@@ -1,8 +1,6 @@
 import { DerivativeTicker, Exchange, FilterForExchange, NormalizedData } from '../types.ts'
 
 export type Mapper<T extends Exchange, U extends NormalizedData> = {
-  initialize?: () => Promise<void>
-
   canHandle: (message: any) => boolean
 
   map(message: any, localTimestamp: Date): IterableIterator<U> | undefined
@@ -11,27 +9,6 @@ export type Mapper<T extends Exchange, U extends NormalizedData> = {
 }
 
 export type MapperFactory<T extends Exchange, U extends NormalizedData> = (exchange: T, localTimestamp: Date) => Mapper<T, U>
-
-export function createMappersFactory<T extends Exchange>(exchange: T, normalizers: MapperFactory<T, any>[]) {
-  return async (localTimestamp: Date): Promise<Mapper<T, any>[]> => {
-    if (normalizers.length === 0) {
-      throw new Error(`Can't normalize data without any normalizers provided`)
-    }
-    const mappers = await Promise.all(
-      normalizers.map(async (normalizerFactory) => {
-        const mapper = normalizerFactory(exchange, localTimestamp)
-        try {
-          await mapper.initialize?.()
-          return mapper
-        } catch (err) {
-          console.error(`mapper initialize failed for exchange "${exchange}", excluding from pipeline:`, err)
-          return undefined
-        }
-      })
-    )
-    return mappers.filter((m): m is Mapper<T, any> => m !== undefined)
-  }
-}
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 

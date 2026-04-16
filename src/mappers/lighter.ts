@@ -1,49 +1,7 @@
-import { getJSON } from '../handy.ts'
 import { BookChange, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
-const LIGHTER_MARKETS_URL = 'https://mainnet.zklighter.elliot.ai/api/v1/orderBookDetails'
-
-const lighterMarkets = {
-  idToSymbol: new Map<number, string>(),
-  symbolToId: new Map<string, number>(),
-  loadingPromise: undefined as Promise<void> | undefined
-}
-
-function loadLighterMarkets(): Promise<void> {
-  if (lighterMarkets.loadingPromise !== undefined) {
-    return lighterMarkets.loadingPromise
-  }
-
-  lighterMarkets.loadingPromise = getJSON<LighterOrderBookDetailsResponse>(LIGHTER_MARKETS_URL, { timeout: 10000 })
-    .then(({ data }) => {
-      data.order_book_details.forEach((market) => {
-        if (market.market_type === 'perp' && market.status === 'active') {
-          lighterMarkets.idToSymbol.set(market.market_id, market.symbol)
-          lighterMarkets.symbolToId.set(market.symbol, market.market_id)
-        }
-      })
-    })
-    .catch((err) => {
-      lighterMarkets.loadingPromise = undefined
-      throw err
-    })
-
-  return lighterMarkets.loadingPromise
-}
-
-function resolveFilterSymbols(symbols?: string[]): string[] | undefined {
-  if (symbols === undefined) {
-    return undefined
-  }
-
-  return symbols
-    .map((symbol) => lighterMarkets.symbolToId.get(symbol))
-    .filter((id): id is number => id !== undefined)
-    .map((id) => String(id))
-}
-
-function parseChannelMarketId(channel: string): number | undefined {
+function parseChannelMarketId(channel: string): string | undefined {
   const colonIndex = channel.indexOf(':')
   if (colonIndex < 0) {
     return undefined
@@ -52,21 +10,10 @@ function parseChannelMarketId(channel: string): number | undefined {
   if (suffix === 'all') {
     return undefined
   }
-  const parsed = Number(suffix)
-  return Number.isNaN(parsed) ? undefined : parsed
-}
-
-function mapChannelToSymbol(channel: string): string | undefined {
-  const marketId = parseChannelMarketId(channel)
-  if (marketId === undefined) return undefined
-  return lighterMarkets.idToSymbol.get(marketId)
+  return suffix
 }
 
 export class LighterTradesMapper implements Mapper<'lighter', Trade> {
-  async initialize() {
-    await loadLighterMarkets()
-  }
-
   canHandle(message: LighterUpdateTradeMessage) {
     return message.type === 'update/trade'
   }
@@ -75,13 +22,13 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
     return [
       {
         channel: 'trade' as const,
-        symbols: resolveFilterSymbols(symbols)
+        symbols
       }
     ]
   }
 
   *map(message: LighterUpdateTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
-    const symbol = mapChannelToSymbol(message.channel)
+    const symbol = parseChannelMarketId(message.channel)
     if (symbol === undefined) return
 
     for (const trade of message.trades) {
@@ -103,10 +50,6 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
 export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
   private readonly _snapshotSent = new Set<string>()
 
-  async initialize() {
-    await loadLighterMarkets()
-  }
-
   canHandle(message: LighterOrderBookMessage) {
     return message.type === 'update/order_book'
   }
@@ -115,13 +58,13 @@ export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
     return [
       {
         channel: 'order_book' as const,
-        symbols: resolveFilterSymbols(symbols)
+        symbols
       }
     ]
   }
 
   *map(message: LighterOrderBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
-    const symbol = mapChannelToSymbol(message.channel)
+    const symbol = parseChannelMarketId(message.channel)
     if (symbol === undefined) return
 
     const isSnapshot = this._snapshotSent.has(symbol) === false
@@ -152,10 +95,6 @@ function mapLighterLevel(level: LighterLevel) {
 export class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
-  async initialize() {
-    await loadLighterMarkets()
-  }
-
   canHandle(message: LighterMarketStatsMessage) {
     return message.type === 'update/market_stats'
   }
@@ -173,7 +112,7 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
     const stats = message.market_stats
     for (const key of Object.keys(stats)) {
       const entry = stats[key]
-      const symbol = entry.symbol !== undefined ? entry.symbol : lighterMarkets.idToSymbol.get(entry.market_id)
+      const symbol = entry.symbol !== undefined ? entry.symbol : entry.market_id !== undefined ? String(entry.market_id) : key
       if (symbol === undefined) continue
 
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'lighter')
@@ -189,15 +128,6 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
       }
     }
   }
-}
-
-type LighterOrderBookDetailsResponse = {
-  order_book_details: {
-    symbol: string
-    market_id: number
-    market_type: 'perp' | 'spot'
-    status: string
-  }[]
 }
 
 type LighterLevel = {

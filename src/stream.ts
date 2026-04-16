@@ -1,6 +1,6 @@
 import { debug } from './debug.ts'
 import { getFilters, normalizeMessages } from './handy.ts'
-import { createMappersFactory, MapperFactory } from './mappers/index.ts'
+import { MapperFactory } from './mappers/index.ts'
 import { createRealTimeFeed } from './realtimefeeds/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
 
@@ -60,8 +60,8 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
   while (true) {
     try {
-      const createMappers = createMappersFactory(exchange, normalizers)
-      const mappers = await createMappers(new Date())
+      const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
+      const mappers = createMappers(new Date())
       const filters = getFilters(mappers, symbols)
 
       const messages = _stream({
@@ -80,7 +80,16 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
         return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
       }
 
-      const normalizedMessages = normalizeMessages(exchange, symbols, messages, createMappers, withDisconnectMessages, filter, new Date())
+      const normalizedMessages = normalizeMessages(
+        exchange,
+        symbols,
+        messages,
+        mappers,
+        createMappers,
+        withDisconnectMessages,
+        filter,
+        new Date()
+      )
 
       for await (const message of normalizedMessages) {
         yield message
