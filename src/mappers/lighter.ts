@@ -201,19 +201,39 @@ type LighterTradeMessage = {
   liquidation_trades: LighterTrade[]
 }
 
-type LighterMarketStatsEntry = {
-  symbol?: string
+type LighterMarketStats = {
+  symbol: string
   market_id: number
-  mark_price?: string
-  index_price?: string
-  funding_rate?: string
-  current_funding_rate?: string
-  open_interest?: string
+  index_price: string
+  mark_price: string
+  mid_price: string
+  open_interest: string
+  open_interest_limit: string
+  funding_clamp_small: string
+  funding_clamp_big: string
+  last_trade_price: string
+  current_funding_rate: string
+  funding_rate: string
+  funding_timestamp: number
+  daily_base_token_volume: number
+  daily_quote_token_volume: number
+  daily_price_low: number
+  daily_price_high: number
+  daily_price_change: number
 }
 
-type LighterMarketStatsMessage = {
-  type: 'update/market_stats'
-  channel: string
+type LighterMarketStatsAllMessage = {
+  type: 'subscribed/market_stats' | 'update/market_stats'
+  channel: 'market_stats:all'
   timestamp: number
-  market_stats: { [marketIdOrSymbol: string]: LighterMarketStatsEntry }
+  market_stats: Record<string, LighterMarketStats>
 }
+
+type LighterMarketStatsMarketIdMessage = {
+  type: 'subscribed/market_stats' | 'update/market_stats'
+  channel: `market_stats:${number}`
+  timestamp: number
+  market_stats: LighterMarketStats
+}
+
+type LighterMarketStatsMessage = LighterMarketStatsAllMessage | LighterMarketStatsMarketIdMessage
