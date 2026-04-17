@@ -154,20 +154,49 @@ type LighterOrderBookMessage = {
 
 type LighterTrade = {
   trade_id: number
-  trade_id_str?: string
+  trade_id_str: string
+  tx_hash: string
+  type: 'trade' | 'liquidation' | 'deleverage' | 'market-settlement'
   market_id: number
   size: string
   price: string
+  usd_amount: string
+  ask_id: number
+  ask_id_str: string
+  bid_id: number
+  bid_id_str: string
+  ask_client_id: number
+  ask_client_id_str: string
+  bid_client_id: number
+  bid_client_id_str: string
+  ask_account_id: number
+  bid_account_id: number
   is_maker_ask: boolean
+  block_height: number
   timestamp: number
-  type: 'trade' | 'liquidation' | 'deleverage' | 'market-settlement'
+  taker_fee?: number
+  taker_position_size_before?: string
+  taker_entry_quote_before?: string
+  taker_initial_margin_fraction_before?: number
+  taker_position_sign_changed?: boolean
+  taker_allocated_margin_usdc_before?: number
+  maker_fee?: number
+  maker_position_size_before?: string
+  maker_entry_quote_before?: string
+  maker_initial_margin_fraction_before?: number
+  maker_position_sign_changed?: boolean
+  transaction_time: number
+  ask_account_pnl?: string
+  bid_account_pnl?: string
+  side?: Trade['side']
 }
 
-type LighterUpdateTradeMessage = {
-  type: 'update/trade'
+type LighterTradeMessage = {
+  type: 'subscribed/trade' | 'update/trade'
   channel: string
+  nonce: number
   trades: LighterTrade[]
-  liquidation_trades?: LighterTrade[]
+  liquidation_trades: LighterTrade[]
 }
 
 type LighterMarketStatsEntry = {
