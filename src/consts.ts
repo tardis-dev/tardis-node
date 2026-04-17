@@ -519,7 +519,7 @@ const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RIS
 
 const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']
 
-const LIGHTER_CHANNELS = ['order_book', 'trade', 'market_stats']
+const LIGHTER_CHANNELS = ['order_book', 'trade', 'ticker', 'market_stats', 'spot_market_stats']
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
