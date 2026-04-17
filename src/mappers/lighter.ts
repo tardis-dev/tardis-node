@@ -1,4 +1,4 @@
-import { BookChange, DerivativeTicker, Trade } from '../types.ts'
+import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 function parseChannelMarketId(channel: string): string | undefined {
@@ -92,6 +92,38 @@ function mapLighterLevel(level: LighterLevel) {
   }
 }
 
+export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
+  canHandle(message: LighterTickerMessage) {
+    return message.type === 'subscribed/ticker' || message.type === 'update/ticker'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker' as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(message: LighterTickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    const symbol = parseChannelMarketId(message.channel)
+    if (symbol === undefined) return
+
+    yield {
+      type: 'book_ticker',
+      symbol,
+      exchange: 'lighter',
+      askAmount: Number(message.ticker.a.size),
+      askPrice: Number(message.ticker.a.price),
+      bidPrice: Number(message.ticker.b.price),
+      bidAmount: Number(message.ticker.b.size),
+      timestamp: new Date(message.timestamp),
+      localTimestamp
+    }
+  }
+}
+
 export class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
@@ -152,6 +184,22 @@ type LighterOrderBookMessage = {
   offset: number
   timestamp: number
   order_book: LighterOrderBook
+}
+
+type LighterTicker = {
+  s: string
+  a: LighterLevel
+  b: LighterLevel
+  last_updated_at: number
+}
+
+type LighterTickerMessage = {
+  type: 'subscribed/ticker' | 'update/ticker'
+  channel: `ticker:${number}`
+  last_updated_at: number
+  nonce: number
+  ticker: LighterTicker
+  timestamp: number
 }
 
 type LighterTrade = {

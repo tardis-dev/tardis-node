@@ -116,7 +116,7 @@ import {
   HyperliquidDerivativeTickerMapper,
   HyperliquidTradesMapper
 } from './hyperliquid.ts'
-import { LighterBookChangeMapper, LighterDerivativeTickerMapper, LighterTradesMapper } from './lighter.ts'
+import { LighterBookChangeMapper, LighterBookTickerMapper, LighterDerivativeTickerMapper, LighterTradesMapper } from './lighter.ts'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
 import {
@@ -553,6 +553,7 @@ const bookTickersMappers = {
   'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
   hyperliquid: () => new HyperliquidBookTickerMapper(),
+  lighter: () => new LighterBookTickerMapper(),
   'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
 }
 
