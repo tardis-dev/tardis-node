@@ -14,7 +14,7 @@ function parseChannelMarketId(channel: string): string | undefined {
 }
 
 export class LighterTradesMapper implements Mapper<'lighter', Trade> {
-  canHandle(message: LighterUpdateTradeMessage) {
+  canHandle(message: LighterTradeMessage) {
     return message.type === 'update/trade'
   }
 
@@ -27,7 +27,7 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
     ]
   }
 
-  *map(message: LighterUpdateTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+  *map(message: LighterTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
     const symbol = parseChannelMarketId(message.channel)
     if (symbol === undefined) return
 
@@ -36,7 +36,7 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
         type: 'trade',
         symbol,
         exchange: 'lighter',
-        id: trade.trade_id_str !== undefined ? trade.trade_id_str : String(trade.trade_id),
+        id: trade.trade_id_str,
         price: Number(trade.price),
         amount: Number(trade.size),
         side: trade.is_maker_ask ? 'buy' : 'sell',
@@ -238,7 +238,6 @@ type LighterTrade = {
   transaction_time: number
   ask_account_pnl?: string
   bid_account_pnl?: string
-  side?: Trade['side']
 }
 
 type LighterTradeMessage = {
