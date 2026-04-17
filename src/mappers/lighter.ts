@@ -237,3 +237,32 @@ type LighterMarketStatsMarketIdMessage = {
 }
 
 type LighterMarketStatsMessage = LighterMarketStatsAllMessage | LighterMarketStatsMarketIdMessage
+
+type LighterSpotMarketStats = {
+  symbol: string
+  market_id: number
+  index_price: string
+  mid_price: string
+  last_trade_price: string
+  daily_base_token_volume: number
+  daily_quote_token_volume: number
+  daily_price_low: number
+  daily_price_high: number
+  daily_price_change: number
+}
+
+type LighterSpotMarketStatsAllMessage = {
+  type: 'subscribed/spot_market_stats' | 'update/spot_market_stats'
+  channel: 'spot_market_stats:all'
+  timestamp: number
+  spot_market_stats: Record<string, LighterSpotMarketStats>
+}
+
+type LighterSpotMarketStatsMarketIdMessage = {
+  type: 'subscribed/spot_market_stats' | 'update/spot_market_stats'
+  channel: `spot_market_stats:${number}`
+  timestamp: number
+  spot_market_stats: LighterSpotMarketStats
+}
+
+type LighterSpotMarketStatsMessage = LighterSpotMarketStatsAllMessage | LighterSpotMarketStatsMarketIdMessage
