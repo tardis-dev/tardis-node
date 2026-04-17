@@ -135,21 +135,23 @@ type LighterLevel = {
   size: string
 }
 
+type LighterOrderBook = {
+  asks: LighterLevel[]
+  bids: LighterLevel[]
+  code: number
+  nonce: number
+  begin_nonce: number
+  offset: number
+  last_updated_at: number
+}
+
 type LighterOrderBookMessage = {
   type: 'subscribed/order_book' | 'update/order_book'
   channel: string
   last_updated_at: number
   offset: number
   timestamp: number
-  order_book: {
-    asks: LighterLevel[]
-    bids: LighterLevel[]
-    code: number
-    nonce: number
-    begin_nonce: number
-    offset: number
-    last_updated_at: number
-  }
+  order_book: LighterOrderBook
 }
 
 type LighterTrade = {
