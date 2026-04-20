@@ -178,7 +178,7 @@ type LighterOrderBook = {
 
 type LighterOrderBookMessage = {
   type: 'subscribed/order_book' | 'update/order_book'
-  channel: string
+  channel: `order_book:${number}`
   last_updated_at: number
   offset: number
   timestamp: number
@@ -241,7 +241,7 @@ type LighterTrade = {
 
 type LighterTradeMessage = {
   type: 'subscribed/trade' | 'update/trade'
-  channel: string
+  channel: `trade:${number}`
   nonce: number
   trades: LighterTrade[]
   liquidation_trades: LighterTrade[]
