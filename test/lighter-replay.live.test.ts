@@ -1,8 +1,8 @@
 import { clearCache, normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades, replayNormalized } from '../dist/index.js'
 import { describeLive } from './live.js'
 
-const from = process.env.LIGHTER_REPLAY_TEST_FROM ?? '2026-04-16T11:30:00.000Z'
-const to = process.env.LIGHTER_REPLAY_TEST_TO ?? '2026-04-16T11:40:00.000Z'
+const from = process.env.LIGHTER_REPLAY_TEST_FROM ?? '2026-04-17T00:00:00.000Z'
+const to = process.env.LIGHTER_REPLAY_TEST_TO ?? '2026-04-17T00:10:00.000Z'
 const symbol = process.env.LIGHTER_REPLAY_TEST_SYMBOL ?? '1'
 
 describeLive('lighter replay live', () => {

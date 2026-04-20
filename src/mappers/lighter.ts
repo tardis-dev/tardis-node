@@ -132,11 +132,14 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
 
   *map(message: LighterMarketStatsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const entry of this.iterateMarketStats(message)) {
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.symbol, 'lighter')
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), 'lighter')
 
       pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
       pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
       pendingTickerInfo.updateFundingRate(Number(entry.funding_rate))
+      pendingTickerInfo.updateFundingTimestamp(new Date(entry.funding_timestamp))
+      pendingTickerInfo.updatePredictedFundingRate(Number(entry.current_funding_rate))
+      pendingTickerInfo.updateLastPrice(Number(entry.last_trade_price))
       pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
 
       if (pendingTickerInfo.hasChanged()) {
