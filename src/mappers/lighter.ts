@@ -121,37 +121,43 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: LighterMarketStatsMessage) {
-    return message.type === 'update/market_stats'
+    return message.type === 'subscribed/market_stats' || message.type === 'update/market_stats'
   }
 
   getFilters(_symbols?: string[]) {
     return [
       {
         channel: 'market_stats' as const,
-        symbols: undefined
+        symbols: []
       }
     ]
   }
 
   *map(message: LighterMarketStatsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    const stats = message.market_stats
-    for (const key of Object.keys(stats)) {
-      const entry = stats[key]
-      const symbol = entry.symbol !== undefined ? entry.symbol : entry.market_id !== undefined ? String(entry.market_id) : key
-      if (symbol === undefined) continue
+    for (const entry of this.iterateMarketStats(message)) {
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.symbol, 'lighter')
 
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'lighter')
-
-      if (entry.mark_price !== undefined) pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
-      if (entry.index_price !== undefined) pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
-      if (entry.funding_rate !== undefined) pendingTickerInfo.updateFundingRate(Number(entry.funding_rate))
-      if (entry.open_interest !== undefined) pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
+      pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
+      pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
+      pendingTickerInfo.updateFundingRate(Number(entry.funding_rate))
+      pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
 
       if (pendingTickerInfo.hasChanged()) {
         pendingTickerInfo.updateTimestamp(new Date(message.timestamp))
         yield pendingTickerInfo.getSnapshot(localTimestamp)
       }
     }
+  }
+
+  private *iterateMarketStats(message: LighterMarketStatsMessage): IterableIterator<LighterMarketStats> {
+    if (message.channel === 'market_stats:all') {
+      for (const key of Object.keys(message.market_stats)) {
+        yield message.market_stats[key]
+      }
+      return
+    }
+
+    yield message.market_stats
   }
 }
 

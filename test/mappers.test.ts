@@ -35,7 +35,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'kucoin-futures',
   'bitget-futures',
   'coinbase-international',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -78,7 +79,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitget',
   'bitget-futures',
   'coinbase-international',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'huobi-dm-options', 'bybit-options', 'binance-european-options']
@@ -9906,6 +9908,158 @@ test('map lighter order book messages', () => {
         last_updated_at: 1776692222467930,
         begin_nonce: 10382292136
       }
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter market stats messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/market_stats — initial snapshot of all markets (real captured message)
+    {
+      type: 'subscribed/market_stats',
+      channel: 'market_stats:all',
+      timestamp: 1776694043429,
+      market_stats: {
+        '0': {
+          symbol: 'ETH',
+          market_id: 0,
+          index_price: '2309.89',
+          mark_price: '2308.86',
+          mid_price: '2308.52',
+          open_interest: '70209112.921092',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '2308.57',
+          current_funding_rate: '0.0011',
+          funding_rate: '0.0003',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 185243.4448,
+          daily_quote_token_volume: 424882918.347895,
+          daily_price_low: 2250.75,
+          daily_price_high: 2340.48,
+          daily_price_change: -0.8647896637453895
+        },
+        '1': {
+          symbol: 'BTC',
+          market_id: 1,
+          index_price: '75281.9',
+          mark_price: '75241.1',
+          mid_price: '75237.9',
+          open_interest: '124496091.756091',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '75232.0',
+          current_funding_rate: '0.0012',
+          funding_rate: '0.0008',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 9180.73357,
+          daily_quote_token_volume: 686539466.320927,
+          daily_price_low: 73688.4,
+          daily_price_high: 76127,
+          daily_price_change: -0.7606613942249353
+        }
+      }
+    },
+    // update/market_stats — incremental update, open_interest changed (real captured message)
+    {
+      type: 'update/market_stats',
+      channel: 'market_stats:all',
+      timestamp: 1776694043874,
+      market_stats: {
+        '0': {
+          symbol: 'ETH',
+          market_id: 0,
+          index_price: '2309.89',
+          mark_price: '2308.86',
+          mid_price: '2308.40',
+          open_interest: '70209098.837046',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '2308.57',
+          current_funding_rate: '0.0011',
+          funding_rate: '0.0003',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 185243.4448,
+          daily_quote_token_volume: 424882918.347895,
+          daily_price_low: 2250.75,
+          daily_price_high: 2340.48,
+          daily_price_change: -0.8647896637453895
+        },
+        '1': {
+          symbol: 'BTC',
+          market_id: 1,
+          index_price: '75281.9',
+          mark_price: '75241.1',
+          mid_price: '75237.8',
+          open_interest: '124496030.810800',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '75232.0',
+          current_funding_rate: '0.0012',
+          funding_rate: '0.0008',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 9180.73357,
+          daily_quote_token_volume: 686539466.320927,
+          daily_price_low: 73688.4,
+          daily_price_high: 76127,
+          daily_price_change: -0.7606613942249353
+        }
+      }
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter ticker messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/ticker — initial BBO snapshot (real captured message)
+    {
+      type: 'subscribed/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695866952028,
+      nonce: 10385958485,
+      ticker: {
+        s: 'BTC',
+        a: { price: '75531.6', size: '0.53087' },
+        b: { price: '75531.5', size: '0.00120' },
+        last_updated_at: 1776695866952028
+      },
+      timestamp: 1776695867145
+    },
+    // update/ticker — BBO changed (real captured message)
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144750,
+      nonce: 10385958486,
+      ticker: {
+        s: 'BTC',
+        a: { price: '75531.6', size: '0.52927' },
+        b: { price: '75524.4', size: '0.10752' },
+        last_updated_at: 1776695867144750
+      },
+      timestamp: 1776695867147
     }
   ]
 
