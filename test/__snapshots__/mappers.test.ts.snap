@@ -2127,6 +2127,17 @@ exports[`map lighter trade messages 1`] = `
     "timestamp": 2026-04-20T13:13:19.874Z,
     "type": "trade",
   },
+  {
+    "amount": 0.01664,
+    "exchange": "lighter",
+    "id": "18237797923",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75602.8,
+    "side": "buy",
+    "symbol": "1",
+    "timestamp": 2026-04-20T12:20:56.653Z,
+    "type": "liquidation",
+  },
 ]
 `;
 
@@ -2146,7 +2157,21 @@ exports[`map lighter trade messages 2`] = `
 ]
 `;
 
-exports[`map lighter trade messages 3`] = `[]`;
+exports[`map lighter trade messages 3`] = `
+[
+  {
+    "amount": 0.01664,
+    "exchange": "lighter",
+    "id": "18237797923",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75602.8,
+    "side": "buy",
+    "symbol": "1",
+    "timestamp": 2026-04-20T12:20:56.653Z,
+    "type": "liquidation",
+  },
+]
+`;
 
 exports[`map okex-spreads messages 1`] = `
 [

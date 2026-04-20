@@ -1,4 +1,4 @@
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 function parseChannelMarketId(channel: string): string | undefined {
@@ -31,6 +31,41 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
     for (const trade of message.trades) {
       yield {
         type: 'trade',
+        symbol: trade.market_id.toString(),
+        exchange: 'lighter',
+        id: trade.trade_id_str,
+        price: Number(trade.price),
+        amount: Number(trade.size),
+        side: trade.is_maker_ask ? 'buy' : 'sell',
+        timestamp: new Date(trade.timestamp),
+        localTimestamp
+      }
+    }
+  }
+}
+
+export class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
+  canHandle(message: LighterTradeMessage) {
+    return message.type === 'subscribed/trade' || message.type === 'update/trade'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'trade' as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(message: LighterTradeMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const trade of message.liquidation_trades) {
+      if (trade.type !== 'liquidation') {
+        continue
+      }
+
+      yield {
+        type: 'liquidation',
         symbol: trade.market_id.toString(),
         exchange: 'lighter',
         id: trade.trade_id_str,

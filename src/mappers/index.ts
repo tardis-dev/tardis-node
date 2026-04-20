@@ -116,7 +116,13 @@ import {
   HyperliquidDerivativeTickerMapper,
   HyperliquidTradesMapper
 } from './hyperliquid.ts'
-import { LighterBookChangeMapper, LighterBookTickerMapper, LighterDerivativeTickerMapper, LighterTradesMapper } from './lighter.ts'
+import {
+  LighterBookChangeMapper,
+  LighterBookTickerMapper,
+  LighterDerivativeTickerMapper,
+  LighterLiquidationMapper,
+  LighterTradesMapper
+} from './lighter.ts'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
 import {
@@ -478,6 +484,7 @@ const liquidationsMappers = {
   'dydx-v4': () => new DydxV4LiquidationsMapper(),
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
+  lighter: () => new LighterLiquidationMapper(),
   bybit: (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp)
       ? shouldUseBybitAllLiquidationFeed(localTimestamp)

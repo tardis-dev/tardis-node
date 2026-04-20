@@ -99,7 +99,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'bybit',
   'okex-futures',
   'okex-swap',
-  'dydx-v4'
+  'dydx-v4',
+  'lighter'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
