@@ -9648,3 +9648,207 @@ test('map hyperliquid messages', () => {
     expect(mappedMessages).toMatchSnapshot()
   }
 })
+
+test('map lighter trade messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/trade — initial batch of recent trades (real captured message)
+    {
+      type: 'subscribed/trade',
+      channel: 'trade:1',
+      nonce: 10380968789,
+      trades: [
+        {
+          trade_id: 18240999145,
+          trade_id_str: '18240999145',
+          tx_hash: '00000011bd66332a0000019dab062502000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00006',
+          price: '75198.1',
+          usd_amount: '4.511886',
+          ask_id: 562952080517578,
+          ask_id_str: '562952080517578',
+          bid_id: 844422774647641,
+          bid_id_str: '844422774647641',
+          ask_client_id: 177669079961927,
+          ask_client_id_str: '177669079961927',
+          bid_client_id: 51630146860820,
+          bid_client_id_str: '51630146860820',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856170,
+          timestamp: 1776690799874,
+          taker_position_size_before: '0.00072',
+          taker_entry_quote_before: '54.139644',
+          taker_initial_margin_fraction_before: 200,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95094',
+          maker_entry_quote_before: '4581275.187585',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690799927875
+        },
+        {
+          trade_id: 18240999144,
+          trade_id_str: '18240999144',
+          tx_hash: '00000011bd6633290000019dab062502000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00020',
+          price: '75198.2',
+          usd_amount: '15.039640',
+          ask_id: 562952080517578,
+          ask_id_str: '562952080517578',
+          bid_id: 844422774647644,
+          bid_id_str: '844422774647644',
+          ask_client_id: 177669079961927,
+          ask_client_id_str: '177669079961927',
+          bid_client_id: 116325593583470,
+          bid_client_id_str: '116325593583470',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856170,
+          timestamp: 1776690799874,
+          taker_position_size_before: '0.00092',
+          taker_entry_quote_before: '69.178434',
+          taker_initial_margin_fraction_before: 200,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95114',
+          maker_entry_quote_before: '4581290.220250',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690799927846
+        }
+      ],
+      liquidation_trades: [
+        {
+          trade_id: 18237797923,
+          trade_id_str: '18237797923',
+          tx_hash: '00000011bcbd1dfc0000019daad62ecd000000000000000000000000000000000000000000000000',
+          type: 'liquidation',
+          market_id: 1,
+          size: '0.01664',
+          price: '75602.8',
+          usd_amount: '1258.030592',
+          ask_id: 562952080068427,
+          ask_id_str: '562952080068427',
+          bid_id: 844422775101621,
+          bid_id_str: '844422775101621',
+          ask_client_id: 177668765669007,
+          ask_client_id_str: '177668765669007',
+          bid_client_id: 0,
+          bid_client_id_str: '0',
+          ask_account_id: 281474976626509,
+          bid_account_id: 281474976600615,
+          is_maker_ask: true,
+          block_height: 218829719,
+          timestamp: 1776687656653,
+          taker_fee: 10000,
+          taker_position_size_before: '-0.01664',
+          taker_entry_quote_before: '1247.585664',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 39,
+          maker_position_size_before: '-0.00015',
+          maker_entry_quote_before: '11.282089',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1776687656681222,
+          taker_allocated_margin_usdc_before: 25585360
+        }
+      ]
+    },
+    // update/trade — single incremental trade (real captured message)
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380969080,
+      trades: [
+        {
+          trade_id: 18240999426,
+          trade_id_str: '18240999426',
+          tx_hash: '00000011bd6636f50000019dab062676000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00012',
+          price: '75196.7',
+          usd_amount: '9.023604',
+          ask_id: 562952080517591,
+          ask_id_str: '562952080517591',
+          bid_id: 844422774647737,
+          bid_id_str: '844422774647737',
+          ask_client_id: 177669079994047,
+          ask_client_id_str: '177669079994047',
+          bid_client_id: 227191959496532,
+          bid_client_id_str: '227191959496532',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856174,
+          timestamp: 1776690800246,
+          taker_position_size_before: '0.00012',
+          taker_entry_quote_before: '9.023274',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95034',
+          maker_entry_quote_before: '4581230.089589',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690800252707
+        }
+      ],
+      liquidation_trades: []
+    },
+    // update/trade — liquidation_trades only, no regular trades; nothing should be emitted
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380968790,
+      trades: [],
+      liquidation_trades: [
+        {
+          trade_id: 18237797923,
+          trade_id_str: '18237797923',
+          tx_hash: '00000011bcbd1dfc0000019daad62ecd000000000000000000000000000000000000000000000000',
+          type: 'liquidation',
+          market_id: 1,
+          size: '0.01664',
+          price: '75602.8',
+          usd_amount: '1258.030592',
+          ask_id: 562952080068427,
+          ask_id_str: '562952080068427',
+          bid_id: 844422775101621,
+          bid_id_str: '844422775101621',
+          ask_client_id: 177668765669007,
+          ask_client_id_str: '177668765669007',
+          bid_client_id: 0,
+          bid_client_id_str: '0',
+          ask_account_id: 281474976626509,
+          bid_account_id: 281474976600615,
+          is_maker_ask: true,
+          block_height: 218829719,
+          timestamp: 1776687656653,
+          taker_fee: 10000,
+          taker_position_size_before: '-0.01664',
+          taker_entry_quote_before: '1247.585664',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 39,
+          maker_position_size_before: '-0.00015',
+          maker_entry_quote_before: '11.282089',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1776687656681222,
+          taker_allocated_margin_usdc_before: 25585360
+        }
+      ]
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})

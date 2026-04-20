@@ -1923,6 +1923,51 @@ exports[`map kucoin-futures messages 15`] = `
 ]
 `;
 
+exports[`map lighter trade messages 1`] = `
+[
+  {
+    "amount": 0.00006,
+    "exchange": "lighter",
+    "id": "18240999145",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75198.1,
+    "side": "sell",
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:13:19.874Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.0002,
+    "exchange": "lighter",
+    "id": "18240999144",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75198.2,
+    "side": "sell",
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:13:19.874Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map lighter trade messages 2`] = `
+[
+  {
+    "amount": 0.00012,
+    "exchange": "lighter",
+    "id": "18240999426",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75196.7,
+    "side": "sell",
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:13:20.246Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map lighter trade messages 3`] = `[]`;
+
 exports[`map okex-spreads messages 1`] = `
 [
   {

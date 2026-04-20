@@ -15,7 +15,7 @@ function parseChannelMarketId(channel: string): string | undefined {
 
 export class LighterTradesMapper implements Mapper<'lighter', Trade> {
   canHandle(message: LighterTradeMessage) {
-    return message.type === 'update/trade'
+    return message.type === 'subscribed/trade' || message.type === 'update/trade'
   }
 
   getFilters(symbols?: string[]) {
