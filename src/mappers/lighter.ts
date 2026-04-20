@@ -28,13 +28,10 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
   }
 
   *map(message: LighterTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
-    const symbol = parseChannelMarketId(message.channel)
-    if (symbol === undefined) return
-
     for (const trade of message.trades) {
       yield {
         type: 'trade',
-        symbol,
+        symbol: trade.market_id.toString(),
         exchange: 'lighter',
         id: trade.trade_id_str,
         price: Number(trade.price),
