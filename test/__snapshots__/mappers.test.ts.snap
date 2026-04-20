@@ -1923,6 +1923,88 @@ exports[`map kucoin-futures messages 15`] = `
 ]
 `;
 
+exports[`map lighter order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.08303,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.00331,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.1328,
+        "price": 75302,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.00117,
+        "price": 75300.4,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.3,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.1,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.437Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map lighter order book messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.28364,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.61855,
+        "price": 75313.9,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.04881,
+        "price": 75300.6,
+      },
+      {
+        "amount": 0.01993,
+        "price": 75295.7,
+      },
+      {
+        "amount": 0.10792,
+        "price": 75294.3,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.475Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`map lighter trade messages 1`] = `
 [
   {

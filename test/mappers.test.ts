@@ -9852,3 +9852,67 @@ test('map lighter trade messages', () => {
     expect(mappedMessages).toMatchSnapshot()
   }
 })
+
+test('map lighter order book messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/order_book — full snapshot (real captured message)
+    {
+      type: 'subscribed/order_book',
+      channel: 'order_book:1',
+      last_updated_at: 1776692222420103,
+      offset: 52072043,
+      timestamp: 1776692222437,
+      order_book: {
+        code: 0,
+        asks: [
+          { price: '75300.5', size: '0.08303' },
+          { price: '75300.7', size: '0.00331' },
+          { price: '75302.0', size: '0.13280' }
+        ],
+        bids: [
+          { price: '75300.4', size: '0.00117' },
+          { price: '75300.3', size: '0.00020' },
+          { price: '75300.1', size: '0.00020' }
+        ],
+        offset: 52072043,
+        nonce: 10382292136,
+        last_updated_at: 1776692222420103,
+        begin_nonce: 0
+      }
+    },
+    // update/order_book — incremental delta (real captured message)
+    {
+      type: 'update/order_book',
+      channel: 'order_book:1',
+      last_updated_at: 1776692222467930,
+      offset: 52072055,
+      timestamp: 1776692222475,
+      order_book: {
+        code: 0,
+        asks: [
+          { price: '75300.5', size: '0.00000' },
+          { price: '75300.7', size: '0.28364' },
+          { price: '75313.9', size: '0.61855' }
+        ],
+        bids: [
+          { price: '75300.6', size: '0.04881' },
+          { price: '75295.7', size: '0.01993' },
+          { price: '75294.3', size: '0.10792' }
+        ],
+        offset: 52072055,
+        nonce: 10382292188,
+        last_updated_at: 1776692222467930,
+        begin_nonce: 10382292136
+      }
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})

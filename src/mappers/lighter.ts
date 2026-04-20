@@ -48,10 +48,8 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
 }
 
 export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
-  private readonly _snapshotSent = new Set<string>()
-
   canHandle(message: LighterOrderBookMessage) {
-    return message.type === 'update/order_book'
+    return message.type === 'subscribed/order_book' || message.type === 'update/order_book'
   }
 
   getFilters(symbols?: string[]) {
@@ -67,28 +65,23 @@ export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
     const symbol = parseChannelMarketId(message.channel)
     if (symbol === undefined) return
 
-    const isSnapshot = this._snapshotSent.has(symbol) === false
-    if (isSnapshot) {
-      this._snapshotSent.add(symbol)
-    }
-
     yield {
       type: 'book_change',
       symbol,
       exchange: 'lighter',
-      isSnapshot,
-      bids: message.order_book.bids.map(mapLighterLevel),
-      asks: message.order_book.asks.map(mapLighterLevel),
+      isSnapshot: message.type === 'subscribed/order_book',
+      bids: message.order_book.bids.map(this.mapLevel),
+      asks: message.order_book.asks.map(this.mapLevel),
       timestamp: new Date(message.timestamp),
       localTimestamp
     }
   }
-}
 
-function mapLighterLevel(level: LighterLevel) {
-  return {
-    price: Number(level.price),
-    amount: Number(level.size)
+  private mapLevel(level: LighterLevel) {
+    return {
+      price: Number(level.price),
+      amount: Number(level.size)
+    }
   }
 }
 
