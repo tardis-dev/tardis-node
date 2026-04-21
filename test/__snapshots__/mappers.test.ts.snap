@@ -1923,38 +1923,7 @@ exports[`map kucoin-futures messages 15`] = `
 ]
 `;
 
-exports[`map lighter market stats messages 1`] = `
-[
-  {
-    "exchange": "lighter",
-    "fundingRate": 0.0003,
-    "fundingTimestamp": 2026-04-20T14:00:00.000Z,
-    "indexPrice": 2309.89,
-    "lastPrice": 2308.57,
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "markPrice": 2308.86,
-    "openInterest": 70209112.921092,
-    "predictedFundingRate": 0.0011,
-    "symbol": "0",
-    "timestamp": 2026-04-20T14:07:23.429Z,
-    "type": "derivative_ticker",
-  },
-  {
-    "exchange": "lighter",
-    "fundingRate": 0.0008,
-    "fundingTimestamp": 2026-04-20T14:00:00.000Z,
-    "indexPrice": 75281.9,
-    "lastPrice": 75232,
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "markPrice": 75241.1,
-    "openInterest": 124496091.756091,
-    "predictedFundingRate": 0.0012,
-    "symbol": "1",
-    "timestamp": 2026-04-20T14:07:23.429Z,
-    "type": "derivative_ticker",
-  },
-]
-`;
+exports[`map lighter market stats messages 1`] = `[]`;
 
 exports[`map lighter market stats messages 2`] = `
 [
@@ -2071,21 +2040,7 @@ exports[`map lighter order book messages 2`] = `
 ]
 `;
 
-exports[`map lighter ticker messages 1`] = `
-[
-  {
-    "askAmount": 0.53087,
-    "askPrice": 75531.6,
-    "bidAmount": 0.0012,
-    "bidPrice": 75531.5,
-    "exchange": "lighter",
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "symbol": "1",
-    "timestamp": 2026-04-20T14:37:47.145Z,
-    "type": "book_ticker",
-  },
-]
-`;
+exports[`map lighter ticker messages 1`] = `[]`;
 
 exports[`map lighter ticker messages 2`] = `
 [
@@ -2103,43 +2058,7 @@ exports[`map lighter ticker messages 2`] = `
 ]
 `;
 
-exports[`map lighter trade messages 1`] = `
-[
-  {
-    "amount": 0.00006,
-    "exchange": "lighter",
-    "id": "18240999145",
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "price": 75198.1,
-    "side": "sell",
-    "symbol": "1",
-    "timestamp": 2026-04-20T13:13:19.874Z,
-    "type": "trade",
-  },
-  {
-    "amount": 0.0002,
-    "exchange": "lighter",
-    "id": "18240999144",
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "price": 75198.2,
-    "side": "sell",
-    "symbol": "1",
-    "timestamp": 2026-04-20T13:13:19.874Z,
-    "type": "trade",
-  },
-  {
-    "amount": 0.01664,
-    "exchange": "lighter",
-    "id": "18237797923",
-    "localTimestamp": 2026-04-20T11:35:00.000Z,
-    "price": 75602.8,
-    "side": "buy",
-    "symbol": "1",
-    "timestamp": 2026-04-20T12:20:56.653Z,
-    "type": "liquidation",
-  },
-]
-`;
+exports[`map lighter trade messages 1`] = `[]`;
 
 exports[`map lighter trade messages 2`] = `
 [

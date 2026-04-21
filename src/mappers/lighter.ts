@@ -15,7 +15,7 @@ function parseChannelMarketId(channel: string): string | undefined {
 
 export class LighterTradesMapper implements Mapper<'lighter', Trade> {
   canHandle(message: LighterTradeMessage) {
-    return message.type === 'subscribed/trade' || message.type === 'update/trade'
+    return message.type === 'update/trade'
   }
 
   getFilters(symbols?: string[]) {
@@ -46,7 +46,7 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
 
 export class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
   canHandle(message: LighterTradeMessage) {
-    return message.type === 'subscribed/trade' || message.type === 'update/trade'
+    return message.type === 'update/trade'
   }
 
   getFilters(symbols?: string[]) {
@@ -119,7 +119,7 @@ export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
 
 export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
   canHandle(message: LighterTickerMessage) {
-    return message.type === 'subscribed/ticker' || message.type === 'update/ticker'
+    return message.type === 'update/ticker'
   }
 
   getFilters(symbols?: string[]) {
@@ -153,7 +153,7 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: LighterMarketStatsMessage) {
-    return message.type === 'subscribed/market_stats' || message.type === 'update/market_stats'
+    return message.type === 'update/market_stats'
   }
 
   getFilters(_symbols?: string[]) {
