@@ -221,14 +221,9 @@ type LighterOrderBookMessage = {
 
 type LighterTicker = {
   s: string
-  a?: LighterTickerLevel
-  b?: LighterTickerLevel
+  a?: Partial<LighterLevel>
+  b?: Partial<LighterLevel>
   last_updated_at: number
-}
-
-type LighterTickerLevel = {
-  price?: string
-  size?: string
 }
 
 type LighterTickerMessage = {
