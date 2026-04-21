@@ -2124,6 +2124,8 @@ exports[`map lighter trade messages 3`] = `
 ]
 `;
 
+exports[`map lighter trade messages 4`] = `[]`;
+
 exports[`map okex-spreads messages 1`] = `
 [
   {

@@ -9845,6 +9845,13 @@ test('map lighter trade messages', () => {
           taker_allocated_margin_usdc_before: 25585360
         }
       ]
+    },
+    // update/trade - Lighter sometimes omits liquidation_trades when there are no liquidation events
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380968791,
+      trades: []
     }
   ]
 
