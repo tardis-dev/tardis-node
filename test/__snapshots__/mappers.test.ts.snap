@@ -1923,6 +1923,207 @@ exports[`map kucoin-futures messages 15`] = `
 ]
 `;
 
+exports[`map lighter market stats messages 1`] = `[]`;
+
+exports[`map lighter market stats messages 2`] = `
+[
+  {
+    "exchange": "lighter",
+    "fundingRate": 0.0011,
+    "fundingTimestamp": undefined,
+    "indexPrice": 2309.89,
+    "lastPrice": 2308.57,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "markPrice": 2308.86,
+    "openInterest": 70209098.837046,
+    "predictedFundingRate": undefined,
+    "symbol": "0",
+    "timestamp": 2026-04-20T14:07:23.874Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "lighter",
+    "fundingRate": 0.0012,
+    "fundingTimestamp": undefined,
+    "indexPrice": 75281.9,
+    "lastPrice": 75232,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "markPrice": 75241.1,
+    "openInterest": 124496030.8108,
+    "predictedFundingRate": undefined,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:07:23.874Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map lighter order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.08303,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.00331,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.1328,
+        "price": 75302,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.00117,
+        "price": 75300.4,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.3,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.1,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.437Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map lighter order book messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.28364,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.61855,
+        "price": 75313.9,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.04881,
+        "price": 75300.6,
+      },
+      {
+        "amount": 0.01993,
+        "price": 75295.7,
+      },
+      {
+        "amount": 0.10792,
+        "price": 75294.3,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.475Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 1`] = `[]`;
+
+exports[`map lighter ticker messages 2`] = `
+[
+  {
+    "askAmount": 0.52927,
+    "askPrice": 75531.6,
+    "bidAmount": 0.10752,
+    "bidPrice": 75524.4,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.147Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 3`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.148Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 4`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.149Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter trade messages 1`] = `[]`;
+
+exports[`map lighter trade messages 2`] = `
+[
+  {
+    "amount": 0.00012,
+    "exchange": "lighter",
+    "id": "18240999426",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75196.7,
+    "side": "sell",
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:13:20.246Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map lighter trade messages 3`] = `
+[
+  {
+    "amount": 0.01664,
+    "exchange": "lighter",
+    "id": "18237797923",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75602.8,
+    "side": "buy",
+    "symbol": "1",
+    "timestamp": 2026-04-20T12:20:56.653Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`map okex-spreads messages 1`] = `
 [
   {

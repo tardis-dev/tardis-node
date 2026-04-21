@@ -116,6 +116,13 @@ import {
   HyperliquidDerivativeTickerMapper,
   HyperliquidTradesMapper
 } from './hyperliquid.ts'
+import {
+  LighterBookChangeMapper,
+  LighterBookTickerMapper,
+  LighterDerivativeTickerMapper,
+  LighterLiquidationMapper,
+  LighterTradesMapper
+} from './lighter.ts'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
 import {
@@ -316,7 +323,8 @@ const tradesMappers = {
   bitget: () => new BitgetTradesMapper('bitget'),
   'bitget-futures': () => new BitgetTradesMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalTradesMapper,
-  hyperliquid: () => new HyperliquidTradesMapper()
+  hyperliquid: () => new HyperliquidTradesMapper(),
+  lighter: () => new LighterTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -411,7 +419,8 @@ const bookChangeMappers = {
   bitget: () => new BitgetBookChangeMapper('bitget'),
   'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures'),
   'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
-  hyperliquid: () => new HyperliquidBookChangeMapper()
+  hyperliquid: () => new HyperliquidBookChangeMapper(),
+  lighter: () => new LighterBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -447,7 +456,8 @@ const derivativeTickersMappers = {
   'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
   'bitget-futures': () => new BitgetDerivativeTickerMapper(),
   'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper(),
-  hyperliquid: () => new HyperliquidDerivativeTickerMapper()
+  hyperliquid: () => new HyperliquidDerivativeTickerMapper(),
+  lighter: () => new LighterDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -474,6 +484,7 @@ const liquidationsMappers = {
   'dydx-v4': () => new DydxV4LiquidationsMapper(),
   'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
+  lighter: () => new LighterLiquidationMapper(),
   bybit: (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp)
       ? shouldUseBybitAllLiquidationFeed(localTimestamp)
@@ -549,6 +560,7 @@ const bookTickersMappers = {
   'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
   hyperliquid: () => new HyperliquidBookTickerMapper(),
+  lighter: () => new LighterBookTickerMapper(),
   'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
 }
 
