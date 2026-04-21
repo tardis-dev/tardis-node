@@ -8,7 +8,7 @@ import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
 
 if (isMainThread) {
-  debug('existing, worker is not meant to run in main thread')
+  debug('current worker is not meant to run in main thread')
 } else {
   parentPort!.on('message', (signal: WorkerSignal) => {
     if (signal === WorkerSignal.BEFORE_TERMINATE) {
