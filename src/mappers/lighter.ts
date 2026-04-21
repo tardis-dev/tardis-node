@@ -172,9 +172,7 @@ export class LighterDerivativeTickerMapper implements Mapper<'lighter', Derivati
 
       pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
       pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
-      pendingTickerInfo.updateFundingRate(Number(entry.funding_rate))
-      pendingTickerInfo.updateFundingTimestamp(new Date(entry.funding_timestamp))
-      pendingTickerInfo.updatePredictedFundingRate(Number(entry.current_funding_rate))
+      pendingTickerInfo.updateFundingRate(Number(entry.current_funding_rate))
       pendingTickerInfo.updateLastPrice(Number(entry.last_trade_price))
       pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
 
