@@ -10061,6 +10061,25 @@ test('map lighter ticker messages', () => {
         last_updated_at: 1776695867144750
       },
       timestamp: 1776695867147
+    },
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144751,
+      nonce: 10385958487,
+      ticker: {
+        s: 'BTC',
+        b: {},
+        last_updated_at: 1776695867144751
+      },
+      timestamp: 1776695867148
+    },
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144752,
+      nonce: 10385958488,
+      timestamp: 1776695867149
     }
   ]
 

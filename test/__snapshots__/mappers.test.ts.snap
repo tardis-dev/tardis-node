@@ -2058,6 +2058,38 @@ exports[`map lighter ticker messages 2`] = `
 ]
 `;
 
+exports[`map lighter ticker messages 3`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.148Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 4`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.149Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map lighter trade messages 1`] = `[]`;
 
 exports[`map lighter trade messages 2`] = `

@@ -1,3 +1,4 @@
+import { asNumberIfValid } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -139,10 +140,10 @@ export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
       type: 'book_ticker',
       symbol,
       exchange: 'lighter',
-      askAmount: Number(message.ticker.a.size),
-      askPrice: Number(message.ticker.a.price),
-      bidPrice: Number(message.ticker.b.price),
-      bidAmount: Number(message.ticker.b.size),
+      askAmount: asNumberIfValid(message.ticker?.a?.size),
+      askPrice: asNumberIfValid(message.ticker?.a?.price),
+      bidPrice: asNumberIfValid(message.ticker?.b?.price),
+      bidAmount: asNumberIfValid(message.ticker?.b?.size),
       timestamp: new Date(message.timestamp),
       localTimestamp
     }
@@ -222,9 +223,14 @@ type LighterOrderBookMessage = {
 
 type LighterTicker = {
   s: string
-  a: LighterLevel
-  b: LighterLevel
+  a?: LighterTickerLevel
+  b?: LighterTickerLevel
   last_updated_at: number
+}
+
+type LighterTickerLevel = {
+  price?: string
+  size?: string
 }
 
 type LighterTickerMessage = {
