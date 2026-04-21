@@ -60,6 +60,10 @@ export class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> 
   }
 
   *map(message: LighterTradeMessage, localTimestamp: Date): IterableIterator<Liquidation> {
+    if (!Array.isArray(message.liquidation_trades)) {
+      return
+    }
+
     for (const trade of message.liquidation_trades) {
       if (trade.type !== 'liquidation') {
         continue
@@ -278,7 +282,7 @@ type LighterTradeMessage = {
   channel: `trade:${number}`
   nonce: number
   trades: LighterTrade[]
-  liquidation_trades: LighterTrade[]
+  liquidation_trades?: LighterTrade[]
 }
 
 type LighterMarketStats = {
