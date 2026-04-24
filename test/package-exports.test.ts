@@ -20,13 +20,15 @@ describe('package exports', () => {
       path.join(tempDir, 'import-test.mjs'),
       `
         import * as tardis from 'tardis-dev'
-        import { replay, stream } from 'tardis-dev'
+        import { findInstrumentSymbols, replay, stream } from 'tardis-dev'
         console.log(JSON.stringify({
           namespaceReplay: typeof tardis.replay,
           namespaceStream: typeof tardis.stream,
+          namespaceFindInstrumentSymbols: typeof tardis.findInstrumentSymbols,
           hasDefault: Object.prototype.hasOwnProperty.call(tardis, 'default'),
           namedReplay: typeof replay,
-          namedStream: typeof stream
+          namedStream: typeof stream,
+          namedFindInstrumentSymbols: typeof findInstrumentSymbols
         }))
       `.trim() + '\n'
     )
@@ -41,9 +43,11 @@ describe('package exports', () => {
     expect(importOutput).toEqual({
       namespaceReplay: 'function',
       namespaceStream: 'function',
+      namespaceFindInstrumentSymbols: 'function',
       hasDefault: false,
       namedReplay: 'function',
-      namedStream: 'function'
+      namedStream: 'function',
+      namedFindInstrumentSymbols: 'function'
     })
 
     rmSync(tempDir, { force: true, recursive: true })

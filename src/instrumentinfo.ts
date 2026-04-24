@@ -51,12 +51,43 @@ async function getInstrumentInfoForExchange(exchange: Exchange, filterOrSymbol?:
   }
 }
 
-type InstrumentInfoFilter = {
+export async function findInstrumentSymbols(
+  exchanges: Exchange[],
+  filter: InstrumentInfoFilter,
+  selector: InstrumentSymbolSelector = 'id'
+): Promise<InstrumentSymbols[]> {
+  if (selector !== 'id' && selector !== 'datasetId') {
+    throw new Error("Invalid selector. Supported values are 'id' and 'datasetId'.")
+  }
+
+  return await Promise.all(
+    exchanges.map(async (exchange) => {
+      const instruments = (await getInstrumentInfoForExchange(exchange, filter)) as InstrumentInfo[]
+
+      return {
+        exchange,
+        symbols: instruments.map((instrument) => (selector === 'datasetId' ? instrument.datasetId ?? instrument.id : instrument.id))
+      }
+    })
+  )
+}
+
+export type InstrumentSymbolSelector = 'id' | 'datasetId'
+
+export type InstrumentSymbols = {
+  exchange: Exchange
+  symbols: string[]
+}
+
+export type InstrumentInfoFilter = {
   baseCurrency?: string | string[]
   quoteCurrency?: string | string[]
   type?: SymbolType | SymbolType[]
   contractType?: ContractType | ContractType[]
+  underlyingType?: UnderlyingType | UnderlyingType[]
   active?: boolean
+  availableSince?: string
+  availableTo?: string
 }
 
 export type ContractType =
@@ -75,6 +106,8 @@ export type ContractType =
   | 'interest_rate_swap'
   | 'repo'
   | 'index'
+
+export type UnderlyingType = 'native' | 'equity' | 'commodity' | 'fixed_income' | 'fx' | 'index' | 'pre_market'
 
 export interface InstrumentInfo {
   /** symbol id */
@@ -104,6 +137,8 @@ export interface InstrumentInfo {
   expirationType?: 'daily' | 'weekly' | 'next_week' | 'quarter' | 'next_quarter'
   /** the underlying index for derivatives */
   underlyingIndex?: string
+  /** underlying asset class */
+  underlyingType?: UnderlyingType
   /** price tick size, price precision can be calculated from it */
   priceIncrement: number
   /** amount tick size, amount/size precision can be calculated from it */
