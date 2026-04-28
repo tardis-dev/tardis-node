@@ -22,9 +22,12 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 describe('replay', () => {
-  beforeEach(() => {
-    return clearCache()
-  }, 1000 * 60 * 10)
+  beforeEach(
+    () => {
+      return clearCache()
+    },
+    1000 * 60 * 10
+  )
 
   test(
     'invalid args validation',

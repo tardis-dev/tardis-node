@@ -35,8 +35,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       ? { localTimestamp: Buffer; message: Buffer } | undefined
       : { localTimestamp: Date; message: any } | undefined
     : U extends true
-    ? { localTimestamp: Buffer; message: Buffer }
-    : { localTimestamp: Date; message: any }
+      ? { localTimestamp: Buffer; message: Buffer }
+      : { localTimestamp: Date; message: any }
 > {
   validateReplayOptions(exchange, from, to, filters)
 

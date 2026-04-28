@@ -46,7 +46,10 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly _exchange: Exchange, private readonly ignoreBookSnapshotOverlapError: boolean) {}
+  constructor(
+    protected readonly _exchange: Exchange,
+    private readonly ignoreBookSnapshotOverlapError: boolean
+  ) {}
 
   canHandle(message: KucoinLevel2SnapshotMessage | KucoinLevel2UpdateMessage) {
     return message.type === 'message' && message.topic.startsWith('/market/level2')

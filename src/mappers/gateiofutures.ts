@@ -76,8 +76,8 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
         depthMessage.time_ms !== undefined
           ? new Date(depthMessage.time_ms)
           : depthMessage.result.t !== undefined
-          ? new Date(depthMessage.result.t)
-          : new Date(depthMessage.time * 1000)
+            ? new Date(depthMessage.result.t)
+            : new Date(depthMessage.time * 1000)
 
       // snapshot
       yield {

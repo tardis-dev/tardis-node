@@ -6,7 +6,10 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 // https://www.okex.com/docs-v5/en/#websocket-api-public-channel-trades-channel
 
 export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  constructor(private readonly _exchange: Exchange, private readonly _useTradesAll: boolean) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _useTradesAll: boolean
+  ) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
@@ -62,7 +65,10 @@ const mapV5BookLevel = (level: OkexV5BookLevel) => {
 export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
   private _channelName: string
 
-  constructor(private readonly _exchange: Exchange, usePublicBooksChannel: boolean) {
+  constructor(
+    private readonly _exchange: Exchange,
+    usePublicBooksChannel: boolean
+  ) {
     this._channelName = this._getBooksChannelName(usePublicBooksChannel)
   }
 
@@ -137,7 +143,10 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
 }
 
 export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
-  constructor(private readonly _exchange: Exchange, private readonly _useTbtTickerChannel: boolean) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _useTbtTickerChannel: boolean
+  ) {}
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
@@ -726,7 +735,10 @@ type OkexV5SummaryMessage = {
 // https://www.okex.com/docs/en/#ws_swap-README
 
 export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _market: OKEX_MARKETS
+  ) {}
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/trade`
@@ -991,7 +1003,10 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
 }
 
 export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _market: OKEX_MARKETS
+  ) {}
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/liquidation`
@@ -1027,7 +1042,10 @@ export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidatio
 }
 
 export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _market: OKEX_MARKETS
+  ) {}
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/ticker`

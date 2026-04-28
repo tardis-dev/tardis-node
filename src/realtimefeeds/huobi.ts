@@ -271,7 +271,11 @@ class HuobiOpenInterestClient extends PoolingClientBase {
 }
 
 class HuobiOptionsMarketIndexClient extends PoolingClientBase {
-  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
+  constructor(
+    exchange: string,
+    private readonly _httpURL: string,
+    private readonly _instruments: string[]
+  ) {
     super(exchange, 4)
   }
 
@@ -306,7 +310,11 @@ class HuobiOptionsMarketIndexClient extends PoolingClientBase {
 }
 
 class HuobiOptionsIndexClient extends PoolingClientBase {
-  constructor(exchange: string, private readonly _httpURL: string, private readonly _instruments: string[]) {
+  constructor(
+    exchange: string,
+    private readonly _httpURL: string,
+    private readonly _instruments: string[]
+  ) {
     super(exchange, 4)
   }
 

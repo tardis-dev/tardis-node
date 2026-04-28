@@ -36,14 +36,17 @@ export class HitBtcRealTimeFeed extends RealTimeFeedBase {
         })
       })
       .flatMap((s) => s)
-      .reduce((prev, current) => {
-        const matchingExisting = prev.find((c) => c.method === current.method && c.symbol === current.symbol)
-        if (matchingExisting === undefined) {
-          prev.push(current)
-        }
+      .reduce(
+        (prev, current) => {
+          const matchingExisting = prev.find((c) => c.method === current.method && c.symbol === current.symbol)
+          if (matchingExisting === undefined) {
+            prev.push(current)
+          }
 
-        return prev
-      }, [] as { method: string; symbol: string }[])
+          return prev
+        },
+        [] as { method: string; symbol: string }[]
+      )
 
     return subscriptions.map((subscription, index) => {
       return {

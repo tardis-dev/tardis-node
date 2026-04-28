@@ -66,7 +66,7 @@ export async function findInstrumentSymbols(
 
       return {
         exchange,
-        symbols: instruments.map((instrument) => (selector === 'datasetId' ? instrument.datasetId ?? instrument.id : instrument.id))
+        symbols: instruments.map((instrument) => (selector === 'datasetId' ? (instrument.datasetId ?? instrument.id) : instrument.id))
       }
     })
   )

@@ -71,13 +71,21 @@ export function* sequence(end: number, seed = 0) {
 export const ONE_SEC_IN_MS = 1000
 
 export class HttpError extends Error {
-  constructor(public readonly status: number, public readonly responseText: string, public readonly url: string) {
+  constructor(
+    public readonly status: number,
+    public readonly responseText: string,
+    public readonly url: string
+  ) {
     super(`HttpError: status code: ${status}, response text: ${responseText}`)
   }
 }
 
 class HttpClientError extends Error {
-  constructor(public readonly response: HttpResponse, public readonly method: string, public readonly url: string) {
+  constructor(
+    public readonly response: HttpResponse,
+    public readonly method: string,
+    public readonly url: string
+  ) {
     super(`HTTP ${method} ${url} failed with status ${response.statusCode}`)
   }
 }
@@ -160,24 +168,27 @@ export async function* normalizeMessages(
 export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
   const filters = mappers.flatMap((mapper) => mapper.getFilters(symbols))
 
-  const deduplicatedFilters = filters.reduce((prev, current) => {
-    const matchingExisting = prev.find((c) => c.channel === current.channel)
-    if (matchingExisting !== undefined) {
-      if (matchingExisting.symbols !== undefined && current.symbols) {
-        for (let symbol of current.symbols) {
-          if (matchingExisting.symbols.includes(symbol) === false) {
-            matchingExisting.symbols.push(symbol)
+  const deduplicatedFilters = filters.reduce(
+    (prev, current) => {
+      const matchingExisting = prev.find((c) => c.channel === current.channel)
+      if (matchingExisting !== undefined) {
+        if (matchingExisting.symbols !== undefined && current.symbols) {
+          for (let symbol of current.symbols) {
+            if (matchingExisting.symbols.includes(symbol) === false) {
+              matchingExisting.symbols.push(symbol)
+            }
           }
+        } else if (current.symbols) {
+          matchingExisting.symbols = [...current.symbols]
         }
-      } else if (current.symbols) {
-        matchingExisting.symbols = [...current.symbols]
+      } else {
+        prev.push(current)
       }
-    } else {
-      prev.push(current)
-    }
 
-    return prev
-  }, [] as FilterForExchange[T][])
+      return prev
+    },
+    [] as FilterForExchange[T][]
+  )
 
   return deduplicatedFilters
 }
@@ -255,8 +266,8 @@ export const httpsProxyAgent: Agent | undefined =
   process.env.HTTP_PROXY !== undefined
     ? new HttpsProxyAgent(process.env.HTTP_PROXY)
     : process.env.SOCKS_PROXY !== undefined
-    ? new SocksProxyAgent(process.env.SOCKS_PROXY)
-    : undefined
+      ? new SocksProxyAgent(process.env.SOCKS_PROXY)
+      : undefined
 
 const DEFAULT_FETCH_RETRY_LIMIT = 2
 
@@ -296,7 +307,7 @@ type RetrySettings = {
 function getRetrySettings(method: string, retry?: HttpRetryOptions): RetrySettings {
   const retryOptions = typeof retry === 'object' ? retry : undefined
   const retryEnabled = method === 'GET' || retry !== undefined
-  const limit = typeof retry === 'number' ? retry : retryOptions?.limit ?? (retryEnabled ? DEFAULT_FETCH_RETRY_LIMIT : 0)
+  const limit = typeof retry === 'number' ? retry : (retryOptions?.limit ?? (retryEnabled ? DEFAULT_FETCH_RETRY_LIMIT : 0))
 
   return {
     limit,

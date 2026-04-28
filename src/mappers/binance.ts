@@ -5,9 +5,10 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
-export class BinanceTradesMapper
-  implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', Trade>
-{
+export class BinanceTradesMapper implements Mapper<
+  'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery',
+  Trade
+> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -53,14 +54,18 @@ export class BinanceTradesMapper
   }
 }
 
-export class BinanceBookChangeMapper
-  implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', BookChange>
-{
+export class BinanceBookChangeMapper implements Mapper<
+  'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery',
+  BookChange
+> {
   protected readonly symbolToDepthInfoMapping: {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
+  constructor(
+    protected readonly exchange: Exchange,
+    protected readonly ignoreBookSnapshotOverlapError: boolean
+  ) {}
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -217,7 +222,10 @@ export class BinanceFuturesBookChangeMapper
   extends BinanceBookChangeMapper
   implements Mapper<'binance-futures' | 'binance-delivery', BookChange>
 {
-  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {
+  constructor(
+    protected readonly exchange: Exchange,
+    protected readonly ignoreBookSnapshotOverlapError: boolean
+  ) {
     super(exchange, ignoreBookSnapshotOverlapError)
   }
 

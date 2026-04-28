@@ -109,7 +109,10 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
 }
 
 class KucoinFuturesContractDetailsClient extends PoolingClientBase {
-  constructor(exchange: string, private readonly _httpURL: string) {
+  constructor(
+    exchange: string,
+    private readonly _httpURL: string
+  ) {
     super(exchange, 6)
   }
 

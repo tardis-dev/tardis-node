@@ -5,9 +5,10 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
-export class HuobiTradesMapper
-  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', Trade>
-{
+export class HuobiTradesMapper implements Mapper<
+  'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options',
+  Trade
+> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -46,9 +47,10 @@ export class HuobiTradesMapper
   }
 }
 
-export class HuobiBookChangeMapper
-  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', BookChange>
-{
+export class HuobiBookChangeMapper implements Mapper<
+  'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options',
+  BookChange
+> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {

@@ -409,8 +409,8 @@ const bookChangeMappers = {
     shouldUseGateIOV4OrderBookV2Mappers(localTimestamp)
       ? new GateIOV4OrderBookV2ChangeMapper('gate-io')
       : shouldUseGateIOV4Mappers(localTimestamp)
-      ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
-      : new GateIOBookChangeMapper('gate-io'),
+        ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
+        : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),

@@ -377,7 +377,11 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected readonly debug: dbg.Debugger
   private _tid: NodeJS.Timeout | undefined = undefined
 
-  constructor(exchange: string, private readonly _poolingIntervalSeconds: number, protected readonly onError?: (error: Error) => void) {
+  constructor(
+    exchange: string,
+    private readonly _poolingIntervalSeconds: number,
+    protected readonly onError?: (error: Error) => void
+  ) {
     this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
   }
 

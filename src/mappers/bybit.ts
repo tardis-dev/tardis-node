@@ -44,7 +44,10 @@ export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'byb
 }
 
 export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _depth: number) {}
+  constructor(
+    protected readonly _exchange: Exchange,
+    private readonly _depth: number
+  ) {}
 
   canHandle(message: BybitV5OrderBookMessage) {
     if (message.topic === undefined) {
@@ -388,8 +391,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
         'trade_time_ms' in trade
           ? new Date(Number(trade.trade_time_ms))
           : 'tradeTimeMs' in trade
-          ? new Date(Number(trade.tradeTimeMs))
-          : new Date(trade.timestamp)
+            ? new Date(Number(trade.tradeTimeMs))
+            : new Date(trade.timestamp)
 
       yield {
         type: 'trade',
@@ -407,7 +410,10 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
 }
 
 export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _canUseBook200Channel: boolean) {}
+  constructor(
+    protected readonly _exchange: Exchange,
+    private readonly _canUseBook200Channel: boolean
+  ) {}
 
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -449,8 +455,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
         ? 'order_book' in message.data
           ? message.data.order_book
           : 'orderBook' in message.data
-          ? message.data.orderBook
-          : message.data
+            ? message.data.orderBook
+            : message.data
         : [...message.data.delete, ...message.data.update, ...message.data.insert]
 
     const timestampBybit = message.timestamp_e6 !== undefined ? Number(message.timestamp_e6) : Number(message.timestampE6)
@@ -858,16 +864,15 @@ type BybitInstrumentUpdate = {
   ask1Price: '21213.50'
 }
 
-type BybitInstrumentDataMessage =
-  | BybitDataMessage & {
-      timestamp_e6: string
-      timestampE6: string
-      data:
-        | BybitInstrumentUpdate
-        | {
-            update: [BybitInstrumentUpdate]
-          }
-    }
+type BybitInstrumentDataMessage = BybitDataMessage & {
+  timestamp_e6: string
+  timestampE6: string
+  data:
+    | BybitInstrumentUpdate
+    | {
+        update: [BybitInstrumentUpdate]
+      }
+}
 
 type BybitLiquidationMessage = BybitDataMessage & {
   generated: true

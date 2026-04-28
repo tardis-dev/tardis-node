@@ -60,7 +60,10 @@ export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(protected readonly exchange: Exchange, protected readonly ignoreBookSnapshotOverlapError: boolean) {}
+  constructor(
+    protected readonly exchange: Exchange,
+    protected readonly ignoreBookSnapshotOverlapError: boolean
+  ) {}
 
   canHandle(message: GateV4OrderBookUpdate | Gatev4OrderBookSnapshot) {
     if (message.channel === undefined) {

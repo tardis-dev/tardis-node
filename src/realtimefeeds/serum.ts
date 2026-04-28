@@ -40,20 +40,23 @@ export class SerumRealTimeFeed extends RealTimeFeedBase {
           markets: filter.symbols
         }
       })
-      .reduce((prev, current) => {
-        const matchingExisting = prev.find((c) => c.channel === current.channel)
-        if (matchingExisting !== undefined) {
-          for (const market of current.markets) {
-            if (matchingExisting.markets.includes(market) === false) {
-              matchingExisting.markets.push(market)
+      .reduce(
+        (prev, current) => {
+          const matchingExisting = prev.find((c) => c.channel === current.channel)
+          if (matchingExisting !== undefined) {
+            for (const market of current.markets) {
+              if (matchingExisting.markets.includes(market) === false) {
+                matchingExisting.markets.push(market)
+              }
             }
+          } else {
+            prev.push(current)
           }
-        } else {
-          prev.push(current)
-        }
 
-        return prev
-      }, [] as { channel: string; markets: string[] }[])
+          return prev
+        },
+        [] as { channel: string; markets: string[] }[]
+      )
 
     return subs
   }
