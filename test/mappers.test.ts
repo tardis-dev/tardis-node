@@ -100,6 +100,7 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'okex-futures',
   'okex-swap',
   'dydx-v4',
+  'bitget-futures',
   'lighter'
 ]
 
@@ -9261,6 +9262,81 @@ test('map bitget messages', () => {
   }
 })
 
+test('map bitget v3 messages', () => {
+  const messages = [
+    {
+      action: 'update',
+      arg: { instType: 'spot', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [
+        { i: '1432912488536195072', p: '76671.22', v: '0.001367', S: 'sell', T: '1777358880170', L: '1432912488536195073', isRPI: 'no' }
+      ],
+      ts: 1777358880172
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [
+        { i: '1432912488536195072', p: '76671.22', v: '0.001367', S: 'sell', T: '1777358880170', L: '1432912488536195073', isRPI: 'no' }
+      ],
+      ts: 1777358880172
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76794.01', '1.049783'],
+            ['76794.05', '0.002881']
+          ],
+          b: [
+            ['76794', '0.062194'],
+            ['76793', '0.000032']
+          ],
+          checksum: 0,
+          seq: 451275591390,
+          pseq: 0,
+          ts: '1777362656332'
+        }
+      ],
+      ts: 1777362656336
+    },
+    {
+      action: 'update',
+      arg: { instType: 'spot', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76679.99', '0'],
+            ['76681.49', '0.026085']
+          ],
+          b: [
+            ['76646.9', '0.03914'],
+            ['76439.78', '0']
+          ],
+          checksum: 1153969492,
+          seq: 451057502090,
+          pseq: 451057497631,
+          ts: '1777358880011'
+        }
+      ],
+      ts: 1777358880013
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'books1', symbol: 'BTCUSDT' },
+      data: [{ a: [['76671.23', '0.41581']], b: [['76671.22', '0.531211']], checksum: 0, seq: 451057506670, pseq: 0, ts: '1777358880105' }],
+      ts: 1777358880106
+    }
+  ]
+  const mapper = createMapper('bitget', new Date('2026-04-28T00:00:00.000Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
 test('map bitget-futures messages', () => {
   const messages = [
     { event: 'subscribe', arg: { instType: 'USDT-FUTURES', channel: 'trade', instId: 'LTCUSDT' } },
@@ -9398,6 +9474,115 @@ test('map bitget-futures messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bitget-futures v3 messages', () => {
+  const messages = [
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [{ i: '1432912492051054592', p: '76631.3', v: '0.01', S: 'buy', T: '1777358881008', L: '1432912492051054593', isRPI: 'no' }],
+      ts: 1777358881009
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [{ i: '1432912492051054592', p: '76631.3', v: '0.01', S: 'buy', T: '1777358881008', L: '1432912492051054593', isRPI: 'no' }],
+      ts: 1777358881009
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76742.9', '4.2465'],
+            ['76743', '0.0001']
+          ],
+          b: [
+            ['76742.8', '2.8986'],
+            ['76742.7', '0.0001']
+          ],
+          checksum: 0,
+          seq: 483814309734,
+          pseq: 0,
+          ts: '1777362657614'
+        }
+      ],
+      ts: 1777362657617
+    },
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76642', '0'],
+            ['76642.1', '0']
+          ],
+          b: [
+            ['76598.9', '0.0783'],
+            ['76596.4', '0']
+          ],
+          checksum: -431745958,
+          seq: 483415085712,
+          pseq: 483415077719,
+          ts: '1777358880000'
+        }
+      ],
+      ts: 1777358880001
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'books1', symbol: 'BTCUSDT' },
+      data: [{ a: [['76631.3', '8.8086']], b: [['76631.2', '0.9608']], checksum: 0, seq: 483415090019, pseq: 0, ts: '1777358880027' }],
+      ts: 1777358880029
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'ticker', symbol: 'BTCUSDT' },
+      data: [
+        {
+          highPrice24h: '78237.7',
+          lowPrice24h: '76414.5',
+          openPrice24h: '77641',
+          lastPrice: '76631.3',
+          turnover24h: '2914473798.93323',
+          volume24h: '37764.7894',
+          bid1Price: '76631.2',
+          ask1Price: '76631.3',
+          bid1Size: '0.9608',
+          ask1Size: '9.5716',
+          price24hPcnt: '-0.013',
+          indexPrice: '76671.4381686055379793',
+          markPrice: '76631.3',
+          fundingRate: '-0.00003',
+          openInterest: '29539.3825',
+          deliveryTime: '',
+          deliveryStartTime: '',
+          deliveryStatus: '',
+          nextFundingTime: '1777363200000'
+        }
+      ],
+      ts: 1777358880084
+    },
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'liquidation' },
+      data: [
+        { symbol: 'APEUSDT', side: 'buy', price: '0.1649', amount: '13.70319', ts: '1777358886549' },
+        { symbol: 'IPUSDT', side: 'buy', price: '0.500280739469', amount: '143.330431857868', ts: '1777358876983' }
+      ],
+      ts: 1777358897167
+    }
+  ]
+
+  const mapper = createMapper('bitget-futures', new Date('2026-04-28T00:00:00.000Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })

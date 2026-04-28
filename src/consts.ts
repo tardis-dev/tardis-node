@@ -514,8 +514,8 @@ const KUCOIN_FUTURES_CHANNELS = [
   'contractMarket/snapshot'
 ]
 
-const BITGET_CHANNELS = ['trade', 'books1', 'books15']
-const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
+const BITGET_CHANNELS = ['trade', 'publicTrade', 'books1', 'books15', 'books']
+const BITGET_FUTURES_CHANNELS = ['trade', 'publicTrade', 'books1', 'books15', 'books', 'ticker', 'liquidation']
 const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RISK', 'LEVEL1', 'LEVEL2', 'CANDLES_ONE_MINUTE']
 
 const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']

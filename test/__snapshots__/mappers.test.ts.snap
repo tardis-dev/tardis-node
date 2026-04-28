@@ -367,6 +367,106 @@ exports[`map bitget messages 9`] = `
 ]
 `;
 
+exports[`map bitget v3 messages 1`] = `
+[
+  {
+    "amount": 0.001367,
+    "exchange": "bitget",
+    "id": "1432912488536195072",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 76671.22,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.170Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 2`] = `[]`;
+
+exports[`map bitget v3 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 1.049783,
+        "price": 76794.01,
+      },
+      {
+        "amount": 0.002881,
+        "price": 76794.05,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.062194,
+        "price": 76794,
+      },
+      {
+        "amount": 0.000032,
+        "price": 76793,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T07:50:56.332Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 76679.99,
+      },
+      {
+        "amount": 0.026085,
+        "price": 76681.49,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.03914,
+        "price": 76646.9,
+      },
+      {
+        "amount": 0,
+        "price": 76439.78,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.011Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 5`] = `
+[
+  {
+    "askAmount": 0.41581,
+    "askPrice": 76671.23,
+    "bidAmount": 0.531211,
+    "bidPrice": 76671.22,
+    "exchange": "bitget",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.105Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map bitget-futures messages 1`] = `[]`;
 
 exports[`map bitget-futures messages 2`] = `[]`;
@@ -492,6 +592,152 @@ exports[`map bitget-futures messages 11`] = `
     "symbol": "YGGUSDT",
     "timestamp": 2024-11-07T07:15:59.972Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 1`] = `
+[
+  {
+    "amount": 0.01,
+    "exchange": "bitget-futures",
+    "id": "1432912492051054592",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 76631.3,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:01.008Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 2`] = `[]`;
+
+exports[`map bitget-futures v3 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 4.2465,
+        "price": 76742.9,
+      },
+      {
+        "amount": 0.0001,
+        "price": 76743,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 2.8986,
+        "price": 76742.8,
+      },
+      {
+        "amount": 0.0001,
+        "price": 76742.7,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T07:50:57.614Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 76642,
+      },
+      {
+        "amount": 0,
+        "price": 76642.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.0783,
+        "price": 76598.9,
+      },
+      {
+        "amount": 0,
+        "price": 76596.4,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 5`] = `
+[
+  {
+    "askAmount": 8.8086,
+    "askPrice": 76631.3,
+    "bidAmount": 0.9608,
+    "bidPrice": 76631.2,
+    "exchange": "bitget-futures",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.027Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 6`] = `
+[
+  {
+    "exchange": "bitget-futures",
+    "fundingRate": -0.00003,
+    "fundingTimestamp": 2026-04-28T08:00:00.000Z,
+    "indexPrice": 76671.43816860554,
+    "lastPrice": 76631.3,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "markPrice": 76631.3,
+    "openInterest": 29539.3825,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.084Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 7`] = `
+[
+  {
+    "amount": 13.70319,
+    "exchange": "bitget-futures",
+    "id": undefined,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 0.1649,
+    "side": "sell",
+    "symbol": "APEUSDT",
+    "timestamp": 2026-04-28T06:48:06.549Z,
+    "type": "liquidation",
+  },
+  {
+    "amount": 143.330431857868,
+    "exchange": "bitget-futures",
+    "id": undefined,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 0.500280739469,
+    "side": "sell",
+    "symbol": "IPUSDT",
+    "timestamp": 2026-04-28T06:47:56.983Z,
+    "type": "liquidation",
   },
 ]
 `;

@@ -27,7 +27,17 @@ import {
   BitfinexTradesMapper
 } from './bitfinex.ts'
 import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer.ts'
-import { BitgetBookChangeMapper, BitgetBookTickerMapper, BitgetDerivativeTickerMapper, BitgetTradesMapper } from './bitget.ts'
+import {
+  BitgetBookChangeMapper,
+  BitgetBookTickerMapper,
+  BitgetDerivativeTickerMapper,
+  BitgetTradesMapper,
+  BitgetV3BookChangeMapper,
+  BitgetV3BookTickerMapper,
+  BitgetV3DerivativeTickerMapper,
+  BitgetV3LiquidationsMapper,
+  BitgetV3TradesMapper
+} from './bitget.ts'
 import {
   BitmexBookChangeMapper,
   BitmexDerivativeTickerMapper,
@@ -208,6 +218,12 @@ const shouldUseBybitAllLiquidationFeed = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE.valueOf()
 }
 
+const BITGET_V3_API_SWITCH_DATE = new Date('2026-04-28T00:00:00.000Z')
+
+const shouldUseBitgetV3Mappers = (localTimestamp: Date) => {
+  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BITGET_V3_API_SWITCH_DATE.valueOf()
+}
+
 const OKCOIN_V5_API_SWITCH_DATE = new Date('2023-04-27T00:00:00.000Z')
 const shouldUseOkcoinV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKCOIN_V5_API_SWITCH_DATE.valueOf()
@@ -320,8 +336,10 @@ const tradesMappers = {
       ? new BinanceEuropeanOptionsTradesMapperV2()
       : new BinanceEuropeanOptionsTradesMapper(),
   'okex-spreads': () => new OkexSpreadsTradesMapper(),
-  bitget: () => new BitgetTradesMapper('bitget'),
-  'bitget-futures': () => new BitgetTradesMapper('bitget-futures'),
+  bitget: (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3TradesMapper('bitget') : new BitgetTradesMapper('bitget'),
+  'bitget-futures': (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3TradesMapper('bitget-futures') : new BitgetTradesMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalTradesMapper,
   hyperliquid: () => new HyperliquidTradesMapper(),
   lighter: () => new LighterTradesMapper()
@@ -416,8 +434,12 @@ const bookChangeMappers = {
       ? new BinanceEuropeanOptionsBookChangeMapperV2()
       : new BinanceEuropeanOptionsBookChangeMapper(),
   'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
-  bitget: () => new BitgetBookChangeMapper('bitget'),
-  'bitget-futures': () => new BitgetBookChangeMapper('bitget-futures'),
+  bitget: (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3BookChangeMapper('bitget') : new BitgetBookChangeMapper('bitget'),
+  'bitget-futures': (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp)
+      ? new BitgetV3BookChangeMapper('bitget-futures')
+      : new BitgetBookChangeMapper('bitget-futures'),
   'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
   hyperliquid: () => new HyperliquidBookChangeMapper(),
   lighter: () => new LighterBookChangeMapper()
@@ -454,7 +476,8 @@ const derivativeTickersMappers = {
   'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
   'woo-x': () => new WooxDerivativeTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
-  'bitget-futures': () => new BitgetDerivativeTickerMapper(),
+  'bitget-futures': (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3DerivativeTickerMapper() : new BitgetDerivativeTickerMapper(),
   'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper(),
   hyperliquid: () => new HyperliquidDerivativeTickerMapper(),
   lighter: () => new LighterDerivativeTickerMapper()
@@ -496,7 +519,8 @@ const liquidationsMappers = {
       ? new OkexV5LiquidationsMapper('okex-futures')
       : new OkexLiquidationsMapper('okex-futures', 'futures'),
   'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5LiquidationsMapper('okex-swap') : new OkexLiquidationsMapper('okex-swap', 'swap')
+    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5LiquidationsMapper('okex-swap') : new OkexLiquidationsMapper('okex-swap', 'swap'),
+  'bitget-futures': () => new BitgetV3LiquidationsMapper()
 }
 
 const bookTickersMappers = {
@@ -556,8 +580,12 @@ const bookTickersMappers = {
   'gate-io': () => new GateIOV4BookTickerMapper('gate-io'),
   'okex-spreads': () => new OkexSpreadsBookTickerMapper(),
   'kucoin-futures': () => new KucoinFuturesBookTickerMapper(),
-  bitget: () => new BitgetBookTickerMapper('bitget'),
-  'bitget-futures': () => new BitgetBookTickerMapper('bitget-futures'),
+  bitget: (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3BookTickerMapper('bitget') : new BitgetBookTickerMapper('bitget'),
+  'bitget-futures': (localTimestamp: Date) =>
+    shouldUseBitgetV3Mappers(localTimestamp)
+      ? new BitgetV3BookTickerMapper('bitget-futures')
+      : new BitgetBookTickerMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),

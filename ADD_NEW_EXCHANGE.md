@@ -48,7 +48,7 @@ Mapper decisions to make explicit:
 
 Normalized type semantics:
 
-- **Trades** — `side` is liquidity taker side: `buy` means the aggressor bought, `sell` means the aggressor sold. Invert maker-side flags when needed. Skip off-book maintenance events such as insurance fund or ADL unless the product contract explicitly requires them.
+- **Trades** — `side` is liquidity taker side: `buy` means the aggressor bought, `sell` means the aggressor sold. Invert maker-side flags when needed. Skip off-book maintenance events such as insurance fund or ADL unless the product contract explicitly requires them. If a trade channel uses `snapshot` followed by `update`, map only `update`; the initial `snapshot` is recent-trade backfill and must have a test that emits nothing to avoid duplicate or stale trades after reconnect. Map trade `snapshot` only when the exchange sends trades exclusively as snapshots and there is no incremental update variant.
 - **Book changes** — `book_change` is L2 market-by-price data. `isSnapshot=true` means consumers discard prior book state. `isSnapshot=false` means consumers apply absolute price-level amounts to the current book. `amount=0` removes the level.
 - **Book tickers** — `book_ticker` comes from native top-of-book or BBO feeds. It is not `quotes`, which are computed from reconstructed L2 books.
 - **Derivative tickers** — keep `lastPrice`, `openInterest`, `indexPrice`, `markPrice`, funding fields, and predicted funding fields aligned with exchange meaning. `fundingTimestamp` is the next funding event timestamp.
