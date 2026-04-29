@@ -1,4 +1,4 @@
-import { BookChange, BookTicker, Trade } from '../types.ts'
+import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
 export class BullishTradesMapper implements Mapper<'bullish', Trade> {
@@ -33,8 +33,8 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
 }
 
 export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
-  canHandle(message: BullishMessage) {
-    return message.dataType === 'V1TALevel2'
+  canHandle(message: BullishMessage): message is BullishLevel2Message {
+    return message.dataType === 'V1TALevel2' && (message.type === 'snapshot' || message.type === 'update')
   }
 
   getFilters(symbols?: string[]) {
@@ -46,8 +46,30 @@ export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
     ]
   }
 
-  *map(_message: BullishMessage, _localTimestamp: Date): IterableIterator<BookChange> {
-    return
+  *map(message: BullishLevel2Message, localTimestamp: Date): IterableIterator<BookChange> {
+    yield {
+      type: 'book_change',
+      symbol: message.data.symbol,
+      exchange: 'bullish',
+      isSnapshot: message.type === 'snapshot',
+      bids: this.mapLevels(message.data.bids),
+      asks: this.mapLevels(message.data.asks),
+      timestamp: new Date(message.data.datetime),
+      localTimestamp
+    }
+  }
+
+  private mapLevels(levels: string[]): BookPriceLevel[] {
+    return levels.reduce<BookPriceLevel[]>((result, value, index) => {
+      if (index % 2 === 0) {
+        result.push({
+          price: Number(value),
+          amount: Number(levels[index + 1])
+        })
+      }
+
+      return result
+    }, [])
   }
 }
 
@@ -83,6 +105,7 @@ type BullishDataMessage<TDataType extends string, TData> = {
 type BullishMessageRole = 'snapshot' | 'update'
 
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
+type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
 
 type BullishAnonymousTradeUpdateData = {
   symbol: string
@@ -103,3 +126,13 @@ type BullishAnonymousTrade = {
   createdAtDatetime: string
 }
 type BullishTradeSide = 'BUY' | 'SELL'
+
+type BullishLevel2Data = {
+  timestamp: string
+  bids: string[]
+  asks: string[]
+  publishedAtTimestamp: string
+  datetime: string
+  sequenceNumberRange: [number, number]
+  symbol: string
+}

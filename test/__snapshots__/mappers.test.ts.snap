@@ -827,6 +827,103 @@ exports[`map bitnomial messages 4`] = `
 ]
 `;
 
+exports[`map bullish order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 6.08,
+        "price": 94.973,
+      },
+      {
+        "amount": 8.42081721,
+        "price": 94.984,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.985,
+      },
+      {
+        "amount": 5,
+        "price": 95.078,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 56.33894018,
+        "price": 94.519,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.489,
+      },
+      {
+        "amount": 5,
+        "price": 94.467,
+      },
+      {
+        "amount": 1.08,
+        "price": 94.466,
+      },
+    ],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T13:04:19.490Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bullish order book messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 9800,
+        "price": 0.2513,
+      },
+      {
+        "amount": 25000,
+        "price": 0.2514,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 11800,
+        "price": 0.2507,
+      },
+      {
+        "amount": 0,
+        "price": 0.2506,
+      },
+    ],
+    "exchange": "bullish",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "ADAUSDC",
+    "timestamp": 2026-04-24T13:04:19.138Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bullish order book messages 3`] = `
+[
+  {
+    "asks": [],
+    "bids": [],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEAUSD",
+    "timestamp": 2026-04-24T13:04:19.138Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`map bullish trade messages 1`] = `
 [
   {

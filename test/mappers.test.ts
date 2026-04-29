@@ -9925,7 +9925,75 @@ test('map bullish trade messages', () => {
   const mapper = normalizeTrades('bullish', localTimestamp)
 
   for (const message of messages) {
-    const mappedMessages = mapper.canHandle(message) ? Array.from(mapper.map(message, localTimestamp)) : []
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish order book messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel2 snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859490',
+        bids: ['94.5190', '56.33894018', '94.4890', '53.70000000', '94.4670', '5.00000000', '94.4660', '1.08000000'],
+        asks: ['94.9730', '6.08000000', '94.9840', '8.42081721', '94.9850', '53.70000000', '95.0780', '5.00000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumberRange: [428371450, 428371450],
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel2 update uses the same payload shape; no updates were present in the captured slices
+    {
+      type: 'update',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: ['0.2507', '11800.00000', '0.2506', '0.00000'],
+        asks: ['0.2513', '9800.00000', '0.2514', '25000.00000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [24919768, 24919769],
+        symbol: 'ADAUSDC'
+      }
+    },
+    // Empty book snapshot should still emit a book_change
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: [],
+        asks: [],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [4536455, 4536455],
+        symbol: 'AAVEAUSD'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookChanges('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
     expect(mappedMessages).toMatchSnapshot()
   }
 })
