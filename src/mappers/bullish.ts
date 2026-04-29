@@ -1,3 +1,4 @@
+import { asNumberIfValid } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
@@ -74,8 +75,8 @@ export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
 }
 
 export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
-  canHandle(message: BullishMessage) {
-    return message.dataType === 'V1TALevel1' || message.dataType === 'V1TATickerResponse'
+  canHandle(message: BullishMessage): message is BullishLevel1Message {
+    return message.dataType === 'V1TALevel1' && (message.type === 'snapshot' || message.type === 'update')
   }
 
   getFilters(symbols?: string[]) {
@@ -83,16 +84,22 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
       {
         channel: 'V1TALevel1' as const,
         symbols
-      },
-      {
-        channel: 'V1TATickerResponse' as const,
-        symbols
       }
     ]
   }
 
-  *map(_message: BullishMessage, _localTimestamp: Date): IterableIterator<BookTicker> {
-    return
+  *map(message: BullishLevel1Message, localTimestamp: Date): IterableIterator<BookTicker> {
+    yield {
+      type: 'book_ticker',
+      symbol: message.data.symbol,
+      exchange: 'bullish',
+      bidPrice: asNumberIfValid(message.data.bid[0]),
+      bidAmount: asNumberIfValid(message.data.bid[1]),
+      askPrice: asNumberIfValid(message.data.ask[0]),
+      askAmount: asNumberIfValid(message.data.ask[1]),
+      timestamp: new Date(message.data.datetime),
+      localTimestamp
+    }
   }
 }
 
@@ -106,6 +113,7 @@ type BullishMessageRole = 'snapshot' | 'update'
 
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
 type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
+type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
 
 type BullishAnonymousTradeUpdateData = {
   symbol: string
@@ -134,5 +142,15 @@ type BullishLevel2Data = {
   publishedAtTimestamp: string
   datetime: string
   sequenceNumberRange: [number, number]
+  symbol: string
+}
+
+type BullishLevel1Data = {
+  timestamp: string
+  bid: [string, string]
+  ask: [string, string]
+  publishedAtTimestamp: string
+  datetime: string
+  sequenceNumber: string
   symbol: string
 }

@@ -80,7 +80,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitget-futures',
   'coinbase-international',
   'hyperliquid',
-  'lighter'
+  'lighter',
+  'bullish'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'huobi-dm-options', 'bybit-options', 'binance-european-options']
@@ -9985,6 +9986,76 @@ test('map bullish order book messages', () => {
   ]
 
   const mapper = normalizeBookChanges('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish book ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel1 snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035859490',
+        bid: ['94.5190', '56.33894018'],
+        ask: ['94.9730', '6.08000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumber: '428371450',
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel1 update - real captured payload shape
+    {
+      type: 'update',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035860138',
+        bid: ['6.4290', '1.9840594'],
+        ask: ['6.4310', '59.9788953'],
+        publishedAtTimestamp: '1777035860223',
+        datetime: '2026-04-24T13:04:20.138Z',
+        sequenceNumber: '31788641',
+        symbol: 'BONK1MUSDC'
+      }
+    },
+    // Empty BBO snapshot should still emit a book_ticker with undefined price/amount values
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1776928933990',
+        bid: ['0.00000000', '0.00000000'],
+        ask: ['0.00000000', '0.00000000'],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-23T07:22:13.990Z',
+        sequenceNumber: '4433134',
+        symbol: 'AAVEAUSD'
+      }
+    },
+    // Non-L1 Bullish message should not be handled by the book ticker mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookTickers('bullish', localTimestamp)
 
   for (const message of messages) {
     const mappedMessages = []

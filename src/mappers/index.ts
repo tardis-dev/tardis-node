@@ -48,7 +48,7 @@ import {
 import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial.ts'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp.ts'
 import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom.ts'
-import { BullishBookChangeMapper, BullishTradesMapper } from './bullish.ts'
+import { BullishBookChangeMapper, BullishBookTickerMapper, BullishTradesMapper } from './bullish.ts'
 import {
   BybitBookChangeMapper,
   BybitDerivativeTickerMapper,
@@ -592,6 +592,7 @@ const bookTickersMappers = {
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),
+  bullish: () => new BullishBookTickerMapper(),
   'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
 }
 

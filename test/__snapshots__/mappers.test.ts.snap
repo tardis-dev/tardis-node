@@ -827,6 +827,56 @@ exports[`map bitnomial messages 4`] = `
 ]
 `;
 
+exports[`map bullish book ticker messages 1`] = `
+[
+  {
+    "askAmount": 6.08,
+    "askPrice": 94.973,
+    "bidAmount": 56.33894018,
+    "bidPrice": 94.519,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T13:04:19.490Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 2`] = `
+[
+  {
+    "askAmount": 59.9788953,
+    "askPrice": 6.431,
+    "bidAmount": 1.9840594,
+    "bidPrice": 6.429,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "BONK1MUSDC",
+    "timestamp": 2026-04-24T13:04:20.138Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 3`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEAUSD",
+    "timestamp": 2026-04-23T07:22:13.990Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 4`] = `[]`;
+
 exports[`map bullish order book messages 1`] = `
 [
   {
