@@ -53,6 +53,7 @@ import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
 import { LighterRealTimeFeed } from './lighter.ts'
+import { BullishRealTimeFeed } from './bullish.ts'
 
 export * from './realtimefeed.ts'
 
@@ -116,7 +117,8 @@ const realTimeFeedsMap: {
   'bitget-futures': BitgetFuturesRealTimeFeed,
   'coinbase-international': CoinbaseInternationalRealTimeFeed,
   hyperliquid: HyperliquidRealTimeFeed,
-  lighter: LighterRealTimeFeed
+  lighter: LighterRealTimeFeed,
+  bullish: BullishRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
