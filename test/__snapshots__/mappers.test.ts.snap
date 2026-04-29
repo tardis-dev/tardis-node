@@ -827,6 +827,53 @@ exports[`map bitnomial messages 4`] = `
 ]
 `;
 
+exports[`map bullish trade messages 1`] = `
+[
+  {
+    "amount": 1.63639338,
+    "exchange": "bullish",
+    "id": "100118000001462721",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 94.008,
+    "side": "buy",
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T01:19:40.158Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.125,
+    "exchange": "bullish",
+    "id": "100118000001462722",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 94.009,
+    "side": "sell",
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T01:19:40.159Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bullish trade messages 2`] = `
+[
+  {
+    "amount": 0.0042,
+    "exchange": "bullish",
+    "id": "100118000001462723",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 66250.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-24T01:19:40.258Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bullish trade messages 3`] = `[]`;
+
+exports[`map bullish trade messages 4`] = `[]`;
+
 exports[`map bybit spot messages 1`] = `[]`;
 
 exports[`map bybit spot messages 2`] = `[]`;

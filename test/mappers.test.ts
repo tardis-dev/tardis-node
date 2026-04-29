@@ -9837,6 +9837,99 @@ test('map hyperliquid messages', () => {
   }
 })
 
+test('map bullish trade messages', () => {
+  const localTimestamp = new Date('2026-04-24T01:19:40.250Z')
+
+  const messages = [
+    // V1TAAnonymousTradeUpdate snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'AAVEUSDC',
+        createdAtTimestamp: '1745457580200000000',
+        publishedAtTimestamp: '1745457580201000000',
+        trades: [
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462721',
+            price: '94.008',
+            quantity: '1.63639338',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580158000000',
+            publishedAtTimestamp: '1745457580160000000',
+            lastUpdatedTimestamp: '1745457580158000000',
+            createdAtDatetime: '2026-04-24T01:19:40.158Z'
+          },
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462722',
+            price: '94.009',
+            quantity: '0.125',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580159000000',
+            publishedAtTimestamp: '1745457580161000000',
+            lastUpdatedTimestamp: '1745457580159000000',
+            createdAtDatetime: '2026-04-24T01:19:40.159Z'
+          }
+        ]
+      }
+    },
+    // V1TAAnonymousTradeUpdate update - single incremental trade
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580300000000',
+        publishedAtTimestamp: '1745457580301000000',
+        trades: [
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462723',
+            price: '66250.5',
+            quantity: '0.0042',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580258000000',
+            publishedAtTimestamp: '1745457580260000000',
+            lastUpdatedTimestamp: '1745457580258000000',
+            createdAtDatetime: '2026-04-24T01:19:40.258Z'
+          }
+        ]
+      }
+    },
+    // Empty trade batch should emit nothing
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580400000000',
+        publishedAtTimestamp: '1745457580401000000',
+        trades: []
+      }
+    },
+    // Non-trade Bullish message should not be handled by the trade mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeTrades('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.canHandle(message) ? Array.from(mapper.map(message, localTimestamp)) : []
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
 test('map lighter trade messages', () => {
   const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
 
