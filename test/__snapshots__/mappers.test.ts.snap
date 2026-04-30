@@ -875,7 +875,39 @@ exports[`map bullish book ticker messages 3`] = `
 ]
 `;
 
-exports[`map bullish book ticker messages 4`] = `[]`;
+exports[`map bullish option summary messages 1`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.9998113,
+    "exchange": "bullish",
+    "expirationDate": 2026-04-25T08:00:00.000Z,
+    "gamma": 3e-7,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.7045,
+    "markPrice": 8133.6201,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 70000,
+    "symbol": "BTC-USDC-20260425-70000-C",
+    "theta": -93.2574,
+    "timestamp": 2026-04-24T14:58:52.219Z,
+    "type": "option_summary",
+    "underlyingIndex": "",
+    "underlyingPrice": undefined,
+    "vega": 0.0247,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 2`] = `[]`;
 
 exports[`map bullish order book messages 1`] = `
 [

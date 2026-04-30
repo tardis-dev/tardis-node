@@ -48,7 +48,7 @@ import {
 import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial.ts'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp.ts'
 import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom.ts'
-import { BullishBookChangeMapper, BullishBookTickerMapper, BullishTradesMapper } from './bullish.ts'
+import { BullishBookChangeMapper, BullishBookTickerMapper, BullishOptionSummaryMapper, BullishTradesMapper } from './bullish.ts'
 import {
   BybitBookChangeMapper,
   BybitDerivativeTickerMapper,
@@ -495,7 +495,8 @@ const optionsSummaryMappers = {
   'binance-european-options': (localTimestamp: Date) =>
     shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
       ? new BinanceEuropeanOptionSummaryMapperV2()
-      : new BinanceEuropeanOptionSummaryMapper()
+      : new BinanceEuropeanOptionSummaryMapper(),
+  bullish: () => new BullishOptionSummaryMapper()
 }
 
 const liquidationsMappers = {

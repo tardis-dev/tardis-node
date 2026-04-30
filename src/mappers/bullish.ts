@@ -1,5 +1,5 @@
 import { asNumberIfValid } from '../handy.ts'
-import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
+import { BookChange, BookPriceLevel, BookTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
 export class BullishTradesMapper implements Mapper<'bullish', Trade> {
@@ -103,6 +103,62 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
   }
 }
 
+export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
+  canHandle(message: BullishMessage): message is BullishOptionTickerMessage {
+    if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
+      const tickerMessage = message as BullishTickerMessage
+
+      return tickerMessage.data.symbol.endsWith('-C') || tickerMessage.data.symbol.endsWith('-P')
+    }
+
+    return false
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'V1TATickerResponse' as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(message: BullishOptionTickerMessage, localTimestamp: Date): IterableIterator<OptionSummary> {
+    const [, , dateText, strikePriceText, optionType] = message.data.symbol.split('-')
+
+    const expirationDate = new Date(`${dateText.slice(0, 4)}-${dateText.slice(4, 6)}-${dateText.slice(6, 8)}Z`)
+    expirationDate.setUTCHours(8)
+
+    yield {
+      type: 'option_summary',
+      symbol: message.data.symbol,
+      exchange: 'bullish',
+      optionType: optionType === 'P' ? 'put' : 'call',
+      strikePrice: Number(strikePriceText),
+      expirationDate,
+      bestBidPrice: asNumberIfValid(message.data.bestBid),
+      bestBidAmount: asNumberIfValid(message.data.bidVolume),
+      bestBidIV: undefined,
+      bestAskPrice: asNumberIfValid(message.data.bestAsk),
+      bestAskAmount: asNumberIfValid(message.data.askVolume),
+      bestAskIV: undefined,
+      lastPrice: asNumberIfValid(message.data.last),
+      openInterest: asNumberIfValid(message.data.openInterest),
+      markPrice: asNumberIfValid(message.data.markPrice),
+      markIV: asNumberIfValid(message.data.impliedVolatility),
+      delta: asNumberIfValid(message.data.delta),
+      gamma: asNumberIfValid(message.data.gamma),
+      vega: asNumberIfValid(message.data.vega),
+      theta: asNumberIfValid(message.data.theta),
+      rho: undefined,
+      underlyingPrice: undefined,
+      underlyingIndex: '',
+      timestamp: new Date(message.data.createdAtDatetime),
+      localTimestamp
+    }
+  }
+}
+
 type BullishMessage = BullishDataMessage<string, unknown>
 type BullishDataMessage<TDataType extends string, TData> = {
   type: BullishMessageRole
@@ -114,6 +170,7 @@ type BullishMessageRole = 'snapshot' | 'update'
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
 type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
 type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
+type BullishOptionTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishOptionTickerData>
 
 type BullishAnonymousTradeUpdateData = {
   symbol: string
@@ -153,4 +210,51 @@ type BullishLevel1Data = {
   datetime: string
   sequenceNumber: string
   symbol: string
+}
+
+type BullishOptionTickerData = BullishTickerDataBase & {
+  markPrice: string | null
+  openInterest: string | null
+  openInterestUSD: string | null
+  delta: string | null
+  gamma: string | null
+  theta: string | null
+  vega: string | null
+  impliedVolatility: string | null
+}
+
+type BullishTickerDataBase = {
+  askVolume: string | null
+  average: string | null
+  baseVolume: string
+  bestAsk?: string | null
+  bestBid?: string | null
+  bidVolume?: string | null
+  change: string
+  close: string | null
+  createdAtTimestamp: string
+  publishedAtTimestamp: string
+  high: string | null
+  last: string | null
+  lastTradeDatetime: string | null
+  lastTradeSize: string
+  low: string | null
+  open: string | null
+  percentage: string
+  quoteVolume: string
+  symbol: string
+  type: 'ticker'
+  vwap: string | null
+  currentPrice: string | null
+  ammData: BullishTickerAmmData[] | null
+  createdAtDatetime: string
+  otcBaseVolume: string
+}
+
+type BullishTickerAmmData = {
+  feeTierId: string
+  tierPrice: string
+  currentPrice: string
+  bidSpreadFee: string
+  askSpreadFee: string
 }
