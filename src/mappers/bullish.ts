@@ -1,6 +1,6 @@
 import { asNumberIfValid } from '../handy.ts'
-import { BookChange, BookPriceLevel, BookTicker, OptionSummary, Trade } from '../types.ts'
-import { Mapper } from './mapper.ts'
+import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class BullishTradesMapper implements Mapper<'bullish', Trade> {
   canHandle(message: BullishMessage): message is BullishAnonymousTradeUpdateMessage {
@@ -103,6 +103,43 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
   }
 }
 
+export class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicker> {
+  private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  canHandle(message: BullishMessage): message is BullishDerivativeTickerMessage {
+    if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
+      const tickerMessage = message as BullishTickerMessage
+
+      return tickerMessage.data.symbol.endsWith('-PERP') || /-\d{8}$/.test(tickerMessage.data.symbol)
+    }
+
+    return false
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'V1TATickerResponse' as const,
+        symbols
+      }
+    ]
+  }
+
+  *map(message: BullishDerivativeTickerMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.data.symbol, 'bullish')
+
+    pendingTickerInfo.updateLastPrice(asNumberIfValid(message.data.last))
+    pendingTickerInfo.updateMarkPrice(asNumberIfValid(message.data.markPrice))
+    pendingTickerInfo.updateFundingRate(asNumberIfValid(message.data.fundingRate))
+    pendingTickerInfo.updateOpenInterest(asNumberIfValid(message.data.openInterest))
+
+    if (pendingTickerInfo.hasChanged()) {
+      pendingTickerInfo.updateTimestamp(new Date(message.data.createdAtDatetime))
+      yield pendingTickerInfo.getSnapshot(localTimestamp)
+    }
+  }
+}
+
 export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
   canHandle(message: BullishMessage): message is BullishOptionTickerMessage {
     if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
@@ -170,6 +207,8 @@ type BullishMessageRole = 'snapshot' | 'update'
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
 type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
 type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
+type BullishTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishTickerData>
+type BullishDerivativeTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishDerivativeTickerData>
 type BullishOptionTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishOptionTickerData>
 
 type BullishAnonymousTradeUpdateData = {
@@ -210,6 +249,17 @@ type BullishLevel1Data = {
   datetime: string
   sequenceNumber: string
   symbol: string
+}
+
+type BullishTickerData = BullishSpotTickerData | BullishDerivativeTickerData | BullishOptionTickerData
+
+type BullishSpotTickerData = BullishTickerDataBase
+
+type BullishDerivativeTickerData = BullishTickerDataBase & {
+  markPrice: string | null
+  fundingRate?: string | null
+  openInterest: string | null
+  openInterestUSD: string | null
 }
 
 type BullishOptionTickerData = BullishTickerDataBase & {

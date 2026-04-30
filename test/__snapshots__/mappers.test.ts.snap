@@ -875,6 +875,48 @@ exports[`map bullish book ticker messages 3`] = `
 ]
 `;
 
+exports[`map bullish book ticker messages 4`] = `[]`;
+
+exports[`map bullish derivative ticker messages 1`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": -0.001492,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 78029.65,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78035.395,
+    "openInterest": 647.17244459,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:54.715Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 2`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78001.2667,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-20260426",
+    "timestamp": 2026-04-24T14:58:51.879Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 3`] = `[]`;
+
 exports[`map bullish option summary messages 1`] = `
 [
   {

@@ -36,7 +36,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bitget-futures',
   'coinbase-international',
   'hyperliquid',
-  'lighter'
+  'lighter',
+  'bullish'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -10075,6 +10076,127 @@ test('map bullish book ticker messages', () => {
     expect(mappedMessages).toMatchSnapshot()
   }
 })
+
+test('map bullish derivative ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
+
+  const messages = [
+    // V1TATickerResponse perpetual snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042734715',
+        publishedAtTimestamp: '1777042734865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:54.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '-0.001492',
+        openInterest: '647.17244459',
+        openInterestUSD: '50507926.2656',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // V1TATickerResponse dated future snapshot - no fundingRate field
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042731879',
+        publishedAtTimestamp: '1777042734841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260426',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: '78104.8465',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:51.879Z',
+        markPrice: '78001.2667',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // Spot ticker should not be handled by the derivative ticker mapper
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '5.61187517',
+        average: '93.6790',
+        baseVolume: '4448.42894841',
+        bestAsk: '93.5800',
+        bestBid: '93.1320',
+        bidVolume: '57.15536018',
+        change: '0.7040',
+        close: '94.0310',
+        createdAtTimestamp: '1777042725522',
+        publishedAtTimestamp: '1777042734821',
+        high: '96.7090',
+        last: '94.0310',
+        lastTradeDatetime: '2026-04-24T13:34:13.426Z',
+        lastTradeSize: '2.22800000',
+        low: '91.3430',
+        open: '93.3270',
+        percentage: '0.75',
+        quoteVolume: '419347.8185',
+        symbol: 'AAVEUSDC',
+        type: 'ticker',
+        vwap: '94.2642',
+        currentPrice: '127.6770',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:45.522Z',
+        otcBaseVolume: '0.00000000'
+      }
+    }
+  ]
+
+  const mapper = normalizeDerivativeTickers('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
 test('map bullish option summary messages', () => {
   const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
 
