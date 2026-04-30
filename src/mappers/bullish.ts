@@ -25,7 +25,7 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
         id: trade.tradeId,
         price: Number(trade.price),
         amount: Number(trade.quantity),
-        side: (['buy', 'sell'] as const).find((side) => side === trade.side.toLowerCase()) ?? 'unknown',
+        side: trade.side.toLowerCase() as 'buy' | 'sell',
         timestamp: new Date(trade.createdAtDatetime),
         localTimestamp
       }
