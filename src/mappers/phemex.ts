@@ -27,6 +27,11 @@ function getQtyScale(symbol: string) {
   return 1
 }
 
+function isExcludedFromNormalizedOutput(symbol: string) {
+  // Matches tardis-api metadata: Phemex spot OL/USDT uses sOLUSDT, which collides with SOLUSDT when normalized.
+  return symbol === 'sOLUSDT'
+}
+
 const COINS_STARTING_WITH_S = [
   'SOLUSD',
   'SUSHIUSD',
@@ -163,10 +168,13 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   },
 
   *map(message: PhemexTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+    const symbol = message.symbol
+    if (isExcludedFromNormalizedOutput(symbol)) {
+      return
+    }
+
     if ('trades' in message) {
       for (const [timestamp, side, priceEp, qty] of message.trades) {
-        const symbol = message.symbol
-
         yield {
           type: 'trade',
           symbol: symbol.toUpperCase(),
@@ -181,8 +189,6 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
       }
     } else if ('trades_p' in message) {
       for (const [timestamp, side, price, qty] of message.trades_p) {
-        const symbol = message.symbol
-
         yield {
           type: 'trade',
           symbol: symbol.toUpperCase(),
@@ -253,6 +259,10 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
 
   *map(message: PhemexBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const symbol = message.symbol
+    if (isExcludedFromNormalizedOutput(symbol)) {
+      return
+    }
+
     if ('book' in message) {
       const mapBookLevel = mapBookLevelForSymbol(symbol)
       yield {

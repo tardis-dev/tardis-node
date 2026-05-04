@@ -6675,7 +6675,19 @@ describe('mappers', () => {
         timestamp: 1669198855202180601,
         type: 'incremental'
       },
-      { sequence: 80321106, symbol: 'XRPUSDT', trades_p: [[1669198857616162039, 'Buy', '0.3758', '244.65']], type: 'incremental' }
+      { sequence: 80321106, symbol: 'XRPUSDT', trades_p: [[1669198857616162039, 'Buy', '0.3758', '244.65']], type: 'incremental' },
+      {
+        book: {
+          asks: [[1238100, 11840000000]],
+          bids: [[1238000, 10000000000]]
+        },
+        depth: 30,
+        sequence: 23906375249,
+        symbol: 'sOLUSDT',
+        timestamp: 1772323195423084785,
+        type: 'incremental'
+      },
+      { sequence: 23912236867, symbol: 'sOLUSDT', trades: [[1772323222771984119, 'Sell', 1228700, 41250000000]], type: 'incremental' }
     ]
     const phemex = createMapper('phemex')
 

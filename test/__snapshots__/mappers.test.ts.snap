@@ -12118,6 +12118,10 @@ exports[`mappers map phemex messages 15`] = `
 ]
 `;
 
+exports[`mappers map phemex messages 16`] = `[]`;
+
+exports[`mappers map phemex messages 17`] = `[]`;
+
 exports[`mappers map poloniex messages 1`] = `
 [
   {
