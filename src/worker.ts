@@ -7,6 +7,8 @@ import type { DataFeedCompression } from './options.ts'
 import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
 
+const DEFAULT_DATA_FEED_SLICE_SIZE = 1
+
 if (isMainThread) {
   debug('current worker is not meant to run in main thread')
 } else {
@@ -77,15 +79,32 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
     }
   } else {
     // fetch last slice - it will tell us if user has access to the end of requested date range and data is available
-    await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir)
+    // also fetch it from API to get current suggested slice size headers
+    const lastSlice = await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
 
     // fetch first slice - it will tell us if user has access to the beginning of requested date range
-    await getDataFeedSlice(payload, 0, filters, cacheDir)
+    const firstSlice =
+      minutesCountToFetch === 1 ? lastSlice : await getDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+
+    const replaySliceSize =
+      filters.length === 0 ? DEFAULT_DATA_FEED_SLICE_SIZE : Math.max(firstSlice.suggestedSliceSize, lastSlice.suggestedSliceSize)
+    const sliceOffsets: number[] = []
+    for (let offset = 1; offset < minutesCountToFetch - 1; offset += replaySliceSize) {
+      sliceOffsets.push(offset)
+    }
 
     // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
     await pMap(
-      sequence(minutesCountToFetch, 1), // this will produce Iterable sequence from 1 to minutesCountToFetch
-      (offset) => getDataFeedSlice(payload, offset, filters, cacheDir),
+      sliceOffsets,
+      async (offset) => {
+        let currentOffset = offset
+        let remainingSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
+        while (remainingSliceSize > 0) {
+          const result = await getDataFeedSlice(payload, currentOffset, filters, cacheDir, remainingSliceSize)
+          currentOffset += result.sliceSize
+          remainingSliceSize -= result.sliceSize
+        }
+      },
       { concurrency: CONCURRENCY_LIMIT }
     )
   }
@@ -95,51 +114,73 @@ async function getDataFeedSlice(
   { exchange, fromDate, endpoint, apiKey, dataFeedCompression, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
-  cacheDir: string
+  cacheDir: string,
+  requestedSliceSize = DEFAULT_DATA_FEED_SLICE_SIZE,
+  useCache = true
 ) {
   const sliceTimestamp = addMinutes(fromDate, offset)
   const sliceKey = sliceTimestamp.toISOString()
-  const sliceBasePath = `${cacheDir}/${formatDateToPath(sliceTimestamp)}.json`
+  const sliceSizeSuffix = requestedSliceSize === DEFAULT_DATA_FEED_SLICE_SIZE ? '' : `.size-${requestedSliceSize}`
+  const sliceBasePath = `${cacheDir}/${formatDateToPath(sliceTimestamp)}${sliceSizeSuffix}.json`
   const zstdSlicePath = `${sliceBasePath}.zst`
   const gzipSlicePath = `${sliceBasePath}.gz`
-  const cachedSlicePath = existsSync(zstdSlicePath) ? zstdSlicePath : existsSync(gzipSlicePath) ? gzipSlicePath : undefined
+  let cachedSlicePath
+  if (useCache) {
+    cachedSlicePath = existsSync(zstdSlicePath) ? zstdSlicePath : existsSync(gzipSlicePath) ? gzipSlicePath : undefined
+  }
+
+  if (cachedSlicePath !== undefined) {
+    debug('getDataFeedSlice already cached: %s, sliceSize: %d', sliceKey, requestedSliceSize)
+    const message: WorkerMessage = {
+      sliceKey,
+      slicePath: cachedSlicePath,
+      sliceSize: requestedSliceSize
+    }
+    parentPort!.postMessage(message)
+    return {
+      sliceSize: requestedSliceSize,
+      suggestedSliceSize: DEFAULT_DATA_FEED_SLICE_SIZE
+    }
+  }
 
   let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${dataFeedCompression}`
+  if (requestedSliceSize > DEFAULT_DATA_FEED_SLICE_SIZE) {
+    url += `&sliceSize=${requestedSliceSize}`
+  }
 
   if (filters.length > 0) {
     url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`
   }
 
-  const slicePath =
-    cachedSlicePath ||
-    (
-      await download({
-        apiKey,
-        downloadPath: sliceBasePath,
-        url,
-        userAgent,
-        appendContentEncodingExtension: true,
-        acceptEncoding: dataFeedCompression === 'gzip' ? 'gzip' : 'zstd, gzip'
-      })
-    ).downloadPath
+  const downloadResult = await download({
+    apiKey,
+    downloadPath: sliceBasePath,
+    url,
+    userAgent,
+    appendContentEncodingExtension: true,
+    acceptEncoding: dataFeedCompression === 'gzip' ? 'gzip' : 'zstd, gzip'
+  })
+  const responseSliceSize = Number(downloadResult.headers['x-slice-size'])
+  const suggestedSliceSize = Number(downloadResult.headers['x-suggested-slice-size'] ?? DEFAULT_DATA_FEED_SLICE_SIZE)
 
-  if (cachedSlicePath === undefined) {
-    debug('getDataFeedSlice fetched from API and cached, %s', sliceKey)
-  } else {
-    debug('getDataFeedSlice already cached: %s', sliceKey)
-  }
-
-  // everything went well (already cached or successfull cached) let's communicate it to parent thread
+  debug('getDataFeedSlice fetched from API and cached, %s, sliceSize: %d', sliceKey, responseSliceSize)
   const message: WorkerMessage = {
     sliceKey,
-    slicePath
+    slicePath: downloadResult.downloadPath,
+    sliceSize: responseSliceSize
   }
   parentPort!.postMessage(message)
+
+  return {
+    sliceSize: responseSliceSize,
+    suggestedSliceSize
+  }
 }
 
 export type WorkerMessage = {
   sliceKey: string
   slicePath: string
+  sliceSize: number
 }
 
 export type WorkerJobPayload = {

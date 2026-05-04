@@ -13,18 +13,18 @@ Main Thread                         Worker Thread
   │                                     │
   │── Start replay ──→                  │
   │                         Fetch data slice from API
-  │                         Cache to disk (.gz file)
-  │  ←── message (sliceKey, path) ──    │
+  │                         Cache to disk (.gz/.zst file)
+  │  ←── message (sliceKey, path, size) ──
   │                         Fetch next slice...
   │                                     │
   Read cached file from disk            │
-  Decompress (gunzip)                   │
+  Decompress (gzip/zstd)                │
   Split by newlines                     │
   Parse JSON messages                   │
   Yield {localTimestamp, message}       │
 ```
 
-Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined.
+Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename.
 
 ## Real-time Streaming
 

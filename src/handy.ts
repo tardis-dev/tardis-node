@@ -628,6 +628,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
+    let responseHeaders: Record<string, string> = {}
     await new Promise<void>((resolve, reject) => {
       const req = https
         .get(url, requestOptions, (res) => {
@@ -642,6 +643,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
               reject(new HttpError(statusCode!, body, url))
             })
           } else {
+            responseHeaders = parseNodeResponseHeaders(res.headers)
             if (appendContentEncodingExtension) {
               const contentEncoding = asSingleHeaderValue(res.headers['content-encoding'])
               if (contentEncoding === 'zstd') {
@@ -682,7 +684,8 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     await rename(tmpFilePath, finalDownloadPath)
 
     return {
-      downloadPath: finalDownloadPath
+      downloadPath: finalDownloadPath,
+      headers: responseHeaders
     }
   } finally {
     tmpFileCleanups.delete(tmpFilePath)

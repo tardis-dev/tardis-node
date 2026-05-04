@@ -42,7 +42,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
   const fromDate = parseAsUTCDate(from)
   const toDate = parseAsUTCDate(to)
-  const cachedSlicePaths = new Map<string, string>()
+  const cachedSlicePaths = new Map<string, { slicePath: string; sliceSize: number }>()
   let replayError
   debug('replay for exchange: %s started - from: %s, to: %s, filters: %o', exchange, fromDate.toISOString(), toDate.toISOString(), filters)
 
@@ -65,7 +65,10 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   const worker = new ReliableWorker(payload)
 
   worker.on('message', (message: WorkerMessage) => {
-    cachedSlicePaths.set(message.sliceKey, message.slicePath)
+    cachedSlicePaths.set(message.sliceKey, {
+      slicePath: message.slicePath,
+      sliceSize: message.sliceSize
+    })
   })
 
   worker.on('error', (err) => {
@@ -100,16 +103,16 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       debug('getting slice: %s, exchange: %s', sliceKey, exchange)
 
-      let cachedSlicePath
-      while (cachedSlicePath === undefined) {
-        cachedSlicePath = cachedSlicePaths.get(sliceKey)
+      let cachedSlice
+      while (cachedSlice === undefined) {
+        cachedSlice = cachedSlicePaths.get(sliceKey)
 
         // if something went wrong(network issue, auth issue, gunzip issue etc)
         if (replayError !== undefined) {
           throw replayError
         }
 
-        if (cachedSlicePath === undefined) {
+        if (cachedSlice === undefined) {
           // if response for requested date is not ready yet wait 100ms and try again
           debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
           await wait(100)
@@ -117,6 +120,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       }
 
       // response is a path to file on disk let' read it as stream
+      const { slicePath: cachedSlicePath, sliceSize } = cachedSlice
       const isZstdSlice = cachedSlicePath.endsWith('.zst')
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE })
         // decompress it while preserving the on-disk cache in the negotiated wire format
@@ -185,8 +189,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       if (autoCleanup) {
         await cleanupSlice(cachedSlicePath)
       }
-      // move one minute forward
-      currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
+      // move by the number of minutes covered by this cached response
+      currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + sliceSize)
     }
 
     debug(
