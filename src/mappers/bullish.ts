@@ -130,14 +130,35 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
       },
       {
         channel: 'V1TAIndexPrice' as const,
-        symbols: symbols?.map((symbol) => symbol.split('-')[0])
+        symbols: symbols === undefined ? undefined : [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
       }
     ]
   }
 
   *map(message: BullishDerivativeTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     if (message.dataType === 'V1TAIndexPrice') {
-      yield* this.mapIndexPrice(message, localTimestamp)
+      const price = asNumberIfValid(message.data.price)
+      if (price === undefined) {
+        return
+      }
+
+      const timestamp = new Date(message.data.updatedAtDatetime)
+      this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
+
+      for (const symbol of this.derivativeSymbolsByIndexAsset.get(message.data.assetSymbol) ?? []) {
+        if (!this.pendingTickerInfoHelper.hasPendingTickerInfo(symbol)) {
+          continue
+        }
+
+        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bullish')
+        pendingTickerInfo.updateIndexPrice(price)
+
+        if (pendingTickerInfo.hasChanged()) {
+          pendingTickerInfo.updateTimestamp(timestamp)
+          yield pendingTickerInfo.getSnapshot(localTimestamp)
+        }
+      }
+
       return
     }
 
@@ -155,30 +176,6 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
     if (pendingTickerInfo.hasChanged()) {
       pendingTickerInfo.updateTimestamp(new Date(message.data.createdAtDatetime))
       yield pendingTickerInfo.getSnapshot(localTimestamp)
-    }
-  }
-
-  private *mapIndexPrice(message: BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
-    const price = asNumberIfValid(message.data.price)
-    if (price === undefined) {
-      return
-    }
-
-    const timestamp = new Date(message.data.updatedAtDatetime)
-    this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
-
-    for (const symbol of this.derivativeSymbolsByIndexAsset.get(message.data.assetSymbol) ?? []) {
-      if (this.pendingTickerInfoHelper.hasPendingTickerInfo(symbol)) {
-        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bullish')
-        pendingTickerInfo.updateIndexPrice(price)
-
-        if (pendingTickerInfo.hasChanged()) {
-          pendingTickerInfo.updateTimestamp(timestamp)
-          yield pendingTickerInfo.getSnapshot(localTimestamp)
-        }
-      } else {
-        continue
-      }
     }
   }
 
