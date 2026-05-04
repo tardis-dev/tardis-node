@@ -10236,6 +10236,17 @@ test('map bullish option summary messages', () => {
   const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
 
   const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC option summary messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
     // V1TATickerResponse option snapshot - real captured payload shape
     {
       type: 'snapshot',
@@ -10271,6 +10282,28 @@ test('map bullish option summary messages', () => {
         vega: '0.0247',
         impliedVolatility: '0.7045',
         otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - emits updated option summaries for already-seen BTC options
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Unrelated index price update should not emit option summary messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
       }
     },
     // Perpetual ticker should not be handled by the option summary mapper
@@ -10312,6 +10345,8 @@ test('map bullish option summary messages', () => {
   ]
 
   const mapper = normalizeOptionsSummary('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-20260425-70000-C'])).toMatchSnapshot()
 
   for (const message of messages) {
     const mappedMessages = []

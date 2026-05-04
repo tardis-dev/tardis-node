@@ -975,6 +975,25 @@ exports[`map bullish derivative ticker messages 7`] = `[]`;
 exports[`map bullish option summary messages 1`] = `
 [
   {
+    "channel": "V1TATickerResponse",
+    "symbols": [
+      "BTC-USDC-20260425-70000-C",
+    ],
+  },
+  {
+    "channel": "V1TAIndexPrice",
+    "symbols": [
+      "BTC",
+    ],
+  },
+]
+`;
+
+exports[`map bullish option summary messages 2`] = `[]`;
+
+exports[`map bullish option summary messages 3`] = `
+[
+  {
     "bestAskAmount": undefined,
     "bestAskIV": undefined,
     "bestAskPrice": undefined,
@@ -998,13 +1017,47 @@ exports[`map bullish option summary messages 1`] = `
     "timestamp": 2026-04-24T14:58:52.219Z,
     "type": "option_summary",
     "underlyingIndex": "",
-    "underlyingPrice": undefined,
+    "underlyingPrice": 78032.25,
     "vega": 0.0247,
   },
 ]
 `;
 
-exports[`map bullish option summary messages 2`] = `[]`;
+exports[`map bullish option summary messages 4`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.9998113,
+    "exchange": "bullish",
+    "expirationDate": 2026-04-25T08:00:00.000Z,
+    "gamma": 3e-7,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.7045,
+    "markPrice": 8133.6201,
+    "openInterest": undefined,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 70000,
+    "symbol": "BTC-USDC-20260425-70000-C",
+    "theta": -93.2574,
+    "timestamp": 2026-04-24T14:58:55.000Z,
+    "type": "option_summary",
+    "underlyingIndex": "",
+    "underlyingPrice": 78040.5,
+    "vega": 0.0247,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 5`] = `[]`;
+
+exports[`map bullish option summary messages 6`] = `[]`;
 
 exports[`map bullish order book messages 1`] = `
 [

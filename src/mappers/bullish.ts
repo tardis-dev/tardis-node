@@ -191,7 +191,14 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
 }
 
 export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
-  canHandle(message: BullishMessage): message is BullishOptionTickerMessage {
+  private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
+  private readonly optionSummariesByIndexAsset = new Map<string, Map<string, OptionSummary>>()
+
+  canHandle(message: BullishMessage): message is BullishOptionTickerMessage | BullishIndexPriceMessage {
+    if (message.dataType === 'V1TAIndexPrice' && (message.type === 'snapshot' || message.type === 'update')) {
+      return true
+    }
+
     if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
       const tickerMessage = message as BullishTickerMessage
 
@@ -206,17 +213,49 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
       {
         channel: 'V1TATickerResponse' as const,
         symbols
+      },
+      {
+        channel: 'V1TAIndexPrice' as const,
+        symbols: symbols === undefined ? undefined : [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
       }
     ]
   }
 
-  *map(message: BullishOptionTickerMessage, localTimestamp: Date): IterableIterator<OptionSummary> {
-    const [, , dateText, strikePriceText, optionType] = message.data.symbol.split('-')
+  *map(message: BullishOptionTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<OptionSummary> {
+    if (message.dataType === 'V1TAIndexPrice') {
+      const price = asNumberIfValid(message.data.price)
+      if (price === undefined) {
+        return
+      }
+
+      const timestamp = new Date(message.data.updatedAtDatetime)
+      this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
+
+      for (const [symbol, optionSummary] of this.optionSummariesByIndexAsset.get(message.data.assetSymbol) ?? []) {
+        if (optionSummary.underlyingPrice === price) {
+          continue
+        }
+
+        const updatedOptionSummary = {
+          ...optionSummary,
+          underlyingPrice: price,
+          timestamp,
+          localTimestamp
+        }
+        this.addOptionSummaryForIndexAsset(message.data.assetSymbol, symbol, updatedOptionSummary)
+        yield updatedOptionSummary
+      }
+
+      return
+    }
+
+    const [indexAsset, , dateText, strikePriceText, optionType] = message.data.symbol.split('-')
+    const indexPrice = this.indexPrices.get(indexAsset)
 
     const expirationDate = new Date(`${dateText.slice(0, 4)}-${dateText.slice(4, 6)}-${dateText.slice(6, 8)}Z`)
     expirationDate.setUTCHours(8)
 
-    yield {
+    const optionSummary: OptionSummary = {
       type: 'option_summary',
       symbol: message.data.symbol,
       exchange: 'bullish',
@@ -238,11 +277,24 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
       vega: asNumberIfValid(message.data.vega),
       theta: asNumberIfValid(message.data.theta),
       rho: undefined,
-      underlyingPrice: undefined,
+      underlyingPrice: indexPrice?.price,
       underlyingIndex: '',
       timestamp: new Date(message.data.createdAtDatetime),
       localTimestamp
     }
+
+    this.addOptionSummaryForIndexAsset(indexAsset, message.data.symbol, optionSummary)
+    yield optionSummary
+  }
+
+  private addOptionSummaryForIndexAsset(indexAsset: string, symbol: string, optionSummary: OptionSummary) {
+    let optionSummaries = this.optionSummariesByIndexAsset.get(indexAsset)
+    if (optionSummaries === undefined) {
+      optionSummaries = new Map()
+      this.optionSummariesByIndexAsset.set(indexAsset, optionSummaries)
+    }
+
+    optionSummaries.set(symbol, optionSummary)
   }
 }
 
