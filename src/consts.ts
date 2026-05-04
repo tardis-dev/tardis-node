@@ -523,14 +523,7 @@ const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotA
 
 const LIGHTER_CHANNELS = ['order_book', 'trade', 'ticker', 'market_stats', 'spot_market_stats'] as const
 
-const BULLISH_CHANNELS = [
-  'V1TALevel2',
-  'V1TALevel1',
-  'V1TAAnonymousTradeUpdate',
-  'V1TATickerResponse',
-  'V1TAIndexPrice',
-  'V1TAHeartbeat'
-] as const
+const BULLISH_CHANNELS = ['V1TALevel2', 'V1TALevel1', 'V1TAAnonymousTradeUpdate', 'V1TATickerResponse', 'V1TAIndexPrice'] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,

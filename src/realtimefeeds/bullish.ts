@@ -32,10 +32,6 @@ const BULLISH_SUBSCRIPTION_TARGETS: Record<string, BullishSubscriptionTarget> = 
     topic: 'indexPrice',
     path: '/trading-api/v1/index-data',
     symbolParam: 'assetSymbol'
-  },
-  V1TAHeartbeat: {
-    topic: 'heartbeat',
-    path: '/trading-api/v1/market-data/orderbook'
   }
 }
 
