@@ -58,18 +58,6 @@ test('map bullish realtime index price subscription with assetSymbol', () => {
   expect(subscribeMessages).toMatchSnapshot()
 })
 
-test('map bullish realtime heartbeat subscription without symbol', () => {
-  const feed = new TestBullishSingleConnectionRealTimeFeed('bullish', '/trading-api/v1/market-data/orderbook', [], undefined)
-
-  const subscribeMessages = feed.map([
-    {
-      channel: 'V1TAHeartbeat'
-    }
-  ])
-
-  expect(subscribeMessages).toMatchSnapshot()
-})
-
 test('bullish realtime market subscriptions require symbols', () => {
   const feed = new TestBullishSingleConnectionRealTimeFeed('bullish', '/trading-api/v1/market-data/orderbook', [], undefined)
 

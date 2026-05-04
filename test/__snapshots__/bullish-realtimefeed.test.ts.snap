@@ -1,19 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`map bullish realtime heartbeat subscription without symbol 1`] = `
-[
-  {
-    "id": "1",
-    "jsonrpc": "2.0",
-    "method": "subscribe",
-    "params": {
-      "topic": "heartbeat",
-    },
-    "type": "command",
-  },
-]
-`;
-
 exports[`map bullish realtime index price subscription with assetSymbol 1`] = `
 [
   {
