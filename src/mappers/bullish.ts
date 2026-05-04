@@ -105,8 +105,14 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
 
 export class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
+  private readonly derivativeSymbolsByIndexAsset = new Map<string, Set<string>>()
 
-  canHandle(message: BullishMessage): message is BullishDerivativeTickerMessage {
+  canHandle(message: BullishMessage): message is BullishDerivativeTickerMessage | BullishIndexPriceMessage {
+    if (message.dataType === 'V1TAIndexPrice' && (message.type === 'snapshot' || message.type === 'update')) {
+      return true
+    }
+
     if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
       const tickerMessage = message as BullishTickerMessage
 
@@ -121,22 +127,69 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
       {
         channel: 'V1TATickerResponse' as const,
         symbols
+      },
+      {
+        channel: 'V1TAIndexPrice' as const,
+        symbols: symbols?.map((symbol) => symbol.split('-')[0])
       }
     ]
   }
 
-  *map(message: BullishDerivativeTickerMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+  *map(message: BullishDerivativeTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    if (message.dataType === 'V1TAIndexPrice') {
+      yield* this.mapIndexPrice(message, localTimestamp)
+      return
+    }
+
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.data.symbol, 'bullish')
+    const indexAsset = message.data.symbol.split('-')[0]
+    const indexPrice = this.indexPrices.get(indexAsset)
 
     pendingTickerInfo.updateLastPrice(asNumberIfValid(message.data.last))
     pendingTickerInfo.updateMarkPrice(asNumberIfValid(message.data.markPrice))
     pendingTickerInfo.updateFundingRate(asNumberIfValid(message.data.fundingRate))
     pendingTickerInfo.updateOpenInterest(asNumberIfValid(message.data.openInterest))
+    pendingTickerInfo.updateIndexPrice(indexPrice?.price)
+    this.addDerivativeSymbolForIndexAsset(indexAsset, message.data.symbol)
 
     if (pendingTickerInfo.hasChanged()) {
       pendingTickerInfo.updateTimestamp(new Date(message.data.createdAtDatetime))
       yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
+  }
+
+  private *mapIndexPrice(message: BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    const price = asNumberIfValid(message.data.price)
+    if (price === undefined) {
+      return
+    }
+
+    const timestamp = new Date(message.data.updatedAtDatetime)
+    this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
+
+    for (const symbol of this.derivativeSymbolsByIndexAsset.get(message.data.assetSymbol) ?? []) {
+      if (this.pendingTickerInfoHelper.hasPendingTickerInfo(symbol)) {
+        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bullish')
+        pendingTickerInfo.updateIndexPrice(price)
+
+        if (pendingTickerInfo.hasChanged()) {
+          pendingTickerInfo.updateTimestamp(timestamp)
+          yield pendingTickerInfo.getSnapshot(localTimestamp)
+        }
+      } else {
+        continue
+      }
+    }
+  }
+
+  private addDerivativeSymbolForIndexAsset(indexAsset: string, symbol: string) {
+    let symbols = this.derivativeSymbolsByIndexAsset.get(indexAsset)
+    if (symbols === undefined) {
+      symbols = new Set()
+      this.derivativeSymbolsByIndexAsset.set(indexAsset, symbols)
+    }
+
+    symbols.add(symbol)
   }
 }
 
@@ -210,6 +263,7 @@ type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
 type BullishTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishTickerData>
 type BullishDerivativeTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishDerivativeTickerData>
 type BullishOptionTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishOptionTickerData>
+type BullishIndexPriceMessage = BullishDataMessage<'V1TAIndexPrice', BullishIndexPriceData>
 
 type BullishAnonymousTradeUpdateData = {
   symbol: string
@@ -249,6 +303,13 @@ type BullishLevel1Data = {
   datetime: string
   sequenceNumber: string
   symbol: string
+}
+
+type BullishIndexPriceData = {
+  price: string
+  assetSymbol: string
+  updatedAtDatetime: string
+  updatedAtTimestamp: string
 }
 
 type BullishTickerData = BullishSpotTickerData | BullishDerivativeTickerData | BullishOptionTickerData

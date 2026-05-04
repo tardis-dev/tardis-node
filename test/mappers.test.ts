@@ -10081,6 +10081,17 @@ test('map bullish derivative ticker messages', () => {
   const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
 
   const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC derivative ticker messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
     // V1TATickerResponse perpetual snapshot - real captured payload shape
     {
       type: 'snapshot',
@@ -10149,6 +10160,28 @@ test('map bullish derivative ticker messages', () => {
         otcBaseVolume: '0.00000000'
       }
     },
+    // V1TAIndexPrice update - emits updated derivative tickers for already-seen BTC derivatives
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Unrelated index price update should not emit derivative ticker messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
     // Spot ticker should not be handled by the derivative ticker mapper
     {
       type: 'snapshot',
@@ -10184,6 +10217,8 @@ test('map bullish derivative ticker messages', () => {
   ]
 
   const mapper = normalizeDerivativeTickers('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-PERP', 'BTC-USDC-20260426'])).toMatchSnapshot()
 
   for (const message of messages) {
     const mappedMessages = []
