@@ -87,7 +87,7 @@ for await (const message of messages) {
 
 ## Installation
 
-Requires Node.js v24+ installed.
+Requires Node.js v25+ installed.
 
 ```bash
 npm install tardis-dev --save

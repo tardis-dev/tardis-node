@@ -45,15 +45,16 @@ Mapper decisions to make explicit:
 - **Normalized field semantics** — map a field only when the exchange field has the same meaning as the normalized type. Leave ambiguous fields unmapped until the exchange meaning is verified from docs or captured data.
 - **Optional numeric fields** — missing, empty, null, or non-finite exchange values must normalize to `undefined`, not `NaN` or an invalid `Date`. See [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md) before choosing between `Number`, `asNumberOrUndefined`, and `asNumberIfValid`.
 - **Stateful output** — when normalized output is built from multiple partial messages, use the existing state helper patterns and emit only when the normalized value changes.
+- **Partial price feeds** — standalone index, mark, oracle, or underlying price messages usually update cached mapper state only. Do not emit a `derivative_ticker` or `option_summary` from a price-only message unless that message carries the full normalized contract for that type. Merge the cached price into the next ticker or option summary payload that owns the output timestamp.
 
 Normalized type semantics:
 
 - **Trades** — `side` is liquidity taker side: `buy` means the aggressor bought, `sell` means the aggressor sold. Invert maker-side flags when needed. Skip off-book maintenance events such as insurance fund or ADL unless the product contract explicitly requires them. If a trade channel uses `snapshot` followed by `update`, map only `update`; the initial `snapshot` is recent-trade backfill and must have a test that emits nothing to avoid duplicate or stale trades after reconnect. Map trade `snapshot` only when the exchange sends trades exclusively as snapshots and there is no incremental update variant.
 - **Book changes** — `book_change` is L2 market-by-price data. `isSnapshot=true` means consumers discard prior book state. `isSnapshot=false` means consumers apply absolute price-level amounts to the current book. `amount=0` removes the level.
 - **Book tickers** — `book_ticker` comes from native top-of-book or BBO feeds. It is not `quotes`, which are computed from reconstructed L2 books.
-- **Derivative tickers** — keep `lastPrice`, `openInterest`, `indexPrice`, `markPrice`, funding fields, and predicted funding fields aligned with exchange meaning. `fundingTimestamp` is the next funding event timestamp.
+- **Derivative tickers** — keep `lastPrice`, `openInterest`, `indexPrice`, `markPrice`, funding fields, and predicted funding fields aligned with exchange meaning. `fundingTimestamp` is the next funding event timestamp. When price fields come from separate channels, cache them and emit only from the ticker or stats payload that represents the derivative ticker update.
 - **Liquidations** — `side` is liquidation side: `buy` means a short position was liquidated, `sell` means a long position was liquidated. Do not copy an exchange order side unless it has that meaning.
-- **Option summaries** — parse option type, strike, expiration, greeks, IV, underlying, bid/ask, mark, last price, and open interest from the exchange contract. Use instrument metadata when symbol parsing is not reliable.
+- **Option summaries** — parse option type, strike, expiration, greeks, IV, underlying, bid/ask, mark, last price, and open interest from the exchange contract. Prefer explicit instrument metadata such as `indexAsset` or underlying asset fields over symbol parsing when the exchange provides it.
 
 For `normalizeBookChanges`, first identify where the initial book snapshot comes from:
 
@@ -86,6 +87,8 @@ Mapper tests should cover:
 - order book snapshot and delta behavior, when the exchange provides both
 - message variants that should intentionally emit nothing
 - optional, missing, empty, and otherwise invalid values for fields that can be absent
+- valid zero values for optional numeric fields, especially values cached through `PendingTickerInfoHelper`
+- separate price/index/underlying messages that update mapper state without directly emitting normalized output
 
 Run tests and validation — see AGENTS.md for the full checklist.
 
