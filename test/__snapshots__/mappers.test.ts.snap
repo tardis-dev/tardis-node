@@ -1023,7 +1023,7 @@ exports[`map bullish option summary messages 3`] = `
     "theta": -93.2574,
     "timestamp": 2026-04-24T14:58:52.219Z,
     "type": "option_summary",
-    "underlyingIndex": "",
+    "underlyingIndex": "BTC",
     "underlyingPrice": 78032.25,
     "vega": 0.0247,
   },
@@ -1055,7 +1055,7 @@ exports[`map bullish option summary messages 4`] = `
     "theta": 0,
     "timestamp": 2026-04-24T14:58:53.219Z,
     "type": "option_summary",
-    "underlyingIndex": "",
+    "underlyingIndex": "BTC",
     "underlyingPrice": 78032.25,
     "vega": 0,
   },
@@ -1089,7 +1089,7 @@ exports[`map bullish option summary messages 6`] = `
     "theta": -93.2574,
     "timestamp": 2026-04-24T14:58:54.219Z,
     "type": "option_summary",
-    "underlyingIndex": "",
+    "underlyingIndex": "BTC",
     "underlyingPrice": 78040.5,
     "vega": 0.0247,
   },
@@ -1100,7 +1100,54 @@ exports[`map bullish option summary messages 7`] = `[]`;
 
 exports[`map bullish option summary messages 8`] = `[]`;
 
-exports[`map bullish order book messages 1`] = `[]`;
+exports[`map bullish order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 6.08,
+        "price": 94.973,
+      },
+      {
+        "amount": 8.42081721,
+        "price": 94.984,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.985,
+      },
+      {
+        "amount": 5,
+        "price": 95.078,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 56.33894018,
+        "price": 94.519,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.489,
+      },
+      {
+        "amount": 5,
+        "price": 94.467,
+      },
+      {
+        "amount": 1.08,
+        "price": 94.466,
+      },
+    ],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T13:04:19.490Z,
+    "type": "book_change",
+  },
+]
+`;
 
 exports[`map bullish order book messages 2`] = `
 [
@@ -1135,7 +1182,20 @@ exports[`map bullish order book messages 2`] = `
 ]
 `;
 
-exports[`map bullish order book messages 3`] = `[]`;
+exports[`map bullish order book messages 3`] = `
+[
+  {
+    "asks": [],
+    "bids": [],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEAUSD",
+    "timestamp": 2026-04-24T13:04:19.138Z,
+    "type": "book_change",
+  },
+]
+`;
 
 exports[`map bullish trade messages 1`] = `[]`;
 

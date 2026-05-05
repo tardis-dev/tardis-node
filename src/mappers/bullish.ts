@@ -245,7 +245,7 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
       theta: asNumberOrUndefined(message.data.theta),
       rho: undefined,
       underlyingPrice: indexPrice?.price,
-      underlyingIndex: '',
+      underlyingIndex: indexAsset,
       timestamp: new Date(message.data.createdAtDatetime),
       localTimestamp
     }
