@@ -97,13 +97,8 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
     await pMap(
       sliceOffsets,
       async (offset) => {
-        let currentOffset = offset
-        let remainingSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
-        while (remainingSliceSize > 0) {
-          const result = await getDataFeedSlice(payload, currentOffset, filters, cacheDir, remainingSliceSize)
-          currentOffset += result.sliceSize
-          remainingSliceSize -= result.sliceSize
-        }
+        const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
+        await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
       },
       { concurrency: CONCURRENCY_LIMIT }
     )
