@@ -9985,7 +9985,7 @@ test('map bullish order book messages', () => {
   const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
 
   const messages = [
-    // V1TALevel2 snapshot - recent order book backfill should emit nothing
+    // V1TALevel2 snapshot - initial order book state
     {
       type: 'snapshot',
       dataType: 'V1TALevel2',
@@ -10013,7 +10013,7 @@ test('map bullish order book messages', () => {
         symbol: 'ADAUSDC'
       }
     },
-    // Empty book snapshot should emit nothing
+    // Empty book snapshot still emits an empty book_change snapshot
     {
       type: 'snapshot',
       dataType: 'V1TALevel2',

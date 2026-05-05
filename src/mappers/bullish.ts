@@ -45,7 +45,7 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
 
 export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
   canHandle(message: BullishMessage): message is BullishLevel2Message {
-    return message.dataType === 'V1TALevel2' && message.type === 'update'
+    return message.dataType === 'V1TALevel2'
   }
 
   getFilters(symbols?: string[]) {
