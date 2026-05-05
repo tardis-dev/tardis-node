@@ -10128,6 +10128,42 @@ test('map bullish derivative ticker messages', () => {
         otcBaseVolume: '92.17200000'
       }
     },
+    // V1TATickerResponse perpetual update - zero fundingRate/openInterest are valid values and clear cached non-zero values
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042735715',
+        publishedAtTimestamp: '1777042735865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:55.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
+      }
+    },
     // V1TATickerResponse dated future snapshot - no fundingRate field
     {
       type: 'snapshot',
@@ -10160,7 +10196,7 @@ test('map bullish derivative ticker messages', () => {
         otcBaseVolume: '0.00000000'
       }
     },
-    // V1TAIndexPrice update - emits updated derivative tickers for already-seen BTC derivatives
+    // V1TAIndexPrice update - stored and applied to later BTC derivative ticker messages
     {
       type: 'update',
       dataType: 'V1TAIndexPrice',
@@ -10169,6 +10205,42 @@ test('map bullish derivative ticker messages', () => {
         assetSymbol: 'BTC',
         updatedAtDatetime: '2026-04-24T14:58:55.000Z',
         updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse perpetual update - uses the latest cached BTC index price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042736715',
+        publishedAtTimestamp: '1777042736865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:56.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
       }
     },
     // Unrelated index price update should not emit derivative ticker messages
@@ -10284,7 +10356,44 @@ test('map bullish option summary messages', () => {
         otcBaseVolume: '0.00000000'
       }
     },
-    // V1TAIndexPrice update - emits updated option summaries for already-seen BTC options
+    // V1TATickerResponse option snapshot - zero option mark/greeks are valid Bullish values
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042733219',
+        publishedAtTimestamp: '1777042735841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260515-150000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:53.219Z',
+        markPrice: '0.0000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.00000000',
+        gamma: '0.00000000',
+        theta: '0.0000',
+        vega: '0.0000',
+        impliedVolatility: '0.6182',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - stored and applied to later BTC option summary messages
     {
       type: 'update',
       dataType: 'V1TAIndexPrice',
@@ -10293,6 +10402,43 @@ test('map bullish option summary messages', () => {
         assetSymbol: 'BTC',
         updatedAtDatetime: '2026-04-24T14:58:55.000Z',
         updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse option update - uses the latest cached BTC underlying price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042734219',
+        publishedAtTimestamp: '1777042736841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260425-70000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:54.219Z',
+        markPrice: '8133.6201',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.99981130',
+        gamma: '0.00000030',
+        theta: '-93.2574',
+        vega: '0.0247',
+        impliedVolatility: '0.7045',
+        otcBaseVolume: '0.00000000'
       }
     },
     // Unrelated index price update should not emit option summary messages

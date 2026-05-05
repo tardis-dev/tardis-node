@@ -1,4 +1,4 @@
-import { asNumberIfValid } from '../handy.ts'
+import { asNumberIfValid, asNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -105,7 +105,6 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
 export class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
-  private readonly derivativeSymbolsByIndexAsset = new Map<string, Set<string>>()
 
   canHandle(message: BullishMessage): message is BullishDerivativeTickerMessage | BullishIndexPriceMessage {
     if (message.dataType === 'V1TAIndexPrice' && (message.type === 'snapshot' || message.type === 'update')) {
@@ -137,25 +136,11 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
   *map(message: BullishDerivativeTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     if (message.dataType === 'V1TAIndexPrice') {
       const price = asNumberIfValid(message.data.price)
-      if (price === undefined) {
-        return
-      }
-
-      const timestamp = new Date(message.data.updatedAtDatetime)
-      this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
-
-      for (const symbol of this.derivativeSymbolsByIndexAsset.get(message.data.assetSymbol) ?? []) {
-        if (!this.pendingTickerInfoHelper.hasPendingTickerInfo(symbol)) {
-          continue
-        }
-
-        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bullish')
-        pendingTickerInfo.updateIndexPrice(price)
-
-        if (pendingTickerInfo.hasChanged()) {
-          pendingTickerInfo.updateTimestamp(timestamp)
-          yield pendingTickerInfo.getSnapshot(localTimestamp)
-        }
+      if (price !== undefined) {
+        this.indexPrices.set(message.data.assetSymbol, {
+          price,
+          timestamp: new Date(message.data.updatedAtDatetime)
+        })
       }
 
       return
@@ -167,31 +152,19 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
 
     pendingTickerInfo.updateLastPrice(asNumberIfValid(message.data.last))
     pendingTickerInfo.updateMarkPrice(asNumberIfValid(message.data.markPrice))
-    pendingTickerInfo.updateFundingRate(asNumberIfValid(message.data.fundingRate))
-    pendingTickerInfo.updateOpenInterest(asNumberIfValid(message.data.openInterest))
+    pendingTickerInfo.updateFundingRate(asNumberOrUndefined(message.data.fundingRate))
+    pendingTickerInfo.updateOpenInterest(asNumberOrUndefined(message.data.openInterest))
     pendingTickerInfo.updateIndexPrice(indexPrice?.price)
-    this.addDerivativeSymbolForIndexAsset(indexAsset, message.data.symbol)
 
     if (pendingTickerInfo.hasChanged()) {
       pendingTickerInfo.updateTimestamp(new Date(message.data.createdAtDatetime))
       yield pendingTickerInfo.getSnapshot(localTimestamp)
     }
   }
-
-  private addDerivativeSymbolForIndexAsset(indexAsset: string, symbol: string) {
-    let symbols = this.derivativeSymbolsByIndexAsset.get(indexAsset)
-    if (symbols === undefined) {
-      symbols = new Set()
-      this.derivativeSymbolsByIndexAsset.set(indexAsset, symbols)
-    }
-
-    symbols.add(symbol)
-  }
 }
 
 export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
   private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
-  private readonly optionSummariesByIndexAsset = new Map<string, Map<string, OptionSummary>>()
 
   canHandle(message: BullishMessage): message is BullishOptionTickerMessage | BullishIndexPriceMessage {
     if (message.dataType === 'V1TAIndexPrice' && (message.type === 'snapshot' || message.type === 'update')) {
@@ -223,26 +196,11 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
   *map(message: BullishOptionTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<OptionSummary> {
     if (message.dataType === 'V1TAIndexPrice') {
       const price = asNumberIfValid(message.data.price)
-      if (price === undefined) {
-        return
-      }
-
-      const timestamp = new Date(message.data.updatedAtDatetime)
-      this.indexPrices.set(message.data.assetSymbol, { price, timestamp })
-
-      for (const [symbol, optionSummary] of this.optionSummariesByIndexAsset.get(message.data.assetSymbol) ?? []) {
-        if (optionSummary.underlyingPrice === price) {
-          continue
-        }
-
-        const updatedOptionSummary = {
-          ...optionSummary,
-          underlyingPrice: price,
-          timestamp,
-          localTimestamp
-        }
-        this.addOptionSummaryForIndexAsset(message.data.assetSymbol, symbol, updatedOptionSummary)
-        yield updatedOptionSummary
+      if (price !== undefined) {
+        this.indexPrices.set(message.data.assetSymbol, {
+          price,
+          timestamp: new Date(message.data.updatedAtDatetime)
+        })
       }
 
       return
@@ -254,7 +212,7 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
     const expirationDate = new Date(`${dateText.slice(0, 4)}-${dateText.slice(4, 6)}-${dateText.slice(6, 8)}Z`)
     expirationDate.setUTCHours(8)
 
-    const optionSummary: OptionSummary = {
+    yield {
       type: 'option_summary',
       symbol: message.data.symbol,
       exchange: 'bullish',
@@ -268,32 +226,19 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
       bestAskAmount: asNumberIfValid(message.data.askVolume),
       bestAskIV: undefined,
       lastPrice: asNumberIfValid(message.data.last),
-      openInterest: asNumberIfValid(message.data.openInterest),
-      markPrice: asNumberIfValid(message.data.markPrice),
+      openInterest: asNumberOrUndefined(message.data.openInterest),
+      markPrice: asNumberOrUndefined(message.data.markPrice),
       markIV: asNumberIfValid(message.data.impliedVolatility),
-      delta: asNumberIfValid(message.data.delta),
-      gamma: asNumberIfValid(message.data.gamma),
-      vega: asNumberIfValid(message.data.vega),
-      theta: asNumberIfValid(message.data.theta),
+      delta: asNumberOrUndefined(message.data.delta),
+      gamma: asNumberOrUndefined(message.data.gamma),
+      vega: asNumberOrUndefined(message.data.vega),
+      theta: asNumberOrUndefined(message.data.theta),
       rho: undefined,
       underlyingPrice: indexPrice?.price,
       underlyingIndex: '',
       timestamp: new Date(message.data.createdAtDatetime),
       localTimestamp
     }
-
-    this.addOptionSummaryForIndexAsset(indexAsset, message.data.symbol, optionSummary)
-    yield optionSummary
-  }
-
-  private addOptionSummaryForIndexAsset(indexAsset: string, symbol: string, optionSummary: OptionSummary) {
-    let optionSummaries = this.optionSummariesByIndexAsset.get(indexAsset)
-    if (optionSummaries === undefined) {
-      optionSummaries = new Map()
-      this.optionSummariesByIndexAsset.set(indexAsset, optionSummaries)
-    }
-
-    optionSummaries.set(symbol, optionSummary)
   }
 }
 

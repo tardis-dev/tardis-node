@@ -920,16 +920,16 @@ exports[`map bullish derivative ticker messages 4`] = `
 [
   {
     "exchange": "bullish",
-    "fundingRate": undefined,
+    "fundingRate": 0,
     "fundingTimestamp": undefined,
     "indexPrice": 78032.25,
-    "lastPrice": undefined,
+    "lastPrice": 78029.65,
     "localTimestamp": 2026-04-24T14:58:55.000Z,
-    "markPrice": 78001.2667,
-    "openInterest": undefined,
+    "markPrice": 78035.395,
+    "openInterest": 0,
     "predictedFundingRate": undefined,
-    "symbol": "BTC-USDC-20260426",
-    "timestamp": 2026-04-24T14:58:51.879Z,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:55.715Z,
     "type": "derivative_ticker",
   },
 ]
@@ -939,30 +939,16 @@ exports[`map bullish derivative ticker messages 5`] = `
 [
   {
     "exchange": "bullish",
-    "fundingRate": -0.001492,
-    "fundingTimestamp": undefined,
-    "indexPrice": 78040.5,
-    "lastPrice": 78029.65,
-    "localTimestamp": 2026-04-24T14:58:55.000Z,
-    "markPrice": 78035.395,
-    "openInterest": 647.17244459,
-    "predictedFundingRate": undefined,
-    "symbol": "BTC-USDC-PERP",
-    "timestamp": 2026-04-24T14:58:55.000Z,
-    "type": "derivative_ticker",
-  },
-  {
-    "exchange": "bullish",
     "fundingRate": undefined,
     "fundingTimestamp": undefined,
-    "indexPrice": 78040.5,
+    "indexPrice": 78032.25,
     "lastPrice": undefined,
     "localTimestamp": 2026-04-24T14:58:55.000Z,
     "markPrice": 78001.2667,
-    "openInterest": undefined,
+    "openInterest": 0,
     "predictedFundingRate": undefined,
     "symbol": "BTC-USDC-20260426",
-    "timestamp": 2026-04-24T14:58:55.000Z,
+    "timestamp": 2026-04-24T14:58:51.879Z,
     "type": "derivative_ticker",
   },
 ]
@@ -970,7 +956,28 @@ exports[`map bullish derivative ticker messages 5`] = `
 
 exports[`map bullish derivative ticker messages 6`] = `[]`;
 
-exports[`map bullish derivative ticker messages 7`] = `[]`;
+exports[`map bullish derivative ticker messages 7`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": 0,
+    "fundingTimestamp": undefined,
+    "indexPrice": 78040.5,
+    "lastPrice": 78029.65,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78035.395,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:56.715Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 8`] = `[]`;
+
+exports[`map bullish derivative ticker messages 9`] = `[]`;
 
 exports[`map bullish option summary messages 1`] = `
 [
@@ -1008,7 +1015,7 @@ exports[`map bullish option summary messages 3`] = `
     "localTimestamp": 2026-04-24T14:58:55.000Z,
     "markIV": 0.7045,
     "markPrice": 8133.6201,
-    "openInterest": undefined,
+    "openInterest": 0,
     "optionType": "call",
     "rho": undefined,
     "strikePrice": 70000,
@@ -1032,6 +1039,40 @@ exports[`map bullish option summary messages 4`] = `
     "bestBidAmount": undefined,
     "bestBidIV": undefined,
     "bestBidPrice": undefined,
+    "delta": 0,
+    "exchange": "bullish",
+    "expirationDate": 2026-05-15T08:00:00.000Z,
+    "gamma": 0,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.6182,
+    "markPrice": 0,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 150000,
+    "symbol": "BTC-USDC-20260515-150000-C",
+    "theta": 0,
+    "timestamp": 2026-04-24T14:58:53.219Z,
+    "type": "option_summary",
+    "underlyingIndex": "",
+    "underlyingPrice": 78032.25,
+    "vega": 0,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 5`] = `[]`;
+
+exports[`map bullish option summary messages 6`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
     "delta": 0.9998113,
     "exchange": "bullish",
     "expirationDate": 2026-04-25T08:00:00.000Z,
@@ -1040,13 +1081,13 @@ exports[`map bullish option summary messages 4`] = `
     "localTimestamp": 2026-04-24T14:58:55.000Z,
     "markIV": 0.7045,
     "markPrice": 8133.6201,
-    "openInterest": undefined,
+    "openInterest": 0,
     "optionType": "call",
     "rho": undefined,
     "strikePrice": 70000,
     "symbol": "BTC-USDC-20260425-70000-C",
     "theta": -93.2574,
-    "timestamp": 2026-04-24T14:58:55.000Z,
+    "timestamp": 2026-04-24T14:58:54.219Z,
     "type": "option_summary",
     "underlyingIndex": "",
     "underlyingPrice": 78040.5,
@@ -1055,9 +1096,9 @@ exports[`map bullish option summary messages 4`] = `
 ]
 `;
 
-exports[`map bullish option summary messages 5`] = `[]`;
+exports[`map bullish option summary messages 7`] = `[]`;
 
-exports[`map bullish option summary messages 6`] = `[]`;
+exports[`map bullish option summary messages 8`] = `[]`;
 
 exports[`map bullish order book messages 1`] = `[]`;
 
