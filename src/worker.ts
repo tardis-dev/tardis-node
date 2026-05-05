@@ -28,6 +28,7 @@ process.on('unhandledRejection', (err, promise) => {
 
 async function getDataFeedSlices(payload: WorkerJobPayload) {
   const MILLISECONDS_IN_MINUTE = 60 * 1000
+  const MIN_WAIT_WHEN_DATA_NOT_AVAILABLE_OFFSET = 6
   const CONCURRENCY_LIMIT = 60
   // deduplicate filters (if the channel was provided multiple times)
   const filters = optimizeFilters(payload.filters)
@@ -39,70 +40,97 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
   // each filter will have separate sub dir based on it's sha hash
   const cacheDir = `${payload.cacheDir}/feeds/${payload.exchange}/${sha256(filters)}`
 
-  const waitOffsetMS =
+  const waitOffsetMinutes =
     typeof payload.waitWhenDataNotYetAvailable === 'number'
-      ? payload.waitWhenDataNotYetAvailable * MILLISECONDS_IN_MINUTE
-      : 30 * MILLISECONDS_IN_MINUTE
+      ? Math.max(payload.waitWhenDataNotYetAvailable, MIN_WAIT_WHEN_DATA_NOT_AVAILABLE_OFFSET)
+      : 30
+  const waitOffsetMS = waitOffsetMinutes * MILLISECONDS_IN_MINUTE
 
-  if (payload.waitWhenDataNotYetAvailable && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS) {
-    let timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+  const minutesCountThatAreAlreadyAvailableToFetch = await getAvailableMinutesCount(
+    payload,
+    minutesCountToFetch,
+    waitOffsetMS,
+    MILLISECONDS_IN_MINUTE
+  )
 
-    // in case when even initial from date is not yet available wait until it is
-    if (timestampForLastAvailableData < payload.fromDate.valueOf()) {
-      const initialWaitTime = payload.fromDate.valueOf() - timestampForLastAvailableData
-      if (initialWaitTime > 0) {
-        await wait(initialWaitTime)
-      }
+  await getAvailableDataFeedSlices(payload, filters, cacheDir, minutesCountThatAreAlreadyAvailableToFetch, CONCURRENCY_LIMIT)
+
+  // for remaining data iterate one by one and wait as needed
+  for (let offset = minutesCountThatAreAlreadyAvailableToFetch; offset < minutesCountToFetch; offset++) {
+    const timestampToFetch = payload.fromDate.valueOf() + offset * MILLISECONDS_IN_MINUTE
+    const timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+
+    if (timestampToFetch > timestampForLastAvailableData) {
+      const waitTime = timestampToFetch - timestampForLastAvailableData + 100
+
+      await wait(waitTime)
     }
-
-    // fetch concurently any data that is already available
-    timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
-    const minutesCountThatAreAlreadyAvailableToFetch = Math.floor(
-      (timestampForLastAvailableData - payload.fromDate.valueOf()) / MILLISECONDS_IN_MINUTE
-    )
-
-    await pMap(sequence(minutesCountThatAreAlreadyAvailableToFetch, 0), (offset) => getDataFeedSlice(payload, offset, filters, cacheDir), {
-      concurrency: CONCURRENCY_LIMIT
-    })
-
-    // for remaining data iterate one by one and wait as needed
-    for (let offset = minutesCountThatAreAlreadyAvailableToFetch; offset < minutesCountToFetch; offset++) {
-      const timestampToFetch = payload.fromDate.valueOf() + offset * MILLISECONDS_IN_MINUTE
-      timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
-
-      if (timestampToFetch > timestampForLastAvailableData) {
-        const waitTime = timestampToFetch - timestampForLastAvailableData + 100
-
-        await wait(waitTime)
-      }
-      await getDataFeedSlice(payload, offset, filters, cacheDir)
-    }
-  } else {
-    // fetch last slice - it will tell us if user has access to the end of requested date range and data is available
-    // also fetch it from API to get current suggested slice size headers
-    const lastSlice = await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
-
-    // fetch first slice - it will tell us if user has access to the beginning of requested date range
-    const firstSlice =
-      minutesCountToFetch === 1 ? lastSlice : await getDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
-
-    const replaySliceSize =
-      filters.length === 0 ? DEFAULT_DATA_FEED_SLICE_SIZE : Math.max(firstSlice.suggestedSliceSize, lastSlice.suggestedSliceSize)
-    const sliceOffsets: number[] = []
-    for (let offset = 1; offset < minutesCountToFetch - 1; offset += replaySliceSize) {
-      sliceOffsets.push(offset)
-    }
-
-    // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
-    await pMap(
-      sliceOffsets,
-      async (offset) => {
-        const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
-        await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
-      },
-      { concurrency: CONCURRENCY_LIMIT }
-    )
+    await getDataFeedSlice(payload, offset, filters, cacheDir)
   }
+}
+
+async function getAvailableMinutesCount(
+  payload: WorkerJobPayload,
+  minutesCountToFetch: number,
+  waitOffsetMS: number,
+  millisecondsInMinute: number
+) {
+  const waitWhenDataIsNotAvailable = payload.waitWhenDataNotYetAvailable && payload.toDate.valueOf() > new Date().valueOf() - waitOffsetMS
+  if (!waitWhenDataIsNotAvailable) {
+    return minutesCountToFetch
+  }
+
+  let timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+
+  // in case when even initial from date is not yet available wait until it is
+  if (timestampForLastAvailableData < payload.fromDate.valueOf()) {
+    const initialWaitTime = payload.fromDate.valueOf() - timestampForLastAvailableData
+    if (initialWaitTime > 0) {
+      await wait(initialWaitTime)
+    }
+  }
+
+  // fetch concurently any data that is already available
+  timestampForLastAvailableData = new Date().valueOf() - waitOffsetMS
+  const availableMinutesCount = Math.floor((timestampForLastAvailableData - payload.fromDate.valueOf()) / millisecondsInMinute)
+  return Math.min(Math.max(availableMinutesCount, 0), minutesCountToFetch)
+}
+
+async function getAvailableDataFeedSlices(
+  payload: WorkerJobPayload,
+  filters: object[],
+  cacheDir: string,
+  minutesCountToFetch: number,
+  concurrencyLimit: number
+) {
+  if (minutesCountToFetch <= 0) {
+    return
+  }
+
+  // fetch last slice - it will tell us if user has access to the end of requested date range and data is available
+  // also fetch it from API to get current suggested slice size headers
+  const lastSlice = await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+
+  // fetch first slice - it will tell us if user has access to the beginning of requested date range
+  const firstSlice =
+    minutesCountToFetch === 1 ? lastSlice : await getDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+
+  const replaySliceSize =
+    filters.length === 0 ? DEFAULT_DATA_FEED_SLICE_SIZE : Math.max(firstSlice.suggestedSliceSize, lastSlice.suggestedSliceSize)
+  const sliceOffsets: number[] = []
+  for (let offset = 1; offset < minutesCountToFetch - 1; offset += replaySliceSize) {
+    sliceOffsets.push(offset)
+  }
+
+  // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
+  await pMap(
+    sliceOffsets,
+    async (offset) => {
+      const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
+      await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
+    },
+    { concurrency: concurrencyLimit }
+  )
 }
 
 async function getDataFeedSlice(
