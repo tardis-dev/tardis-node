@@ -1059,54 +1059,7 @@ exports[`map bullish option summary messages 5`] = `[]`;
 
 exports[`map bullish option summary messages 6`] = `[]`;
 
-exports[`map bullish order book messages 1`] = `
-[
-  {
-    "asks": [
-      {
-        "amount": 6.08,
-        "price": 94.973,
-      },
-      {
-        "amount": 8.42081721,
-        "price": 94.984,
-      },
-      {
-        "amount": 53.7,
-        "price": 94.985,
-      },
-      {
-        "amount": 5,
-        "price": 95.078,
-      },
-    ],
-    "bids": [
-      {
-        "amount": 56.33894018,
-        "price": 94.519,
-      },
-      {
-        "amount": 53.7,
-        "price": 94.489,
-      },
-      {
-        "amount": 5,
-        "price": 94.467,
-      },
-      {
-        "amount": 1.08,
-        "price": 94.466,
-      },
-    ],
-    "exchange": "bullish",
-    "isSnapshot": true,
-    "localTimestamp": 2026-04-24T13:04:20.636Z,
-    "symbol": "AAVEUSDC",
-    "timestamp": 2026-04-24T13:04:19.490Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bullish order book messages 1`] = `[]`;
 
 exports[`map bullish order book messages 2`] = `
 [
@@ -1141,47 +1094,9 @@ exports[`map bullish order book messages 2`] = `
 ]
 `;
 
-exports[`map bullish order book messages 3`] = `
-[
-  {
-    "asks": [],
-    "bids": [],
-    "exchange": "bullish",
-    "isSnapshot": true,
-    "localTimestamp": 2026-04-24T13:04:20.636Z,
-    "symbol": "AAVEAUSD",
-    "timestamp": 2026-04-24T13:04:19.138Z,
-    "type": "book_change",
-  },
-]
-`;
+exports[`map bullish order book messages 3`] = `[]`;
 
-exports[`map bullish trade messages 1`] = `
-[
-  {
-    "amount": 1.63639338,
-    "exchange": "bullish",
-    "id": "100118000001462721",
-    "localTimestamp": 2026-04-24T01:19:40.250Z,
-    "price": 94.008,
-    "side": "buy",
-    "symbol": "AAVEUSDC",
-    "timestamp": 2026-04-24T01:19:40.158Z,
-    "type": "trade",
-  },
-  {
-    "amount": 0.125,
-    "exchange": "bullish",
-    "id": "100118000001462722",
-    "localTimestamp": 2026-04-24T01:19:40.250Z,
-    "price": 94.009,
-    "side": "sell",
-    "symbol": "AAVEUSDC",
-    "timestamp": 2026-04-24T01:19:40.159Z,
-    "type": "trade",
-  },
-]
-`;
+exports[`map bullish trade messages 1`] = `[]`;
 
 exports[`map bullish trade messages 2`] = `
 [

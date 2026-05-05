@@ -9850,7 +9850,7 @@ test('map bullish trade messages', () => {
   const localTimestamp = new Date('2026-04-24T01:19:40.250Z')
 
   const messages = [
-    // V1TAAnonymousTradeUpdate snapshot - real captured payload shape
+    // V1TAAnonymousTradeUpdate snapshot - recent-trade backfill should emit nothing
     {
       type: 'snapshot',
       dataType: 'V1TAAnonymousTradeUpdate',
@@ -9949,7 +9949,7 @@ test('map bullish order book messages', () => {
   const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
 
   const messages = [
-    // V1TALevel2 snapshot - real captured payload shape
+    // V1TALevel2 snapshot - recent order book backfill should emit nothing
     {
       type: 'snapshot',
       dataType: 'V1TALevel2',
@@ -9977,7 +9977,7 @@ test('map bullish order book messages', () => {
         symbol: 'ADAUSDC'
       }
     },
-    // Empty book snapshot should still emit a book_change
+    // Empty book snapshot should emit nothing
     {
       type: 'snapshot',
       dataType: 'V1TALevel2',

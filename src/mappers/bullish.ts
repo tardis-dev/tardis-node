@@ -4,7 +4,7 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
 export class BullishTradesMapper implements Mapper<'bullish', Trade> {
   canHandle(message: BullishMessage): message is BullishAnonymousTradeUpdateMessage {
-    return message.dataType === 'V1TAAnonymousTradeUpdate' && (message.type === 'snapshot' || message.type === 'update')
+    return message.dataType === 'V1TAAnonymousTradeUpdate' && message.type === 'update'
   }
 
   getFilters(symbols?: string[]) {
@@ -35,7 +35,7 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
 
 export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
   canHandle(message: BullishMessage): message is BullishLevel2Message {
-    return message.dataType === 'V1TALevel2' && (message.type === 'snapshot' || message.type === 'update')
+    return message.dataType === 'V1TALevel2' && message.type === 'update'
   }
 
   getFilters(symbols?: string[]) {
@@ -61,16 +61,15 @@ export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
   }
 
   private mapLevels(levels: string[]): BookPriceLevel[] {
-    return levels.reduce<BookPriceLevel[]>((result, value, index) => {
-      if (index % 2 === 0) {
-        result.push({
-          price: Number(value),
-          amount: Number(levels[index + 1])
-        })
+    const result = new Array<BookPriceLevel>(levels.length / 2)
+    for (let index = 0, resultIndex = 0; index < levels.length; index += 2, resultIndex++) {
+      result[resultIndex] = {
+        price: Number(levels[index]),
+        amount: Number(levels[index + 1])
       }
+    }
 
-      return result
-    }, [])
+    return result
   }
 }
 
