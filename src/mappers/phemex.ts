@@ -90,7 +90,21 @@ const COINS_STARTING_WITH_S = [
   'STRKUSD',
   'SOLVUSD',
   'SPKUSDT',
-  'SAHARAUSDT'
+  'SAHARAUSDT',
+  'SOLAMIUSDT',
+  'SAPIENUSDT',
+  'SOMIUSDT',
+  'SKYUSDT',
+  'STBLUSDT',
+  'STABLEUSDT',
+  'SENTUSDT',
+  'SPORTFUNUSDT',
+  'SKRUSDT',
+  'SPACEUSDT',
+  'SPX500USDT',
+  'SPYXUSDT',
+  'SP500USDT',
+  'SNDKUSDT'
 ]
 function getInstrumentType(symbol: string) {
   if (/\d+$/.test(symbol)) {
