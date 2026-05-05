@@ -9886,7 +9886,7 @@ test('map bullish trade messages', () => {
         ]
       }
     },
-    // V1TAAnonymousTradeUpdate update - single incremental trade
+    // V1TAAnonymousTradeUpdate update - incremental trades with all taker side combinations
     {
       type: 'update',
       dataType: 'V1TAAnonymousTradeUpdate',
@@ -9906,6 +9906,42 @@ test('map bullish trade messages', () => {
             publishedAtTimestamp: '1745457580260000000',
             lastUpdatedTimestamp: '1745457580258000000',
             createdAtDatetime: '2026-04-24T01:19:40.258Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462724',
+            price: '66251.5',
+            quantity: '0.0043',
+            side: 'SELL',
+            isTaker: true,
+            createdAtTimestamp: '1745457580259000000',
+            publishedAtTimestamp: '1745457580261000000',
+            lastUpdatedTimestamp: '1745457580259000000',
+            createdAtDatetime: '2026-04-24T01:19:40.259Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462725',
+            price: '66252.5',
+            quantity: '0.0044',
+            side: 'BUY',
+            isTaker: false,
+            createdAtTimestamp: '1745457580260000000',
+            publishedAtTimestamp: '1745457580262000000',
+            lastUpdatedTimestamp: '1745457580260000000',
+            createdAtDatetime: '2026-04-24T01:19:40.260Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462726',
+            price: '66253.5',
+            quantity: '0.0045',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580261000000',
+            publishedAtTimestamp: '1745457580263000000',
+            lastUpdatedTimestamp: '1745457580261000000',
+            createdAtDatetime: '2026-04-24T01:19:40.261Z'
           }
         ]
       }

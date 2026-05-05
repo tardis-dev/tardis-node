@@ -27,7 +27,8 @@ export type Trade = {
   readonly id: string | undefined
   readonly price: number
   readonly amount: number
-  readonly side: 'buy' | 'sell' | 'unknown' // liquidity taker side (aggressor)
+  /** liquidity taker side (aggressor), not the resting maker order side */
+  readonly side: 'buy' | 'sell' | 'unknown'
   readonly timestamp: Date
   readonly localTimestamp: Date
 }

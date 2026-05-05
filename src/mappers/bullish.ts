@@ -25,11 +25,21 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
         id: trade.tradeId,
         price: Number(trade.price),
         amount: Number(trade.quantity),
-        side: trade.side.toLowerCase() as 'buy' | 'sell',
+        side: this.mapBullishTradeSide(trade.side, trade.isTaker),
         timestamp: new Date(trade.createdAtDatetime),
         localTimestamp
       }
     }
+  }
+
+  private mapBullishTradeSide(side: BullishTradeSide, isTaker: boolean): 'buy' | 'sell' {
+    if (isTaker) {
+      // Bullish side already represents the taker/aggressor side.
+      return side === 'BUY' ? 'buy' : 'sell'
+    }
+
+    // Bullish side represents the maker/resting order, so the taker was on the opposite side.
+    return side === 'BUY' ? 'sell' : 'buy'
   }
 }
 
