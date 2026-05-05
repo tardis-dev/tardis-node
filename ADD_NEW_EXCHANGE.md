@@ -43,7 +43,7 @@ Mapper decisions to make explicit:
 - **Timestamps** — use the exchange event timestamp for `timestamp`. Use `localTimestamp` only when the exchange does not provide a usable event time. Never replace `localTimestamp`; it is the Tardis receive timestamp for replay and streaming.
 - **Message roles** — map snapshots, deltas, trades, ticker updates, status messages, and acknowledgements according to the exchange contract. For order book data, make the `isSnapshot` decision from the actual message role, not from the channel name alone.
 - **Normalized field semantics** — map a field only when the exchange field has the same meaning as the normalized type. Leave ambiguous fields unmapped until the exchange meaning is verified from docs or captured data.
-- **Optional numeric fields** — missing, empty, null, or non-finite exchange values must normalize to `undefined`, not `NaN` or an invalid `Date`.
+- **Optional numeric fields** — missing, empty, null, or non-finite exchange values must normalize to `undefined`, not `NaN` or an invalid `Date`. See [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md) before choosing between `Number`, `asNumberOrUndefined`, and `asNumberIfValid`.
 - **Stateful output** — when normalized output is built from multiple partial messages, use the existing state helper patterns and emit only when the normalized value changes.
 
 Normalized type semantics:

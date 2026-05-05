@@ -36,7 +36,8 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'bitget-futures',
   'coinbase-international',
   'hyperliquid',
-  'lighter'
+  'lighter',
+  'bullish'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -80,10 +81,18 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitget-futures',
   'coinbase-international',
   'hyperliquid',
-  'lighter'
+  'lighter',
+  'bullish'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'huobi-dm-options', 'bybit-options', 'binance-european-options']
+const exchangesWithOptionsSummary: Exchange[] = [
+  'deribit',
+  'okex-options',
+  'huobi-dm-options',
+  'bybit-options',
+  'binance-european-options',
+  'bullish'
+]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -9845,6 +9854,702 @@ test('map hyperliquid messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish trade messages', () => {
+  const localTimestamp = new Date('2026-04-24T01:19:40.250Z')
+
+  const messages = [
+    // V1TAAnonymousTradeUpdate snapshot - recent-trade backfill should emit nothing
+    {
+      type: 'snapshot',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'AAVEUSDC',
+        createdAtTimestamp: '1745457580200000000',
+        publishedAtTimestamp: '1745457580201000000',
+        trades: [
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462721',
+            price: '94.008',
+            quantity: '1.63639338',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580158000000',
+            publishedAtTimestamp: '1745457580160000000',
+            lastUpdatedTimestamp: '1745457580158000000',
+            createdAtDatetime: '2026-04-24T01:19:40.158Z'
+          },
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462722',
+            price: '94.009',
+            quantity: '0.125',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580159000000',
+            publishedAtTimestamp: '1745457580161000000',
+            lastUpdatedTimestamp: '1745457580159000000',
+            createdAtDatetime: '2026-04-24T01:19:40.159Z'
+          }
+        ]
+      }
+    },
+    // V1TAAnonymousTradeUpdate update - incremental trades with all taker side combinations
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580300000000',
+        publishedAtTimestamp: '1745457580301000000',
+        trades: [
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462723',
+            price: '66250.5',
+            quantity: '0.0042',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580258000000',
+            publishedAtTimestamp: '1745457580260000000',
+            lastUpdatedTimestamp: '1745457580258000000',
+            createdAtDatetime: '2026-04-24T01:19:40.258Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462724',
+            price: '66251.5',
+            quantity: '0.0043',
+            side: 'SELL',
+            isTaker: true,
+            createdAtTimestamp: '1745457580259000000',
+            publishedAtTimestamp: '1745457580261000000',
+            lastUpdatedTimestamp: '1745457580259000000',
+            createdAtDatetime: '2026-04-24T01:19:40.259Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462725',
+            price: '66252.5',
+            quantity: '0.0044',
+            side: 'BUY',
+            isTaker: false,
+            createdAtTimestamp: '1745457580260000000',
+            publishedAtTimestamp: '1745457580262000000',
+            lastUpdatedTimestamp: '1745457580260000000',
+            createdAtDatetime: '2026-04-24T01:19:40.260Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462726',
+            price: '66253.5',
+            quantity: '0.0045',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580261000000',
+            publishedAtTimestamp: '1745457580263000000',
+            lastUpdatedTimestamp: '1745457580261000000',
+            createdAtDatetime: '2026-04-24T01:19:40.261Z'
+          }
+        ]
+      }
+    },
+    // Empty trade batch should emit nothing
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580400000000',
+        publishedAtTimestamp: '1745457580401000000',
+        trades: []
+      }
+    },
+    // Non-trade Bullish message should not be handled by the trade mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeTrades('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish order book messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel2 snapshot - initial order book state
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859490',
+        bids: ['94.5190', '56.33894018', '94.4890', '53.70000000', '94.4670', '5.00000000', '94.4660', '1.08000000'],
+        asks: ['94.9730', '6.08000000', '94.9840', '8.42081721', '94.9850', '53.70000000', '95.0780', '5.00000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumberRange: [428371450, 428371450],
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel2 update uses the same payload shape; no updates were present in the captured slices
+    {
+      type: 'update',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: ['0.2507', '11800.00000', '0.2506', '0.00000'],
+        asks: ['0.2513', '9800.00000', '0.2514', '25000.00000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [24919768, 24919769],
+        symbol: 'ADAUSDC'
+      }
+    },
+    // Empty book snapshot still emits an empty book_change snapshot
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: [],
+        asks: [],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [4536455, 4536455],
+        symbol: 'AAVEAUSD'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookChanges('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish book ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel1 snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035859490',
+        bid: ['94.5190', '56.33894018'],
+        ask: ['94.9730', '6.08000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumber: '428371450',
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel1 update - real captured payload shape
+    {
+      type: 'update',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035860138',
+        bid: ['6.4290', '1.9840594'],
+        ask: ['6.4310', '59.9788953'],
+        publishedAtTimestamp: '1777035860223',
+        datetime: '2026-04-24T13:04:20.138Z',
+        sequenceNumber: '31788641',
+        symbol: 'BONK1MUSDC'
+      }
+    },
+    // Empty BBO snapshot should still emit a book_ticker with undefined price/amount values
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1776928933990',
+        bid: ['0.00000000', '0.00000000'],
+        ask: ['0.00000000', '0.00000000'],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-23T07:22:13.990Z',
+        sequenceNumber: '4433134',
+        symbol: 'AAVEAUSD'
+      }
+    },
+    // Non-L1 Bullish message should not be handled by the book ticker mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookTickers('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish derivative ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
+
+  const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC derivative ticker messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
+    // V1TATickerResponse perpetual snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042734715',
+        publishedAtTimestamp: '1777042734865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:54.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '-0.001492',
+        openInterest: '647.17244459',
+        openInterestUSD: '50507926.2656',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // V1TATickerResponse perpetual update - zero fundingRate/openInterest are valid values and clear cached non-zero values
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042735715',
+        publishedAtTimestamp: '1777042735865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:55.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // V1TATickerResponse dated future snapshot - no fundingRate field
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042731879',
+        publishedAtTimestamp: '1777042734841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260426',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: '78104.8465',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:51.879Z',
+        markPrice: '78001.2667',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - stored and applied to later BTC derivative ticker messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse perpetual update - uses the latest cached BTC index price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042736715',
+        publishedAtTimestamp: '1777042736865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:56.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // Unrelated index price update should not emit derivative ticker messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Spot ticker should not be handled by the derivative ticker mapper
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '5.61187517',
+        average: '93.6790',
+        baseVolume: '4448.42894841',
+        bestAsk: '93.5800',
+        bestBid: '93.1320',
+        bidVolume: '57.15536018',
+        change: '0.7040',
+        close: '94.0310',
+        createdAtTimestamp: '1777042725522',
+        publishedAtTimestamp: '1777042734821',
+        high: '96.7090',
+        last: '94.0310',
+        lastTradeDatetime: '2026-04-24T13:34:13.426Z',
+        lastTradeSize: '2.22800000',
+        low: '91.3430',
+        open: '93.3270',
+        percentage: '0.75',
+        quoteVolume: '419347.8185',
+        symbol: 'AAVEUSDC',
+        type: 'ticker',
+        vwap: '94.2642',
+        currentPrice: '127.6770',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:45.522Z',
+        otcBaseVolume: '0.00000000'
+      }
+    }
+  ]
+
+  const mapper = normalizeDerivativeTickers('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-PERP', 'BTC-USDC-20260426'])).toMatchSnapshot()
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish option summary messages', () => {
+  const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
+
+  const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC option summary messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
+    // V1TATickerResponse option snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042732219',
+        publishedAtTimestamp: '1777042734841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260425-70000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:52.219Z',
+        markPrice: '8133.6201',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.99981130',
+        gamma: '0.00000030',
+        theta: '-93.2574',
+        vega: '0.0247',
+        impliedVolatility: '0.7045',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TATickerResponse option snapshot - zero option mark/greeks are valid Bullish values
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042733219',
+        publishedAtTimestamp: '1777042735841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260515-150000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:53.219Z',
+        markPrice: '0.0000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.00000000',
+        gamma: '0.00000000',
+        theta: '0.0000',
+        vega: '0.0000',
+        impliedVolatility: '0.6182',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - stored and applied to later BTC option summary messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse option update - uses the latest cached BTC underlying price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042734219',
+        publishedAtTimestamp: '1777042736841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260425-70000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:54.219Z',
+        markPrice: '8133.6201',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.99981130',
+        gamma: '0.00000030',
+        theta: '-93.2574',
+        vega: '0.0247',
+        impliedVolatility: '0.7045',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // Unrelated index price update should not emit option summary messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Perpetual ticker should not be handled by the option summary mapper
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042734715',
+        publishedAtTimestamp: '1777042734865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:54.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '-0.001492',
+        openInterest: '647.17244459',
+        openInterestUSD: '50507926.2656',
+        otcBaseVolume: '92.17200000'
+      }
+    }
+  ]
+
+  const mapper = normalizeOptionsSummary('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-20260425-70000-C'])).toMatchSnapshot()
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
     expect(mappedMessages).toMatchSnapshot()
   }
 })

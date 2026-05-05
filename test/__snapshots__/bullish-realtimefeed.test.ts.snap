@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`map bullish realtime index price subscription with assetSymbol 1`] = `
+[
+  {
+    "id": "1",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "assetSymbol": "BTC",
+      "topic": "indexPrice",
+    },
+    "type": "command",
+  },
+]
+`;
+
+exports[`map bullish realtime market-symbol subscriptions 1`] = `
+[
+  {
+    "id": "1",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "symbol": "BTCUSD",
+      "topic": "l2Orderbook",
+    },
+    "type": "command",
+  },
+  {
+    "id": "2",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "symbol": "ETHUSD",
+      "topic": "l2Orderbook",
+    },
+    "type": "command",
+  },
+  {
+    "id": "3",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "symbol": "BTCUSD",
+      "topic": "l1Orderbook",
+    },
+    "type": "command",
+  },
+  {
+    "id": "4",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "symbol": "BTCUSD",
+      "topic": "anonymousTrades",
+    },
+    "type": "command",
+  },
+  {
+    "id": "5",
+    "jsonrpc": "2.0",
+    "method": "subscribe",
+    "params": {
+      "symbol": "BTCUSD",
+      "topic": "tick",
+    },
+    "type": "command",
+  },
+]
+`;

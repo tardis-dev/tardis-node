@@ -770,6 +770,23 @@ export function decimalPlaces(n: number) {
   return count
 }
 
+/**
+ * Parses optional numeric fields where `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
+ * `0` is valid and preserved. Use for nullable/optional numeric fields such as open interest, funding rates, and greeks.
+ */
+export function asNumberOrUndefined(val: string | number | undefined | null) {
+  if (val === undefined || val === null || val === '') {
+    return
+  }
+
+  const asNumber = Number(val)
+  return Number.isFinite(asNumber) ? asNumber : undefined
+}
+
+/**
+ * Parses optional numeric fields where `0`, `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
+ * Use for empty quote/top-of-book values that exchanges encode as zero.
+ */
 export function asNumberIfValid(val: string | number | undefined | null) {
   if (val === undefined || val === null) {
     return

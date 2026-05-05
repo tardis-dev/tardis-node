@@ -49,6 +49,13 @@ import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial.ts'
 import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp.ts'
 import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom.ts'
 import {
+  BullishBookChangeMapper,
+  BullishBookTickerMapper,
+  BullishDerivativeTickerMapper,
+  BullishOptionSummaryMapper,
+  BullishTradesMapper
+} from './bullish.ts'
+import {
   BybitBookChangeMapper,
   BybitDerivativeTickerMapper,
   BybitLiquidationsMapper,
@@ -342,7 +349,8 @@ const tradesMappers = {
     shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3TradesMapper('bitget-futures') : new BitgetTradesMapper('bitget-futures'),
   'coinbase-international': () => coinbaseInternationalTradesMapper,
   hyperliquid: () => new HyperliquidTradesMapper(),
-  lighter: () => new LighterTradesMapper()
+  lighter: () => new LighterTradesMapper(),
+  bullish: () => new BullishTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -442,7 +450,8 @@ const bookChangeMappers = {
       : new BitgetBookChangeMapper('bitget-futures'),
   'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
   hyperliquid: () => new HyperliquidBookChangeMapper(),
-  lighter: () => new LighterBookChangeMapper()
+  lighter: () => new LighterBookChangeMapper(),
+  bullish: () => new BullishBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -480,7 +489,8 @@ const derivativeTickersMappers = {
     shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3DerivativeTickerMapper() : new BitgetDerivativeTickerMapper(),
   'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper(),
   hyperliquid: () => new HyperliquidDerivativeTickerMapper(),
-  lighter: () => new LighterDerivativeTickerMapper()
+  lighter: () => new LighterDerivativeTickerMapper(),
+  bullish: () => new BullishDerivativeTickerMapper()
 }
 
 const optionsSummaryMappers = {
@@ -492,7 +502,8 @@ const optionsSummaryMappers = {
   'binance-european-options': (localTimestamp: Date) =>
     shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
       ? new BinanceEuropeanOptionSummaryMapperV2()
-      : new BinanceEuropeanOptionSummaryMapper()
+      : new BinanceEuropeanOptionSummaryMapper(),
+  bullish: () => new BullishOptionSummaryMapper()
 }
 
 const liquidationsMappers = {
@@ -589,6 +600,7 @@ const bookTickersMappers = {
   'coinbase-international': () => coinbaseInternationalBookTickerMapper,
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),
+  bullish: () => new BullishBookTickerMapper(),
   'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
 }
 
