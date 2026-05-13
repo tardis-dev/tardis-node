@@ -87,6 +87,35 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
     }
   }
 }
+
+export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
+  canHandle(message: PolymarketNativeMessage): message is PolymarketMarketLastTradePriceMessage {
+    return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'last_trade_price'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'last_trade_price' as const, symbols }]
+  }
+
+  *map(message: PolymarketMarketLastTradePriceMessage, localTimestamp: Date): IterableIterator<Trade> {
+    const price = asNumberOrUndefined(message.price)
+    if (price === undefined) {
+      return
+    }
+
+    yield {
+      type: 'trade',
+      symbol: message.asset_id,
+      exchange: 'polymarket',
+      id: message.transaction_hash,
+      price,
+      amount: asNumberOrUndefined(message.size) ?? 0,
+      side: message.side.toLowerCase() as Lowercase<PolymarketMarketTradeSide>,
+      timestamp: new Date(Number(message.timestamp)),
+      localTimestamp
+    }
+  }
+}
 type PolymarketMarketEventType =
   | 'book'
   | 'price_change'
