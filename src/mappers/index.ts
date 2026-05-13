@@ -169,7 +169,7 @@ import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMap
 import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum.ts'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit.ts'
 import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox.ts'
-import { PolymarketBookChangeMapper, PolymarketTradesMapper } from './polymarket.ts'
+import { PolymarketBookChangeMapper, PolymarketBookTickerMapper, PolymarketTradesMapper } from './polymarket.ts'
 
 export * from './mapper.ts'
 
@@ -419,8 +419,8 @@ const bookChangeMappers = {
     shouldUseGateIOV4OrderBookV2Mappers(localTimestamp)
       ? new GateIOV4OrderBookV2ChangeMapper('gate-io')
       : shouldUseGateIOV4Mappers(localTimestamp)
-        ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
-        : new GateIOBookChangeMapper('gate-io'),
+      ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
+      : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
@@ -604,7 +604,8 @@ const bookTickersMappers = {
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),
   bullish: () => new BullishBookTickerMapper(),
-  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
+  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper(),
+  polymarket: () => new PolymarketBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

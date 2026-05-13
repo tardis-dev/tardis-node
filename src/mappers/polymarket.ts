@@ -1,5 +1,5 @@
 import { BookChange, BookTicker, Trade } from '../types.ts'
-import { asNumberOrUndefined } from '../handy.ts'
+import { asNumberIfValid, asNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
 
 type PolymarketBookChangeMapperMessage = PolymarketMarketBookMessage | PolymarketMarketBookMessage[] | PolymarketMarketPriceChangeMessage
@@ -116,6 +116,42 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
     }
   }
 }
+
+export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
+  canHandle(message: PolymarketNativeMessage): message is PolymarketMarketBestBidAskMessage {
+    return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'best_bid_ask'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'best_bid_ask' as const, symbols }]
+  }
+
+  *map(message: PolymarketMarketBestBidAskMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    yield {
+      type: 'book_ticker',
+      symbol: message.asset_id,
+      exchange: 'polymarket',
+      bidPrice: asNumberIfValid(message.best_bid),
+      bidAmount: undefined,
+      askPrice: asNumberIfValid(message.best_ask),
+      askAmount: undefined,
+      timestamp: new Date(Number(message.timestamp)),
+      localTimestamp
+    }
+  }
+}
+
+export type PolymarketNativeMessage =
+  | PolymarketMarketBookMessage
+  | PolymarketMarketBookMessage[]
+  | PolymarketMarketPriceChangeMessage
+  | PolymarketMarketLastTradePriceMessage
+  | PolymarketMarketTickSizeChangeMessage
+  | PolymarketMarketBestBidAskMessage
+  | PolymarketMarketNewMarketMessage
+  | PolymarketMarketResolvedMessage
+  | PolymarketSportsResultMessage
+
 type PolymarketMarketEventType =
   | 'book'
   | 'price_change'
