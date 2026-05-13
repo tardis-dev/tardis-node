@@ -2,6 +2,91 @@ import { BookChange, BookTicker, Trade } from '../types.ts'
 import { asNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
 
+type PolymarketBookChangeMapperMessage = PolymarketMarketBookMessage | PolymarketMarketBookMessage[] | PolymarketMarketPriceChangeMessage
+export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChange> {
+  canHandle(message: PolymarketNativeMessage): message is PolymarketBookChangeMapperMessage {
+    if (Array.isArray(message)) {
+      return message.length > 0 && message.every(isPolymarketMarketBookMessage)
+    }
+    return isPolymarketMarketBookMessage(message) || isPolymarketMarketPriceChangeMessage(message)
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      { channel: 'book' as const, symbols },
+      { channel: 'price_change' as const, symbols }
+    ]
+  }
+
+  *map(message: PolymarketNativeMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    if (Array.isArray(message)) {
+      for (const bookMsg of message) {
+        yield this.mapBookSnapshot(bookMsg, localTimestamp)
+      }
+      return
+    }
+
+    if (isPolymarketMarketBookMessage(message)) {
+      yield this.mapBookSnapshot(message, localTimestamp)
+      return
+    }
+
+    if (isPolymarketMarketPriceChangeMessage(message)) {
+      yield* this.mapPriceChange(message, localTimestamp)
+    }
+  }
+
+  private mapBookSnapshot(message: PolymarketMarketBookMessage, localTimestamp: Date): BookChange {
+    return {
+      type: 'book_change',
+      symbol: message.asset_id,
+      exchange: 'polymarket',
+      isSnapshot: true,
+      bids: message.bids.map((level) => this.mapLevel(level)),
+      asks: message.asks.map((level) => this.mapLevel(level)),
+      timestamp: new Date(Number(message.timestamp)),
+      localTimestamp
+    }
+  }
+
+  private *mapPriceChange(message: PolymarketMarketPriceChangeMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    const messageTimestamp = new Date(Number(message.timestamp))
+    const changesByAsset = new Map<string, Pick<BookChange, 'bids' | 'asks'>>()
+
+    for (const change of message.price_changes) {
+      if (!changesByAsset.has(change.asset_id)) {
+        changesByAsset.set(change.asset_id, { bids: [], asks: [] })
+      }
+
+      const assetChanges = changesByAsset.get(change.asset_id)!
+      if (change.side === 'BUY') {
+        assetChanges.bids.push(this.mapLevel(change))
+      } else {
+        assetChanges.asks.push(this.mapLevel(change))
+      }
+    }
+
+    for (const [assetId, changes] of changesByAsset) {
+      yield {
+        type: 'book_change',
+        symbol: assetId,
+        exchange: 'polymarket',
+        isSnapshot: false,
+        bids: changes.bids,
+        asks: changes.asks,
+        timestamp: messageTimestamp,
+        localTimestamp
+      }
+    }
+  }
+
+  private mapLevel(level: Pick<PolymarketMarketBookLevel, 'price' | 'size'>) {
+    return {
+      price: Number(level.price),
+      amount: Number(level.size)
+    }
+  }
+}
 type PolymarketMarketEventType =
   | 'book'
   | 'price_change'
@@ -16,6 +101,9 @@ type PolymarketMarketMessage<T extends PolymarketMarketEventType = PolymarketMar
   market: string
 }
 
+function isPolymarketMarketBookMessage(message: any): message is PolymarketMarketBookMessage {
+  return message?.event_type === 'book'
+}
 type PolymarketMarketBookMessage = PolymarketMarketMessage<'book'> & {
   asset_id: string
   timestamp: string
@@ -31,6 +119,9 @@ type PolymarketMarketBookLevel = {
   size: string
 }
 
+function isPolymarketMarketPriceChangeMessage(message: any): message is PolymarketMarketPriceChangeMessage {
+  return message?.event_type === 'price_change'
+}
 type PolymarketMarketPriceChangeMessage = PolymarketMarketMessage<'price_change'> & {
   timestamp: string
   price_changes: PolymarketMarketPriceChange[]
