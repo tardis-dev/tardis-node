@@ -57,7 +57,8 @@ export const EXCHANGES = [
   'bitget-futures',
   'hyperliquid',
   'lighter',
-  'bullish'
+  'bullish',
+  'polymarket'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -525,6 +526,8 @@ const LIGHTER_CHANNELS = ['order_book', 'trade', 'ticker', 'market_stats', 'spot
 
 const BULLISH_CHANNELS = ['V1TALevel2', 'V1TALevel1', 'V1TAAnonymousTradeUpdate', 'V1TATickerResponse', 'V1TAIndexPrice'] as const
 
+const POLYMARKET_CHANNELS = ['book', 'price_change', 'last_trade_price', 'best_bid_ask', 'tick_size_change', 'sport_result'] as const
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -584,5 +587,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'bitget-futures': BITGET_FUTURES_CHANNELS,
   hyperliquid: HYPERLIQUID_CHANNELS,
   lighter: LIGHTER_CHANNELS,
-  bullish: BULLISH_CHANNELS
+  bullish: BULLISH_CHANNELS,
+  polymarket: POLYMARKET_CHANNELS
 }

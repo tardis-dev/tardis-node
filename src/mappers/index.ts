@@ -169,6 +169,7 @@ import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMap
 import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum.ts'
 import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit.ts'
 import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox.ts'
+import { PolymarketBookChangeMapper, PolymarketBookTickerMapper, PolymarketTradesMapper } from './polymarket.ts'
 
 export * from './mapper.ts'
 
@@ -350,7 +351,8 @@ const tradesMappers = {
   'coinbase-international': () => coinbaseInternationalTradesMapper,
   hyperliquid: () => new HyperliquidTradesMapper(),
   lighter: () => new LighterTradesMapper(),
-  bullish: () => new BullishTradesMapper()
+  bullish: () => new BullishTradesMapper(),
+  polymarket: () => new PolymarketTradesMapper()
 }
 
 const bookChangeMappers = {
@@ -451,7 +453,8 @@ const bookChangeMappers = {
   'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
   hyperliquid: () => new HyperliquidBookChangeMapper(),
   lighter: () => new LighterBookChangeMapper(),
-  bullish: () => new BullishBookChangeMapper()
+  bullish: () => new BullishBookChangeMapper(),
+  polymarket: () => new PolymarketBookChangeMapper()
 }
 
 const derivativeTickersMappers = {
@@ -601,7 +604,8 @@ const bookTickersMappers = {
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),
   bullish: () => new BullishBookTickerMapper(),
-  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper()
+  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper(),
+  polymarket: () => new PolymarketBookTickerMapper()
 }
 
 export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {

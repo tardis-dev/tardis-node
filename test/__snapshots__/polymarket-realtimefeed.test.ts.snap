@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`map polymarket clob realtime subscription 1`] = `
+[
+  {
+    "assets_ids": [
+      "123",
+      "456",
+      "789",
+    ],
+    "custom_feature_enabled": true,
+    "initial_dump": true,
+    "level": 2,
+    "type": "market",
+  },
+]
+`;

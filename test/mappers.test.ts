@@ -8,6 +8,7 @@ import {
   normalizeLiquidations,
   normalizeBookTickers
 } from '../dist/index.js'
+import type { PolymarketNativeMessage } from '../src/mappers/polymarket.ts'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -82,7 +83,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'coinbase-international',
   'hyperliquid',
   'lighter',
-  'bullish'
+  'bullish',
+  'polymarket'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -10993,6 +10995,287 @@ test('map lighter ticker messages', () => {
   ]
 
   const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map polymarket messages', () => {
+  const localTimestamp = new Date('2026-05-11T06:30:00.000Z')
+
+  const messages = [
+    // book snapshot single object
+    {
+      event_type: 'book',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      timestamp: '1778480069765',
+      hash: '45f2026aa4eb8dee21005241e2fb95c3a5cc3a78',
+      bids: [
+        { price: '0.01', size: '505' },
+        { price: '0.59', size: '15.25' }
+      ],
+      asks: [{ price: '0.99', size: '2501' }],
+      tick_size: '0.01',
+      last_trade_price: ''
+    },
+    // book snapshot array (multiple assets in one message)
+    [
+      {
+        event_type: 'book',
+        asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+        market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+        timestamp: '1778480069765',
+        hash: '45f2026aa4eb8dee21005241e2fb95c3a5cc3a78',
+        bids: [{ price: '0.60', size: '100' }],
+        asks: [{ price: '0.98', size: '200' }],
+        tick_size: '0.01',
+        last_trade_price: ''
+      },
+      {
+        event_type: 'book',
+        asset_id: '114598918128008649573289110164634285301775348261383142320713626791317488686608',
+        market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+        timestamp: '1778464937192',
+        hash: '8b2d393ef49638c22a522aa5602df5d6de7185ab',
+        bids: [{ price: '0.45', size: '50' }],
+        asks: [{ price: '0.94', size: '11.53' }],
+        tick_size: '0.01',
+        last_trade_price: ''
+      }
+    ],
+    // price_change with two different asset_ids (one bid, one ask)
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.05',
+          size: '2849.22',
+          side: 'BUY',
+          hash: '2a784b3f6149b2430b8c21cf0f3302c9d6e5a8e3',
+          best_bid: '0.99',
+          best_ask: '1'
+        },
+        {
+          asset_id: '44076628926488158747612441576415392346365146558144994485384867009865003867169',
+          price: '0.95',
+          size: '2849.22',
+          side: 'SELL',
+          hash: '2e83aa931bc04b2ce1b80e3ae79d05282e89f26b',
+          best_bid: '0',
+          best_ask: '0.01'
+        }
+      ],
+      timestamp: '1778480999942',
+      event_type: 'price_change'
+    },
+    // price_change with size 0 (level removal)
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.05',
+          size: '0',
+          side: 'BUY',
+          hash: '2a784b3f6149b2430b8c21cf0f3302c9d6e5a8e3',
+          best_bid: '0.99',
+          best_ask: '1'
+        }
+      ],
+      timestamp: '1778481000000',
+      event_type: 'price_change'
+    },
+    // price_change with multiple changes for the same asset_id
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.06',
+          size: '120',
+          side: 'BUY',
+          hash: '548f622c40bb0fe7f21b58df0c1959c0b9fd6f4a',
+          best_bid: '0.99',
+          best_ask: '1'
+        },
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.07',
+          size: '80',
+          side: 'SELL',
+          hash: '816f43d037c549b5a9d4bf42dc1a6a3d41d4d31e',
+          best_bid: '0.99',
+          best_ask: '1'
+        }
+      ],
+      timestamp: '1778481001000',
+      event_type: 'price_change'
+    },
+    // best_bid_ask
+    {
+      market: '0xec006eb725b2454a3cf58d3bf43ddd95a03b019188c2286b3767454ec761d054',
+      asset_id: '102872648555130809031488632355736527619427659766925788934870144378212124766731',
+      best_bid: '0.48',
+      best_ask: '0.51',
+      spread: '0.03',
+      timestamp: '1778480999944',
+      event_type: 'best_bid_ask'
+    },
+    // best_bid_ask with zero top of book
+    {
+      market: '0xec006eb725b2454a3cf58d3bf43ddd95a03b019188c2286b3767454ec761d054',
+      asset_id: '102872648555130809031488632355736527619427659766925788934870144378212124766731',
+      best_bid: '0',
+      best_ask: '0',
+      spread: '0',
+      timestamp: '1778480999945',
+      event_type: 'best_bid_ask'
+    },
+    // last_trade_price
+    {
+      event_type: 'last_trade_price',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      fee_rate_bps: '0',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      price: '0.60',
+      size: '100',
+      side: 'BUY',
+      timestamp: '1778480999940',
+      transaction_hash: 'abc123def456'
+    },
+    // last_trade_price sell side
+    {
+      event_type: 'last_trade_price',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      fee_rate_bps: '0',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      price: '0.61',
+      size: '25',
+      side: 'SELL',
+      timestamp: '1778480999950',
+      transaction_hash: 'def456abc123'
+    },
+    // last_trade_price with empty price — should emit nothing
+    {
+      event_type: 'last_trade_price',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      fee_rate_bps: '0',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      price: '',
+      size: '100',
+      side: 'BUY',
+      timestamp: '1778480999940',
+      transaction_hash: 'abc123def456'
+    },
+    // sport_result — no mapper, should emit nothing
+    {
+      gameId: 19439,
+      leagueAbbreviation: 'soccer',
+      slug: 'mci-liv-2025-02-03',
+      homeTeam: 'MCI',
+      awayTeam: 'LIV',
+      status: 'InProgress',
+      live: true,
+      ended: false,
+      score: '1-0',
+      period: '1H',
+      elapsed: '32:15'
+    },
+    // sport_result live shape — no mapper, should emit nothing
+    {
+      gameId: 5529405,
+      leagueAbbreviation: 'challenger',
+      homeTeam: 'Pierre Delage',
+      awayTeam: 'Roman Andres Burruchaga',
+      status: 'inprogress',
+      eventState: {
+        type: 'tennis',
+        createdAt: '2026-05-13T14:55:46.551588084Z',
+        updatedAt: '2026-05-13T14:55:46.551588084Z',
+        score: '3-6, 6-4, 2-2',
+        period: 'S3',
+        live: true,
+        ended: false,
+        tournamentName: 'Challenger Bordeaux',
+        tennisRound: 'Round of 32'
+      },
+      score: '3-6, 6-4, 2-2',
+      period: 'S3',
+      live: true,
+      ended: false
+    },
+    // tick_size_change — no mapper, should emit nothing
+    {
+      event_type: 'tick_size_change',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      old_tick_size: '0.01',
+      new_tick_size: '0.001',
+      timestamp: '1778480999940'
+    },
+    // new_market — no mapper, should emit nothing
+    {
+      id: '1031769',
+      question: 'Will NVIDIA (NVDA) close above $240 end of January?',
+      market: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      slug: 'nvda-above-240-on-january-30-2026',
+      description: 'This market will resolve to "Yes" if the official closing price is above $240.',
+      assets_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      outcomes: ['Yes', 'No'],
+      event_message: {
+        id: '125819',
+        ticker: 'nvda-above-in-january-2026',
+        slug: 'nvda-above-in-january-2026',
+        title: 'Will NVIDIA (NVDA) close above ___ end of January?',
+        description: 'This market will resolve to "Yes" if the official closing price is above the selected level.'
+      },
+      timestamp: '1766790415550',
+      event_type: 'new_market',
+      tags: ['stocks'],
+      condition_id: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      active: true,
+      clob_token_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      sports_market_type: '',
+      line: '',
+      game_start_time: '',
+      order_price_min_tick_size: '0.01',
+      group_item_title: 'NVDA above $240',
+      taker_base_fee: '1000',
+      fees_enabled: true,
+      fee_schedule: {
+        exponent: '1',
+        rate: '0.07',
+        taker_only: true,
+        rebate_rate: '0.2'
+      }
+    },
+    // market_resolved — no mapper, should emit nothing
+    {
+      id: '1031769',
+      market: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      assets_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      winning_asset_id: '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+      winning_outcome: 'Yes',
+      timestamp: '1766790415550',
+      event_type: 'market_resolved',
+      tags: ['stocks']
+    }
+  ] satisfies PolymarketNativeMessage[]
+
+  const mapper = createMapper('polymarket')
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)

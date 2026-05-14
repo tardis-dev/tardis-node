@@ -2858,6 +2858,236 @@ exports[`map okex-spreads messages 3`] = `
 ]
 `;
 
+exports[`map polymarket messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 2501,
+        "price": 0.99,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 505,
+        "price": 0.01,
+      },
+      {
+        "amount": 15.25,
+        "price": 0.59,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:14:29.765Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 200,
+        "price": 0.98,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 100,
+        "price": 0.6,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:14:29.765Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 11.53,
+        "price": 0.94,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 50,
+        "price": 0.45,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "114598918128008649573289110164634285301775348261383142320713626791317488686608",
+    "timestamp": 2026-05-11T02:02:17.192Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 3`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 2849.22,
+        "price": 0.05,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:29:59.942Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 2849.22,
+        "price": 0.95,
+      },
+    ],
+    "bids": [],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "44076628926488158747612441576415392346365146558144994485384867009865003867169",
+    "timestamp": 2026-05-11T06:29:59.942Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 4`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 0.05,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 5`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 80,
+        "price": 0.07,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 120,
+        "price": 0.06,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:01.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 6`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": 0.51,
+    "bidAmount": undefined,
+    "bidPrice": 0.48,
+    "exchange": "polymarket",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "102872648555130809031488632355736527619427659766925788934870144378212124766731",
+    "timestamp": 2026-05-11T06:29:59.944Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map polymarket messages 7`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "polymarket",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "102872648555130809031488632355736527619427659766925788934870144378212124766731",
+    "timestamp": 2026-05-11T06:29:59.945Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map polymarket messages 8`] = `
+[
+  {
+    "amount": 100,
+    "exchange": "polymarket",
+    "id": "abc123def456",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "price": 0.6,
+    "side": "buy",
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:29:59.940Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map polymarket messages 9`] = `
+[
+  {
+    "amount": 25,
+    "exchange": "polymarket",
+    "id": "def456abc123",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "price": 0.61,
+    "side": "sell",
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:29:59.950Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map polymarket messages 10`] = `[]`;
+
+exports[`map polymarket messages 11`] = `[]`;
+
+exports[`map polymarket messages 12`] = `[]`;
+
+exports[`map polymarket messages 13`] = `[]`;
+
+exports[`map polymarket messages 14`] = `[]`;
+
+exports[`map polymarket messages 15`] = `[]`;
+
 exports[`map woo-x messages 1`] = `
 [
   {
