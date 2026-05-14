@@ -219,6 +219,16 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     this._ws.send(JSON.stringify(msg))
   }
 
+  protected sendRaw(msg: string | Buffer) {
+    if (this._ws === undefined) {
+      return
+    }
+    if (this._ws.readyState !== WebSocket.OPEN) {
+      return
+    }
+    this._ws.send(msg)
+  }
+
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
@@ -377,11 +387,7 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected readonly debug: dbg.Debugger
   private _tid: NodeJS.Timeout | undefined = undefined
 
-  constructor(
-    exchange: string,
-    private readonly _poolingIntervalSeconds: number,
-    protected readonly onError?: (error: Error) => void
-  ) {
+  constructor(exchange: string, private readonly _poolingIntervalSeconds: number, protected readonly onError?: (error: Error) => void) {
     this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
   }
 
