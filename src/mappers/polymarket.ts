@@ -2,13 +2,13 @@ import { BookChange, BookTicker, Trade } from '../types.ts'
 import { asNumberIfValid, asNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
 
-type PolymarketBookChangeMapperMessage = PolymarketMarketBookMessage | PolymarketMarketBookMessage[] | PolymarketMarketPriceChangeMessage
+type PolymarketBookChangeMapperMessage = PolymarketClobBookMessage | PolymarketClobBookMessage[] | PolymarketClobPriceChangeMessage
 export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChange> {
   canHandle(message: PolymarketNativeMessage): message is PolymarketBookChangeMapperMessage {
     if (Array.isArray(message)) {
-      return message.length > 0 && message.every(isPolymarketMarketBookMessage)
+      return message.length > 0 && message.every(isPolymarketClobBookMessage)
     }
-    return isPolymarketMarketBookMessage(message) || isPolymarketMarketPriceChangeMessage(message)
+    return isPolymarketClobBookMessage(message) || isPolymarketClobPriceChangeMessage(message)
   }
 
   getFilters(symbols?: string[]) {
@@ -26,17 +26,17 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
       return
     }
 
-    if (isPolymarketMarketBookMessage(message)) {
+    if (isPolymarketClobBookMessage(message)) {
       yield this.mapBookSnapshot(message, localTimestamp)
       return
     }
 
-    if (isPolymarketMarketPriceChangeMessage(message)) {
+    if (isPolymarketClobPriceChangeMessage(message)) {
       yield* this.mapPriceChange(message, localTimestamp)
     }
   }
 
-  private mapBookSnapshot(message: PolymarketMarketBookMessage, localTimestamp: Date): BookChange {
+  private mapBookSnapshot(message: PolymarketClobBookMessage, localTimestamp: Date): BookChange {
     return {
       type: 'book_change',
       symbol: message.asset_id,
@@ -49,7 +49,7 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
     }
   }
 
-  private *mapPriceChange(message: PolymarketMarketPriceChangeMessage, localTimestamp: Date): IterableIterator<BookChange> {
+  private *mapPriceChange(message: PolymarketClobPriceChangeMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const messageTimestamp = new Date(Number(message.timestamp))
     const changesByAsset = new Map<string, Pick<BookChange, 'bids' | 'asks'>>()
 
@@ -80,7 +80,7 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
     }
   }
 
-  private mapLevel(level: Pick<PolymarketMarketBookLevel, 'price' | 'size'>) {
+  private mapLevel(level: Pick<PolymarketClobBookLevel, 'price' | 'size'>) {
     return {
       price: Number(level.price),
       amount: Number(level.size)
@@ -89,7 +89,7 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
 }
 
 export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
-  canHandle(message: PolymarketNativeMessage): message is PolymarketMarketLastTradePriceMessage {
+  canHandle(message: PolymarketNativeMessage): message is PolymarketClobLastTradePriceMessage {
     return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'last_trade_price'
   }
 
@@ -97,7 +97,7 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
     return [{ channel: 'last_trade_price' as const, symbols }]
   }
 
-  *map(message: PolymarketMarketLastTradePriceMessage, localTimestamp: Date): IterableIterator<Trade> {
+  *map(message: PolymarketClobLastTradePriceMessage, localTimestamp: Date): IterableIterator<Trade> {
     const price = asNumberOrUndefined(message.price)
     if (price === undefined) {
       return
@@ -110,7 +110,7 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
       id: message.transaction_hash,
       price,
       amount: asNumberOrUndefined(message.size) ?? 0,
-      side: message.side.toLowerCase() as Lowercase<PolymarketMarketTradeSide>,
+      side: message.side.toLowerCase() as Lowercase<PolymarketClobTradeSide>,
       timestamp: new Date(Number(message.timestamp)),
       localTimestamp
     }
@@ -118,7 +118,7 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
 }
 
 export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
-  canHandle(message: PolymarketNativeMessage): message is PolymarketMarketBestBidAskMessage {
+  canHandle(message: PolymarketNativeMessage): message is PolymarketClobBestBidAskMessage {
     return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'best_bid_ask'
   }
 
@@ -126,7 +126,7 @@ export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTick
     return [{ channel: 'best_bid_ask' as const, symbols }]
   }
 
-  *map(message: PolymarketMarketBestBidAskMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+  *map(message: PolymarketClobBestBidAskMessage, localTimestamp: Date): IterableIterator<BookTicker> {
     yield {
       type: 'book_ticker',
       symbol: message.asset_id,
@@ -142,17 +142,17 @@ export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTick
 }
 
 export type PolymarketNativeMessage =
-  | PolymarketMarketBookMessage
-  | PolymarketMarketBookMessage[]
-  | PolymarketMarketPriceChangeMessage
-  | PolymarketMarketLastTradePriceMessage
-  | PolymarketMarketTickSizeChangeMessage
-  | PolymarketMarketBestBidAskMessage
-  | PolymarketMarketNewMarketMessage
-  | PolymarketMarketResolvedMessage
+  | PolymarketClobBookMessage
+  | PolymarketClobBookMessage[]
+  | PolymarketClobPriceChangeMessage
+  | PolymarketClobLastTradePriceMessage
+  | PolymarketClobTickSizeChangeMessage
+  | PolymarketClobBestBidAskMessage
+  | PolymarketClobNewMarketMessage
+  | PolymarketClobResolvedMessage
   | PolymarketSportsResultMessage
 
-type PolymarketMarketEventType =
+type PolymarketClobEventType =
   | 'book'
   | 'price_change'
   | 'tick_size_change'
@@ -161,67 +161,67 @@ type PolymarketMarketEventType =
   | 'new_market'
   | 'market_resolved'
 
-type PolymarketMarketMessage<T extends PolymarketMarketEventType = PolymarketMarketEventType> = {
+type PolymarketClobMessage<T extends PolymarketClobEventType = PolymarketClobEventType> = {
   event_type: T
   market: string
 }
 
-function isPolymarketMarketBookMessage(message: any): message is PolymarketMarketBookMessage {
+function isPolymarketClobBookMessage(message: any): message is PolymarketClobBookMessage {
   return message?.event_type === 'book'
 }
-type PolymarketMarketBookMessage = PolymarketMarketMessage<'book'> & {
+type PolymarketClobBookMessage = PolymarketClobMessage<'book'> & {
   asset_id: string
   timestamp: string
   hash: string
-  bids: PolymarketMarketBookLevel[]
-  asks: PolymarketMarketBookLevel[]
+  bids: PolymarketClobBookLevel[]
+  asks: PolymarketClobBookLevel[]
   tick_size?: string
   last_trade_price?: string
 }
 
-type PolymarketMarketBookLevel = {
+type PolymarketClobBookLevel = {
   price: string
   size: string
 }
 
-function isPolymarketMarketPriceChangeMessage(message: any): message is PolymarketMarketPriceChangeMessage {
+function isPolymarketClobPriceChangeMessage(message: any): message is PolymarketClobPriceChangeMessage {
   return message?.event_type === 'price_change'
 }
-type PolymarketMarketPriceChangeMessage = PolymarketMarketMessage<'price_change'> & {
+type PolymarketClobPriceChangeMessage = PolymarketClobMessage<'price_change'> & {
   timestamp: string
-  price_changes: PolymarketMarketPriceChange[]
+  price_changes: PolymarketClobPriceChange[]
 }
 
-type PolymarketMarketPriceChange = {
+type PolymarketClobPriceChange = {
   asset_id: string
   price: string
   size: string
-  side: PolymarketMarketTradeSide
+  side: PolymarketClobTradeSide
   hash: string
   best_bid: string
   best_ask: string
 }
 
-type PolymarketMarketLastTradePriceMessage = PolymarketMarketMessage<'last_trade_price'> & {
+type PolymarketClobLastTradePriceMessage = PolymarketClobMessage<'last_trade_price'> & {
   asset_id: string
   fee_rate_bps: string
   price: string
-  side: PolymarketMarketTradeSide
+  side: PolymarketClobTradeSide
   size: string
   timestamp: string
   transaction_hash: string
 }
 
-type PolymarketMarketTradeSide = 'BUY' | 'SELL'
+type PolymarketClobTradeSide = 'BUY' | 'SELL'
 
-type PolymarketMarketTickSizeChangeMessage = PolymarketMarketMessage<'tick_size_change'> & {
+type PolymarketClobTickSizeChangeMessage = PolymarketClobMessage<'tick_size_change'> & {
   asset_id: string
   old_tick_size: string
   new_tick_size: string
   timestamp: string
 }
 
-type PolymarketMarketBestBidAskMessage = PolymarketMarketMessage<'best_bid_ask'> & {
+type PolymarketClobBestBidAskMessage = PolymarketClobMessage<'best_bid_ask'> & {
   asset_id: string
   best_bid: string
   best_ask: string
@@ -229,14 +229,14 @@ type PolymarketMarketBestBidAskMessage = PolymarketMarketMessage<'best_bid_ask'>
   timestamp: string
 }
 
-type PolymarketMarketNewMarketMessage = PolymarketMarketMessage<'new_market'> & {
+type PolymarketClobNewMarketMessage = PolymarketClobMessage<'new_market'> & {
   id: string
   question: string
   slug: string
   description: string
   assets_ids: string[]
   outcomes: string[]
-  event_message: PolymarketEventMessage
+  event_message: PolymarketClobEventMessage
   timestamp: string
   tags: string[]
   condition_id: string
@@ -249,10 +249,10 @@ type PolymarketMarketNewMarketMessage = PolymarketMarketMessage<'new_market'> & 
   group_item_title: string
   taker_base_fee?: string
   fees_enabled?: boolean
-  fee_schedule?: PolymarketMarketFeeSchedule
+  fee_schedule?: PolymarketClobFeeSchedule
 }
 
-type PolymarketEventMessage = {
+type PolymarketClobEventMessage = {
   id: string
   ticker: string
   slug: string
@@ -260,14 +260,14 @@ type PolymarketEventMessage = {
   description: string
 }
 
-type PolymarketMarketFeeSchedule = {
+type PolymarketClobFeeSchedule = {
   exponent: string
   rate: string
   taker_only: boolean
   rebate_rate: string
 }
 
-type PolymarketMarketResolvedMessage = PolymarketMarketMessage<'market_resolved'> & {
+type PolymarketClobResolvedMessage = PolymarketClobMessage<'market_resolved'> & {
   id: string
   assets_ids: string[]
   winning_asset_id: string
