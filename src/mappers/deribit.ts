@@ -1,4 +1,4 @@
-import { asNumberIfValid } from '../handy.ts'
+import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -200,15 +200,15 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
       strikePrice,
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(optionInfo.best_bid_price),
-      bestBidAmount: asNumberIfValid(optionInfo.best_bid_amount),
-      bestBidIV: asNumberIfValid(optionInfo.bid_iv),
+      bestBidPrice: asNonZeroNumberOrUndefined(optionInfo.best_bid_price),
+      bestBidAmount: asNonZeroNumberOrUndefined(optionInfo.best_bid_amount),
+      bestBidIV: asNonZeroNumberOrUndefined(optionInfo.bid_iv),
 
-      bestAskPrice: asNumberIfValid(optionInfo.best_ask_price),
-      bestAskAmount: asNumberIfValid(optionInfo.best_ask_amount),
-      bestAskIV: asNumberIfValid(optionInfo.ask_iv),
+      bestAskPrice: asNonZeroNumberOrUndefined(optionInfo.best_ask_price),
+      bestAskAmount: asNonZeroNumberOrUndefined(optionInfo.best_ask_amount),
+      bestAskIV: asNonZeroNumberOrUndefined(optionInfo.ask_iv),
 
-      lastPrice: asNumberIfValid(optionInfo.last_price),
+      lastPrice: asNonZeroNumberOrUndefined(optionInfo.last_price),
       openInterest: optionInfo.open_interest,
 
       markPrice: optionInfo.mark_price,
@@ -308,10 +308,10 @@ export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
       symbol: deribitTicker.instrument_name.toUpperCase(),
       exchange: 'deribit',
 
-      askAmount: asNumberIfValid(deribitTicker.best_ask_amount),
-      askPrice: asNumberIfValid(deribitTicker.best_ask_price),
-      bidPrice: asNumberIfValid(deribitTicker.best_bid_price),
-      bidAmount: asNumberIfValid(deribitTicker.best_bid_amount),
+      askAmount: asNonZeroNumberOrUndefined(deribitTicker.best_ask_amount),
+      askPrice: asNonZeroNumberOrUndefined(deribitTicker.best_ask_price),
+      bidPrice: asNonZeroNumberOrUndefined(deribitTicker.best_bid_price),
+      bidAmount: asNonZeroNumberOrUndefined(deribitTicker.best_bid_amount),
 
       timestamp: new Date(deribitTicker.timestamp),
       localTimestamp: localTimestamp

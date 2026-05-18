@@ -1,4 +1,4 @@
-import { asNumberIfValid, asNumberOrUndefined } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -102,10 +102,10 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
       type: 'book_ticker',
       symbol: message.data.symbol,
       exchange: 'bullish',
-      bidPrice: asNumberIfValid(message.data.bid[0]),
-      bidAmount: asNumberIfValid(message.data.bid[1]),
-      askPrice: asNumberIfValid(message.data.ask[0]),
-      askAmount: asNumberIfValid(message.data.ask[1]),
+      bidPrice: asNonZeroNumberOrUndefined(message.data.bid[0]),
+      bidAmount: asNonZeroNumberOrUndefined(message.data.bid[1]),
+      askPrice: asNonZeroNumberOrUndefined(message.data.ask[0]),
+      askAmount: asNonZeroNumberOrUndefined(message.data.ask[1]),
       timestamp: new Date(message.data.datetime),
       localTimestamp
     }
@@ -145,7 +145,7 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
 
   *map(message: BullishDerivativeTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     if (message.dataType === 'V1TAIndexPrice') {
-      const price = asNumberIfValid(message.data.price)
+      const price = asNonZeroNumberOrUndefined(message.data.price)
       if (price !== undefined) {
         this.indexPrices.set(message.data.assetSymbol, {
           price,
@@ -160,8 +160,8 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
     const indexAsset = message.data.symbol.split('-')[0]
     const indexPrice = this.indexPrices.get(indexAsset)
 
-    pendingTickerInfo.updateLastPrice(asNumberIfValid(message.data.last))
-    pendingTickerInfo.updateMarkPrice(asNumberIfValid(message.data.markPrice))
+    pendingTickerInfo.updateLastPrice(asNonZeroNumberOrUndefined(message.data.last))
+    pendingTickerInfo.updateMarkPrice(asNonZeroNumberOrUndefined(message.data.markPrice))
     pendingTickerInfo.updateFundingRate(asNumberOrUndefined(message.data.fundingRate))
     pendingTickerInfo.updateOpenInterest(asNumberOrUndefined(message.data.openInterest))
     pendingTickerInfo.updateIndexPrice(indexPrice?.price)
@@ -205,7 +205,7 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
 
   *map(message: BullishOptionTickerMessage | BullishIndexPriceMessage, localTimestamp: Date): IterableIterator<OptionSummary> {
     if (message.dataType === 'V1TAIndexPrice') {
-      const price = asNumberIfValid(message.data.price)
+      const price = asNonZeroNumberOrUndefined(message.data.price)
       if (price !== undefined) {
         this.indexPrices.set(message.data.assetSymbol, {
           price,
@@ -229,16 +229,16 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
       optionType: optionType === 'P' ? 'put' : 'call',
       strikePrice: Number(strikePriceText),
       expirationDate,
-      bestBidPrice: asNumberIfValid(message.data.bestBid),
-      bestBidAmount: asNumberIfValid(message.data.bidVolume),
+      bestBidPrice: asNonZeroNumberOrUndefined(message.data.bestBid),
+      bestBidAmount: asNonZeroNumberOrUndefined(message.data.bidVolume),
       bestBidIV: undefined,
-      bestAskPrice: asNumberIfValid(message.data.bestAsk),
-      bestAskAmount: asNumberIfValid(message.data.askVolume),
+      bestAskPrice: asNonZeroNumberOrUndefined(message.data.bestAsk),
+      bestAskAmount: asNonZeroNumberOrUndefined(message.data.askVolume),
       bestAskIV: undefined,
-      lastPrice: asNumberIfValid(message.data.last),
+      lastPrice: asNonZeroNumberOrUndefined(message.data.last),
       openInterest: asNumberOrUndefined(message.data.openInterest),
       markPrice: asNumberOrUndefined(message.data.markPrice),
-      markIV: asNumberIfValid(message.data.impliedVolatility),
+      markIV: asNonZeroNumberOrUndefined(message.data.impliedVolatility),
       delta: asNumberOrUndefined(message.data.delta),
       gamma: asNumberOrUndefined(message.data.gamma),
       vega: asNumberOrUndefined(message.data.vega),
