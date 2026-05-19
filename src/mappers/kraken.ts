@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
@@ -158,11 +158,11 @@ export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
       symbol: message[3],
       exchange: 'kraken',
 
-      askAmount: asNumberIfValid(askVolume),
-      askPrice: asNumberIfValid(ask),
+      askAmount: asNonZeroNumberOrUndefined(askVolume),
+      askPrice: asNonZeroNumberOrUndefined(ask),
 
-      bidPrice: asNumberIfValid(bid),
-      bidAmount: asNumberIfValid(bidVolume),
+      bidPrice: asNonZeroNumberOrUndefined(bid),
+      bidAmount: asNonZeroNumberOrUndefined(bidVolume),
       timestamp,
       localTimestamp: localTimestamp
     }

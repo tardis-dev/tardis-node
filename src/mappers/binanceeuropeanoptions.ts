@@ -1,4 +1,4 @@
-import { asNumberIfValid, lowerCaseSymbols, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, lowerCaseSymbols, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
@@ -285,34 +285,10 @@ export class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-europ
 
     const underlyingIndex = `${base}USDT`
 
-    let bestBidPrice = asNumberIfValid(optionInfo.bo)
-    if (bestBidPrice === 0) {
-      bestBidPrice = undefined
-    }
-
-    let bestBidAmount = asNumberIfValid(optionInfo.bq)
-    if (bestBidAmount === 0) {
-      bestBidAmount = undefined
-    }
-    let bestAskPrice = asNumberIfValid(optionInfo.ao)
-    if (bestAskPrice === 0) {
-      bestAskPrice = undefined
-    }
-
-    let bestAskAmount = asNumberIfValid(optionInfo.aq)
-    if (bestAskAmount === 0) {
-      bestAskAmount = undefined
-    }
-
-    let bestBidIV = bestBidPrice !== undefined ? asNumberIfValid(optionInfo.b) : undefined
-    if (bestBidIV === -1) {
-      bestBidIV = undefined
-    }
-
-    let bestAskIV = bestAskPrice !== undefined ? asNumberIfValid(optionInfo.a) : undefined
-    if (bestAskIV === -1) {
-      bestAskIV = undefined
-    }
+    const bestBidPrice = asNonZeroNumberOrUndefined(optionInfo.bo)
+    const bestBidIV = bestBidPrice !== undefined ? asNonZeroNumberOrUndefined(optionInfo.b) : undefined
+    const bestAskPrice = asNonZeroNumberOrUndefined(optionInfo.ao)
+    const bestAskIV = bestAskPrice !== undefined ? asNonZeroNumberOrUndefined(optionInfo.a) : undefined
 
     const optionSummary: OptionSummary = {
       type: 'option_summary',
@@ -323,24 +299,24 @@ export class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-europ
       expirationDate,
 
       bestBidPrice,
-      bestBidAmount,
-      bestBidIV,
+      bestBidAmount: asNonZeroNumberOrUndefined(optionInfo.bq),
+      bestBidIV: bestBidIV === -1 ? undefined : bestBidIV,
 
       bestAskPrice,
-      bestAskAmount,
-      bestAskIV,
+      bestAskAmount: asNonZeroNumberOrUndefined(optionInfo.aq),
+      bestAskIV: bestAskIV === -1 ? undefined : bestAskIV,
 
-      lastPrice: asNumberIfValid(optionInfo.c),
+      lastPrice: asNonZeroNumberOrUndefined(optionInfo.c),
 
       openInterest: this._openInterests.get(optionInfo.s),
 
-      markPrice: asNumberIfValid(optionInfo.mp),
+      markPrice: asNonZeroNumberOrUndefined(optionInfo.mp),
       markIV: undefined,
 
-      delta: asNumberIfValid(optionInfo.d),
-      gamma: asNumberIfValid(optionInfo.g),
-      vega: asNumberIfValid(optionInfo.v),
-      theta: asNumberIfValid(optionInfo.t),
+      delta: asNonZeroNumberOrUndefined(optionInfo.d),
+      gamma: asNonZeroNumberOrUndefined(optionInfo.g),
+      vega: asNonZeroNumberOrUndefined(optionInfo.v),
+      theta: asNonZeroNumberOrUndefined(optionInfo.t),
       rho: undefined,
 
       underlyingPrice: this._indexPrices.get(underlyingIndex),
@@ -434,43 +410,18 @@ export class BinanceEuropeanOptionSummaryMapperV2 implements Mapper<'binance-eur
       const isPut = optionType === 'P'
       const underlyingIndex = `${base}USDT`
 
-      let bestBidPrice = asNumberIfValid(markData.bo)
-      if (bestBidPrice === 0) {
-        bestBidPrice = undefined
-      }
+      const bestBidPrice = asNonZeroNumberOrUndefined(markData.bo)
+      const bestBidIV = bestBidPrice !== undefined ? asNonZeroNumberOrUndefined(markData.b) : undefined
+      const bestAskPrice = asNonZeroNumberOrUndefined(markData.ao)
+      const bestAskIV = bestAskPrice !== undefined ? asNonZeroNumberOrUndefined(markData.a) : undefined
 
-      let bestBidAmount = asNumberIfValid(markData.bq)
-      if (bestBidAmount === 0) {
-        bestBidAmount = undefined
-      }
-
-      let bestAskPrice = asNumberIfValid(markData.ao)
-      if (bestAskPrice === 0) {
-        bestAskPrice = undefined
-      }
-
-      let bestAskAmount = asNumberIfValid(markData.aq)
-      if (bestAskAmount === 0) {
-        bestAskAmount = undefined
-      }
-
-      let bestBidIV = bestBidPrice !== undefined ? asNumberIfValid(markData.b) : undefined
-      if (bestBidIV === -1) {
-        bestBidIV = undefined
-      }
-
-      let bestAskIV = bestAskPrice !== undefined ? asNumberIfValid(markData.a) : undefined
-      if (bestAskIV === -1) {
-        bestAskIV = undefined
-      }
-
-      const markPrice = asNumberIfValid(markData.mp)
-      const markIV = asNumberIfValid(markData.vo)
-      const delta = asNumberIfValid(markData.d)
-      const gamma = asNumberIfValid(markData.g)
-      const vega = asNumberIfValid(markData.v)
-      const theta = asNumberIfValid(markData.t)
-      const underlyingPrice = asNumberIfValid(markData.i) // Index price is included in mark price data
+      const markPrice = asNonZeroNumberOrUndefined(markData.mp)
+      const markIV = asNonZeroNumberOrUndefined(markData.vo)
+      const delta = asNonZeroNumberOrUndefined(markData.d)
+      const gamma = asNonZeroNumberOrUndefined(markData.g)
+      const vega = asNonZeroNumberOrUndefined(markData.v)
+      const theta = asNonZeroNumberOrUndefined(markData.t)
+      const underlyingPrice = asNonZeroNumberOrUndefined(markData.i) // Index price is included in mark price data
 
       const optionSummary: OptionSummary = {
         type: 'option_summary',
@@ -481,12 +432,12 @@ export class BinanceEuropeanOptionSummaryMapperV2 implements Mapper<'binance-eur
         expirationDate,
 
         bestBidPrice,
-        bestBidAmount,
-        bestBidIV,
+        bestBidAmount: asNonZeroNumberOrUndefined(markData.bq),
+        bestBidIV: bestBidIV === -1 ? undefined : bestBidIV,
 
         bestAskPrice,
-        bestAskAmount,
-        bestAskIV,
+        bestAskAmount: asNonZeroNumberOrUndefined(markData.aq),
+        bestAskIV: bestAskIV === -1 ? undefined : bestAskIV,
 
         lastPrice: this._lastPrices.get(markData.s),
 

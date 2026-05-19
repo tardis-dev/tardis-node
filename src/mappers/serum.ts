@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Exchange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 
@@ -107,11 +107,11 @@ export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', Boo
       symbol: message.market.toUpperCase(),
       exchange: this._exchange,
 
-      askAmount: message.bestAsk !== undefined ? asNumberIfValid(message.bestAsk[1]) : undefined,
-      askPrice: message.bestAsk !== undefined ? asNumberIfValid(message.bestAsk[0]) : undefined,
+      askAmount: asNonZeroNumberOrUndefined(message.bestAsk?.[1]),
+      askPrice: asNonZeroNumberOrUndefined(message.bestAsk?.[0]),
 
-      bidPrice: message.bestBid !== undefined ? asNumberIfValid(message.bestBid[0]) : undefined,
-      bidAmount: message.bestBid !== undefined ? asNumberIfValid(message.bestBid[1]) : undefined,
+      bidPrice: asNonZeroNumberOrUndefined(message.bestBid?.[0]),
+      bidAmount: asNonZeroNumberOrUndefined(message.bestBid?.[1]),
       timestamp: new Date(message.timestamp),
       localTimestamp: localTimestamp
     }

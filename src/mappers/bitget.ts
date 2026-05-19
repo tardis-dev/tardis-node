@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -248,10 +248,10 @@ export class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futur
         type: 'book_ticker',
         symbol: message.arg.symbol,
         exchange: this._exchange,
-        askAmount: bboMessage.a[0] ? asNumberIfValid(bboMessage.a[0][1]) : undefined,
-        askPrice: bboMessage.a[0] ? asNumberIfValid(bboMessage.a[0][0]) : undefined,
-        bidPrice: bboMessage.b[0] ? asNumberIfValid(bboMessage.b[0][0]) : undefined,
-        bidAmount: bboMessage.b[0] ? asNumberIfValid(bboMessage.b[0][1]) : undefined,
+        askPrice: asNonZeroNumberOrUndefined(bboMessage.a[0]?.[0]),
+        askAmount: asNonZeroNumberOrUndefined(bboMessage.a[0]?.[1]),
+        bidPrice: asNonZeroNumberOrUndefined(bboMessage.b[0]?.[0]),
+        bidAmount: asNonZeroNumberOrUndefined(bboMessage.b[0]?.[1]),
         timestamp: new Date(Number(bboMessage.ts)),
         localTimestamp
       }

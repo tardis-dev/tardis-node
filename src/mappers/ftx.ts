@@ -1,4 +1,4 @@
-import { asNumberIfValid, parseμs, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, parseμs, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -229,11 +229,11 @@ export class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker>
       symbol: ftxTicker.market,
       exchange: this._exchange,
 
-      askAmount: asNumberIfValid(ftxTicker.data.askSize),
-      askPrice: asNumberIfValid(ftxTicker.data.ask),
+      askAmount: asNonZeroNumberOrUndefined(ftxTicker.data.askSize),
+      askPrice: asNonZeroNumberOrUndefined(ftxTicker.data.ask),
 
-      bidPrice: asNumberIfValid(ftxTicker.data.bid),
-      bidAmount: asNumberIfValid(ftxTicker.data.bidSize),
+      bidPrice: asNonZeroNumberOrUndefined(ftxTicker.data.bid),
+      bidAmount: asNonZeroNumberOrUndefined(ftxTicker.data.bidSize),
       timestamp,
       localTimestamp: localTimestamp
     }

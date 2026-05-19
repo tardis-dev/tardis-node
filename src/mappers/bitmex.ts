@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, FilterForExchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -267,11 +267,11 @@ export const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
         type: 'book_ticker',
         symbol: bitmexQuote.symbol,
         exchange: 'bitmex',
-        askAmount: asNumberIfValid(bitmexQuote.askSize),
-        askPrice: asNumberIfValid(bitmexQuote.askPrice),
+        askAmount: asNonZeroNumberOrUndefined(bitmexQuote.askSize),
+        askPrice: asNonZeroNumberOrUndefined(bitmexQuote.askPrice),
 
-        bidPrice: asNumberIfValid(bitmexQuote.bidPrice),
-        bidAmount: asNumberIfValid(bitmexQuote.bidSize),
+        bidPrice: asNonZeroNumberOrUndefined(bitmexQuote.bidPrice),
+        bidAmount: asNonZeroNumberOrUndefined(bitmexQuote.bidSize),
         timestamp: new Date(bitmexQuote.timestamp),
         localTimestamp: localTimestamp
       }
