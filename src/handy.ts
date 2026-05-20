@@ -771,12 +771,19 @@ export function decimalPlaces(n: number) {
 }
 
 /**
- * Parses optional numeric fields where `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
- * `0` is valid and preserved. Use for nullable/optional numeric fields such as open interest, funding rates, and greeks.
+ * Parses optional numeric fields where:
+ * * `0` **is valid and preserved**
+ * * `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`
+ *
+ * Use for nullable/optional numeric fields such as open interest, funding rates, and greeks.
  */
 export function asNumberOrUndefined(val: string | number | undefined | null) {
   if (val === undefined || val === null || val === '') {
     return
+  }
+
+  if (typeof val === 'number') {
+    return Number.isFinite(val) ? val : undefined
   }
 
   const asNumber = Number(val)
@@ -784,25 +791,22 @@ export function asNumberOrUndefined(val: string | number | undefined | null) {
 }
 
 /**
- * Parses optional numeric fields where `0`, `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
+ * Parses optional numeric fields where:
+ * * `0`, `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
+ *
  * Use for empty quote/top-of-book values that exchanges encode as zero.
  */
-export function asNumberIfValid(val: string | number | undefined | null) {
-  if (val === undefined || val === null) {
+export function asNonZeroNumberOrUndefined(val: string | number | undefined | null) {
+  if (val === undefined || val === null || val === '' || val === 0) {
     return
   }
 
-  var asNumber = Number(val)
-
-  if (isNaN(asNumber) || isFinite(asNumber) === false) {
-    return
+  if (typeof val === 'number') {
+    return Number.isFinite(val) ? val : undefined
   }
 
-  if (asNumber === 0) {
-    return
-  }
-
-  return asNumber
+  const asNumber = Number(val)
+  return Number.isFinite(asNumber) && asNumber !== 0 ? asNumber : undefined
 }
 
 export function upperCaseSymbols(symbols?: string[]) {

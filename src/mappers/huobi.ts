@@ -1,4 +1,4 @@
-import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -489,26 +489,26 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
       strikePrice: Number(symbolParts[4]),
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(marketIndexMessage.data.bid_one),
+      bestBidPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.bid_one),
 
       bestBidAmount: undefined,
-      bestBidIV: asNumberIfValid(marketIndexMessage.data.iv_bid_one),
+      bestBidIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_bid_one),
 
-      bestAskPrice: asNumberIfValid(marketIndexMessage.data.ask_one),
+      bestAskPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.ask_one),
       bestAskAmount: undefined,
-      bestAskIV: asNumberIfValid(marketIndexMessage.data.iv_ask_one),
+      bestAskIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_ask_one),
 
-      lastPrice: asNumberIfValid(marketIndexMessage.data.last_price),
+      lastPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.last_price),
 
       openInterest,
 
-      markPrice: marketIndexMessage.data.mark_price > 0 ? asNumberIfValid(marketIndexMessage.data.mark_price) : undefined,
-      markIV: asNumberIfValid(marketIndexMessage.data.iv_mark_price),
+      markPrice: marketIndexMessage.data.mark_price > 0 ? asNonZeroNumberOrUndefined(marketIndexMessage.data.mark_price) : undefined,
+      markIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_mark_price),
 
-      delta: asNumberIfValid(marketIndexMessage.data.delta),
-      gamma: asNumberIfValid(marketIndexMessage.data.gamma),
-      vega: asNumberIfValid(marketIndexMessage.data.vega),
-      theta: asNumberIfValid(marketIndexMessage.data.theta),
+      delta: asNonZeroNumberOrUndefined(marketIndexMessage.data.delta),
+      gamma: asNonZeroNumberOrUndefined(marketIndexMessage.data.gamma),
+      vega: asNonZeroNumberOrUndefined(marketIndexMessage.data.vega),
+      theta: asNonZeroNumberOrUndefined(marketIndexMessage.data.theta),
       rho: undefined,
 
       underlyingPrice: lastUnderlyingPrice,
@@ -555,11 +555,11 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         symbol,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(message.tick.askSize),
-        askPrice: asNumberIfValid(message.tick.ask),
+        askAmount: asNonZeroNumberOrUndefined(message.tick.askSize),
+        askPrice: asNonZeroNumberOrUndefined(message.tick.ask),
 
-        bidPrice: asNumberIfValid(message.tick.bid),
-        bidAmount: asNumberIfValid(message.tick.bidSize),
+        bidPrice: asNonZeroNumberOrUndefined(message.tick.bid),
+        bidAmount: asNonZeroNumberOrUndefined(message.tick.bidSize),
         timestamp: new Date(message.tick.quoteTime),
         localTimestamp: localTimestamp
       }
@@ -569,11 +569,11 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         symbol,
         exchange: this._exchange,
 
-        askAmount: message.tick.ask !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.ask[1]) : undefined,
-        askPrice: message.tick.ask !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.ask[0]) : undefined,
+        askAmount: asNonZeroNumberOrUndefined(message.tick.ask?.[1]),
+        askPrice: asNonZeroNumberOrUndefined(message.tick.ask?.[0]),
 
-        bidPrice: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[0]) : undefined,
-        bidAmount: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[1]) : undefined,
+        bidPrice: asNonZeroNumberOrUndefined(message.tick.bid?.[0]),
+        bidAmount: asNonZeroNumberOrUndefined(message.tick.bid?.[1]),
         timestamp: new Date(message.tick.ts),
         localTimestamp: localTimestamp
       }

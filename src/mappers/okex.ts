@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -221,11 +221,11 @@ export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker
         symbol: okexTicker.instId,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(okexTicker.askSz),
-        askPrice: asNumberIfValid(okexTicker.askPx),
+        askAmount: asNonZeroNumberOrUndefined(okexTicker.askSz),
+        askPrice: asNonZeroNumberOrUndefined(okexTicker.askPx),
 
-        bidPrice: asNumberIfValid(okexTicker.bidPx),
-        bidAmount: asNumberIfValid(okexTicker.bidSz),
+        bidPrice: asNonZeroNumberOrUndefined(okexTicker.bidPx),
+        bidAmount: asNonZeroNumberOrUndefined(okexTicker.bidSz),
         timestamp: new Date(Number(okexTicker.ts)),
         localTimestamp: localTimestamp
       }
@@ -501,7 +501,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const indexTickerMessage = dataMessage as OkexV5IndexTickerMessage['data'][0]
 
-        const lastIndexPrice = asNumberIfValid(indexTickerMessage.idxPx)
+        const lastIndexPrice = asNonZeroNumberOrUndefined(indexTickerMessage.idxPx)
         if (lastIndexPrice !== undefined) {
           this._indexPrices.set(indexTickerMessage.instId, lastIndexPrice)
         }
@@ -513,7 +513,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
 
-        const openInterestValue = asNumberIfValid(openInterestMessage.oi)
+        const openInterestValue = asNonZeroNumberOrUndefined(openInterestMessage.oi)
         if (openInterestValue !== undefined) {
           this._openInterests.set(openInterestMessage.instId, openInterestValue)
         }
@@ -525,7 +525,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const markPriceMessage = dataMessage as OkexV5MarkPriceMessage['data'][0]
 
-        const markPrice = asNumberIfValid(markPriceMessage.markPx)
+        const markPrice = asNonZeroNumberOrUndefined(markPriceMessage.markPx)
         if (markPrice !== undefined) {
           this._markPrices.set(markPriceMessage.instId, markPrice)
         }
@@ -569,24 +569,24 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
           strikePrice,
           expirationDate,
 
-          bestBidPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidPx) : undefined,
-          bestBidAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidSz) : undefined,
-          bestBidIV: asNumberIfValid(summary.bidVol),
+          bestBidPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.bidPx),
+          bestBidAmount: asNonZeroNumberOrUndefined(lastTickerInfo?.bidSz),
+          bestBidIV: asNonZeroNumberOrUndefined(summary.bidVol),
 
-          bestAskPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askPx) : undefined,
-          bestAskAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askSz) : undefined,
-          bestAskIV: asNumberIfValid(summary.askVol),
+          bestAskPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.askPx),
+          bestAskAmount: asNonZeroNumberOrUndefined(lastTickerInfo?.askSz),
+          bestAskIV: asNonZeroNumberOrUndefined(summary.askVol),
 
-          lastPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.last) : undefined,
+          lastPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.last),
           openInterest: lastOpenInterest,
 
           markPrice: lastMarkPrice,
-          markIV: asNumberIfValid(summary.markVol),
+          markIV: asNonZeroNumberOrUndefined(summary.markVol),
 
-          delta: asNumberIfValid(summary.delta),
-          gamma: asNumberIfValid(summary.gamma),
-          vega: asNumberIfValid(summary.vega),
-          theta: asNumberIfValid(summary.theta),
+          delta: asNonZeroNumberOrUndefined(summary.delta),
+          gamma: asNonZeroNumberOrUndefined(summary.gamma),
+          vega: asNonZeroNumberOrUndefined(summary.vega),
+          theta: asNonZeroNumberOrUndefined(summary.theta),
           rho: undefined,
 
           underlyingPrice: lastUnderlyingPrice,
@@ -970,24 +970,24 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
         strikePrice,
         expirationDate,
 
-        bestBidPrice: asNumberIfValid(summary.best_bid),
-        bestBidAmount: asNumberIfValid(summary.best_bid_size),
-        bestBidIV: asNumberIfValid(summary.bid_vol),
+        bestBidPrice: asNonZeroNumberOrUndefined(summary.best_bid),
+        bestBidAmount: asNonZeroNumberOrUndefined(summary.best_bid_size),
+        bestBidIV: asNonZeroNumberOrUndefined(summary.bid_vol),
 
-        bestAskPrice: asNumberIfValid(summary.best_ask),
-        bestAskAmount: asNumberIfValid(summary.best_ask_size),
-        bestAskIV: asNumberIfValid(summary.ask_vol),
+        bestAskPrice: asNonZeroNumberOrUndefined(summary.best_ask),
+        bestAskAmount: asNonZeroNumberOrUndefined(summary.best_ask_size),
+        bestAskIV: asNonZeroNumberOrUndefined(summary.ask_vol),
 
-        lastPrice: asNumberIfValid(summary.last),
-        openInterest: asNumberIfValid(summary.open_interest),
+        lastPrice: asNonZeroNumberOrUndefined(summary.last),
+        openInterest: asNonZeroNumberOrUndefined(summary.open_interest),
 
-        markPrice: asNumberIfValid(summary.mark_price),
-        markIV: asNumberIfValid(summary.mark_vol),
+        markPrice: asNonZeroNumberOrUndefined(summary.mark_price),
+        markIV: asNonZeroNumberOrUndefined(summary.mark_vol),
 
-        delta: asNumberIfValid(summary.delta),
-        gamma: asNumberIfValid(summary.gamma),
-        vega: asNumberIfValid(summary.vega),
-        theta: asNumberIfValid(summary.theta),
+        delta: asNonZeroNumberOrUndefined(summary.delta),
+        gamma: asNonZeroNumberOrUndefined(summary.gamma),
+        vega: asNonZeroNumberOrUndefined(summary.vega),
+        theta: asNonZeroNumberOrUndefined(summary.theta),
         rho: undefined,
 
         underlyingPrice: lastUnderlyingPrice,
@@ -1069,11 +1069,11 @@ export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> 
         symbol: okexTicker.instrument_id,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(okexTicker.best_ask_size),
-        askPrice: asNumberIfValid(okexTicker.best_ask),
+        askAmount: asNonZeroNumberOrUndefined(okexTicker.best_ask_size),
+        askPrice: asNonZeroNumberOrUndefined(okexTicker.best_ask),
 
-        bidPrice: asNumberIfValid(okexTicker.best_bid),
-        bidAmount: asNumberIfValid(okexTicker.best_bid_size),
+        bidPrice: asNonZeroNumberOrUndefined(okexTicker.best_bid),
+        bidAmount: asNonZeroNumberOrUndefined(okexTicker.best_bid_size),
         timestamp: new Date(okexTicker.timestamp),
         localTimestamp: localTimestamp
       }

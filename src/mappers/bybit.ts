@@ -1,4 +1,4 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -332,27 +332,27 @@ export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', Optio
       strikePrice,
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(message.data.bidPrice),
-      bestBidAmount: asNumberIfValid(message.data.bidSize),
-      bestBidIV: asNumberIfValid(message.data.bidIv),
+      bestBidPrice: asNonZeroNumberOrUndefined(message.data.bidPrice),
+      bestBidAmount: asNonZeroNumberOrUndefined(message.data.bidSize),
+      bestBidIV: asNonZeroNumberOrUndefined(message.data.bidIv),
 
-      bestAskPrice: asNumberIfValid(message.data.askPrice),
-      bestAskAmount: asNumberIfValid(message.data.askSize),
-      bestAskIV: asNumberIfValid(message.data.askIv),
+      bestAskPrice: asNonZeroNumberOrUndefined(message.data.askPrice),
+      bestAskAmount: asNonZeroNumberOrUndefined(message.data.askSize),
+      bestAskIV: asNonZeroNumberOrUndefined(message.data.askIv),
 
-      lastPrice: asNumberIfValid(message.data.lastPrice),
-      openInterest: asNumberIfValid(message.data.openInterest),
+      lastPrice: asNonZeroNumberOrUndefined(message.data.lastPrice),
+      openInterest: asNonZeroNumberOrUndefined(message.data.openInterest),
 
-      markPrice: asNumberIfValid(message.data.markPrice),
-      markIV: asNumberIfValid(message.data.markPriceIv),
+      markPrice: asNonZeroNumberOrUndefined(message.data.markPrice),
+      markIV: asNonZeroNumberOrUndefined(message.data.markPriceIv),
 
-      delta: asNumberIfValid(message.data.delta),
-      gamma: asNumberIfValid(message.data.gamma),
-      vega: asNumberIfValid(message.data.vega),
-      theta: asNumberIfValid(message.data.theta),
+      delta: asNonZeroNumberOrUndefined(message.data.delta),
+      gamma: asNonZeroNumberOrUndefined(message.data.gamma),
+      vega: asNonZeroNumberOrUndefined(message.data.vega),
+      theta: asNonZeroNumberOrUndefined(message.data.theta),
       rho: undefined,
 
-      underlyingPrice: asNumberIfValid(message.data.underlyingPrice),
+      underlyingPrice: asNonZeroNumberOrUndefined(message.data.underlyingPrice),
       underlyingIndex: '',
       timestamp: new Date(message.ts),
       localTimestamp: localTimestamp

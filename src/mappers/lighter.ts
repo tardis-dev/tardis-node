@@ -1,4 +1,4 @@
-import { asNumberIfValid } from '../handy.ts'
+import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -144,10 +144,10 @@ export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
       type: 'book_ticker',
       symbol,
       exchange: 'lighter',
-      askAmount: asNumberIfValid(message.ticker?.a?.size),
-      askPrice: asNumberIfValid(message.ticker?.a?.price),
-      bidPrice: asNumberIfValid(message.ticker?.b?.price),
-      bidAmount: asNumberIfValid(message.ticker?.b?.size),
+      askAmount: asNonZeroNumberOrUndefined(message.ticker?.a?.size),
+      askPrice: asNonZeroNumberOrUndefined(message.ticker?.a?.price),
+      bidPrice: asNonZeroNumberOrUndefined(message.ticker?.b?.price),
+      bidAmount: asNonZeroNumberOrUndefined(message.ticker?.b?.size),
       timestamp: new Date(message.timestamp),
       localTimestamp
     }
