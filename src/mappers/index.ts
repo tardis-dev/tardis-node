@@ -183,6 +183,7 @@ const isRealTime = (date: Date) => {
 
 const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
 const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
+const OKEX_PUBLIC_BOOKS_SWITCH_DATE = new Date('2026-05-21T00:00:00.000Z')
 const shouldUseOkexV5Mappers = (localTimestamp: Date) => {
   return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_API_SWITCH_DATE.valueOf()
 }
@@ -200,8 +201,9 @@ const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
 // see https://status.tardis.dev/incidents/ryjyv8tgdgkj
 const shouldUseOKXPublicBooksChannel = (localTimestamp: Date) => {
   return (
-    localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf() &&
-    localTimestamp.valueOf() < new Date('2023-03-09T00:00:00.000Z').valueOf()
+    (localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf() &&
+      localTimestamp.valueOf() < new Date('2023-03-09T00:00:00.000Z').valueOf()) ||
+    localTimestamp.valueOf() >= OKEX_PUBLIC_BOOKS_SWITCH_DATE.valueOf()
   )
 }
 
