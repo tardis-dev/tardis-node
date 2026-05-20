@@ -1,5 +1,5 @@
 import { BookChange, BookTicker, Trade } from '../types.ts'
-import { asNumberIfValid, asNumberOrUndefined } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
 
 type PolymarketBookChangeMapperMessage = PolymarketClobBookMessage | PolymarketClobBookMessage[] | PolymarketClobPriceChangeMessage
@@ -131,9 +131,9 @@ export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTick
       type: 'book_ticker',
       symbol: message.asset_id,
       exchange: 'polymarket',
-      bidPrice: asNumberIfValid(message.best_bid),
+      bidPrice: asNonZeroNumberOrUndefined(message.best_bid),
       bidAmount: undefined,
-      askPrice: asNumberIfValid(message.best_ask),
+      askPrice: asNonZeroNumberOrUndefined(message.best_ask),
       askAmount: undefined,
       timestamp: new Date(Number(message.timestamp)),
       localTimestamp
