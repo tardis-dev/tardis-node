@@ -64,6 +64,25 @@ test('map polymarket clob realtime subscription', () => {
   expect(subscribeMessages).toMatchSnapshot()
 })
 
+test('polymarket realtime feed accepts market metadata channels', async () => {
+  const messages = stream({
+    exchange: 'polymarket',
+    filters: [
+      {
+        channel: 'new_market',
+        symbols: ['123']
+      },
+      {
+        channel: 'market_resolved',
+        symbols: ['456']
+      }
+    ],
+    timeoutIntervalMS: 0
+  })
+
+  await messages.return?.()
+})
+
 test('polymarket clob realtime subscriptions require symbols', async () => {
   await expect(async () => {
     const messages = stream({

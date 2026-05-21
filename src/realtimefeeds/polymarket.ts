@@ -2,7 +2,15 @@ import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, RealTimeFeedIterable } from './realtimefeed.ts'
 
 export class PolymarketRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  private readonly clobChannels = new Set(['book', 'price_change', 'last_trade_price', 'best_bid_ask', 'tick_size_change'])
+  private readonly clobChannels = new Set([
+    'book',
+    'price_change',
+    'last_trade_price',
+    'best_bid_ask',
+    'tick_size_change',
+    'new_market',
+    'market_resolved'
+  ])
   private readonly sportsChannel = 'sport_result'
 
   protected *_getRealTimeFeeds(
