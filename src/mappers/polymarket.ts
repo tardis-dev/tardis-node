@@ -1,5 +1,5 @@
 import { BookChange, BookTicker, Trade } from '../types.ts'
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../handy.ts'
+import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
 
 type PolymarketBookChangeMapperMessage = PolymarketClobBookMessage | PolymarketClobBookMessage[] | PolymarketClobPriceChangeMessage
@@ -98,18 +98,13 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
   }
 
   *map(message: PolymarketClobLastTradePriceMessage, localTimestamp: Date): IterableIterator<Trade> {
-    const price = asNumberOrUndefined(message.price)
-    if (price === undefined) {
-      return
-    }
-
     yield {
       type: 'trade',
       symbol: message.asset_id,
       exchange: 'polymarket',
       id: message.transaction_hash,
-      price,
-      amount: asNumberOrUndefined(message.size) ?? 0,
+      price: Number(message.price),
+      amount: Number(message.size),
       side: message.side.toLowerCase() as Lowercase<PolymarketClobTradeSide>,
       timestamp: new Date(Number(message.timestamp)),
       localTimestamp

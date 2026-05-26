@@ -11158,18 +11158,6 @@ test('map polymarket messages', () => {
       timestamp: '1778480999950',
       transaction_hash: 'def456abc123'
     },
-    // last_trade_price with empty price — should emit nothing
-    {
-      event_type: 'last_trade_price',
-      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
-      fee_rate_bps: '0',
-      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
-      price: '',
-      size: '100',
-      side: 'BUY',
-      timestamp: '1778480999940',
-      transaction_hash: 'abc123def456'
-    },
     // sport_result — no mapper, should emit nothing
     {
       gameId: 19439,
