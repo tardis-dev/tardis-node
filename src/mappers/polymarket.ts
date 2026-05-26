@@ -42,8 +42,8 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
       symbol: message.asset_id,
       exchange: 'polymarket',
       isSnapshot: true,
-      bids: message.bids.map((level) => this.mapLevel(level)),
-      asks: message.asks.map((level) => this.mapLevel(level)),
+      bids: message.bids.map(this.mapLevel.bind(this)),
+      asks: message.asks.map(this.mapLevel.bind(this)),
       timestamp: new Date(Number(message.timestamp)),
       localTimestamp
     }
