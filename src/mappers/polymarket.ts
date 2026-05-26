@@ -89,8 +89,8 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
 }
 
 export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
-  canHandle(message: PolymarketNativeMessage): message is PolymarketClobLastTradePriceMessage {
-    return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'last_trade_price'
+  canHandle(message: any): message is PolymarketClobLastTradePriceMessage {
+    return message.event_type === 'last_trade_price'
   }
 
   getFilters(symbols?: string[]) {
@@ -118,8 +118,8 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
 }
 
 export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
-  canHandle(message: PolymarketNativeMessage): message is PolymarketClobBestBidAskMessage {
-    return Array.isArray(message) === false && 'event_type' in message && message.event_type === 'best_bid_ask'
+  canHandle(message: any): message is PolymarketClobBestBidAskMessage {
+    return message.event_type === 'best_bid_ask'
   }
 
   getFilters(symbols?: string[]) {
