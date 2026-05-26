@@ -8,7 +8,7 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
     if (Array.isArray(message)) {
       return message.length > 0 && message.every(isPolymarketClobBookMessage)
     }
-    return isPolymarketClobBookMessage(message) || isPolymarketClobPriceChangeMessage(message)
+    return isPolymarketClobPriceChangeMessage(message) || isPolymarketClobBookMessage(message)
   }
 
   getFilters(symbols?: string[]) {
@@ -26,13 +26,13 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
       return
     }
 
+    if (isPolymarketClobPriceChangeMessage(message)) {
+      yield* this.mapPriceChange(message, localTimestamp)
+    }
+
     if (isPolymarketClobBookMessage(message)) {
       yield this.mapBookSnapshot(message, localTimestamp)
       return
-    }
-
-    if (isPolymarketClobPriceChangeMessage(message)) {
-      yield* this.mapPriceChange(message, localTimestamp)
     }
   }
 
