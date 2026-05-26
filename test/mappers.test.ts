@@ -8,7 +8,6 @@ import {
   normalizeLiquidations,
   normalizeBookTickers
 } from '../dist/index.js'
-import type { PolymarketNativeMessage } from '../src/mappers/polymarket.ts'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'bitmex',
@@ -11273,7 +11272,7 @@ test('map polymarket messages', () => {
       event_type: 'market_resolved',
       tags: ['stocks']
     }
-  ] satisfies PolymarketNativeMessage[]
+  ]
 
   const mapper = createMapper('polymarket')
 
