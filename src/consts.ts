@@ -32,6 +32,7 @@ export const EXCHANGES = [
   'ftx-us',
   'binance-us',
   'gate-io-futures',
+  'mexc-futures',
   'gate-io',
   'okcoin',
   'bitflyer',
@@ -432,6 +433,7 @@ const DELTA_CHANNELS = [
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
+const MEXC_FUTURES_CHANNELS = ['sub.deal', 'sub.depth', 'sub.ticker', 'sub.index.price', 'sub.fair.price'] as const
 const POLONIEX_CHANNELS = ['price_aggregated_book', 'trades', 'ticker', 'book_lv2'] as const
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data'] as const
@@ -563,6 +565,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   delta: DELTA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
+  'mexc-futures': MEXC_FUTURES_CHANNELS,
   poloniex: POLONIEX_CHANNELS,
   upbit: UPBIT_CHANNELS,
   ascendex: ASCENDEX_CHANNELS,

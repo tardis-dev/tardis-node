@@ -54,6 +54,7 @@ import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
 import { LighterRealTimeFeed } from './lighter.ts'
 import { BullishRealTimeFeed } from './bullish.ts'
+import { MexcFuturesRealTimeFeed } from './mexcfutures.ts'
 
 export * from './realtimefeed.ts'
 
@@ -93,6 +94,7 @@ const realTimeFeedsMap: {
   delta: DeltaRealTimeFeed,
   'gate-io': GateIORealTimeFeed,
   'gate-io-futures': GateIOFuturesRealTimeFeed,
+  'mexc-futures': MexcFuturesRealTimeFeed,
   poloniex: PoloniexRealTimeFeed,
   coinflex: CoinflexRealTimeFeed,
   upbit: UpbitRealTimeFeed,
