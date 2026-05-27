@@ -8,7 +8,7 @@ export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'sub.deal', symbols: upperCaseSymbols(symbols) } as const]
+    return [{ channel: 'push.deal', symbols: upperCaseSymbols(symbols) } as const]
   }
 
   *map(message: MexcFuturesDealMessage, localTimestamp: Date): IterableIterator<Trade> {
@@ -34,7 +34,7 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'sub.depth', symbols: upperCaseSymbols(symbols) } as const]
+    return [{ channel: 'push.depth', symbols: upperCaseSymbols(symbols) } as const]
   }
 
   *map(message: MexcFuturesDepthMessage, localTimestamp: Date): IterableIterator<BookChange> {
@@ -64,7 +64,7 @@ export class MexcFuturesBookTickerMapper implements Mapper<'mexc-futures', BookT
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'sub.ticker', symbols: upperCaseSymbols(symbols) } as const]
+    return [{ channel: 'push.ticker', symbols: upperCaseSymbols(symbols) } as const]
   }
 
   *map(message: MexcFuturesTickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
@@ -93,9 +93,9 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
     const normalizedSymbols = upperCaseSymbols(symbols)
 
     return [
-      { channel: 'sub.ticker', symbols: normalizedSymbols } as const,
-      { channel: 'sub.index.price', symbols: normalizedSymbols } as const,
-      { channel: 'sub.fair.price', symbols: normalizedSymbols } as const
+      { channel: 'push.ticker', symbols: normalizedSymbols } as const,
+      { channel: 'push.index.price', symbols: normalizedSymbols } as const,
+      { channel: 'push.fair.price', symbols: normalizedSymbols } as const
     ]
   }
 

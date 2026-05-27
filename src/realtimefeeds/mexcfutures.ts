@@ -15,7 +15,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       }
 
       return filter.symbols.map((symbol) => ({
-        method: filter.channel,
+        method: filter.channel.replace(/^push\./, 'sub.'),
         param: { symbol },
         gzip: false
       }))
