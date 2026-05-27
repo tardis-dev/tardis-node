@@ -148,6 +148,12 @@ import {
   KucoinFuturesDerivativeTickerMapper,
   KucoinFuturesTradesMapper
 } from './kucoinfutures.ts'
+import {
+  MexcFuturesBookChangeMapper,
+  MexcFuturesBookTickerMapper,
+  MexcFuturesDerivativeTickerMapper,
+  MexcFuturesTradesMapper
+} from './mexcfutures.ts'
 import { Mapper } from './mapper.ts'
 import {
   OkexBookChangeMapper,
@@ -321,6 +327,7 @@ const tradesMappers = {
   'gate-io': (localTimestamp: Date) =>
     shouldUseGateIOV4Mappers(localTimestamp) ? new GateIOV4TradesMapper('gate-io') : new GateIOTradesMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
+  'mexc-futures': () => new MexcFuturesTradesMapper(),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2TradesMapper() : new PoloniexTradesMapper(),
   coinflex: () => coinflexTradesMapper,
@@ -422,6 +429,7 @@ const bookChangeMappers = {
         ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
         : new GateIOBookChangeMapper('gate-io'),
   'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
+  'mexc-futures': () => new MexcFuturesBookChangeMapper(),
   poloniex: (localTimestamp: Date) =>
     shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
   coinflex: () => coinflexBookChangeMapper,
@@ -480,6 +488,7 @@ const derivativeTickersMappers = {
   'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
   'huobi-dm-linear-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
   'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
+  'mexc-futures': () => new MexcFuturesDerivativeTickerMapper(),
   coinflex: () => new CoinflexDerivativeTickerMapper(),
   ascendex: () => new AscendexDerivativeTickerMapper(),
   dydx: () => new DydxDerivativeTickerMapper(),
@@ -583,6 +592,7 @@ const bookTickersMappers = {
   'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
   mango: () => new SerumBookTickerMapper('mango'),
   'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
+  'mexc-futures': () => new MexcFuturesBookTickerMapper(),
   'bybit-spot': (localTimestamp: Date) =>
     shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookTickerMapper('bybit-spot') : new BybitSpotBookTickerMapper('bybit-spot'),
   'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
