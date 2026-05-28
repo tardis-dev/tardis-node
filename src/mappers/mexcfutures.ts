@@ -40,20 +40,13 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
   }
 
   *map(message: MexcFuturesDepthMessage, localTimestamp: Date): IterableIterator<BookChange> {
-    if (this.symbolDepthInfo[message.symbol] === undefined) {
-      this.symbolDepthInfo[message.symbol] = {
-        bufferedUpdates: new CircularBuffer<MexcFuturesDepthUpdateMessage>(2000)
-      }
-    }
-
-    const depthInfo = this.symbolDepthInfo[message.symbol]
+    const depthInfo = this.getSymbolDepthInfo(message.symbol)
     if (message.generated === true) {
-      if (depthInfo.snapshotProcessed) {
+      if (depthInfo.snapshotEmitted) {
         return
       }
 
-      depthInfo.snapshotProcessed = true
-      for (const update of depthInfo.bufferedUpdates.items()) {
+      for (const update of depthInfo.updates.items()) {
         if (message.data.version + 1 < update.data.begin || message.data.version >= update.data.end) {
           continue
         }
@@ -65,8 +58,9 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
         }
         message.data.version = update.data.end
       }
-      depthInfo.lastUpdateId = message.data.version
-      depthInfo.bufferedUpdates.clear()
+      depthInfo.updates.clear()
+      depthInfo.currentBookVersion = message.data.version
+      depthInfo.snapshotEmitted = true
 
       yield {
         type: 'book_change',
@@ -82,28 +76,28 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       return
     }
 
-    if (!depthInfo.snapshotProcessed) {
-      depthInfo.bufferedUpdates.append(message)
+    if (!depthInfo.snapshotEmitted) {
+      depthInfo.updates.append(message)
       return
     }
 
-    if (message.data.end <= depthInfo.lastUpdateId!) {
+    if (message.data.end <= depthInfo.currentBookVersion!) {
       return
     }
 
-    if (!depthInfo.validatedFirstUpdate) {
-      if (message.data.begin > depthInfo.lastUpdateId! + 1 || message.data.end < depthInfo.lastUpdateId! + 1) {
+    if (!depthInfo.isContinuityValidated) {
+      if (message.data.begin > depthInfo.currentBookVersion! + 1 || message.data.end < depthInfo.currentBookVersion! + 1) {
         throw new Error(
-          `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, lastUpdateId: ${
-            depthInfo.lastUpdateId
+          `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, currentBookVersion: ${
+            depthInfo.currentBookVersion
           }`
         )
       }
 
-      depthInfo.validatedFirstUpdate = true
+      depthInfo.isContinuityValidated = true
     }
 
-    depthInfo.lastUpdateId = message.data.end
+    depthInfo.currentBookVersion = message.data.end
 
     yield {
       type: 'book_change',
@@ -138,6 +132,14 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       price: level[0],
       amount: level[2]
     }
+  }
+
+  private getSymbolDepthInfo(symbol: string) {
+    if (this.symbolDepthInfo[symbol] === undefined) {
+      this.symbolDepthInfo[symbol] = { updates: new CircularBuffer<MexcFuturesDepthUpdateMessage>(2000) }
+    }
+
+    return this.symbolDepthInfo[symbol]
   }
 }
 
@@ -252,10 +254,10 @@ enum MexcFuturesSelfTrade {
 type MexcFuturesDepthMessage = MexcFuturesDepthSnapshotMessage | MexcFuturesDepthUpdateMessage
 
 type MexcFuturesDepthInfo = {
-  bufferedUpdates: CircularBuffer<MexcFuturesDepthUpdateMessage>
-  snapshotProcessed?: boolean
-  lastUpdateId?: number
-  validatedFirstUpdate?: boolean
+  isContinuityValidated?: boolean
+  currentBookVersion?: number
+  snapshotEmitted?: boolean
+  updates: CircularBuffer<MexcFuturesDepthUpdateMessage>
 }
 
 type MexcFuturesDepthSnapshotMessage = MexcFuturesMessage<
