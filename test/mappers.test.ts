@@ -11066,7 +11066,61 @@ test('map mexc futures messages', () => {
         data: {
           asks: [[6859.5, 3251, 1]],
           bids: [[6858.5, 42, 7]],
+          begin: 96801927,
+          end: 96801927,
           version: 96801927
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022003
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        generated: true,
+        data: {
+          asks: [[6860.5, 2, 3]],
+          bids: [[6857.5, 4, 5]],
+          version: 96801926
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442021003
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: true,
+      bids: [
+        { price: 6857.5, amount: 5 },
+        { price: 6858.5, amount: 7 }
+      ],
+      asks: [
+        { price: 6860.5, amount: 3 },
+        { price: 6859.5, amount: 1 }
+      ],
+      timestamp: new Date('2020-04-21T04:07:01.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[6860.5, 0, 0]],
+          bids: [[6858.5, 6, 8]],
+          begin: 96801928,
+          end: 96801928,
+          version: 96801928
         },
         symbol: 'BTC_USDT',
         ts: 1587442022003
@@ -11079,8 +11133,8 @@ test('map mexc futures messages', () => {
       symbol: 'BTC_USDT',
       exchange: 'mexc-futures',
       isSnapshot: false,
-      bids: [{ price: 6858.5, amount: 7 }],
-      asks: [{ price: 6859.5, amount: 1 }],
+      bids: [{ price: 6858.5, amount: 8 }],
+      asks: [{ price: 6860.5, amount: 0 }],
       timestamp: new Date('2020-04-21T04:07:02.003Z'),
       localTimestamp
     }
