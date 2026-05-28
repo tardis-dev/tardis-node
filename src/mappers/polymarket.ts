@@ -27,7 +27,26 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
     }
 
     if (isPolymarketClobPriceChangeMessage(message)) {
-      yield* this.mapPriceChange(message, localTimestamp)
+      const timestamp = new Date(Number(message.timestamp))
+      const changes = message.price_changes
+
+      for (let i = 0; i < changes.length; i++) {
+        const change = changes[i]
+        const level = this.mapLevel(change)
+
+        yield {
+          type: 'book_change',
+          symbol: change.asset_id,
+          exchange: 'polymarket',
+          isSnapshot: false,
+          bids: change.side === 'BUY' ? [level] : [],
+          asks: change.side === 'SELL' ? [level] : [],
+          timestamp,
+          localTimestamp
+        }
+      }
+
+      return
     }
 
     if (isPolymarketClobBookMessage(message)) {
@@ -46,37 +65,6 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
       asks: message.asks.map(this.mapLevel.bind(this)),
       timestamp: new Date(Number(message.timestamp)),
       localTimestamp
-    }
-  }
-
-  private *mapPriceChange(message: PolymarketClobPriceChangeMessage, localTimestamp: Date): IterableIterator<BookChange> {
-    const messageTimestamp = new Date(Number(message.timestamp))
-    const changesByAsset = new Map<string, Pick<BookChange, 'bids' | 'asks'>>()
-
-    for (const change of message.price_changes) {
-      if (!changesByAsset.has(change.asset_id)) {
-        changesByAsset.set(change.asset_id, { bids: [], asks: [] })
-      }
-
-      const assetChanges = changesByAsset.get(change.asset_id)!
-      if (change.side === 'BUY') {
-        assetChanges.bids.push(this.mapLevel(change))
-      } else {
-        assetChanges.asks.push(this.mapLevel(change))
-      }
-    }
-
-    for (const [assetId, changes] of changesByAsset) {
-      yield {
-        type: 'book_change',
-        symbol: assetId,
-        exchange: 'polymarket',
-        isSnapshot: false,
-        bids: changes.bids,
-        asks: changes.asks,
-        timestamp: messageTimestamp,
-        localTimestamp
-      }
     }
   }
 
