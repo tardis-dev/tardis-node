@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 
@@ -29,6 +29,8 @@ export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
 }
 
 export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookChange> {
+  private readonly symbolDepthInfo: { [symbol: string]: MexcFuturesDepthInfo } = {}
+
   canHandle(message: MexcFuturesDepthMessage) {
     return message.channel === 'push.depth'
   }
@@ -38,6 +40,71 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
   }
 
   *map(message: MexcFuturesDepthMessage, localTimestamp: Date): IterableIterator<BookChange> {
+    if (this.symbolDepthInfo[message.symbol] === undefined) {
+      this.symbolDepthInfo[message.symbol] = {
+        bufferedUpdates: new CircularBuffer<MexcFuturesDepthUpdateMessage>(2000)
+      }
+    }
+
+    const depthInfo = this.symbolDepthInfo[message.symbol]
+    if (message.generated === true) {
+      if (depthInfo.snapshotProcessed) {
+        return
+      }
+
+      depthInfo.snapshotProcessed = true
+      for (const update of depthInfo.bufferedUpdates.items()) {
+        if (message.data.version + 1 < update.data.begin || message.data.version >= update.data.end) {
+          continue
+        }
+        for (const bid of update.data.bids) {
+          this.applyLevel(message.data.bids, bid)
+        }
+        for (const ask of update.data.asks) {
+          this.applyLevel(message.data.asks, ask)
+        }
+        message.data.version = update.data.end
+      }
+      depthInfo.lastUpdateId = message.data.version
+      depthInfo.bufferedUpdates.clear()
+
+      yield {
+        type: 'book_change',
+        symbol: message.symbol,
+        exchange: 'mexc-futures',
+        isSnapshot: true,
+        bids: message.data.bids.map(this.mapBookLevel),
+        asks: message.data.asks.map(this.mapBookLevel),
+        timestamp: new Date(message.ts),
+        localTimestamp
+      }
+
+      return
+    }
+
+    if (!depthInfo.snapshotProcessed) {
+      depthInfo.bufferedUpdates.append(message)
+      return
+    }
+
+    if (message.data.end <= depthInfo.lastUpdateId!) {
+      return
+    }
+
+    if (!depthInfo.validatedFirstUpdate) {
+      if (message.data.begin > depthInfo.lastUpdateId! + 1 || message.data.end < depthInfo.lastUpdateId! + 1) {
+        throw new Error(
+          `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, lastUpdateId: ${
+            depthInfo.lastUpdateId
+          }`
+        )
+      }
+
+      depthInfo.validatedFirstUpdate = true
+    }
+
+    depthInfo.lastUpdateId = message.data.end
+
     yield {
       type: 'book_change',
       symbol: message.symbol,
@@ -47,6 +114,22 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       asks: message.data.asks.map(this.mapBookLevel),
       timestamp: new Date(message.ts),
       localTimestamp
+    }
+  }
+
+  private applyLevel(bookSide: MexcFuturesDepthLevel[], levelUpdate: MexcFuturesDepthLevel) {
+    const existingIndex = bookSide.findIndex((level) => level[0] === levelUpdate[0])
+    if (levelUpdate[2] === 0) {
+      if (existingIndex !== -1) {
+        bookSide.splice(existingIndex, 1)
+      }
+      return
+    }
+
+    if (existingIndex === -1) {
+      bookSide.push(levelUpdate)
+    } else {
+      bookSide[existingIndex] = levelUpdate
     }
   }
 
@@ -166,14 +249,34 @@ enum MexcFuturesSelfTrade {
   No = 2
 }
 
-type MexcFuturesDepthMessage = MexcFuturesMessage<
+type MexcFuturesDepthMessage = MexcFuturesDepthSnapshotMessage | MexcFuturesDepthUpdateMessage
+
+type MexcFuturesDepthInfo = {
+  bufferedUpdates: CircularBuffer<MexcFuturesDepthUpdateMessage>
+  snapshotProcessed?: boolean
+  lastUpdateId?: number
+  validatedFirstUpdate?: boolean
+}
+
+type MexcFuturesDepthSnapshotMessage = MexcFuturesMessage<
   'push.depth',
   {
     asks: MexcFuturesDepthLevel[]
     bids: MexcFuturesDepthLevel[]
     version: number
   }
->
+> & { generated: true }
+
+type MexcFuturesDepthUpdateMessage = MexcFuturesMessage<
+  'push.depth',
+  {
+    asks: MexcFuturesDepthLevel[]
+    bids: MexcFuturesDepthLevel[]
+    begin: number
+    end: number
+    version: number
+  }
+> & { generated?: undefined }
 
 type MexcFuturesDepthLevel = [price: number, ordersCount: number, quantity: number]
 
