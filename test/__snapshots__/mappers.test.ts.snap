@@ -2990,18 +2990,28 @@ exports[`map polymarket messages 4`] = `
 exports[`map polymarket messages 5`] = `
 [
   {
-    "asks": [
-      {
-        "amount": 80,
-        "price": 0.07,
-      },
-    ],
+    "asks": [],
     "bids": [
       {
         "amount": 120,
         "price": 0.06,
       },
     ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:01.000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 80,
+        "price": 0.07,
+      },
+    ],
+    "bids": [],
     "exchange": "polymarket",
     "isSnapshot": false,
     "localTimestamp": 2026-05-11T06:30:00.000Z,
