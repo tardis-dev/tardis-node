@@ -219,6 +219,16 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     this._ws.send(JSON.stringify(msg))
   }
 
+  protected sendRaw(msg: string | Buffer) {
+    if (this._ws === undefined) {
+      return
+    }
+    if (this._ws.readyState !== WebSocket.OPEN) {
+      return
+    }
+    this._ws.send(msg)
+  }
+
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
