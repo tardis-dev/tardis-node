@@ -10334,6 +10334,12 @@ test('map bullish derivative ticker messages', () => {
         createdAtDatetime: '2026-04-24T14:58:45.522Z',
         otcBaseVolume: '0.00000000'
       }
+    },
+    // Bullish can publish empty ticker updates; they should be ignored by derivative ticker mapper
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: null
     }
   ]
 
@@ -10536,6 +10542,12 @@ test('map bullish option summary messages', () => {
         openInterestUSD: '50507926.2656',
         otcBaseVolume: '92.17200000'
       }
+    },
+    // Bullish can publish empty ticker updates; they should be ignored by option summary mapper
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: null
     }
   ]
 

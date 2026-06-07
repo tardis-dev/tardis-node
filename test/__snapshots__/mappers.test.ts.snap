@@ -979,6 +979,8 @@ exports[`map bullish derivative ticker messages 8`] = `[]`;
 
 exports[`map bullish derivative ticker messages 9`] = `[]`;
 
+exports[`map bullish derivative ticker messages 10`] = `[]`;
+
 exports[`map bullish option summary messages 1`] = `
 [
   {
@@ -1099,6 +1101,8 @@ exports[`map bullish option summary messages 6`] = `
 exports[`map bullish option summary messages 7`] = `[]`;
 
 exports[`map bullish option summary messages 8`] = `[]`;
+
+exports[`map bullish option summary messages 9`] = `[]`;
 
 exports[`map bullish order book messages 1`] = `
 [
