@@ -18,6 +18,10 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters.flatMap((filter) => {
+      if (filter.channel === 'push.contract') {
+        return [{ method: 'sub.contract' }]
+      }
+
       const method = this.channelToSubscriptionMethod[filter.channel as keyof typeof this.channelToSubscriptionMethod]
       if (method === undefined) {
         throw new Error(`Unsupported MEXC futures channel ${filter.channel}`)
