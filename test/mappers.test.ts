@@ -11224,4 +11224,34 @@ test('map mexc futures messages', () => {
       localTimestamp
     }
   ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.funding.rate',
+        data: {
+          rate: 0.0012,
+          symbol: 'BTC_USDT'
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022503
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'derivative_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      lastPrice: 6865.5,
+      openInterest: 2284742,
+      fundingRate: 0.0012,
+      fundingTimestamp: undefined,
+      predictedFundingRate: undefined,
+      indexPrice: 6861.6,
+      markPrice: 6867.4,
+      timestamp: new Date('2020-04-21T04:07:02.503Z'),
+      localTimestamp
+    }
+  ])
 })
