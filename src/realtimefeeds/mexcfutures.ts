@@ -3,6 +3,14 @@ import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://contract.mexc.com/edge'
+  protected readonly channelToSubscriptionMethod = {
+    'push.deal': 'sub.deal',
+    'push.depth': 'sub.depth',
+    'push.ticker': 'sub.ticker',
+    'push.index.price': 'sub.index.price',
+    'push.fair.price': 'sub.fair.price',
+    'push.funding.rate': 'sub.funding.rate'
+  } as const
 
   protected sendCustomPing = () => {
     this.send({ method: 'ping' })
@@ -15,7 +23,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       }
 
       return filter.symbols.map((symbol) => ({
-        method: filter.channel.replace(/^push\./, 'sub.'),
+        method,
         param: { symbol },
         gzip: false
       }))
