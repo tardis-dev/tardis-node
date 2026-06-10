@@ -40,7 +40,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected messageIsError(message: any): boolean {
-    return message.success === false || message.error !== undefined
+    return message.channel === 'rs.error' || message.success === false || message.error !== undefined
   }
 
   protected messageIsHeartbeat(message: any) {
