@@ -18,6 +18,11 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters.flatMap((filter) => {
+      const method = this.channelToSubscriptionMethod[filter.channel as keyof typeof this.channelToSubscriptionMethod]
+      if (method === undefined) {
+        throw new Error(`Unsupported MEXC futures channel ${filter.channel}`)
+      }
+
       if (!filter.symbols || filter.symbols.length === 0) {
         throw new Error('MexcFuturesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
