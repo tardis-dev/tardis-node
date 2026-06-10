@@ -433,7 +433,15 @@ const DELTA_CHANNELS = [
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
-const MEXC_FUTURES_CHANNELS = ['push.deal', 'push.depth', 'push.ticker', 'push.index.price', 'push.fair.price'] as const
+const MEXC_FUTURES_CHANNELS = [
+  'push.deal',
+  'push.depth',
+  'push.ticker',
+  'push.index.price',
+  'push.fair.price',
+  'push.funding.rate',
+  'push.contract'
+] as const
 const POLONIEX_CHANNELS = ['price_aggregated_book', 'trades', 'ticker', 'book_lv2'] as const
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data'] as const
