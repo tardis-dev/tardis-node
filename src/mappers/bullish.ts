@@ -123,8 +123,9 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
 
     if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
       const tickerMessage = message as BullishTickerMessage
+      const symbol = tickerMessage.data?.symbol
 
-      return tickerMessage.data.symbol.endsWith('-PERP') || /-\d{8}$/.test(tickerMessage.data.symbol)
+      return symbol !== undefined && (symbol.endsWith('-PERP') || /-\d{8}$/.test(symbol))
     }
 
     return false
@@ -183,8 +184,9 @@ export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSumma
 
     if (message.dataType === 'V1TATickerResponse' && (message.type === 'snapshot' || message.type === 'update')) {
       const tickerMessage = message as BullishTickerMessage
+      const symbol = tickerMessage.data?.symbol
 
-      return tickerMessage.data.symbol.endsWith('-C') || tickerMessage.data.symbol.endsWith('-P')
+      return symbol !== undefined && (symbol.endsWith('-C') || symbol.endsWith('-P'))
     }
 
     return false
@@ -263,7 +265,7 @@ type BullishMessageRole = 'snapshot' | 'update'
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
 type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
 type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
-type BullishTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishTickerData>
+type BullishTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishTickerData | null>
 type BullishDerivativeTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishDerivativeTickerData>
 type BullishOptionTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishOptionTickerData>
 type BullishIndexPriceMessage = BullishDataMessage<'V1TAIndexPrice', BullishIndexPriceData>
