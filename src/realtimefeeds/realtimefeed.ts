@@ -117,7 +117,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
             message = message.toString().replace(/"id":([0-9]+),/g, '"id":"$1",') as any
           }
 
-          const messageDeserialized = JSON.parse(message as any)
+          const messageDeserialized = this.parseMessage(message)
 
           if (this.messageIsError(messageDeserialized)) {
             if (this.isIgnoredError(messageDeserialized)) {
@@ -232,6 +232,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
+
+  protected parseMessage(message: Buffer): any {
+    return JSON.parse(message as any)
+  }
 
   protected sendCustomPing: (() => void) | undefined = undefined
 
