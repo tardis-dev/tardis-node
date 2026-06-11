@@ -140,6 +140,7 @@ import {
   LighterLiquidationMapper,
   LighterTradesMapper
 } from './lighter.ts'
+import { MexcBookChangeMapper, MexcBookTickerMapper, MexcTradesMapper } from './mexc.ts'
 import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
 import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
 import {
@@ -354,6 +355,7 @@ const tradesMappers = {
   hyperliquid: () => new HyperliquidTradesMapper(),
   lighter: () => new LighterTradesMapper(),
   bullish: () => new BullishTradesMapper(),
+  mexc: () => new MexcTradesMapper(),
   polymarket: () => new PolymarketTradesMapper()
 }
 
@@ -456,6 +458,7 @@ const bookChangeMappers = {
   hyperliquid: () => new HyperliquidBookChangeMapper(),
   lighter: () => new LighterBookChangeMapper(),
   bullish: () => new BullishBookChangeMapper(),
+  mexc: () => new MexcBookChangeMapper(),
   polymarket: () => new PolymarketBookChangeMapper()
 }
 
@@ -606,6 +609,7 @@ const bookTickersMappers = {
   hyperliquid: () => new HyperliquidBookTickerMapper(),
   lighter: () => new LighterBookTickerMapper(),
   bullish: () => new BullishBookTickerMapper(),
+  mexc: () => new MexcBookTickerMapper(),
   'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper(),
   polymarket: () => new PolymarketBookTickerMapper()
 }
