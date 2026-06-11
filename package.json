@@ -73,6 +73,7 @@
     "follow-redirects": "^1.15.9",
     "https-proxy-agent": "^8.0.0",
     "p-map": "^7.0.4",
+    "protobufjs": "^8.6.2",
     "socks-proxy-agent": "^9.0.0",
     "ws": "^8.18.3"
   },

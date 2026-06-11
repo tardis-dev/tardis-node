@@ -1,9 +1,63 @@
+import protobuf from 'protobufjs'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
-type ProtobufWireType = 0 | 1 | 2 | 3 | 4 | 5
-
 export class MexcRealTimeFeed extends RealTimeFeedBase {
+  private static pushDataV3ApiWrapper: protobuf.Type | undefined
+  /**
+   * MEXC protobuf docs at @see https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/protocol-buffers-integration
+   * and schemas from @see https://github.com/mexcdevelop/websocket-proto, mirrored in tardis-recorder/datafeeds/src/mexc/proto.
+   */
+  private static readonly pushDataV3ApiWrapperSchema = `
+    syntax = "proto3";
+
+    message PushDataV3ApiWrapper {
+      string channel = 1;
+      oneof body {
+        PublicAggreDepthsV3Api publicAggreDepths = 313;
+        PublicAggreDealsV3Api publicAggreDeals = 314;
+        PublicAggreBookTickerV3Api publicAggreBookTicker = 315;
+      }
+
+      optional string symbol = 3;
+      optional string symbolId = 4;
+      optional int64 createTime = 5;
+      optional int64 sendTime = 6;
+    }
+
+    message PublicAggreDealsV3Api {
+      repeated PublicAggreDealsV3ApiItem deals = 1;
+      string eventType = 2;
+    }
+
+    message PublicAggreDealsV3ApiItem {
+      string price = 1;
+      string quantity = 2;
+      int32 tradeType = 3;
+      int64 time = 4;
+    }
+
+    message PublicAggreDepthsV3Api {
+      repeated PublicAggreDepthV3ApiItem asks = 1;
+      repeated PublicAggreDepthV3ApiItem bids = 2;
+      string eventType = 3;
+      string fromVersion = 4;
+      string toVersion = 5;
+    }
+
+    message PublicAggreDepthV3ApiItem {
+      string price = 1;
+      string quantity = 2;
+    }
+
+    message PublicAggreBookTickerV3Api {
+      string bidPrice = 1;
+      string bidQuantity = 2;
+      string askPrice = 3;
+      string askQuantity = 4;
+    }
+  `
+
   protected readonly wssURL = 'wss://wbs-api.mexc.com/ws'
   private readonly channels = new Set([
     'spot@public.aggre.deals.v3.api.pb@10ms',
@@ -37,7 +91,11 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       return JSON.parse(message.toString())
     }
 
-    return decodePushDataV3ApiWrapper(message)
+    const pushDataV3ApiWrapper = MexcRealTimeFeed.getPushDataV3ApiWrapper()
+    return pushDataV3ApiWrapper.toObject(pushDataV3ApiWrapper.decode(message), {
+      longs: String,
+      arrays: true
+    })
   }
 
   protected messageIsError(message: any): boolean {
@@ -51,228 +109,12 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
   protected sendCustomPing = () => {
     this.send({ method: 'PING' })
   }
-}
 
-function decodePushDataV3ApiWrapper(buffer: Buffer) {
-  const reader = new ProtobufReader(buffer)
-  const message: Record<string, any> = {}
+  private static getPushDataV3ApiWrapper() {
+    MexcRealTimeFeed.pushDataV3ApiWrapper ??= protobuf
+      .parse(MexcRealTimeFeed.pushDataV3ApiWrapperSchema)
+      .root.lookupType('PushDataV3ApiWrapper')
 
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-
-    if (fieldNumber === 1 && wireType === 2) {
-      message.channel = reader.readString()
-    } else if (fieldNumber === 3 && wireType === 2) {
-      message.symbol = reader.readString()
-    } else if (fieldNumber === 4 && wireType === 2) {
-      message.symbolId = reader.readString()
-    } else if (fieldNumber === 5 && wireType === 0) {
-      message.createTime = reader.readInt64String()
-    } else if (fieldNumber === 6 && wireType === 0) {
-      message.sendTime = reader.readInt64String()
-    } else if (fieldNumber === 313 && wireType === 2) {
-      message.publicAggreDepths = decodePublicAggreDepths(reader.readBytes())
-    } else if (fieldNumber === 314 && wireType === 2) {
-      message.publicAggreDeals = decodePublicAggreDeals(reader.readBytes())
-    } else if (fieldNumber === 315 && wireType === 2) {
-      message.publicAggreBookTicker = decodePublicAggreBookTicker(reader.readBytes())
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-function decodePublicAggreDeals(buffer: Uint8Array) {
-  const reader = new ProtobufReader(buffer)
-  const message: { deals: any[]; eventType?: string } = { deals: [] }
-
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-    if (fieldNumber === 1 && wireType === 2) {
-      message.deals.push(decodePublicAggreDeal(reader.readBytes()))
-    } else if (fieldNumber === 2 && wireType === 2) {
-      message.eventType = reader.readString()
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-function decodePublicAggreDeal(buffer: Uint8Array) {
-  const reader = new ProtobufReader(buffer)
-  const message: Record<string, any> = {}
-
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-    if (fieldNumber === 1 && wireType === 2) {
-      message.price = reader.readString()
-    } else if (fieldNumber === 2 && wireType === 2) {
-      message.quantity = reader.readString()
-    } else if (fieldNumber === 3 && wireType === 0) {
-      message.tradeType = reader.readVarintNumber()
-    } else if (fieldNumber === 4 && wireType === 0) {
-      message.time = reader.readInt64String()
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-function decodePublicAggreDepths(buffer: Uint8Array) {
-  const reader = new ProtobufReader(buffer)
-  const message: { asks: any[]; bids: any[]; eventType?: string; fromVersion?: string; toVersion?: string } = { asks: [], bids: [] }
-
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-    if (fieldNumber === 1 && wireType === 2) {
-      message.asks.push(decodePublicAggreDepthLevel(reader.readBytes()))
-    } else if (fieldNumber === 2 && wireType === 2) {
-      message.bids.push(decodePublicAggreDepthLevel(reader.readBytes()))
-    } else if (fieldNumber === 3 && wireType === 2) {
-      message.eventType = reader.readString()
-    } else if (fieldNumber === 4 && wireType === 2) {
-      message.fromVersion = reader.readString()
-    } else if (fieldNumber === 5 && wireType === 2) {
-      message.toVersion = reader.readString()
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-function decodePublicAggreDepthLevel(buffer: Uint8Array) {
-  const reader = new ProtobufReader(buffer)
-  const message: Record<string, string> = {}
-
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-    if (fieldNumber === 1 && wireType === 2) {
-      message.price = reader.readString()
-    } else if (fieldNumber === 2 && wireType === 2) {
-      message.quantity = reader.readString()
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-function decodePublicAggreBookTicker(buffer: Uint8Array) {
-  const reader = new ProtobufReader(buffer)
-  const message: Record<string, string> = {}
-
-  while (!reader.done) {
-    const { fieldNumber, wireType } = reader.readTag()
-    if (fieldNumber === 1 && wireType === 2) {
-      message.bidPrice = reader.readString()
-    } else if (fieldNumber === 2 && wireType === 2) {
-      message.bidQuantity = reader.readString()
-    } else if (fieldNumber === 3 && wireType === 2) {
-      message.askPrice = reader.readString()
-    } else if (fieldNumber === 4 && wireType === 2) {
-      message.askQuantity = reader.readString()
-    } else {
-      reader.skip(wireType)
-    }
-  }
-
-  return message
-}
-
-class ProtobufReader {
-  private offset = 0
-
-  constructor(private readonly buffer: Uint8Array) {}
-
-  get done() {
-    return this.offset >= this.buffer.length
-  }
-
-  readTag() {
-    const tag = this.readVarintNumber()
-    return {
-      fieldNumber: tag >>> 3,
-      wireType: (tag & 7) as ProtobufWireType
-    }
-  }
-
-  readVarintNumber() {
-    return Number(this.readVarintBigInt())
-  }
-
-  readInt64String() {
-    return this.readVarintBigInt().toString()
-  }
-
-  readString() {
-    return Buffer.from(this.readBytes()).toString('utf8')
-  }
-
-  readBytes() {
-    const length = this.readVarintNumber()
-    const end = this.offset + length
-    if (end > this.buffer.length) {
-      throw new Error('MEXC protobuf message ended unexpectedly')
-    }
-
-    const bytes = this.buffer.subarray(this.offset, end)
-    this.offset = end
-    return bytes
-  }
-
-  skip(wireType: ProtobufWireType) {
-    if (wireType === 0) {
-      this.readVarintBigInt()
-      return
-    }
-
-    if (wireType === 1) {
-      this.skipFixed(8)
-      return
-    }
-
-    if (wireType === 2) {
-      this.readBytes()
-      return
-    }
-
-    if (wireType === 5) {
-      this.skipFixed(4)
-      return
-    }
-
-    throw new Error(`Unsupported MEXC protobuf wire type ${wireType}`)
-  }
-
-  private readVarintBigInt() {
-    let shift = 0n
-    let value = 0n
-
-    while (this.offset < this.buffer.length) {
-      const byte = this.buffer[this.offset++]
-      value |= BigInt(byte & 0x7f) << shift
-      if ((byte & 0x80) === 0) {
-        return value
-      }
-      shift += 7n
-    }
-
-    throw new Error('MEXC protobuf varint ended unexpectedly')
-  }
-
-  private skipFixed(bytes: number) {
-    this.offset += bytes
-    if (this.offset > this.buffer.length) {
-      throw new Error('MEXC protobuf message ended unexpectedly')
-    }
+    return MexcRealTimeFeed.pushDataV3ApiWrapper
   }
 }
