@@ -233,7 +233,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected abstract messageIsError(message: any): boolean
 
-  protected parseMessage(message: Buffer): any {
+  protected parseMessage(message: Buffer<ArrayBufferLike>): any {
     return JSON.parse(message as any)
   }
 

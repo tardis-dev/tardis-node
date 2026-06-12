@@ -3,6 +3,7 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class MexcRealTimeFeed extends RealTimeFeedBase {
+  private static readonly jsonObjectStart = '{'.charCodeAt(0)
   private static pushDataV3ApiWrapper: protobuf.Type | undefined
   /**
    * MEXC protobuf docs at @see https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/protocol-buffers-integration
@@ -86,13 +87,15 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
     ]
   }
 
-  protected parseMessage(message: Buffer): any {
-    if (message.length > 0 && message[0] === 123) {
-      return JSON.parse(message.toString())
+  protected parseMessage(message: Buffer<ArrayBufferLike>): any {
+    const buffer = Buffer.isBuffer(message) ? message : Buffer.from(message)
+
+    if (buffer.length > 0 && buffer[0] === MexcRealTimeFeed.jsonObjectStart) {
+      return JSON.parse(buffer.toString())
     }
 
-    const pushDataV3ApiWrapper = MexcRealTimeFeed.getPushDataV3ApiWrapper()
-    return pushDataV3ApiWrapper.toObject(pushDataV3ApiWrapper.decode(message), {
+    const pushDataV3ApiWrapper = this.getPushDataV3ApiWrapper()
+    return pushDataV3ApiWrapper.toObject(pushDataV3ApiWrapper.decode(buffer), {
       longs: String,
       arrays: true
     })
@@ -110,7 +113,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
     this.send({ method: 'PING' })
   }
 
-  private static getPushDataV3ApiWrapper() {
+  private getPushDataV3ApiWrapper() {
     MexcRealTimeFeed.pushDataV3ApiWrapper ??= protobuf
       .parse(MexcRealTimeFeed.pushDataV3ApiWrapperSchema)
       .root.lookupType('PushDataV3ApiWrapper')

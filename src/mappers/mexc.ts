@@ -5,8 +5,8 @@ import { Mapper } from './mapper.ts'
 export class MexcTradesMapper implements Mapper<'mexc', Trade> {
   private readonly channel = 'spot@public.aggre.deals.v3.api.pb@10ms'
 
-  canHandle(message: MexcTradeMessage) {
-    return message.channel === this.channel || message.channel.startsWith(`${this.channel}@`)
+  canHandle(message: MexcTradeMessage | MexcControlMessage) {
+    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
   }
 
   getFilters(symbols?: string[]) {
@@ -34,8 +34,8 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   private readonly channel = 'spot@public.aggre.depth.v3.api.pb@10ms'
   private readonly symbolDepthInfo: Record<string, MexcDepthInfo> = {}
 
-  canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage) {
-    return message.channel === this.channel || message.channel.startsWith(`${this.channel}@`)
+  canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcControlMessage) {
+    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
   }
 
   getFilters(symbols?: string[]) {
@@ -158,8 +158,8 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
 export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
   private readonly channel = 'spot@public.aggre.bookTicker.v3.api.pb@100ms'
 
-  canHandle(message: MexcBookTickerMessage) {
-    return message.channel === this.channel || message.channel.startsWith(`${this.channel}@`)
+  canHandle(message: MexcBookTickerMessage | MexcControlMessage) {
+    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
   }
 
   getFilters(symbols?: string[]) {
@@ -179,6 +179,13 @@ export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
       localTimestamp
     }
   }
+}
+
+type MexcControlMessage = {
+  channel?: undefined
+  id?: number
+  code?: number
+  msg?: string
 }
 
 type MexcMappedChannel =

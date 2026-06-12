@@ -11021,6 +11021,17 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
+        id: 0,
+        code: 0,
+        msg: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
         channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000000',
