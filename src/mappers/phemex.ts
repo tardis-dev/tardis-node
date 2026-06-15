@@ -45,6 +45,7 @@ const COINS_STARTING_WITH_S = [
   'STGUSD',
   'SLPUUSD',
   'SPELLUSD',
+  'SSVUSDT',
   'SSVUSD',
   'STXUSD',
   'SUIUSD',
@@ -101,7 +102,15 @@ const COINS_STARTING_WITH_S = [
   'SPORTFUNUSDT',
   'SKRUSDT',
   'SPACEUSDT',
+  'SPACEXUSDT',
+  'STARUSDT',
+  'SOXLUSDT',
+  'SPCXUSDT',
+  'SAMSUNGUSDT',
+  'SKHYNIXUSDT',
+  'SLXUSDT',
   'SPX500USDT',
+  'STXXUSDT',
   'SPYXUSDT',
   'SP500USDT',
   'SNDKUSDT'
@@ -111,7 +120,10 @@ function getInstrumentType(symbol: string) {
     return 'future'
   }
 
-  if (COINS_STARTING_WITH_S.some((c) => symbol.startsWith(c)) || symbol.startsWith('S') === false) {
+  if (
+    COINS_STARTING_WITH_S.some((coin) => (coin === 'SUSDT' ? symbol === coin : symbol.startsWith(coin))) ||
+    symbol.startsWith('S') === false
+  ) {
     return 'perpetual'
   }
 
