@@ -1,10 +1,21 @@
 import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, FilterForExchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://www.bitmex.com/app/wsAPI
 
-export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
+export const bitmexMappers = exchangeMappers({
+  bitmex: {
+    trades: () => bitmexTradesMapper,
+    bookChanges: () => new BitmexBookChangeMapper(),
+    derivativeTickers: () => new BitmexDerivativeTickerMapper(),
+    liquidations: () => bitmexLiquidationsMapper,
+    bookTickers: () => bitmexBookTickerMapper
+  }
+})
+
+const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
   canHandle(message: BitmexDataMessage) {
     return message.table === 'trade' && message.action === 'insert'
   },
@@ -39,7 +50,7 @@ export const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
   }
 }
 
-export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
+class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
   private readonly _idToPriceLevelMap: Map<number, number> = new Map()
 
   canHandle(message: BitmexDataMessage) {
@@ -158,7 +169,7 @@ export class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
   }
 }
 
-export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', DerivativeTicker> {
+class BitmexDerivativeTickerMapper implements Mapper<'bitmex', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitmexDataMessage) {
@@ -210,7 +221,7 @@ export class BitmexDerivativeTickerMapper implements Mapper<'bitmex', Derivative
   }
 }
 
-export const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
+const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
   canHandle(message: BitmexDataMessage) {
     return message.table === 'liquidation' && message.action === 'insert'
   },
@@ -245,7 +256,7 @@ export const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
   }
 }
 
-export const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
+const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
   canHandle(message: BitmexDataMessage) {
     return message.table === 'quote' && message.action === 'insert'
   },

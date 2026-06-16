@@ -1,8 +1,16 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class BlockchainComTradesMapper implements Mapper<'blockchain-com', Trade> {
+export const blockchainComMappers = exchangeMappers({
+  'blockchain-com': {
+    trades: () => new BlockchainComTradesMapper(),
+    bookChanges: () => new BlockchainComBookChangeMapper()
+  }
+})
+
+class BlockchainComTradesMapper implements Mapper<'blockchain-com', Trade> {
   canHandle(message: BlockchainComTradeMessage) {
     return message.channel === 'trades' && message.event === 'updated'
   }
@@ -32,7 +40,7 @@ export class BlockchainComTradesMapper implements Mapper<'blockchain-com', Trade
   }
 }
 
-export class BlockchainComBookChangeMapper implements Mapper<'blockchain-com', BookChange> {
+class BlockchainComBookChangeMapper implements Mapper<'blockchain-com', BookChange> {
   canHandle(message: BlockchainComL2Message) {
     return message.channel == 'l2' && (message.event === 'snapshot' || message.event === 'updated')
   }

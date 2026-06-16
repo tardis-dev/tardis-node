@@ -1,8 +1,47 @@
 import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
-export class BitgetTradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
+const BITGET_V3_API_SWITCH_DATE = new Date('2026-04-28T00:00:00.000Z')
+
+export const bitgetMappers = exchangeMappers({
+  bitget: {
+    trades: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetTradesMapper('bitget') },
+      { use: () => new BitgetV3TradesMapper('bitget') }
+    ]),
+    bookChanges: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetBookChangeMapper('bitget') },
+      { use: () => new BitgetV3BookChangeMapper('bitget') }
+    ]),
+    bookTickers: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetBookTickerMapper('bitget') },
+      { use: () => new BitgetV3BookTickerMapper('bitget') }
+    ])
+  },
+  'bitget-futures': {
+    trades: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetTradesMapper('bitget-futures') },
+      { use: () => new BitgetV3TradesMapper('bitget-futures') }
+    ]),
+    bookChanges: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetBookChangeMapper('bitget-futures') },
+      { use: () => new BitgetV3BookChangeMapper('bitget-futures') }
+    ]),
+    derivativeTickers: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetDerivativeTickerMapper() },
+      { use: () => new BitgetV3DerivativeTickerMapper() }
+    ]),
+    liquidations: () => new BitgetV3LiquidationsMapper(),
+    bookTickers: mapper([
+      { until: BITGET_V3_API_SWITCH_DATE, use: () => new BitgetBookTickerMapper('bitget-futures') },
+      { use: () => new BitgetV3BookTickerMapper('bitget-futures') }
+    ])
+  }
+})
+
+class BitgetTradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetTradeMessage) {
@@ -43,7 +82,7 @@ function mapPriceLevel(level: [string, string]) {
     amount: Number(level[1])
   }
 }
-export class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures', BookChange> {
+class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetOrderbookMessage) {
@@ -77,7 +116,7 @@ export class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures
   }
 }
 
-export class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures', BookTicker> {
+class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetBBoMessage) {
@@ -116,7 +155,7 @@ export class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures
   }
 }
 
-export class BitgetDerivativeTickerMapper implements Mapper<'bitget-futures', DerivativeTicker> {
+class BitgetDerivativeTickerMapper implements Mapper<'bitget-futures', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitgetTickerMessage) {
@@ -155,7 +194,7 @@ export class BitgetDerivativeTickerMapper implements Mapper<'bitget-futures', De
   }
 }
 
-export class BitgetV3TradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
+class BitgetV3TradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3TradeMessage) {
@@ -190,7 +229,7 @@ export class BitgetV3TradesMapper implements Mapper<'bitget' | 'bitget-futures',
   }
 }
 
-export class BitgetV3BookChangeMapper implements Mapper<'bitget' | 'bitget-futures', BookChange> {
+class BitgetV3BookChangeMapper implements Mapper<'bitget' | 'bitget-futures', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3OrderbookMessage) {
@@ -224,7 +263,7 @@ export class BitgetV3BookChangeMapper implements Mapper<'bitget' | 'bitget-futur
   }
 }
 
-export class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futures', BookTicker> {
+class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futures', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3BBoMessage) {
@@ -259,7 +298,7 @@ export class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futur
   }
 }
 
-export class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', DerivativeTicker> {
+class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitgetV3TickerMessage) {
@@ -299,7 +338,7 @@ export class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', 
   }
 }
 
-export class BitgetV3LiquidationsMapper implements Mapper<'bitget-futures', Liquidation> {
+class BitgetV3LiquidationsMapper implements Mapper<'bitget-futures', Liquidation> {
   canHandle(message: BitgetV3LiquidationMessage) {
     return message.arg.topic === 'liquidation' && message.action === 'update'
   }

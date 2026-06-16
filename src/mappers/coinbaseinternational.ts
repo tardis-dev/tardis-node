@@ -1,8 +1,18 @@
 import { addMinutes, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export const coinbaseInternationalTradesMapper: Mapper<'coinbase-international', Trade> = {
+export const coinbaseInternationalMappers = exchangeMappers({
+  'coinbase-international': {
+    trades: () => coinbaseInternationalTradesMapper,
+    bookChanges: () => new CoinbaseInternationalBookChangMapper(),
+    derivativeTickers: () => new CoinbaseInternationalDerivativeTickerMapper(),
+    bookTickers: () => coinbaseInternationalBookTickerMapper
+  }
+})
+
+const coinbaseInternationalTradesMapper: Mapper<'coinbase-international', Trade> = {
   canHandle(message: CoinbaseInternationalTradeMessage) {
     return message.channel === 'MATCH' && message.type === 'UPDATE'
   },
@@ -58,7 +68,7 @@ const validAmountsOnly = (level: BookPriceLevel) => {
   return true
 }
 
-export class CoinbaseInternationalBookChangMapper implements Mapper<'coinbase-international', BookChange> {
+class CoinbaseInternationalBookChangMapper implements Mapper<'coinbase-international', BookChange> {
   canHandle(message: CoinbaseInternationalLevel2Snapshot | CoinbaseInternationalLevel2Update) {
     return message.channel === 'LEVEL2' && (message.type === 'SNAPSHOT' || message.type === 'UPDATE')
   }
@@ -116,7 +126,7 @@ export class CoinbaseInternationalBookChangMapper implements Mapper<'coinbase-in
   }
 }
 
-export const coinbaseInternationalBookTickerMapper: Mapper<'coinbase-international', BookTicker> = {
+const coinbaseInternationalBookTickerMapper: Mapper<'coinbase-international', BookTicker> = {
   canHandle(message: CoinbaseInternationalLevel1Message) {
     return message.channel === 'LEVEL1' && (message.type === 'SNAPSHOT' || message.type === 'UPDATE')
   },
@@ -153,7 +163,7 @@ export const coinbaseInternationalBookTickerMapper: Mapper<'coinbase-internation
   }
 }
 
-export class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coinbase-international', DerivativeTicker> {
+class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coinbase-international', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: CoinbaseInternationalTradeMessage | CoinbaseInternationalRiskMessage | CoinbaseInternationalFundingMessage) {

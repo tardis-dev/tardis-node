@@ -1,5 +1,15 @@
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const hyperliquidMappers = exchangeMappers({
+  hyperliquid: {
+    trades: () => new HyperliquidTradesMapper(),
+    bookChanges: () => new HyperliquidBookChangeMapper(),
+    derivativeTickers: () => new HyperliquidDerivativeTickerMapper(),
+    bookTickers: () => new HyperliquidBookTickerMapper()
+  }
+})
 
 const KILO_SYMBOLS = ['kPEPE', 'kSHIB', 'kBONK', 'kFLOKI', 'kLUNC', 'kDOGS', 'kNEIRO']
 
@@ -22,7 +32,7 @@ function getSymbols(symbols?: string[]) {
   }
   return
 }
-export class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
+class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
   private readonly _seenSymbols = new Set<string>()
 
   canHandle(message: HyperliquidTradeMessage) {
@@ -67,7 +77,7 @@ function mapHyperliquidLevel(level: HyperliquidWsLevel) {
     amount: Number(level.sz)
   }
 }
-export class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookChange> {
+class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookChange> {
   canHandle(message: HyperliquidWsBookMessage) {
     return message.channel === 'l2Book'
   }
@@ -97,7 +107,7 @@ export class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookCh
   }
 }
 
-export class HyperliquidBookTickerMapper implements Mapper<'hyperliquid', BookTicker> {
+class HyperliquidBookTickerMapper implements Mapper<'hyperliquid', BookTicker> {
   canHandle(message: HyperliquidBboMessage) {
     return message.channel === 'bbo'
   }
@@ -134,7 +144,7 @@ export class HyperliquidBookTickerMapper implements Mapper<'hyperliquid', BookTi
   }
 }
 
-export class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', DerivativeTicker> {
+class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: HyperliquidContextMessage) {

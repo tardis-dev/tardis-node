@@ -1,10 +1,29 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://www.cryptofacilities.com/resources/hc/en-us/categories/115000132213-API
 
-export const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
+const CRYPTOFACILITIES_RELATIVE_FUNDING_SWITCH_DATE = new Date('2022-09-29T00:00:00.000Z')
+
+export const cryptofacilitiesMappers = exchangeMappers({
+  cryptofacilities: {
+    trades: () => cryptofacilitiesTradesMapper,
+    bookChanges: () => cryptofacilitiesBookChangeMapper,
+    derivativeTickers: mapper([
+      {
+        until: CRYPTOFACILITIES_RELATIVE_FUNDING_SWITCH_DATE,
+        use: () => new CryptofacilitiesDerivativeTickerMapper({ useRelativeFundingRate: false })
+      },
+      { use: () => new CryptofacilitiesDerivativeTickerMapper({ useRelativeFundingRate: true }) }
+    ]),
+    liquidations: () => cryptofacilitiesLiquidationsMapper,
+    bookTickers: () => cryptofacilitiesBookTickerMapper
+  }
+})
+
+const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
     return message.feed === 'trade' && message.event === undefined
   },
@@ -39,7 +58,7 @@ const mapBookLevel = ({ price, qty }: CryptofacilitiesBookLevel) => {
   return { price, amount: qty < 0 ? 0 : qty }
 }
 
-export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> = {
+const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> = {
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
     return message.event === undefined && (message.feed === 'book' || message.feed === 'book_snapshot')
   },
@@ -94,8 +113,13 @@ export const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookCh
   }
 }
 
-export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities', DerivativeTicker> {
-  constructor(private readonly _useRelativeFundingRate: boolean) {}
+class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities', DerivativeTicker> {
+  private readonly _useRelativeFundingRate: boolean
+
+  constructor({ useRelativeFundingRate }: { useRelativeFundingRate: boolean }) {
+    this._useRelativeFundingRate = useRelativeFundingRate
+  }
+
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
     return message.feed === 'ticker' && message.event === undefined
@@ -141,7 +165,7 @@ export class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofac
   }
 }
 
-export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation> = {
+const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation> = {
   canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
     return message.feed === 'trade' && message.event === undefined && message.type === 'liquidation'
   },
@@ -172,7 +196,7 @@ export const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liqu
   }
 }
 
-export const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
+const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
   canHandle(message: CryptofacilitiesTicker) {
     return message.feed === 'ticker' && message.event === undefined
   },

@@ -22,7 +22,7 @@ Before coding, inspect the contract in this order:
 1. Hosted Exchanges API: `https://api.tardis.dev/v1/exchanges/{exchange}` owns the current channels, symbol ids, and instrument classification for hosted exchanges.
 2. If the exchange is not hosted yet, use `../tardis-api/src/routes/exchanges/{exchange}.ts`.
 3. `src/types.ts` owns normalized TypeScript shapes.
-4. `src/mappers/index.ts` owns mapper registration, normalizer coverage, and date-based API version selection.
+4. `src/mappers/{exchange}.ts` owns mapper registration, normalizer coverage, and date-based API version selection for that exchange. `src/mappers/index.ts` only aggregates exchange mapper registries.
 5. Official exchange docs and captured raw messages own upstream payload meaning.
 
 Make a coverage table from the channels exposed by the Exchanges API, exchange docs, and captured WebSocket messages. `sourceFor` is supporting context: use it to understand why a channel sources a normalized type, not as a replacement for inspecting the channel payload. For each channel and message variant, record the message role and the exact mapper action. Do not infer the role from the channel name alone; exchanges use different conventions for snapshots, deltas, events, subscription acknowledgements, cached payloads, and status messages.
@@ -63,7 +63,7 @@ For `normalizeBookChanges`, first identify where the initial book snapshot comes
 - Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels, buffer deltas until the snapshot arrives, emit one snapshot, then emit deltas.
 - Delta-only feed without a snapshot channel: do not mark a delta as a snapshot. Add a snapshot source first or leave the channel out of `normalizeBookChanges`.
 
-Register mapper factory in `src/mappers/index.ts`.
+Export an `{exchange}Mappers` registry from `src/mappers/{exchange}.ts` with `exchangeMappers()`. Registry keys are validated, so use the exchange IDs and mapper kind names already defined by the code instead of inventing ad hoc keys. Use plain factories for stable mappings, for example `trades: () => new ExchangeTradesMapper()`. If a mapper constructor needs configuration beyond the exchange ID, pass it as a named options object, for example `new ExchangeBookChangeMapper('exchange', { depth: 50 })`, not as positional booleans or numbers. Use `mapper([{ until, use }, { use }])` only when the exchange changed mapper behavior over time. Register that registry in `src/mappers/index.ts`.
 
 ### 3. Create real-time feed
 
@@ -94,7 +94,7 @@ Run tests and validation — see AGENTS.md for the full checklist.
 
 ## Decision Points
 
-- **Date-based mapper versioning** — If the exchange changed its API format at some point, you may need different mapper implementations for different time periods. Look at existing examples in `src/mappers/index.ts` for the pattern.
+- **Date-based mapper versioning** — If the exchange changed its API format at some point, define the switch in the exchange mapper registry with `mapper([{ until, use }, { use }])`. Look at existing `*Mappers` exports in `src/mappers/{exchange}.ts` files for the pattern.
 - **Multi-connection feeds** — Some exchanges need multiple WebSocket connections. The base class supports this via `MultiConnectionRealTimeFeedBase`.
 - **Decompression** — Some exchanges compress WebSocket messages. Override the decompress hook if needed.
 - **Filter optimization** — The base class has `optimizeFilters()` for normalizing subscription filters. Override if the exchange needs special handling.

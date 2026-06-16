@@ -1,10 +1,26 @@
 import { asNonZeroNumberOrUndefined, parseμs, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.ftx.com/#websocket-api
 
-export class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
+export const ftxMappers = exchangeMappers({
+  ftx: {
+    trades: () => new FTXTradesMapper('ftx'),
+    bookChanges: () => new FTXBookChangeMapper('ftx'),
+    derivativeTickers: () => new FTXDerivativeTickerMapper('ftx'),
+    liquidations: () => new FTXLiquidationsMapper(),
+    bookTickers: () => new FTXBookTickerMapper('ftx')
+  },
+  'ftx-us': {
+    trades: () => new FTXTradesMapper('ftx-us'),
+    bookChanges: () => new FTXBookChangeMapper('ftx-us'),
+    bookTickers: () => new FTXBookTickerMapper('ftx-us')
+  }
+})
+
+class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: FtxTrades | FtxOrderBook) {
@@ -46,14 +62,14 @@ export class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
   }
 }
 
-export const mapBookLevel = (level: FtxBookLevel) => {
+const mapBookLevel = (level: FtxBookLevel) => {
   const price = level[0]
   const amount = level[1]
 
   return { price, amount }
 }
 
-export class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange> {
+class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: FtxTrades | FtxOrderBook) {
@@ -97,7 +113,7 @@ export class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange>
   }
 }
 
-export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
+class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -156,7 +172,7 @@ export class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker
   }
 }
 
-export class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
+class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
   canHandle(message: FtxTrades | FtxOrderBook) {
     if (message.data == undefined) {
       return false
@@ -198,7 +214,7 @@ export class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
   }
 }
 
-export class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker> {
+class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: FTXTicker) {

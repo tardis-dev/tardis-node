@@ -275,26 +275,13 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   ...normalizers: U
 ): AsyncIterableIterator<ReplayNormalizedMessage<U, Z>> {
   const fromDate = parseAsUTCDate(from)
+  const toDate = parseAsUTCDate(to)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
-
-  //TODO: zrovi replay dzien po dniu, tak ze kazdego dnia przekazuje swierze filters
 
   const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
   const mappers = createMappers(fromDate)
   const filters = getFilters(mappers, symbols)
-
-  const messages = replay({
-    exchange,
-    from,
-    to,
-    withDisconnects: true,
-    filters,
-    apiKey,
-    withMicroseconds: true,
-    autoCleanup,
-    waitWhenDataNotYetAvailable
-  })
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
   // for symbols we've not requested for
@@ -303,7 +290,78 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
     return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
   }
 
-  return normalizeMessages(exchange, undefined, messages, mappers, createMappers, withDisconnectMessages, filter)
+  const segments = getReplayNormalizedSegments(exchange, normalizers, fromDate, toDate)
+
+  if (segments.length <= 1) {
+    const messages = replay({
+      exchange,
+      from,
+      to,
+      withDisconnects: true,
+      filters,
+      apiKey,
+      withMicroseconds: true,
+      autoCleanup,
+      waitWhenDataNotYetAvailable
+    })
+
+    return normalizeMessages(exchange, undefined, messages, mappers, createMappers, withDisconnectMessages, filter)
+  }
+
+  return replayNormalizedSegments()
+
+  async function* replayNormalizedSegments() {
+    for (let i = 0; i < segments.length; i++) {
+      const { from: segmentFrom, to: segmentTo } = segments[i]
+      const segmentMappers = i === 0 ? mappers : createMappers(segmentFrom)
+      const segmentFilters = getFilters(segmentMappers, symbols)
+
+      const segmentMessages = replay({
+        exchange,
+        from: segmentFrom.toISOString(),
+        to: segmentTo.toISOString(),
+        withDisconnects: true,
+        filters: segmentFilters,
+        apiKey,
+        withMicroseconds: true,
+        autoCleanup,
+        waitWhenDataNotYetAvailable
+      })
+
+      yield* normalizeMessages(exchange, undefined, segmentMessages, segmentMappers, createMappers, withDisconnectMessages, filter)
+    }
+  }
+}
+
+function getReplayNormalizedSegments<T extends Exchange>(exchange: T, normalizers: MapperFactory<T, any>[], fromDate: Date, toDate: Date) {
+  const fromTime = fromDate.valueOf()
+  const toTime = toDate.valueOf()
+  if (Number.isFinite(fromTime) === false || Number.isFinite(toTime) === false || fromTime >= toTime) {
+    return [{ from: fromDate, to: toDate }]
+  }
+
+  const switchTimes = new Set<number>()
+  for (const normalizer of normalizers) {
+    const switchDates = normalizer.getSwitchDates?.(exchange) ?? []
+    for (const switchDate of switchDates) {
+      const switchTime = switchDate.valueOf()
+      if (fromTime < switchTime && switchTime < toTime) {
+        switchTimes.add(switchTime)
+      }
+    }
+  }
+
+  const switchDates = [...switchTimes].sort((a, b) => a - b).map((switchTime) => new Date(switchTime))
+  const segments: { from: Date; to: Date }[] = []
+  let segmentFrom = fromDate
+
+  for (const switchDate of switchDates) {
+    segments.push({ from: segmentFrom, to: switchDate })
+    segmentFrom = switchDate
+  }
+  segments.push({ from: segmentFrom, to: toDate })
+
+  return segments
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {

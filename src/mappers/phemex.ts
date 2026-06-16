@@ -1,5 +1,14 @@
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { Trade, BookChange, DerivativeTicker } from '../types.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const phemexMappers = exchangeMappers({
+  phemex: {
+    trades: () => phemexTradesMapper,
+    bookChanges: () => phemexBookChangeMapper,
+    derivativeTickers: () => new PhemexDerivativeTickerMapper()
+  }
+})
 
 // phemex provides timestamps in nanoseconds
 const fromNanoSecondsToDate = (nanos: number) => {
@@ -156,7 +165,7 @@ function getSymbols(symbols: string[]) {
   }
 }
 
-export const phemexTradesMapper: Mapper<'phemex', Trade> = {
+const phemexTradesMapper: Mapper<'phemex', Trade> = {
   canHandle(message: PhemexTradeMessage) {
     return message.type === 'incremental' && ('trades' in message || 'trades_p' in message)
   },
@@ -247,7 +256,7 @@ function mapPerpBookLevel([price, amount]: [string, string]) {
   }
 }
 
-export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
+const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   canHandle(message: PhemexBookMessage) {
     return 'book' in message || 'orderbook_p' in message
   },
@@ -317,7 +326,7 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   }
 }
 
-export class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker> {
+class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: PhemexTicker) {
