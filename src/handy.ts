@@ -573,13 +573,16 @@ export async function download({
       }
     } catch (error) {
       const unsupportedDataFeedEncoding = error instanceof Error && error.message.startsWith('Unsupported data feed content encoding')
-      const badOrUnauthorizedRequest =
+      const nonRetryableHttpError =
         error instanceof HttpError &&
-        ((error.status === 400 && error.message.includes('ISO 8601 format') === false) || error.status === 401)
+        ((error.status === 400 && error.message.includes('ISO 8601 format') === false) ||
+          error.status === 401 ||
+          error.status === 403 ||
+          error.status === 404)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       const internalServiceError = error instanceof HttpError && error.status === 500
       // do not retry when we've got bad or unauthorized request or enough attempts
-      if (unsupportedDataFeedEncoding || badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
+      if (unsupportedDataFeedEncoding || nonRetryableHttpError || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
