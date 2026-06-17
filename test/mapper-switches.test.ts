@@ -337,6 +337,21 @@ test('OKX trades-all env override remains separate from mapper dates', () => {
   ])
 })
 
+test('OKX options summary filters preserve current instFamily values', () => {
+  expect(
+    normalizeOptionsSummary('okex-options', date('2026-06-17T00:00:00.000Z')).getFilters([
+      'SOL-USD_UM-260618-67-C',
+      'SOL-USD_UM-260618-67-P'
+    ])
+  ).toEqual([
+    { channel: 'opt-summary', symbols: ['SOL-USD_UM'] },
+    { channel: 'index-tickers', symbols: ['SOL-USD'] },
+    { channel: 'tickers', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+    { channel: 'open-interest', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+    { channel: 'mark-price', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] }
+  ])
+})
+
 function date(value: string) {
   return new Date(value)
 }

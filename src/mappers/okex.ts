@@ -1,4 +1,5 @@
 import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../okexsymbols.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads.ts'
@@ -587,18 +588,15 @@ class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionSummary>
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
 
-    const indexes =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}-${symbolParts[1]}`
-          })
-        : undefined
+    const indexes = symbols !== undefined ? [...new Set(symbols.map((s) => getOkexOptionsUnderlyingIndex(s)))] : undefined
+
+    const optionSummaryInstrumentFamilies =
+      symbols !== undefined ? [...new Set(symbols.map((s) => getOkexOptionsFamilyOrIndex(s)))] : undefined
 
     return [
       {
         channel: `opt-summary`,
-        symbols: [] as string[]
+        symbols: optionSummaryInstrumentFamilies
       } as const,
       {
         channel: `index-tickers`,
