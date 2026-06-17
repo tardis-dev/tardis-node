@@ -69,7 +69,7 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
           continue
         }
 
-        if (fromVersion > currentBookVersion + 1 || toVersion < currentBookVersion + 1) {
+        if (currentBookVersion + 1 < fromVersion || currentBookVersion + 1 > toVersion) {
           throw new Error(
             `MEXC depth snapshot has no overlap with buffered update, update ${JSON.stringify(update)}, currentBookVersion: ${
               currentBookVersion
