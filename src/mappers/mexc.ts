@@ -58,27 +58,36 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
         return
       }
 
-      const snapshotVersion = Number(message.publicAggreDepths.toVersion)
+      let currentBookVersion = Number(message.publicAggreDepths.toVersion)
       const bids = message.publicAggreDepths.bids.map(this.mapBookLevel)
       const asks = message.publicAggreDepths.asks.map(this.mapBookLevel)
 
       for (const update of depthInfo.updates.items()) {
         const fromVersion = Number(update.publicAggreDepths.fromVersion)
         const toVersion = Number(update.publicAggreDepths.toVersion)
-        if (snapshotVersion + 1 < fromVersion || snapshotVersion >= toVersion) {
+        if (currentBookVersion >= toVersion) {
           continue
         }
+
+        if (fromVersion > currentBookVersion + 1 || toVersion < currentBookVersion + 1) {
+          throw new Error(
+            `MEXC depth snapshot has no overlap with buffered update, update ${JSON.stringify(update)}, currentBookVersion: ${
+              currentBookVersion
+            }`
+          )
+        }
+
         for (const bid of update.publicAggreDepths.bids) {
           this.applyLevel(bids, this.mapBookLevel(bid))
         }
         for (const ask of update.publicAggreDepths.asks) {
           this.applyLevel(asks, this.mapBookLevel(ask))
         }
-        depthInfo.currentBookVersion = toVersion
+        currentBookVersion = toVersion
       }
 
       depthInfo.updates.clear()
-      depthInfo.currentBookVersion = depthInfo.currentBookVersion ?? snapshotVersion
+      depthInfo.currentBookVersion = currentBookVersion
       depthInfo.snapshotEmitted = true
 
       yield {
