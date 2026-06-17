@@ -15,7 +15,7 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
   private readonly channel = 'spot@public.aggre.deals.v3.api.pb@10ms'
 
   canHandle(message: MexcTradeMessage | MexcControlMessage) {
-    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
+    return (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreDeals' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -44,7 +44,7 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   private readonly symbolDepthInfo: Record<string, MexcDepthInfo> = {}
 
   canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcControlMessage) {
-    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
+    return (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreDepths' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -177,7 +177,9 @@ export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
   private readonly channel = 'spot@public.aggre.bookTicker.v3.api.pb@100ms'
 
   canHandle(message: MexcBookTickerMessage | MexcControlMessage) {
-    return message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel
+    return (
+      (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreBookTicker' in message
+    )
   }
 
   getFilters(symbols?: string[]) {
