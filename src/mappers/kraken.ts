@@ -1,10 +1,19 @@
 import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://www.kraken.com/features/websocket-api
 
-export const krakenTradesMapper: Mapper<'kraken', Trade> = {
+export const krakenMappers = exchangeMappers({
+  kraken: {
+    trades: () => krakenTradesMapper,
+    bookChanges: () => krakenBookChangeMapper,
+    bookTickers: () => krakenBookTickerMapper
+  }
+})
+
+const krakenTradesMapper: Mapper<'kraken', Trade> = {
   canHandle(message: KrakenTrades) {
     if (!Array.isArray(message)) {
       return false
@@ -64,7 +73,7 @@ const getLatestTimestamp = (bids: KrakenBookLevel[], asks: KrakenBookLevel[]): D
   return timestamp
 }
 
-export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
+const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   canHandle(message: KrakenBookSnapshot | KrakenBookUpdate) {
     if (!Array.isArray(message)) {
       return false
@@ -122,7 +131,7 @@ export const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   }
 }
 
-export const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
+const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
   canHandle(message: KrakenSpread) {
     if (!Array.isArray(message)) {
       return false

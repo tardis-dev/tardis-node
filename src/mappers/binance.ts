@@ -2,13 +2,59 @@ import { debug } from '../debug.ts'
 import { CircularBuffer, fromMicroSecondsToDate, lowerCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
 // https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md
 
-export class BinanceTradesMapper implements Mapper<
-  'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery',
-  Trade
-> {
+export const binanceMappers = exchangeMappers({
+  binance: {
+    trades: () => new BinanceTradesMapper('binance'),
+    bookChanges: (localTimestamp) =>
+      new BinanceBookChangeMapper('binance', { ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp) }),
+    bookTickers: () => new BinanceBookTickerMapper('binance')
+  },
+  'binance-us': {
+    trades: () => new BinanceTradesMapper('binance-us'),
+    bookChanges: (localTimestamp) =>
+      new BinanceBookChangeMapper('binance-us', { ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp) }),
+    bookTickers: () => new BinanceBookTickerMapper('binance-us')
+  },
+  'binance-jersey': {
+    trades: () => new BinanceTradesMapper('binance-jersey'),
+    bookChanges: (localTimestamp) =>
+      new BinanceBookChangeMapper('binance-jersey', { ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp) })
+  },
+  'binance-futures': {
+    trades: () => new BinanceTradesMapper('binance-futures'),
+    bookChanges: (localTimestamp) =>
+      new BinanceFuturesBookChangeMapper('binance-futures', {
+        ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp)
+      }),
+    derivativeTickers: () => new BinanceFuturesDerivativeTickerMapper('binance-futures'),
+    liquidations: () => new BinanceLiquidationsMapper('binance-futures'),
+    bookTickers: () => new BinanceBookTickerMapper('binance-futures')
+  },
+  'binance-delivery': {
+    trades: () => new BinanceTradesMapper('binance-delivery'),
+    bookChanges: (localTimestamp) =>
+      new BinanceFuturesBookChangeMapper('binance-delivery', {
+        ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp)
+      }),
+    derivativeTickers: () => new BinanceFuturesDerivativeTickerMapper('binance-delivery'),
+    liquidations: () => new BinanceLiquidationsMapper('binance-delivery'),
+    bookTickers: () => new BinanceBookTickerMapper('binance-delivery')
+  }
+})
+
+function shouldIgnoreBookSnapshotOverlap(date?: Date) {
+  if (process.env.IGNORE_BOOK_SNAPSHOT_OVERLAP_ERROR) {
+    return true
+  }
+
+  return isRealTime(date) === false
+}
+
+class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -54,7 +100,7 @@ export class BinanceTradesMapper implements Mapper<
   }
 }
 
-export class BinanceBookChangeMapper implements Mapper<
+class BinanceBookChangeMapper implements Mapper<
   'binance' | 'binance-jersey' | 'binance-us' | 'binance-futures' | 'binance-delivery',
   BookChange
 > {
@@ -64,8 +110,12 @@ export class BinanceBookChangeMapper implements Mapper<
 
   constructor(
     protected readonly exchange: Exchange,
-    protected readonly ignoreBookSnapshotOverlapError: boolean
-  ) {}
+    { ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }
+  ) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
+
+  protected readonly ignoreBookSnapshotOverlapError: boolean
 
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
@@ -218,17 +268,7 @@ export class BinanceBookChangeMapper implements Mapper<
   }
 }
 
-export class BinanceFuturesBookChangeMapper
-  extends BinanceBookChangeMapper
-  implements Mapper<'binance-futures' | 'binance-delivery', BookChange>
-{
-  constructor(
-    protected readonly exchange: Exchange,
-    protected readonly ignoreBookSnapshotOverlapError: boolean
-  ) {
-    super(exchange, ignoreBookSnapshotOverlapError)
-  }
-
+class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper implements Mapper<'binance-futures' | 'binance-delivery', BookChange> {
   protected mapBookDepthUpdate(binanceDepthUpdateData: BinanceFuturesDepthData, localTimestamp: Date): BookChange | undefined {
     // we can safely assume here that depthContext and lastUpdateId aren't null here as this is method only works
     // when we've already processed the snapshot
@@ -273,7 +313,7 @@ export class BinanceFuturesBookChangeMapper
   }
 }
 
-export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures' | 'binance-delivery', DerivativeTicker> {
+class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures' | 'binance-delivery', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
@@ -369,7 +409,7 @@ export class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-fut
   }
 }
 
-export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'binance-delivery', Liquidation> {
+class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'binance-delivery', Liquidation> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {
@@ -414,7 +454,7 @@ export class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'bi
   }
 }
 
-export class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', BookTicker> {
+class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'binance-delivery' | 'binance', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BinanceResponse<any>) {

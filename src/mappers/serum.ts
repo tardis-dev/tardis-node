@@ -1,8 +1,27 @@
 import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Exchange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
+export const serumMappers = exchangeMappers({
+  serum: {
+    trades: () => new SerumTradesMapper('serum'),
+    bookChanges: () => new SerumBookChangeMapper('serum'),
+    bookTickers: () => new SerumBookTickerMapper('serum')
+  },
+  'star-atlas': {
+    trades: () => new SerumTradesMapper('star-atlas'),
+    bookChanges: () => new SerumBookChangeMapper('star-atlas'),
+    bookTickers: () => new SerumBookTickerMapper('star-atlas')
+  },
+  mango: {
+    trades: () => new SerumTradesMapper('mango'),
+    bookChanges: () => new SerumBookChangeMapper('mango'),
+    bookTickers: () => new SerumBookTickerMapper('mango')
+  }
+})
+
+class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: SerumVialTrade) {
@@ -37,7 +56,7 @@ export class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> 
   }
 }
 
-export class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', BookChange> {
+class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: SerumVialL2Snapshot | SerumVialL2Update) {
@@ -81,7 +100,7 @@ export class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', Boo
   }
 }
 
-export class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', BookTicker> {
+class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: SerumVialQuote) {

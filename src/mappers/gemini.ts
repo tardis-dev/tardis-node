@@ -1,10 +1,18 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.gemini.com/websocket-api/#market-data-version-2
 
-export const geminiTradesMapper: Mapper<'gemini', Trade> = {
+export const geminiMappers = exchangeMappers({
+  gemini: {
+    trades: () => geminiTradesMapper,
+    bookChanges: () => geminiBookChangeMapper
+  }
+})
+
+const geminiTradesMapper: Mapper<'gemini', Trade> = {
   canHandle(message: GeminiL2Updates | GeminiTrade) {
     return message.type === 'trade'
   },
@@ -42,7 +50,7 @@ const mapBookLevel = (level: GeminiBookLevel) => {
   return { price, amount }
 }
 
-export const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
+const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
   canHandle(message: GeminiL2Updates | GeminiTrade) {
     return message.type === 'l2_updates'
   },

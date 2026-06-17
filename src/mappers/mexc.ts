@@ -1,6 +1,15 @@
 import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const mexcMappers = exchangeMappers({
+  mexc: {
+    trades: () => new MexcTradesMapper(),
+    bookChanges: () => new MexcBookChangeMapper(),
+    bookTickers: () => new MexcBookTickerMapper()
+  }
+})
 
 export class MexcTradesMapper implements Mapper<'mexc', Trade> {
   private readonly channel = 'spot@public.aggre.deals.v3.api.pb@10ms'

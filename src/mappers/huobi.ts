@@ -1,14 +1,51 @@
 import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
-export class HuobiTradesMapper implements Mapper<
-  'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options',
-  Trade
-> {
+const HUOBI_MBP_BOOK_CHANGE_SWITCH_DATE = new Date('2020-07-03T00:00:00.000Z')
+
+export const huobiMappers = exchangeMappers({
+  huobi: {
+    trades: () => new HuobiTradesMapper('huobi'),
+    bookChanges: mapper([
+      { until: HUOBI_MBP_BOOK_CHANGE_SWITCH_DATE, use: () => new HuobiBookChangeMapper('huobi') },
+      { use: () => new HuobiMBPBookChangeMapper('huobi') }
+    ]),
+    bookTickers: () => new HuobiBookTickerMapper('huobi')
+  },
+  'huobi-dm': {
+    trades: () => new HuobiTradesMapper('huobi-dm'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm')
+  },
+  'huobi-dm-swap': {
+    trades: () => new HuobiTradesMapper('huobi-dm-swap'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-swap'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm-swap'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm-swap')
+  },
+  'huobi-dm-linear-swap': {
+    trades: () => new HuobiTradesMapper('huobi-dm-linear-swap'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm-linear-swap')
+  },
+  'huobi-dm-options': {
+    trades: () => new HuobiTradesMapper('huobi-dm-options'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-options'),
+    optionsSummary: () => new HuobiOptionsSummaryMapper()
+  }
+})
+
+class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -47,7 +84,7 @@ export class HuobiTradesMapper implements Mapper<
   }
 }
 
-export class HuobiBookChangeMapper implements Mapper<
+class HuobiBookChangeMapper implements Mapper<
   'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options',
   BookChange
 > {
@@ -103,7 +140,7 @@ function isSnapshot(message: HuobiMBPDataMessage | HuobiMBPSnapshot): message is
   return 'rep' in message
 }
 
-export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
+class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
   protected readonly symbolToMBPInfoMapping: {
     [key: string]: MBPInfo
   } = {}
@@ -243,7 +280,7 @@ function normalizeSymbols(symbols?: string[]) {
   return
 }
 
-export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
+class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -324,7 +361,7 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
   }
 }
 
-export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Liquidation> {
+class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Liquidation> {
   private readonly _contractCodeToSymbolMap: Map<string, string> = new Map()
   private readonly _contractTypesSuffixes = { this_week: 'CW', next_week: 'NW', quarter: 'CQ', next_quarter: 'NQ' }
 
@@ -412,7 +449,7 @@ export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-sw
   }
 }
 
-export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSummary> {
+class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly _openInterest = new Map<string, number>()
 
@@ -522,7 +559,7 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
   }
 }
 
-export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookTicker> {
+class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {

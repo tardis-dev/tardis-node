@@ -1,690 +1,138 @@
-import { ONE_SEC_IN_MS } from '../handy.ts'
-import { BookChange, DerivativeTicker, Liquidation, OptionSummary, BookTicker, Trade } from '../types.ts'
-import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexBookTickerMapper, AscendexTradesMapper } from './ascendex.ts'
-import {
-  BinanceBookChangeMapper,
-  BinanceFuturesBookChangeMapper,
-  BinanceFuturesDerivativeTickerMapper,
-  BinanceLiquidationsMapper,
-  BinanceBookTickerMapper,
-  BinanceTradesMapper
-} from './binance.ts'
-import { binanceDexBookChangeMapper, binanceDexBookTickerMapper, binanceDexTradesMapper } from './binancedex.ts'
-import {
-  BinanceEuropeanOptionsBookChangeMapper,
-  BinanceEuropeanOptionsBookChangeMapperV2,
-  BinanceEuropeanOptionsBookTickerMapper,
-  BinanceEuropeanOptionsTradesMapper,
-  BinanceEuropeanOptionsTradesMapperV2,
-  BinanceEuropeanOptionSummaryMapper,
-  BinanceEuropeanOptionSummaryMapperV2
-} from './binanceeuropeanoptions.ts'
-import {
-  BitfinexBookChangeMapper,
-  BitfinexDerivativeTickerMapper,
-  BitfinexLiquidationsMapper,
-  BitfinexBookTickerMapper,
-  BitfinexTradesMapper
-} from './bitfinex.ts'
-import { BitflyerBookChangeMapper, bitflyerBookTickerMapper, bitflyerTradesMapper } from './bitflyer.ts'
-import {
-  BitgetBookChangeMapper,
-  BitgetBookTickerMapper,
-  BitgetDerivativeTickerMapper,
-  BitgetTradesMapper,
-  BitgetV3BookChangeMapper,
-  BitgetV3BookTickerMapper,
-  BitgetV3DerivativeTickerMapper,
-  BitgetV3LiquidationsMapper,
-  BitgetV3TradesMapper
-} from './bitget.ts'
-import {
-  BitmexBookChangeMapper,
-  BitmexDerivativeTickerMapper,
-  bitmexLiquidationsMapper,
-  bitmexBookTickerMapper,
-  bitmexTradesMapper
-} from './bitmex.ts'
-import { BitnomialBookChangMapper, bitnomialTradesMapper } from './bitnomial.ts'
-import { BitstampBookChangeMapper, bitstampTradesMapper } from './bitstamp.ts'
-import { BlockchainComBookChangeMapper, BlockchainComTradesMapper } from './blockchaincom.ts'
-import {
-  BullishBookChangeMapper,
-  BullishBookTickerMapper,
-  BullishDerivativeTickerMapper,
-  BullishOptionSummaryMapper,
-  BullishTradesMapper
-} from './bullish.ts'
-import {
-  BybitBookChangeMapper,
-  BybitDerivativeTickerMapper,
-  BybitLiquidationsMapper,
-  BybitTradesMapper,
-  BybitV5AllLiquidationsMapper,
-  BybitV5BookChangeMapper,
-  BybitV5BookTickerMapper,
-  BybitV5DerivativeTickerMapper,
-  BybitV5LiquidationsMapper,
-  BybitV5OptionSummaryMapper,
-  BybitV5TradesMapper
-} from './bybit.ts'
-import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot.ts'
-import { CoinbaseBookChangMapper, coinbaseBookTickerMapper, coinbaseTradesMapper } from './coinbase.ts'
-import {
-  CoinbaseInternationalBookChangMapper,
-  coinbaseInternationalBookTickerMapper,
-  CoinbaseInternationalDerivativeTickerMapper,
-  coinbaseInternationalTradesMapper
-} from './coinbaseinternational.ts'
-import { coinflexBookChangeMapper, CoinflexDerivativeTickerMapper, coinflexTradesMapper } from './coinflex.ts'
-import {
-  CryptoComBookChangeMapper,
-  CryptoComBookTickerMapper,
-  CryptoComDerivativeTickerMapper,
-  CryptoComTradesMapper
-} from './cryptocom.ts'
-import {
-  cryptofacilitiesBookChangeMapper,
-  CryptofacilitiesDerivativeTickerMapper,
-  cryptofacilitiesLiquidationsMapper,
-  cryptofacilitiesBookTickerMapper,
-  cryptofacilitiesTradesMapper
-} from './cryptofacilities.ts'
-import { DeltaBookChangeMapper, DeltaBookTickerMapper, DeltaDerivativeTickerMapper, DeltaTradesMapper } from './delta.ts'
-import {
-  deribitBookChangeMapper,
-  DeribitDerivativeTickerMapper,
-  deribitLiquidationsMapper,
-  DeribitOptionSummaryMapper,
-  deribitBookTickerMapper,
-  deribitTradesMapper
-} from './deribit.ts'
-import { DydxBookChangeMapper, DydxDerivativeTickerMapper, DydxTradesMapper } from './dydx.ts'
-import { DydxV4BookChangeMapper, DydxV4DerivativeTickerMapper, DydxV4LiquidationsMapper, DydxV4TradesMapper } from './dydxv4.ts'
-import { FTXBookChangeMapper, FTXDerivativeTickerMapper, FTXLiquidationsMapper, FTXBookTickerMapper, FTXTradesMapper } from './ftx.ts'
-import {
-  GateIOBookChangeMapper,
-  GateIOTradesMapper,
-  GateIOV4BookChangeMapper,
-  GateIOV4BookTickerMapper,
-  GateIOV4OrderBookV2ChangeMapper,
-  GateIOV4TradesMapper
-} from './gateio.ts'
-import {
-  GateIOFuturesBookChangeMapper,
-  GateIOFuturesBookTickerMapper,
-  GateIOFuturesDerivativeTickerMapper,
-  GateIOFuturesTradesMapper
-} from './gateiofutures.ts'
-import { geminiBookChangeMapper, geminiTradesMapper } from './gemini.ts'
-import { hitBtcBookChangeMapper, hitBtcTradesMapper } from './hitbtc.ts'
-import {
-  HuobiBookChangeMapper,
-  HuobiDerivativeTickerMapper,
-  HuobiLiquidationsMapper,
-  HuobiMBPBookChangeMapper,
-  HuobiOptionsSummaryMapper,
-  HuobiBookTickerMapper,
-  HuobiTradesMapper
-} from './huobi.ts'
-import {
-  HyperliquidBookChangeMapper,
-  HyperliquidBookTickerMapper,
-  HyperliquidDerivativeTickerMapper,
-  HyperliquidTradesMapper
-} from './hyperliquid.ts'
-import {
-  LighterBookChangeMapper,
-  LighterBookTickerMapper,
-  LighterDerivativeTickerMapper,
-  LighterLiquidationMapper,
-  LighterTradesMapper
-} from './lighter.ts'
-import { MexcBookChangeMapper, MexcBookTickerMapper, MexcTradesMapper } from './mexc.ts'
-import { krakenBookChangeMapper, krakenBookTickerMapper, krakenTradesMapper } from './kraken.ts'
-import { KucoinBookChangeMapper, KucoinBookTickerMapper, KucoinTradesMapper } from './kucoin.ts'
-import {
-  KucoinFuturesBookChangeMapper,
-  KucoinFuturesBookTickerMapper,
-  KucoinFuturesDerivativeTickerMapper,
-  KucoinFuturesTradesMapper
-} from './kucoinfutures.ts'
+import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, NormalizedData, OptionSummary, Trade } from '../types.ts'
+import { ascendexMappers } from './ascendex.ts'
+import { binanceMappers } from './binance.ts'
+import { binanceDexMappers } from './binancedex.ts'
+import { binanceEuropeanOptionsMappers } from './binanceeuropeanoptions.ts'
+import { bitfinexMappers } from './bitfinex.ts'
+import { bitflyerMappers } from './bitflyer.ts'
+import { bitgetMappers } from './bitget.ts'
+import { bitmexMappers } from './bitmex.ts'
+import { bitnomialMappers } from './bitnomial.ts'
+import { bitstampMappers } from './bitstamp.ts'
+import { blockchainComMappers } from './blockchaincom.ts'
+import { bullishMappers } from './bullish.ts'
+import { bybitMappers } from './bybit.ts'
+import { coinbaseMappers } from './coinbase.ts'
+import { coinbaseInternationalMappers } from './coinbaseinternational.ts'
+import { coinflexMappers } from './coinflex.ts'
+import { cryptoComMappers } from './cryptocom.ts'
+import { cryptofacilitiesMappers } from './cryptofacilities.ts'
+import { deltaMappers } from './delta.ts'
+import { deribitMappers } from './deribit.ts'
+import { dydxMappers } from './dydx.ts'
+import { dydxV4Mappers } from './dydxv4.ts'
+import { ftxMappers } from './ftx.ts'
+import { gateIOMappers } from './gateio.ts'
+import { gateIOFuturesMappers } from './gateiofutures.ts'
+import { geminiMappers } from './gemini.ts'
+import { hitBtcMappers } from './hitbtc.ts'
+import { huobiMappers } from './huobi.ts'
+import { hyperliquidMappers } from './hyperliquid.ts'
+import { krakenMappers } from './kraken.ts'
+import { kucoinMappers } from './kucoin.ts'
+import { kucoinFuturesMappers } from './kucoinfutures.ts'
+import { lighterMappers } from './lighter.ts'
 import { Mapper } from './mapper.ts'
-import {
-  OkexBookChangeMapper,
-  OkexBookTickerMapper,
-  OkexDerivativeTickerMapper,
-  OkexLiquidationsMapper,
-  OkexOptionSummaryMapper,
-  OkexTradesMapper,
-  OkexV5BookChangeMapper,
-  OkexV5BookTickerMapper,
-  OkexV5DerivativeTickerMapper,
-  OkexV5LiquidationsMapper,
-  OkexV5OptionSummaryMapper,
-  OkexV5TradesMapper
-} from './okex.ts'
-import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads.ts'
-import { phemexBookChangeMapper, PhemexDerivativeTickerMapper, phemexTradesMapper } from './phemex.ts'
-import { PoloniexBookChangeMapper, PoloniexTradesMapper, PoloniexV2BookChangeMapper, PoloniexV2TradesMapper } from './poloniex.ts'
-import { SerumBookChangeMapper, SerumBookTickerMapper, SerumTradesMapper } from './serum.ts'
-import { UpbitBookChangeMapper, UpbitTradesMapper } from './upbit.ts'
-import { WooxBookChangeMapper, WooxBookTickerMapper, WooxDerivativeTickerMapper, wooxTradesMapper } from './woox.ts'
-import { PolymarketBookChangeMapper, PolymarketBookTickerMapper, PolymarketTradesMapper } from './polymarket.ts'
+import { mexcMappers } from './mexc.ts'
+import { okexMappers } from './okex.ts'
+import { phemexMappers } from './phemex.ts'
+import { poloniexMappers } from './poloniex.ts'
+import { polymarketMappers } from './polymarket.ts'
+import { serumMappers } from './serum.ts'
+import { MapperCollection, mergeExchangeMappers } from './registry.ts'
+import { upbitMappers } from './upbit.ts'
+import { wooxMappers } from './woox.ts'
 
 export * from './mapper.ts'
 
-const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
-
-const isRealTime = (date: Date) => {
-  if (process.env.__NO_REAL_TIME__) {
-    return false
-  }
-  return date.valueOf() + THREE_MINUTES_IN_MS > new Date().valueOf()
-}
-
-const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
-const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
-const OKEX_PUBLIC_BOOKS_SWITCH_DATE = new Date('2026-05-21T00:00:00.000Z')
-const shouldUseOkexV5Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_API_SWITCH_DATE.valueOf()
-}
-
-const canUseOkexTbtBookTicker = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE.valueOf()
-}
-
-const POLONIEX_V2_API_SWITCH_DATE = new Date('2022-08-02T00:00:00.000Z')
-
-const shouldUsePoloniexV2Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= POLONIEX_V2_API_SWITCH_DATE.valueOf()
-}
-
-// see https://status.tardis.dev/incidents/ryjyv8tgdgkj
-const shouldUseOKXPublicBooksChannel = (localTimestamp: Date) => {
-  return (
-    (localTimestamp.valueOf() >= new Date('2023-02-25T00:00:00.000Z').valueOf() &&
-      localTimestamp.valueOf() < new Date('2023-03-09T00:00:00.000Z').valueOf()) ||
-    localTimestamp.valueOf() >= OKEX_PUBLIC_BOOKS_SWITCH_DATE.valueOf()
-  )
-}
-
-const shouldIgnoreBookSnapshotOverlap = (date: Date) => {
-  if (process.env.IGNORE_BOOK_SNAPSHOT_OVERLAP_ERROR) {
-    return true
-  }
-
-  return isRealTime(date) === false
-}
-
-const BYBIT_V5_API_SWITCH_DATE = new Date('2023-04-05T00:00:00.000Z')
-
-const BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE = new Date('2025-02-26T00:00:00.000Z')
-
-const shouldUseBybitV5Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_SWITCH_DATE.valueOf()
-}
-
-const shouldUseBybitAllLiquidationFeed = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE.valueOf()
-}
-
-const BITGET_V3_API_SWITCH_DATE = new Date('2026-04-28T00:00:00.000Z')
-
-const shouldUseBitgetV3Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BITGET_V3_API_SWITCH_DATE.valueOf()
-}
-
-const OKCOIN_V5_API_SWITCH_DATE = new Date('2023-04-27T00:00:00.000Z')
-const shouldUseOkcoinV5Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= OKCOIN_V5_API_SWITCH_DATE.valueOf()
-}
-
-const GATE_IO_V4_API_SWITCH_DATE = new Date('2023-04-29T00:00:00.000Z')
-const GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE = new Date('2025-08-01T00:00:00.000Z')
-
-const shouldUseGateIOV4Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_API_SWITCH_DATE.valueOf()
-}
-
-const shouldUseGateIOV4OrderBookV2Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE.valueOf()
-}
-
-const shouldUseCFRelativeFunding = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2022-09-29T00:00:00.000Z').valueOf()
-}
-
-const shouldUseOKXTradesAllChannel = (localTimestamp: Date) => {
-  if (process.env.OKX_USE_TRADES_CHANNEL) {
-    return false
-  }
-
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= new Date('2023-10-19T00:00:00.000Z').valueOf()
-}
-
-const BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE = new Date('2025-12-17T00:00:00.000Z')
-
-const shouldUseBinanceEuropeanOptionsV2Mappers = (localTimestamp: Date) => {
-  return isRealTime(localTimestamp) || localTimestamp.valueOf() >= BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE.valueOf()
-}
-
-const tradesMappers = {
-  bitmex: () => bitmexTradesMapper,
-  binance: () => new BinanceTradesMapper('binance'),
-  'binance-us': () => new BinanceTradesMapper('binance-us'),
-  'binance-jersey': () => new BinanceTradesMapper('binance-jersey'),
-  'binance-futures': () => new BinanceTradesMapper('binance-futures'),
-  'binance-delivery': () => new BinanceTradesMapper('binance-delivery'),
-  'binance-dex': () => binanceDexTradesMapper,
-  bitfinex: () => new BitfinexTradesMapper('bitfinex'),
-  'bitfinex-derivatives': () => new BitfinexTradesMapper('bitfinex-derivatives'),
-  bitflyer: () => bitflyerTradesMapper,
-  bitstamp: () => bitstampTradesMapper,
-  coinbase: () => coinbaseTradesMapper,
-  cryptofacilities: () => cryptofacilitiesTradesMapper,
-  deribit: () => deribitTradesMapper,
-  ftx: () => new FTXTradesMapper('ftx'),
-  'ftx-us': () => new FTXTradesMapper('ftx-us'),
-  gemini: () => geminiTradesMapper,
-  kraken: () => krakenTradesMapper,
-  okex: (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5TradesMapper('okex', shouldUseOKXTradesAllChannel(localTimestamp))
-      : new OkexTradesMapper('okex', 'spot'),
-
-  'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5TradesMapper('okex-futures', shouldUseOKXTradesAllChannel(localTimestamp))
-      : new OkexTradesMapper('okex-futures', 'futures'),
-
-  'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5TradesMapper('okex-swap', shouldUseOKXTradesAllChannel(localTimestamp))
-      : new OkexTradesMapper('okex-swap', 'swap'),
-
-  'okex-options': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5TradesMapper('okex-options', shouldUseOKXTradesAllChannel(localTimestamp))
-      : new OkexTradesMapper('okex-options', 'option'),
-
-  huobi: () => new HuobiTradesMapper('huobi'),
-  'huobi-dm': () => new HuobiTradesMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiTradesMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiTradesMapper('huobi-dm-linear-swap'),
-  'huobi-dm-options': () => new HuobiTradesMapper('huobi-dm-options'),
-  bybit: (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit') : new BybitTradesMapper('bybit'),
-  okcoin: (localTimestamp: Date) =>
-    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5TradesMapper('okcoin', false) : new OkexTradesMapper('okcoin', 'spot'),
-  hitbtc: () => hitBtcTradesMapper,
-  phemex: () => phemexTradesMapper,
-  delta: (localTimestamp: Date) => new DeltaTradesMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
-  'gate-io': (localTimestamp: Date) =>
-    shouldUseGateIOV4Mappers(localTimestamp) ? new GateIOV4TradesMapper('gate-io') : new GateIOTradesMapper('gate-io'),
-  'gate-io-futures': () => new GateIOFuturesTradesMapper('gate-io-futures'),
-  poloniex: (localTimestamp: Date) =>
-    shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2TradesMapper() : new PoloniexTradesMapper(),
-  coinflex: () => coinflexTradesMapper,
-  upbit: () => new UpbitTradesMapper(),
-  ascendex: () => new AscendexTradesMapper(),
-  dydx: () => new DydxTradesMapper(),
-  'dydx-v4': () => new DydxV4TradesMapper(),
-  serum: () => new SerumTradesMapper('serum'),
-  'star-atlas': () => new SerumTradesMapper('star-atlas'),
-  mango: () => new SerumTradesMapper('mango'),
-  'bybit-spot': (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5TradesMapper('bybit-spot') : new BybitSpotTradesMapper('bybit-spot'),
-  'crypto-com': () => new CryptoComTradesMapper('crypto-com'),
-  kucoin: () => new KucoinTradesMapper('kucoin'),
-  'kucoin-futures': () => new KucoinFuturesTradesMapper(),
-  bitnomial: () => bitnomialTradesMapper,
-  'woo-x': () => wooxTradesMapper,
-  'blockchain-com': () => new BlockchainComTradesMapper(),
-  'bybit-options': () => new BybitV5TradesMapper('bybit-options'),
-  'binance-european-options': (localTimestamp: Date) =>
-    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
-      ? new BinanceEuropeanOptionsTradesMapperV2()
-      : new BinanceEuropeanOptionsTradesMapper(),
-  'okex-spreads': () => new OkexSpreadsTradesMapper(),
-  bitget: (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3TradesMapper('bitget') : new BitgetTradesMapper('bitget'),
-  'bitget-futures': (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3TradesMapper('bitget-futures') : new BitgetTradesMapper('bitget-futures'),
-  'coinbase-international': () => coinbaseInternationalTradesMapper,
-  hyperliquid: () => new HyperliquidTradesMapper(),
-  lighter: () => new LighterTradesMapper(),
-  bullish: () => new BullishTradesMapper(),
-  mexc: () => new MexcTradesMapper(),
-  polymarket: () => new PolymarketTradesMapper()
-}
-
-const bookChangeMappers = {
-  bitmex: () => new BitmexBookChangeMapper(),
-  binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
-  'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
-  'binance-jersey': (localTimestamp: Date) =>
-    new BinanceBookChangeMapper('binance-jersey', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
-  'binance-futures': (localTimestamp: Date) =>
-    new BinanceFuturesBookChangeMapper('binance-futures', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
-  'binance-delivery': (localTimestamp: Date) =>
-    new BinanceFuturesBookChangeMapper('binance-delivery', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
-  'binance-dex': () => binanceDexBookChangeMapper,
-  bitfinex: () => new BitfinexBookChangeMapper('bitfinex'),
-  'bitfinex-derivatives': () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
-  bitflyer: () => new BitflyerBookChangeMapper(),
-  bitstamp: () => new BitstampBookChangeMapper(),
-  coinbase: () => new CoinbaseBookChangMapper(),
-  cryptofacilities: () => cryptofacilitiesBookChangeMapper,
-  deribit: () => deribitBookChangeMapper,
-  ftx: () => new FTXBookChangeMapper('ftx'),
-  'ftx-us': () => new FTXBookChangeMapper('ftx-us'),
-  gemini: () => geminiBookChangeMapper,
-  kraken: () => krakenBookChangeMapper,
-  okex: (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
-      : new OkexBookChangeMapper('okex', 'spot', localTimestamp.valueOf() >= new Date('2020-04-10').valueOf()),
-  'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-futures', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
-      : new OkexBookChangeMapper('okex-futures', 'futures', localTimestamp.valueOf() >= new Date('2019-12-05').valueOf()),
-
-  'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-swap', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
-      : new OkexBookChangeMapper('okex-swap', 'swap', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
-  'okex-options': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okex-options', isRealTime(localTimestamp) || shouldUseOKXPublicBooksChannel(localTimestamp))
-      : new OkexBookChangeMapper('okex-options', 'option', localTimestamp.valueOf() >= new Date('2020-02-08').valueOf()),
-
-  huobi: (localTimestamp: Date) =>
-    localTimestamp.valueOf() >= new Date('2020-07-03').valueOf()
-      ? new HuobiMBPBookChangeMapper('huobi')
-      : new HuobiBookChangeMapper('huobi'),
-
-  'huobi-dm': () => new HuobiBookChangeMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiBookChangeMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
-  'huobi-dm-options': () => new HuobiBookChangeMapper('huobi-dm-options'),
-  'bybit-spot': (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookChangeMapper('bybit-spot', 50) : new BybitSpotBookChangeMapper('bybit-spot'),
-  bybit: (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookChangeMapper('bybit', 50) : new BybitBookChangeMapper('bybit', false),
-  okcoin: (localTimestamp: Date) =>
-    shouldUseOkcoinV5Mappers(localTimestamp)
-      ? new OkexV5BookChangeMapper('okcoin', true)
-      : new OkexBookChangeMapper('okcoin', 'spot', localTimestamp.valueOf() >= new Date('2020-02-13').valueOf()),
-  hitbtc: () => hitBtcBookChangeMapper,
-  phemex: () => phemexBookChangeMapper,
-  delta: (localTimestamp: Date) => new DeltaBookChangeMapper(localTimestamp.valueOf() >= new Date('2023-04-01').valueOf()),
-  'gate-io': (localTimestamp: Date) =>
-    shouldUseGateIOV4OrderBookV2Mappers(localTimestamp)
-      ? new GateIOV4OrderBookV2ChangeMapper('gate-io')
-      : shouldUseGateIOV4Mappers(localTimestamp)
-        ? new GateIOV4BookChangeMapper('gate-io', isRealTime(localTimestamp) == false)
-        : new GateIOBookChangeMapper('gate-io'),
-  'gate-io-futures': () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
-  poloniex: (localTimestamp: Date) =>
-    shouldUsePoloniexV2Mappers(localTimestamp) ? new PoloniexV2BookChangeMapper() : new PoloniexBookChangeMapper(),
-  coinflex: () => coinflexBookChangeMapper,
-  upbit: () => new UpbitBookChangeMapper(),
-  ascendex: () => new AscendexBookChangeMapper(),
-  dydx: () => new DydxBookChangeMapper(),
-  'dydx-v4': () => new DydxV4BookChangeMapper(),
-  serum: () => new SerumBookChangeMapper('serum'),
-  'star-atlas': () => new SerumBookChangeMapper('star-atlas'),
-  mango: () => new SerumBookChangeMapper('mango'),
-  'crypto-com': () => new CryptoComBookChangeMapper('crypto-com'),
-  kucoin: (localTimestamp: Date) => new KucoinBookChangeMapper('kucoin', isRealTime(localTimestamp) === false),
-  'kucoin-futures': (localTimestamp: Date) => new KucoinFuturesBookChangeMapper(isRealTime(localTimestamp) === false),
-  bitnomial: () => new BitnomialBookChangMapper(),
-  'woo-x': () => new WooxBookChangeMapper(),
-  'blockchain-com': () => new BlockchainComBookChangeMapper(),
-  'bybit-options': () => new BybitV5BookChangeMapper('bybit-options', 25),
-  'binance-european-options': (localTimestamp: Date) =>
-    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
-      ? new BinanceEuropeanOptionsBookChangeMapperV2()
-      : new BinanceEuropeanOptionsBookChangeMapper(),
-  'okex-spreads': () => new OkexSpreadsBookChangeMapper(),
-  bitget: (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3BookChangeMapper('bitget') : new BitgetBookChangeMapper('bitget'),
-  'bitget-futures': (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp)
-      ? new BitgetV3BookChangeMapper('bitget-futures')
-      : new BitgetBookChangeMapper('bitget-futures'),
-  'coinbase-international': () => new CoinbaseInternationalBookChangMapper(),
-  hyperliquid: () => new HyperliquidBookChangeMapper(),
-  lighter: () => new LighterBookChangeMapper(),
-  bullish: () => new BullishBookChangeMapper(),
-  mexc: () => new MexcBookChangeMapper(),
-  polymarket: () => new PolymarketBookChangeMapper()
-}
-
-const derivativeTickersMappers = {
-  bitmex: () => new BitmexDerivativeTickerMapper(),
-  'binance-futures': () => new BinanceFuturesDerivativeTickerMapper('binance-futures'),
-  'binance-delivery': () => new BinanceFuturesDerivativeTickerMapper('binance-delivery'),
-  'bitfinex-derivatives': () => new BitfinexDerivativeTickerMapper(),
-  cryptofacilities: (localTimestamp: Date) => new CryptofacilitiesDerivativeTickerMapper(shouldUseCFRelativeFunding(localTimestamp)),
-  deribit: () => new DeribitDerivativeTickerMapper(),
-  'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5DerivativeTickerMapper('okex-futures')
-      : new OkexDerivativeTickerMapper('okex-futures'),
-
-  'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5DerivativeTickerMapper('okex-swap') : new OkexDerivativeTickerMapper('okex-swap'),
-
-  bybit: (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5DerivativeTickerMapper() : new BybitDerivativeTickerMapper(),
-  phemex: () => new PhemexDerivativeTickerMapper(),
-  ftx: () => new FTXDerivativeTickerMapper('ftx'),
-  delta: (localTimestamp: Date) => new DeltaDerivativeTickerMapper(localTimestamp.valueOf() >= new Date('2020-10-14').valueOf()),
-  'huobi-dm': () => new HuobiDerivativeTickerMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
-  'gate-io-futures': () => new GateIOFuturesDerivativeTickerMapper(),
-  coinflex: () => new CoinflexDerivativeTickerMapper(),
-  ascendex: () => new AscendexDerivativeTickerMapper(),
-  dydx: () => new DydxDerivativeTickerMapper(),
-  'dydx-v4': () => new DydxV4DerivativeTickerMapper(),
-  'crypto-com': () => new CryptoComDerivativeTickerMapper('crypto-com'),
-  'woo-x': () => new WooxDerivativeTickerMapper(),
-  'kucoin-futures': () => new KucoinFuturesDerivativeTickerMapper(),
-  'bitget-futures': (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3DerivativeTickerMapper() : new BitgetDerivativeTickerMapper(),
-  'coinbase-international': () => new CoinbaseInternationalDerivativeTickerMapper(),
-  hyperliquid: () => new HyperliquidDerivativeTickerMapper(),
-  lighter: () => new LighterDerivativeTickerMapper(),
-  bullish: () => new BullishDerivativeTickerMapper()
-}
-
-const optionsSummaryMappers = {
-  deribit: () => new DeribitOptionSummaryMapper(),
-  'okex-options': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5OptionSummaryMapper() : new OkexOptionSummaryMapper(),
-  'huobi-dm-options': () => new HuobiOptionsSummaryMapper(),
-  'bybit-options': () => new BybitV5OptionSummaryMapper(),
-  'binance-european-options': (localTimestamp: Date) =>
-    shouldUseBinanceEuropeanOptionsV2Mappers(localTimestamp)
-      ? new BinanceEuropeanOptionSummaryMapperV2()
-      : new BinanceEuropeanOptionSummaryMapper(),
-  bullish: () => new BullishOptionSummaryMapper()
-}
-
-const liquidationsMappers = {
-  ftx: () => new FTXLiquidationsMapper(),
-  bitmex: () => bitmexLiquidationsMapper,
-  deribit: () => deribitLiquidationsMapper,
-  'binance-futures': () => new BinanceLiquidationsMapper('binance-futures'),
-  'binance-delivery': () => new BinanceLiquidationsMapper('binance-delivery'),
-  'bitfinex-derivatives': () => new BitfinexLiquidationsMapper('bitfinex-derivatives'),
-  cryptofacilities: () => cryptofacilitiesLiquidationsMapper,
-  'huobi-dm': () => new HuobiLiquidationsMapper('huobi-dm'),
-  'dydx-v4': () => new DydxV4LiquidationsMapper(),
-  'huobi-dm-swap': () => new HuobiLiquidationsMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
-  lighter: () => new LighterLiquidationMapper(),
-  bybit: (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp)
-      ? shouldUseBybitAllLiquidationFeed(localTimestamp)
-        ? new BybitV5AllLiquidationsMapper('bybit')
-        : new BybitV5LiquidationsMapper('bybit')
-      : new BybitLiquidationsMapper('bybit'),
-  'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5LiquidationsMapper('okex-futures')
-      : new OkexLiquidationsMapper('okex-futures', 'futures'),
-  'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp) ? new OkexV5LiquidationsMapper('okex-swap') : new OkexLiquidationsMapper('okex-swap', 'swap'),
-  'bitget-futures': () => new BitgetV3LiquidationsMapper()
-}
-
-const bookTickersMappers = {
-  binance: () => new BinanceBookTickerMapper('binance'),
-  'binance-futures': () => new BinanceBookTickerMapper('binance-futures'),
-  'binance-delivery': () => new BinanceBookTickerMapper('binance-delivery'),
-  'binance-us': () => new BinanceBookTickerMapper('binance-us'),
-  ascendex: () => new AscendexBookTickerMapper(),
-  'binance-dex': () => binanceDexBookTickerMapper,
-  bitfinex: () => new BitfinexBookTickerMapper('bitfinex'),
-  'bitfinex-derivatives': () => new BitfinexBookTickerMapper('bitfinex-derivatives'),
-  bitflyer: () => bitflyerBookTickerMapper,
-  bitmex: () => bitmexBookTickerMapper,
-  coinbase: () => coinbaseBookTickerMapper,
-  cryptofacilities: () => cryptofacilitiesBookTickerMapper,
-  deribit: () => deribitBookTickerMapper,
-  ftx: () => new FTXBookTickerMapper('ftx'),
-  'ftx-us': () => new FTXBookTickerMapper('ftx-us'),
-  huobi: () => new HuobiBookTickerMapper('huobi'),
-  'huobi-dm': () => new HuobiBookTickerMapper('huobi-dm'),
-  'huobi-dm-swap': () => new HuobiBookTickerMapper('huobi-dm-swap'),
-  'huobi-dm-linear-swap': () => new HuobiBookTickerMapper('huobi-dm-linear-swap'),
-  kraken: () => krakenBookTickerMapper,
-  okex: (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex', canUseOkexTbtBookTicker(localTimestamp))
-      : new OkexBookTickerMapper('okex', 'spot'),
-
-  'okex-futures': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex-futures', canUseOkexTbtBookTicker(localTimestamp))
-      : new OkexBookTickerMapper('okex-futures', 'futures'),
-
-  'okex-swap': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex-swap', canUseOkexTbtBookTicker(localTimestamp))
-      : new OkexBookTickerMapper('okex-swap', 'swap'),
-
-  'okex-options': (localTimestamp: Date) =>
-    shouldUseOkexV5Mappers(localTimestamp)
-      ? new OkexV5BookTickerMapper('okex-options', canUseOkexTbtBookTicker(localTimestamp))
-      : new OkexBookTickerMapper('okex-options', 'option'),
-
-  okcoin: (localTimestamp: Date) =>
-    shouldUseOkcoinV5Mappers(localTimestamp) ? new OkexV5BookTickerMapper('okcoin', true) : new OkexBookTickerMapper('okcoin', 'spot'),
-  serum: () => new SerumBookTickerMapper('serum'),
-  'star-atlas': () => new SerumBookTickerMapper('star-atlas'),
-  mango: () => new SerumBookTickerMapper('mango'),
-  'gate-io-futures': () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
-  'bybit-spot': (localTimestamp: Date) =>
-    shouldUseBybitV5Mappers(localTimestamp) ? new BybitV5BookTickerMapper('bybit-spot') : new BybitSpotBookTickerMapper('bybit-spot'),
-  'crypto-com': () => new CryptoComBookTickerMapper('crypto-com'),
-  kucoin: () => new KucoinBookTickerMapper('kucoin'),
-  'woo-x': () => new WooxBookTickerMapper(),
-  delta: () => new DeltaBookTickerMapper(),
-  bybit: () => new BybitV5BookTickerMapper('bybit'),
-  'gate-io': () => new GateIOV4BookTickerMapper('gate-io'),
-  'okex-spreads': () => new OkexSpreadsBookTickerMapper(),
-  'kucoin-futures': () => new KucoinFuturesBookTickerMapper(),
-  bitget: (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp) ? new BitgetV3BookTickerMapper('bitget') : new BitgetBookTickerMapper('bitget'),
-  'bitget-futures': (localTimestamp: Date) =>
-    shouldUseBitgetV3Mappers(localTimestamp)
-      ? new BitgetV3BookTickerMapper('bitget-futures')
-      : new BitgetBookTickerMapper('bitget-futures'),
-  'coinbase-international': () => coinbaseInternationalBookTickerMapper,
-  hyperliquid: () => new HyperliquidBookTickerMapper(),
-  lighter: () => new LighterBookTickerMapper(),
-  bullish: () => new BullishBookTickerMapper(),
-  mexc: () => new MexcBookTickerMapper(),
-  'binance-european-options': () => new BinanceEuropeanOptionsBookTickerMapper(),
-  polymarket: () => new PolymarketBookTickerMapper()
-}
-
-export const normalizeTrades = <T extends keyof typeof tradesMappers>(exchange: T, localTimestamp: Date): Mapper<T, Trade> => {
-  const createTradesMapper = tradesMappers[exchange]
-
-  if (createTradesMapper === undefined) {
-    throw new Error(`normalizeTrades: ${exchange} not supported`)
-  }
-
-  return createTradesMapper(localTimestamp) as Mapper<T, Trade>
-}
-
-export const normalizeBookChanges = <T extends keyof typeof bookChangeMappers>(
+type Normalizer<M extends MapperCollection, U extends NormalizedData> = (<T extends keyof M & Exchange>(
   exchange: T,
   localTimestamp: Date
-): Mapper<T, BookChange> => {
-  const createBookChangesMapper = bookChangeMappers[exchange]
-
-  if (createBookChangesMapper === undefined) {
-    throw new Error(`normalizeBookChanges: ${exchange} not supported`)
-  }
-
-  return createBookChangesMapper(localTimestamp) as Mapper<T, BookChange>
+) => Mapper<T, U>) & {
+  getSwitchDates: (exchange: keyof M & Exchange) => readonly Date[]
 }
 
-export const normalizeDerivativeTickers = <T extends keyof typeof derivativeTickersMappers>(
-  exchange: T,
-  localTimestamp: Date
-): Mapper<T, DerivativeTicker> => {
-  const createDerivativeTickerMapper = derivativeTickersMappers[exchange]
+const registeredMappers = mergeExchangeMappers(
+  ascendexMappers,
+  binanceMappers,
+  binanceDexMappers,
+  binanceEuropeanOptionsMappers,
+  bitfinexMappers,
+  bitflyerMappers,
+  bitgetMappers,
+  bitmexMappers,
+  bitnomialMappers,
+  bitstampMappers,
+  blockchainComMappers,
+  bullishMappers,
+  bybitMappers,
+  coinbaseMappers,
+  coinbaseInternationalMappers,
+  coinflexMappers,
+  cryptoComMappers,
+  cryptofacilitiesMappers,
+  deltaMappers,
+  deribitMappers,
+  dydxMappers,
+  dydxV4Mappers,
+  ftxMappers,
+  gateIOMappers,
+  gateIOFuturesMappers,
+  geminiMappers,
+  hitBtcMappers,
+  huobiMappers,
+  hyperliquidMappers,
+  krakenMappers,
+  kucoinMappers,
+  kucoinFuturesMappers,
+  lighterMappers,
+  mexcMappers,
+  okexMappers,
+  phemexMappers,
+  poloniexMappers,
+  polymarketMappers,
+  serumMappers,
+  upbitMappers,
+  wooxMappers
+)
 
-  if (createDerivativeTickerMapper === undefined) {
-    throw new Error(`normalizeDerivativeTickers: ${exchange} not supported`)
-  }
+export const normalizeTrades = createNormalizer<typeof registeredMappers.trades, Trade>('normalizeTrades', registeredMappers.trades)
+export const normalizeBookChanges = createNormalizer<typeof registeredMappers.bookChanges, BookChange>(
+  'normalizeBookChanges',
+  registeredMappers.bookChanges
+)
+export const normalizeDerivativeTickers = createNormalizer<typeof registeredMappers.derivativeTickers, DerivativeTicker>(
+  'normalizeDerivativeTickers',
+  registeredMappers.derivativeTickers
+)
+export const normalizeOptionsSummary = createNormalizer<typeof registeredMappers.optionsSummary, OptionSummary>(
+  'normalizeOptionsSummary',
+  registeredMappers.optionsSummary
+)
+export const normalizeLiquidations = createNormalizer<typeof registeredMappers.liquidations, Liquidation>(
+  'normalizeLiquidations',
+  registeredMappers.liquidations
+)
+export const normalizeBookTickers = createNormalizer<typeof registeredMappers.bookTickers, BookTicker>(
+  'normalizeBookTickers',
+  registeredMappers.bookTickers
+)
 
-  return createDerivativeTickerMapper(localTimestamp) as any
+function createNormalizer<M extends MapperCollection, U extends NormalizedData>(name: string, mappers: M): Normalizer<M, U> {
+  const normalize = (<T extends keyof M & Exchange>(exchange: T, localTimestamp: Date) => {
+    const createMapper = mappers[exchange]
+
+    if (createMapper === undefined) {
+      throw new Error(`${name}: ${exchange} not supported`)
+    }
+
+    return createMapper(localTimestamp) as Mapper<T, U>
+  }) as Normalizer<M, U>
+
+  normalize.getSwitchDates = (exchange) => getMapperSwitchDates(mappers, exchange)
+  return normalize
 }
 
-export const normalizeOptionsSummary = <T extends keyof typeof optionsSummaryMappers>(
-  exchange: T,
-  localTimestamp: Date
-): Mapper<T, OptionSummary> => {
-  const createOptionSummaryMapper = optionsSummaryMappers[exchange]
-
-  if (createOptionSummaryMapper === undefined) {
-    throw new Error(`normalizeOptionsSummary: ${exchange} not supported`)
-  }
-
-  return createOptionSummaryMapper(localTimestamp) as any
-}
-
-export const normalizeLiquidations = <T extends keyof typeof liquidationsMappers>(
-  exchange: T,
-  localTimestamp: Date
-): Mapper<T, Liquidation> => {
-  const createLiquidationsMapper = liquidationsMappers[exchange]
-
-  if (createLiquidationsMapper === undefined) {
-    throw new Error(`normalizeLiquidations: ${exchange} not supported`)
-  }
-
-  return createLiquidationsMapper(localTimestamp) as any
-}
-
-export const normalizeBookTickers = <T extends keyof typeof bookTickersMappers>(
-  exchange: T,
-  localTimestamp: Date
-): Mapper<T, BookTicker> => {
-  const createTickerMapper = bookTickersMappers[exchange]
-
-  if (createTickerMapper === undefined) {
-    throw new Error(`normalizeBookTickers: ${exchange} not supported`)
-  }
-
-  return createTickerMapper(localTimestamp) as any
+function getMapperSwitchDates(mappers: MapperCollection, exchange: string) {
+  return mappers[exchange]?.switchDates ?? []
 }

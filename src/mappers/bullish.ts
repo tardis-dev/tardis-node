@@ -1,8 +1,19 @@
 import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class BullishTradesMapper implements Mapper<'bullish', Trade> {
+export const bullishMappers = exchangeMappers({
+  bullish: {
+    trades: () => new BullishTradesMapper(),
+    bookChanges: () => new BullishBookChangeMapper(),
+    derivativeTickers: () => new BullishDerivativeTickerMapper(),
+    optionsSummary: () => new BullishOptionSummaryMapper(),
+    bookTickers: () => new BullishBookTickerMapper()
+  }
+})
+
+class BullishTradesMapper implements Mapper<'bullish', Trade> {
   canHandle(message: BullishMessage): message is BullishAnonymousTradeUpdateMessage {
     return message.dataType === 'V1TAAnonymousTradeUpdate' && message.type === 'update'
   }
@@ -43,7 +54,7 @@ export class BullishTradesMapper implements Mapper<'bullish', Trade> {
   }
 }
 
-export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
+class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
   canHandle(message: BullishMessage): message is BullishLevel2Message {
     return message.dataType === 'V1TALevel2'
   }
@@ -83,7 +94,7 @@ export class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
   }
 }
 
-export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
+class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
   canHandle(message: BullishMessage): message is BullishLevel1Message {
     return message.dataType === 'V1TALevel1' && (message.type === 'snapshot' || message.type === 'update')
   }
@@ -112,7 +123,7 @@ export class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
   }
 }
 
-export class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicker> {
+class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
 
@@ -174,7 +185,7 @@ export class BullishDerivativeTickerMapper implements Mapper<'bullish', Derivati
   }
 }
 
-export class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
+class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
   private readonly indexPrices = new Map<string, { price: number; timestamp: Date }>()
 
   canHandle(message: BullishMessage): message is BullishOptionTickerMessage | BullishIndexPriceMessage {

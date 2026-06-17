@@ -2,8 +2,18 @@ import { debug } from '../debug.ts'
 import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, Exchange, BookTicker, Trade, BookPriceLevel } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
-export class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
+export const kucoinMappers = exchangeMappers({
+  kucoin: {
+    trades: () => new KucoinTradesMapper('kucoin'),
+    bookChanges: (localTimestamp) =>
+      new KucoinBookChangeMapper('kucoin', { ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
+    bookTickers: () => new KucoinBookTickerMapper('kucoin')
+  }
+})
+
+class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: KucoinTradeMessage) {
     return message.type === 'message' && message.topic.startsWith('/market/match')
@@ -41,15 +51,19 @@ export class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
   }
 }
 
-export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
+class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
   protected readonly symbolToDepthInfoMapping: {
     [key: string]: LocalDepthInfo
   } = {}
 
   constructor(
     protected readonly _exchange: Exchange,
-    private readonly ignoreBookSnapshotOverlapError: boolean
-  ) {}
+    { ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }
+  ) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
+
+  private readonly ignoreBookSnapshotOverlapError: boolean
 
   canHandle(message: KucoinLevel2SnapshotMessage | KucoinLevel2UpdateMessage) {
     return message.type === 'message' && message.topic.startsWith('/market/level2')
@@ -221,7 +235,7 @@ export class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
   }
 }
 
-export class KucoinBookTickerMapper implements Mapper<'kucoin', BookTicker> {
+class KucoinBookTickerMapper implements Mapper<'kucoin', BookTicker> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: KucoinTickerMessage) {

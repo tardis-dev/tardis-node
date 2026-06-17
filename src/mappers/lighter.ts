@@ -1,6 +1,17 @@
 import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const lighterMappers = exchangeMappers({
+  lighter: {
+    trades: () => new LighterTradesMapper(),
+    bookChanges: () => new LighterBookChangeMapper(),
+    derivativeTickers: () => new LighterDerivativeTickerMapper(),
+    liquidations: () => new LighterLiquidationMapper(),
+    bookTickers: () => new LighterBookTickerMapper()
+  }
+})
 
 function parseChannelMarketId(channel: string): string | undefined {
   const colonIndex = channel.indexOf(':')
@@ -14,7 +25,7 @@ function parseChannelMarketId(channel: string): string | undefined {
   return suffix
 }
 
-export class LighterTradesMapper implements Mapper<'lighter', Trade> {
+class LighterTradesMapper implements Mapper<'lighter', Trade> {
   canHandle(message: LighterTradeMessage) {
     return message.type === 'update/trade'
   }
@@ -45,7 +56,7 @@ export class LighterTradesMapper implements Mapper<'lighter', Trade> {
   }
 }
 
-export class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
+class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
   canHandle(message: LighterTradeMessage) {
     return message.type === 'update/trade'
   }
@@ -84,7 +95,7 @@ export class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> 
   }
 }
 
-export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
+class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
   canHandle(message: LighterOrderBookMessage) {
     return message.type === 'subscribed/order_book' || message.type === 'update/order_book'
   }
@@ -122,7 +133,7 @@ export class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
   }
 }
 
-export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
+class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
   canHandle(message: LighterTickerMessage) {
     return message.type === 'update/ticker'
   }
@@ -154,7 +165,7 @@ export class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
   }
 }
 
-export class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicker> {
+class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: LighterMarketStatsMessage) {

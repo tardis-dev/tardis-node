@@ -2,8 +2,30 @@ import { debug } from '../debug.ts'
 import { CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Exchange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
-export class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookChange> {
+const GATE_IO_V4_API_SWITCH_DATE = new Date('2023-04-29T00:00:00.000Z')
+const GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE = new Date('2025-08-01T00:00:00.000Z')
+
+export const gateIOMappers = exchangeMappers({
+  'gate-io': {
+    trades: mapper([
+      { until: GATE_IO_V4_API_SWITCH_DATE, use: () => new GateIOTradesMapper('gate-io') },
+      { use: () => new GateIOV4TradesMapper('gate-io') }
+    ]),
+    bookChanges: mapper([
+      { until: GATE_IO_V4_API_SWITCH_DATE, use: () => new GateIOBookChangeMapper('gate-io') },
+      {
+        until: GATE_IO_V4_ORDER_BOOK_V2_SWITCH_DATE,
+        use: () => new GateIOV4BookChangeMapper('gate-io', { ignoreBookSnapshotOverlapError: true })
+      },
+      { use: () => new GateIOV4OrderBookV2ChangeMapper('gate-io') }
+    ]),
+    bookTickers: () => new GateIOV4BookTickerMapper('gate-io')
+  }
+})
+
+class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookChange> {
   constructor(protected readonly exchange: Exchange) {}
 
   canHandle(message: GateV4OrderBookV2Message) {
@@ -55,15 +77,19 @@ export class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookCh
 }
 //v4
 
-export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
+class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
   protected readonly symbolToDepthInfoMapping: {
     [key: string]: LocalDepthInfo
   } = {}
 
   constructor(
     protected readonly exchange: Exchange,
-    protected readonly ignoreBookSnapshotOverlapError: boolean
-  ) {}
+    { ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }
+  ) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
+
+  protected readonly ignoreBookSnapshotOverlapError: boolean
 
   canHandle(message: GateV4OrderBookUpdate | Gatev4OrderBookSnapshot) {
     if (message.channel === undefined) {
@@ -216,7 +242,7 @@ export class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
   }
 }
 
-export class GateIOV4BookTickerMapper implements Mapper<'gate-io', BookTicker> {
+class GateIOV4BookTickerMapper implements Mapper<'gate-io', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: GateV4BookTicker) {
@@ -260,7 +286,7 @@ export class GateIOV4BookTickerMapper implements Mapper<'gate-io', BookTicker> {
   }
 }
 
-export class GateIOV4TradesMapper implements Mapper<'gate-io', Trade> {
+class GateIOV4TradesMapper implements Mapper<'gate-io', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: GateV4Trade) {
@@ -302,7 +328,7 @@ export class GateIOV4TradesMapper implements Mapper<'gate-io', Trade> {
 
 // v3 https://www.gate.io/docs/websocket/index.html
 
-export class GateIOTradesMapper implements Mapper<'gate-io', Trade> {
+class GateIOTradesMapper implements Mapper<'gate-io', Trade> {
   private readonly _seenSymbols = new Set<string>()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -361,7 +387,7 @@ const mapBookLevel = (level: GateIODepthLevel) => {
   return { price, amount }
 }
 
-export class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
+class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: any) {
