@@ -11032,6 +11032,28 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
+        channel: 'spot@public.aggre.deals.v3.api.pb@10ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
         channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000000',
@@ -11101,6 +11123,24 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000001',
+        publicAggreDepths: {
+          asks: [{ price: '100.1', quantity: '0' }],
+          bids: [{ price: '99.7', quantity: '1.1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '102',
+          toVersion: '102'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
         symbol: 'BTCUSDT',
         sendTime: '1710000000002',
@@ -11123,13 +11163,25 @@ test('map mexc messages', () => {
       isSnapshot: true,
       bids: [
         { price: 99.8, amount: 2.3 },
-        { price: 99.9, amount: 0.5 }
+        { price: 99.9, amount: 0.5 },
+        { price: 99.7, amount: 1.1 }
       ],
-      asks: [{ price: 100.1, amount: 1.2 }],
+      asks: [],
       timestamp: new Date('2024-03-09T16:00:00.002Z'),
       localTimestamp
     }
   ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@100ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
 
   expect(
     mapper.map(
@@ -11141,8 +11193,8 @@ test('map mexc messages', () => {
           asks: [{ price: '100.1', quantity: '0' }],
           bids: [{ price: '99.7', quantity: '1.1' }],
           eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '102',
-          toVersion: '102'
+          fromVersion: '103',
+          toVersion: '103'
         }
       },
       localTimestamp

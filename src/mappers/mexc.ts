@@ -241,7 +241,7 @@ enum MexcTradeType {
   Sell = 2
 }
 
-type MexcDepthSnapshotMessage = MexcProtobufMessage<'spot@public.aggre.depth.v3.api.pb@10ms'> & {
+export type MexcDepthSnapshotMessage = MexcProtobufMessage<'spot@public.aggre.depth.v3.api.pb@10ms'> & {
   generated: true
   publicAggreDepths: MexcAggreDepths
 }

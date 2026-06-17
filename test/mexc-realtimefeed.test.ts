@@ -1,8 +1,17 @@
+import type { AddressInfo } from 'net'
+import { createServer } from 'http'
 import { Filter } from '../src/types.ts'
 import { MexcRealTimeFeed } from '../src/realtimefeeds/mexc.ts'
 import { getRealTimeFeedFactory } from '../src/realtimefeeds/index.ts'
 
 class TestMexcRealTimeFeed extends MexcRealTimeFeed {
+  protected readonly httpURL: string
+
+  constructor(exchange: 'mexc', filters: Filter<string>[], timeoutIntervalMS: number | undefined, httpURL = 'https://api.mexc.com') {
+    super(exchange, filters, timeoutIntervalMS)
+    this.httpURL = httpURL
+  }
+
   map(filters: Filter<string>[]) {
     return this.mapToSubscribeMessages(filters)
   }
@@ -17,6 +26,15 @@ class TestMexcRealTimeFeed extends MexcRealTimeFeed {
 
   isHeartbeat(message: any) {
     return this.messageIsHeartbeat(message)
+  }
+
+  observe(message: any) {
+    this.onMessage(message)
+  }
+
+  async provideSnapshots(filters: Filter<string>[], shouldCancel = () => false) {
+    await this.provideManualSnapshots(filters, shouldCancel)
+    return this.manualSnapshotsBuffer
   }
 }
 
@@ -172,6 +190,108 @@ test('decode mexc realtime protobuf book ticker message', () => {
   })
 })
 
+test('provide mexc manual depth snapshots', async () => {
+  const server = await startSnapshotServer()
+  const feed = new TestMexcRealTimeFeed('mexc', [], undefined, server.url)
+  const originalDateNow = Date.now
+
+  Date.now = () => 1710000000000
+
+  try {
+    const filters = [
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        symbols: ['btcusdt']
+      }
+    ]
+
+    feed.map(filters)
+    feed.observe({
+      channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+      symbol: 'BTCUSDT',
+      publicAggreDepths: {
+        fromVersion: '101',
+        toVersion: '101'
+      }
+    })
+
+    const snapshots = await feed.provideSnapshots(filters)
+
+    expect(snapshots).toEqual([
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000000',
+        generated: true,
+        publicAggreDepths: {
+          asks: [{ price: '100.1', quantity: '1.2' }],
+          bids: [{ price: '99.9', quantity: '0.5' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '100',
+          toVersion: '100'
+        }
+      }
+    ])
+  } finally {
+    Date.now = originalDateNow
+    await server.close()
+  }
+})
+
+test('retry mexc manual depth snapshots until buffered update overlaps', async () => {
+  const server = await startSnapshotServer([
+    { lastUpdateId: 101, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] },
+    { lastUpdateId: 102, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']] },
+    { lastUpdateId: 103, asks: [['100.3', '1.2']], bids: [['99.7', '0.5']] },
+    { lastUpdateId: 104, asks: [['100.4', '1.2']], bids: [['99.6', '0.5']] }
+  ])
+  const feed = new TestMexcRealTimeFeed('mexc', [], undefined, server.url)
+  const originalDateNow = Date.now
+
+  Date.now = () => 1710000000000
+
+  try {
+    const filters = [
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        symbols: ['btcusdt']
+      }
+    ]
+
+    feed.map(filters)
+    feed.observe({
+      channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+      symbol: 'BTCUSDT',
+      publicAggreDepths: {
+        fromVersion: '105',
+        toVersion: '105'
+      }
+    })
+
+    const snapshots = await feed.provideSnapshots(filters)
+
+    expect(server.requestsCount).toBe(4)
+    expect(snapshots).toEqual([
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000000',
+        generated: true,
+        publicAggreDepths: {
+          asks: [{ price: '100.4', quantity: '1.2' }],
+          bids: [{ price: '99.6', quantity: '0.5' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '104',
+          toVersion: '104'
+        }
+      }
+    ])
+  } finally {
+    Date.now = originalDateNow
+    await server.close()
+  }
+})
+
 function message(...fields: Buffer[]) {
   return Buffer.concat(fields)
 }
@@ -201,4 +321,35 @@ function varint(value: number) {
   }
   bytes.push(Number(remaining))
   return Buffer.from(bytes)
+}
+
+async function startSnapshotServer(
+  responses: MexcTestDepthSnapshotResponse[] = [{ lastUpdateId: 100, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] }]
+) {
+  let requestsCount = 0
+  const server = createServer((request, response) => {
+    expect(request.url).toBe('/api/v3/depth?symbol=BTCUSDT&limit=1000')
+    const body = responses[Math.min(requestsCount, responses.length - 1)]
+    requestsCount++
+
+    response.writeHead(200, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify(body))
+  })
+
+  await new Promise<void>((resolve) => server.listen(0, resolve))
+  const { port } = server.address() as AddressInfo
+
+  return {
+    url: `http://127.0.0.1:${port}`,
+    get requestsCount() {
+      return requestsCount
+    },
+    close: () => new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
+  }
+}
+
+type MexcTestDepthSnapshotResponse = {
+  lastUpdateId: number
+  bids: string[][]
+  asks: string[][]
 }
