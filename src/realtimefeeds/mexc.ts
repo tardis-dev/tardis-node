@@ -68,7 +68,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
   private readonly channels = new Set([
     'spot@public.aggre.deals.v3.api.pb@10ms',
     'spot@public.aggre.depth.v3.api.pb@10ms',
-    'spot@public.aggre.bookTicker.v3.api.pb@100ms'
+    'spot@public.aggre.bookTicker.v3.api.pb@10ms'
   ])
 
   protected override mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -272,7 +272,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
     const version = data.lastUpdateId.toString()
 
     return {
-      channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+      channel: `spot@public.aggre.depth.v3.api.pb@10ms@${symbol}`,
       symbol,
       sendTime: Date.now().toString(),
       generated: true,

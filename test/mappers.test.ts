@@ -11141,7 +11141,7 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000002',
         generated: true,
@@ -11175,7 +11175,7 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.bookTicker.v3.api.pb@100ms@XENUSDT',
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@XENUSDT',
         symbol: 'XENUSDT',
         sendTime: '1781337091703'
       },
@@ -11215,7 +11215,7 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.bookTicker.v3.api.pb@100ms@BTCUSDT',
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000004',
         publicAggreBookTicker: {

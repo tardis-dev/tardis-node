@@ -15,7 +15,7 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
   private readonly channel = 'spot@public.aggre.deals.v3.api.pb@10ms'
 
   canHandle(message: MexcTradeMessage | MexcControlMessage) {
-    return (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreDeals' in message
+    return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDeals' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -44,7 +44,7 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   private readonly symbolDepthInfo: Record<string, MexcDepthInfo> = {}
 
   canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcControlMessage) {
-    return (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreDepths' in message
+    return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDepths' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -174,12 +174,10 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
 }
 
 export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
-  private readonly channel = 'spot@public.aggre.bookTicker.v3.api.pb@100ms'
+  private readonly channel = 'spot@public.aggre.bookTicker.v3.api.pb@10ms'
 
   canHandle(message: MexcBookTickerMessage | MexcControlMessage) {
-    return (
-      (message.channel?.startsWith(`${this.channel}@`) === true || message.channel === this.channel) && 'publicAggreBookTicker' in message
-    )
+    return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreBookTicker' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -211,8 +209,8 @@ type MexcControlMessage = {
 type MexcMappedChannel =
   | 'spot@public.aggre.deals.v3.api.pb@10ms'
   | 'spot@public.aggre.depth.v3.api.pb@10ms'
-  | 'spot@public.aggre.bookTicker.v3.api.pb@100ms'
-type MexcChannelWithSymbol<TChannel extends MexcMappedChannel> = TChannel | `${TChannel}@${string}`
+  | 'spot@public.aggre.bookTicker.v3.api.pb@10ms'
+type MexcChannelWithSymbol<TChannel extends MexcMappedChannel> = `${TChannel}@${string}`
 
 type MexcProtobufMessage<TChannel extends MexcMappedChannel> = {
   channel: MexcChannelWithSymbol<TChannel>
@@ -264,7 +262,7 @@ type MexcPriceLevel = {
   quantity: string
 }
 
-type MexcBookTickerMessage = MexcProtobufMessage<'spot@public.aggre.bookTicker.v3.api.pb@100ms'> & {
+type MexcBookTickerMessage = MexcProtobufMessage<'spot@public.aggre.bookTicker.v3.api.pb@10ms'> & {
   publicAggreBookTicker: {
     bidPrice: string
     bidQuantity: string
