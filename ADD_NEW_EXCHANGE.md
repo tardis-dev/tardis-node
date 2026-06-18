@@ -92,6 +92,27 @@ Mapper tests should cover:
 
 Run tests and validation — see AGENTS.md for the full checklist.
 
+### 5. Validate live and replay output
+
+After adding or changing a real-time feed, mapper, filter, or upstream API version branch, validate the implementation against actual data in addition to mapper snapshots. Build first because `example.js` imports `dist/index.js`.
+
+```bash
+npm run build
+```
+
+Use `example.js` to check native and normalized output for at least one active symbol and each channel or normalized data type touched by the change:
+
+```bash
+node example.js stream <exchange> <symbol> <channel>
+node example.js --normalized stream <exchange> <symbol> <data-type>
+node example.js replay <exchange> <symbol> <channel> <from> <to>
+node example.js --normalized replay <exchange> <symbol> <data-type> <from> <to>
+```
+
+For order book changes, confirm the expected snapshot behavior: snapshot-capable feeds should emit an initial `book_change` with `isSnapshot=true`, then deltas with `isSnapshot=false` when the exchange contract provides deltas. For trades, tickers, liquidations, and other mapped data types, confirm that messages are produced for the requested symbol and that key fields are populated from the documented exchange semantics.
+
+If a channel is intentionally state-only or should emit nothing for a message variant, validate the paired channel or later payload that should produce the normalized output. Record any skipped live or replay checks in the PR notes.
+
 ## Decision Points
 
 - **Date-based mapper versioning** — If the exchange changed its API format at some point, define the switch in the exchange mapper registry with `mapper([{ until, use }, { use }])`. Look at existing `*Mappers` exports in `src/mappers/{exchange}.ts` files for the pattern.
