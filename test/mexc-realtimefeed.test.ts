@@ -45,32 +45,22 @@ test('register mexc realtime feed', () => {
 test('map mexc realtime subscriptions', () => {
   const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
 
-  expect(
-    feed.map([
-      {
-        channel: 'spot@public.aggre.deals.v3.api.pb@10ms',
-        symbols: ['btcusdt', 'ETHUSDT']
-      },
-      {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
-        symbols: ['BTCUSDT']
-      },
-      {
-        channel: 'spot@public.aggre.bookTicker.v3.api.pb@100ms',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toEqual([
+  const subscribeMessages = feed.map([
     {
-      method: 'SUBSCRIPTION',
-      params: [
-        'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
-        'spot@public.aggre.deals.v3.api.pb@10ms@ETHUSDT',
-        'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
-        'spot@public.aggre.bookTicker.v3.api.pb@100ms@BTCUSDT'
-      ]
+      channel: 'spot@public.aggre.deals.v3.api.pb@10ms',
+      symbols: ['btcusdt', 'ETHUSDT']
+    },
+    {
+      channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+      symbols: ['BTCUSDT']
+    },
+    {
+      channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms',
+      symbols: ['BTCUSDT']
     }
   ])
+
+  expect(subscribeMessages).toMatchSnapshot()
 })
 
 test('mexc realtime subscriptions require symbols', () => {
@@ -171,14 +161,14 @@ test('decode mexc realtime protobuf book ticker message', () => {
   const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
   const publicAggreBookTicker = message(stringField(1, '99.9'), stringField(2, '1.2'), stringField(3, '100.1'), stringField(4, '2.3'))
   const wrapper = message(
-    stringField(1, 'spot@public.aggre.bookTicker.v3.api.pb@100ms@BTCUSDT'),
+    stringField(1, 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
     varintField(6, 1710000000000),
     bytesField(315, publicAggreBookTicker)
   )
 
   expect(feed.parse(wrapper)).toEqual({
-    channel: 'spot@public.aggre.bookTicker.v3.api.pb@100ms@BTCUSDT',
+    channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
     symbol: 'BTCUSDT',
     sendTime: '1710000000000',
     publicAggreBookTicker: {
@@ -219,7 +209,7 @@ test('provide mexc manual depth snapshots', async () => {
 
     expect(snapshots).toEqual([
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000000',
         generated: true,
@@ -273,7 +263,7 @@ test('retry mexc manual depth snapshots until buffered update overlaps', async (
     expect(server.requestsCount).toBe(4)
     expect(snapshots).toEqual([
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000000',
         generated: true,
