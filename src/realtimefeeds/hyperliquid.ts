@@ -12,11 +12,14 @@ export class HyperliquidRealTimeFeed extends RealTimeFeedBase {
         }
 
         return filter.symbols.map((symbol) => {
+          const isFastBook = filter.channel === 'fastBook'
+
           return {
             method: 'subscribe',
             subscription: {
               coin: symbol,
-              type: filter.channel
+              type: isFastBook ? 'l2Book' : filter.channel,
+              fast: isFastBook ? true : undefined
             }
           }
         })

@@ -1,6 +1,16 @@
 import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const mexcFuturesMappers = exchangeMappers({
+  'mexc-futures': {
+    trades: () => new MexcFuturesTradesMapper(),
+    bookChanges: () => new MexcFuturesBookChangeMapper(),
+    derivativeTickers: () => new MexcFuturesDerivativeTickerMapper(),
+    bookTickers: () => new MexcFuturesBookTickerMapper()
+  }
+})
 
 export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
   canHandle(message: MexcFuturesDealMessage) {

@@ -2,8 +2,19 @@ import { debug } from '../debug.ts'
 import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
-export class KucoinFuturesTradesMapper implements Mapper<'kucoin-futures', Trade> {
+export const kucoinFuturesMappers = exchangeMappers({
+  'kucoin-futures': {
+    trades: () => new KucoinFuturesTradesMapper(),
+    bookChanges: (localTimestamp) =>
+      new KucoinFuturesBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
+    derivativeTickers: () => new KucoinFuturesDerivativeTickerMapper(),
+    bookTickers: () => new KucoinFuturesBookTickerMapper()
+  }
+})
+
+class KucoinFuturesTradesMapper implements Mapper<'kucoin-futures', Trade> {
   canHandle(message: KucoinFuturesTradeMessage) {
     return message.type === 'message' && message.topic.startsWith('/contractMarket/execution')
   }
@@ -38,12 +49,16 @@ export class KucoinFuturesTradesMapper implements Mapper<'kucoin-futures', Trade
   }
 }
 
-export class KucoinFuturesBookChangeMapper implements Mapper<'kucoin-futures', BookChange> {
+class KucoinFuturesBookChangeMapper implements Mapper<'kucoin-futures', BookChange> {
   protected readonly symbolToDepthInfoMapping: {
     [key: string]: LocalDepthInfo
   } = {}
 
-  constructor(private readonly ignoreBookSnapshotOverlapError: boolean) {}
+  private readonly ignoreBookSnapshotOverlapError: boolean
+
+  constructor({ ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
 
   canHandle(message: KucoinFuturesLevel2SnapshotMessage | KucoinFuturesLevel2UpdateMessage) {
     return message.type === 'message' && message.topic.startsWith('/contractMarket/level2')
@@ -229,7 +244,7 @@ export class KucoinFuturesBookChangeMapper implements Mapper<'kucoin-futures', B
   }
 }
 
-export class KucoinFuturesBookTickerMapper implements Mapper<'kucoin-futures', BookTicker> {
+class KucoinFuturesBookTickerMapper implements Mapper<'kucoin-futures', BookTicker> {
   canHandle(message: KucoinFuturesTickerMessage) {
     return message.type === 'message' && message.topic.startsWith('/contractMarket/tickerV2')
   }
@@ -267,7 +282,7 @@ export class KucoinFuturesBookTickerMapper implements Mapper<'kucoin-futures', B
   }
 }
 
-export class KucoinFuturesDerivativeTickerMapper implements Mapper<'kucoin-futures', DerivativeTicker> {
+class KucoinFuturesDerivativeTickerMapper implements Mapper<'kucoin-futures', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _lastPrices = new Map<string, number>()
   private readonly _openInterests = new Map<string, number>()

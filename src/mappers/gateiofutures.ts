@@ -1,10 +1,20 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://www.gate.io/docs/futures/ws/index.html
 
-export class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trade> {
+export const gateIOFuturesMappers = exchangeMappers({
+  'gate-io-futures': {
+    trades: () => new GateIOFuturesTradesMapper('gate-io-futures'),
+    bookChanges: () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
+    derivativeTickers: () => new GateIOFuturesDerivativeTickerMapper(),
+    bookTickers: () => new GateIOFuturesBookTickerMapper('gate-io-futures')
+  }
+})
+
+class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: any) {
@@ -49,7 +59,7 @@ const mapBookLevel = (level: GateIOFuturesSnapshotLevel) => {
   return { price, amount: Math.abs(size) }
 }
 
-export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', BookChange> {
+class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', BookChange> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: GateIOFuturesOrderBookSnapshot | GateIOFuturesOrderBookUpdate) {
@@ -108,7 +118,7 @@ export class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', 
   }
 }
 
-export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futures', DerivativeTicker> {
+class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futures', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: GateIOFuturesTicker) {
@@ -155,7 +165,7 @@ export class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futu
   }
 }
 
-export class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', BookTicker> {
+class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: any) {

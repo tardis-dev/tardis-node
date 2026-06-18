@@ -1,10 +1,31 @@
 import { asNonZeroNumberOrUndefined, lowerCaseSymbols, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, OptionSummary, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
+
+const BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE = new Date('2025-12-17T00:00:00.000Z')
 
 // https://binance-docs.github.io/apidocs/voptions/en/#websocket-market-streams
 
-export class BinanceEuropeanOptionsTradesMapper implements Mapper<'binance-european-options', Trade> {
+export const binanceEuropeanOptionsMappers = exchangeMappers({
+  'binance-european-options': {
+    trades: mapper([
+      { until: BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE, use: () => new BinanceEuropeanOptionsTradesMapper() },
+      { use: () => new BinanceEuropeanOptionsTradesMapperV2() }
+    ]),
+    bookChanges: mapper([
+      { until: BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE, use: () => new BinanceEuropeanOptionsBookChangeMapper() },
+      { use: () => new BinanceEuropeanOptionsBookChangeMapperV2() }
+    ]),
+    optionsSummary: mapper([
+      { until: BINANCE_EUROPEAN_OPTIONS_V2_API_SWITCH_DATE, use: () => new BinanceEuropeanOptionSummaryMapper() },
+      { use: () => new BinanceEuropeanOptionSummaryMapperV2() }
+    ]),
+    bookTickers: () => new BinanceEuropeanOptionsBookTickerMapper()
+  }
+})
+
+class BinanceEuropeanOptionsTradesMapper implements Mapper<'binance-european-options', Trade> {
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
       return false
@@ -41,7 +62,7 @@ export class BinanceEuropeanOptionsTradesMapper implements Mapper<'binance-europ
   }
 }
 
-export class BinanceEuropeanOptionsTradesMapperV2 implements Mapper<'binance-european-options', Trade> {
+class BinanceEuropeanOptionsTradesMapperV2 implements Mapper<'binance-european-options', Trade> {
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
       return false
@@ -78,7 +99,7 @@ export class BinanceEuropeanOptionsTradesMapperV2 implements Mapper<'binance-eur
   }
 }
 
-export class BinanceEuropeanOptionsBookChangeMapper implements Mapper<'binance-european-options', BookChange> {
+class BinanceEuropeanOptionsBookChangeMapper implements Mapper<'binance-european-options', BookChange> {
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
       return false
@@ -120,7 +141,7 @@ export class BinanceEuropeanOptionsBookChangeMapper implements Mapper<'binance-e
   }
 }
 
-export class BinanceEuropeanOptionsBookChangeMapperV2 implements Mapper<'binance-european-options', BookChange> {
+class BinanceEuropeanOptionsBookChangeMapperV2 implements Mapper<'binance-european-options', BookChange> {
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
       return false
@@ -162,7 +183,7 @@ export class BinanceEuropeanOptionsBookChangeMapperV2 implements Mapper<'binance
   }
 }
 
-export class BinanceEuropeanOptionsBookTickerMapper implements Mapper<'binance-european-options', BookTicker> {
+class BinanceEuropeanOptionsBookTickerMapper implements Mapper<'binance-european-options', BookTicker> {
   canHandle(message: BinanceResponse<any>) {
     if (message.stream === undefined) {
       return false
@@ -204,7 +225,7 @@ export class BinanceEuropeanOptionsBookTickerMapper implements Mapper<'binance-e
   }
 }
 
-export class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-european-options', OptionSummary> {
+class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-european-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly _openInterests = new Map<string, number>()
 
@@ -330,7 +351,7 @@ export class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-europ
   }
 }
 
-export class BinanceEuropeanOptionSummaryMapperV2 implements Mapper<'binance-european-options', OptionSummary> {
+class BinanceEuropeanOptionSummaryMapperV2 implements Mapper<'binance-european-options', OptionSummary> {
   private readonly _lastPrices = new Map<string, number>()
   private readonly _openInterests = new Map<string, number>()
 

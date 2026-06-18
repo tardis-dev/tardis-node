@@ -1,8 +1,18 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export const wooxTradesMapper: Mapper<'woo-x', Trade> = {
+export const wooxMappers = exchangeMappers({
+  'woo-x': {
+    trades: () => wooxTradesMapper,
+    bookChanges: () => new WooxBookChangeMapper(),
+    derivativeTickers: () => new WooxDerivativeTickerMapper(),
+    bookTickers: () => new WooxBookTickerMapper()
+  }
+})
+
+const wooxTradesMapper: Mapper<'woo-x', Trade> = {
   canHandle(message: WooxTradeMessage) {
     return message.topic !== undefined && message.topic.endsWith('@trade')
   },
@@ -39,7 +49,7 @@ export const wooxTradesMapper: Mapper<'woo-x', Trade> = {
   }
 }
 
-export class WooxBookChangeMapper implements Mapper<'woo-x', BookChange> {
+class WooxBookChangeMapper implements Mapper<'woo-x', BookChange> {
   private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
 
   canHandle(message: WooxOrderbookMessage | WooxOrderbookupdateMessage) {
@@ -149,7 +159,7 @@ export class WooxBookChangeMapper implements Mapper<'woo-x', BookChange> {
   }
 }
 
-export class WooxDerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> {
+class WooxDerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
@@ -236,7 +246,7 @@ export class WooxDerivativeTickerMapper implements Mapper<'woo-x', DerivativeTic
   }
 }
 
-export class WooxBookTickerMapper implements Mapper<'woo-x', BookTicker> {
+class WooxBookTickerMapper implements Mapper<'woo-x', BookTicker> {
   canHandle(message: WooxTradeMessage) {
     return message.topic !== undefined && message.topic.endsWith('@bbo')
   }

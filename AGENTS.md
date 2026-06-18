@@ -15,7 +15,7 @@ npm run check-format # prettier check
 - Keep backward compatibility for public API signatures — this is a published npm package
 - Maintain cache key stability (filters are normalized/sorted intentionally)
 - Preserve memory-safe streaming behavior (avoid large in-memory buffering)
-- Exchange additions must update realtime feed + mapper tables consistently
+- Exchange additions must update realtime feed + mapper registries consistently
 - **Format after every edit** — run `npx prettier --write` on modified files after each change
 
 ## Validation

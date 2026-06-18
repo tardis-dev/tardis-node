@@ -81,6 +81,33 @@ describe('replay', () => {
     1000 * 60 * 10
   )
 
+  test('invalid replayNormalized args validation', async () => {
+    await expect(
+      replayNormalized({ exchange: 'binance', symbols: ['btcusdt'], from: 'sdf', to: 'dsf' }, normalizeTrades).next()
+    ).rejects.toThrowError()
+
+    expect(() =>
+      replayNormalized(
+        { exchange: 'binances' as any, symbols: ['btcusdt'], from: '2019-05-05 00:00', to: '2019-05-05 00:05' },
+        normalizeTrades
+      )
+    ).toThrowError()
+
+    await expect(
+      replayNormalized(
+        { exchange: 'binance', symbols: ['btcusdt'], from: '2019-06-05 00:00', to: '2019-05-05 00:05' },
+        normalizeTrades
+      ).next()
+    ).rejects.toThrowError()
+
+    await expect(
+      replayNormalized(
+        { exchange: 'binance', symbols: ['btcusdt'], from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z' },
+        normalizeTrades
+      ).next()
+    ).rejects.toThrowError()
+  })
+
   test(
     'replays raw Bitmex data feed (ETHUSD trades) for 1st of April 2019 and compares with not decoded sample',
     async () => {

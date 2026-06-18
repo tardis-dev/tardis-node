@@ -1,9 +1,18 @@
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const polymarketMappers = exchangeMappers({
+  polymarket: {
+    trades: () => new PolymarketTradesMapper(),
+    bookChanges: () => new PolymarketBookChangeMapper(),
+    bookTickers: () => new PolymarketBookTickerMapper()
+  }
+})
 
 type PolymarketBookChangeMapperMessage = PolymarketClobBookMessage | PolymarketClobBookMessage[] | PolymarketClobPriceChangeMessage
-export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChange> {
+class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChange> {
   canHandle(message: PolymarketNativeMessage): message is PolymarketBookChangeMapperMessage {
     if (Array.isArray(message)) {
       return message.length > 0 && message.every(isPolymarketClobBookMessage)
@@ -76,7 +85,7 @@ export class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChan
   }
 }
 
-export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
+class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
   canHandle(message: any): message is PolymarketClobLastTradePriceMessage {
     return message.event_type === 'last_trade_price'
   }
@@ -100,7 +109,7 @@ export class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
   }
 }
 
-export class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
+class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
   canHandle(message: any): message is PolymarketClobBestBidAskMessage {
     return message.event_type === 'best_bid_ask'
   }

@@ -32,9 +32,9 @@ Worker thread pre-fetches and caches slices while the main thread processes the 
 
 ## Mapper System
 
-Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange has mapper classes registered in `src/mappers/index.ts`.
+Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange defines its mapper registry next to its mapper classes in `src/mappers/{exchange}.ts`; `src/mappers/index.ts` aggregates those registries for the public normalizers. Mapper registries validate exchange IDs and mapper-kind keys, and mapper-specific configuration should use named options objects instead of positional booleans or numbers.
 
-Some exchanges have date-based mapper versioning — different mapper implementations for different time periods when the exchange changed its API format.
+Some exchanges have date-based mapper versioning through `mapper()` entries — different mapper implementations for different time periods when the exchange changed its API format.
 
 ## Key Abstractions
 
@@ -44,4 +44,4 @@ Some exchanges have date-based mapper versioning — different mapper implementa
 
 ## Configuration
 
-Exchange definitions and channel info in `src/consts.ts`. Mapper and feed registrations in their respective `index.ts` files.
+Exchange definitions and channel info in `src/consts.ts`. Mapper registries live in each exchange mapper file and are aggregated by `src/mappers/index.ts`; feed registrations live in `src/realtimefeeds/index.ts`.

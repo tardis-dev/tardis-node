@@ -1,8 +1,16 @@
 import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
+export const upbitMappers = exchangeMappers({
+  upbit: {
+    trades: () => new UpbitTradesMapper(),
+    bookChanges: () => new UpbitBookChangeMapper()
+  }
+})
+
+class UpbitTradesMapper implements Mapper<'upbit', Trade> {
   canHandle(message: UpbitTrade) {
     return message.type === 'trade'
   }
@@ -33,7 +41,7 @@ export class UpbitTradesMapper implements Mapper<'upbit', Trade> {
   }
 }
 
-export class UpbitBookChangeMapper implements Mapper<'upbit', BookChange> {
+class UpbitBookChangeMapper implements Mapper<'upbit', BookChange> {
   canHandle(message: UpbitOrderBook) {
     return message.type === 'orderbook'
   }
