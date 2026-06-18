@@ -11113,17 +11113,35 @@ test('map mexc futures messages', () => {
       exchange: 'mexc-futures',
       isSnapshot: true,
       bids: [
-        { price: 6857.5, amount: 5 },
-        { price: 6858.5, amount: 7 }
+        { price: 6857.5, amount: 4 },
+        { price: 6858.5, amount: 42 }
       ],
       asks: [
-        { price: 6860.5, amount: 3 },
-        { price: 6859.5, amount: 1 }
+        { price: 6860.5, amount: 2 },
+        { price: 6859.5, amount: 3251 }
       ],
       timestamp: new Date('2020-04-21T04:07:01.003Z'),
       localTimestamp
     }
   ])
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [],
+          bids: [[6858.5, 7, 9]],
+          begin: 96801930,
+          end: 96801930,
+          version: 96801930
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442023003
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC futures depth update is not contiguous')
 
   expect(
     mapper.map(
@@ -11147,7 +11165,7 @@ test('map mexc futures messages', () => {
       symbol: 'BTC_USDT',
       exchange: 'mexc-futures',
       isSnapshot: false,
-      bids: [{ price: 6858.5, amount: 8 }],
+      bids: [{ price: 6858.5, amount: 6 }],
       asks: [{ price: 6860.5, amount: 0 }],
       timestamp: new Date('2020-04-21T04:07:02.003Z'),
       localTimestamp
