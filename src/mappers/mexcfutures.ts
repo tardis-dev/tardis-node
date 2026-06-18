@@ -39,7 +39,7 @@ export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
 }
 
 export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookChange> {
-  private readonly symbolDepthInfo: { [symbol: string]: MexcFuturesDepthInfo } = {}
+  private readonly symbolDepthInfo: Record<string, MexcFuturesDepthInfo> = {}
 
   canHandle(message: MexcFuturesDepthMessage) {
     return message.channel === 'push.depth'
@@ -57,9 +57,18 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       }
 
       for (const update of depthInfo.updates.items()) {
-        if (message.data.version + 1 < update.data.begin || message.data.version >= update.data.end) {
+        if (message.data.version >= update.data.end) {
           continue
         }
+
+        if (message.data.version + 1 < update.data.begin || message.data.version + 1 > update.data.end) {
+          throw new Error(
+            `MEXC futures depth snapshot has no overlap with buffered update, update ${JSON.stringify(update)}, currentBookVersion: ${
+              message.data.version
+            }`
+          )
+        }
+
         for (const bid of update.data.bids) {
           this.applyLevel(message.data.bids, bid)
         }
@@ -95,18 +104,15 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       return
     }
 
-    if (!depthInfo.isContinuityValidated) {
-      if (message.data.begin > depthInfo.currentBookVersion! + 1 || message.data.end < depthInfo.currentBookVersion! + 1) {
-        throw new Error(
-          `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, currentBookVersion: ${
-            depthInfo.currentBookVersion
-          }`
-        )
-      }
-
-      depthInfo.isContinuityValidated = true
+    if (message.data.begin > depthInfo.currentBookVersion! + 1 || message.data.end < depthInfo.currentBookVersion! + 1) {
+      throw new Error(
+        `MEXC futures depth update is not contiguous, update ${JSON.stringify(message)}, currentBookVersion: ${
+          depthInfo.currentBookVersion
+        }`
+      )
     }
 
+    depthInfo.isContinuityValidated = true
     depthInfo.currentBookVersion = message.data.end
 
     yield {
@@ -123,7 +129,7 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
 
   private applyLevel(bookSide: MexcFuturesDepthLevel[], levelUpdate: MexcFuturesDepthLevel) {
     const existingIndex = bookSide.findIndex((level) => level[0] === levelUpdate[0])
-    if (levelUpdate[2] === 0) {
+    if (levelUpdate[1] === 0) {
       if (existingIndex !== -1) {
         bookSide.splice(existingIndex, 1)
       }
@@ -140,7 +146,7 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
   private mapBookLevel(level: MexcFuturesDepthLevel) {
     return {
       price: level[0],
-      amount: level[2]
+      amount: level[1]
     }
   }
 
@@ -296,27 +302,23 @@ type MexcFuturesDepthInfo = {
   updates: CircularBuffer<MexcFuturesDepthUpdateMessage>
 }
 
-type MexcFuturesDepthSnapshotMessage = MexcFuturesMessage<
-  'push.depth',
-  {
-    asks: MexcFuturesDepthLevel[]
-    bids: MexcFuturesDepthLevel[]
-    version: number
-  }
-> & { generated: true }
+export type MexcFuturesDepthSnapshotMessage = MexcFuturesMessage<'push.depth', MexcFuturesDepthSnapshotData> & { generated: true }
 
 type MexcFuturesDepthUpdateMessage = MexcFuturesMessage<
   'push.depth',
-  {
-    asks: MexcFuturesDepthLevel[]
-    bids: MexcFuturesDepthLevel[]
+  MexcFuturesDepthSnapshotData & {
     begin: number
     end: number
-    version: number
   }
 > & { generated?: undefined }
 
-type MexcFuturesDepthLevel = [price: number, ordersCount: number, quantity: number]
+export type MexcFuturesDepthSnapshotData = {
+  asks: MexcFuturesDepthLevel[]
+  bids: MexcFuturesDepthLevel[]
+  version: number
+}
+
+export type MexcFuturesDepthLevel = [price: number, quantity: number, ordersCount: number]
 
 type MexcFuturesTickerMessage = MexcFuturesMessage<
   'push.ticker',
