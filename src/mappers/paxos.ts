@@ -3,9 +3,6 @@ import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
 
-// https://docs.paxos.com/api-reference/websockets/execution-data
-// https://docs.paxos.com/api-reference/websockets/market-data
-
 export const paxosMappers = exchangeMappers({
   paxos: {
     trades: () => new PaxosTradesMapper(),
