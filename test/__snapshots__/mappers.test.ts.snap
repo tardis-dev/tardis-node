@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ignore paxos error messages 1`] = `[]`;
+
 exports[`map binance-european-options messages 1`] = `
 [
   {
@@ -2857,6 +2859,107 @@ exports[`map okex-spreads messages 3`] = `
     "localTimestamp": 2023-12-22T00:00:00.081Z,
     "symbol": "BTC-USD-SWAP_BTC-USD-231229",
     "timestamp": 2023-12-21T10:50:59.224Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map paxos executiondata messages 1`] = `
+[
+  {
+    "amount": 0.00000412,
+    "exchange": "paxos",
+    "id": "6AJVAX7BTCH8",
+    "localTimestamp": 2026-06-20T00:00:00.000Z,
+    "price": 24228.75,
+    "side": "unknown",
+    "symbol": "BTCUSD",
+    "timestamp": 2023-03-13T18:46:53.386Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map paxos marketdata messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.5,
+        "price": 19959,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.62649999,
+        "price": 19958.5,
+      },
+      {
+        "amount": 1.25,
+        "price": 19958,
+      },
+    ],
+    "exchange": "paxos",
+    "isSnapshot": true,
+    "localTimestamp": 2026-06-20T00:00:00.000Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2026-06-20T00:00:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map paxos marketdata messages 2`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.62649999,
+        "price": 19958.5,
+      },
+    ],
+    "exchange": "paxos",
+    "isSnapshot": false,
+    "localTimestamp": 2026-06-20T00:00:00.000Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2026-06-20T00:00:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map paxos marketdata messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 19959,
+      },
+    ],
+    "bids": [],
+    "exchange": "paxos",
+    "isSnapshot": false,
+    "localTimestamp": 2026-06-20T00:00:00.000Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2026-06-20T00:00:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map paxos stablecoin marketdata messages 1`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": 1,
+    "bidAmount": undefined,
+    "bidPrice": 1,
+    "exchange": "paxos",
+    "localTimestamp": 2026-06-20T00:00:00.000Z,
+    "symbol": "USDCUSD",
+    "timestamp": 2026-06-19T08:46:58.050Z,
     "type": "book_ticker",
   },
 ]

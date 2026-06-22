@@ -58,7 +58,8 @@ export const EXCHANGES = [
   'hyperliquid',
   'lighter',
   'bullish',
-  'polymarket'
+  'polymarket',
+  'paxos'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -537,6 +538,8 @@ const POLYMARKET_CHANNELS = [
   'market_resolved'
 ] as const
 
+const PAXOS_CHANNELS = ['executiondata', 'marketdata', 'marketdata/stablecoin'] as const
+
 export const EXCHANGE_CHANNELS_INFO = {
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
@@ -597,5 +600,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   hyperliquid: HYPERLIQUID_CHANNELS,
   lighter: LIGHTER_CHANNELS,
   bullish: BULLISH_CHANNELS,
-  polymarket: POLYMARKET_CHANNELS
+  polymarket: POLYMARKET_CHANNELS,
+  paxos: PAXOS_CHANNELS
 }

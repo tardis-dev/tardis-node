@@ -83,7 +83,8 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'hyperliquid',
   'lighter',
   'bullish',
-  'polymarket'
+  'polymarket',
+  'paxos'
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
@@ -11275,6 +11276,101 @@ test('map polymarket messages', () => {
   ]
 
   const mapper = createMapper('polymarket')
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map paxos executiondata messages', () => {
+  const localTimestamp = new Date('2026-06-20T00:00:00.000Z')
+
+  const messages = [
+    {
+      market: 'BTCUSD',
+      price: '24228.75',
+      amount: '0.00000412',
+      executed_at: '2023-03-13T18:46:53.386Z',
+      match_number: '6AJVAX7BTCH8'
+    }
+  ]
+
+  const mapper = createMapper('paxos')
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map paxos marketdata messages', () => {
+  const localTimestamp = new Date('2026-06-20T00:00:00.000Z')
+
+  const messages = [
+    {
+      type: 'SNAPSHOT',
+      market: 'BTCUSD',
+      bids: [
+        { price: '19958.5', amount: '0.62649999' },
+        { price: '19958.0', amount: '1.25' }
+      ],
+      asks: [{ price: '19959.0', amount: '0.5' }],
+      final_snapshot: true
+    },
+    {
+      type: 'UPDATE',
+      market: 'BTCUSD',
+      side: 'BUY',
+      price: '19958.5',
+      amount: '0.62649999'
+    },
+    {
+      type: 'UPDATE',
+      market: 'BTCUSD',
+      side: 'SELL',
+      price: '19959.0',
+      amount: '0'
+    }
+  ]
+
+  const mapper = createMapper('paxos')
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map paxos stablecoin marketdata messages', () => {
+  const localTimestamp = new Date('2026-06-20T00:00:00.000Z')
+
+  const messages = [
+    {
+      market: 'USDCUSD',
+      price: '1.0000',
+      timestamp: '2026-06-19T08:46:58.050632028Z'
+    }
+  ]
+
+  const mapper = createMapper('paxos')
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('ignore paxos error messages', () => {
+  const localTimestamp = new Date('2026-06-20T00:00:00.000Z')
+
+  const messages = [
+    {
+      error: 'Not Found'
+    }
+  ]
+
+  const mapper = createMapper('paxos')
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)

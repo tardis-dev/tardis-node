@@ -55,6 +55,7 @@ import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
 import { LighterRealTimeFeed } from './lighter.ts'
 import { BullishRealTimeFeed } from './bullish.ts'
 import { PolymarketRealTimeFeed } from './polymarket.ts'
+import { PaxosRealTimeFeed } from './paxos.ts'
 
 export * from './realtimefeed.ts'
 
@@ -120,7 +121,8 @@ const realTimeFeedsMap: {
   hyperliquid: HyperliquidRealTimeFeed,
   lighter: LighterRealTimeFeed,
   bullish: BullishRealTimeFeed,
-  polymarket: PolymarketRealTimeFeed
+  polymarket: PolymarketRealTimeFeed,
+  paxos: PaxosRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
