@@ -16,7 +16,7 @@ npm run check-format # prettier check
 - Maintain cache key stability (filters are normalized/sorted intentionally)
 - Preserve memory-safe streaming behavior (avoid large in-memory buffering)
 - Exchange additions must update realtime feed + mapper registries consistently
-- **Format after every edit** — run `npx prettier --write` on modified files after each change
+- Run the repo formatter/check-format before handoff and before staging, committing, or opening a PR.
 
 ## Validation
 
