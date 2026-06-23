@@ -11298,6 +11298,35 @@ test('map mexc messages', () => {
       localTimestamp
     }
   ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000005',
+        publicAggreBookTicker: {
+          bidPrice: '100',
+          bidQuantity: '4',
+          askPrice: '',
+          askQuantity: ''
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_ticker',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      askAmount: undefined,
+      askPrice: undefined,
+      bidPrice: 100,
+      bidAmount: 4,
+      timestamp: new Date('2024-03-09T16:00:00.005Z'),
+      localTimestamp
+    }
+  ])
 })
 
 test('map mexc buffered depth updates with omitted side', () => {

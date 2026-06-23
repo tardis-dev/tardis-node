@@ -1,5 +1,5 @@
 import { debug } from '../debug.ts'
-import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { asNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -203,10 +203,10 @@ export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
       type: 'book_ticker',
       symbol: message.symbol,
       exchange: 'mexc',
-      askAmount: Number(message.publicAggreBookTicker.askQuantity),
-      askPrice: Number(message.publicAggreBookTicker.askPrice),
-      bidAmount: Number(message.publicAggreBookTicker.bidQuantity),
-      bidPrice: Number(message.publicAggreBookTicker.bidPrice),
+      askAmount: asNumberOrUndefined(message.publicAggreBookTicker.askQuantity),
+      askPrice: asNumberOrUndefined(message.publicAggreBookTicker.askPrice),
+      bidAmount: asNumberOrUndefined(message.publicAggreBookTicker.bidQuantity),
+      bidPrice: asNumberOrUndefined(message.publicAggreBookTicker.bidPrice),
       timestamp: new Date(Number(message.sendTime)),
       localTimestamp
     }
@@ -280,10 +280,10 @@ type MexcPriceLevel = {
 
 type MexcBookTickerMessage = MexcProtobufMessage<'spot@public.aggre.bookTicker.v3.api.pb@10ms'> & {
   publicAggreBookTicker: {
-    bidPrice: string
-    bidQuantity: string
-    askPrice: string
-    askQuantity: string
+    bidPrice?: string
+    bidQuantity?: string
+    askPrice?: string
+    askQuantity?: string
     version?: string
     lastOrderCreateTime?: string | number
   }
