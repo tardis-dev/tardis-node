@@ -11125,7 +11125,7 @@ test('map mexc futures messages', () => {
     }
   ])
 
-  expect(() =>
+  expect(
     mapper.map(
       {
         channel: 'push.depth',
@@ -11141,7 +11141,18 @@ test('map mexc futures messages', () => {
       },
       localTimestamp
     )
-  ).toThrow('MEXC futures depth update is not contiguous')
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: false,
+      bids: [{ price: 6858.5, amount: 7 }],
+      asks: [],
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
+      localTimestamp
+    }
+  ])
 
   expect(
     mapper.map(
@@ -11150,9 +11161,9 @@ test('map mexc futures messages', () => {
         data: {
           asks: [[6860.5, 0, 0]],
           bids: [[6858.5, 6, 8]],
-          begin: 96801928,
-          end: 96801928,
-          version: 96801928
+          begin: 96801931,
+          end: 96801931,
+          version: 96801931
         },
         symbol: 'BTC_USDT',
         ts: 1587442022003
@@ -11209,7 +11220,6 @@ test('map mexc futures messages', () => {
         data: {
           ask1: 6866.5,
           bid1: 6865,
-          contractId: 1,
           fairPrice: 6867.4,
           fundingRate: 0.0008,
           high24Price: 7223.5,
@@ -11286,6 +11296,44 @@ test('map mexc futures messages', () => {
       localTimestamp
     }
   ])
+})
+
+test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
+  const localTimestamp = new Date()
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  mapper.map(
+    {
+      channel: 'push.depth',
+      generated: true,
+      data: {
+        asks: [],
+        bids: [],
+        version: 100
+      },
+      symbol: 'BTC_USDT',
+      ts: Date.now()
+    },
+    localTimestamp
+  )
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[101, 1, 1]],
+          bids: [],
+          begin: 102,
+          end: 102,
+          version: 102
+        },
+        symbol: 'BTC_USDT',
+        ts: Date.now()
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC futures depth snapshot has no overlap with first update')
 })
 
 test('map polymarket messages', () => {

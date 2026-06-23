@@ -1,12 +1,14 @@
+import { debug } from '../debug.ts'
 import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
 export const mexcFuturesMappers = exchangeMappers({
   'mexc-futures': {
     trades: () => new MexcFuturesTradesMapper(),
-    bookChanges: () => new MexcFuturesBookChangeMapper(),
+    bookChanges: (localTimestamp) =>
+      new MexcFuturesBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
     derivativeTickers: () => new MexcFuturesDerivativeTickerMapper(),
     bookTickers: () => new MexcFuturesBookTickerMapper()
   }
@@ -40,6 +42,11 @@ export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
 
 export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookChange> {
   private readonly symbolDepthInfo: Record<string, MexcFuturesDepthInfo> = {}
+  private readonly ignoreBookSnapshotOverlapError: boolean
+
+  constructor({ ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
 
   canHandle(message: MexcFuturesDepthMessage) {
     return message.channel === 'push.depth'
@@ -61,12 +68,18 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
           continue
         }
 
-        if (message.data.version + 1 < update.data.begin || message.data.version + 1 > update.data.end) {
-          throw new Error(
-            `MEXC futures depth snapshot has no overlap with buffered update, update ${JSON.stringify(update)}, currentBookVersion: ${
-              message.data.version
-            }`
-          )
+        if (!depthInfo.isContinuityValidated) {
+          if (update.data.begin > message.data.version + 1 || update.data.end < message.data.version + 1) {
+            const errorMessage = `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(update)}, currentBookVersion: ${message.data.version}`
+            if (this.ignoreBookSnapshotOverlapError) {
+              depthInfo.isContinuityValidated = true
+              debug(errorMessage)
+            } else {
+              throw new Error(errorMessage)
+            }
+          } else {
+            depthInfo.isContinuityValidated = true
+          }
         }
 
         for (const bid of update.data.bids) {
@@ -104,15 +117,20 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
       return
     }
 
-    if (message.data.begin > depthInfo.currentBookVersion! + 1 || message.data.end < depthInfo.currentBookVersion! + 1) {
-      throw new Error(
-        `MEXC futures depth update is not contiguous, update ${JSON.stringify(message)}, currentBookVersion: ${
-          depthInfo.currentBookVersion
-        }`
-      )
+    if (!depthInfo.isContinuityValidated) {
+      if (message.data.begin > depthInfo.currentBookVersion! + 1 || message.data.end < depthInfo.currentBookVersion! + 1) {
+        const errorMessage = `MEXC futures depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, currentBookVersion: ${depthInfo.currentBookVersion}`
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthInfo.isContinuityValidated = true
+          debug(errorMessage)
+        } else {
+          throw new Error(errorMessage)
+        }
+      } else {
+        depthInfo.isContinuityValidated = true
+      }
     }
 
-    depthInfo.isContinuityValidated = true
     depthInfo.currentBookVersion = message.data.end
 
     yield {
@@ -325,7 +343,7 @@ type MexcFuturesTickerMessage = MexcFuturesMessage<
   {
     ask1: number
     bid1: number
-    contractId: number
+    contractId?: number
     fairPrice: number
     fundingRate: number
     high24Price: number
