@@ -11215,6 +11215,62 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000005',
+        publicAggreDepths: {
+          asks: [{ price: '100.3', quantity: '0.4' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '104',
+          toVersion: '104'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [],
+      asks: [{ price: 100.3, amount: 0.4 }],
+      timestamp: new Date('2024-03-09T16:00:00.005Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000006',
+        publicAggreDepths: {
+          bids: [{ price: '99.6', quantity: '0.8' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '105',
+          toVersion: '105'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [{ price: 99.6, amount: 0.8 }],
+      asks: [],
+      timestamp: new Date('2024-03-09T16:00:00.006Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
         channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         sendTime: '1710000000004',
@@ -11237,6 +11293,343 @@ test('map mexc messages', () => {
       bidPrice: 99.9,
       bidAmount: 1.2,
       timestamp: new Date('2024-03-09T16:00:00.004Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc buffered depth updates with omitted side', () => {
+  const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800130',
+        publicAggreDepths: {
+          asks: [
+            { price: '64526.18', quantity: '0.32477055' },
+            { price: '64849.35', quantity: '0.01209236' }
+          ],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74483042021',
+          toVersion: '74483042022'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800000',
+        generated: true,
+        publicAggreDepths: {
+          asks: [{ price: '64530.00', quantity: '1' }],
+          bids: [{ price: '64520.00', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74483042020',
+          toVersion: '74483042020'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [{ price: 64520, amount: 1 }],
+      asks: [
+        { price: 64530, amount: 1 },
+        { price: 64526.18, amount: 0.32477055 },
+        { price: 64849.35, amount: 0.01209236 }
+      ],
+      timestamp: new Date('2026-06-18T00:00:00.000Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc historical buffered depth updates without enforcing full sequence', () => {
+  const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800001',
+        publicAggreDepths: {
+          bids: [{ price: '99', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '101',
+          toVersion: '101'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800002',
+        publicAggreDepths: {
+          asks: [{ price: '101', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '103',
+          toVersion: '103'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800003',
+        generated: true,
+        publicAggreDepths: {
+          asks: [],
+          bids: [],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '100',
+          toVersion: '100'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [{ price: 99, amount: 1 }],
+      asks: [{ price: 101, amount: 1 }],
+      timestamp: new Date('2026-06-18T00:00:00.003Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc realtime depth update throws when first update has no snapshot overlap', () => {
+  const localTimestamp = new Date()
+  const mapper = createMapper('mexc', localTimestamp)
+
+  mapper.map(
+    {
+      channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+      symbol: 'BTCUSDT',
+      sendTime: Date.now().toString(),
+      generated: true,
+      publicAggreDepths: {
+        asks: [],
+        bids: [],
+        eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        fromVersion: '100',
+        toVersion: '100'
+      }
+    },
+    localTimestamp
+  )
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: Date.now().toString(),
+        publicAggreDepths: {
+          asks: [{ price: '101', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '102',
+          toVersion: '102'
+        }
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC depth snapshot has no overlap with first update')
+})
+
+test('map mexc live captured messages', () => {
+  const localTimestamp = new Date('2026-06-23T09:46:45.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208005000',
+        generated: true,
+        publicAggreDepths: {
+          asks: [],
+          bids: [],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74891313262',
+          toVersion: '74891313262'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [],
+      asks: [],
+      timestamp: new Date('2026-06-23T09:46:45.000Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208005090',
+        publicAggreDepths: {
+          asks: [],
+          bids: [{ price: '61759.73', quantity: '0.0001778' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74891313263',
+          toVersion: '74891313263'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [{ price: 61759.73, amount: 0.0001778 }],
+      asks: [],
+      timestamp: new Date('2026-06-23T09:46:45.090Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208005090',
+        publicAggreBookTicker: {
+          bidPrice: '62383.56',
+          bidQuantity: '0.07956651',
+          askPrice: '62383.57',
+          askQuantity: '0.09556'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_ticker',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      askAmount: 0.09556,
+      askPrice: 62383.57,
+      bidPrice: 62383.56,
+      bidAmount: 0.07956651,
+      timestamp: new Date('2026-06-23T09:46:45.090Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208006171',
+        publicAggreDeals: {
+          deals: [
+            { price: '62383.56', quantity: '0.00008235', tradeType: 2, time: '1782208006167' },
+            { price: '62383.57', quantity: '0.00019595', tradeType: 1, time: '1782208006167' },
+            { price: '62383.57', quantity: '0.00059353', tradeType: 1, time: '1782208006167' },
+            { price: '62383.56', quantity: '0.00027168', tradeType: 2, time: '1782208006168' },
+            { price: '62383.57', quantity: '0.00002555', tradeType: 2, time: '1782208006168' }
+          ],
+          eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.56,
+      amount: 0.00008235,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00019595,
+      side: 'buy',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00059353,
+      side: 'buy',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.56,
+      amount: 0.00027168,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.168Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00002555,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.168Z'),
       localTimestamp
     }
   ])

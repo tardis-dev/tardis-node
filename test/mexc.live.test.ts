@@ -1,8 +1,8 @@
-import { normalizeBookChanges, streamNormalized } from '../dist/index.js'
+import { normalizeBookChanges, normalizeBookTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
 import { describeLive } from './live.js'
 
 describeLive('mexc live', () => {
-  test('streams normalized BTCUSDT book changes', async () => {
+  test('streams normalized BTCUSDT data for all mappers', async () => {
     const messages = streamNormalized(
       {
         exchange: 'mexc',
@@ -10,10 +10,17 @@ describeLive('mexc live', () => {
         timeoutIntervalMS: 20_000,
         withDisconnectMessages: true
       },
-      normalizeBookChanges
+      normalizeTrades,
+      normalizeBookChanges,
+      normalizeBookTickers
     )
 
-    let sawBookSnapshot = false
+    const seen = {
+      trade: false,
+      bookSnapshot: false,
+      bookDelta: false,
+      bookTicker: false
+    }
     let sawDisconnect = false
 
     try {
@@ -27,13 +34,23 @@ describeLive('mexc live', () => {
           continue
         }
 
-        if (message.type === 'book_change') {
-          if (message.isSnapshot) {
-            sawBookSnapshot = message.asks.length > 0 || message.bids.length > 0
-          }
+        if (message.type === 'trade') {
+          seen.trade = message.amount > 0 && Number.isFinite(message.price)
         }
 
-        if (sawBookSnapshot) {
+        if (message.type === 'book_ticker') {
+          seen.bookTicker = Number.isFinite(message.askPrice ?? NaN) || Number.isFinite(message.bidPrice ?? NaN)
+        }
+
+        if (message.type === 'book_change' && message.isSnapshot) {
+          seen.bookSnapshot = message.asks.length > 0 || message.bids.length > 0
+        }
+
+        if (message.type === 'book_change' && !message.isSnapshot) {
+          seen.bookDelta = true
+        }
+
+        if (Object.values(seen).every(Boolean)) {
           break
         }
       }
@@ -42,6 +59,11 @@ describeLive('mexc live', () => {
     }
 
     expect(sawDisconnect).toBe(false)
-    expect(sawBookSnapshot).toBe(true)
+    expect(seen).toEqual({
+      trade: true,
+      bookSnapshot: true,
+      bookDelta: true,
+      bookTicker: true
+    })
   }, 40_000)
 })

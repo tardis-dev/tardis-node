@@ -1,12 +1,13 @@
+import { debug } from '../debug.ts'
 import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
 export const mexcMappers = exchangeMappers({
   mexc: {
     trades: () => new MexcTradesMapper(),
-    bookChanges: () => new MexcBookChangeMapper(),
+    bookChanges: (localTimestamp) => new MexcBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
     bookTickers: () => new MexcBookTickerMapper()
   }
 })
@@ -42,6 +43,11 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
 export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   private readonly channel = 'spot@public.aggre.depth.v3.api.pb@10ms'
   private readonly symbolDepthInfo: Record<string, MexcDepthInfo> = {}
+  private readonly ignoreBookSnapshotOverlapError: boolean
+
+  constructor({ ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
 
   canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcControlMessage) {
     return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDepths' in message
@@ -59,8 +65,8 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
       }
 
       let currentBookVersion = Number(message.publicAggreDepths.toVersion)
-      const bids = message.publicAggreDepths.bids.map(this.mapBookLevel)
-      const asks = message.publicAggreDepths.asks.map(this.mapBookLevel)
+      const bids = (message.publicAggreDepths.bids ?? []).map(this.mapBookLevel)
+      const asks = (message.publicAggreDepths.asks ?? []).map(this.mapBookLevel)
 
       for (const update of depthInfo.updates.items()) {
         const fromVersion = Number(update.publicAggreDepths.fromVersion)
@@ -69,18 +75,24 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
           continue
         }
 
-        if (currentBookVersion + 1 < fromVersion || currentBookVersion + 1 > toVersion) {
-          throw new Error(
-            `MEXC depth snapshot has no overlap with buffered update, update ${JSON.stringify(update)}, currentBookVersion: ${
-              currentBookVersion
-            }`
-          )
+        if (!depthInfo.isContinuityValidated) {
+          if (fromVersion > currentBookVersion + 1 || toVersion < currentBookVersion + 1) {
+            const message = `MEXC depth snapshot has no overlap with first update, update ${JSON.stringify(update)}, currentBookVersion: ${currentBookVersion}`
+            if (this.ignoreBookSnapshotOverlapError) {
+              depthInfo.isContinuityValidated = true
+              debug(message)
+            } else {
+              throw new Error(message)
+            }
+          } else {
+            depthInfo.isContinuityValidated = true
+          }
         }
 
-        for (const bid of update.publicAggreDepths.bids) {
+        for (const bid of update.publicAggreDepths.bids ?? []) {
           this.applyLevel(bids, this.mapBookLevel(bid))
         }
-        for (const ask of update.publicAggreDepths.asks) {
+        for (const ask of update.publicAggreDepths.asks ?? []) {
           this.applyLevel(asks, this.mapBookLevel(ask))
         }
         currentBookVersion = toVersion
@@ -117,14 +129,16 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
 
     if (!depthInfo.isContinuityValidated) {
       if (fromVersion > depthInfo.currentBookVersion! + 1 || toVersion < depthInfo.currentBookVersion! + 1) {
-        throw new Error(
-          `MEXC depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, currentBookVersion: ${
-            depthInfo.currentBookVersion
-          }`
-        )
+        const errorMessage = `MEXC depth snapshot has no overlap with first update, update ${JSON.stringify(message)}, currentBookVersion: ${depthInfo.currentBookVersion}`
+        if (this.ignoreBookSnapshotOverlapError) {
+          depthInfo.isContinuityValidated = true
+          debug(errorMessage)
+        } else {
+          throw new Error(errorMessage)
+        }
+      } else {
+        depthInfo.isContinuityValidated = true
       }
-
-      depthInfo.isContinuityValidated = true
     }
 
     depthInfo.currentBookVersion = toVersion
@@ -134,8 +148,8 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
       symbol: message.symbol,
       exchange: 'mexc',
       isSnapshot: false,
-      bids: message.publicAggreDepths.bids.map(this.mapBookLevel),
-      asks: message.publicAggreDepths.asks.map(this.mapBookLevel),
+      bids: (message.publicAggreDepths.bids ?? []).map(this.mapBookLevel),
+      asks: (message.publicAggreDepths.asks ?? []).map(this.mapBookLevel),
       timestamp: new Date(Number(message.sendTime)),
       localTimestamp
     }
@@ -251,8 +265,8 @@ type MexcDepthUpdateMessage = MexcProtobufMessage<'spot@public.aggre.depth.v3.ap
 
 type MexcAggreDepths = {
   eventType: 'spot@public.aggre.depth.v3.api.pb@10ms'
-  asks: MexcPriceLevel[]
-  bids: MexcPriceLevel[]
+  asks?: MexcPriceLevel[]
+  bids?: MexcPriceLevel[]
   fromVersion: string
   toVersion: string
 }
