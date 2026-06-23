@@ -211,14 +211,12 @@ test('provide mexc manual depth snapshots', async () => {
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1710000000000',
         generated: true,
-        publicAggreDepths: {
-          asks: [{ price: '100.1', quantity: '1.2' }],
-          bids: [{ price: '99.9', quantity: '0.5' }],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '100',
-          toVersion: '100'
+        publicAggreDepthsSnapshot: {
+          lastUpdateId: 100,
+          asks: [['100.1', '1.2']],
+          bids: [['99.9', '0.5']],
+          timestamp: 1782235749967
         }
       }
     ])
@@ -230,10 +228,10 @@ test('provide mexc manual depth snapshots', async () => {
 
 test('retry mexc manual depth snapshots until buffered update overlaps', async () => {
   const server = await startSnapshotServer([
-    { lastUpdateId: 101, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] },
-    { lastUpdateId: 102, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']] },
-    { lastUpdateId: 103, asks: [['100.3', '1.2']], bids: [['99.7', '0.5']] },
-    { lastUpdateId: 104, asks: [['100.4', '1.2']], bids: [['99.6', '0.5']] }
+    { lastUpdateId: 101, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']], timestamp: 1782235749964 },
+    { lastUpdateId: 102, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']], timestamp: 1782235749965 },
+    { lastUpdateId: 103, asks: [['100.3', '1.2']], bids: [['99.7', '0.5']], timestamp: 1782235749966 },
+    { lastUpdateId: 104, asks: [['100.4', '1.2']], bids: [['99.6', '0.5']], timestamp: 1782235749967 }
   ])
   const feed = new TestMexcRealTimeFeed('mexc', [], undefined, server.url)
   const originalDateNow = Date.now
@@ -265,14 +263,12 @@ test('retry mexc manual depth snapshots until buffered update overlaps', async (
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1710000000000',
         generated: true,
-        publicAggreDepths: {
-          asks: [{ price: '100.4', quantity: '1.2' }],
-          bids: [{ price: '99.6', quantity: '0.5' }],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '104',
-          toVersion: '104'
+        publicAggreDepthsSnapshot: {
+          lastUpdateId: 104,
+          asks: [['100.4', '1.2']],
+          bids: [['99.6', '0.5']],
+          timestamp: 1782235749967
         }
       }
     ])
@@ -314,7 +310,9 @@ function varint(value: number) {
 }
 
 async function startSnapshotServer(
-  responses: MexcTestDepthSnapshotResponse[] = [{ lastUpdateId: 100, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] }]
+  responses: MexcTestDepthSnapshotResponse[] = [
+    { lastUpdateId: 100, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']], timestamp: 1782235749967 }
+  ]
 ) {
   let requestsCount = 0
   const server = createServer((request, response) => {
@@ -342,4 +340,5 @@ type MexcTestDepthSnapshotResponse = {
   lastUpdateId: number
   bids: string[][]
   asks: string[][]
+  timestamp: number
 }

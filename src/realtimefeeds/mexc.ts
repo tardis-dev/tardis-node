@@ -273,25 +273,17 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
   }
 
   private createManualSnapshot(symbol: string, data: MexcDepthSnapshotResponse): MexcDepthSnapshotMessage {
-    const version = data.lastUpdateId.toString()
-
     return {
       channel: `spot@public.aggre.depth.v3.api.pb@10ms@${symbol}`,
       symbol,
-      sendTime: Date.now().toString(),
       generated: true,
-      publicAggreDepths: {
-        asks: data.asks.map(this.mapDepthSnapshotLevel),
-        bids: data.bids.map(this.mapDepthSnapshotLevel),
-        eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-        fromVersion: version,
-        toVersion: version
+      publicAggreDepthsSnapshot: {
+        lastUpdateId: data.lastUpdateId,
+        asks: data.asks,
+        bids: data.bids,
+        timestamp: data.timestamp
       }
     }
-  }
-
-  private mapDepthSnapshotLevel([price, quantity]: [string, string]) {
-    return { price, quantity }
   }
 }
 
@@ -299,6 +291,7 @@ type MexcDepthSnapshotResponse = {
   lastUpdateId: number
   bids: [string, string][]
   asks: [string, string][]
+  timestamp: number
 }
 
 type MexcDepthUpdateData = {

@@ -11145,14 +11145,12 @@ test('map mexc messages', () => {
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1710000000002',
         generated: true,
-        publicAggreDepths: {
-          asks: [{ price: '100.1', quantity: '1.2' }],
-          bids: [{ price: '99.8', quantity: '2.3' }],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '100',
-          toVersion: '100'
+        publicAggreDepthsSnapshot: {
+          asks: [['100.1', '1.2']],
+          bids: [['99.8', '2.3']],
+          lastUpdateId: 100,
+          timestamp: 1710000000002
         }
       },
       localTimestamp
@@ -11358,14 +11356,12 @@ test('map mexc buffered depth updates with omitted side', () => {
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1781740800000',
         generated: true,
-        publicAggreDepths: {
-          asks: [{ price: '64530.00', quantity: '1' }],
-          bids: [{ price: '64520.00', quantity: '1' }],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '74483042020',
-          toVersion: '74483042020'
+        publicAggreDepthsSnapshot: {
+          asks: [['64530.00', '1']],
+          bids: [['64520.00', '1']],
+          lastUpdateId: 74483042020,
+          timestamp: 1781740800000
         }
       },
       localTimestamp
@@ -11431,14 +11427,12 @@ test('map mexc historical buffered depth updates without enforcing full sequence
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1781740800003',
         generated: true,
-        publicAggreDepths: {
+        publicAggreDepthsSnapshot: {
           asks: [],
           bids: [],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '100',
-          toVersion: '100'
+          lastUpdateId: 100,
+          timestamp: 1781740800003
         }
       },
       localTimestamp
@@ -11465,14 +11459,12 @@ test('map mexc realtime depth update throws when first update has no snapshot ov
     {
       channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
       symbol: 'BTCUSDT',
-      sendTime: Date.now().toString(),
       generated: true,
-      publicAggreDepths: {
+      publicAggreDepthsSnapshot: {
         asks: [],
         bids: [],
-        eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-        fromVersion: '100',
-        toVersion: '100'
+        lastUpdateId: 100,
+        timestamp: Date.now()
       }
     },
     localTimestamp
@@ -11505,14 +11497,12 @@ test('map mexc live captured messages', () => {
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
-        sendTime: '1782208005000',
         generated: true,
-        publicAggreDepths: {
+        publicAggreDepthsSnapshot: {
           asks: [],
           bids: [],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '74891313262',
-          toVersion: '74891313262'
+          lastUpdateId: 74891313262,
+          timestamp: 1782208005000
         }
       },
       localTimestamp

@@ -49,8 +49,11 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
     this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
   }
 
-  canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcControlMessage) {
-    return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDepths' in message
+  canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage) {
+    return (
+      message.channel?.startsWith(`${this.channel}@`) === true &&
+      (message.generated === true ? 'publicAggreDepthsSnapshot' in message : 'publicAggreDepths' in message)
+    )
   }
 
   getFilters(symbols?: string[]) {
@@ -64,9 +67,9 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
         return
       }
 
-      let currentBookVersion = Number(message.publicAggreDepths.toVersion)
-      const bids = (message.publicAggreDepths.bids ?? []).map(this.mapBookLevel)
-      const asks = (message.publicAggreDepths.asks ?? []).map(this.mapBookLevel)
+      let currentBookVersion = Number(message.publicAggreDepthsSnapshot.lastUpdateId)
+      const bids = message.publicAggreDepthsSnapshot.bids.map(this.mapDepthSnapshotLevel)
+      const asks = message.publicAggreDepthsSnapshot.asks.map(this.mapDepthSnapshotLevel)
 
       for (const update of depthInfo.updates.items()) {
         const fromVersion = Number(update.publicAggreDepths.fromVersion)
@@ -109,7 +112,7 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
         isSnapshot: true,
         bids,
         asks,
-        timestamp: new Date(Number(message.sendTime)),
+        timestamp: new Date(Number(message.publicAggreDepthsSnapshot.timestamp)),
         localTimestamp
       }
 
@@ -175,6 +178,13 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
     return {
       price: Number(level.price),
       amount: Number(level.quantity)
+    }
+  }
+
+  private mapDepthSnapshotLevel([price, quantity]: MexcDepthSnapshotLevel) {
+    return {
+      price: Number(price),
+      amount: Number(quantity)
     }
   }
 
@@ -254,10 +264,21 @@ enum MexcTradeType {
   Sell = 2
 }
 
-export type MexcDepthSnapshotMessage = MexcProtobufMessage<'spot@public.aggre.depth.v3.api.pb@10ms'> & {
+export type MexcDepthSnapshotMessage = {
+  channel: MexcChannelWithSymbol<'spot@public.aggre.depth.v3.api.pb@10ms'>
+  symbol: string
   generated: true
-  publicAggreDepths: MexcAggreDepths
+  publicAggreDepthsSnapshot: MexcAggreDepthsSnapshot
 }
+
+type MexcAggreDepthsSnapshot = {
+  asks: MexcDepthSnapshotLevel[]
+  bids: MexcDepthSnapshotLevel[]
+  lastUpdateId: number
+  timestamp: number
+}
+
+type MexcDepthSnapshotLevel = [string, string]
 
 type MexcDepthUpdateMessage = MexcProtobufMessage<'spot@public.aggre.depth.v3.api.pb@10ms'> & {
   generated?: undefined
