@@ -257,9 +257,9 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
 
     pendingTickerInfo.updateLastPrice(message.data.lastPrice)
     pendingTickerInfo.updateOpenInterest(message.data.holdVol)
-    pendingTickerInfo.updateFundingRate(message.data.fundingRate)
     pendingTickerInfo.updateIndexPrice(message.data.indexPrice)
     pendingTickerInfo.updateMarkPrice(message.data.fairPrice)
+    pendingTickerInfo.updateFundingRate(message.data.fundingRate)
     pendingTickerInfo.updateTimestamp(new Date(message.data.timestamp))
 
     if (pendingTickerInfo.hasChanged()) {
