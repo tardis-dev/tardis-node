@@ -11063,13 +11063,15 @@ test('map mexc messages', () => {
               price: '100.1',
               quantity: '0.2',
               tradeType: 1,
-              time: '1710000000001'
+              time: '1710000000001',
+              tradeId: '698165549569396736X0_698165549569396737X0'
             },
             {
               price: '100.2',
               quantity: '0.3',
               tradeType: 2,
-              time: '1710000000002'
+              time: '1710000000002',
+              tradeId: '698165549569396738X0_698165549569396739X0'
             }
           ],
           eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
@@ -11082,7 +11084,7 @@ test('map mexc messages', () => {
       type: 'trade',
       symbol: 'BTCUSDT',
       exchange: 'mexc',
-      id: undefined,
+      id: '698165549569396736X0_698165549569396737X0',
       price: 100.1,
       amount: 0.2,
       side: 'buy',
@@ -11093,7 +11095,7 @@ test('map mexc messages', () => {
       type: 'trade',
       symbol: 'BTCUSDT',
       exchange: 'mexc',
-      id: undefined,
+      id: '698165549569396738X0_698165549569396739X0',
       price: 100.2,
       amount: 0.3,
       side: 'sell',

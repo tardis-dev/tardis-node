@@ -38,6 +38,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       string quantity = 2;
       int32 tradeType = 3;
       int64 time = 4;
+      string tradeId = 5;
     }
 
     message PublicAggreDepthsV3Api {
@@ -46,6 +47,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       string eventType = 3;
       string fromVersion = 4;
       string toVersion = 5;
+      int64 lastOrderCreateTime = 6;
     }
 
     message PublicAggreDepthV3ApiItem {
@@ -58,6 +60,8 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       string bidQuantity = 2;
       string askPrice = 3;
       string askQuantity = 4;
+      string version = 5;
+      int64 lastOrderCreateTime = 6;
     }
   `
 

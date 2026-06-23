@@ -29,7 +29,7 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
         type: 'trade',
         symbol: message.symbol,
         exchange: 'mexc',
-        id: undefined,
+        id: trade.tradeId,
         price: Number(trade.price),
         amount: Number(trade.quantity),
         side: trade.tradeType === MexcTradeType.Buy ? 'buy' : 'sell',
@@ -246,6 +246,7 @@ type MexcTrade = {
   quantity: string
   tradeType: MexcTradeType
   time: string | number
+  tradeId?: string
 }
 
 enum MexcTradeType {
@@ -269,6 +270,7 @@ type MexcAggreDepths = {
   bids?: MexcPriceLevel[]
   fromVersion: string
   toVersion: string
+  lastOrderCreateTime?: string | number
 }
 
 type MexcPriceLevel = {
@@ -282,6 +284,8 @@ type MexcBookTickerMessage = MexcProtobufMessage<'spot@public.aggre.bookTicker.v
     bidQuantity: string
     askPrice: string
     askQuantity: string
+    version?: string
+    lastOrderCreateTime?: string | number
   }
 }
 
