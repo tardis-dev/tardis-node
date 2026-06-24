@@ -25,6 +25,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm',
   'huobi-dm-swap',
   'gate-io-futures',
+  'mexc-futures',
   'coinflex',
   'huobi-dm-linear-swap',
   'ascendex',
@@ -68,6 +69,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okcoin',
   'serum',
   'gate-io-futures',
+  'mexc-futures',
   'bybit-spot',
   'crypto-com',
   'kucoin',
@@ -11654,6 +11656,336 @@ test('map mexc live captured messages', () => {
       localTimestamp
     }
   ])
+})
+
+test('map mexc futures messages', () => {
+  const localTimestamp = new Date('2026-05-27T12:00:00.000Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        symbol: 'BTC_USDT',
+        data: [
+          {
+            p: 115309.8,
+            v: 55,
+            T: 2,
+            O: 3,
+            M: 1,
+            t: 1755487578276,
+            i: '13064218826',
+            cts: '1755487578276'
+          },
+          {
+            p: 115309.8,
+            v: 11,
+            T: 1,
+            O: 3,
+            M: 1,
+            t: 1755487578275,
+            i: '13064218827',
+            cts: '1755487578275'
+          }
+        ],
+        channel: 'push.deal',
+        ts: 1755487578276
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'trade',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      id: '13064218826',
+      price: 115309.8,
+      amount: 55,
+      side: 'sell',
+      timestamp: new Date('2025-08-18T03:26:18.276Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      id: '13064218827',
+      price: 115309.8,
+      amount: 11,
+      side: 'buy',
+      timestamp: new Date('2025-08-18T03:26:18.275Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[6859.5, 3251, 1]],
+          bids: [[6858.5, 42, 7]],
+          begin: 96801927,
+          cts: 1587442021983,
+          end: 96801927,
+          version: 96801927
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022003
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth.snapshot',
+        generated: true,
+        data: {
+          cts: null,
+          asks: [[6860.5, 2, 3]],
+          bids: [[6857.5, 4, 5]],
+          timestamp: 1587442021003,
+          version: 96801926
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: true,
+      bids: [
+        { price: 6857.5, amount: 4 },
+        { price: 6858.5, amount: 42 }
+      ],
+      asks: [
+        { price: 6860.5, amount: 2 },
+        { price: 6859.5, amount: 3251 }
+      ],
+      timestamp: new Date('2020-04-21T04:07:01.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [],
+          bids: [[6858.5, 7, 9]],
+          begin: 96801930,
+          end: 96801930,
+          version: 96801930
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442023003
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: false,
+      bids: [{ price: 6858.5, amount: 7 }],
+      asks: [],
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[6860.5, 0, 0]],
+          bids: [[6858.5, 6, 8]],
+          begin: 96801931,
+          end: 96801931,
+          version: 96801931
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022003
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: false,
+      bids: [{ price: 6858.5, amount: 6 }],
+      asks: [{ price: 6860.5, amount: 0 }],
+      timestamp: new Date('2020-04-21T04:07:02.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.index.price',
+        data: {
+          price: 6861.7,
+          symbol: 'BTC_USDT'
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442021003
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.fair.price',
+        data: {
+          price: 6867.5,
+          symbol: 'BTC_USDT'
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442021503
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.ticker',
+        data: {
+          ask1: 6866.5,
+          bid1: 6865,
+          fairPrice: 6867.4,
+          fundingRate: 0.0008,
+          high24Price: 7223.5,
+          indexPrice: 6861.6,
+          lastPrice: 6865.5,
+          lower24Price: 6756,
+          maxBidPrice: 7073.42,
+          minAskPrice: 6661.37,
+          riseFallRate: -0.0424,
+          riseFallValue: -304.5,
+          symbol: 'BTC_USDT',
+          timestamp: 1587442022003,
+          holdVol: 2284742,
+          volume24: 164586129,
+          riseFallRates: [-0.0424, -0.0419, -0.0407],
+          riseFallRatesOfTimezone: [-0.0402, -0.0398, -0.0388],
+          zone: 'UTC+8'
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'derivative_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      lastPrice: 6865.5,
+      openInterest: 2284742,
+      fundingRate: 0.0008,
+      fundingTimestamp: undefined,
+      predictedFundingRate: undefined,
+      indexPrice: 6861.6,
+      markPrice: 6867.4,
+      timestamp: new Date('2020-04-21T04:07:02.003Z'),
+      localTimestamp
+    },
+    {
+      type: 'book_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      askAmount: undefined,
+      askPrice: 6866.5,
+      bidPrice: 6865,
+      bidAmount: undefined,
+      timestamp: new Date('2020-04-21T04:07:02.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.funding.rate',
+        data: {
+          rate: 0.0012,
+          symbol: 'BTC_USDT',
+          nextSettleTime: 1587445200000
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022503
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'derivative_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      lastPrice: 6865.5,
+      openInterest: 2284742,
+      fundingRate: 0.0012,
+      fundingTimestamp: undefined,
+      predictedFundingRate: undefined,
+      indexPrice: 6861.6,
+      markPrice: 6867.4,
+      timestamp: new Date('2020-04-21T04:07:02.503Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
+  const localTimestamp = new Date()
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  mapper.map(
+    {
+      channel: 'push.depth.snapshot',
+      generated: true,
+      data: {
+        cts: null,
+        asks: [],
+        bids: [],
+        timestamp: Date.now(),
+        version: 100
+      },
+      symbol: 'BTC_USDT'
+    },
+    localTimestamp
+  )
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[101, 1, 1]],
+          bids: [],
+          begin: 102,
+          end: 102,
+          version: 102
+        },
+        symbol: 'BTC_USDT',
+        ts: Date.now()
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC futures depth snapshot has no overlap with first update')
 })
 
 test('map polymarket messages', () => {
