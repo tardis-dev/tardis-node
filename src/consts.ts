@@ -59,6 +59,7 @@ export const EXCHANGES = [
   'hyperliquid',
   'lighter',
   'bullish',
+  'mexc',
   'polymarket'
 ] as const
 
@@ -537,6 +538,13 @@ const LIGHTER_CHANNELS = ['order_book', 'trade', 'ticker', 'market_stats', 'spot
 
 const BULLISH_CHANNELS = ['V1TALevel2', 'V1TALevel1', 'V1TAAnonymousTradeUpdate', 'V1TATickerResponse', 'V1TAIndexPrice'] as const
 
+const MEXC_CHANNELS = [
+  'spot@public.aggre.deals.v3.api.pb@10ms',
+  'spot@public.aggre.depth.v3.api.pb@10ms',
+  'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+  'spot@public.aggre.bookTicker.v3.api.pb@10ms'
+] as const
+
 const POLYMARKET_CHANNELS = [
   'book',
   'price_change',
@@ -609,5 +617,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   hyperliquid: HYPERLIQUID_CHANNELS,
   lighter: LIGHTER_CHANNELS,
   bullish: BULLISH_CHANNELS,
+  mexc: MEXC_CHANNELS,
   polymarket: POLYMARKET_CHANNELS
 }
