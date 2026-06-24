@@ -32,7 +32,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
         return { ...filter, symbols: [] }
       }
 
-      if (this.channelToSubscriptionMethod.has(filter.channel) === false) {
+      if (filter.channel !== 'push.depth.snapshot' && this.channelToSubscriptionMethod.has(filter.channel) === false) {
         throw new Error(`Unsupported MEXC futures channel ${filter.channel}`)
       }
 
@@ -43,9 +43,15 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       return filter as Required<Filter<string>>
     })
 
-    this.resetDepthSnapshotTracking(filtersWithSymbols.filter((filter) => filter.channel === 'push.depth'))
+    const depthSnapshotFilters = filtersWithSymbols.filter((filter) => filter.channel === 'push.depth.snapshot')
+    this.validateDepthSnapshotFilters(filtersWithSymbols, depthSnapshotFilters)
+    this.resetDepthSnapshotTracking(depthSnapshotFilters)
 
     return filtersWithSymbols.flatMap((filter) => {
+      if (filter.channel === 'push.depth.snapshot') {
+        return []
+      }
+
       if (filter.channel === 'push.contract') {
         return [{ method: this.channelToSubscriptionMethod.get(filter.channel) }]
       }
@@ -71,6 +77,24 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
     }
   }
 
+  private validateDepthSnapshotFilters(filters: Required<Filter<string>>[], depthSnapshotFilters: Required<Filter<string>>[]) {
+    if (depthSnapshotFilters.length === 0) {
+      return
+    }
+
+    const depthSymbols = new Set(
+      filters.filter((filter) => filter.channel === 'push.depth').flatMap((filter) => filter.symbols.map((symbol) => symbol.toUpperCase()))
+    )
+
+    for (const filter of depthSnapshotFilters) {
+      for (const symbol of filter.symbols) {
+        if (depthSymbols.has(symbol.toUpperCase()) === false) {
+          throw new Error('MexcFuturesRealTimeFeed requires push.depth for every push.depth.snapshot symbol')
+        }
+      }
+    }
+  }
+
   protected override onMessage(message: any) {
     if (
       message.channel !== 'push.depth' ||
@@ -92,7 +116,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected override async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const depthFilter = filters.find((filter) => filter.channel === 'push.depth')
+    const depthFilter = filters.find((filter) => filter.channel === 'push.depth.snapshot')
     if (depthFilter === undefined) {
       return
     }
@@ -212,7 +236,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
 
   private createManualSnapshot(symbol: string, data: MexcFuturesDepthSnapshotData): MexcFuturesDepthSnapshotMessage {
     return {
-      channel: 'push.depth',
+      channel: 'push.depth.snapshot',
       symbol,
       generated: true,
       data: {

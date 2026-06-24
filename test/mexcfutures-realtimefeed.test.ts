@@ -44,6 +44,10 @@ test('map mexc futures stored push channels to subscription methods', () => {
         symbols: ['BTC_USDT']
       },
       {
+        channel: 'push.depth.snapshot',
+        symbols: ['BTC_USDT']
+      },
+      {
         channel: 'push.funding.rate',
         symbols: ['BTC_USDT']
       },
@@ -90,6 +94,32 @@ test('mexc futures realtime subscriptions require symbols', () => {
   ).toThrow('MexcFuturesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
 })
 
+test('mexc futures snapshot filters require matching depth filters', () => {
+  const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined)
+
+  expect(() =>
+    feed.map([
+      {
+        channel: 'push.depth.snapshot',
+        symbols: ['BTC_USDT']
+      }
+    ])
+  ).toThrow('MexcFuturesRealTimeFeed requires push.depth for every push.depth.snapshot symbol')
+
+  expect(() =>
+    feed.map([
+      {
+        channel: 'push.depth',
+        symbols: ['ETH_USDT']
+      },
+      {
+        channel: 'push.depth.snapshot',
+        symbols: ['BTC_USDT']
+      }
+    ])
+  ).toThrow('MexcFuturesRealTimeFeed requires push.depth for every push.depth.snapshot symbol')
+})
+
 test('provide mexc futures manual depth snapshots', async () => {
   const server = await startSnapshotServer()
   const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined, server.url)
@@ -98,6 +128,10 @@ test('provide mexc futures manual depth snapshots', async () => {
     const filters = [
       {
         channel: 'push.depth',
+        symbols: ['btc_usdt']
+      },
+      {
+        channel: 'push.depth.snapshot',
         symbols: ['btc_usdt']
       }
     ]
@@ -123,7 +157,7 @@ test('provide mexc futures manual depth snapshots', async () => {
       {
         symbol: 'BTC_USDT',
         generated: true,
-        channel: 'push.depth',
+        channel: 'push.depth.snapshot',
         data: {
           cts: null,
           asks: [[75230, 1, 1]],
@@ -150,6 +184,10 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
       {
         channel: 'push.depth',
         symbols: ['BTC_USDT']
+      },
+      {
+        channel: 'push.depth.snapshot',
+        symbols: ['BTC_USDT']
       }
     ]
 
@@ -175,7 +213,7 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
       {
         symbol: 'BTC_USDT',
         generated: true,
-        channel: 'push.depth',
+        channel: 'push.depth.snapshot',
         data: {
           cts: null,
           asks: [[75233, 1, 1]],

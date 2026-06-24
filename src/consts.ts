@@ -437,6 +437,7 @@ const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticke
 const MEXC_FUTURES_CHANNELS = [
   'push.deal',
   'push.depth',
+  'push.depth.snapshot',
   'push.ticker',
   'push.index.price',
   'push.fair.price',

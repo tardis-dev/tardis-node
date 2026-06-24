@@ -11097,7 +11097,7 @@ test('map mexc futures messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'push.depth',
+        channel: 'push.depth.snapshot',
         generated: true,
         data: {
           cts: null,
@@ -11312,7 +11312,7 @@ test('map mexc futures realtime depth update throws when first update has no sna
 
   mapper.map(
     {
-      channel: 'push.depth',
+      channel: 'push.depth.snapshot',
       generated: true,
       data: {
         cts: null,

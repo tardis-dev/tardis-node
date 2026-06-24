@@ -49,11 +49,16 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
   }
 
   canHandle(message: MexcFuturesDepthMessage) {
-    return message.channel === 'push.depth'
+    return message.channel === 'push.depth' || message.channel === 'push.depth.snapshot'
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'push.depth', symbols: upperCaseSymbols(symbols) } as const]
+    const normalizedSymbols = upperCaseSymbols(symbols)
+
+    return [
+      { channel: 'push.depth', symbols: normalizedSymbols } as const,
+      { channel: 'push.depth.snapshot', symbols: normalizedSymbols } as const
+    ]
   }
 
   *map(message: MexcFuturesDepthMessage, localTimestamp: Date): IterableIterator<BookChange> {
@@ -271,6 +276,7 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
 const MEXC_FUTURES_MAPPED_PUSH_CHANNELS = [
   'push.deal',
   'push.depth',
+  'push.depth.snapshot',
   'push.ticker',
   'push.index.price',
   'push.fair.price',
@@ -322,7 +328,7 @@ type MexcFuturesDepthInfo = {
 type MexcFuturesDepthMessage = MexcFuturesDepthSnapshotMessage | MexcFuturesDepthUpdateMessage
 
 export type MexcFuturesDepthSnapshotMessage = {
-  channel: 'push.depth'
+  channel: 'push.depth.snapshot'
   symbol: string
   generated: true
   data: MexcFuturesDepthSnapshotData
