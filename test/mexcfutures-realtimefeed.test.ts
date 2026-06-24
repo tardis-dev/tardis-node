@@ -93,9 +93,6 @@ test('mexc futures realtime subscriptions require symbols', () => {
 test('provide mexc futures manual depth snapshots', async () => {
   const server = await startSnapshotServer()
   const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined, server.url)
-  const originalDateNow = Date.now
-
-  Date.now = () => 1779703618000
 
   try {
     const filters = [
@@ -112,6 +109,7 @@ test('provide mexc futures manual depth snapshots', async () => {
         asks: [],
         bids: [[75228, 32, 4]],
         begin: 101,
+        cts: 1779703618130,
         end: 101,
         version: 101
       },
@@ -126,29 +124,26 @@ test('provide mexc futures manual depth snapshots', async () => {
         symbol: 'BTC_USDT',
         generated: true,
         channel: 'push.depth',
-        ts: 1779703618000,
         data: {
+          cts: null,
           asks: [[75230, 1, 1]],
           bids: [[75220, 2, 2]],
+          timestamp: 1782245602481,
           version: 100
         }
       }
     ])
   } finally {
-    Date.now = originalDateNow
     await server.close()
   }
 })
 
 test('retry mexc futures manual depth snapshots until buffered update overlaps', async () => {
   const server = await startSnapshotServer([
-    { success: true, code: 0, data: { asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], version: 102 } },
-    { success: true, code: 0, data: { asks: [[75233, 1, 1]], bids: [[75217, 2, 2]], version: 104 } }
+    { success: true, code: 0, data: { cts: null, asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], timestamp: 1782245602480, version: 102 } },
+    { success: true, code: 0, data: { cts: null, asks: [[75233, 1, 1]], bids: [[75217, 2, 2]], timestamp: 1782245602481, version: 104 } }
   ])
   const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined, server.url)
-  const originalDateNow = Date.now
-
-  Date.now = () => 1779703618000
 
   try {
     const filters = [
@@ -165,6 +160,7 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
         asks: [],
         bids: [[75228, 32, 4]],
         begin: 105,
+        cts: 1779703618130,
         end: 105,
         version: 105
       },
@@ -180,23 +176,23 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
         symbol: 'BTC_USDT',
         generated: true,
         channel: 'push.depth',
-        ts: 1779703618000,
         data: {
+          cts: null,
           asks: [[75233, 1, 1]],
           bids: [[75217, 2, 2]],
+          timestamp: 1782245602481,
           version: 104
         }
       }
     ])
   } finally {
-    Date.now = originalDateNow
     await server.close()
   }
 })
 
 async function startSnapshotServer(
   responses: MexcFuturesTestDepthSnapshotResponse[] = [
-    { success: true, code: 0, data: { asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], version: 100 } }
+    { success: true, code: 0, data: { cts: null, asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], timestamp: 1782245602481, version: 100 } }
   ]
 ) {
   let requestsCount = 0
@@ -225,8 +221,10 @@ type MexcFuturesTestDepthSnapshotResponse = {
   success: boolean
   code: number
   data: {
+    cts: number | null
     asks: number[][]
     bids: number[][]
+    timestamp: number
     version: number
   }
 }

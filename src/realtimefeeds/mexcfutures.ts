@@ -215,10 +215,11 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       channel: 'push.depth',
       symbol,
       generated: true,
-      ts: Date.now(),
       data: {
+        cts: data.cts,
         asks: data.asks,
         bids: data.bids,
+        timestamp: data.timestamp,
         version: data.version
       }
     }

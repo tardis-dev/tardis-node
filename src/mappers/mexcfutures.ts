@@ -101,7 +101,7 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
         isSnapshot: true,
         bids: message.data.bids.map(this.mapBookLevel),
         asks: message.data.asks.map(this.mapBookLevel),
-        timestamp: new Date(message.ts),
+        timestamp: new Date(message.data.timestamp),
         localTimestamp
       }
 
@@ -294,6 +294,7 @@ type MexcFuturesDealMessage = MexcFuturesMessage<
     M: MexcFuturesSelfTrade
     t: number
     i: string
+    cts?: string
   }[]
 >
 
@@ -311,8 +312,6 @@ enum MexcFuturesSelfTrade {
   No = 2
 }
 
-type MexcFuturesDepthMessage = MexcFuturesDepthSnapshotMessage | MexcFuturesDepthUpdateMessage
-
 type MexcFuturesDepthInfo = {
   isContinuityValidated?: boolean
   currentBookVersion?: number
@@ -320,19 +319,31 @@ type MexcFuturesDepthInfo = {
   updates: CircularBuffer<MexcFuturesDepthUpdateMessage>
 }
 
-export type MexcFuturesDepthSnapshotMessage = MexcFuturesMessage<'push.depth', MexcFuturesDepthSnapshotData> & { generated: true }
+type MexcFuturesDepthMessage = MexcFuturesDepthSnapshotMessage | MexcFuturesDepthUpdateMessage
 
-type MexcFuturesDepthUpdateMessage = MexcFuturesMessage<
-  'push.depth',
-  MexcFuturesDepthSnapshotData & {
-    begin: number
-    end: number
-  }
-> & { generated?: undefined }
+export type MexcFuturesDepthSnapshotMessage = {
+  channel: 'push.depth'
+  symbol: string
+  generated: true
+  data: MexcFuturesDepthSnapshotData
+}
 
 export type MexcFuturesDepthSnapshotData = {
   asks: MexcFuturesDepthLevel[]
   bids: MexcFuturesDepthLevel[]
+  cts?: number | null
+  timestamp: number
+  version: number
+}
+
+type MexcFuturesDepthUpdateMessage = MexcFuturesMessage<'push.depth', MexcFuturesDepthUpdateData> & { generated?: undefined }
+
+export type MexcFuturesDepthUpdateData = {
+  asks: MexcFuturesDepthLevel[]
+  bids: MexcFuturesDepthLevel[]
+  begin: number
+  cts?: number
+  end: number
   version: number
 }
 
@@ -359,6 +370,9 @@ type MexcFuturesTickerMessage = MexcFuturesMessage<
     holdVol: number
     volume24: number
     amount24?: number
+    riseFallRates?: number[]
+    riseFallRatesOfTimezone?: number[]
+    zone?: string
   }
 >
 
@@ -370,4 +384,4 @@ type MexcFuturesPriceData = {
   symbol: string
 }
 
-type MexcFuturesFundingRateMessage = MexcFuturesMessage<'push.funding.rate', { rate: number; symbol: string }>
+type MexcFuturesFundingRateMessage = MexcFuturesMessage<'push.funding.rate', { rate: number; symbol: string; nextSettleTime?: number }>

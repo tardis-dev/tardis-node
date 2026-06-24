@@ -11031,7 +11031,8 @@ test('map mexc futures messages', () => {
             O: 3,
             M: 1,
             t: 1755487578276,
-            i: '13064218826'
+            i: '13064218826',
+            cts: '1755487578276'
           },
           {
             p: 115309.8,
@@ -11040,7 +11041,8 @@ test('map mexc futures messages', () => {
             O: 3,
             M: 1,
             t: 1755487578275,
-            i: '13064218827'
+            i: '13064218827',
+            cts: '1755487578275'
           }
         ],
         channel: 'push.deal',
@@ -11081,6 +11083,7 @@ test('map mexc futures messages', () => {
           asks: [[6859.5, 3251, 1]],
           bids: [[6858.5, 42, 7]],
           begin: 96801927,
+          cts: 1587442021983,
           end: 96801927,
           version: 96801927
         },
@@ -11097,12 +11100,13 @@ test('map mexc futures messages', () => {
         channel: 'push.depth',
         generated: true,
         data: {
+          cts: null,
           asks: [[6860.5, 2, 3]],
           bids: [[6857.5, 4, 5]],
+          timestamp: 1587442021003,
           version: 96801926
         },
-        symbol: 'BTC_USDT',
-        ts: 1587442021003
+        symbol: 'BTC_USDT'
       },
       localTimestamp
     )
@@ -11233,7 +11237,10 @@ test('map mexc futures messages', () => {
           symbol: 'BTC_USDT',
           timestamp: 1587442022003,
           holdVol: 2284742,
-          volume24: 164586129
+          volume24: 164586129,
+          riseFallRates: [-0.0424, -0.0419, -0.0407],
+          riseFallRatesOfTimezone: [-0.0402, -0.0398, -0.0388],
+          zone: 'UTC+8'
         },
         symbol: 'BTC_USDT'
       },
@@ -11273,7 +11280,8 @@ test('map mexc futures messages', () => {
         channel: 'push.funding.rate',
         data: {
           rate: 0.0012,
-          symbol: 'BTC_USDT'
+          symbol: 'BTC_USDT',
+          nextSettleTime: 1587445200000
         },
         symbol: 'BTC_USDT',
         ts: 1587442022503
@@ -11307,12 +11315,13 @@ test('map mexc futures realtime depth update throws when first update has no sna
       channel: 'push.depth',
       generated: true,
       data: {
+        cts: null,
         asks: [],
         bids: [],
+        timestamp: Date.now(),
         version: 100
       },
-      symbol: 'BTC_USDT',
-      ts: Date.now()
+      symbol: 'BTC_USDT'
     },
     localTimestamp
   )
