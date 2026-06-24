@@ -33,6 +33,7 @@ import { kucoinMappers } from './kucoin.ts'
 import { kucoinFuturesMappers } from './kucoinfutures.ts'
 import { lighterMappers } from './lighter.ts'
 import { Mapper } from './mapper.ts'
+import { mexcMappers } from './mexc.ts'
 import { okexMappers } from './okex.ts'
 import { phemexMappers } from './phemex.ts'
 import { poloniexMappers } from './poloniex.ts'
@@ -85,6 +86,7 @@ const registeredMappers = mergeExchangeMappers(
   kucoinMappers,
   kucoinFuturesMappers,
   lighterMappers,
+  mexcMappers,
   okexMappers,
   phemexMappers,
   poloniexMappers,
