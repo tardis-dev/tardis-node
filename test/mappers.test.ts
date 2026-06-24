@@ -11143,7 +11143,7 @@ test('map mexc messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {
@@ -11354,7 +11354,7 @@ test('map mexc buffered depth updates with omitted side', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {
@@ -11425,7 +11425,7 @@ test('map mexc historical buffered depth updates without enforcing full sequence
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {
@@ -11457,7 +11457,7 @@ test('map mexc realtime depth update throws when first update has no snapshot ov
 
   mapper.map(
     {
-      channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+      channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
       symbol: 'BTCUSDT',
       generated: true,
       publicAggreDepthsSnapshot: {
@@ -11495,7 +11495,7 @@ test('map mexc live captured messages', () => {
   expect(
     mapper.map(
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {

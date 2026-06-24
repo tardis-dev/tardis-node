@@ -5,6 +5,8 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class MexcRealTimeFeed extends RealTimeFeedBase {
+  private static readonly depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
+  private static readonly depthSnapshotChannel = 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms'
   private static readonly jsonObjectStart = '{'.charCodeAt(0)
   private static pushDataV3ApiWrapper: protobuf.Type | undefined
   /**
@@ -71,7 +73,8 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
   protected readonly httpURL: string = 'https://api.mexc.com'
   private readonly channels = new Set([
     'spot@public.aggre.deals.v3.api.pb@10ms',
-    'spot@public.aggre.depth.v3.api.pb@10ms',
+    MexcRealTimeFeed.depthChannel,
+    MexcRealTimeFeed.depthSnapshotChannel,
     'spot@public.aggre.bookTicker.v3.api.pb@10ms'
   ])
 
@@ -88,12 +91,18 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       return filter as Required<Filter<string>>
     })
 
-    this.resetDepthSnapshotTracking(filtersWithSymbols)
+    const depthSnapshotFilters = filtersWithSymbols.filter((filter) => filter.channel === MexcRealTimeFeed.depthSnapshotChannel)
+    this.validateDepthSnapshotFilters(filtersWithSymbols, depthSnapshotFilters)
+    this.resetDepthSnapshotTracking(depthSnapshotFilters)
 
     return [
       {
         method: 'SUBSCRIPTION',
-        params: filtersWithSymbols.flatMap((filter) => filter.symbols.map((symbol) => `${filter.channel}@${symbol.toUpperCase()}`))
+        params: filtersWithSymbols.flatMap((filter) =>
+          filter.channel === MexcRealTimeFeed.depthSnapshotChannel
+            ? []
+            : filter.symbols.map((symbol) => `${filter.channel}@${symbol.toUpperCase()}`)
+        )
       }
     ]
   }
@@ -122,7 +131,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
 
   protected override onMessage(message: any) {
     if (
-      message.channel?.startsWith('spot@public.aggre.depth.v3.api.pb@10ms') !== true ||
+      message.channel?.startsWith(MexcRealTimeFeed.depthChannel) !== true ||
       message.symbol === undefined ||
       this.pendingDepthSnapshotSymbols.has(message.symbol) === false
     ) {
@@ -141,7 +150,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected override async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const depthFilter = filters.find((filter) => filter.channel === 'spot@public.aggre.depth.v3.api.pb@10ms')
+    const depthFilter = filters.find((filter) => filter.channel === MexcRealTimeFeed.depthSnapshotChannel)
     if (depthFilter === undefined) {
       return
     }
@@ -172,14 +181,32 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
     this.bufferedDepthUpdates.clear()
 
     for (const filter of filters) {
-      if (filter.channel !== 'spot@public.aggre.depth.v3.api.pb@10ms') {
-        continue
-      }
-
       for (const symbol of filter.symbols) {
         const upperCaseSymbol = symbol.toUpperCase()
         this.pendingDepthSnapshotSymbols.add(upperCaseSymbol)
         this.bufferedDepthUpdates.set(upperCaseSymbol, new CircularBuffer<MexcDepthUpdateData>(2000))
+      }
+    }
+  }
+
+  private validateDepthSnapshotFilters(filters: Required<Filter<string>>[], depthSnapshotFilters: Required<Filter<string>>[]) {
+    if (depthSnapshotFilters.length === 0) {
+      return
+    }
+
+    const depthSymbols = new Set(
+      filters
+        .filter((filter) => filter.channel === MexcRealTimeFeed.depthChannel)
+        .flatMap((filter) => filter.symbols.map((symbol) => symbol.toUpperCase()))
+    )
+
+    for (const filter of depthSnapshotFilters) {
+      for (const symbol of filter.symbols) {
+        if (depthSymbols.has(symbol.toUpperCase()) === false) {
+          throw new Error(
+            `MexcRealTimeFeed requires ${MexcRealTimeFeed.depthChannel} for every ${MexcRealTimeFeed.depthSnapshotChannel} symbol`
+          )
+        }
       }
     }
   }
@@ -274,7 +301,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
 
   private createManualSnapshot(symbol: string, data: MexcDepthSnapshotResponse): MexcDepthSnapshotMessage {
     return {
-      channel: `spot@public.aggre.depth.v3.api.pb@10ms@${symbol}`,
+      channel: `${MexcRealTimeFeed.depthSnapshotChannel}@${symbol}`,
       symbol,
       generated: true,
       publicAggreDepthsSnapshot: {

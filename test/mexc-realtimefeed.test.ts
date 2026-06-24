@@ -55,6 +55,10 @@ test('map mexc realtime subscriptions', () => {
       symbols: ['BTCUSDT']
     },
     {
+      channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+      symbols: ['BTCUSDT']
+    },
+    {
       channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms',
       symbols: ['BTCUSDT']
     }
@@ -86,6 +90,36 @@ test('mexc realtime rejects unsupported channels', () => {
       }
     ])
   ).toThrow('MexcRealTimeFeed unsupported channel unsupported')
+})
+
+test('mexc snapshot filters require matching depth filters', () => {
+  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
+
+  expect(() =>
+    feed.map([
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+        symbols: ['BTCUSDT']
+      }
+    ])
+  ).toThrow(
+    'MexcRealTimeFeed requires spot@public.aggre.depth.v3.api.pb@10ms for every spot@public.aggre.depth.snapshot.v3.api.pb@10ms symbol'
+  )
+
+  expect(() =>
+    feed.map([
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
+        symbols: ['ETHUSDT']
+      },
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+        symbols: ['BTCUSDT']
+      }
+    ])
+  ).toThrow(
+    'MexcRealTimeFeed requires spot@public.aggre.depth.v3.api.pb@10ms for every spot@public.aggre.depth.snapshot.v3.api.pb@10ms symbol'
+  )
 })
 
 test('classify mexc realtime control messages', () => {
@@ -192,6 +226,10 @@ test('provide mexc manual depth snapshots', async () => {
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
         symbols: ['btcusdt']
+      },
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+        symbols: ['btcusdt']
       }
     ]
 
@@ -209,7 +247,7 @@ test('provide mexc manual depth snapshots', async () => {
 
     expect(snapshots).toEqual([
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {
@@ -243,6 +281,10 @@ test('retry mexc manual depth snapshots until buffered update overlaps', async (
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
         symbols: ['btcusdt']
+      },
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+        symbols: ['btcusdt']
       }
     ]
 
@@ -261,7 +303,7 @@ test('retry mexc manual depth snapshots until buffered update overlaps', async (
     expect(server.requestsCount).toBe(4)
     expect(snapshots).toEqual([
       {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
         generated: true,
         publicAggreDepthsSnapshot: {

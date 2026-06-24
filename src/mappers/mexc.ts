@@ -42,6 +42,7 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
 
 export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   private readonly channel = 'spot@public.aggre.depth.v3.api.pb@10ms'
+  private readonly snapshotChannel = 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms'
   private readonly symbolDepthInfo: Record<string, MexcDepthInfo> = {}
   private readonly ignoreBookSnapshotOverlapError: boolean
 
@@ -50,14 +51,18 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
   }
 
   canHandle(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage) {
-    return (
-      message.channel?.startsWith(`${this.channel}@`) === true &&
-      (message.generated === true ? 'publicAggreDepthsSnapshot' in message : 'publicAggreDepths' in message)
-    )
+    return message.generated === true
+      ? message.channel?.startsWith(`${this.snapshotChannel}@`) === true && 'publicAggreDepthsSnapshot' in message
+      : message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDepths' in message
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: this.channel, symbols: upperCaseSymbols(symbols) } as const]
+    const normalizedSymbols = upperCaseSymbols(symbols)
+
+    return [
+      { channel: this.channel, symbols: normalizedSymbols } as const,
+      { channel: this.snapshotChannel, symbols: normalizedSymbols } as const
+    ]
   }
 
   *map(message: MexcDepthSnapshotMessage | MexcDepthUpdateMessage, localTimestamp: Date): IterableIterator<BookChange> {
@@ -233,6 +238,7 @@ type MexcControlMessage = {
 type MexcMappedChannel =
   | 'spot@public.aggre.deals.v3.api.pb@10ms'
   | 'spot@public.aggre.depth.v3.api.pb@10ms'
+  | 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms'
   | 'spot@public.aggre.bookTicker.v3.api.pb@10ms'
 type MexcChannelWithSymbol<TChannel extends MexcMappedChannel> = `${TChannel}@${string}`
 
@@ -265,7 +271,7 @@ enum MexcTradeType {
 }
 
 export type MexcDepthSnapshotMessage = {
-  channel: MexcChannelWithSymbol<'spot@public.aggre.depth.v3.api.pb@10ms'>
+  channel: MexcChannelWithSymbol<'spot@public.aggre.depth.snapshot.v3.api.pb@10ms'>
   symbol: string
   generated: true
   publicAggreDepthsSnapshot: MexcAggreDepthsSnapshot
