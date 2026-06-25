@@ -69,7 +69,6 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'okcoin',
   'serum',
   'gate-io-futures',
-  'mexc-futures',
   'bybit-spot',
   'crypto-com',
   'kucoin',
@@ -11899,17 +11898,6 @@ test('map mexc futures messages', () => {
       markPrice: 6867.4,
       timestamp: new Date('2020-04-21T04:07:02.003Z'),
       localTimestamp
-    },
-    {
-      type: 'book_ticker',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      askAmount: undefined,
-      askPrice: 6866.5,
-      bidPrice: 6865,
-      bidAmount: undefined,
-      timestamp: new Date('2020-04-21T04:07:02.003Z'),
-      localTimestamp
     }
   ])
 
@@ -11968,17 +11956,6 @@ test('map mexc futures messages', () => {
       predictedFundingRate: undefined,
       indexPrice: 6861.7,
       markPrice: 6867.5,
-      timestamp: new Date('2020-04-21T04:07:03.003Z'),
-      localTimestamp
-    },
-    {
-      type: 'book_ticker',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      askAmount: undefined,
-      askPrice: 6866.6,
-      bidPrice: 6865.1,
-      bidAmount: undefined,
       timestamp: new Date('2020-04-21T04:07:03.003Z'),
       localTimestamp
     }

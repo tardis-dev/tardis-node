@@ -1,6 +1,6 @@
 import { debug } from '../debug.ts'
-import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
-import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
+import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { BookChange, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
 
@@ -9,8 +9,7 @@ export const mexcFuturesMappers = exchangeMappers({
     trades: () => new MexcFuturesTradesMapper(),
     bookChanges: (localTimestamp) =>
       new MexcFuturesBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
-    derivativeTickers: () => new MexcFuturesDerivativeTickerMapper(),
-    bookTickers: () => new MexcFuturesBookTickerMapper()
+    derivativeTickers: () => new MexcFuturesDerivativeTickerMapper()
   }
 })
 
@@ -191,30 +190,6 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
     }
 
     return this.symbolDepthInfo[symbol]
-  }
-}
-
-export class MexcFuturesBookTickerMapper implements Mapper<'mexc-futures', BookTicker> {
-  canHandle(message: MexcFuturesTickerMessage) {
-    return message.channel === 'push.ticker'
-  }
-
-  getFilters(symbols?: string[]) {
-    return [{ channel: 'push.ticker', symbols: upperCaseSymbols(symbols) } as const]
-  }
-
-  *map(message: MexcFuturesTickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
-    yield {
-      type: 'book_ticker',
-      symbol: message.symbol,
-      exchange: 'mexc-futures',
-      askPrice: asNonZeroNumberOrUndefined(message.data.ask1),
-      askAmount: undefined,
-      bidPrice: asNonZeroNumberOrUndefined(message.data.bid1),
-      bidAmount: undefined,
-      timestamp: new Date(message.data.timestamp),
-      localTimestamp
-    }
   }
 }
 
