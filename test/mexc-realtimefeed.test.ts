@@ -358,7 +358,7 @@ async function startSnapshotServer(
 ) {
   let requestsCount = 0
   const server = createServer((request, response) => {
-    expect(request.url).toBe('/api/v3/depth?symbol=BTCUSDT&limit=1000')
+    expect(request.url).toBe('/api/v3/depth?symbol=BTCUSDT&limit=5000')
     const body = responses[Math.min(requestsCount, responses.length - 1)]
     requestsCount++
 

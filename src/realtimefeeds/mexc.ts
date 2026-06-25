@@ -221,7 +221,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
           return
         }
 
-        const { data } = await getJSON<MexcDepthSnapshotResponse>(`${this.httpURL}/api/v3/depth?symbol=${symbol}&limit=1000`)
+        const { data } = await getJSON<MexcDepthSnapshotResponse>(`${this.httpURL}/api/v3/depth?symbol=${symbol}&limit=5000`)
         if (this.snapshotResponseIsValid(data) === false) {
           if (attempt < maxSnapshotAttemptsPerRound) {
             await wait(attempt * 1000)
