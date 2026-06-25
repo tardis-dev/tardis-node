@@ -16,17 +16,20 @@ npm run check-format # prettier check
 - Maintain cache key stability (filters are normalized/sorted intentionally)
 - Preserve memory-safe streaming behavior (avoid large in-memory buffering)
 - Exchange additions must update realtime feed + mapper registries consistently
+- New exchange support and behavior-changing mapper or realtime feed changes must follow the evidence checklist in [ADD_NEW_EXCHANGE.md](ADD_NEW_EXCHANGE.md); mapper snapshots alone are not enough for new exchange support
 - Run the repo formatter/check-format before handoff and before staging, committing, or opening a PR.
 
 ## Validation
 
 - `npm run build && npm test`
 - `npm run check-format`
+- Manual `replay()` / `replayNormalized()` checks must run from a real `.mjs`/`.js` file, not from `node --input-type=module` or STDIN. Replay uses worker threads, and workers inherit `execArgv`; `--input-type` makes Node reject the worker file with `ERR_INPUT_TYPE_NOT_ALLOWED`.
 
 ## Operational Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — async iterators, replay pipeline, mapper system, order book
 - [ADD_NEW_EXCHANGE.md](ADD_NEW_EXCHANGE.md) — add mappers and realtime feed for a new exchange
+- [NORMALIZED_MAPPING_GUIDELINES.md](NORMALIZED_MAPPING_GUIDELINES.md) — normalized mapper semantics and snapshot alignment rules
 
 ## Publishing
 

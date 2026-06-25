@@ -25,45 +25,33 @@ Before coding, inspect the contract in this order:
 4. `src/mappers/{exchange}.ts` owns mapper registration, normalizer coverage, and date-based API version selection for that exchange. `src/mappers/index.ts` only aggregates exchange mapper registries.
 5. Official exchange docs and captured raw messages own upstream payload meaning.
 
-Make a coverage table from the channels exposed by the Exchanges API, exchange docs, and captured WebSocket messages. `sourceFor` is supporting context: use it to understand why a channel sources a normalized type, not as a replacement for inspecting the channel payload. For each channel and message variant, record the message role and the exact mapper action. Do not infer the role from the channel name alone; exchanges use different conventions for snapshots, deltas, events, subscription acknowledgements, cached payloads, and status messages.
+Make a coverage table from the channels exposed by the Exchanges API, exchange docs, captured WebSocket messages, and recorded raw replay when available. `sourceFor` is supporting context: use it to understand why a channel sources a normalized type, not as a replacement for inspecting the channel payload.
+
+For each channel and message variant, record the message role, exact mapper action, and concrete evidence for the decision. Evidence should point to a docs section, captured payload, replay range, or test case. Do not infer the role from the channel name alone; exchanges use different conventions for snapshots, deltas, events, subscription acknowledgements, cached payloads, and status messages.
 
 Use this shape in the PR description or implementation notes:
 
-| Channel | Message variants | Role | Normalizer | Mapper action | Test payload |
-| ------- | ---------------- | ---- | ---------- | ------------- | ------------ |
-|         |                  |      |            |               |              |
+| Channel | Message variants | Role | Normalizer | Mapper action | Evidence / test payload |
+| ------- | ---------------- | ---- | ---------- | ------------- | ----------------------- |
+|         |                  |      |            |               |                         |
 
-Mappers to implement depend on what the exchange provides: trades, book changes, tickers, derivative tickers, liquidations, book tickers, options summaries, etc. Do not stop at the channel list — inspect the fields each channel carries and map every supported normalized type. For example, a native ticker channel may produce `BookTicker`, while market stats may produce `DerivativeTicker`.
+Mappers to implement depend on what the exchange provides: trades, book changes, tickers, derivative tickers, liquidations, book tickers, options summaries, etc. Do not stop at the channel list; inspect the fields each channel carries and map every supported normalized type. Use [NORMALIZED_MAPPING_GUIDELINES.md](NORMALIZED_MAPPING_GUIDELINES.md) for normalized field semantics.
 
 Mapper decisions to make explicit:
 
 - **Symbols** — use the same exchange symbol value across mapper output, replay filters, real-time subscription filters, and customer-facing filters. If the exchange exposes more than one identifier, choose the identifier used by the Exchanges API and keep conversions explicit.
 - **Filters** — implement `getFilters()` for each mapper to request the channels needed by that normalizer in `replayNormalized()` and `streamNormalized()`. Return only channels defined for that exchange in `src/consts.ts`.
-- **IDs** — preserve exchange identifiers without losing precision. Prefer string identifiers when the exchange provides them.
-- **Timestamps** — use the exchange event timestamp for `timestamp`. Use `localTimestamp` only when the exchange does not provide a usable event time. Never replace `localTimestamp`; it is the Tardis receive timestamp for replay and streaming.
-- **Message roles** — map snapshots, deltas, trades, ticker updates, status messages, and acknowledgements according to the exchange contract. For order book data, make the `isSnapshot` decision from the actual message role, not from the channel name alone.
-- **Normalized field semantics** — map a field only when the exchange field has the same meaning as the normalized type. Leave ambiguous fields unmapped until the exchange meaning is verified from docs or captured data.
-- **Optional numeric fields** — missing, empty, null, or non-finite exchange values must normalize to `undefined`, not `NaN` or an invalid `Date`. See [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md) before choosing between `Number`, `asNumberOrUndefined`, and `asNonZeroNumberOrUndefined`.
-- **Stateful output** — when normalized output is built from multiple partial messages, use the existing state helper patterns and emit only when the normalized value changes.
-- **Partial price feeds** — standalone index, mark, oracle, or underlying price messages usually update cached mapper state only. Do not emit a `derivative_ticker` or `option_summary` from a price-only message unless that message carries the full normalized contract for that type. Merge the cached price into the next ticker or option summary payload that owns the output timestamp.
+- **Message roles** — map snapshots, deltas, trades, ticker updates, status messages, and acknowledgements according to the exchange contract, not the channel name alone.
+- **Generated snapshots** — when `normalizeBookChanges()` needs a generated or REST-backed snapshot, prove the snapshot can synchronize with buffered deltas in both real-time and replay paths.
+- **Partial feeds** — when a normalized output is built from multiple partial messages, document which message owns the output timestamp, which messages only update cached state, and any partial message intentionally chosen as an output source.
 
-Normalized type semantics:
+Export an `{exchange}Mappers` registry from `src/mappers/{exchange}.ts` with `exchangeMappers()`.
 
-- **Trades** — `side` is liquidity taker side: `buy` means the aggressor bought, `sell` means the aggressor sold. Invert maker-side flags when needed. Skip off-book maintenance events such as insurance fund or ADL unless the product contract explicitly requires them. If a trade channel uses `snapshot` followed by `update`, map only `update`; the initial `snapshot` is recent-trade backfill and must have a test that emits nothing to avoid duplicate or stale trades after reconnect. Map trade `snapshot` only when the exchange sends trades exclusively as snapshots and there is no incremental update variant.
-- **Book changes** — `book_change` is L2 market-by-price data. `isSnapshot=true` means consumers discard prior book state. `isSnapshot=false` means consumers apply absolute price-level amounts to the current book. `amount=0` removes the level.
-- **Book tickers** — `book_ticker` comes from native top-of-book or BBO feeds. It is not `quotes`, which are computed from reconstructed L2 books.
-- **Derivative tickers** — keep `lastPrice`, `openInterest`, `indexPrice`, `markPrice`, funding fields, and predicted funding fields aligned with exchange meaning. `fundingTimestamp` is the next funding event timestamp. When price fields come from separate channels, cache them and emit only from the ticker or stats payload that represents the derivative ticker update.
-- **Liquidations** — `side` is liquidation side: `buy` means a short position was liquidated, `sell` means a long position was liquidated. Do not copy an exchange order side unless it has that meaning.
-- **Option summaries** — parse option type, strike, expiration, greeks, IV, underlying, bid/ask, mark, last price, and open interest from the exchange contract. Prefer explicit instrument metadata such as `indexAsset` or underlying asset fields over symbol parsing when the exchange provides it.
-
-For `normalizeBookChanges`, first identify where the initial book snapshot comes from:
-
-- Native snapshot plus deltas: map the exchange snapshot as `isSnapshot=true`, then map later deltas as `isSnapshot=false`.
-- Snapshot-only feed, such as a full L2 book pushed repeatedly: map each full book message as `isSnapshot=true`.
-- Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels, buffer deltas until the snapshot arrives, emit one snapshot, then emit deltas.
-- Delta-only feed without a snapshot channel: do not mark a delta as a snapshot. Add a snapshot source first or leave the channel out of `normalizeBookChanges`.
-
-Export an `{exchange}Mappers` registry from `src/mappers/{exchange}.ts` with `exchangeMappers()`. Registry keys are validated, so use the exchange IDs and mapper kind names already defined by the code instead of inventing ad hoc keys. Use plain factories for stable mappings, for example `trades: () => new ExchangeTradesMapper()`. If a mapper constructor needs configuration beyond the exchange ID, pass it as a named options object, for example `new ExchangeBookChangeMapper('exchange', { depth: 50 })`, not as positional booleans or numbers. Use `mapper([{ until, use }, { use }])` only when the exchange changed mapper behavior over time. Register that registry in `src/mappers/index.ts`.
+- Use existing exchange IDs and mapper-kind keys; registry keys are validated.
+- Use plain factories for stable mappings, for example `trades: () => new ExchangeTradesMapper()`.
+- If a mapper constructor needs configuration beyond the exchange ID, pass a named options object, for example `new ExchangeBookChangeMapper('exchange', { depth: 50 })`.
+- Use `mapper([{ until, use }, { use }])` only when the exchange changed mapper behavior over time.
+- Register the registry in `src/mappers/index.ts`.
 
 ### 3. Create real-time feed
 
@@ -86,9 +74,9 @@ Mapper tests should cover:
 - representative message variants for each mapped channel
 - order book snapshot and delta behavior, when the exchange provides both
 - message variants that should intentionally emit nothing
-- optional, missing, empty, and otherwise invalid values for fields that can be absent
-- valid zero values for optional numeric fields, especially values cached through `PendingTickerInfoHelper`
+- numeric edge cases from [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md)
 - separate price/index/underlying messages that update mapper state without directly emitting normalized output
+- no `NaN`, `Infinity`, invalid `Date`, or schema-required `undefined` values in emitted normalized messages
 
 Run tests and validation — see AGENTS.md for the full checklist.
 
@@ -100,7 +88,7 @@ After adding or changing a real-time feed, mapper, filter, or upstream API versi
 npm run build
 ```
 
-Use `example.js` to check native and normalized output for at least one active symbol and each channel or normalized data type touched by the change:
+Use `example.js` to check native and normalized output for at least one active symbol and each channel or normalized data type touched by the change. See [AGENTS.md](AGENTS.md) for the manual replay script requirement.
 
 ```bash
 node example.js stream <exchange> <symbol> <channel>
@@ -111,7 +99,9 @@ node example.js --normalized replay <exchange> <symbol> <data-type> <from> <to>
 
 For order book changes, confirm the expected snapshot behavior: snapshot-capable feeds should emit an initial `book_change` with `isSnapshot=true`, then deltas with `isSnapshot=false` when the exchange contract provides deltas. For trades, tickers, liquidations, and other mapped data types, confirm that messages are produced for the requested symbol and that key fields are populated from the documented exchange semantics.
 
-If a channel is intentionally state-only or should emit nothing for a message variant, validate the paired channel or later payload that should produce the normalized output. Record any skipped live or replay checks in the PR notes.
+For order book changes, also confirm that the first snapshot version can be synchronized with the first emitted deltas for both real-time and replay paths. For trades, confirm whether the first trade message is a true incremental trade or a recent-trades backfill that should not be normalized.
+
+If a channel is intentionally state-only or should emit nothing for a message variant, validate the paired channel or later payload that should produce the normalized output. Record the symbol, time range, raw channel, normalized type, and any skipped live or replay checks in the PR notes.
 
 ## Decision Points
 

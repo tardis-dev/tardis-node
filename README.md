@@ -128,7 +128,7 @@ const realTimeStreams = exchangesToStream.map((e) => {
 // combine all real-time message streams into one
 const messages = combine(...realTimeStreams)
 
-// create book snapshots with depth1 that are produced
+// create depth-1 book snapshots that are produced
 // every time best bid/ask info is changed
 // effectively computing real-time quotes
 const realTimeQuoteComputable = computeBookSnapshots({
@@ -137,7 +137,7 @@ const realTimeQuoteComputable = computeBookSnapshots({
   name: 'realtime_quote'
 })
 
-// compute real-time quotes for combines real-time messages
+// compute real-time quotes for combined real-time messages
 const messagesWithQuotes = compute(messages, realTimeQuoteComputable)
 
 const spreads = {}
@@ -164,7 +164,7 @@ for await (const message of messagesWithQuotes) {
 
 ### Seamless switching between real-time streaming and historical market data replay
 
-Example showing simple pattern of providing `async iterable` of market data messages to the function that can process them no matter if it's is real-time or historical market data. That effectively enables having the same 'data pipeline' for backtesting and live trading.
+Example showing a simple pattern of providing an `async iterable` of market data messages to a function that can process real-time or historical market data. That enables the same data pipeline for backtesting and live trading.
 
 ```javascript
 import { replayNormalized, streamNormalized, normalizeTrades, compute, computeTradeBars } from 'tardis-dev'
@@ -205,7 +205,7 @@ async function produceVolumeBasedTradeBars(messages) {
 
 await produceVolumeBasedTradeBars(historicalMessages)
 
-// or for real time data
+// or for real-time data
 //  await produceVolumeBasedTradeBars(realTimeMessages)
 ```
 
