@@ -221,15 +221,8 @@ export class MexcFuturesBookTickerMapper implements Mapper<'mexc-futures', BookT
 export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
-  canHandle(
-    message: MexcFuturesTickerMessage | MexcFuturesIndexPriceMessage | MexcFuturesFairPriceMessage | MexcFuturesFundingRateMessage
-  ) {
-    return (
-      message.channel === 'push.ticker' ||
-      message.channel === 'push.index.price' ||
-      message.channel === 'push.fair.price' ||
-      message.channel === 'push.funding.rate'
-    )
+  canHandle(message: MexcFuturesTickerMessage | MexcFuturesFundingRateMessage) {
+    return message.channel === 'push.ticker' || message.channel === 'push.funding.rate'
   }
 
   getFilters(symbols?: string[]) {
@@ -237,38 +230,18 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
 
     return [
       { channel: 'push.ticker', symbols: normalizedSymbols } as const,
-      { channel: 'push.index.price', symbols: normalizedSymbols } as const,
-      { channel: 'push.fair.price', symbols: normalizedSymbols } as const,
       { channel: 'push.funding.rate', symbols: normalizedSymbols } as const
     ]
   }
 
-  *map(
-    message: MexcFuturesTickerMessage | MexcFuturesIndexPriceMessage | MexcFuturesFairPriceMessage | MexcFuturesFundingRateMessage,
-    localTimestamp: Date
-  ): IterableIterator<DerivativeTicker> {
+  *map(message: MexcFuturesTickerMessage | MexcFuturesFundingRateMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.symbol, 'mexc-futures')
-
-    if (message.channel === 'push.index.price') {
-      pendingTickerInfo.updateIndexPrice(message.data.price)
-      pendingTickerInfo.updateTimestamp(new Date(message.ts))
-      return
-    }
-
-    if (message.channel === 'push.fair.price') {
-      pendingTickerInfo.updateMarkPrice(message.data.price)
-      pendingTickerInfo.updateTimestamp(new Date(message.ts))
-      return
-    }
 
     if (message.channel === 'push.funding.rate') {
       pendingTickerInfo.updateFundingRate(message.data.rate)
-      pendingTickerInfo.updateTimestamp(new Date(message.ts))
-
-      if (pendingTickerInfo.hasChanged()) {
-        yield pendingTickerInfo.getSnapshot(localTimestamp)
-      }
-
+      pendingTickerInfo.updateFundingTimestamp(
+        message.data.nextSettleTime !== undefined ? new Date(message.data.nextSettleTime) : undefined
+      )
       return
     }
 
@@ -276,7 +249,6 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
     pendingTickerInfo.updateOpenInterest(message.data.holdVol)
     pendingTickerInfo.updateIndexPrice(message.data.indexPrice)
     pendingTickerInfo.updateMarkPrice(message.data.fairPrice)
-    pendingTickerInfo.updateFundingRate(message.data.fundingRate)
     pendingTickerInfo.updateTimestamp(new Date(message.data.timestamp))
 
     if (pendingTickerInfo.hasChanged()) {

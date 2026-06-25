@@ -11892,7 +11892,7 @@ test('map mexc futures messages', () => {
       exchange: 'mexc-futures',
       lastPrice: 6865.5,
       openInterest: 2284742,
-      fundingRate: 0.0008,
+      fundingRate: undefined,
       fundingTimestamp: undefined,
       predictedFundingRate: undefined,
       indexPrice: 6861.6,
@@ -11927,19 +11927,59 @@ test('map mexc futures messages', () => {
       },
       localTimestamp
     )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.ticker',
+        data: {
+          ask1: 6866.6,
+          bid1: 6865.1,
+          contractId: 10,
+          fairPrice: 6867.5,
+          fundingRate: 0.0008,
+          high24Price: 7223.5,
+          indexPrice: 6861.7,
+          lastPrice: 6865.6,
+          lower24Price: 6756,
+          maxBidPrice: 7073.42,
+          minAskPrice: 6661.37,
+          riseFallRate: -0.0424,
+          riseFallValue: -304.5,
+          symbol: 'BTC_USDT',
+          timestamp: 1587442023003,
+          holdVol: 2284743,
+          volume24: 164586129
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
   ).toEqual([
     {
       type: 'derivative_ticker',
       symbol: 'BTC_USDT',
       exchange: 'mexc-futures',
-      lastPrice: 6865.5,
-      openInterest: 2284742,
+      lastPrice: 6865.6,
+      openInterest: 2284743,
       fundingRate: 0.0012,
-      fundingTimestamp: undefined,
+      fundingTimestamp: new Date('2020-04-21T05:00:00.000Z'),
       predictedFundingRate: undefined,
-      indexPrice: 6861.6,
-      markPrice: 6867.4,
-      timestamp: new Date('2020-04-21T04:07:02.503Z'),
+      indexPrice: 6861.7,
+      markPrice: 6867.5,
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
+      localTimestamp
+    },
+    {
+      type: 'book_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      askAmount: undefined,
+      askPrice: 6866.6,
+      bidPrice: 6865.1,
+      bidAmount: undefined,
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
       localTimestamp
     }
   ])
