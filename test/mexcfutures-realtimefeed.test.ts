@@ -142,10 +142,8 @@ test('provide mexc futures manual depth snapshots', async () => {
       data: {
         asks: [],
         bids: [[75228, 32, 4]],
-        begin: 101,
         cts: 1779703618130,
-        end: 101,
-        version: 101
+        version: 1
       },
       channel: 'push.depth',
       ts: 1779703618133
@@ -163,7 +161,7 @@ test('provide mexc futures manual depth snapshots', async () => {
           asks: [[75230, 1, 1]],
           bids: [[75220, 2, 2]],
           timestamp: 1782245602481,
-          version: 100
+          version: 0
         }
       }
     ])
@@ -230,7 +228,7 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
 
 async function startSnapshotServer(
   responses: MexcFuturesTestDepthSnapshotResponse[] = [
-    { success: true, code: 0, data: { cts: null, asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], timestamp: 1782245602481, version: 100 } }
+    { success: true, code: 0, data: { cts: null, asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], timestamp: 1782245602481, version: 0 } }
   ]
 ) {
   let requestsCount = 0

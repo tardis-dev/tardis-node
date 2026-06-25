@@ -11725,9 +11725,7 @@ test('map mexc futures messages', () => {
         data: {
           asks: [[6859.5, 3251, 1]],
           bids: [[6858.5, 42, 7]],
-          begin: 96801927,
           cts: 1587442021983,
-          end: 96801927,
           version: 96801927
         },
         symbol: 'BTC_USDT',
@@ -11779,8 +11777,6 @@ test('map mexc futures messages', () => {
         data: {
           asks: [],
           bids: [[6858.5, 7, 9]],
-          begin: 96801930,
-          end: 96801930,
           version: 96801930
         },
         symbol: 'BTC_USDT',

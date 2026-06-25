@@ -104,8 +104,14 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
-    const firstVersion = Number(message.data?.begin ?? message.data?.version)
-    const lastVersion = Number(message.data?.end ?? message.data?.version)
+    const firstVersion = Number(
+      message.data?.begin !== undefined && message.data.begin !== null && message.data.begin !== 0
+        ? message.data.begin
+        : message.data?.version
+    )
+    const lastVersion = Number(
+      message.data?.end !== undefined && message.data.end !== null && message.data.end !== 0 ? message.data.end : message.data?.version
+    )
     if (Number.isFinite(firstVersion) === false || Number.isFinite(lastVersion) === false) {
       return
     }
@@ -228,7 +234,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       response.code === 0 &&
       response.data !== undefined &&
       Number.isFinite(response.data.version) &&
-      response.data.version > 0 &&
+      response.data.version >= 0 &&
       Array.isArray(response.data.asks) &&
       Array.isArray(response.data.bids)
     )
