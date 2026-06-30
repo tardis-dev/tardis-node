@@ -21,14 +21,14 @@ describe('findInstrumentSymbols', () => {
     jest.restoreAllMocks()
   })
 
-  test('returns dataset ids and falls back to id when datasetId is omitted', async () => {
+  test('returns only instruments with dataset ids when datasetId selector is used', async () => {
     global.fetch = createFetchMock(
       new Response(JSON.stringify([{ id: 'btcusdt', datasetId: 'BTCUSDT' }, { id: 'ethusdt' }]), { status: 200 })
     )
     init({ endpoint: 'https://example.com/v1' })
 
     await expect(findInstrumentSymbols(['binance'], { active: true }, 'datasetId')).resolves.toEqual([
-      { exchange: 'binance', symbols: ['BTCUSDT', 'ethusdt'] }
+      { exchange: 'binance', symbols: ['BTCUSDT'] }
     ])
   })
 

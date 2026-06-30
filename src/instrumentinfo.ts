@@ -66,7 +66,10 @@ export async function findInstrumentSymbols(
 
       return {
         exchange,
-        symbols: instruments.map((instrument) => (selector === 'datasetId' ? (instrument.datasetId ?? instrument.id) : instrument.id))
+        symbols:
+          selector === 'datasetId'
+            ? instruments.flatMap((instrument) => instrument.datasetId ?? [])
+            : instruments.map((instrument) => instrument.id)
       }
     })
   )
@@ -112,7 +115,7 @@ export type UnderlyingType = 'native' | 'equity' | 'commodity' | 'fixed_income' 
 export interface InstrumentInfo {
   /** symbol id */
   id: string
-  /** dataset symbol id, may differ from id */
+  /** dataset symbol id, present after the symbol appears in exported dataset metadata */
   datasetId?: string
   /** exchange id */
   exchange: string
