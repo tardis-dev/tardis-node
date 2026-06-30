@@ -4472,6 +4472,20 @@ describe('mappers', () => {
     const messages = [
       {
         channel: 'trade',
+        type: 'snapshot',
+        data: [
+          {
+            symbol: 'BTC/USD',
+            side: 'buy',
+            price: 100.1,
+            qty: 0.25,
+            trade_id: 122,
+            timestamp: '2026-07-01T00:00:00.023456Z'
+          }
+        ]
+      },
+      {
+        channel: 'trade',
         type: 'update',
         data: [
           {

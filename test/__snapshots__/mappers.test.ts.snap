@@ -10582,7 +10582,9 @@ exports[`mappers map kraken messages 7`] = `
 
 exports[`mappers map kraken messages 8`] = `[]`;
 
-exports[`mappers map kraken v2 messages 1`] = `
+exports[`mappers map kraken v2 messages 1`] = `[]`;
+
+exports[`mappers map kraken v2 messages 2`] = `
 [
   {
     "amount": 0.25,
@@ -10598,7 +10600,7 @@ exports[`mappers map kraken v2 messages 1`] = `
 ]
 `;
 
-exports[`mappers map kraken v2 messages 2`] = `
+exports[`mappers map kraken v2 messages 3`] = `
 [
   {
     "asks": [
@@ -10623,7 +10625,7 @@ exports[`mappers map kraken v2 messages 2`] = `
 ]
 `;
 
-exports[`mappers map kraken v2 messages 3`] = `
+exports[`mappers map kraken v2 messages 4`] = `
 [
   {
     "asks": [],
@@ -10643,7 +10645,7 @@ exports[`mappers map kraken v2 messages 3`] = `
 ]
 `;
 
-exports[`mappers map kraken v2 messages 4`] = `
+exports[`mappers map kraken v2 messages 5`] = `
 [
   {
     "askAmount": 2.3,

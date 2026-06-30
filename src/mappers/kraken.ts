@@ -237,7 +237,7 @@ type KrakenSpread = [
 /** @see https://docs.kraken.com/api/docs/websocket-v2/trade */
 class KrakenV2TradesMapper implements Mapper<'kraken', Trade> {
   canHandle(message: KrakenV2Trades) {
-    return message.channel === 'trade'
+    return message.channel === 'trade' && message.type === 'update'
   }
 
   getFilters(symbols?: string[]) {
