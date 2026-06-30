@@ -105,7 +105,7 @@ If a channel is intentionally state-only or should emit nothing for a message va
 
 ## Decision Points
 
-- **Date-based mapper versioning** — If the exchange changed its API format at some point, define the switch in the exchange mapper registry with `mapper([{ until, use }, { use }])`. Look at existing `*Mappers` exports in `src/mappers/{exchange}.ts` files for the pattern.
+- **Date-based mapper versioning** — If the exchange changed its raw API format at some point, define the switch in the exchange mapper registry with `mapper([{ until, use }, { use }])`. Use separate mapper classes for each raw format even when public Tardis channel names stayed the same. Look at existing `*Mappers` exports in `src/mappers/{exchange}.ts` files for the pattern.
 - **Multi-connection feeds** — Some exchanges need multiple WebSocket connections. The base class supports this via `MultiConnectionRealTimeFeedBase`.
 - **Decompression** — Some exchanges compress WebSocket messages. Override the decompress hook if needed.
 - **Filter optimization** — The base class has `optimizeFilters()` for normalizing subscription filters. Override if the exchange needs special handling.

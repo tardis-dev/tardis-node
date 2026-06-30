@@ -8401,7 +8401,7 @@ test('map bitnomial messages', () => {
   }
 })
 
-test('map woo-x messages', () => {
+test('map woo-x legacy messages', () => {
   const messages = [
     {
       topic: 'PERP_GALA_USDT@trade',
@@ -8475,10 +8475,88 @@ test('map woo-x messages', () => {
     { topic: 'PERP_BTC_USDT@openinterest', ts: 1674432013624, data: { symbol: 'PERP_BTC_USDT', openInterest: 83.2241 } }
   ]
 
-  const wooxMapper = createMapper('woo-x', new Date('2022-08-16T00:00:00.4642130Z'))
+  const localTimestamp = new Date('2023-01-23T00:00:00.464Z')
+  const wooxMapper = createMapper('woo-x', localTimestamp)
 
   for (const message of messages) {
-    const mappedMessages = wooxMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
+    const mappedMessages = wooxMapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map woo-x v3 messages', () => {
+  const messages = [
+    {
+      topic: 'trade@PERP_ETH_USDT',
+      ts: 1782770880002,
+      data: { ts: 1782770879821, px: '1622.8', sx: '0.09', sd: 'SELL', src: 1, s: 'PERP_ETH_USDT' }
+    },
+    {
+      topic: 'trade@SPOT_ETH_USDT',
+      ts: 1782770880006,
+      data: { ts: 1782770880005, px: '1622.6', sx: '0.02', sd: 'BUY', src: 1, s: 'SPOT_ETH_USDT' }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880101,
+      data: {
+        s: 'PERP_ETH_USDT',
+        prevTs: 1782770879850,
+        ts: 1782770880100,
+        asks: [['1622.8', '0.3']],
+        bids: []
+      }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880120,
+      generated: true,
+      data: {
+        s: 'PERP_ETH_USDT',
+        ts: 1782770880000,
+        asks: [
+          ['1622.8', '0.2'],
+          ['1623.0', '0.1']
+        ],
+        bids: [['1622.7', '0.4']]
+      }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880300,
+      data: {
+        s: 'PERP_ETH_USDT',
+        prevTs: 1782770880000,
+        ts: 1782770880300,
+        asks: [['1622.8', '0']],
+        bids: [['1622.6', '0.5']]
+      }
+    },
+    {
+      topic: 'bbo@PERP_ETH_USDT',
+      ts: 1782770880005,
+      data: { ts: 1782770880004, bp: '1622.7', bq: '0.4', ap: '1622.8', aq: '0.2', s: 'PERP_ETH_USDT' }
+    },
+    { topic: 'markprice@PERP_ETH_USDT', ts: 1782770880003, data: { ts: 1782770880000, px: '1622.9', s: 'PERP_ETH_USDT' } },
+    { topic: 'indexprice@SPOT_ETH_USDT', ts: 1782770880004, data: { ts: 1782770880000, px: '1622.5', s: 'SPOT_ETH_USDT' } },
+    { topic: 'openinterest@PERP_ETH_USDT', ts: 1782770880574, data: { ts: 1782770880570, oi: '95500', s: 'PERP_ETH_USDT' } },
+    {
+      topic: 'estfundingrate@PERP_ETH_USDT',
+      ts: 1782770939003,
+      data: { ts: 1782770939000, ft: 1782777600000, s: 'PERP_ETH_USDT', r: '0.00001181' }
+    },
+    {
+      topic: 'trade@PERP_ETH_USDT',
+      ts: 1782770940002,
+      data: { ts: 1782770940001, px: '1622.8', sx: '0.01', sd: 'BUY', src: 0, s: 'PERP_ETH_USDT' }
+    }
+  ]
+
+  const localTimestamp = new Date('2026-06-29T22:08:00.464Z')
+  const wooxMapper = createMapper('woo-x', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = wooxMapper.map(message, localTimestamp)
     expect(mappedMessages).toMatchSnapshot()
   }
 })

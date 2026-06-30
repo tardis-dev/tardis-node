@@ -8,6 +8,7 @@ Use this when implementing or reviewing `src/mappers/{exchange}.ts`. [ADD_NEW_EX
 - Preserve exchange identifiers without losing precision. Prefer strings when the exchange provides string ids.
 - Use the exchange event timestamp for `timestamp`. Use `localTimestamp` only when the exchange does not provide a usable event time. Never replace `localTimestamp`.
 - Do not add fallback fields, default values, sequence branches, or type coercion unless official docs, captured messages, or recorder output show that variant.
+- If an exchange changes raw API format over time, keep mapper implementations date-based and separate even when Tardis channel names stay the same. Do not mix old and new payload fields in one parser branch unless the same upstream API version documents both variants.
 - For numeric parsing, follow [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md). Missing, empty, null, or non-finite optional values should normalize to `undefined`.
 - When normalized output is built from multiple partial messages, use existing state helper patterns and pick one payload type to own the output timestamp. Side-channel updates should update cached state only unless they are intentionally chosen as normalized output sources and their timestamp and field semantics are validated.
 

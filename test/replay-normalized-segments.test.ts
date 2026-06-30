@@ -152,6 +152,38 @@ test('replayNormalized segments OKX book changes at public books channel boundar
   }
 })
 
+test('replayNormalized segments WOO X book changes at the V3 raw payload boundary', async () => {
+  const messages = []
+  for await (const message of replayNormalized(
+    {
+      exchange: 'woo-x',
+      symbols: ['PERP_BTC_USDT'],
+      from: '2026-06-29T22:01:00.000Z',
+      to: '2026-06-29T22:03:00.000Z'
+    },
+    normalizeBookChanges
+  )) {
+    messages.push(message)
+  }
+
+  expect(messages).toHaveLength(2)
+  expect(messages.map((message) => message.timestamp.toISOString())).toEqual(['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z'])
+  expect(workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()])).toEqual([
+    ['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z'],
+    ['2026-06-29T22:02:00.000Z', '2026-06-29T22:03:00.000Z']
+  ])
+  expect(workerPayloads.map((payload) => payload.filters)).toEqual([
+    [
+      { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
+      { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
+    ],
+    [
+      { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
+      { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
+    ]
+  ])
+})
+
 function createMessage(payload: any) {
   const filter = payload.filters[0]
   const symbol = filter.symbols[0]
@@ -170,6 +202,35 @@ function createMessage(payload: any) {
           trdMatchID: `${payload.fromDate.valueOf()}`
         }
       ]
+    }
+  }
+
+  if (payload.exchange === 'woo-x') {
+    if (payload.fromDate.valueOf() < Date.parse('2026-06-29T22:02:00.000Z')) {
+      return {
+        id: `${symbol}@orderbook`,
+        event: 'request',
+        success: true,
+        ts: payload.fromDate.valueOf(),
+        data: {
+          symbol,
+          ts: payload.fromDate.valueOf(),
+          bids: [[100, 1]],
+          asks: [[101, 2]]
+        }
+      }
+    }
+
+    return {
+      topic: `orderbook@${symbol}@50`,
+      ts: payload.fromDate.valueOf(),
+      generated: true,
+      data: {
+        s: symbol,
+        ts: payload.fromDate.valueOf(),
+        bids: [['100', '1']],
+        asks: [['101', '2']]
+      }
     }
   }
 

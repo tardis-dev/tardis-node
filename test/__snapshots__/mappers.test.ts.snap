@@ -3100,13 +3100,13 @@ exports[`map polymarket messages 13`] = `[]`;
 
 exports[`map polymarket messages 14`] = `[]`;
 
-exports[`map woo-x messages 1`] = `
+exports[`map woo-x legacy messages 1`] = `
 [
   {
     "amount": 4109,
     "exchange": "woo-x",
     "id": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "price": 0.048756,
     "side": "sell",
     "symbol": "PERP_GALA_USDT",
@@ -3119,7 +3119,7 @@ exports[`map woo-x messages 1`] = `
     "fundingTimestamp": undefined,
     "indexPrice": undefined,
     "lastPrice": 0.048756,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": undefined,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -3130,13 +3130,13 @@ exports[`map woo-x messages 1`] = `
 ]
 `;
 
-exports[`map woo-x messages 2`] = `
+exports[`map woo-x legacy messages 2`] = `
 [
   {
     "amount": 0.0516,
     "exchange": "woo-x",
     "id": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "price": 1522.45,
     "side": "sell",
     "symbol": "SPOT_ETH_USDT",
@@ -3146,9 +3146,9 @@ exports[`map woo-x messages 2`] = `
 ]
 `;
 
-exports[`map woo-x messages 3`] = `[]`;
+exports[`map woo-x legacy messages 3`] = `[]`;
 
-exports[`map woo-x messages 4`] = `
+exports[`map woo-x legacy messages 4`] = `
 [
   {
     "asks": [
@@ -3173,7 +3173,7 @@ exports[`map woo-x messages 4`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": true,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.020Z,
     "type": "book_change",
@@ -3193,7 +3193,7 @@ exports[`map woo-x messages 4`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": false,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.020Z,
     "type": "book_change",
@@ -3201,7 +3201,7 @@ exports[`map woo-x messages 4`] = `
 ]
 `;
 
-exports[`map woo-x messages 5`] = `
+exports[`map woo-x legacy messages 5`] = `
 [
   {
     "asks": [
@@ -3222,7 +3222,7 @@ exports[`map woo-x messages 5`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": false,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.220Z,
     "type": "book_change",
@@ -3230,7 +3230,7 @@ exports[`map woo-x messages 5`] = `
 ]
 `;
 
-exports[`map woo-x messages 6`] = `
+exports[`map woo-x legacy messages 6`] = `
 [
   {
     "askAmount": 38.2,
@@ -3238,7 +3238,7 @@ exports[`map woo-x messages 6`] = `
     "bidAmount": 21.137,
     "bidPrice": 13.322,
     "exchange": "woo-x",
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "SPOT_ATOM_USDT",
     "timestamp": 2023-01-22T23:59:59.997Z,
     "type": "book_ticker",
@@ -3246,7 +3246,7 @@ exports[`map woo-x messages 6`] = `
 ]
 `;
 
-exports[`map woo-x messages 7`] = `
+exports[`map woo-x legacy messages 7`] = `
 [
   {
     "exchange": "woo-x",
@@ -3254,7 +3254,7 @@ exports[`map woo-x messages 7`] = `
     "fundingTimestamp": undefined,
     "indexPrice": undefined,
     "lastPrice": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -3265,7 +3265,7 @@ exports[`map woo-x messages 7`] = `
 ]
 `;
 
-exports[`map woo-x messages 8`] = `
+exports[`map woo-x legacy messages 8`] = `
 [
   {
     "exchange": "woo-x",
@@ -3273,7 +3273,7 @@ exports[`map woo-x messages 8`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -3284,9 +3284,9 @@ exports[`map woo-x messages 8`] = `
 ]
 `;
 
-exports[`map woo-x messages 9`] = `[]`;
+exports[`map woo-x legacy messages 9`] = `[]`;
 
-exports[`map woo-x messages 10`] = `
+exports[`map woo-x legacy messages 10`] = `
 [
   {
     "exchange": "woo-x",
@@ -3294,7 +3294,7 @@ exports[`map woo-x messages 10`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": 22708.44,
     "lastPrice": 22703.97,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -3305,7 +3305,7 @@ exports[`map woo-x messages 10`] = `
 ]
 `;
 
-exports[`map woo-x messages 11`] = `
+exports[`map woo-x legacy messages 11`] = `
 [
   {
     "exchange": "woo-x",
@@ -3313,7 +3313,7 @@ exports[`map woo-x messages 11`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": 22708.44,
     "lastPrice": 22703.97,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": 83.2241,
     "predictedFundingRate": undefined,
@@ -3323,6 +3323,185 @@ exports[`map woo-x messages 11`] = `
   },
 ]
 `;
+
+exports[`map woo-x v3 messages 1`] = `
+[
+  {
+    "amount": 0.09,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "price": 1622.8,
+    "side": "sell",
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:07:59.821Z,
+    "type": "trade",
+  },
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:07:59.821Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 2`] = `
+[
+  {
+    "amount": 0.02,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "price": 1622.6,
+    "side": "buy",
+    "symbol": "SPOT_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.005Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 3`] = `[]`;
+
+exports[`map woo-x v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.2,
+        "price": 1622.8,
+      },
+      {
+        "amount": 0.1,
+        "price": 1623,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.4,
+        "price": 1622.7,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": true,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 5`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 1622.8,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.5,
+        "price": 1622.6,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": false,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.300Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 6`] = `
+[
+  {
+    "askAmount": 0.2,
+    "askPrice": 1622.8,
+    "bidAmount": 0.4,
+    "bidPrice": 1622.7,
+    "exchange": "woo-x",
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.004Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 7`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 8`] = `[]`;
+
+exports[`map woo-x v3 messages 9`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 1622.5,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": 95500,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.570Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 10`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": 0.00001181,
+    "fundingTimestamp": 2026-06-30T00:00:00.000Z,
+    "indexPrice": 1622.5,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": 95500,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:59.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 11`] = `[]`;
 
 exports[`mappers ignore bitfinex funding ticker messages for book ticker 1`] = `[]`;
 
