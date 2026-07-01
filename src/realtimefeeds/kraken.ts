@@ -2,36 +2,50 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class KrakenRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ws.kraken.com'
+  private readonly channels = new Set(['trade', 'book', 'ticker'])
+  protected wssURL = 'wss://ws.kraken.com/v2'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    return filters.map((filter) => {
-      if (!filter.symbols || filter.symbols.length === 0) {
+    return filters.flatMap(({ channel, symbols }): any[] => {
+      if (!symbols || symbols.length === 0) {
         throw new Error('KrakenRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
 
-      let depth = undefined
-
-      if (filter.channel === 'book') {
-        depth = 1000
+      if (!this.channels.has(channel)) {
+        throw new Error(`KrakenRealTimeFeed unsupported channel ${channel}`)
       }
 
-      return {
-        event: 'subscribe',
-        pair: filter.symbols,
-        subscription: {
-          name: filter.channel,
-          depth
+      if (channel === 'ticker') {
+        return [
+          {
+            method: 'subscribe',
+            params: { channel, symbol: symbols, event_trigger: 'trades' }
+          },
+          {
+            method: 'subscribe',
+            params: { channel, symbol: symbols, event_trigger: 'bbo' }
+          }
+        ]
+      }
+
+      return [
+        {
+          method: 'subscribe',
+          params: {
+            channel,
+            symbol: symbols,
+            ...(channel === 'book' ? { depth: 1000 } : {})
+          }
         }
-      }
+      ]
     })
   }
 
   protected messageIsError(message: any): boolean {
-    return message.errorMessage !== undefined
+    return message.errorMessage !== undefined || message.success === false
   }
 
   protected messageIsHeartbeat(message: any): boolean {
-    return message.event === 'heartbeat'
+    return message.event === 'heartbeat' || message.channel === 'heartbeat'
   }
 }
