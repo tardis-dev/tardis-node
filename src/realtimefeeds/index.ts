@@ -35,7 +35,6 @@ import { GateIOFuturesRealTimeFeed } from './gateiofutures.ts'
 import { PoloniexRealTimeFeed } from './poloniex.ts'
 import { CoinflexRealTimeFeed } from './coinflex.ts'
 import { UpbitRealTimeFeed } from './upbit.ts'
-import { AscendexRealTimeFeed } from './ascendex.ts'
 import { DydxRealTimeFeed } from './dydx.ts'
 import { SerumRealTimeFeed } from './serum.ts'
 import { StarAtlasRealTimeFeed } from './staratlas.ts'
@@ -100,7 +99,6 @@ const realTimeFeedsMap: {
   poloniex: PoloniexRealTimeFeed,
   coinflex: CoinflexRealTimeFeed,
   upbit: UpbitRealTimeFeed,
-  ascendex: AscendexRealTimeFeed,
   dydx: DydxRealTimeFeed,
   serum: SerumRealTimeFeed,
   'star-atlas': StarAtlasRealTimeFeed,
