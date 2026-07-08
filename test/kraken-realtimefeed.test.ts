@@ -40,10 +40,6 @@ test('map kraken v2 realtime subscriptions', () => {
     },
     {
       method: 'subscribe',
-      params: { channel: 'ticker', symbol: ['AAPLx/USD'], event_trigger: 'trades' }
-    },
-    {
-      method: 'subscribe',
       params: { channel: 'ticker', symbol: ['AAPLx/USD'], event_trigger: 'bbo' }
     }
   ])

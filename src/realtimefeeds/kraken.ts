@@ -15,25 +15,13 @@ export class KrakenRealTimeFeed extends RealTimeFeedBase {
         throw new Error(`KrakenRealTimeFeed unsupported channel ${channel}`)
       }
 
-      if (channel === 'ticker') {
-        return [
-          {
-            method: 'subscribe',
-            params: { channel, symbol: symbols, event_trigger: 'trades' }
-          },
-          {
-            method: 'subscribe',
-            params: { channel, symbol: symbols, event_trigger: 'bbo' }
-          }
-        ]
-      }
-
       return [
         {
           method: 'subscribe',
           params: {
             channel,
             symbol: symbols,
+            ...(channel === 'ticker' ? { event_trigger: 'bbo' } : {}),
             ...(channel === 'book' ? { depth: 1000 } : {})
           }
         }
