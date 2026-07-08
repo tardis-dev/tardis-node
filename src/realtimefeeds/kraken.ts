@@ -2,17 +2,26 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class KrakenRealTimeFeed extends RealTimeFeedBase {
-  private readonly channels = new Set(['trade', 'book', 'ticker'])
+  private readonly channels = new Set(['trade', 'book', 'ticker', 'instrument'])
   protected wssURL = 'wss://ws.kraken.com/v2'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters.flatMap(({ channel, symbols }): any[] => {
-      if (!symbols || symbols.length === 0) {
+      if (channel !== 'instrument' && (!symbols || symbols.length === 0)) {
         throw new Error('KrakenRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
 
       if (!this.channels.has(channel)) {
         throw new Error(`KrakenRealTimeFeed unsupported channel ${channel}`)
+      }
+
+      if (channel === 'instrument') {
+        return [
+          {
+            method: 'subscribe',
+            params: { channel, include_tokenized_assets: true }
+          }
+        ]
       }
 
       return [

@@ -124,7 +124,7 @@ const DERIBIT_CHANNELS = [
   'instrument.state.any'
 ] as const
 
-const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
+const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread', 'instrument'] as const
 
 const OKEX_CHANNELS = [
   'spot/trade',

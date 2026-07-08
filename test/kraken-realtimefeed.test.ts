@@ -26,7 +26,8 @@ test('map kraken v2 realtime subscriptions', () => {
   const subscribeMessages = feed.map([
     { channel: 'trade', symbols: ['BTC/USD'] },
     { channel: 'book', symbols: ['BTC/USD'] },
-    { channel: 'ticker', symbols: ['AAPLx/USD'] }
+    { channel: 'ticker', symbols: ['AAPLx/USD'] },
+    { channel: 'instrument' }
   ])
 
   expect(subscribeMessages).toEqual([
@@ -41,6 +42,10 @@ test('map kraken v2 realtime subscriptions', () => {
     {
       method: 'subscribe',
       params: { channel: 'ticker', symbol: ['AAPLx/USD'], event_trigger: 'bbo' }
+    },
+    {
+      method: 'subscribe',
+      params: { channel: 'instrument', include_tokenized_assets: true }
     }
   ])
 })
