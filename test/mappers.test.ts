@@ -4480,7 +4480,7 @@ describe('mappers', () => {
             price: 100.1,
             qty: 0.25,
             trade_id: 122,
-            timestamp: '2026-07-01T00:00:00.023456Z'
+            timestamp: '2026-07-10T00:00:00.023456Z'
           }
         ]
       },
@@ -4494,7 +4494,7 @@ describe('mappers', () => {
             price: 100.1,
             qty: 0.25,
             trade_id: 123,
-            timestamp: '2026-07-01T00:00:00.123456Z'
+            timestamp: '2026-07-10T00:00:00.123456Z'
           }
         ]
       },
@@ -4507,7 +4507,7 @@ describe('mappers', () => {
             bids: [{ price: 199.9, qty: 1.2 }],
             asks: [{ price: 200.1, qty: 0.8 }],
             checksum: 123456,
-            timestamp: '2026-07-01T00:00:01.123457Z'
+            timestamp: '2026-07-10T00:00:01.123457Z'
           }
         ]
       },
@@ -4519,7 +4519,7 @@ describe('mappers', () => {
             symbol: 'BTC/USD',
             bids: [{ price: 99.9, qty: 0.5 }],
             asks: [],
-            timestamp: '2026-07-01T00:00:01.223456Z'
+            timestamp: '2026-07-10T00:00:01.223456Z'
           }
         ]
       },
@@ -4533,16 +4533,16 @@ describe('mappers', () => {
             bid_qty: 1.2,
             ask: 100.1,
             ask_qty: 2.3,
-            timestamp: '2026-07-01T00:00:02.123456Z'
+            timestamp: '2026-07-10T00:00:02.123456Z'
           }
         ]
       }
     ]
 
-    const krakenMapper = createMapper('kraken', new Date('2026-07-01T00:00:00.000Z'))
+    const krakenMapper = createMapper('kraken', new Date('2026-07-10T00:00:00.000Z'))
 
     for (const message of messages) {
-      const mappedMessages = krakenMapper.map(message, new Date('2026-07-01T00:00:03.275054Z'))
+      const mappedMessages = krakenMapper.map(message, new Date('2026-07-10T00:00:03.275054Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })

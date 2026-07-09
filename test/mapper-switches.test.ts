@@ -307,8 +307,8 @@ test('Bybit mapper switches keep existing filter behavior around switch dates', 
 })
 
 test('Kraken mapper switches all v2 filters at the API switch date', () => {
-  const beforeSwitch = date('2026-06-30T23:59:59.999Z')
-  const switchDate = date('2026-07-01T00:00:00.000Z')
+  const beforeSwitch = date('2026-07-09T23:59:59.999Z')
+  const switchDate = date('2026-07-10T00:00:00.000Z')
   const symbols = ['AAPLx/USD']
 
   expect(normalizeTrades('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLX/USD'] }])

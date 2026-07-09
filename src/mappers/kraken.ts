@@ -4,7 +4,7 @@ import { Mapper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
 
 // https://www.kraken.com/features/websocket-api
-const KRAKEN_V2_API_SWITCH_DATE = new Date('2026-07-01T00:00:00.000Z')
+const KRAKEN_V2_API_SWITCH_DATE = new Date('2026-07-10T00:00:00.000Z')
 
 export const krakenMappers = exchangeMappers({
   kraken: {
