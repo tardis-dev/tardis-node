@@ -306,6 +306,21 @@ test('Bybit mapper switches keep existing filter behavior around switch dates', 
   ])
 })
 
+test('Kraken mapper switches all v2 filters at the API switch date', () => {
+  const beforeSwitch = date('2026-07-09T23:59:59.999Z')
+  const switchDate = date('2026-07-10T00:00:00.000Z')
+  const symbols = ['AAPLx/USD']
+
+  expect(normalizeTrades('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLX/USD'] }])
+  expect(normalizeTrades('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLx/USD'] }])
+
+  expect(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLX/USD'] }])
+  expect(normalizeBookChanges('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLx/USD'] }])
+
+  expect(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'spread', symbols: ['AAPLX/USD'] }])
+  expect(normalizeBookTickers('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'ticker', symbols: ['AAPLx/USD'] }])
+})
+
 test('OKX mapper switches keep existing book channel windows', () => {
   expect(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT'])).toEqual([
     { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] },

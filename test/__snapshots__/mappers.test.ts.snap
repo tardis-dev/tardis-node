@@ -10761,6 +10761,85 @@ exports[`mappers map kraken messages 7`] = `
 
 exports[`mappers map kraken messages 8`] = `[]`;
 
+exports[`mappers map kraken v2 messages 1`] = `[]`;
+
+exports[`mappers map kraken v2 messages 2`] = `
+[
+  {
+    "amount": 0.25,
+    "exchange": "kraken",
+    "id": "123",
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "price": 100.1,
+    "side": "buy",
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:00.123456Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.8,
+        "price": 200.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.2,
+        "price": 199.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "AAPLx/USD",
+    "timestamp": 2026-07-10T00:00:01.123457Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 4`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.5,
+        "price": 99.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:01.223456Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 5`] = `
+[
+  {
+    "askAmount": 2.3,
+    "askPrice": 100.1,
+    "bidAmount": 1.2,
+    "bidPrice": 99.9,
+    "exchange": "kraken",
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:02.123456Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`mappers map okcoin messages 1`] = `
 [
   {
