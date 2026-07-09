@@ -311,13 +311,13 @@ test('Kraken mapper switches all v2 filters at the API switch date', () => {
   const switchDate = date('2026-07-10T00:00:00.000Z')
   const symbols = ['AAPLx/USD']
 
-  expect(normalizeTrades('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLX/USD'] }])
+  expect(normalizeTrades('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLx/USD'] }])
   expect(normalizeTrades('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLx/USD'] }])
 
-  expect(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLX/USD'] }])
+  expect(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLx/USD'] }])
   expect(normalizeBookChanges('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLx/USD'] }])
 
-  expect(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'spread', symbols: ['AAPLX/USD'] }])
+  expect(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'spread', symbols: ['AAPLx/USD'] }])
   expect(normalizeBookTickers('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'ticker', symbols: ['AAPLx/USD'] }])
 })
 

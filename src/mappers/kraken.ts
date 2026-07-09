@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, parseμs, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, parseμs } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
@@ -31,8 +31,6 @@ const krakenTradesMapper: Mapper<'kraken', Trade> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
-
     return [
       {
         channel: 'trade',
@@ -91,8 +89,6 @@ const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
-
     return [
       {
         channel: 'book',
@@ -149,8 +145,6 @@ const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
   },
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
-
     return [
       {
         channel: 'spread',
