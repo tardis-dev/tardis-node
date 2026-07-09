@@ -7,7 +7,7 @@ import { BinarySplitStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 import { debug } from './debug.ts'
-import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy.ts'
+import { addDays, createNormalizedSymbolFilter, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy.ts'
 import { MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
@@ -285,14 +285,10 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
   // for symbols we've not requested for
-  const upperCaseSymbols = symbols !== undefined ? symbols.map((s) => s.toUpperCase()) : undefined
-  const filter = (symbol: string) => {
-    return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
-  }
-
   const segments = getReplayNormalizedSegments(exchange, normalizers, fromDate, toDate)
 
   if (segments.length <= 1) {
+    const filter = createNormalizedSymbolFilter(symbols, filters)
     const messages = replay({
       exchange,
       from,
@@ -315,6 +311,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
       const { from: segmentFrom, to: segmentTo } = segments[i]
       const segmentMappers = i === 0 ? mappers : createMappers(segmentFrom)
       const segmentFilters = getFilters(segmentMappers, symbols)
+      const segmentFilter = createNormalizedSymbolFilter(symbols, segmentFilters)
 
       const segmentMessages = replay({
         exchange,
@@ -328,7 +325,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
         waitWhenDataNotYetAvailable
       })
 
-      yield* normalizeMessages(exchange, undefined, segmentMessages, segmentMappers, createMappers, withDisconnectMessages, filter)
+      yield* normalizeMessages(exchange, undefined, segmentMessages, segmentMappers, createMappers, withDisconnectMessages, segmentFilter)
     }
   }
 }

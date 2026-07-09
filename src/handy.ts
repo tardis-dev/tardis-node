@@ -819,6 +819,28 @@ export function upperCaseSymbols(symbols?: string[]) {
   return
 }
 
+export function createNormalizedSymbolFilter(symbols: string[] | undefined, filters: Filter<any>[]) {
+  if (symbols === undefined || symbols.length === 0) {
+    return
+  }
+
+  const allowedSymbols = new Set<string>()
+  for (const symbol of symbols) {
+    allowedSymbols.add(symbol)
+    allowedSymbols.add(symbol.toUpperCase())
+  }
+
+  for (const filter of filters) {
+    if (filter.symbols !== undefined) {
+      for (const symbol of filter.symbols) {
+        allowedSymbols.add(symbol)
+      }
+    }
+  }
+
+  return (symbol: string) => allowedSymbols.has(symbol)
+}
+
 export function lowerCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => s.toLowerCase())
