@@ -10840,6 +10840,8 @@ exports[`mappers map kraken v2 messages 5`] = `
 ]
 `;
 
+exports[`mappers map kraken v2 messages 6`] = `[]`;
+
 exports[`mappers map okcoin messages 1`] = `
 [
   {

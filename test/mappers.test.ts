@@ -4536,6 +4536,20 @@ describe('mappers', () => {
             timestamp: '2026-07-10T00:00:02.123456Z'
           }
         ]
+      },
+      {
+        channel: 'ticker',
+        type: 'update',
+        data: [
+          {
+            symbol: 'ANETx/USD',
+            bid: 0,
+            bid_qty: 0,
+            ask: 0,
+            ask_qty: 0,
+            timestamp: '1970-01-01T00:00:00.000000Z'
+          }
+        ]
       }
     ]
 

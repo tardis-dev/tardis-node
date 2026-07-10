@@ -307,6 +307,9 @@ class KrakenV2BookTickerMapper implements Mapper<'kraken', BookTicker> {
   *map(message: KrakenV2Ticker, localTimestamp: Date): IterableIterator<BookTicker> {
     for (const tickerMessage of message.data) {
       const timestamp = new Date(tickerMessage.timestamp)
+      if (timestamp.valueOf() === 0) {
+        continue
+      }
       timestamp.μs = parseμs(tickerMessage.timestamp)
 
       yield {
