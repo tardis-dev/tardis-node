@@ -99,3 +99,36 @@ type GeminiTrade = {
   quantity: string
   side: 'sell' | 'buy'
 }
+
+class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
+  canHandle(message: GeminiV3Trade | GeminiV3BookTicker | GeminiV3DepthUpdate) {
+    return 't' in message && !('e' in message)
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'trade', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map(message: GeminiV3Trade, localTimestamp: Date): IterableIterator<Trade> {
+    yield {
+      type: 'trade',
+      symbol: message.s,
+      exchange: 'gemini',
+      id: message.t.toString(),
+      price: Number(message.p),
+      amount: Number(message.q),
+      side: message.m ? 'sell' : 'buy',
+      timestamp: fromMicroSecondsToDate(Math.floor(message.E / 1000)),
+      localTimestamp
+    }
+  }
+}
+/** @see https://developer.gemini.com/prediction-markets/websocket/streams#trade-stream  */
+type GeminiV3Trade = {
+  E: number
+  s: string
+  t: number
+  p: string
+  q: string
+  m: boolean
+}
