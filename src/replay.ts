@@ -162,7 +162,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
             const message = JSON.parse(messageString)
 
-            const localTimestamp = new Date(bufferLine.toString('utf8', 0, DATE_MESSAGE_SPLIT_INDEX))
+            const localTimestamp = parseReplayTimestamp(bufferLine)
             if (withMicroseconds) {
               localTimestamp.μs = parseReplayMicroseconds(bufferLine)
             }
@@ -242,6 +242,30 @@ async function cleanupSlice(slicePath: string) {
 
 function parseReplayMicroseconds(bufferLine: Buffer) {
   return (bufferLine[23] - 48) * 100 + (bufferLine[24] - 48) * 10 + (bufferLine[25] - 48)
+}
+
+function parseReplayTimestamp(bufferLine: Buffer) {
+  // Recorder writes yyyy-MM-ddTHH:mm:ss.fffffffZ.
+  return new Date(
+    Date.UTC(
+      parseReplayDigits(bufferLine, 0, 4),
+      parseReplayDigits(bufferLine, 5, 2) - 1,
+      parseReplayDigits(bufferLine, 8, 2),
+      parseReplayDigits(bufferLine, 11, 2),
+      parseReplayDigits(bufferLine, 14, 2),
+      parseReplayDigits(bufferLine, 17, 2),
+      parseReplayDigits(bufferLine, 20, 3)
+    )
+  )
+}
+
+function parseReplayDigits(bufferLine: Buffer, start: number, length: number) {
+  let value = 0
+  const end = start + length
+  for (let index = start; index < end; index++) {
+    value = value * 10 + (bufferLine[index] - 48)
+  }
+  return value
 }
 
 // gracefully terminate worker
