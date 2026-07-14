@@ -292,7 +292,16 @@ const FTX_CHANNELS = [
   'busy'
 ] as const
 
-const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
+const GEMINI_CHANNELS = [
+  'trade',
+  'l2_updates',
+  'auction_open',
+  'auction_indicative',
+  'auction_result',
+  'depth@100ms',
+  'bookTicker',
+  'contractStatus'
+] as const
 
 const BITFLYER_CHANNELS = ['lightning_executions', 'lightning_board_snapshot', 'lightning_board', 'lightning_ticker'] as const
 

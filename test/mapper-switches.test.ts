@@ -257,6 +257,7 @@ test('normalizers keep existing exchange support matrix', () => {
       'ftx-us',
       'gate-io',
       'gate-io-futures',
+      'gemini',
       'huobi',
       'huobi-dm',
       'huobi-dm-linear-swap',
@@ -319,6 +320,21 @@ test('Kraken mapper switches all v2 filters at the API switch date', () => {
 
   expect(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'spread', symbols: ['AAPLx/USD'] }])
   expect(normalizeBookTickers('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'ticker', symbols: ['AAPLx/USD'] }])
+})
+
+test('Gemini mapper switches to v3 filters at the API switch date', () => {
+  const beforeSwitch = date('2026-07-07T21:59:59.999Z')
+  const switchDate = date('2026-07-07T22:00:00.000Z')
+  const symbols = ['btcusd']
+
+  expect(normalizeTrades('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['BTCUSD'] }])
+  expect(normalizeTrades('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['BTCUSD'] }])
+
+  expect(normalizeBookChanges('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'l2_updates', symbols: ['BTCUSD'] }])
+  expect(normalizeBookChanges('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'depth@100ms', symbols: ['BTCUSD'] }])
+
+  expect(normalizeBookTickers('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'bookTicker', symbols: ['BTCUSD'] }])
+  expect(normalizeBookTickers('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'bookTicker', symbols: ['BTCUSD'] }])
 })
 
 test('OKX mapper switches keep existing book channel windows', () => {
