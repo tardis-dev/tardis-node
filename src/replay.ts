@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs'
 import { rm } from 'node:fs/promises'
-import { EventEmitter } from 'events'
+import { EventEmitter, once } from 'events'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip, createZstdDecompress } from 'zlib'
 import { BinarySplitStream } from './binarysplit.ts'
@@ -113,9 +113,9 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
         }
 
         if (cachedSlice === undefined) {
-          // if response for requested date is not ready yet wait 100ms and try again
+          // if the requested slice is not ready yet, wait for the worker to report another cached slice
           debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
-          await wait(100)
+          await once(worker, 'message')
         }
       }
 
