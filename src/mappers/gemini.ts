@@ -1,7 +1,7 @@
 import { asNonZeroNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
-import { exchangeMappers, isRealTime, mapper } from './registry.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://docs.gemini.com/websocket-api/#market-data-version-2
 const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-07T22:00:00.000Z')
@@ -11,10 +11,7 @@ export const geminiMappers = exchangeMappers({
     trades: mapper([{ until: GEMINI_V3_API_SWITCH_DATE, use: () => geminiTradesMapper }, { use: () => new GeminiV3TradesMapper() }]),
     bookChanges: mapper([
       { until: GEMINI_V3_API_SWITCH_DATE, use: () => geminiBookChangeMapper },
-      {
-        use: (localTimestamp) =>
-          new GeminiV3BookChangeMapper({ isSnapshotDeterminedByEqualUpdateIds: isRealTime(localTimestamp) === false })
-      }
+      { use: () => new GeminiV3BookChangeMapper() }
     ]),
     bookTickers: () => new GeminiV3BookTickerMapper()
   }
@@ -135,8 +132,6 @@ class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
 class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
   private readonly previousUpdateIdBySymbol = new Map<string, number>()
 
-  constructor(private readonly options: GeminiV3BookChangeMapperOptions) {}
-
   canHandle(message: GeminiV3DepthUpdate) {
     return message.e === 'depthUpdate'
   }
@@ -159,10 +154,6 @@ class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
   }
 
   private isSnapshot(message: GeminiV3DepthUpdate) {
-    if (this.options.isSnapshotDeterminedByEqualUpdateIds) {
-      return message.U === message.u
-    }
-
     const isSnapshot = this.previousUpdateIdBySymbol.has(message.s) === false
     this.previousUpdateIdBySymbol.set(message.s, message.u)
     return isSnapshot
@@ -171,10 +162,6 @@ class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
   private mapBookLevel([price, amount]: GeminiV3BookLevel) {
     return { price: Number(price), amount: Number(amount) }
   }
-}
-
-type GeminiV3BookChangeMapperOptions = {
-  isSnapshotDeterminedByEqualUpdateIds: boolean
 }
 
 class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
