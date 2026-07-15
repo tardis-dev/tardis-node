@@ -19,12 +19,14 @@ Main Thread                         Worker Thread
   │                                     │
   Read cached file from disk            │
   Decompress (gzip/zstd)                │
-  Split by newlines                     │
+  Split by newlines into batches        │
   Parse JSON messages                   │
   Yield {localTimestamp, message}       │
 ```
 
 Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename.
+
+`replay()` decodes one line batch at a time and still yields individual public messages in order. `replayNormalized()` consumes the same internal line batches directly, avoiding an intermediate per-message raw iterator while keeping mapper invocation lazy. This preserves async-iterator backpressure for built-in and custom normalizers while the stream's high-water mark keeps splitter read-ahead small.
 
 ## Real-time Streaming
 
