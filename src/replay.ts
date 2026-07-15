@@ -3,7 +3,7 @@ import { rm } from 'node:fs/promises'
 import { EventEmitter, once } from 'events'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip, createZstdDecompress } from 'zlib'
-import { BinarySplitStream } from './binarysplit.ts'
+import { BinarySplitBatchStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 import { debug } from './debug.ts'
@@ -17,6 +17,8 @@ type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
   ? MapperOutput<U[number]> | Disconnect
   : MapperOutput<U[number]>
+
+type ReplayMessage = { localTimestamp: Date; message: any } | { localTimestamp: Buffer; message: Buffer } | undefined
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -130,7 +132,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
           linesStream.destroy(err)
         })
         // and split by new line
-        .pipe(new BinarySplitStream())
+        .pipe(new BinarySplitBatchStream())
         .on('error', function onBinarySplitStreamError(err) {
           debug('binary split stream error %o', err)
           linesStream.destroy(err)
@@ -138,46 +140,49 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       let linesCount = 0
 
-      for await (const bufferLine of linesStream as unknown as Iterable<Buffer>) {
-        linesCount++
-        if (bufferLine.length > 0) {
-          lastMessageWasUndefined = false
-          // as any due to https://github.com/Microsoft/TypeScript/issues/24929
-          if (skipDecoding === true) {
-            yield {
-              localTimestamp: bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX),
-              message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
-            } as any
-          } else {
-            let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
+      for await (const bufferLines of linesStream as AsyncIterable<Buffer[]>) {
+        linesCount += bufferLines.length
+        // Decode one bounded decompression chunk in a tight loop, then preserve the public one-message-at-a-time iterator.
+        const messages: ReplayMessage[] = []
 
-            // hack to handle huobi long numeric id for trades
-            if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
-              messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
+        for (let i = 0; i < bufferLines.length; i++) {
+          const bufferLine = bufferLines[i]
+          if (bufferLine.length > 0) {
+            lastMessageWasUndefined = false
+            if (skipDecoding === true) {
+              messages.push({
+                localTimestamp: bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX),
+                message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
+              })
+            } else {
+              let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
+
+              // hack to handle huobi long numeric id for trades
+              if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
+                messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
+              }
+              // hack to handle upbit long numeric id for trades
+              if (exchange === 'upbit' && messageString.includes('sequential_id')) {
+                messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
+              }
+
+              const message = JSON.parse(messageString)
+              const localTimestamp = parseReplayTimestamp(bufferLine)
+              if (withMicroseconds) {
+                localTimestamp.μs = parseReplayMicroseconds(bufferLine)
+              }
+
+              messages.push({ localTimestamp, message })
             }
-            // hack to handle upbit long numeric id for trades
-            if (exchange === 'upbit' && messageString.includes('sequential_id')) {
-              messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
-            }
-
-            const message = JSON.parse(messageString)
-
-            const localTimestamp = parseReplayTimestamp(bufferLine)
-            if (withMicroseconds) {
-              localTimestamp.μs = parseReplayMicroseconds(bufferLine)
-            }
-
-            yield {
-              // when skipDecoding is not set, decode timestamp to Date and message to object
-              localTimestamp,
-              message
-            } as any
+          } else if (withDisconnects === true && lastMessageWasUndefined === false) {
+            lastMessageWasUndefined = true
+            messages.push(undefined)
           }
-          // ignore empty lines unless withDisconnects is set to true
-          // do not yield subsequent undefined messages
-        } else if (withDisconnects === true && lastMessageWasUndefined === false) {
-          lastMessageWasUndefined = true
-          yield undefined as any
+        }
+
+        // Drain a batch already received from the stream; its iterator surfaces later stream errors on the next read.
+        for (let i = 0; i < messages.length; i++) {
+          yield messages[i] as any
         }
       }
 

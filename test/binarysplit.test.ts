@@ -1,19 +1,27 @@
 import { Readable } from 'stream'
-import { BinarySplitStream } from '../dist/binarysplit.js'
+import { BinarySplitBatchStream } from '../dist/binarysplit.js'
 
-async function collectLines(chunks: Buffer[]) {
-  const lines: string[] = []
+async function collectBatches(chunks: Buffer[]) {
+  const batches: string[][] = []
 
-  for await (const line of Readable.from(chunks).pipe(new BinarySplitStream()) as AsyncIterable<Buffer>) {
-    lines.push(line.toString('utf8'))
+  for await (const batch of Readable.from(chunks).pipe(new BinarySplitBatchStream()) as AsyncIterable<Buffer[]>) {
+    batches.push(batch.map((line) => line.toString('utf8')))
   }
 
-  return lines
+  return batches
 }
 
-describe('BinarySplitStream', () => {
-  test('splits multiple lines from a single chunk', async () => {
-    await expect(collectLines([Buffer.from('alpha\nbeta\ngamma\n')])).resolves.toEqual(['alpha', 'beta', 'gamma'])
+async function collectLines(chunks: Buffer[]) {
+  return (await collectBatches(chunks)).flat()
+}
+
+describe('BinarySplitBatchStream', () => {
+  test('sets the readable batch high water mark to two', () => {
+    expect(new BinarySplitBatchStream().readableHighWaterMark).toBe(2)
+  })
+
+  test('batches lines from a single chunk', async () => {
+    await expect(collectBatches([Buffer.from('alpha\nbeta\ngamma\n')])).resolves.toEqual([['alpha', 'beta', 'gamma']])
   })
 
   test('preserves empty lines', async () => {
