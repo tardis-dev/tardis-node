@@ -23,19 +23,18 @@ test('map gemini v3 realtime subscriptions', () => {
     feed.map([
       { channel: 'trade', symbols: ['btcusd', 'ETHUSD'] },
       { channel: 'depth@100ms', symbols: ['BTCUSD'] },
-      { channel: 'bookTicker', symbols: ['btcusd'] },
-      { channel: 'contractStatus' }
+      { channel: 'bookTicker', symbols: ['btcusd'] }
     ])
   ).toEqual([
     {
       method: 'SUBSCRIBE',
-      params: ['btcusd@trade', 'ethusd@trade', 'btcusd@depth@100ms', 'btcusd@bookTicker', 'contractStatus'],
+      params: ['btcusd@trade', 'ethusd@trade', 'btcusd@depth@100ms', 'btcusd@bookTicker'],
       id: 1
     }
   ])
 })
 
-test('gemini realtime subscriptions require symbols for market channels only', () => {
+test('gemini realtime subscriptions require symbols', () => {
   const feed = new TestGeminiRealTimeFeed('gemini', [], undefined)
 
   expect(() => feed.map([{ channel: 'trade' }])).toThrow(
@@ -44,8 +43,6 @@ test('gemini realtime subscriptions require symbols for market channels only', (
   expect(() => feed.map([{ channel: 'trade', symbols: 'btcusd' as any }])).toThrow(
     'GeminiRealTimeFeed requires explicitly specified symbols when subscribing to live feed'
   )
-
-  expect(feed.map([{ channel: 'contractStatus' }])).toEqual([{ method: 'SUBSCRIBE', params: ['contractStatus'], id: 1 }])
 })
 
 test('gemini realtime rejects unsupported channels', () => {

@@ -299,8 +299,7 @@ const GEMINI_CHANNELS = [
   'auction_indicative',
   'auction_result',
   'depth@100ms',
-  'bookTicker',
-  'contractStatus'
+  'bookTicker'
 ] as const
 
 const BITFLYER_CHANNELS = ['lightning_executions', 'lightning_board_snapshot', 'lightning_board', 'lightning_ticker'] as const
