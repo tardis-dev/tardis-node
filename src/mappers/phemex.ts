@@ -41,6 +41,9 @@ function isExcludedFromNormalizedOutput(symbol: string) {
   return symbol === 'sOLUSDT'
 }
 
+// Uppercase normalized spot symbols can be indistinguishable from native Phemex perpetual symbols.
+// Keep this list aligned with tardis-api and tardis-exporter so aliases such as SBTCUSDT can be
+// converted back to sBTCUSDT without changing native perpetual symbols such as SPKUSDT.
 const COINS_STARTING_WITH_S = [
   'SOLUSD',
   'SUSHIUSD',
@@ -122,11 +125,44 @@ const COINS_STARTING_WITH_S = [
   'STXXUSDT',
   'SPYXUSDT',
   'SP500USDT',
-  'SNDKUSDT'
+  'SNDKUSDT',
+  'SKHYUSDT',
+  'SMCIUSDT',
+  'SONYUSDT',
+  'SQQQUSDT',
+  'STRCUSDT'
 ]
+
+// Phemex used the V2 `_p` channels for this short-lived, now delisted PerpetualPilot market family.
+// Exact casing matters: SIRENPUSD was a pilot, while sIRENPUSD was a separate spot instrument.
+const PERPETUAL_PILOT_SYMBOLS = new Set([
+  'ANGLERFISHPUSD',
+  'BNBCARDPUSD',
+  'BNBXBTPUSD',
+  'BUTTCOINPUSD',
+  'CRYPTOAIPUSD',
+  'CTDPUSD',
+  'DOGEAIPUSD',
+  'FULLSENDPUSD',
+  'GHIBLIPUSD',
+  'GREED3PUSD',
+  'IMGPUSD',
+  'MCPOSPUSD',
+  'PAINPUSD',
+  'PERRYPUSD',
+  'SIRENPUSD',
+  'TITCOINPUSD',
+  'TOLYPUSD',
+  'WILDNOUTPUSD'
+])
+
 function getInstrumentType(symbol: string) {
   if (/\d+$/.test(symbol)) {
     return 'future'
+  }
+
+  if (symbol.startsWith('s')) {
+    return 'spot'
   }
 
   if (
@@ -140,6 +176,16 @@ function getInstrumentType(symbol: string) {
 }
 
 function getApiSymbolId(symbolId: string) {
+  // These are already exchange-native mixed-case identifiers.
+  if (symbolId.startsWith('s') || symbolId.startsWith('u100') || symbolId.startsWith('c')) {
+    return symbolId
+  }
+
+  // SIRENPUSD must not be mistaken for the uppercase alias of spot sIRENPUSD.
+  if (PERPETUAL_PILOT_SYMBOLS.has(symbolId)) {
+    return symbolId
+  }
+
   const type = getInstrumentType(symbolId)
   if (type === 'spot' && symbolId.startsWith('S')) {
     return symbolId.charAt(0).toLowerCase() + symbolId.slice(1)
@@ -155,13 +201,26 @@ function getApiSymbolId(symbolId: string) {
   return symbolId
 }
 
-function getSymbols(symbols: string[]) {
-  const perpV2Symbols = symbols.filter((s) => getInstrumentType(s) === 'perpetual' && s.endsWith('USDT')).map(getApiSymbolId)
-  const otherSymbols = symbols.filter((s) => getInstrumentType(s) !== 'perpetual' || s.endsWith('USDT') == false).map(getApiSymbolId)
+function splitSymbolsByChannelFamily(symbols: string[]) {
+  const v2Symbols: string[] = []
+  const legacySymbols: string[] = []
+
+  for (const symbol of symbols) {
+    const apiSymbolId = getApiSymbolId(symbol)
+    const usesV2Channels =
+      PERPETUAL_PILOT_SYMBOLS.has(apiSymbolId) ||
+      (getInstrumentType(symbol) === 'perpetual' && (apiSymbolId.endsWith('USDT') || apiSymbolId.endsWith('USDC')))
+
+    if (usesV2Channels) {
+      v2Symbols.push(apiSymbolId)
+    } else {
+      legacySymbols.push(apiSymbolId)
+    }
+  }
 
   return {
-    perpV2Symbols,
-    otherSymbols
+    v2Symbols,
+    legacySymbols
   }
 }
 
@@ -182,20 +241,20 @@ const phemexTradesMapper: Mapper<'phemex', Trade> = {
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
 
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'trades_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'trades',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 
@@ -273,19 +332,19 @@ const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'orderbook_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'book',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 
@@ -345,19 +404,19 @@ class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker>
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'perp_market24h_pack_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'market24h',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 
