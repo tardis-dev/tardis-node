@@ -149,6 +149,26 @@ test('keeps raw replay batch preparation and collapsed disconnect behavior', asy
   expect((await iterator.next()).done).toBe(true)
 })
 
+test('parses fixed recorder timestamps across supported date boundaries', async () => {
+  feed = [
+    timestampedLine('2000-02-29T23:59:59.9990000Z', 1),
+    timestampedLine('2099-12-31T23:59:59.0009999Z', 2),
+    timestampedLine('2100-03-01T00:00:00.0012345Z', 3)
+  ].join('\n')
+  feed += '\n'
+
+  const timestamps = []
+  for await (const { localTimestamp } of replay(rawOptions({ withMicroseconds: true }))) {
+    timestamps.push({ iso: localTimestamp.toISOString(), μs: localTimestamp.μs })
+  }
+
+  expect(timestamps).toEqual([
+    { iso: '2000-02-29T23:59:59.999000Z', μs: 0 },
+    { iso: '2099-12-31T23:59:59.000999Z', μs: 999 },
+    { iso: '2100-03-01T00:00:00.001234Z', μs: 234 }
+  ])
+})
+
 test('keeps raw replay no-catch behavior for malformed JSON in a prepared batch', async () => {
   feed = `${line(1)}\n2026-07-01T00:00:00.0000001Z {invalid\n`
 
@@ -182,6 +202,10 @@ function rawOptions(options: { withDisconnects?: boolean; withMicroseconds?: boo
 
 function line(sequence: number, time = '00.0000000') {
   return `2026-07-01T00:00:${time}Z ${JSON.stringify({ sequence })}`
+}
+
+function timestampedLine(localTimestamp: string, sequence: number) {
+  return `${localTimestamp} ${JSON.stringify({ sequence })}`
 }
 
 function normalizer(name: string, calls: string[], createdAt?: string[]) {

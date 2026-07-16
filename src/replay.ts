@@ -272,24 +272,23 @@ function parseReplayTimestamp(bufferLine: Buffer) {
   // Recorder writes yyyy-MM-ddTHH:mm:ss.fffffffZ.
   return new Date(
     Date.UTC(
-      parseReplayDigits(bufferLine, 0, 4),
-      parseReplayDigits(bufferLine, 5, 2) - 1,
-      parseReplayDigits(bufferLine, 8, 2),
-      parseReplayDigits(bufferLine, 11, 2),
-      parseReplayDigits(bufferLine, 14, 2),
-      parseReplayDigits(bufferLine, 17, 2),
-      parseReplayDigits(bufferLine, 20, 3)
+      parseReplayTwoDigits(bufferLine, 0) * 100 + parseReplayTwoDigits(bufferLine, 2),
+      parseReplayTwoDigits(bufferLine, 5) - 1,
+      parseReplayTwoDigits(bufferLine, 8),
+      parseReplayTwoDigits(bufferLine, 11),
+      parseReplayTwoDigits(bufferLine, 14),
+      parseReplayTwoDigits(bufferLine, 17),
+      parseReplayThreeDigits(bufferLine, 20)
     )
   )
 }
 
-function parseReplayDigits(bufferLine: Buffer, start: number, length: number) {
-  let value = 0
-  const end = start + length
-  for (let index = start; index < end; index++) {
-    value = value * 10 + (bufferLine[index] - 48)
-  }
-  return value
+function parseReplayTwoDigits(bufferLine: Buffer, start: number) {
+  return (bufferLine[start] - 48) * 10 + (bufferLine[start + 1] - 48)
+}
+
+function parseReplayThreeDigits(bufferLine: Buffer, start: number) {
+  return (bufferLine[start] - 48) * 100 + (bufferLine[start + 1] - 48) * 10 + (bufferLine[start + 2] - 48)
 }
 
 // gracefully terminate worker
