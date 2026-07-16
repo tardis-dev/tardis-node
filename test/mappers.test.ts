@@ -4306,7 +4306,7 @@ describe('mappers', () => {
       { type: 'trade', symbol: 'ETHUSD', event_id: 9608228023, timestamp: 1580919901276, price: '200.19', quantity: '100', side: 'block' }
     ]
 
-    const geminiMapper = createMapper('gemini', new Date('2026-07-07T21:59:59.999Z'))
+    const geminiMapper = createMapper('gemini', new Date('2026-07-15T23:59:59.999Z'))
 
     for (const message of messages) {
       const mappedMessages = geminiMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
@@ -4362,17 +4362,17 @@ describe('mappers', () => {
       }
     ]
 
-    const geminiMapper = createMapper('gemini', new Date('2026-07-07T22:00:00.000Z'))
+    const geminiMapper = createMapper('gemini', new Date('2026-07-16T00:00:00.000Z'))
 
     for (const message of messages) {
-      const mappedMessages = geminiMapper.map(message, new Date('2026-07-07T22:00:01.275Z'))
+      const mappedMessages = geminiMapper.map(message, new Date('2026-07-16T00:00:01.275Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
 
   test('map gemini v3 replay depth snapshots from first update per symbol', () => {
-    const geminiMapper = createMapper('gemini', new Date('2026-07-07T22:00:00.000Z'))
-    const localTimestamp = new Date('2026-07-07T22:00:01.275Z')
+    const geminiMapper = createMapper('gemini', new Date('2026-07-16T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-07-16T00:00:01.275Z')
 
     expect(
       geminiMapper.map(

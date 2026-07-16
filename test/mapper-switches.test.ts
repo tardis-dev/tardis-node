@@ -323,8 +323,8 @@ test('Kraken mapper switches all v2 filters at the API switch date', () => {
 })
 
 test('Gemini mapper switches to v3 filters at the API switch date', () => {
-  const beforeSwitch = date('2026-07-07T21:59:59.999Z')
-  const switchDate = date('2026-07-07T22:00:00.000Z')
+  const beforeSwitch = date('2026-07-15T23:59:59.999Z')
+  const switchDate = date('2026-07-16T00:00:00.000Z')
   const symbols = ['btcusd']
 
   expect(normalizeTrades('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['BTCUSD'] }])

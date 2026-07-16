@@ -4,7 +4,7 @@ import { Mapper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
 
 // https://docs.gemini.com/websocket-api/#market-data-version-2
-const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-07T22:00:00.000Z')
+const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-16T00:00:00.000Z')
 
 export const geminiMappers = exchangeMappers({
   gemini: {
