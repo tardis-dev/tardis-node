@@ -28,7 +28,8 @@ const GZIP_OPTIONS = {
   finishFlush: constants.Z_SYNC_FLUSH
 }
 
-type ReplayMessage = { localTimestamp: Date; message: any } | { localTimestamp: Buffer; message: Buffer } | undefined
+type DecodedReplayMessage = { localTimestamp: Date; message: any }
+type ReplayMessage = DecodedReplayMessage | { localTimestamp: Buffer; message: Buffer } | undefined
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -398,9 +399,29 @@ async function* normalizeReplayLineBatches(
   }
 
   for await (const bufferLines of lineBatches) {
-    for (let i = 0; i < bufferLines.length; i++) {
-      const bufferLine = bufferLines[i]
-      if (bufferLine.length === 0) {
+    const decodedMessages: (DecodedReplayMessage | undefined)[] = []
+    let decodingFailed = false
+    let decodingError: unknown
+    try {
+      for (let i = 0; i < bufferLines.length; i++) {
+        const bufferLine = bufferLines[i]
+        if (bufferLine.length === 0) {
+          decodedMessages.push(undefined)
+        } else {
+          const message = parseReplayMessage(exchange, bufferLine)
+          const localTimestamp = parseReplayTimestamp(bufferLine)
+          localTimestamp.μs = parseReplayMicroseconds(bufferLine)
+          decodedMessages.push({ localTimestamp, message })
+        }
+      }
+    } catch (error) {
+      decodingFailed = true
+      decodingError = error
+    }
+
+    for (let i = 0; i < decodedMessages.length; i++) {
+      const decodedMessage = decodedMessages[i]
+      if (decodedMessage === undefined) {
         if (activeMappers === undefined) {
           continue
         }
@@ -418,9 +439,7 @@ async function* normalizeReplayLineBatches(
         continue
       }
 
-      const message = parseReplayMessage(exchange, bufferLine)
-      const localTimestamp = parseReplayTimestamp(bufferLine)
-      localTimestamp.μs = parseReplayMicroseconds(bufferLine)
+      const { localTimestamp, message } = decodedMessage
 
       if (activeMappers === undefined) {
         activeMappers = createMappersAt(localTimestamp)
@@ -442,6 +461,10 @@ async function* normalizeReplayLineBatches(
           }
         }
       }
+    }
+
+    if (decodingFailed) {
+      throw decodingError
     }
   }
 }
