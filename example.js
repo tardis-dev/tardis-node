@@ -18,8 +18,8 @@ if (optionsError !== undefined) {
   console.error(`${optionsError}
 
 Usage:
-  node example.js stream <exchange> [symbol] <channel>
-  node example.js replay <exchange> [symbol] <channel> <from> <to>
+  node example.js stream <exchange> <channel> [symbol]
+  node example.js replay <exchange> <channel> <from> <to> [symbol]
 
 Options:
   --normalized       use normalized <data-type> instead of native <channel>
@@ -30,10 +30,10 @@ Options:
   --limit <n>        stop after n messages
 
 Examples:
-  node example.js stream mexc-futures BTC_USDT push.depth
-  node example.js replay mexc-futures BTC_USDT push.depth 2026-06-17 2026-06-18
-  node example.js --normalized stream mexc-futures BTC_USDT book_change
-  node example.js --normalized replay mexc-futures BTC_USDT book_change 2026-06-17 2026-06-18
+  node example.js stream mexc-futures push.depth BTC_USDT
+  node example.js replay mexc-futures push.depth 2026-06-17 2026-06-18 BTC_USDT
+  node example.js --normalized stream mexc-futures book_change BTC_USDT
+  node example.js --normalized replay mexc-futures book_change 2026-06-17 2026-06-18 BTC_USDT
   node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay gemini trade 2026-07-20T15:45:00.000Z 2026-07-20T15:46:00.000Z`)
   process.exit(1)
 }
@@ -57,9 +57,11 @@ for await (const message of createMessageStream(options)) {
 function getOptions(args) {
   const options = parseOptions(args)
   const normalized = options.positionals.includes('--normalized')
-  const [mode, exchange, ...positionalRest] = options.positionals.filter((arg) => arg !== '--normalized')
-  const withSymbol = (mode === 'stream' && positionalRest.length === 3) || (mode === 'replay' && positionalRest.length === 5)
-  const [symbol, channelOrDataType, from, to] = withSymbol ? positionalRest : [undefined, ...positionalRest]
+  const [mode, exchange, channelOrDataType, streamSymbolOrReplayFrom, to, replaySymbol] = options.positionals.filter(
+    (arg) => arg !== '--normalized'
+  )
+  const symbol = mode === 'stream' ? streamSymbolOrReplayFrom : replaySymbol
+  const from = mode === 'replay' ? streamSymbolOrReplayFrom : undefined
 
   const normalizersByDataType = {
     trade: normalizeTrades,

@@ -112,8 +112,8 @@ npm install tardis-dev --save
 The repository includes `example.js` for quick manual checks against streaming, replay, native, and normalized data.
 
 ```bash
-node example.js stream <exchange> [symbol] <channel>
-node example.js replay <exchange> [symbol] <channel> <from> <to>
+node example.js stream <exchange> <channel> [symbol]
+node example.js replay <exchange> <channel> <from> <to> [symbol]
 ```
 
 Optional flags can be mixed:
