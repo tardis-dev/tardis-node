@@ -5,6 +5,7 @@ import {
   normalizeLiquidations,
   normalizeOptionsSummary,
   normalizeTrades,
+  init,
   replay,
   replayNormalized,
   stream,
@@ -17,31 +18,48 @@ if (optionsError !== undefined) {
   console.error(`${optionsError}
 
 Usage:
-  node example.js stream <exchange> <symbol> <channel>
-  node example.js replay <exchange> <symbol> <channel> <from> <to>
-  node example.js --normalized stream <exchange> <symbol> <data-type>
-  node example.js --normalized replay <exchange> <symbol> <data-type> <from> <to>
+  node example.js stream <exchange> [symbol] <channel>
+  node example.js replay <exchange> [symbol] <channel> <from> <to>
+
+Options:
+  --normalized       use normalized <data-type> instead of native <channel>
+  --endpoint <url>   override API endpoint, default: https://api.tardis.dev/v1
+                     local API example: http://127.0.0.1:8787/v1
+  --api-key <key>    override API key, default: TARDIS_DEV_API_KEY env var
+                     local API example: TD.LOCAL.DEV.API.KEY
+  --limit <n>        stop after n messages
 
 Examples:
   node example.js stream mexc-futures BTC_USDT push.depth
   node example.js replay mexc-futures BTC_USDT push.depth 2026-06-17 2026-06-18
   node example.js --normalized stream mexc-futures BTC_USDT book_change
-  node example.js --normalized replay mexc-futures BTC_USDT book_change 2026-06-17 2026-06-18`)
+  node example.js --normalized replay mexc-futures BTC_USDT book_change 2026-06-17 2026-06-18
+  node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay gemini trade 2026-07-20T15:45:00.000Z 2026-07-20T15:46:00.000Z`)
   process.exit(1)
 }
 
+init(options.init)
+
+let messagesCount = 0
 for await (const message of createMessageStream(options)) {
   if (message === undefined || message?.type === 'disconnect') {
     console.log({ type: 'disconnect' })
-    continue
+  } else {
+    console.log(message)
   }
 
-  console.log(message)
+  messagesCount++
+  if (options.limit !== undefined && messagesCount >= options.limit) {
+    break
+  }
 }
 
 function getOptions(args) {
-  const normalized = args.includes('--normalized')
-  const positionalArgs = args.filter((arg) => arg !== '--normalized')
+  const options = parseOptions(args)
+  const normalized = options.positionals.includes('--normalized')
+  const [mode, exchange, ...positionalRest] = options.positionals.filter((arg) => arg !== '--normalized')
+  const withSymbol = (mode === 'stream' && positionalRest.length === 3) || (mode === 'replay' && positionalRest.length === 5)
+  const [symbol, channelOrDataType, from, to] = withSymbol ? positionalRest : [undefined, ...positionalRest]
 
   const normalizersByDataType = {
     trade: normalizeTrades,
@@ -53,16 +71,47 @@ function getOptions(args) {
   }
 
   return {
-    mode: positionalArgs[0], // 'stream' or 'replay'
+    mode, // 'stream' or 'replay'
     normalized,
-    exchange: positionalArgs[1],
-    symbols: [positionalArgs[2]],
-    channel: normalized ? undefined : positionalArgs[3],
-    dataType: normalized ? positionalArgs[3] : undefined,
-    normalizer: normalized ? normalizersByDataType[positionalArgs[3]] : undefined,
-    from: positionalArgs[4],
-    to: positionalArgs[5]
+    exchange,
+    symbols: symbol === undefined ? undefined : [symbol],
+    channel: normalized ? undefined : channelOrDataType,
+    dataType: normalized ? channelOrDataType : undefined,
+    normalizer: normalized ? normalizersByDataType[channelOrDataType] : undefined,
+    from,
+    to,
+    init: {
+      ...(options.values.endpoint === undefined ? {} : { endpoint: options.values.endpoint }),
+      ...(options.values.apiKey === undefined ? {} : { apiKey: options.values.apiKey })
+    },
+    limit: options.values.limit === undefined ? undefined : Number(options.values.limit)
   }
+}
+
+/**
+ * @param {string[]} args
+ * @returns {{ values: Record<string, string>, positionals: string[] }}
+ */
+function parseOptions(args) {
+  const valueOptions = ['endpoint', 'api-key', 'limit'].map((name) => `--${name}`)
+  const result = { values: {}, positionals: [] }
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (valueOptions.includes(arg)) {
+      const value = args[++i]
+      if (value === undefined) {
+        throw new Error(`Missing value for ${arg}.`)
+      }
+
+      result.values[arg.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value
+      continue
+    }
+
+    result.positionals.push(arg)
+  }
+
+  return result
 }
 
 function getOptionsError(options) {
@@ -71,9 +120,6 @@ function getOptionsError(options) {
   }
   if (options.exchange === undefined) {
     return 'Missing exchange name.'
-  }
-  if (options.symbols[0] === undefined) {
-    return 'Missing symbol.'
   }
   if (options.normalized && options.dataType === undefined) {
     return 'Missing normalized data type.'
@@ -86,6 +132,9 @@ function getOptionsError(options) {
   }
   if (options.mode === 'replay' && (options.from === undefined || options.to === undefined)) {
     return 'Replay mode requires from and to dates.'
+  }
+  if (options.limit !== undefined && (!Number.isSafeInteger(options.limit) || options.limit <= 0)) {
+    return 'Invalid limit. Expected a positive integer.'
   }
 }
 
@@ -116,7 +165,7 @@ function createMessageStream(options) {
     )
   }
 
-  const nativeFilters = [{ channel: options.channel, symbols: options.symbols }]
+  const nativeFilters = [{ channel: options.channel, ...(options.symbols === undefined ? {} : { symbols: options.symbols }) }]
   if (options.mode === 'stream') {
     return stream({
       exchange: options.exchange,
