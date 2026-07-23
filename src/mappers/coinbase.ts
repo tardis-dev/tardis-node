@@ -133,13 +133,24 @@ class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
         this._symbolLastTimestampMap.set(message.product_id, timestamp)
       }
 
+      const bids: BookPriceLevel[] = []
+      const asks: BookPriceLevel[] = []
+      for (let i = 0; i < message.changes.length; i++) {
+        const change = message.changes[i]
+        if (change[0] === 'buy') {
+          bids.push(mapUpdateBookLevel(change))
+        } else if (change[0] === 'sell') {
+          asks.push(mapUpdateBookLevel(change))
+        }
+      }
+
       yield {
         type: 'book_change',
         symbol: message.product_id,
         exchange: 'coinbase',
         isSnapshot: false,
-        bids: message.changes.filter((c) => c[0] === 'buy').map(mapUpdateBookLevel),
-        asks: message.changes.filter((c) => c[0] === 'sell').map(mapUpdateBookLevel),
+        bids,
+        asks,
         timestamp,
         localTimestamp: localTimestamp
       }
