@@ -10299,6 +10299,42 @@ test('map bullish book ticker messages', () => {
   }
 })
 
+test('use local timestamp for malformed bullish order book timestamps', () => {
+  const localTimestamp = new Date('2026-07-23T10:06:27.211Z')
+  const level2Mapper = normalizeBookChanges('bullish', localTimestamp)
+  const level1Mapper = normalizeBookTickers('bullish', localTimestamp)
+
+  const level2Message = {
+    type: 'snapshot',
+    dataType: 'V1TALevel2',
+    data: {
+      symbol: 'SUSHIUSDC',
+      bids: ['0.1698', '47633.28730000', '0.1695', '79388.81220000'],
+      asks: ['0.1709', '127175.65100000'],
+      sequenceNumberRange: [302108113, 302108113],
+      datetime: '1970-01-01T00:29:44.801Z',
+      timestamp: '1784801',
+      publishedAtTimestamp: '1784801187053'
+    }
+  }
+  const level1Message = {
+    type: 'update',
+    dataType: 'V1TALevel1',
+    data: {
+      symbol: 'SUSHIUSDC',
+      bid: ['0.1698', '47633.28730000'],
+      ask: ['0.1709', '127175.65100000'],
+      sequenceNumber: '302108113',
+      datetime: '1970-01-01T00:29:44.801Z',
+      timestamp: '1784801',
+      publishedAtTimestamp: '1784801187053'
+    }
+  }
+
+  expect([...level2Mapper.map(level2Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
+  expect([...level1Mapper.map(level1Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
+})
+
 test('map bullish derivative ticker messages', () => {
   const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
 

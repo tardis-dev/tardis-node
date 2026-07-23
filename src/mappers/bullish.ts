@@ -13,6 +13,11 @@ export const bullishMappers = exchangeMappers({
   }
 })
 
+function getBullishOrderBookTimestamp(value: string, localTimestamp: Date) {
+  const timestamp = Number(value)
+  return value.length === 13 && Number.isSafeInteger(timestamp) ? new Date(timestamp) : localTimestamp
+}
+
 class BullishTradesMapper implements Mapper<'bullish', Trade> {
   canHandle(message: BullishMessage): message is BullishAnonymousTradeUpdateMessage {
     return message.dataType === 'V1TAAnonymousTradeUpdate' && message.type === 'update'
@@ -76,7 +81,7 @@ class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
       isSnapshot: message.type === 'snapshot',
       bids: this.mapLevels(message.data.bids),
       asks: this.mapLevels(message.data.asks),
-      timestamp: new Date(message.data.datetime),
+      timestamp: getBullishOrderBookTimestamp(message.data.timestamp, localTimestamp),
       localTimestamp
     }
   }
@@ -117,7 +122,7 @@ class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
       bidAmount: asNonZeroNumberOrUndefined(message.data.bid[1]),
       askPrice: asNonZeroNumberOrUndefined(message.data.ask[0]),
       askAmount: asNonZeroNumberOrUndefined(message.data.ask[1]),
-      timestamp: new Date(message.data.datetime),
+      timestamp: getBullishOrderBookTimestamp(message.data.timestamp, localTimestamp),
       localTimestamp
     }
   }
