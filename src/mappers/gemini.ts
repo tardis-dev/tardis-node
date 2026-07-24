@@ -1,14 +1,19 @@
-import { upperCaseSymbols } from '../handy.ts'
-import { BookChange, Trade } from '../types.ts'
+import { asNonZeroNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://docs.gemini.com/websocket-api/#market-data-version-2
+const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-16T00:00:00.000Z')
 
 export const geminiMappers = exchangeMappers({
   gemini: {
-    trades: () => geminiTradesMapper,
-    bookChanges: () => geminiBookChangeMapper
+    trades: mapper([{ until: GEMINI_V3_API_SWITCH_DATE, use: () => geminiTradesMapper }, { use: () => new GeminiV3TradesMapper() }]),
+    bookChanges: mapper([
+      { until: GEMINI_V3_API_SWITCH_DATE, use: () => geminiBookChangeMapper },
+      { use: () => new GeminiV3BookChangeMapper() }
+    ]),
+    bookTickers: () => new GeminiV3BookTickerMapper()
   }
 })
 
@@ -98,4 +103,122 @@ type GeminiTrade = {
   price: string
   quantity: string
   side: 'sell' | 'buy'
+}
+
+class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
+  canHandle(message: GeminiV3Trade | GeminiV3BookTicker | GeminiV3DepthUpdate) {
+    return 't' in message && !('e' in message)
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'trade', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map(message: GeminiV3Trade, localTimestamp: Date): IterableIterator<Trade> {
+    yield {
+      type: 'trade',
+      symbol: message.s,
+      exchange: 'gemini',
+      id: message.t.toString(),
+      price: Number(message.p),
+      amount: Number(message.q),
+      side: message.m ? 'sell' : 'buy',
+      timestamp: fromMicroSecondsToDate(Math.floor(message.E / 1000)),
+      localTimestamp
+    }
+  }
+}
+
+class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
+  private readonly previousUpdateIdBySymbol = new Map<string, number>()
+
+  canHandle(message: GeminiV3DepthUpdate) {
+    return message.e === 'depthUpdate'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'depth@100ms', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map(message: GeminiV3DepthUpdate, localTimestamp: Date): IterableIterator<BookChange> {
+    yield {
+      type: 'book_change',
+      symbol: message.s,
+      exchange: 'gemini',
+      isSnapshot: this.isSnapshot(message),
+      bids: message.b.map(this.mapBookLevel),
+      asks: message.a.map(this.mapBookLevel),
+      timestamp: fromMicroSecondsToDate(Math.floor(message.E / 1000)),
+      localTimestamp
+    }
+  }
+
+  private isSnapshot(message: GeminiV3DepthUpdate) {
+    const isSnapshot = this.previousUpdateIdBySymbol.has(message.s) === false
+    this.previousUpdateIdBySymbol.set(message.s, message.u)
+    return isSnapshot
+  }
+
+  private mapBookLevel([price, amount]: GeminiV3BookLevel) {
+    return { price: Number(price), amount: Number(amount) }
+  }
+}
+
+class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
+  canHandle(message: GeminiV3Trade | GeminiV3BookTicker | GeminiV3DepthUpdate) {
+    return 'u' in message && !('e' in message)
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'bookTicker', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map(message: GeminiV3BookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+    yield {
+      type: 'book_ticker',
+      symbol: message.s,
+      exchange: 'gemini',
+      askAmount: asNonZeroNumberOrUndefined(message.A),
+      askPrice: asNonZeroNumberOrUndefined(message.a),
+      bidAmount: asNonZeroNumberOrUndefined(message.B),
+      bidPrice: asNonZeroNumberOrUndefined(message.b),
+      timestamp: fromMicroSecondsToDate(Math.floor(message.E / 1000)),
+      localTimestamp
+    }
+  }
+}
+
+/** @see https://developer.gemini.com/prediction-markets/websocket/streams#trade-stream  */
+type GeminiV3Trade = {
+  E: number
+  s: string
+  t: number
+  p: string
+  q: string
+  m: boolean
+}
+
+/** @see https://developer.gemini.com/prediction-markets/websocket/streams#l2-differential-depth-streams */
+type GeminiV3DepthUpdate = {
+  e: 'depthUpdate'
+  E: number
+  s: string
+  U: number
+  u: number
+  b: GeminiV3BookLevel[]
+  a: GeminiV3BookLevel[]
+}
+type GeminiV3BookLevel = [string, string]
+
+/** @see https://developer.gemini.com/prediction-markets/websocket/streams#book-ticker */
+type GeminiV3BookTicker = {
+  u: number
+  E: number
+  s: string
+  b?: string
+  B?: string
+  a?: string
+  A?: string
+  c?: string
+  C?: string
 }

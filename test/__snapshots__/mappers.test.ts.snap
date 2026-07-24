@@ -9481,6 +9481,90 @@ exports[`mappers map gemini messages 4`] = `
 ]
 `;
 
+exports[`mappers map gemini v3 messages 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 11129.364219,
+        "price": 0.1488,
+      },
+      {
+        "amount": 49574.823701,
+        "price": 0.1489,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-16T00:00:01.275Z,
+    "symbol": "wifusd",
+    "timestamp": 2026-07-13T22:18:59.947514Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 2`] = `
+[
+  {
+    "amount": 0.01625222,
+    "exchange": "gemini",
+    "id": "2840141014190422",
+    "localTimestamp": 2026-07-16T00:00:01.275Z,
+    "price": 62145.38,
+    "side": "sell",
+    "symbol": "btcrlusd",
+    "timestamp": 2026-07-13T22:19:00.085684Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 3`] = `
+[
+  {
+    "askAmount": 38.3906,
+    "askPrice": 1.0615,
+    "bidAmount": 958.69148,
+    "bidPrice": 1.06149,
+    "exchange": "gemini",
+    "localTimestamp": 2026-07-16T00:00:01.275Z,
+    "symbol": "xrpgusd",
+    "timestamp": 2026-07-13T22:19:00.076872Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 7.85375,
+      },
+      {
+        "amount": 0,
+        "price": 7.85388,
+      },
+      {
+        "amount": 0,
+        "price": 7.85374,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-16T00:00:01.275Z,
+    "symbol": "linkrlusd",
+    "timestamp": 2026-07-13T22:19:59.886103Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map hitbtc messages 1`] = `[]`;
 
 exports[`mappers map hitbtc messages 2`] = `

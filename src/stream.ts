@@ -75,7 +75,7 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
       // filter normalized messages by symbol as some exchanges do not offer subscribing to specific symbols for some of the channels
       // for example Phemex market24h channel
 
-      const filter = createNormalizedSymbolFilter(symbols, filters)
+      const filter = createNormalizedSymbolFilter(symbols, filters, exchange)
 
       const normalizedMessages = normalizeMessages(
         exchange,

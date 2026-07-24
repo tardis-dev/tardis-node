@@ -826,7 +826,7 @@ export function upperCaseSymbols(symbols?: string[]) {
   return
 }
 
-export function createNormalizedSymbolFilter(symbols: string[] | undefined, filters: Filter<any>[]) {
+export function createNormalizedSymbolFilter(symbols: string[] | undefined, filters: Filter<any>[], exchange?: Exchange) {
   if (symbols === undefined || symbols.length === 0) {
     return
   }
@@ -835,6 +835,9 @@ export function createNormalizedSymbolFilter(symbols: string[] | undefined, filt
   for (const symbol of symbols) {
     allowedSymbols.add(symbol)
     allowedSymbols.add(symbol.toUpperCase())
+    if (exchange === 'gemini') {
+      allowedSymbols.add(symbol.toLowerCase())
+    }
   }
 
   for (const filter of filters) {

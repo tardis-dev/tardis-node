@@ -8,7 +8,15 @@ describe('createNormalizedSymbolFilter', () => {
 
     expect(filter?.('AAPLx/USD')).toBe(true)
     expect(filter?.('AAPLX/USD')).toBe(true)
+    expect(filter?.('aaplx/usd')).toBe(false)
     expect(filter?.('MSFTx/USD')).toBe(false)
+  })
+
+  test('keeps lowercase Gemini raw symbols when requested with uppercase public symbols', () => {
+    const filters: Filter<string>[] = [{ channel: 'trade', symbols: ['BTCUSD'] }]
+    const filter = createNormalizedSymbolFilter(['BTCUSD'], filters, 'gemini')
+
+    expect(filter?.('btcusd')).toBe(true)
   })
 
   test('keeps mapper-translated mixed-case symbols', () => {
