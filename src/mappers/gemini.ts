@@ -3,8 +3,7 @@ import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
 
-// https://docs.gemini.com/websocket-api/#market-data-version-2
-const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-16T00:00:00.000Z')
+const GEMINI_V3_API_SWITCH_DATE = new Date('2026-07-24T00:00:00.000Z')
 
 export const geminiMappers = exchangeMappers({
   gemini: {
@@ -92,7 +91,7 @@ type GeminiL2Updates = {
   type: 'l2_updates'
   symbol: string
   changes: GeminiBookLevel[]
-  auction_events: any[]
+  auction_events?: any[]
 }
 
 type GeminiTrade = {
@@ -102,12 +101,12 @@ type GeminiTrade = {
   timestamp: number
   price: string
   quantity: string
-  side: 'sell' | 'buy'
+  side: 'sell' | 'buy' | 'block'
 }
 
 class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
   canHandle(message: GeminiV3Trade | GeminiV3BookTicker | GeminiV3DepthUpdate) {
-    return 't' in message && !('e' in message)
+    return 't' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -117,7 +116,7 @@ class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
   *map(message: GeminiV3Trade, localTimestamp: Date): IterableIterator<Trade> {
     yield {
       type: 'trade',
-      symbol: message.s,
+      symbol: message.s.toUpperCase(),
       exchange: 'gemini',
       id: message.t.toString(),
       price: Number(message.p),
@@ -130,22 +129,22 @@ class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
 }
 
 class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
-  private readonly previousUpdateIdBySymbol = new Map<string, number>()
+  private readonly symbolsWithSnapshot = new Set<string>()
 
   canHandle(message: GeminiV3DepthUpdate) {
     return message.e === 'depthUpdate'
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'depth@100ms', symbols: upperCaseSymbols(symbols) } as const]
+    return [{ channel: 'depth', symbols: upperCaseSymbols(symbols) } as const]
   }
 
   *map(message: GeminiV3DepthUpdate, localTimestamp: Date): IterableIterator<BookChange> {
     yield {
       type: 'book_change',
-      symbol: message.s,
+      symbol: message.s.toUpperCase(),
       exchange: 'gemini',
-      isSnapshot: this.isSnapshot(message),
+      isSnapshot: this.isSnapshot(message.s),
       bids: message.b.map(this.mapBookLevel),
       asks: message.a.map(this.mapBookLevel),
       timestamp: fromMicroSecondsToDate(Math.floor(message.E / 1000)),
@@ -153,9 +152,11 @@ class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
     }
   }
 
-  private isSnapshot(message: GeminiV3DepthUpdate) {
-    const isSnapshot = this.previousUpdateIdBySymbol.has(message.s) === false
-    this.previousUpdateIdBySymbol.set(message.s, message.u)
+  private isSnapshot(symbol: string) {
+    // With snapshot=-1 Gemini sends a full book as the first depthUpdate per symbol on a new connection.
+    // A historical replay started mid-connection cannot distinguish that snapshot from a delta using the payload alone.
+    const isSnapshot = this.symbolsWithSnapshot.has(symbol) === false
+    this.symbolsWithSnapshot.add(symbol)
     return isSnapshot
   }
 
@@ -166,7 +167,7 @@ class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
 
 class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
   canHandle(message: GeminiV3Trade | GeminiV3BookTicker | GeminiV3DepthUpdate) {
-    return 'u' in message && !('e' in message)
+    return 'B' in message
   }
 
   getFilters(symbols?: string[]) {
@@ -176,7 +177,7 @@ class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
   *map(message: GeminiV3BookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
     yield {
       type: 'book_ticker',
-      symbol: message.s,
+      symbol: message.s.toUpperCase(),
       exchange: 'gemini',
       askAmount: asNonZeroNumberOrUndefined(message.A),
       askPrice: asNonZeroNumberOrUndefined(message.a),
@@ -188,7 +189,7 @@ class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
   }
 }
 
-/** @see https://developer.gemini.com/prediction-markets/websocket/streams#trade-stream  */
+/** @see https://developer.gemini.com/websocket/streams#trade-stream */
 type GeminiV3Trade = {
   E: number
   s: string
@@ -198,7 +199,7 @@ type GeminiV3Trade = {
   m: boolean
 }
 
-/** @see https://developer.gemini.com/prediction-markets/websocket/streams#l2-differential-depth-streams */
+/** @see https://developer.gemini.com/websocket/streams#l2-differential-depth-streams */
 type GeminiV3DepthUpdate = {
   e: 'depthUpdate'
   E: number
@@ -210,15 +211,15 @@ type GeminiV3DepthUpdate = {
 }
 type GeminiV3BookLevel = [string, string]
 
-/** @see https://developer.gemini.com/prediction-markets/websocket/streams#book-ticker */
+/** @see https://developer.gemini.com/websocket/streams#book-ticker */
 type GeminiV3BookTicker = {
   u: number
   E: number
   s: string
-  b?: string
-  B?: string
-  a?: string
-  A?: string
+  b: string
+  B: string
+  a: string
+  A: string
   c?: string
   C?: string
 }

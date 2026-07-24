@@ -22,7 +22,7 @@ test('map gemini v3 realtime subscriptions', () => {
   expect(
     feed.map([
       { channel: 'trade', symbols: ['btcusd', 'ETHUSD'] },
-      { channel: 'depth@100ms', symbols: ['BTCUSD'] },
+      { channel: 'depth', symbols: ['BTCUSD'] },
       { channel: 'bookTicker', symbols: ['btcusd'] }
     ])
   ).toEqual([

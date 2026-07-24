@@ -3,7 +3,7 @@ import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class GeminiRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.gemini.com?snapshot=-1'
-  private readonly channels = new Set(['trade', 'depth@100ms', 'bookTicker'])
+  private readonly channels = new Set(['trade', 'depth', 'bookTicker'])
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const params = filters
@@ -12,11 +12,12 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
           throw new Error(`GeminiRealTimeFeed unsupported channel ${filter.channel}`)
         }
 
-        if (Array.isArray(filter.symbols) === false || filter.symbols.length === 0) {
+        if (!Array.isArray(filter.symbols) || filter.symbols.length === 0) {
           throw new Error('GeminiRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
         }
 
-        return filter.symbols.map((symbol) => `${symbol.toLowerCase()}@${filter.channel}`)
+        const channel = filter.channel === 'depth' ? 'depth@100ms' : filter.channel
+        return filter.symbols.map((symbol) => `${symbol.toLowerCase()}@${channel}`)
       })
       .filter((value, index, self) => {
         return self.indexOf(value) === index

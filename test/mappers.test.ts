@@ -4362,128 +4362,89 @@ describe('mappers', () => {
       }
     ]
 
-    const geminiMapper = createMapper('gemini', new Date('2026-07-16T00:00:00.000Z'))
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
 
     for (const message of messages) {
-      const mappedMessages = geminiMapper.map(message, new Date('2026-07-16T00:00:01.275Z'))
+      const mappedMessages = geminiMapper.map(message, new Date('2026-07-24T00:00:01.275Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
 
-  test('map gemini v3 replay depth snapshots from first update per symbol', () => {
-    const geminiMapper = createMapper('gemini', new Date('2026-07-16T00:00:00.000Z'))
-    const localTimestamp = new Date('2026-07-16T00:00:01.275Z')
+  test('mark the first gemini v3 depth update per symbol as a snapshot', () => {
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-07-24T00:00:01.275Z')
+    const isSnapshot = (message: any) => geminiMapper.map(message, localTimestamp)[0].isSnapshot
 
     expect(
-      geminiMapper.map(
-        {
-          e: 'depthUpdate',
-          E: 1783981139947514400,
-          s: 'wifusd',
-          U: 1764549594389289,
-          u: 1764549594389676,
-          b: [
-            ['0.148800', '11129.36421900'],
-            ['0.148900', '49574.82370100']
-          ],
-          a: []
-        },
-        localTimestamp
-      )[0].isSnapshot
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851199088426630,
+        s: 'gusdgbp',
+        U: 1764550512767893,
+        u: 1764550512767893,
+        b: [],
+        a: [['0.75196', '1325.49900000']]
+      })
     ).toBe(true)
 
     expect(
-      geminiMapper.map(
-        {
-          e: 'depthUpdate',
-          E: 1783981141461026600,
-          s: 'wifusd',
-          U: 1764549594389676,
-          u: 1764549594391037,
-          b: [['0.148300', '2152.61758200']],
-          a: []
-        },
-        localTimestamp
-      )[0].isSnapshot
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239122227005,
+        s: 'gusdgbp',
+        U: 1764550512767893,
+        u: 1764550512813829,
+        b: [['0.75074', '5201.83440000']],
+        a: [['0.75150', '5175.25940000']]
+      })
     ).toBe(false)
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239118561200,
+        s: 'audusd',
+        U: 1764550512767846,
+        u: 1764550512813818,
+        b: [['0.696826630', '3132.880677']],
+        a: [['0.697523910', '788.989231']]
+      })
+    ).toBe(true)
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239118561200,
+        s: 'emptybook',
+        U: 1764550512813818,
+        u: 1764550512813818,
+        b: [],
+        a: []
+      })
+    ).toBe(true)
   })
 
-  test('map gemini v3 streaming depth snapshots from first update per symbol', () => {
-    const geminiMapper = createMapper('gemini', new Date())
-    const localTimestamp = new Date()
+  test('ignore gemini v3 acknowledgement and contract status messages', () => {
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-07-24T00:00:01.000Z')
 
+    expect(geminiMapper.map({ id: 1, status: 200 }, localTimestamp)).toEqual([])
+    expect(geminiMapper.map({ u: 1764549594389752, E: 1784870400000000000, s: 'btcusd' }, localTimestamp)).toEqual([])
     expect(
       geminiMapper.map(
         {
-          e: 'depthUpdate',
-          E: 1783981139947514400,
-          s: 'wifusd',
-          U: 1764549594389289,
-          u: 1764549594389676,
-          b: [
-            ['0.148800', '11129.36421900'],
-            ['0.148900', '49574.82370100']
-          ],
-          a: []
+          e: 'contractStatus',
+          E: 1784870400000,
+          s: 'gemi-btc15m2607241200-hi100000',
+          k: 'btc15m2607241200',
+          c: 'HI100000',
+          i: 134794,
+          o: 'Awaiting Approval',
+          n: 'Approved'
         },
         localTimestamp
-      )[0].isSnapshot
-    ).toBe(true)
-
-    expect(
-      geminiMapper.map(
-        {
-          e: 'depthUpdate',
-          E: 1783981141461026600,
-          s: 'wifusd',
-          U: 1764549594389676,
-          u: 1764549594391037,
-          b: [
-            ['0.148300', '2152.61758200'],
-            ['0.148600', '1823.64462100'],
-            ['0.148900', '51101.16860500'],
-            ['0.149000', '24125.75902000'],
-            ['0.148200', '8.85930000'],
-            ['0.148700', '10819.22294000'],
-            ['0.149200', '8.85930000'],
-            ['0.148400', '17365.01676300'],
-            ['0.148100', '36875.72599400'],
-            ['0.148500', '4285.98263900'],
-            ['0.148800', '897.23283000']
-          ],
-          a: [
-            ['0.149600', '7602.79875000'],
-            ['0.149200', '0.00000000'],
-            ['0.149400', '23605.68719500'],
-            ['0.149300', '17547.06568200'],
-            ['0.149900', '8.85930000'],
-            ['0.149700', '3.79680000'],
-            ['0.150000', '2175.44665800'],
-            ['0.149500', '39937.28841400']
-          ]
-        },
-        localTimestamp
-      )[0].isSnapshot
-    ).toBe(false)
-
-    expect(
-      geminiMapper.map(
-        {
-          e: 'depthUpdate',
-          E: 1783981199886103586,
-          s: 'linkrlusd',
-          U: 1764549594426242,
-          u: 1764549594426275,
-          b: [],
-          a: [
-            ['7.8537500', '0.00000000'],
-            ['7.8538800', '0.00000000'],
-            ['7.8537400', '0.00000000']
-          ]
-        },
-        localTimestamp
-      )[0].isSnapshot
-    ).toBe(true)
+      )
+    ).toEqual([])
   })
 
   test('map bitstamp messages', () => {

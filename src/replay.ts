@@ -336,7 +336,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   const segments = getReplayNormalizedSegments(exchange, normalizers, fromDate, toDate)
 
   if (segments.length <= 1) {
-    const filter = createNormalizedSymbolFilter(symbols, filters, exchange)
+    const filter = createNormalizedSymbolFilter(symbols, filters)
     const lineBatches = replayLineBatches({
       exchange,
       from,
@@ -357,7 +357,7 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
       const { from: segmentFrom, to: segmentTo } = segments[i]
       const segmentMappers = i === 0 ? initialMappers : createMappersAt(segmentFrom)
       const segmentFilters = getFilters(segmentMappers, symbols)
-      const segmentFilter = createNormalizedSymbolFilter(symbols, segmentFilters, exchange)
+      const segmentFilter = createNormalizedSymbolFilter(symbols, segmentFilters)
 
       const segmentLineBatches = replayLineBatches({
         exchange,
