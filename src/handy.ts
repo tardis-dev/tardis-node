@@ -640,8 +640,10 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
     let responseHeaders: Record<string, string> = {}
     await new Promise<void>((resolve, reject) => {
-      const req = https
-        .get(url, requestOptions, (res) => {
+      const protocol = new URL(url).protocol
+      const requestClient = protocol === 'http:' ? http : https
+      const req = requestClient
+        .get(url, { ...requestOptions, ...(protocol === 'http:' ? { agent: undefined } : {}) }, (res) => {
           const { statusCode } = res
           if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
