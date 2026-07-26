@@ -112,8 +112,8 @@ npm install tardis-dev --save
 The repository includes `example.js` for quick manual checks against streaming, replay, native, and normalized data.
 
 ```bash
-node example.js stream <exchange> <channel> [symbol]
-node example.js replay <exchange> <channel> <from> <to> [symbol]
+node example.js stream <exchange> <symbol> <channel>
+node example.js replay <exchange> <symbol> <channel> <from> <to>
 ```
 
 Optional flags can be mixed:
@@ -122,12 +122,6 @@ Optional flags can be mixed:
 - `--endpoint <url>` overrides the API endpoint, default: `https://api.tardis.dev/v1`
 - `--api-key <key>` overrides the API key, default: `TARDIS_DEV_API_KEY` env var
 - `--limit <n>` stops after `n` messages
-
-Example using a local API:
-
-```bash
-node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 10 replay gemini trade 2026-07-20T15:45:00.000Z 2026-07-20T15:46:00.000Z
-```
 
 <br/>
 

@@ -95,7 +95,8 @@ node example.js stream <exchange> <symbol> <channel>
 node example.js --normalized stream <exchange> <symbol> <data-type>
 node example.js replay <exchange> <symbol> <channel> <from> <to>
 node example.js --normalized replay <exchange> <symbol> <data-type> <from> <to>
-node example.js --endpoint http://127.0.0.1:8787/v1 --limit 3 replay <exchange> <symbol> <channel> <from> <to>
+node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay <exchange> <symbol> <channel> <from> <to>
+node example.js --normalized --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay <exchange> <symbol> <data-type> <from> <to>
 ```
 
 For order book changes, confirm the expected snapshot behavior: snapshot-capable feeds should emit an initial `book_change` with `isSnapshot=true`, then deltas with `isSnapshot=false` when the exchange contract provides deltas. For trades, tickers, liquidations, and other mapped data types, confirm that messages are produced for the requested symbol and that key fields are populated from the documented exchange semantics.

@@ -1,11 +1,12 @@
+import { parseArgs } from 'node:util'
 import {
+  init,
   normalizeBookChanges,
   normalizeBookTickers,
   normalizeDerivativeTickers,
   normalizeLiquidations,
   normalizeOptionsSummary,
   normalizeTrades,
-  init,
   replay,
   replayNormalized,
   stream,
@@ -18,8 +19,8 @@ if (optionsError !== undefined) {
   console.error(`${optionsError}
 
 Usage:
-  node example.js stream <exchange> <channel> [symbol]
-  node example.js replay <exchange> <channel> <from> <to> [symbol]
+  node example.js stream <exchange> <symbol> <channel>
+  node example.js replay <exchange> <symbol> <channel> <from> <to>
 
 Options:
   --normalized       use normalized <data-type> instead of native <channel>
@@ -30,11 +31,10 @@ Options:
   --limit <n>        stop after n messages
 
 Examples:
-  node example.js stream mexc-futures push.depth BTC_USDT
-  node example.js replay mexc-futures push.depth 2026-06-17 2026-06-18 BTC_USDT
-  node example.js --normalized stream mexc-futures book_change BTC_USDT
-  node example.js --normalized replay mexc-futures book_change 2026-06-17 2026-06-18 BTC_USDT
-  node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay gemini trade 2026-07-20T15:45:00.000Z 2026-07-20T15:46:00.000Z`)
+  node example.js stream mexc-futures BTC_USDT push.depth
+  node example.js replay mexc-futures BTC_USDT push.depth 2026-06-17 2026-06-18
+  node example.js --normalized stream mexc-futures BTC_USDT book_change
+  node example.js --normalized replay mexc-futures BTC_USDT book_change 2026-06-17 2026-06-18`)
   process.exit(1)
 }
 
@@ -44,10 +44,10 @@ let messagesCount = 0
 for await (const message of createMessageStream(options)) {
   if (message === undefined || message?.type === 'disconnect') {
     console.log({ type: 'disconnect' })
-  } else {
-    console.log(message)
+    continue
   }
 
+  console.log(message)
   messagesCount++
   if (options.limit !== undefined && messagesCount >= options.limit) {
     break
@@ -55,13 +55,19 @@ for await (const message of createMessageStream(options)) {
 }
 
 function getOptions(args) {
-  const options = parseOptions(args)
-  const normalized = options.positionals.includes('--normalized')
-  const [mode, exchange, channelOrDataType, streamSymbolOrReplayFrom, to, replaySymbol] = options.positionals.filter(
-    (arg) => arg !== '--normalized'
-  )
-  const symbol = mode === 'stream' ? streamSymbolOrReplayFrom : replaySymbol
-  const from = mode === 'replay' ? streamSymbolOrReplayFrom : undefined
+  const { values, positionals } = parseArgs({
+    args,
+    options: {
+      normalized: { type: 'boolean' },
+      endpoint: { type: 'string' },
+      'api-key': { type: 'string' },
+      limit: { type: 'string' }
+    },
+    allowPositionals: true
+  })
+  const [mode, exchange, symbol, channelOrDataType, from, to] = positionals
+  const normalized = values.normalized === true
+  const apiKey = values['api-key'] ?? process.env.TARDIS_DEV_API_KEY
 
   const normalizersByDataType = {
     trade: normalizeTrades,
@@ -76,44 +82,18 @@ function getOptions(args) {
     mode, // 'stream' or 'replay'
     normalized,
     exchange,
-    symbols: symbol === undefined ? undefined : [symbol],
+    symbol,
     channel: normalized ? undefined : channelOrDataType,
     dataType: normalized ? channelOrDataType : undefined,
     normalizer: normalized ? normalizersByDataType[channelOrDataType] : undefined,
     from,
     to,
     init: {
-      ...(options.values.endpoint === undefined ? {} : { endpoint: options.values.endpoint }),
-      ...(options.values.apiKey === undefined ? {} : { apiKey: options.values.apiKey })
+      ...(values.endpoint === undefined ? {} : { endpoint: values.endpoint }),
+      ...(apiKey === undefined ? {} : { apiKey })
     },
-    limit: options.values.limit === undefined ? undefined : Number(options.values.limit)
+    limit: values.limit === undefined ? undefined : Number(values.limit)
   }
-}
-
-/**
- * @param {string[]} args
- * @returns {{ values: Record<string, string>, positionals: string[] }}
- */
-function parseOptions(args) {
-  const valueOptions = ['endpoint', 'api-key', 'limit'].map((name) => `--${name}`)
-  const result = { values: {}, positionals: [] }
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i]
-    if (valueOptions.includes(arg)) {
-      const value = args[++i]
-      if (value === undefined) {
-        throw new Error(`Missing value for ${arg}.`)
-      }
-
-      result.values[arg.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value
-      continue
-    }
-
-    result.positionals.push(arg)
-  }
-
-  return result
 }
 
 function getOptionsError(options) {
@@ -122,6 +102,9 @@ function getOptionsError(options) {
   }
   if (options.exchange === undefined) {
     return 'Missing exchange name.'
+  }
+  if (options.symbol === undefined) {
+    return 'Missing symbol.'
   }
   if (options.normalized && options.dataType === undefined) {
     return 'Missing normalized data type.'
@@ -146,7 +129,7 @@ function createMessageStream(options) {
       return streamNormalized(
         {
           exchange: options.exchange,
-          symbols: options.symbols,
+          symbols: [options.symbol],
           timeoutIntervalMS: 20_000,
           withDisconnectMessages: true,
           onError: (error) => console.error(`[${options.exchange}] ${error.message}`)
@@ -158,7 +141,7 @@ function createMessageStream(options) {
     return replayNormalized(
       {
         exchange: options.exchange,
-        symbols: options.symbols,
+        symbols: [options.symbol],
         from: options.from,
         to: options.to,
         withDisconnectMessages: true
@@ -167,7 +150,7 @@ function createMessageStream(options) {
     )
   }
 
-  const nativeFilters = [{ channel: options.channel, ...(options.symbols === undefined ? {} : { symbols: options.symbols }) }]
+  const nativeFilters = [{ channel: options.channel, symbols: [options.symbol] }]
   if (options.mode === 'stream') {
     return stream({
       exchange: options.exchange,

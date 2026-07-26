@@ -1,5 +1,9 @@
 import { jest } from '@jest/globals'
-import { getJSON, postJSON } from '../dist/handy.js'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { createServer } from 'node:http'
+import os from 'node:os'
+import path from 'node:path'
+import { download, getJSON, postJSON } from '../dist/handy.js'
 
 function createFetchMock(...responses: Response[]) {
   const fetchMock = jest.fn<typeof fetch>()
@@ -136,4 +140,31 @@ describe('getJSON', () => {
       }
     })
   })
+})
+
+test('downloads from an HTTP endpoint', async () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-download-'))
+  const downloadPath = path.join(tempDir, 'slice')
+  const server = createServer((_request, response) => response.end('slice contents'))
+
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+
+  try {
+    const address = server.address()
+    if (address === null || typeof address === 'string') {
+      throw new Error('Expected an HTTP server address')
+    }
+
+    await download({
+      apiKey: '',
+      downloadPath,
+      url: `http://127.0.0.1:${address.port}/slice`,
+      userAgent: 'tardis-node-test'
+    })
+
+    expect(readFileSync(downloadPath, 'utf8')).toBe('slice contents')
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close((error) => (error === undefined ? resolve() : reject(error))))
+    rmSync(tempDir, { recursive: true, force: true })
+  }
 })
