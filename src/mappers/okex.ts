@@ -3,7 +3,7 @@ import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../o
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads.ts'
-import { exchangeMappers, mapper } from './registry.ts'
+import { exchangeMappers, isRealTime, mapper } from './registry.ts'
 
 const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
 const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
@@ -77,7 +77,9 @@ export const okexMappers = exchangeMappers({
         until: OKCOIN_V5_API_SWITCH_DATE,
         use: () => new OkexBookChangeMapper('okcoin', { market: 'spot', useTickByTickChannel: true })
       },
-      { use: () => new OkexV5BookChangeMapper('okcoin', { allowPublicBooksChannel: true }) }
+      {
+        use: () => new OkexV5BookChangeMapper('okcoin', { allowPublicBooksChannel: true, validateSequence: false })
+      }
     ]),
     bookTickers: mapper([
       { until: OKCOIN_V5_API_SWITCH_DATE, use: () => new OkexBookTickerMapper('okcoin', { market: 'spot' }) },
@@ -106,10 +108,25 @@ function okexBookChangesMapper(
   return mapper([
     { until: depthL2TbtSwitchDate, use: () => new OkexBookChangeMapper(exchange, { market, useTickByTickChannel: false }) },
     { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexBookChangeMapper(exchange, { market, useTickByTickChannel: true }) },
-    { until: OKX_PUBLIC_BOOKS_CHANNEL_START_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false }) },
-    { until: OKX_PUBLIC_BOOKS_CHANNEL_END_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true }) },
-    { until: OKEX_PUBLIC_BOOKS_SWITCH_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false }) },
-    { use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true }) }
+    {
+      until: OKX_PUBLIC_BOOKS_CHANNEL_START_DATE,
+      use: (localTimestamp) =>
+        new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false, validateSequence: isRealTime(localTimestamp) })
+    },
+    {
+      until: OKX_PUBLIC_BOOKS_CHANNEL_END_DATE,
+      use: (localTimestamp) =>
+        new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true, validateSequence: isRealTime(localTimestamp) })
+    },
+    {
+      until: OKEX_PUBLIC_BOOKS_SWITCH_DATE,
+      use: (localTimestamp) =>
+        new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false, validateSequence: isRealTime(localTimestamp) })
+    },
+    {
+      use: (localTimestamp) =>
+        new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true, validateSequence: isRealTime(localTimestamp) })
+    }
   ])
 }
 
@@ -187,12 +204,18 @@ const mapV5BookLevel = (level: OkexV5BookLevel) => {
 
 class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
   private _channelName: string
+  private readonly lastSequenceIdBySymbol = new Map<string, number>()
+  private readonly validateSequenceContinuity: boolean
+  private readonly _hasCredentials = process.env.OKX_API_KEY !== undefined
+  private readonly _hasVip5Access = process.env.OKX_API_VIP_5 !== undefined
+  private readonly _hasColoAccess = process.env.OKX_API_COLO !== undefined
 
   constructor(
     private readonly _exchange: Exchange,
-    { allowPublicBooksChannel }: { allowPublicBooksChannel: boolean }
+    { allowPublicBooksChannel, validateSequence }: OkexV5BookChangeMapperOptions
   ) {
     this._channelName = this._getBooksChannelName(allowPublicBooksChannel)
+    this.validateSequenceContinuity = validateSequence
   }
 
   canHandle(message: any) {
@@ -202,10 +225,6 @@ class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
 
     return message.arg.channel === this._channelName
   }
-
-  private _hasCredentials = process.env.OKX_API_KEY !== undefined
-  private _hasVip5Access = process.env.OKX_API_VIP_5 !== undefined
-  private _hasColoAccess = process.env.OKX_API_COLO !== undefined
 
   private _getBooksChannelName(allowPublicBooksChannel: boolean) {
     if (allowPublicBooksChannel === false) {
@@ -241,6 +260,10 @@ class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
 
   *map(okexDepthDataMessage: OkexV5BookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     for (const message of okexDepthDataMessage.data) {
+      if (this.validateSequenceContinuity) {
+        this.validateSequence(okexDepthDataMessage, message)
+      }
+
       if (okexDepthDataMessage.action === 'update' && message.bids.length === 0 && message.asks.length === 0) {
         continue
       }
@@ -263,6 +286,36 @@ class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
       }
     }
   }
+
+  private validateSequence(okexDepthDataMessage: OkexV5BookMessage, message: OkexV5BookData) {
+    if (typeof message.seqId !== 'number') {
+      throw new Error(`OKX order book message is missing seqId, symbol: ${okexDepthDataMessage.arg.instId}`)
+    }
+
+    const symbol = okexDepthDataMessage.arg.instId
+    if (okexDepthDataMessage.action === 'snapshot') {
+      this.lastSequenceIdBySymbol.set(symbol, message.seqId)
+      return
+    }
+
+    if (typeof message.prevSeqId !== 'number') {
+      throw new Error(`OKX order book update is missing prevSeqId, symbol: ${symbol}, seqId: ${message.seqId}`)
+    }
+
+    const lastSequenceId = this.lastSequenceIdBySymbol.get(symbol)
+    if (lastSequenceId !== undefined && message.prevSeqId !== lastSequenceId) {
+      throw new Error(
+        `OKX order book sequence gap, symbol: ${symbol}, previous seqId: ${lastSequenceId}, update prevSeqId: ${message.prevSeqId}, update seqId: ${message.seqId}`
+      )
+    }
+
+    this.lastSequenceIdBySymbol.set(symbol, message.seqId)
+  }
+}
+
+type OkexV5BookChangeMapperOptions = {
+  allowPublicBooksChannel: boolean
+  validateSequence: boolean
 }
 
 class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
@@ -740,21 +793,23 @@ type OkexV5BookLevel = [string, string, string, string]
 
 type OkexV5BookMessage =
   | {
-      arg: { channel: 'books-l2-tbt'; instId: string }
+      arg: { channel: 'books-l2-tbt' | 'books50-l2-tbt' | 'books'; instId: string }
       action: 'snapshot'
-      data: [
-        {
-          asks: OkexV5BookLevel[]
-          bids: OkexV5BookLevel[]
-          ts: string
-        }
-      ]
+      data: OkexV5BookData[]
     }
   | {
-      arg: { channel: 'books-l2-tbt'; instId: string }
+      arg: { channel: 'books-l2-tbt' | 'books50-l2-tbt' | 'books'; instId: string }
       action: 'update'
-      data: [{ asks: OkexV5BookLevel[]; bids: OkexV5BookLevel[]; ts: string }]
+      data: OkexV5BookData[]
     }
+
+type OkexV5BookData = {
+  asks: OkexV5BookLevel[]
+  bids: OkexV5BookLevel[]
+  ts: string
+  seqId?: number
+  prevSeqId?: number
+}
 
 type OkexV5TickerMessage = {
   arg: { channel: 'tickers'; instId: string }

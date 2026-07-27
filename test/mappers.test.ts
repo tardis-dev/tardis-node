@@ -1189,6 +1189,177 @@ describe('mappers', () => {
     }
   })
 
+  test('map okex public books validates seqId continuity', () => {
+    const localTimestamp = new Date()
+    const okexV5Mapper = createMapper('okex', localTimestamp)
+
+    expect(
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'snapshot',
+          data: [{ asks: [['2', '1', '0', '1']], bids: [['1', '1', '0', '1']], ts: '1779321600000', seqId: 100, prevSeqId: -1 }]
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTC-USDT',
+        exchange: 'okex',
+        isSnapshot: true,
+        bids: [{ price: 1, amount: 1 }],
+        asks: [{ price: 2, amount: 1 }],
+        timestamp: new Date('2026-05-21T00:00:00.000Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'update',
+          data: [{ asks: [['2', '0', '0', '1']], bids: [], ts: '1779321600001', seqId: 101, prevSeqId: 100 }]
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTC-USDT',
+        exchange: 'okex',
+        isSnapshot: false,
+        bids: [],
+        asks: [{ price: 2, amount: 0 }],
+        timestamp: new Date('2026-05-21T00:00:00.001Z'),
+        localTimestamp
+      }
+    ])
+  })
+
+  test('map okex public books advances sequence for empty updates', () => {
+    const localTimestamp = new Date()
+    const okexV5Mapper = createMapper('okex', localTimestamp)
+
+    okexV5Mapper.map(
+      {
+        arg: { channel: 'books', instId: 'BTC-USDT' },
+        action: 'snapshot',
+        data: [{ asks: [], bids: [], ts: '1779321600000', seqId: 100, prevSeqId: -1 }]
+      },
+      localTimestamp
+    )
+
+    expect(
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'update',
+          data: [{ asks: [], bids: [], ts: '1779321600001', seqId: 101, prevSeqId: 100 }]
+        },
+        localTimestamp
+      )
+    ).toEqual([])
+
+    expect(() =>
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'update',
+          data: [{ asks: [['2', '1', '0', '1']], bids: [], ts: '1779321600002', seqId: 102, prevSeqId: 101 }]
+        },
+        localTimestamp
+      )
+    ).not.toThrow()
+  })
+
+  test('map okex public books throws on seqId gap', () => {
+    const localTimestamp = new Date()
+    const okexV5Mapper = createMapper('okex', localTimestamp)
+
+    okexV5Mapper.map(
+      {
+        arg: { channel: 'books', instId: 'BTC-USDT' },
+        action: 'snapshot',
+        data: [{ asks: [], bids: [], ts: '1779321600000', seqId: 100, prevSeqId: -1 }]
+      },
+      localTimestamp
+    )
+
+    expect(() =>
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'update',
+          data: [{ asks: [['2', '1', '0', '1']], bids: [], ts: '1779321600001', seqId: 102, prevSeqId: 99 }]
+        },
+        localTimestamp
+      )
+    ).toThrow('OKX order book sequence gap')
+  })
+
+  test('map okex historical public books does not enforce seqId continuity', () => {
+    const okexV5Mapper = createMapper('okex', new Date('2026-05-21T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-05-21T00:00:00.000Z')
+
+    okexV5Mapper.map(
+      {
+        arg: { channel: 'books', instId: 'BTC-USDT' },
+        action: 'snapshot',
+        data: [{ asks: [], bids: [], ts: '1779321600000', seqId: 100, prevSeqId: -1 }]
+      },
+      localTimestamp
+    )
+
+    expect(() =>
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'update',
+          data: [{ asks: [['2', '1', '0', '1']], bids: [], ts: '1779321600001', seqId: 102, prevSeqId: 99 }]
+        },
+        localTimestamp
+      )
+    ).not.toThrow()
+  })
+
+  test('map okex public books requires sequence fields', () => {
+    const localTimestamp = new Date()
+    const okexV5Mapper = createMapper('okex', localTimestamp)
+
+    expect(() =>
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'BTC-USDT' },
+          action: 'snapshot',
+          data: [{ asks: [], bids: [], ts: '1779321600000' }]
+        },
+        localTimestamp
+      )
+    ).toThrow('OKX order book message is missing seqId')
+
+    okexV5Mapper.map(
+      {
+        arg: { channel: 'books', instId: 'ETH-USDT' },
+        action: 'snapshot',
+        data: [{ asks: [], bids: [], ts: '1779321600000', seqId: 100, prevSeqId: -1 }]
+      },
+      localTimestamp
+    )
+
+    expect(() =>
+      okexV5Mapper.map(
+        {
+          arg: { channel: 'books', instId: 'ETH-USDT' },
+          action: 'update',
+          data: [{ asks: [['2', '1', '0', '1']], bids: [], ts: '1779321600001', seqId: 101 }]
+        },
+        localTimestamp
+      )
+    ).toThrow('OKX order book update is missing prevSeqId')
+  })
+
   test('map okex-futures messages', () => {
     const messages = [
       {
