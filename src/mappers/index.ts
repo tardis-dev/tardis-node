@@ -1,6 +1,7 @@
 import { ONE_SEC_IN_MS } from '../handy.ts'
 import { BookChange, DerivativeTicker, Liquidation, OptionSummary, BookTicker, Trade } from '../types.ts'
 import { AscendexBookChangeMapper, AscendexDerivativeTickerMapper, AscendexBookTickerMapper, AscendexTradesMapper } from './ascendex.ts'
+import { AsterBookChangeMapper, AsterBookTickerMapper, AsterTradesMapper } from './aster.ts'
 import {
   BinanceBookChangeMapper,
   BinanceFuturesBookChangeMapper,
@@ -236,6 +237,7 @@ const shouldUseBinanceEuropeanOptionsV2Mappers = (localTimestamp: Date) => {
 }
 
 const tradesMappers = {
+  aster: () => new AsterTradesMapper(),
   bitmex: () => bitmexTradesMapper,
   binance: () => new BinanceTradesMapper('binance'),
   'binance-us': () => new BinanceTradesMapper('binance-us'),
@@ -320,6 +322,7 @@ const tradesMappers = {
 }
 
 const bookChangeMappers = {
+  aster: (localTimestamp: Date) => new AsterBookChangeMapper(shouldIgnoreBookSnapshotOverlap(localTimestamp)),
   bitmex: () => new BitmexBookChangeMapper(),
   binance: (localTimestamp: Date) => new BinanceBookChangeMapper('binance', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
   'binance-us': (localTimestamp: Date) => new BinanceBookChangeMapper('binance-us', shouldIgnoreBookSnapshotOverlap(localTimestamp)),
@@ -489,6 +492,7 @@ const liquidationsMappers = {
 }
 
 const bookTickersMappers = {
+  aster: () => new AsterBookTickerMapper(),
   binance: () => new BinanceBookTickerMapper('binance'),
   'binance-futures': () => new BinanceBookTickerMapper('binance-futures'),
   'binance-delivery': () => new BinanceBookTickerMapper('binance-delivery'),
