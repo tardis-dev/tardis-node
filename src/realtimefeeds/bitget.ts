@@ -4,10 +4,19 @@ import { RealTimeFeedBase } from './realtimefeed.ts'
 
 abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
   protected throttleSubscribeMS = 100
-  protected readonly wssURL = 'wss://ws.bitget.com/v2/ws/public'
+  protected readonly wssURL = 'wss://ws.bitget.com/v3/ws/public'
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const argsInputs = filters.flatMap((filter) => {
+      if (filter.channel === 'liquidation') {
+        return this.getLiquidationInstTypes().map((instType) => {
+          return {
+            instType,
+            topic: filter.channel
+          }
+        })
+      }
+
       if (!filter.symbols || filter.symbols.length === 0) {
         throw new Error('BitgetRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
@@ -15,8 +24,8 @@ abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
       return filter.symbols.map((symbol) => {
         return {
           instType: this.getInstType(symbol),
-          channel: filter.channel,
-          instId: symbol
+          topic: filter.channel,
+          symbol
         }
       })
     })
@@ -36,24 +45,32 @@ abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
   }
 
   abstract getInstType(symbol: string): string
+
+  protected getLiquidationInstTypes(): string[] {
+    return []
+  }
 }
 
 export class BitgetRealTimeFeed extends BitgetRealTimeFeedBase {
   getInstType(_: string) {
-    return 'SPOT'
+    return 'spot'
   }
 }
 
 export class BitgetFuturesRealTimeFeed extends BitgetRealTimeFeedBase {
   getInstType(symbol: string) {
     if (symbol.endsWith('USDT')) {
-      return 'USDT-FUTURES'
+      return 'usdt-futures'
     }
 
     if (symbol.endsWith('PERP')) {
-      return 'USDC-FUTURES'
+      return 'usdc-futures'
     }
 
-    return 'COIN-FUTURES'
+    return 'coin-futures'
+  }
+
+  protected getLiquidationInstTypes() {
+    return ['usdt-futures', 'usdc-futures', 'coin-futures']
   }
 }

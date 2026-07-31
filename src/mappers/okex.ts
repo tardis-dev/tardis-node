@@ -1,12 +1,138 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../okexsymbols.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { OkexSpreadsBookChangeMapper, OkexSpreadsBookTickerMapper, OkexSpreadsTradesMapper } from './okexspreads.ts'
+import { exchangeMappers, mapper } from './registry.ts'
+
+const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
+const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
+const OKX_PUBLIC_BOOKS_CHANNEL_START_DATE = new Date('2023-02-25T00:00:00.000Z')
+const OKX_PUBLIC_BOOKS_CHANNEL_END_DATE = new Date('2023-03-09T00:00:00.000Z')
+const OKEX_PUBLIC_BOOKS_SWITCH_DATE = new Date('2026-05-21T00:00:00.000Z')
+const OKEX_SPOT_DEPTH_L2_TBT_SWITCH_DATE = new Date('2020-04-10T00:00:00.000Z')
+const OKEX_FUTURES_DEPTH_L2_TBT_SWITCH_DATE = new Date('2019-12-05T00:00:00.000Z')
+const OKEX_SWAP_DEPTH_L2_TBT_SWITCH_DATE = new Date('2020-02-08T00:00:00.000Z')
+const OKCOIN_DEPTH_L2_TBT_SWITCH_DATE = new Date('2020-02-13T00:00:00.000Z')
+const OKCOIN_V5_API_SWITCH_DATE = new Date('2023-04-27T00:00:00.000Z')
+const OKX_TRADES_ALL_CHANNEL_SWITCH_DATE = new Date('2023-10-19T00:00:00.000Z')
+
+const useOKXTradesAllChannel = () => process.env.OKX_USE_TRADES_CHANNEL === undefined
+
+export const okexMappers = exchangeMappers({
+  okex: {
+    trades: okexTradesMapper('okex', { market: 'spot' }),
+    bookChanges: okexBookChangesMapper('okex', { market: 'spot', depthL2TbtSwitchDate: OKEX_SPOT_DEPTH_L2_TBT_SWITCH_DATE }),
+    bookTickers: okexBookTickersMapper('okex', { market: 'spot' })
+  },
+  'okex-futures': {
+    trades: okexTradesMapper('okex-futures', { market: 'futures' }),
+    bookChanges: okexBookChangesMapper('okex-futures', {
+      market: 'futures',
+      depthL2TbtSwitchDate: OKEX_FUTURES_DEPTH_L2_TBT_SWITCH_DATE
+    }),
+    derivativeTickers: mapper([
+      { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexDerivativeTickerMapper('okex-futures') },
+      { use: () => new OkexV5DerivativeTickerMapper('okex-futures') }
+    ]),
+    liquidations: mapper([
+      { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexLiquidationsMapper('okex-futures', { market: 'futures' }) },
+      { use: () => new OkexV5LiquidationsMapper('okex-futures') }
+    ]),
+    bookTickers: okexBookTickersMapper('okex-futures', { market: 'futures' })
+  },
+  'okex-swap': {
+    trades: okexTradesMapper('okex-swap', { market: 'swap' }),
+    bookChanges: okexBookChangesMapper('okex-swap', { market: 'swap', depthL2TbtSwitchDate: OKEX_SWAP_DEPTH_L2_TBT_SWITCH_DATE }),
+    derivativeTickers: mapper([
+      { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexDerivativeTickerMapper('okex-swap') },
+      { use: () => new OkexV5DerivativeTickerMapper('okex-swap') }
+    ]),
+    liquidations: mapper([
+      { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexLiquidationsMapper('okex-swap', { market: 'swap' }) },
+      { use: () => new OkexV5LiquidationsMapper('okex-swap') }
+    ]),
+    bookTickers: okexBookTickersMapper('okex-swap', { market: 'swap' })
+  },
+  'okex-options': {
+    trades: okexTradesMapper('okex-options', { market: 'option' }),
+    bookChanges: okexBookChangesMapper('okex-options', { market: 'option', depthL2TbtSwitchDate: OKEX_SWAP_DEPTH_L2_TBT_SWITCH_DATE }),
+    optionsSummary: mapper([
+      { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexOptionSummaryMapper() },
+      { use: () => new OkexV5OptionSummaryMapper() }
+    ]),
+    bookTickers: okexBookTickersMapper('okex-options', { market: 'option' })
+  },
+  okcoin: {
+    trades: mapper([
+      { until: OKCOIN_V5_API_SWITCH_DATE, use: () => new OkexTradesMapper('okcoin', { market: 'spot' }) },
+      { use: () => new OkexV5TradesMapper('okcoin', { useTradesAllChannel: false }) }
+    ]),
+    bookChanges: mapper([
+      {
+        until: OKCOIN_DEPTH_L2_TBT_SWITCH_DATE,
+        use: () => new OkexBookChangeMapper('okcoin', { market: 'spot', useTickByTickChannel: false })
+      },
+      {
+        until: OKCOIN_V5_API_SWITCH_DATE,
+        use: () => new OkexBookChangeMapper('okcoin', { market: 'spot', useTickByTickChannel: true })
+      },
+      { use: () => new OkexV5BookChangeMapper('okcoin', { allowPublicBooksChannel: true }) }
+    ]),
+    bookTickers: mapper([
+      { until: OKCOIN_V5_API_SWITCH_DATE, use: () => new OkexBookTickerMapper('okcoin', { market: 'spot' }) },
+      { use: () => new OkexV5BookTickerMapper('okcoin', { useTbtTickerChannel: true }) }
+    ])
+  },
+  'okex-spreads': {
+    trades: () => new OkexSpreadsTradesMapper(),
+    bookChanges: () => new OkexSpreadsBookChangeMapper(),
+    bookTickers: () => new OkexSpreadsBookTickerMapper()
+  }
+})
+
+function okexTradesMapper(exchange: OKEX_EXCHANGES, { market }: { market: OKEX_MARKETS }) {
+  return mapper([
+    { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexTradesMapper(exchange, { market }) },
+    { until: OKX_TRADES_ALL_CHANNEL_SWITCH_DATE, use: () => new OkexV5TradesMapper(exchange, { useTradesAllChannel: false }) },
+    { use: () => new OkexV5TradesMapper(exchange, { useTradesAllChannel: useOKXTradesAllChannel() }) }
+  ])
+}
+
+function okexBookChangesMapper(
+  exchange: OKEX_EXCHANGES,
+  { market, depthL2TbtSwitchDate }: { market: OKEX_MARKETS; depthL2TbtSwitchDate: Date }
+) {
+  return mapper([
+    { until: depthL2TbtSwitchDate, use: () => new OkexBookChangeMapper(exchange, { market, useTickByTickChannel: false }) },
+    { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexBookChangeMapper(exchange, { market, useTickByTickChannel: true }) },
+    { until: OKX_PUBLIC_BOOKS_CHANNEL_START_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false }) },
+    { until: OKX_PUBLIC_BOOKS_CHANNEL_END_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true }) },
+    { until: OKEX_PUBLIC_BOOKS_SWITCH_DATE, use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: false }) },
+    { use: () => new OkexV5BookChangeMapper(exchange, { allowPublicBooksChannel: true }) }
+  ])
+}
+
+function okexBookTickersMapper(exchange: OKEX_EXCHANGES, { market }: { market: OKEX_MARKETS }) {
+  return mapper([
+    { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexBookTickerMapper(exchange, { market }) },
+    { until: OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE, use: () => new OkexV5BookTickerMapper(exchange, { useTbtTickerChannel: false }) },
+    { use: () => new OkexV5BookTickerMapper(exchange, { useTbtTickerChannel: true }) }
+  ])
+}
 
 // V5 Okex API mappers
 // https://www.okex.com/docs-v5/en/#websocket-api-public-channel-trades-channel
 
-export class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  constructor(private readonly _exchange: Exchange, private readonly _useTradesAll: boolean) {}
+class OkexV5TradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
+  private readonly _useTradesAll: boolean
+
+  constructor(
+    private readonly _exchange: Exchange,
+    { useTradesAllChannel }: { useTradesAllChannel: boolean }
+  ) {
+    this._useTradesAll = useTradesAllChannel
+  }
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
@@ -59,11 +185,14 @@ const mapV5BookLevel = (level: OkexV5BookLevel) => {
   return { price, amount }
 }
 
-export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
+class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
   private _channelName: string
 
-  constructor(private readonly _exchange: Exchange, usePublicBooksChannel: boolean) {
-    this._channelName = this._getBooksChannelName(usePublicBooksChannel)
+  constructor(
+    private readonly _exchange: Exchange,
+    { allowPublicBooksChannel }: { allowPublicBooksChannel: boolean }
+  ) {
+    this._channelName = this._getBooksChannelName(allowPublicBooksChannel)
   }
 
   canHandle(message: any) {
@@ -78,8 +207,8 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
   private _hasVip5Access = process.env.OKX_API_VIP_5 !== undefined
   private _hasColoAccess = process.env.OKX_API_COLO !== undefined
 
-  private _getBooksChannelName(usePublicBooksChannel: boolean) {
-    if (usePublicBooksChannel === false) {
+  private _getBooksChannelName(allowPublicBooksChannel: boolean) {
+    if (allowPublicBooksChannel === false) {
       // historical data always uses books-l2-tbt
       return 'books-l2-tbt'
     }
@@ -136,8 +265,15 @@ export class OkexV5BookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange
   }
 }
 
-export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
-  constructor(private readonly _exchange: Exchange, private readonly _useTbtTickerChannel: boolean) {}
+class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
+  private readonly _useTbtTickerChannel: boolean
+
+  constructor(
+    private readonly _exchange: Exchange,
+    { useTbtTickerChannel }: { useTbtTickerChannel: boolean }
+  ) {
+    this._useTbtTickerChannel = useTbtTickerChannel
+  }
 
   canHandle(message: any) {
     if (message.event !== undefined || message.arg === undefined) {
@@ -212,11 +348,11 @@ export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker
         symbol: okexTicker.instId,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(okexTicker.askSz),
-        askPrice: asNumberIfValid(okexTicker.askPx),
+        askAmount: asNonZeroNumberOrUndefined(okexTicker.askSz),
+        askPrice: asNonZeroNumberOrUndefined(okexTicker.askPx),
 
-        bidPrice: asNumberIfValid(okexTicker.bidPx),
-        bidAmount: asNumberIfValid(okexTicker.bidSz),
+        bidPrice: asNonZeroNumberOrUndefined(okexTicker.bidPx),
+        bidAmount: asNonZeroNumberOrUndefined(okexTicker.bidSz),
         timestamp: new Date(Number(okexTicker.ts)),
         localTimestamp: localTimestamp
       }
@@ -226,7 +362,7 @@ export class OkexV5BookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker
   }
 }
 
-export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
+class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
@@ -357,7 +493,7 @@ export class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'ok
   }
 }
 
-export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
+class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
   private _isFirstMessage = true
   constructor(private readonly _exchange: Exchange) {}
 
@@ -428,7 +564,7 @@ export class OkexV5LiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidat
   }
 }
 
-export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
+class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly _openInterests = new Map<string, number>()
   private readonly _markPrices = new Map<string, number>()
@@ -452,18 +588,15 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
   getFilters(symbols?: string[]) {
     symbols = upperCaseSymbols(symbols)
 
-    const indexes =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}-${symbolParts[1]}`
-          })
-        : undefined
+    const indexes = symbols !== undefined ? [...new Set(symbols.map((s) => getOkexOptionsUnderlyingIndex(s)))] : undefined
+
+    const optionSummaryInstrumentFamilies =
+      symbols !== undefined ? [...new Set(symbols.map((s) => getOkexOptionsFamilyOrIndex(s)))] : undefined
 
     return [
       {
         channel: `opt-summary`,
-        symbols: [] as string[]
+        symbols: optionSummaryInstrumentFamilies
       } as const,
       {
         channel: `index-tickers`,
@@ -492,7 +625,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const indexTickerMessage = dataMessage as OkexV5IndexTickerMessage['data'][0]
 
-        const lastIndexPrice = asNumberIfValid(indexTickerMessage.idxPx)
+        const lastIndexPrice = asNonZeroNumberOrUndefined(indexTickerMessage.idxPx)
         if (lastIndexPrice !== undefined) {
           this._indexPrices.set(indexTickerMessage.instId, lastIndexPrice)
         }
@@ -504,7 +637,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const openInterestMessage = dataMessage as OkexV5OpenInterestMessage['data'][0]
 
-        const openInterestValue = asNumberIfValid(openInterestMessage.oi)
+        const openInterestValue = asNonZeroNumberOrUndefined(openInterestMessage.oi)
         if (openInterestValue !== undefined) {
           this._openInterests.set(openInterestMessage.instId, openInterestValue)
         }
@@ -516,7 +649,7 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
       for (const dataMessage of message.data) {
         const markPriceMessage = dataMessage as OkexV5MarkPriceMessage['data'][0]
 
-        const markPrice = asNumberIfValid(markPriceMessage.markPx)
+        const markPrice = asNonZeroNumberOrUndefined(markPriceMessage.markPx)
         if (markPrice !== undefined) {
           this._markPrices.set(markPriceMessage.instId, markPrice)
         }
@@ -560,24 +693,24 @@ export class OkexV5OptionSummaryMapper implements Mapper<'okex-options', OptionS
           strikePrice,
           expirationDate,
 
-          bestBidPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidPx) : undefined,
-          bestBidAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.bidSz) : undefined,
-          bestBidIV: asNumberIfValid(summary.bidVol),
+          bestBidPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.bidPx),
+          bestBidAmount: asNonZeroNumberOrUndefined(lastTickerInfo?.bidSz),
+          bestBidIV: asNonZeroNumberOrUndefined(summary.bidVol),
 
-          bestAskPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askPx) : undefined,
-          bestAskAmount: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.askSz) : undefined,
-          bestAskIV: asNumberIfValid(summary.askVol),
+          bestAskPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.askPx),
+          bestAskAmount: asNonZeroNumberOrUndefined(lastTickerInfo?.askSz),
+          bestAskIV: asNonZeroNumberOrUndefined(summary.askVol),
 
-          lastPrice: lastTickerInfo !== undefined ? asNumberIfValid(lastTickerInfo.last) : undefined,
+          lastPrice: asNonZeroNumberOrUndefined(lastTickerInfo?.last),
           openInterest: lastOpenInterest,
 
           markPrice: lastMarkPrice,
-          markIV: asNumberIfValid(summary.markVol),
+          markIV: asNonZeroNumberOrUndefined(summary.markVol),
 
-          delta: asNumberIfValid(summary.delta),
-          gamma: asNumberIfValid(summary.gamma),
-          vega: asNumberIfValid(summary.vega),
-          theta: asNumberIfValid(summary.theta),
+          delta: asNonZeroNumberOrUndefined(summary.delta),
+          gamma: asNonZeroNumberOrUndefined(summary.gamma),
+          vega: asNonZeroNumberOrUndefined(summary.vega),
+          theta: asNonZeroNumberOrUndefined(summary.theta),
           rho: undefined,
 
           underlyingPrice: lastUnderlyingPrice,
@@ -725,8 +858,15 @@ type OkexV5SummaryMessage = {
 //V3 Okex API mappers
 // https://www.okex.com/docs/en/#ws_swap-README
 
-export class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+class OkexTradesMapper implements Mapper<OKEX_EXCHANGES, Trade> {
+  private readonly _market: OKEX_MARKETS
+
+  constructor(
+    private readonly _exchange: Exchange,
+    { market }: { market: OKEX_MARKETS }
+  ) {
+    this._market = market
+  }
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/trade`
@@ -769,12 +909,17 @@ const mapBookLevel = (level: OkexBookLevel) => {
   return { price, amount }
 }
 
-export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
+class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> {
+  private readonly _canUseTickByTickChannel: boolean
+  private readonly _market: OKEX_MARKETS
+
   constructor(
     private readonly _exchange: Exchange,
-    private readonly _market: OKEX_MARKETS,
-    private readonly _canUseTickByTickChannel: boolean
-  ) {}
+    { market, useTickByTickChannel }: { market: OKEX_MARKETS; useTickByTickChannel: boolean }
+  ) {
+    this._market = market
+    this._canUseTickByTickChannel = useTickByTickChannel
+  }
 
   canHandle(message: OkexDataMessage) {
     const channelSuffix = this._canUseTickByTickChannel ? 'depth_l2_tbt' : 'depth'
@@ -835,7 +980,7 @@ export class OkexBookChangeMapper implements Mapper<OKEX_EXCHANGES, BookChange> 
   }
 }
 
-export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
+class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private _futuresChannels = ['futures/ticker', 'futures/mark_price']
   private _swapChannels = ['swap/ticker', 'swap/mark_price', 'swap/funding_rate']
@@ -898,7 +1043,7 @@ export class OkexDerivativeTickerMapper implements Mapper<'okex-futures' | 'okex
   }
 }
 
-export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
+class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly expiration_regex = /(\d{2})(\d{2})(\d{2})/
 
@@ -958,24 +1103,24 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
         strikePrice,
         expirationDate,
 
-        bestBidPrice: asNumberIfValid(summary.best_bid),
-        bestBidAmount: asNumberIfValid(summary.best_bid_size),
-        bestBidIV: asNumberIfValid(summary.bid_vol),
+        bestBidPrice: asNonZeroNumberOrUndefined(summary.best_bid),
+        bestBidAmount: asNonZeroNumberOrUndefined(summary.best_bid_size),
+        bestBidIV: asNonZeroNumberOrUndefined(summary.bid_vol),
 
-        bestAskPrice: asNumberIfValid(summary.best_ask),
-        bestAskAmount: asNumberIfValid(summary.best_ask_size),
-        bestAskIV: asNumberIfValid(summary.ask_vol),
+        bestAskPrice: asNonZeroNumberOrUndefined(summary.best_ask),
+        bestAskAmount: asNonZeroNumberOrUndefined(summary.best_ask_size),
+        bestAskIV: asNonZeroNumberOrUndefined(summary.ask_vol),
 
-        lastPrice: asNumberIfValid(summary.last),
-        openInterest: asNumberIfValid(summary.open_interest),
+        lastPrice: asNonZeroNumberOrUndefined(summary.last),
+        openInterest: asNonZeroNumberOrUndefined(summary.open_interest),
 
-        markPrice: asNumberIfValid(summary.mark_price),
-        markIV: asNumberIfValid(summary.mark_vol),
+        markPrice: asNonZeroNumberOrUndefined(summary.mark_price),
+        markIV: asNonZeroNumberOrUndefined(summary.mark_vol),
 
-        delta: asNumberIfValid(summary.delta),
-        gamma: asNumberIfValid(summary.gamma),
-        vega: asNumberIfValid(summary.vega),
-        theta: asNumberIfValid(summary.theta),
+        delta: asNonZeroNumberOrUndefined(summary.delta),
+        gamma: asNonZeroNumberOrUndefined(summary.gamma),
+        vega: asNonZeroNumberOrUndefined(summary.vega),
+        theta: asNonZeroNumberOrUndefined(summary.theta),
         rho: undefined,
 
         underlyingPrice: lastUnderlyingPrice,
@@ -990,8 +1135,15 @@ export class OkexOptionSummaryMapper implements Mapper<'okex-options', OptionSum
   }
 }
 
-export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidation> {
+  private readonly _market: OKEX_MARKETS
+
+  constructor(
+    private readonly _exchange: Exchange,
+    { market }: { market: OKEX_MARKETS }
+  ) {
+    this._market = market
+  }
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/liquidation`
@@ -1026,8 +1178,15 @@ export class OkexLiquidationsMapper implements Mapper<OKEX_EXCHANGES, Liquidatio
   }
 }
 
-export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
-  constructor(private readonly _exchange: Exchange, private readonly _market: OKEX_MARKETS) {}
+class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> {
+  private readonly _market: OKEX_MARKETS
+
+  constructor(
+    private readonly _exchange: Exchange,
+    { market }: { market: OKEX_MARKETS }
+  ) {
+    this._market = market
+  }
 
   canHandle(message: OkexDataMessage) {
     return message.table === `${this._market}/ticker`
@@ -1051,11 +1210,11 @@ export class OkexBookTickerMapper implements Mapper<OKEX_EXCHANGES, BookTicker> 
         symbol: okexTicker.instrument_id,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(okexTicker.best_ask_size),
-        askPrice: asNumberIfValid(okexTicker.best_ask),
+        askAmount: asNonZeroNumberOrUndefined(okexTicker.best_ask_size),
+        askPrice: asNonZeroNumberOrUndefined(okexTicker.best_ask),
 
-        bidPrice: asNumberIfValid(okexTicker.best_bid),
-        bidAmount: asNumberIfValid(okexTicker.best_bid_size),
+        bidPrice: asNonZeroNumberOrUndefined(okexTicker.best_bid),
+        bidAmount: asNonZeroNumberOrUndefined(okexTicker.best_bid_size),
         timestamp: new Date(okexTicker.timestamp),
         localTimestamp: localTimestamp
       }

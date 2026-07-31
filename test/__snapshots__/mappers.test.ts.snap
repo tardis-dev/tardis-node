@@ -367,6 +367,106 @@ exports[`map bitget messages 9`] = `
 ]
 `;
 
+exports[`map bitget v3 messages 1`] = `
+[
+  {
+    "amount": 0.001367,
+    "exchange": "bitget",
+    "id": "1432912488536195072",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 76671.22,
+    "side": "sell",
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.170Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 2`] = `[]`;
+
+exports[`map bitget v3 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 1.049783,
+        "price": 76794.01,
+      },
+      {
+        "amount": 0.002881,
+        "price": 76794.05,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.062194,
+        "price": 76794,
+      },
+      {
+        "amount": 0.000032,
+        "price": 76793,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T07:50:56.332Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 76679.99,
+      },
+      {
+        "amount": 0.026085,
+        "price": 76681.49,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.03914,
+        "price": 76646.9,
+      },
+      {
+        "amount": 0,
+        "price": 76439.78,
+      },
+    ],
+    "exchange": "bitget",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.011Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget v3 messages 5`] = `
+[
+  {
+    "askAmount": 0.41581,
+    "askPrice": 76671.23,
+    "bidAmount": 0.531211,
+    "bidPrice": 76671.22,
+    "exchange": "bitget",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.105Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
 exports[`map bitget-futures messages 1`] = `[]`;
 
 exports[`map bitget-futures messages 2`] = `[]`;
@@ -496,6 +596,152 @@ exports[`map bitget-futures messages 11`] = `
 ]
 `;
 
+exports[`map bitget-futures v3 messages 1`] = `
+[
+  {
+    "amount": 0.01,
+    "exchange": "bitget-futures",
+    "id": "1432912492051054592",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 76631.3,
+    "side": "buy",
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:01.008Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 2`] = `[]`;
+
+exports[`map bitget-futures v3 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 4.2465,
+        "price": 76742.9,
+      },
+      {
+        "amount": 0.0001,
+        "price": 76743,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 2.8986,
+        "price": 76742.8,
+      },
+      {
+        "amount": 0.0001,
+        "price": 76742.7,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T07:50:57.614Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 76642,
+      },
+      {
+        "amount": 0,
+        "price": 76642.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.0783,
+        "price": 76598.9,
+      },
+      {
+        "amount": 0,
+        "price": 76596.4,
+      },
+    ],
+    "exchange": "bitget-futures",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 5`] = `
+[
+  {
+    "askAmount": 8.8086,
+    "askPrice": 76631.3,
+    "bidAmount": 0.9608,
+    "bidPrice": 76631.2,
+    "exchange": "bitget-futures",
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.027Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 6`] = `
+[
+  {
+    "exchange": "bitget-futures",
+    "fundingRate": -0.00003,
+    "fundingTimestamp": 2026-04-28T08:00:00.000Z,
+    "indexPrice": 76671.43816860554,
+    "lastPrice": 76631.3,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "markPrice": 76631.3,
+    "openInterest": 29539.3825,
+    "predictedFundingRate": undefined,
+    "symbol": "BTCUSDT",
+    "timestamp": 2026-04-28T06:48:00.084Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bitget-futures v3 messages 7`] = `
+[
+  {
+    "amount": 13.70319,
+    "exchange": "bitget-futures",
+    "id": undefined,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 0.1649,
+    "side": "sell",
+    "symbol": "APEUSDT",
+    "timestamp": 2026-04-28T06:48:06.549Z,
+    "type": "liquidation",
+  },
+  {
+    "amount": 143.330431857868,
+    "exchange": "bitget-futures",
+    "id": undefined,
+    "localTimestamp": 2026-04-28T00:00:00.000Z,
+    "price": 0.500280739469,
+    "side": "sell",
+    "symbol": "IPUSDT",
+    "timestamp": 2026-04-28T06:47:56.983Z,
+    "type": "liquidation",
+  },
+]
+`;
+
 exports[`map bitnomial messages 1`] = `
 [
   {
@@ -580,6 +826,435 @@ exports[`map bitnomial messages 4`] = `
   },
 ]
 `;
+
+exports[`map bullish book ticker messages 1`] = `
+[
+  {
+    "askAmount": 6.08,
+    "askPrice": 94.973,
+    "bidAmount": 56.33894018,
+    "bidPrice": 94.519,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T13:04:19.490Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 2`] = `
+[
+  {
+    "askAmount": 59.9788953,
+    "askPrice": 6.431,
+    "bidAmount": 1.9840594,
+    "bidPrice": 6.429,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "BONK1MUSDC",
+    "timestamp": 2026-04-24T13:04:20.138Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 3`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "bullish",
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEAUSD",
+    "timestamp": 2026-04-23T07:22:13.990Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map bullish book ticker messages 4`] = `[]`;
+
+exports[`map bullish derivative ticker messages 1`] = `
+[
+  {
+    "channel": "V1TATickerResponse",
+    "symbols": [
+      "BTC-USDC-PERP",
+      "BTC-USDC-20260426",
+    ],
+  },
+  {
+    "channel": "V1TAIndexPrice",
+    "symbols": [
+      "BTC",
+    ],
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 2`] = `[]`;
+
+exports[`map bullish derivative ticker messages 3`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": -0.001492,
+    "fundingTimestamp": undefined,
+    "indexPrice": 78032.25,
+    "lastPrice": 78029.65,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78035.395,
+    "openInterest": 647.17244459,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:54.715Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 4`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": 0,
+    "fundingTimestamp": undefined,
+    "indexPrice": 78032.25,
+    "lastPrice": 78029.65,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78035.395,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:55.715Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 5`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 78032.25,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78001.2667,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-20260426",
+    "timestamp": 2026-04-24T14:58:51.879Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 6`] = `[]`;
+
+exports[`map bullish derivative ticker messages 7`] = `
+[
+  {
+    "exchange": "bullish",
+    "fundingRate": 0,
+    "fundingTimestamp": undefined,
+    "indexPrice": 78040.5,
+    "lastPrice": 78029.65,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markPrice": 78035.395,
+    "openInterest": 0,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-PERP",
+    "timestamp": 2026-04-24T14:58:56.715Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map bullish derivative ticker messages 8`] = `[]`;
+
+exports[`map bullish derivative ticker messages 9`] = `[]`;
+
+exports[`map bullish derivative ticker messages 10`] = `[]`;
+
+exports[`map bullish option summary messages 1`] = `
+[
+  {
+    "channel": "V1TATickerResponse",
+    "symbols": [
+      "BTC-USDC-20260425-70000-C",
+    ],
+  },
+  {
+    "channel": "V1TAIndexPrice",
+    "symbols": [
+      "BTC",
+    ],
+  },
+]
+`;
+
+exports[`map bullish option summary messages 2`] = `[]`;
+
+exports[`map bullish option summary messages 3`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.9998113,
+    "exchange": "bullish",
+    "expirationDate": 2026-04-25T08:00:00.000Z,
+    "gamma": 3e-7,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.7045,
+    "markPrice": 8133.6201,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 70000,
+    "symbol": "BTC-USDC-20260425-70000-C",
+    "theta": -93.2574,
+    "timestamp": 2026-04-24T14:58:52.219Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTC",
+    "underlyingPrice": 78032.25,
+    "vega": 0.0247,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 4`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0,
+    "exchange": "bullish",
+    "expirationDate": 2026-05-15T08:00:00.000Z,
+    "gamma": 0,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.6182,
+    "markPrice": 0,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 150000,
+    "symbol": "BTC-USDC-20260515-150000-C",
+    "theta": 0,
+    "timestamp": 2026-04-24T14:58:53.219Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTC",
+    "underlyingPrice": 78032.25,
+    "vega": 0,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 5`] = `[]`;
+
+exports[`map bullish option summary messages 6`] = `
+[
+  {
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "bestAskPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestBidPrice": undefined,
+    "delta": 0.9998113,
+    "exchange": "bullish",
+    "expirationDate": 2026-04-25T08:00:00.000Z,
+    "gamma": 3e-7,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-04-24T14:58:55.000Z,
+    "markIV": 0.7045,
+    "markPrice": 8133.6201,
+    "openInterest": 0,
+    "optionType": "call",
+    "rho": undefined,
+    "strikePrice": 70000,
+    "symbol": "BTC-USDC-20260425-70000-C",
+    "theta": -93.2574,
+    "timestamp": 2026-04-24T14:58:54.219Z,
+    "type": "option_summary",
+    "underlyingIndex": "BTC",
+    "underlyingPrice": 78040.5,
+    "vega": 0.0247,
+  },
+]
+`;
+
+exports[`map bullish option summary messages 7`] = `[]`;
+
+exports[`map bullish option summary messages 8`] = `[]`;
+
+exports[`map bullish option summary messages 9`] = `[]`;
+
+exports[`map bullish order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 6.08,
+        "price": 94.973,
+      },
+      {
+        "amount": 8.42081721,
+        "price": 94.984,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.985,
+      },
+      {
+        "amount": 5,
+        "price": 95.078,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 56.33894018,
+        "price": 94.519,
+      },
+      {
+        "amount": 53.7,
+        "price": 94.489,
+      },
+      {
+        "amount": 5,
+        "price": 94.467,
+      },
+      {
+        "amount": 1.08,
+        "price": 94.466,
+      },
+    ],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEUSDC",
+    "timestamp": 2026-04-24T13:04:19.490Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bullish order book messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 9800,
+        "price": 0.2513,
+      },
+      {
+        "amount": 25000,
+        "price": 0.2514,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 11800,
+        "price": 0.2507,
+      },
+      {
+        "amount": 0,
+        "price": 0.2506,
+      },
+    ],
+    "exchange": "bullish",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "ADAUSDC",
+    "timestamp": 2026-04-24T13:04:19.138Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bullish order book messages 3`] = `
+[
+  {
+    "asks": [],
+    "bids": [],
+    "exchange": "bullish",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-24T13:04:20.636Z,
+    "symbol": "AAVEAUSD",
+    "timestamp": 2026-04-24T13:04:19.138Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map bullish trade messages 1`] = `[]`;
+
+exports[`map bullish trade messages 2`] = `
+[
+  {
+    "amount": 0.0042,
+    "exchange": "bullish",
+    "id": "100118000001462723",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 66250.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-24T01:19:40.258Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.0043,
+    "exchange": "bullish",
+    "id": "100118000001462724",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 66251.5,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-24T01:19:40.259Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.0044,
+    "exchange": "bullish",
+    "id": "100118000001462725",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 66252.5,
+    "side": "sell",
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-24T01:19:40.260Z,
+    "type": "trade",
+  },
+  {
+    "amount": 0.0045,
+    "exchange": "bullish",
+    "id": "100118000001462726",
+    "localTimestamp": 2026-04-24T01:19:40.250Z,
+    "price": 66253.5,
+    "side": "buy",
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-24T01:19:40.261Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map bullish trade messages 3`] = `[]`;
+
+exports[`map bullish trade messages 4`] = `[]`;
 
 exports[`map bybit spot messages 1`] = `[]`;
 
@@ -1923,6 +2598,209 @@ exports[`map kucoin-futures messages 15`] = `
 ]
 `;
 
+exports[`map lighter market stats messages 1`] = `[]`;
+
+exports[`map lighter market stats messages 2`] = `
+[
+  {
+    "exchange": "lighter",
+    "fundingRate": 0.0011,
+    "fundingTimestamp": undefined,
+    "indexPrice": 2309.89,
+    "lastPrice": 2308.57,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "markPrice": 2308.86,
+    "openInterest": 70209098.837046,
+    "predictedFundingRate": undefined,
+    "symbol": "0",
+    "timestamp": 2026-04-20T14:07:23.874Z,
+    "type": "derivative_ticker",
+  },
+  {
+    "exchange": "lighter",
+    "fundingRate": 0.0012,
+    "fundingTimestamp": undefined,
+    "indexPrice": 75281.9,
+    "lastPrice": 75232,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "markPrice": 75241.1,
+    "openInterest": 124496030.8108,
+    "predictedFundingRate": undefined,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:07:23.874Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map lighter order book messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.08303,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.00331,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.1328,
+        "price": 75302,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.00117,
+        "price": 75300.4,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.3,
+      },
+      {
+        "amount": 0.0002,
+        "price": 75300.1,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": true,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.437Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map lighter order book messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 75300.5,
+      },
+      {
+        "amount": 0.28364,
+        "price": 75300.7,
+      },
+      {
+        "amount": 0.61855,
+        "price": 75313.9,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.04881,
+        "price": 75300.6,
+      },
+      {
+        "amount": 0.01993,
+        "price": 75295.7,
+      },
+      {
+        "amount": 0.10792,
+        "price": 75294.3,
+      },
+    ],
+    "exchange": "lighter",
+    "isSnapshot": false,
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:37:02.475Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 1`] = `[]`;
+
+exports[`map lighter ticker messages 2`] = `
+[
+  {
+    "askAmount": 0.52927,
+    "askPrice": 75531.6,
+    "bidAmount": 0.10752,
+    "bidPrice": 75524.4,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.147Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 3`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.148Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter ticker messages 4`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "lighter",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "symbol": "1",
+    "timestamp": 2026-04-20T14:37:47.149Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map lighter trade messages 1`] = `[]`;
+
+exports[`map lighter trade messages 2`] = `
+[
+  {
+    "amount": 0.00012,
+    "exchange": "lighter",
+    "id": "18240999426",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75196.7,
+    "side": "sell",
+    "symbol": "1",
+    "timestamp": 2026-04-20T13:13:20.246Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map lighter trade messages 3`] = `
+[
+  {
+    "amount": 0.01664,
+    "exchange": "lighter",
+    "id": "18237797923",
+    "localTimestamp": 2026-04-20T11:35:00.000Z,
+    "price": 75602.8,
+    "side": "buy",
+    "symbol": "1",
+    "timestamp": 2026-04-20T12:20:56.653Z,
+    "type": "liquidation",
+  },
+]
+`;
+
+exports[`map lighter trade messages 4`] = `[]`;
+
 exports[`map okex-spreads messages 1`] = `
 [
   {
@@ -1984,13 +2862,251 @@ exports[`map okex-spreads messages 3`] = `
 ]
 `;
 
-exports[`map woo-x messages 1`] = `
+exports[`map polymarket messages 1`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 2501,
+        "price": 0.99,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 505,
+        "price": 0.01,
+      },
+      {
+        "amount": 15.25,
+        "price": 0.59,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:14:29.765Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 2`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 200,
+        "price": 0.98,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 100,
+        "price": 0.6,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:14:29.765Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 11.53,
+        "price": 0.94,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 50,
+        "price": 0.45,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": true,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "114598918128008649573289110164634285301775348261383142320713626791317488686608",
+    "timestamp": 2026-05-11T02:02:17.192Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 3`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 2849.22,
+        "price": 0.05,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:29:59.942Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 2849.22,
+        "price": 0.95,
+      },
+    ],
+    "bids": [],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "44076628926488158747612441576415392346365146558144994485384867009865003867169",
+    "timestamp": 2026-05-11T06:29:59.942Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 4`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0,
+        "price": 0.05,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 5`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 120,
+        "price": 0.06,
+      },
+    ],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:01.000Z,
+    "type": "book_change",
+  },
+  {
+    "asks": [
+      {
+        "amount": 80,
+        "price": 0.07,
+      },
+    ],
+    "bids": [],
+    "exchange": "polymarket",
+    "isSnapshot": false,
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "32029059041121237772501910512051792285371148723936508019755582547379001566932",
+    "timestamp": 2026-05-11T06:30:01.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map polymarket messages 6`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": 0.51,
+    "bidAmount": undefined,
+    "bidPrice": 0.48,
+    "exchange": "polymarket",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "102872648555130809031488632355736527619427659766925788934870144378212124766731",
+    "timestamp": 2026-05-11T06:29:59.944Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map polymarket messages 7`] = `
+[
+  {
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "exchange": "polymarket",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "symbol": "102872648555130809031488632355736527619427659766925788934870144378212124766731",
+    "timestamp": 2026-05-11T06:29:59.945Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map polymarket messages 8`] = `
+[
+  {
+    "amount": 100,
+    "exchange": "polymarket",
+    "id": "abc123def456",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "price": 0.6,
+    "side": "buy",
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:29:59.940Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map polymarket messages 9`] = `
+[
+  {
+    "amount": 25,
+    "exchange": "polymarket",
+    "id": "def456abc123",
+    "localTimestamp": 2026-05-11T06:30:00.000Z,
+    "price": 0.61,
+    "side": "sell",
+    "symbol": "50004092451487013519117521377876897159157506656261391593572775546589316505011",
+    "timestamp": 2026-05-11T06:29:59.950Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map polymarket messages 10`] = `[]`;
+
+exports[`map polymarket messages 11`] = `[]`;
+
+exports[`map polymarket messages 12`] = `[]`;
+
+exports[`map polymarket messages 13`] = `[]`;
+
+exports[`map polymarket messages 14`] = `[]`;
+
+exports[`map woo-x legacy messages 1`] = `
 [
   {
     "amount": 4109,
     "exchange": "woo-x",
     "id": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "price": 0.048756,
     "side": "sell",
     "symbol": "PERP_GALA_USDT",
@@ -2003,7 +3119,7 @@ exports[`map woo-x messages 1`] = `
     "fundingTimestamp": undefined,
     "indexPrice": undefined,
     "lastPrice": 0.048756,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": undefined,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -2014,13 +3130,13 @@ exports[`map woo-x messages 1`] = `
 ]
 `;
 
-exports[`map woo-x messages 2`] = `
+exports[`map woo-x legacy messages 2`] = `
 [
   {
     "amount": 0.0516,
     "exchange": "woo-x",
     "id": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "price": 1522.45,
     "side": "sell",
     "symbol": "SPOT_ETH_USDT",
@@ -2030,9 +3146,9 @@ exports[`map woo-x messages 2`] = `
 ]
 `;
 
-exports[`map woo-x messages 3`] = `[]`;
+exports[`map woo-x legacy messages 3`] = `[]`;
 
-exports[`map woo-x messages 4`] = `
+exports[`map woo-x legacy messages 4`] = `
 [
   {
     "asks": [
@@ -2057,7 +3173,7 @@ exports[`map woo-x messages 4`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": true,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.020Z,
     "type": "book_change",
@@ -2077,7 +3193,7 @@ exports[`map woo-x messages 4`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": false,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.020Z,
     "type": "book_change",
@@ -2085,7 +3201,7 @@ exports[`map woo-x messages 4`] = `
 ]
 `;
 
-exports[`map woo-x messages 5`] = `
+exports[`map woo-x legacy messages 5`] = `
 [
   {
     "asks": [
@@ -2106,7 +3222,7 @@ exports[`map woo-x messages 5`] = `
     ],
     "exchange": "woo-x",
     "isSnapshot": false,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "PERP_BTC_USDT",
     "timestamp": 2023-01-23T00:00:00.220Z,
     "type": "book_change",
@@ -2114,7 +3230,7 @@ exports[`map woo-x messages 5`] = `
 ]
 `;
 
-exports[`map woo-x messages 6`] = `
+exports[`map woo-x legacy messages 6`] = `
 [
   {
     "askAmount": 38.2,
@@ -2122,7 +3238,7 @@ exports[`map woo-x messages 6`] = `
     "bidAmount": 21.137,
     "bidPrice": 13.322,
     "exchange": "woo-x",
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "symbol": "SPOT_ATOM_USDT",
     "timestamp": 2023-01-22T23:59:59.997Z,
     "type": "book_ticker",
@@ -2130,7 +3246,7 @@ exports[`map woo-x messages 6`] = `
 ]
 `;
 
-exports[`map woo-x messages 7`] = `
+exports[`map woo-x legacy messages 7`] = `
 [
   {
     "exchange": "woo-x",
@@ -2138,7 +3254,7 @@ exports[`map woo-x messages 7`] = `
     "fundingTimestamp": undefined,
     "indexPrice": undefined,
     "lastPrice": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -2149,7 +3265,7 @@ exports[`map woo-x messages 7`] = `
 ]
 `;
 
-exports[`map woo-x messages 8`] = `
+exports[`map woo-x legacy messages 8`] = `
 [
   {
     "exchange": "woo-x",
@@ -2157,7 +3273,7 @@ exports[`map woo-x messages 8`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": undefined,
     "lastPrice": undefined,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -2168,9 +3284,9 @@ exports[`map woo-x messages 8`] = `
 ]
 `;
 
-exports[`map woo-x messages 9`] = `[]`;
+exports[`map woo-x legacy messages 9`] = `[]`;
 
-exports[`map woo-x messages 10`] = `
+exports[`map woo-x legacy messages 10`] = `
 [
   {
     "exchange": "woo-x",
@@ -2178,7 +3294,7 @@ exports[`map woo-x messages 10`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": 22708.44,
     "lastPrice": 22703.97,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": undefined,
     "predictedFundingRate": undefined,
@@ -2189,7 +3305,7 @@ exports[`map woo-x messages 10`] = `
 ]
 `;
 
-exports[`map woo-x messages 11`] = `
+exports[`map woo-x legacy messages 11`] = `
 [
   {
     "exchange": "woo-x",
@@ -2197,7 +3313,7 @@ exports[`map woo-x messages 11`] = `
     "fundingTimestamp": 2023-01-23T01:00:00.005Z,
     "indexPrice": 22708.44,
     "lastPrice": 22703.97,
-    "localTimestamp": 2022-08-16T00:00:00.464Z,
+    "localTimestamp": 2023-01-23T00:00:00.464Z,
     "markPrice": 22711.11,
     "openInterest": 83.2241,
     "predictedFundingRate": undefined,
@@ -2207,6 +3323,187 @@ exports[`map woo-x messages 11`] = `
   },
 ]
 `;
+
+exports[`map woo-x v3 messages 1`] = `
+[
+  {
+    "amount": 0.09,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "price": 1622.8,
+    "side": "sell",
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:07:59.821Z,
+    "type": "trade",
+  },
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:07:59.821Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 2`] = `
+[
+  {
+    "amount": 0.02,
+    "exchange": "woo-x",
+    "id": undefined,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "price": 1622.6,
+    "side": "buy",
+    "symbol": "SPOT_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.005Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 3`] = `[]`;
+
+exports[`map woo-x v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.2,
+        "price": 1622.8,
+      },
+      {
+        "amount": 0.1,
+        "price": 1623,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.4,
+        "price": 1622.7,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": true,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.000Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 5`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 1622.8,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 0.5,
+        "price": 1622.6,
+      },
+    ],
+    "exchange": "woo-x",
+    "isSnapshot": false,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.300Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 6`] = `
+[
+  {
+    "askAmount": 0.2,
+    "askPrice": 1622.8,
+    "bidAmount": 0.4,
+    "bidPrice": 1622.7,
+    "exchange": "woo-x",
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.004Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 7`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": undefined,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 8`] = `[]`;
+
+exports[`map woo-x v3 messages 9`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 1622.5,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": 95500,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:00.570Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 10`] = `
+[
+  {
+    "exchange": "woo-x",
+    "fundingRate": 0.00001181,
+    "fundingTimestamp": 2026-06-30T00:00:00.000Z,
+    "indexPrice": 1622.5,
+    "lastPrice": 1622.8,
+    "localTimestamp": 2026-06-29T22:08:00.464Z,
+    "markPrice": 1622.9,
+    "openInterest": 95500,
+    "predictedFundingRate": undefined,
+    "symbol": "PERP_ETH_USDT",
+    "timestamp": 2026-06-29T22:08:59.000Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`map woo-x v3 messages 11`] = `[]`;
+
+exports[`mappers ignore bitfinex funding ticker messages for book ticker 1`] = `[]`;
 
 exports[`mappers map ascendex messages 1`] = `
 [
@@ -3061,6 +4358,38 @@ exports[`mappers map binance messages 10`] = `
     "symbol": "GNTBTC",
     "timestamp": 2019-04-01T00:00:09.699Z,
     "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map bitfinex book ticker messages with trailing null placeholder 1`] = `
+[
+  {
+    "askAmount": 1.22665447,
+    "askPrice": 71760,
+    "bidAmount": 0.26742262,
+    "bidPrice": 71741,
+    "exchange": "bitfinex",
+    "localTimestamp": 2026-04-10T00:00:00.164Z,
+    "symbol": "BTCUSD",
+    "timestamp": 2026-04-10T00:00:00.144Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map bitfinex derivatives book ticker messages with trailing null placeholder 1`] = `
+[
+  {
+    "askAmount": 6.16257014,
+    "askPrice": 71847,
+    "bidAmount": 7.47322491,
+    "bidPrice": 71800,
+    "exchange": "bitfinex-derivatives",
+    "localTimestamp": 2026-04-10T00:00:00.152Z,
+    "symbol": "BTCF0:USTF0",
+    "timestamp": 2026-04-10T00:00:00.139Z,
+    "type": "book_ticker",
   },
 ]
 `;
@@ -8152,6 +9481,90 @@ exports[`mappers map gemini messages 4`] = `
 ]
 `;
 
+exports[`mappers map gemini v3 messages 1`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 11129.364219,
+        "price": 0.1488,
+      },
+      {
+        "amount": 49574.823701,
+        "price": 0.1489,
+      },
+    ],
+    "exchange": "gemini",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-24T00:00:01.275Z,
+    "symbol": "WIFUSD",
+    "timestamp": 2026-07-13T22:18:59.947514Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 2`] = `
+[
+  {
+    "amount": 0.01625222,
+    "exchange": "gemini",
+    "id": "2840141014190422",
+    "localTimestamp": 2026-07-24T00:00:01.275Z,
+    "price": 62145.38,
+    "side": "sell",
+    "symbol": "BTCRLUSD",
+    "timestamp": 2026-07-13T22:19:00.085684Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 3`] = `
+[
+  {
+    "askAmount": 38.3906,
+    "askPrice": 1.0615,
+    "bidAmount": 958.69148,
+    "bidPrice": 1.06149,
+    "exchange": "gemini",
+    "localTimestamp": 2026-07-24T00:00:01.275Z,
+    "symbol": "XRPGUSD",
+    "timestamp": 2026-07-13T22:19:00.076872Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map gemini v3 messages 4`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0,
+        "price": 7.85375,
+      },
+      {
+        "amount": 0,
+        "price": 7.85388,
+      },
+      {
+        "amount": 0,
+        "price": 7.85374,
+      },
+    ],
+    "bids": [],
+    "exchange": "gemini",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-24T00:00:01.275Z,
+    "symbol": "LINKRLUSD",
+    "timestamp": 2026-07-13T22:19:59.886103Z,
+    "type": "book_change",
+  },
+]
+`;
+
 exports[`mappers map hitbtc messages 1`] = `[]`;
 
 exports[`mappers map hitbtc messages 2`] = `
@@ -9431,6 +10844,87 @@ exports[`mappers map kraken messages 7`] = `
 `;
 
 exports[`mappers map kraken messages 8`] = `[]`;
+
+exports[`mappers map kraken v2 messages 1`] = `[]`;
+
+exports[`mappers map kraken v2 messages 2`] = `
+[
+  {
+    "amount": 0.25,
+    "exchange": "kraken",
+    "id": "123",
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "price": 100.1,
+    "side": "buy",
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:00.123456Z,
+    "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 3`] = `
+[
+  {
+    "asks": [
+      {
+        "amount": 0.8,
+        "price": 200.1,
+      },
+    ],
+    "bids": [
+      {
+        "amount": 1.2,
+        "price": 199.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": true,
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "AAPLx/USD",
+    "timestamp": 2026-07-10T00:00:01.123457Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 4`] = `
+[
+  {
+    "asks": [],
+    "bids": [
+      {
+        "amount": 0.5,
+        "price": 99.9,
+      },
+    ],
+    "exchange": "kraken",
+    "isSnapshot": false,
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:01.223456Z,
+    "type": "book_change",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 5`] = `
+[
+  {
+    "askAmount": 2.3,
+    "askPrice": 100.1,
+    "bidAmount": 1.2,
+    "bidPrice": 99.9,
+    "exchange": "kraken",
+    "localTimestamp": 2026-07-10T00:00:03.275Z,
+    "symbol": "BTC/USD",
+    "timestamp": 2026-07-10T00:00:02.123456Z,
+    "type": "book_ticker",
+  },
+]
+`;
+
+exports[`mappers map kraken v2 messages 6`] = `[]`;
 
 exports[`mappers map okcoin messages 1`] = `
 [
@@ -11634,6 +13128,10 @@ exports[`mappers map phemex messages 15`] = `
   },
 ]
 `;
+
+exports[`mappers map phemex messages 16`] = `[]`;
+
+exports[`mappers map phemex messages 17`] = `[]`;
 
 exports[`mappers map poloniex messages 1`] = `
 [

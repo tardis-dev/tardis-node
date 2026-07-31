@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`map mexc realtime subscriptions 1`] = `
+[
+  {
+    "method": "SUBSCRIPTION",
+    "params": [
+      "spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT",
+      "spot@public.aggre.deals.v3.api.pb@10ms@ETHUSDT",
+      "spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT",
+      "spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT",
+    ],
+  },
+]
+`;

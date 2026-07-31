@@ -1,8 +1,17 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class DydxTradesMapper implements Mapper<'dydx', Trade> {
+export const dydxMappers = exchangeMappers({
+  dydx: {
+    trades: () => new DydxTradesMapper(),
+    bookChanges: () => new DydxBookChangeMapper(),
+    derivativeTickers: () => new DydxDerivativeTickerMapper()
+  }
+})
+
+class DydxTradesMapper implements Mapper<'dydx', Trade> {
   canHandle(message: DyDxTrade) {
     return message.channel === 'v3_trades' && message.type === 'channel_data'
   }
@@ -35,7 +44,7 @@ export class DydxTradesMapper implements Mapper<'dydx', Trade> {
   }
 }
 
-export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
+class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
   private _bidsOffsets: { [key: string]: { [key: string]: number | undefined } } = {}
   private _asksOffsets: { [key: string]: { [key: string]: number | undefined } } = {}
 
@@ -148,7 +157,7 @@ export class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
   }
 }
 
-export class DydxDerivativeTickerMapper implements Mapper<'dydx', DerivativeTicker> {
+class DydxDerivativeTickerMapper implements Mapper<'dydx', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: DydxMarketsSnapshot | DyDxMarketsUpdate | DyDxTrade) {

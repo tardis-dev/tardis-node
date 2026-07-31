@@ -1,25 +1,27 @@
 import { Transform } from 'stream'
 import type { TransformCallback } from 'stream'
 
-// Inspired by https://github.com/maxogden/binary-split/blob/master/index.js
-export class BinarySplitStream extends Transform {
-  private readonly _NEW_LINE_BYTE: number
+const NEW_LINE_BYTE = 10
+
+// Inspired by https://github.com/maxogden/binary-split/blob/master/index.js.
+// Batching lines lets replay cross the object-mode async iterator boundary once per decompressed chunk.
+export class BinarySplitBatchStream extends Transform {
   private _buffered?: Buffer
 
   constructor() {
     super({
-      readableObjectMode: true
+      readableObjectMode: true,
+      // A batch can hold a full decompression chunk, so keep read-ahead deliberately small.
+      readableHighWaterMark: 2
     })
-
-    this._NEW_LINE_BYTE = 10
-    this._buffered = undefined
   }
 
   _transform(chunk: Buffer, _: string, callback: TransformCallback) {
-    let chunkStart = 0
+    const lines: Buffer[] = []
+    let lineStart = 0
 
     if (this._buffered !== undefined) {
-      const firstNewLineIndex = chunk.indexOf(this._NEW_LINE_BYTE)
+      const firstNewLineIndex = chunk.indexOf(NEW_LINE_BYTE)
 
       if (firstNewLineIndex === -1) {
         this._buffered = Buffer.concat([this._buffered, chunk])
@@ -27,26 +29,22 @@ export class BinarySplitStream extends Transform {
         return
       }
 
-      this.push(Buffer.concat([this._buffered, chunk.subarray(0, firstNewLineIndex)]))
+      lines.push(Buffer.concat([this._buffered, chunk.subarray(0, firstNewLineIndex)]))
       this._buffered = undefined
-      chunkStart = firstNewLineIndex + 1
+      lineStart = firstNewLineIndex + 1
     }
 
-    let offset = chunkStart
-    let lineStart = chunkStart
-
-    while (true) {
-      const newLineIndex = chunk.indexOf(this._NEW_LINE_BYTE, offset)
-      if (newLineIndex === -1) {
-        break
-      }
-
-      this.push(chunk.subarray(lineStart, newLineIndex))
-      offset = newLineIndex + 1
-      lineStart = offset
+    let newLineIndex = chunk.indexOf(NEW_LINE_BYTE, lineStart)
+    while (newLineIndex !== -1) {
+      lines.push(chunk.subarray(lineStart, newLineIndex))
+      lineStart = newLineIndex + 1
+      newLineIndex = chunk.indexOf(NEW_LINE_BYTE, lineStart)
     }
 
     this._buffered = lineStart < chunk.length ? chunk.subarray(lineStart) : undefined
+    if (lines.length > 0) {
+      this.push(lines)
+    }
     callback()
   }
 }

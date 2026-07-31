@@ -1,10 +1,26 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.bitfinex.com/v2/docs/ws-general
 
-export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', Trade> {
+export const bitfinexMappers = exchangeMappers({
+  bitfinex: {
+    trades: () => new BitfinexTradesMapper('bitfinex'),
+    bookChanges: () => new BitfinexBookChangeMapper('bitfinex'),
+    bookTickers: () => new BitfinexBookTickerMapper('bitfinex')
+  },
+  'bitfinex-derivatives': {
+    trades: () => new BitfinexTradesMapper('bitfinex-derivatives'),
+    bookChanges: () => new BitfinexBookChangeMapper('bitfinex-derivatives'),
+    derivativeTickers: () => new BitfinexDerivativeTickerMapper(),
+    liquidations: () => new BitfinexLiquidationsMapper('bitfinex-derivatives'),
+    bookTickers: () => new BitfinexBookTickerMapper('bitfinex-derivatives')
+  }
+})
+
+class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', Trade> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -80,7 +96,7 @@ export class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-deriv
   }
 }
 
-export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookChange> {
+class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookChange> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -162,7 +178,7 @@ export class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-d
   }
 }
 
-export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivatives', DerivativeTicker> {
+class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivatives', DerivativeTicker> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
@@ -245,7 +261,7 @@ export class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivati
   }
 }
 
-export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liquidation> {
+class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liquidation> {
   private _liquidationsChannelId: number | undefined = undefined
 
   constructor(private readonly _exchange: Exchange) {}
@@ -322,7 +338,7 @@ export class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives'
   }
 }
 
-export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookTicker> {
+class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives', BookTicker> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -366,7 +382,6 @@ export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-d
     const symbolFromMessage = message[message.length - 1]
     const symbol = typeof symbolFromMessage === 'string' ? symbolFromMessage : this._channelIdToSymbolMap.get(message[0])
 
-    // ignore if we don't have matching symbol
     if (symbol === undefined) {
       return
     }
@@ -375,13 +390,14 @@ export class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-d
     if (message[1] === 'hb') {
       return
     }
-    // ignore funding tickers
 
-    if (message[1].length > 10) {
+    // ignore funding tickers
+    const tickerData = message[1]
+    if (tickerData.length > 11) {
       return
     }
 
-    const [bidPrice, bidAmount, askPrice, askAmount, _, __] = message[1]
+    const [bidPrice, bidAmount, askPrice, askAmount] = tickerData
 
     const ticker: BookTicker = {
       type: 'book_ticker',
@@ -424,18 +440,32 @@ type BitfinexLiquidation =
 type BitfinexTicker =
   | [
       CHANNEL_ID: number,
-      ITEMS: [
-        BID: number,
-        BID_SIZE: number,
-        ASK: number,
-        ASK_SIZE: number,
-        DAILY_CHANGE: number,
-        DAILY_CHANGE_RELATIVE: number,
-        LAST_PRICE: number,
-        VOLUME: number,
-        HIGH: number,
-        LOW: number
-      ],
+      ITEMS:
+        | [
+            BID: number,
+            BID_SIZE: number,
+            ASK: number,
+            ASK_SIZE: number,
+            DAILY_CHANGE: number,
+            DAILY_CHANGE_RELATIVE: number,
+            LAST_PRICE: number,
+            VOLUME: number,
+            HIGH: number,
+            LOW: number
+          ]
+        | [
+            BID: number,
+            BID_SIZE: number,
+            ASK: number,
+            ASK_SIZE: number,
+            DAILY_CHANGE: number,
+            DAILY_CHANGE_RELATIVE: number,
+            LAST_PRICE: number,
+            VOLUME: number,
+            HIGH: number,
+            LOW: number,
+            EXTRA: null
+          ],
       SEQ_ID: number,
       TIMESTAMP: number
     ]

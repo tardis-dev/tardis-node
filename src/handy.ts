@@ -71,13 +71,21 @@ export function* sequence(end: number, seed = 0) {
 export const ONE_SEC_IN_MS = 1000
 
 export class HttpError extends Error {
-  constructor(public readonly status: number, public readonly responseText: string, public readonly url: string) {
+  constructor(
+    public readonly status: number,
+    public readonly responseText: string,
+    public readonly url: string
+  ) {
     super(`HttpError: status code: ${status}, response text: ${responseText}`)
   }
 }
 
 class HttpClientError extends Error {
-  constructor(public readonly response: HttpResponse, public readonly method: string, public readonly url: string) {
+  constructor(
+    public readonly response: HttpResponse,
+    public readonly method: string,
+    public readonly url: string
+  ) {
     super(`HTTP ${method} ${url} failed with status ${response.statusCode}`)
   }
 }
@@ -160,24 +168,27 @@ export async function* normalizeMessages(
 export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
   const filters = mappers.flatMap((mapper) => mapper.getFilters(symbols))
 
-  const deduplicatedFilters = filters.reduce((prev, current) => {
-    const matchingExisting = prev.find((c) => c.channel === current.channel)
-    if (matchingExisting !== undefined) {
-      if (matchingExisting.symbols !== undefined && current.symbols) {
-        for (let symbol of current.symbols) {
-          if (matchingExisting.symbols.includes(symbol) === false) {
-            matchingExisting.symbols.push(symbol)
+  const deduplicatedFilters = filters.reduce(
+    (prev, current) => {
+      const matchingExisting = prev.find((c) => c.channel === current.channel)
+      if (matchingExisting !== undefined) {
+        if (matchingExisting.symbols !== undefined && current.symbols) {
+          for (let symbol of current.symbols) {
+            if (matchingExisting.symbols.includes(symbol) === false) {
+              matchingExisting.symbols.push(symbol)
+            }
           }
+        } else if (current.symbols) {
+          matchingExisting.symbols = [...current.symbols]
         }
-      } else if (current.symbols) {
-        matchingExisting.symbols = [...current.symbols]
+      } else {
+        prev.push(current)
       }
-    } else {
-      prev.push(current)
-    }
 
-    return prev
-  }, [] as FilterForExchange[T][])
+      return prev
+    },
+    [] as FilterForExchange[T][]
+  )
 
   return deduplicatedFilters
 }
@@ -197,6 +208,13 @@ export function parseμs(dateString: string): number {
   // check if we have ISO 8601 format date string, e.g: 2019-06-01T00:03:03.1238784Z or 2020-07-22T00:09:16.836773Z
   // or 2020-03-01T00:00:24.893456+00:00
   if (dateString.length === 27 || dateString.length === 28 || dateString.length === 32 || dateString.length === 30) {
+    const hundreds = dateString.charCodeAt(23) - 48
+    const tens = dateString.charCodeAt(24) - 48
+    const ones = dateString.charCodeAt(25) - 48
+    if (hundreds >= 0 && hundreds <= 9 && tens >= 0 && tens <= 9 && ones >= 0 && ones <= 9) {
+      return hundreds * 100 + tens * 10 + ones
+    }
+
     return Number(dateString.slice(23, 26))
   }
 
@@ -255,8 +273,8 @@ export const httpsProxyAgent: Agent | undefined =
   process.env.HTTP_PROXY !== undefined
     ? new HttpsProxyAgent(process.env.HTTP_PROXY)
     : process.env.SOCKS_PROXY !== undefined
-    ? new SocksProxyAgent(process.env.SOCKS_PROXY)
-    : undefined
+      ? new SocksProxyAgent(process.env.SOCKS_PROXY)
+      : undefined
 
 const DEFAULT_FETCH_RETRY_LIMIT = 2
 
@@ -296,7 +314,7 @@ type RetrySettings = {
 function getRetrySettings(method: string, retry?: HttpRetryOptions): RetrySettings {
   const retryOptions = typeof retry === 'object' ? retry : undefined
   const retryEnabled = method === 'GET' || retry !== undefined
-  const limit = typeof retry === 'number' ? retry : retryOptions?.limit ?? (retryEnabled ? DEFAULT_FETCH_RETRY_LIMIT : 0)
+  const limit = typeof retry === 'number' ? retry : (retryOptions?.limit ?? (retryEnabled ? DEFAULT_FETCH_RETRY_LIMIT : 0))
 
   return {
     limit,
@@ -562,13 +580,16 @@ export async function download({
       }
     } catch (error) {
       const unsupportedDataFeedEncoding = error instanceof Error && error.message.startsWith('Unsupported data feed content encoding')
-      const badOrUnauthorizedRequest =
+      const nonRetryableHttpError =
         error instanceof HttpError &&
-        ((error.status === 400 && error.message.includes('ISO 8601 format') === false) || error.status === 401)
+        ((error.status === 400 && error.message.includes('ISO 8601 format') === false) ||
+          error.status === 401 ||
+          error.status === 403 ||
+          error.status === 404)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       const internalServiceError = error instanceof HttpError && error.status === 500
       // do not retry when we've got bad or unauthorized request or enough attempts
-      if (unsupportedDataFeedEncoding || badOrUnauthorizedRequest || attempts === MAX_ATTEMPTS) {
+      if (unsupportedDataFeedEncoding || nonRetryableHttpError || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
@@ -617,9 +638,12 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
+    let responseHeaders: Record<string, string> = {}
     await new Promise<void>((resolve, reject) => {
-      const req = https
-        .get(url, requestOptions, (res) => {
+      const protocol = new URL(url).protocol
+      const requestClient = protocol === 'http:' ? http : https
+      const req = requestClient
+        .get(url, { ...requestOptions, ...(protocol === 'http:' ? { agent: undefined } : {}) }, (res) => {
           const { statusCode } = res
           if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
@@ -631,6 +655,7 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
               reject(new HttpError(statusCode!, body, url))
             })
           } else {
+            responseHeaders = parseNodeResponseHeaders(res.headers)
             if (appendContentEncodingExtension) {
               const contentEncoding = asSingleHeaderValue(res.headers['content-encoding'])
               if (contentEncoding === 'zstd') {
@@ -671,7 +696,8 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     await rename(tmpFilePath, finalDownloadPath)
 
     return {
-      downloadPath: finalDownloadPath
+      downloadPath: finalDownloadPath,
+      headers: responseHeaders
     }
   } finally {
     tmpFileCleanups.delete(tmpFilePath)
@@ -756,22 +782,43 @@ export function decimalPlaces(n: number) {
   return count
 }
 
-export function asNumberIfValid(val: string | number | undefined | null) {
-  if (val === undefined || val === null) {
+/**
+ * Parses optional numeric fields where:
+ * * `0` **is valid and preserved**
+ * * `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`
+ *
+ * Use for nullable/optional numeric fields such as open interest, funding rates, and greeks.
+ */
+export function asNumberOrUndefined(val: string | number | undefined | null) {
+  if (val === undefined || val === null || val === '') {
     return
   }
 
-  var asNumber = Number(val)
+  if (typeof val === 'number') {
+    return Number.isFinite(val) ? val : undefined
+  }
 
-  if (isNaN(asNumber) || isFinite(asNumber) === false) {
+  const asNumber = Number(val)
+  return Number.isFinite(asNumber) ? asNumber : undefined
+}
+
+/**
+ * Parses optional numeric fields where:
+ * * `0`, `undefined`, `null`, `NaN`, `Infinity`, and `-Infinity` are treated as not valid and mapped to `undefined`.
+ *
+ * Use for empty quote/top-of-book values that exchanges encode as zero.
+ */
+export function asNonZeroNumberOrUndefined(val: string | number | undefined | null) {
+  if (val === undefined || val === null || val === '' || val === 0) {
     return
   }
 
-  if (asNumber === 0) {
-    return
+  if (typeof val === 'number') {
+    return Number.isFinite(val) ? val : undefined
   }
 
-  return asNumber
+  const asNumber = Number(val)
+  return Number.isFinite(asNumber) && asNumber !== 0 ? asNumber : undefined
 }
 
 export function upperCaseSymbols(symbols?: string[]) {
@@ -779,6 +826,28 @@ export function upperCaseSymbols(symbols?: string[]) {
     return symbols.map((s) => s.toUpperCase())
   }
   return
+}
+
+export function createNormalizedSymbolFilter(symbols: string[] | undefined, filters: Filter<any>[]) {
+  if (symbols === undefined || symbols.length === 0) {
+    return
+  }
+
+  const allowedSymbols = new Set<string>()
+  for (const symbol of symbols) {
+    allowedSymbols.add(symbol)
+    allowedSymbols.add(symbol.toUpperCase())
+  }
+
+  for (const filter of filters) {
+    if (filter.symbols !== undefined) {
+      for (const symbol of filter.symbols) {
+        allowedSymbols.add(symbol)
+      }
+    }
+  }
+
+  return (symbol: string) => allowedSymbols.has(symbol)
 }
 
 export function lowerCaseSymbols(symbols?: string[]) {

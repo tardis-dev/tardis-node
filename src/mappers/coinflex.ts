@@ -1,10 +1,19 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.coinflex.com/v2/#websocket-api-subscriptions-public
 
-export const coinflexTradesMapper: Mapper<'coinflex', Trade> = {
+export const coinflexMappers = exchangeMappers({
+  coinflex: {
+    trades: () => coinflexTradesMapper,
+    bookChanges: () => coinflexBookChangeMapper,
+    derivativeTickers: () => new CoinflexDerivativeTickerMapper()
+  }
+})
+
+const coinflexTradesMapper: Mapper<'coinflex', Trade> = {
   canHandle(message: CoinflexTrades) {
     return message.table === 'trade'
   },
@@ -44,7 +53,7 @@ const mapBookLevel = (level: CoinflexBookLevel) => {
   return { price, amount }
 }
 
-export const coinflexBookChangeMapper: Mapper<'coinflex', BookChange> = {
+const coinflexBookChangeMapper: Mapper<'coinflex', BookChange> = {
   canHandle(message: CoinflexBookDepthMessage) {
     return message.table === 'futures/depth'
   },
@@ -76,7 +85,7 @@ export const coinflexBookChangeMapper: Mapper<'coinflex', BookChange> = {
   }
 }
 
-export class CoinflexDerivativeTickerMapper implements Mapper<'coinflex', DerivativeTicker> {
+class CoinflexDerivativeTickerMapper implements Mapper<'coinflex', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: CoinflexTickerMessage) {

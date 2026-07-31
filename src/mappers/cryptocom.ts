@@ -1,8 +1,18 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, Exchange, BookTicker, Trade, DerivativeTicker } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
+export const cryptoComMappers = exchangeMappers({
+  'crypto-com': {
+    trades: () => new CryptoComTradesMapper('crypto-com'),
+    bookChanges: () => new CryptoComBookChangeMapper('crypto-com'),
+    derivativeTickers: () => new CryptoComDerivativeTickerMapper('crypto-com'),
+    bookTickers: () => new CryptoComBookTickerMapper('crypto-com')
+  }
+})
+
+class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: CryptoComTradeMessage) {
     return message.result !== undefined && message.result.channel === 'trade'
@@ -40,7 +50,7 @@ export class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
   }
 }
 
-export class CryptoComBookChangeMapper implements Mapper<'crypto-com', BookChange> {
+class CryptoComBookChangeMapper implements Mapper<'crypto-com', BookChange> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: CryptoComBookMessage) {
@@ -82,7 +92,7 @@ export class CryptoComBookChangeMapper implements Mapper<'crypto-com', BookChang
   }
 }
 
-export class CryptoComBookTickerMapper implements Mapper<'crypto-com', BookTicker> {
+class CryptoComBookTickerMapper implements Mapper<'crypto-com', BookTicker> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: CryptoComTickerMessage) {
@@ -119,7 +129,7 @@ export class CryptoComBookTickerMapper implements Mapper<'crypto-com', BookTicke
   }
 }
 
-export class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com', DerivativeTicker> {
+class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 

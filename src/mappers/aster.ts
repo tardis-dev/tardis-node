@@ -1,8 +1,28 @@
 import { CircularBuffer, lowerCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
-export class AsterTradesMapper implements Mapper<'aster', Trade> {
+export const asterMappers = exchangeMappers({
+  aster: {
+    trades: () => new AsterTradesMapper(),
+    bookChanges: (localTimestamp) =>
+      new AsterBookChangeMapper({
+        ignoreBookSnapshotOverlapError: shouldIgnoreBookSnapshotOverlap(localTimestamp)
+      }),
+    bookTickers: () => new AsterBookTickerMapper()
+  }
+})
+
+function shouldIgnoreBookSnapshotOverlap(date?: Date) {
+  if (process.env.IGNORE_BOOK_SNAPSHOT_OVERLAP_ERROR) {
+    return true
+  }
+
+  return isRealTime(date) === false
+}
+
+class AsterTradesMapper implements Mapper<'aster', Trade> {
   canHandle(message: AsterMessage<any>) {
     return message.stream?.endsWith('@trade') === true
   }
@@ -28,10 +48,13 @@ export class AsterTradesMapper implements Mapper<'aster', Trade> {
   }
 }
 
-export class AsterBookChangeMapper implements Mapper<'aster', BookChange> {
+class AsterBookChangeMapper implements Mapper<'aster', BookChange> {
   private readonly symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
+  private readonly ignoreBookSnapshotOverlapError: boolean
 
-  constructor(private readonly ignoreBookSnapshotOverlapError: boolean) {}
+  constructor({ ignoreBookSnapshotOverlapError }: { ignoreBookSnapshotOverlapError: boolean }) {
+    this.ignoreBookSnapshotOverlapError = ignoreBookSnapshotOverlapError
+  }
 
   canHandle(message: AsterMessage<any>) {
     return message.stream?.includes('@depth') === true
@@ -153,7 +176,7 @@ export class AsterBookChangeMapper implements Mapper<'aster', BookChange> {
   }
 }
 
-export class AsterBookTickerMapper implements Mapper<'aster', BookTicker> {
+class AsterBookTickerMapper implements Mapper<'aster', BookTicker> {
   canHandle(message: AsterMessage<any>) {
     return message.stream?.endsWith('@bookTicker') === true
   }

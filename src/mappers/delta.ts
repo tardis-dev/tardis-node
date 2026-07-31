@@ -1,9 +1,35 @@
 import { fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
-export class DeltaTradesMapper implements Mapper<'delta', Trade> {
-  constructor(private _useV2Channels: boolean) {}
+const DELTA_V2_API_SWITCH_DATE = new Date('2020-10-14T00:00:00.000Z')
+const DELTA_BOOK_CHANGE_SWITCH_DATE = new Date('2023-04-01T00:00:00.000Z')
+
+export const deltaMappers = exchangeMappers({
+  delta: {
+    trades: mapper([
+      { until: DELTA_V2_API_SWITCH_DATE, use: () => new DeltaTradesMapper({ useV2Channels: false }) },
+      { use: () => new DeltaTradesMapper({ useV2Channels: true }) }
+    ]),
+    bookChanges: mapper([
+      { until: DELTA_BOOK_CHANGE_SWITCH_DATE, use: () => new DeltaBookChangeMapper({ useL2UpdatesChannel: false }) },
+      { use: () => new DeltaBookChangeMapper({ useL2UpdatesChannel: true }) }
+    ]),
+    derivativeTickers: mapper([
+      { until: DELTA_V2_API_SWITCH_DATE, use: () => new DeltaDerivativeTickerMapper({ useV2Channels: false }) },
+      { use: () => new DeltaDerivativeTickerMapper({ useV2Channels: true }) }
+    ]),
+    bookTickers: () => new DeltaBookTickerMapper()
+  }
+})
+
+class DeltaTradesMapper implements Mapper<'delta', Trade> {
+  private readonly _useV2Channels: boolean
+
+  constructor({ useV2Channels }: { useV2Channels: boolean }) {
+    this._useV2Channels = useV2Channels
+  }
 
   canHandle(message: DeltaTrade) {
     return message.type === (this._useV2Channels ? 'all_trades' : 'recent_trade')
@@ -49,8 +75,12 @@ const mapL2Level = (level: DeltaL2Level) => {
   }
 }
 
-export class DeltaBookChangeMapper implements Mapper<'delta', BookChange> {
-  constructor(private readonly _useL2UpdatesChannel: boolean) {}
+class DeltaBookChangeMapper implements Mapper<'delta', BookChange> {
+  private readonly _useL2UpdatesChannel: boolean
+
+  constructor({ useL2UpdatesChannel }: { useL2UpdatesChannel: boolean }) {
+    this._useL2UpdatesChannel = useL2UpdatesChannel
+  }
 
   canHandle(message: DeltaL2OrderBook | DeltaL2UpdateMessage) {
     if (this._useL2UpdatesChannel) {
@@ -109,8 +139,12 @@ export class DeltaBookChangeMapper implements Mapper<'delta', BookChange> {
   }
 }
 
-export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTicker> {
-  constructor(private _useV2Channels: boolean) {}
+class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTicker> {
+  private readonly _useV2Channels: boolean
+
+  constructor({ useV2Channels }: { useV2Channels: boolean }) {
+    this._useV2Channels = useV2Channels
+  }
 
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
@@ -173,7 +207,7 @@ export class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTi
   }
 }
 
-export class DeltaBookTickerMapper implements Mapper<'delta', BookTicker> {
+class DeltaBookTickerMapper implements Mapper<'delta', BookTicker> {
   canHandle(message: DeltaL1Message) {
     return message.type === 'l1_orderbook'
   }

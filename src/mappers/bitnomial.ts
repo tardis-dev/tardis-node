@@ -1,8 +1,16 @@
 import { parseμs, upperCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export const bitnomialTradesMapper: Mapper<'bitnomial', Trade> = {
+export const bitnomialMappers = exchangeMappers({
+  bitnomial: {
+    trades: () => bitnomialTradesMapper,
+    bookChanges: () => new BitnomialBookChangMapper()
+  }
+})
+
+const bitnomialTradesMapper: Mapper<'bitnomial', Trade> = {
   canHandle(message: BitnomialTrade) {
     return message.type === 'trade'
   },
@@ -40,7 +48,7 @@ const mapBookLevel = (level: BookLevel) => {
   return { price: level[0], amount: level[1] }
 }
 
-export class BitnomialBookChangMapper implements Mapper<'bitnomial', BookChange> {
+class BitnomialBookChangMapper implements Mapper<'bitnomial', BookChange> {
   canHandle(message: BitnomialBookMessage) {
     return message.type === 'book' || message.type === 'level'
   }

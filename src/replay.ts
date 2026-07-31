@@ -1,14 +1,14 @@
 import { createReadStream } from 'node:fs'
 import { rm } from 'node:fs/promises'
-import { EventEmitter } from 'events'
+import { EventEmitter, once } from 'events'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip, createZstdDecompress } from 'zlib'
-import { BinarySplitStream } from './binarysplit.ts'
+import { BinarySplitBatchStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 import { debug } from './debug.ts'
-import { addDays, getFilters, normalizeMessages, parseAsUTCDate, wait } from './handy.ts'
-import { MapperFactory, normalizeBookChanges } from './mappers/index.ts'
+import { addDays, createNormalizedSymbolFilter, getFilters, parseAsUTCDate, wait } from './handy.ts'
+import { Mapper, MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
@@ -17,6 +17,19 @@ type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
   ? MapperOutput<U[number]> | Disconnect
   : MapperOutput<U[number]>
+
+const DATE_MESSAGE_SPLIT_INDEX = 28
+const CHUNK_SIZE = 256 * 1024
+// Keep decompression lenient for partial gzip responses.
+// See https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239.
+const GZIP_OPTIONS = {
+  chunkSize: CHUNK_SIZE,
+  flush: constants.Z_SYNC_FLUSH,
+  finishFlush: constants.Z_SYNC_FLUSH
+}
+
+type DecodedReplayMessage = { localTimestamp: Date; message: any }
+type ReplayMessage = DecodedReplayMessage | { localTimestamp: Buffer; message: Buffer } | undefined
 
 export async function* replay<T extends Exchange, U extends boolean = false, Z extends boolean = false>({
   exchange,
@@ -35,14 +48,66 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       ? { localTimestamp: Buffer; message: Buffer } | undefined
       : { localTimestamp: Date; message: any } | undefined
     : U extends true
-    ? { localTimestamp: Buffer; message: Buffer }
-    : { localTimestamp: Date; message: any }
+      ? { localTimestamp: Buffer; message: Buffer }
+      : { localTimestamp: Date; message: any }
 > {
+  let lastMessageWasUndefined = false
+
+  const lineBatches = replayLineBatches({ exchange, from, to, filters, apiKey, autoCleanup, waitWhenDataNotYetAvailable })
+  for await (const bufferLines of lineBatches) {
+    // Decode one line batch in a tight loop, then preserve the public one-message-at-a-time iterator.
+    const messages: ReplayMessage[] = []
+
+    for (let i = 0; i < bufferLines.length; i++) {
+      const bufferLine = bufferLines[i]
+      if (bufferLine.length > 0) {
+        lastMessageWasUndefined = false
+        if (skipDecoding === true) {
+          messages.push({
+            localTimestamp: bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX),
+            message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
+          })
+        } else {
+          const message = parseReplayMessage(exchange, bufferLine)
+          const localTimestamp = parseReplayTimestamp(bufferLine)
+          if (withMicroseconds) {
+            localTimestamp.μs = parseReplayMicroseconds(bufferLine)
+          }
+
+          messages.push({ localTimestamp, message })
+        }
+      } else if (withDisconnects === true && lastMessageWasUndefined === false) {
+        lastMessageWasUndefined = true
+        messages.push(undefined)
+      }
+    }
+
+    // Drain a batch already received from the stream; its iterator surfaces later stream errors on the next read.
+    for (let i = 0; i < messages.length; i++) {
+      yield messages[i] as any
+    }
+  }
+}
+
+type ReplayLineOptions<T extends Exchange> = Pick<
+  ReplayOptions<T, boolean, boolean>,
+  'exchange' | 'from' | 'to' | 'filters' | 'apiKey' | 'autoCleanup' | 'waitWhenDataNotYetAvailable'
+>
+
+async function* replayLineBatches<T extends Exchange>({
+  exchange,
+  from,
+  to,
+  filters,
+  apiKey = undefined,
+  autoCleanup = undefined,
+  waitWhenDataNotYetAvailable = undefined
+}: ReplayLineOptions<T>): AsyncIterableIterator<Buffer[]> {
   validateReplayOptions(exchange, from, to, filters)
 
   const fromDate = parseAsUTCDate(from)
   const toDate = parseAsUTCDate(to)
-  const cachedSlicePaths = new Map<string, string>()
+  const cachedSlicePaths = new Map<string, { slicePath: string; sliceSize: number }>()
   let replayError
   debug('replay for exchange: %s started - from: %s, to: %s, filters: %o', exchange, fromDate.toISOString(), toDate.toISOString(), filters)
 
@@ -53,6 +118,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
     cacheDir: options.cacheDir,
     endpoint: options.endpoint,
     apiKey: apiKey || options.apiKey,
+    dataFeedCompression: options.dataFeedCompression,
     userAgent: options._userAgent,
     fromDate,
     toDate,
@@ -64,7 +130,10 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   const worker = new ReliableWorker(payload)
 
   worker.on('message', (message: WorkerMessage) => {
-    cachedSlicePaths.set(message.sliceKey, message.slicePath)
+    cachedSlicePaths.set(message.sliceKey, {
+      slicePath: message.slicePath,
+      sliceSize: message.sliceSize
+    })
   })
 
   worker.on('error', (err) => {
@@ -74,23 +143,6 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   })
 
   try {
-    // date is always formatted to have length of 28 so we can skip looking for first space in line and use it
-    // as hardcoded value
-    const DATE_MESSAGE_SPLIT_INDEX = 28
-
-    // more lenient gzip decompression
-    // see https://github.com/request/request/pull/2492 and https://github.com/node-fetch/node-fetch/pull/239
-
-    const CHUNK_SIZE = 256 * 1024
-    const GZIP_OPTIONS = {
-      chunkSize: CHUNK_SIZE,
-      flush: constants.Z_SYNC_FLUSH,
-      finishFlush: constants.Z_SYNC_FLUSH
-    }
-
-    // helper flag that helps us not yielding two subsequent undefined/disconnect messages
-    let lastMessageWasUndefined = false
-
     let currentSliceDate = new Date(fromDate)
     // iterate over every minute in <=from,to> date range
     // get cached slice paths, read them as file streams, decompress, split by new lines and yield as messages
@@ -99,23 +151,24 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       debug('getting slice: %s, exchange: %s', sliceKey, exchange)
 
-      let cachedSlicePath
-      while (cachedSlicePath === undefined) {
-        cachedSlicePath = cachedSlicePaths.get(sliceKey)
+      let cachedSlice
+      while (cachedSlice === undefined) {
+        cachedSlice = cachedSlicePaths.get(sliceKey)
 
         // if something went wrong(network issue, auth issue, gunzip issue etc)
         if (replayError !== undefined) {
           throw replayError
         }
 
-        if (cachedSlicePath === undefined) {
-          // if response for requested date is not ready yet wait 100ms and try again
+        if (cachedSlice === undefined) {
+          // if the requested slice is not ready yet, wait for the worker to report another cached slice
           debug('waiting for slice: %s, exchange: %s', sliceKey, exchange)
-          await wait(100)
+          await once(worker, 'message')
         }
       }
 
       // response is a path to file on disk let' read it as stream
+      const { slicePath: cachedSlicePath, sliceSize } = cachedSlice
       const isZstdSlice = cachedSlicePath.endsWith('.zst')
       const linesStream = createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE })
         // decompress it while preserving the on-disk cache in the negotiated wire format
@@ -125,7 +178,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
           linesStream.destroy(err)
         })
         // and split by new line
-        .pipe(new BinarySplitStream())
+        .pipe(new BinarySplitBatchStream())
         .on('error', function onBinarySplitStreamError(err) {
           debug('binary split stream error %o', err)
           linesStream.destroy(err)
@@ -133,47 +186,9 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
 
       let linesCount = 0
 
-      for await (const bufferLine of linesStream as unknown as Iterable<Buffer>) {
-        linesCount++
-        if (bufferLine.length > 0) {
-          lastMessageWasUndefined = false
-          // as any due to https://github.com/Microsoft/TypeScript/issues/24929
-          if (skipDecoding === true) {
-            yield {
-              localTimestamp: bufferLine.slice(0, DATE_MESSAGE_SPLIT_INDEX),
-              message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
-            } as any
-          } else {
-            let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
-
-            // hack to handle huobi long numeric id for trades
-            if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
-              messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
-            }
-            // hack to handle upbit long numeric id for trades
-            if (exchange === 'upbit' && messageString.includes('sequential_id')) {
-              messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
-            }
-
-            const message = JSON.parse(messageString)
-
-            const localTimestamp = new Date(bufferLine.toString('utf8', 0, DATE_MESSAGE_SPLIT_INDEX))
-            if (withMicroseconds) {
-              localTimestamp.μs = parseReplayMicroseconds(bufferLine)
-            }
-
-            yield {
-              // when skipDecoding is not set, decode timestamp to Date and message to object
-              localTimestamp,
-              message
-            } as any
-          }
-          // ignore empty lines unless withDisconnects is set to true
-          // do not yield subsequent undefined messages
-        } else if (withDisconnects === true && lastMessageWasUndefined === false) {
-          lastMessageWasUndefined = true
-          yield undefined as any
-        }
+      for await (const bufferLines of linesStream as AsyncIterable<Buffer[]>) {
+        linesCount += bufferLines.length
+        yield bufferLines
       }
 
       debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
@@ -184,8 +199,8 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       if (autoCleanup) {
         await cleanupSlice(cachedSlicePath)
       }
-      // move one minute forward
-      currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + 1)
+      // move by the number of minutes covered by this cached response
+      currentSliceDate.setUTCMinutes(currentSliceDate.getUTCMinutes() + sliceSize)
     }
 
     debug(
@@ -227,6 +242,21 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
   }
 }
 
+function parseReplayMessage(exchange: Exchange, bufferLine: Buffer) {
+  let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
+
+  // hack to handle huobi long numeric id for trades
+  if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
+    messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
+  }
+  // hack to handle upbit long numeric id for trades
+  if (exchange === 'upbit' && messageString.includes('sequential_id')) {
+    messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
+  }
+
+  return JSON.parse(messageString)
+}
+
 async function cleanupSlice(slicePath: string) {
   try {
     await rm(slicePath, { force: true })
@@ -237,6 +267,29 @@ async function cleanupSlice(slicePath: string) {
 
 function parseReplayMicroseconds(bufferLine: Buffer) {
   return (bufferLine[23] - 48) * 100 + (bufferLine[24] - 48) * 10 + (bufferLine[25] - 48)
+}
+
+function parseReplayTimestamp(bufferLine: Buffer) {
+  // Recorder writes yyyy-MM-ddTHH:mm:ss.fffffffZ.
+  return new Date(
+    Date.UTC(
+      parseReplayTwoDigits(bufferLine, 0) * 100 + parseReplayTwoDigits(bufferLine, 2),
+      parseReplayTwoDigits(bufferLine, 5) - 1,
+      parseReplayTwoDigits(bufferLine, 8),
+      parseReplayTwoDigits(bufferLine, 11),
+      parseReplayTwoDigits(bufferLine, 14),
+      parseReplayTwoDigits(bufferLine, 17),
+      parseReplayThreeDigits(bufferLine, 20)
+    )
+  )
+}
+
+function parseReplayTwoDigits(bufferLine: Buffer, start: number) {
+  return (bufferLine[start] - 48) * 10 + (bufferLine[start + 1] - 48)
+}
+
+function parseReplayThreeDigits(bufferLine: Buffer, start: number) {
+  return (bufferLine[start] - 48) * 100 + (bufferLine[start + 1] - 48) * 10 + (bufferLine[start + 2] - 48)
 }
 
 // gracefully terminate worker
@@ -270,35 +323,181 @@ export function replayNormalized<T extends Exchange, U extends MapperFactory<T, 
   ...normalizers: U
 ): AsyncIterableIterator<ReplayNormalizedMessage<U, Z>> {
   const fromDate = parseAsUTCDate(from)
+  const toDate = parseAsUTCDate(to)
 
   validateReplayNormalizedOptions(fromDate, normalizers)
 
-  //TODO: zrovi replay dzien po dniu, tak ze kazdego dnia przekazuje swierze filters
-
-  const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
-  const mappers = createMappers(fromDate)
-  const filters = getFilters(mappers, symbols)
-
-  const messages = replay({
-    exchange,
-    from,
-    to,
-    withDisconnects: true,
-    filters,
-    apiKey,
-    withMicroseconds: true,
-    autoCleanup,
-    waitWhenDataNotYetAvailable
-  })
+  const createMappersAt = (localTimestamp: Date) => normalizers.map((normalizer) => normalizer(exchange, localTimestamp))
+  const initialMappers = createMappersAt(fromDate)
+  const filters = getFilters(initialMappers, symbols)
 
   // filter normalized messages by symbol as some exchanges do not provide server side filtering so we could end up with messages
   // for symbols we've not requested for
-  const upperCaseSymbols = symbols !== undefined ? symbols.map((s) => s.toUpperCase()) : undefined
-  const filter = (symbol: string) => {
-    return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
+  const segments = getReplayNormalizedSegments(exchange, normalizers, fromDate, toDate)
+
+  if (segments.length <= 1) {
+    const filter = createNormalizedSymbolFilter(symbols, filters)
+    const lineBatches = replayLineBatches({
+      exchange,
+      from,
+      to,
+      filters,
+      apiKey,
+      autoCleanup,
+      waitWhenDataNotYetAvailable
+    })
+
+    return normalizeReplayLineBatches(exchange, undefined, lineBatches, initialMappers, createMappersAt, withDisconnectMessages, filter)
   }
 
-  return normalizeMessages(exchange, undefined, messages, mappers, createMappers, withDisconnectMessages, filter)
+  return replayNormalizedSegments()
+
+  async function* replayNormalizedSegments() {
+    for (let i = 0; i < segments.length; i++) {
+      const { from: segmentFrom, to: segmentTo } = segments[i]
+      const segmentMappers = i === 0 ? initialMappers : createMappersAt(segmentFrom)
+      const segmentFilters = getFilters(segmentMappers, symbols)
+      const segmentFilter = createNormalizedSymbolFilter(symbols, segmentFilters)
+
+      const segmentLineBatches = replayLineBatches({
+        exchange,
+        from: segmentFrom.toISOString(),
+        to: segmentTo.toISOString(),
+        filters: segmentFilters,
+        apiKey,
+        autoCleanup,
+        waitWhenDataNotYetAvailable
+      })
+
+      yield* normalizeReplayLineBatches(
+        exchange,
+        undefined,
+        segmentLineBatches,
+        segmentMappers,
+        createMappersAt,
+        withDisconnectMessages,
+        segmentFilter
+      )
+    }
+  }
+}
+
+async function* normalizeReplayLineBatches(
+  exchange: Exchange,
+  symbols: string[] | undefined,
+  lineBatches: AsyncIterableIterator<Buffer[]>,
+  initialMappers: Mapper<any, any>[],
+  createMappersAt: (localTimestamp: Date) => Mapper<any, any>[],
+  withDisconnectMessages: boolean | undefined,
+  filter?: (symbol: string) => boolean
+) {
+  // This intentionally keeps mapper calls lazy. Custom normalizers must not process later raw messages before the consumer asks for them.
+  let previousLocalTimestamp: Date | undefined
+  let activeMappers: Mapper<any, any>[] | undefined = initialMappers
+  if (activeMappers.length === 0) {
+    throw new Error(`Can't normalize data without any normalizers provided`)
+  }
+
+  for await (const bufferLines of lineBatches) {
+    const decodedMessages: (DecodedReplayMessage | undefined)[] = []
+    let decodingFailed = false
+    let decodingError: unknown
+    try {
+      for (let i = 0; i < bufferLines.length; i++) {
+        const bufferLine = bufferLines[i]
+        if (bufferLine.length === 0) {
+          decodedMessages.push(undefined)
+        } else {
+          const message = parseReplayMessage(exchange, bufferLine)
+          const localTimestamp = parseReplayTimestamp(bufferLine)
+          localTimestamp.μs = parseReplayMicroseconds(bufferLine)
+          decodedMessages.push({ localTimestamp, message })
+        }
+      }
+    } catch (error) {
+      decodingFailed = true
+      decodingError = error
+    }
+
+    for (let i = 0; i < decodedMessages.length; i++) {
+      const decodedMessage = decodedMessages[i]
+      if (decodedMessage === undefined) {
+        if (activeMappers === undefined) {
+          continue
+        }
+
+        activeMappers = undefined
+        if (withDisconnectMessages === true && previousLocalTimestamp !== undefined) {
+          const disconnect: Disconnect = {
+            type: 'disconnect',
+            exchange,
+            localTimestamp: previousLocalTimestamp,
+            symbols
+          }
+          yield disconnect as any
+        }
+        continue
+      }
+
+      const { localTimestamp, message } = decodedMessage
+
+      if (activeMappers === undefined) {
+        activeMappers = createMappersAt(localTimestamp)
+      }
+      previousLocalTimestamp = localTimestamp
+
+      for (let mapperIndex = 0; mapperIndex < activeMappers.length; mapperIndex++) {
+        const mapper = activeMappers[mapperIndex]
+        if (mapper.canHandle(message)) {
+          const mappedMessages = mapper.map(message, localTimestamp)
+          if (!mappedMessages) {
+            continue
+          }
+
+          for (const normalizedMessage of mappedMessages) {
+            if (filter === undefined || filter(normalizedMessage.symbol)) {
+              yield normalizedMessage
+            }
+          }
+        }
+      }
+    }
+
+    if (decodingFailed) {
+      throw decodingError
+    }
+  }
+}
+
+function getReplayNormalizedSegments<T extends Exchange>(exchange: T, normalizers: MapperFactory<T, any>[], fromDate: Date, toDate: Date) {
+  const fromTime = fromDate.valueOf()
+  const toTime = toDate.valueOf()
+  if (Number.isFinite(fromTime) === false || Number.isFinite(toTime) === false || fromTime >= toTime) {
+    return [{ from: fromDate, to: toDate }]
+  }
+
+  const switchTimes = new Set<number>()
+  for (const normalizer of normalizers) {
+    const switchDates = normalizer.getSwitchDates?.(exchange) ?? []
+    for (const switchDate of switchDates) {
+      const switchTime = switchDate.valueOf()
+      if (fromTime < switchTime && switchTime < toTime) {
+        switchTimes.add(switchTime)
+      }
+    }
+  }
+
+  const switchDates = [...switchTimes].sort((a, b) => a - b).map((switchTime) => new Date(switchTime))
+  const segments: { from: Date; to: Date }[] = []
+  let segmentFrom = fromDate
+
+  for (const switchDate of switchDates) {
+    segments.push({ from: segmentFrom, to: switchDate })
+    segmentFrom = switchDate
+  }
+  segments.push({ from: segmentFrom, to: toDate })
+
+  return segments
 }
 
 function validateReplayOptions<T extends Exchange>(exchange: T, from: string, to: string, filters: FilterForExchange[T][]) {

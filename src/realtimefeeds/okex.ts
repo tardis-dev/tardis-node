@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { wait } from '../handy.ts'
+import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../okexsymbols.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
 
@@ -140,7 +141,8 @@ class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
     super(wssURL, exchange, filters, timeoutIntervalMS, onError)
   }
 
-  private _defaultIndexes = ['BTC-USD', 'ETH-USD']
+  private _defaultIndexes = ['BTC-USD', 'ETH-USD', 'SOL-USD']
+  private _defaultOptionSummaryInstrumentFamilies = ['BTC-USD', 'BTC-USD_UM', 'ETH-USD', 'ETH-USD_UM', 'SOL-USD_UM']
 
   private _channelRequiresIndexNotSymbol(channel: string) {
     if (channel === 'index-tickers' || channel === 'opt-summary') {
@@ -155,7 +157,7 @@ class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
         const channelRequiresIndexNotSymbol = this._channelRequiresIndexNotSymbol(filter.channel)
 
         if (symbols.length === 0 && channelRequiresIndexNotSymbol) {
-          symbols = this._defaultIndexes
+          symbols = filter.channel === 'opt-summary' ? this._defaultOptionSummaryInstrumentFamilies : this._defaultIndexes
         }
 
         if (symbols.length === 0) {
@@ -165,8 +167,7 @@ class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
         return symbols.map((symbol) => {
           let finalSymbol = symbol
           if (channelRequiresIndexNotSymbol) {
-            const symbolParts = symbol.split('-')
-            finalSymbol = `${symbolParts[0]}-${symbolParts[1]}`
+            finalSymbol = filter.channel === 'opt-summary' ? getOkexOptionsFamilyOrIndex(symbol) : getOkexOptionsUnderlyingIndex(symbol)
           }
           return {
             channel: filter.channel,
@@ -176,11 +177,12 @@ class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
         })
       })
       .flatMap((s) => s)
+    const uniqueArgs = [...new Map(args.map((arg) => [`${arg.channel}:${arg.instId ?? ''}:${arg.instFamily ?? ''}`, arg])).values()]
 
     return [
       {
         op: 'subscribe',
-        args: [...new Set(args)]
+        args: uniqueArgs
       }
     ]
   }

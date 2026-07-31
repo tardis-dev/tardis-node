@@ -242,8 +242,7 @@ describe('compute(messages, types)', () => {
 
         localTimestamp: new Date('2024-06-23T03:06:00.158521Z')
       }
-
-      yield {
+      ;(yield {
         id: undefined,
 
         type: 'trade',
@@ -280,7 +279,7 @@ describe('compute(messages, types)', () => {
           timestamp: new Date('2024-06-23T03:06:01.981Z'),
 
           localTimestamp: new Date('2024-06-23T03:06:02.173614Z')
-        }
+        })
     }
 
     const withComputedTypes = compute(messages(), computeTradeBars({ kind: 'time', interval: 60 * 1000, name: 'trade_bar_1_minute' }))

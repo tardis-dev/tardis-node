@@ -10,7 +10,7 @@ export async function getExchangeDetails<T extends Exchange>(exchange: T) {
   return data as ExchangeDetails<T>
 }
 
-export type SymbolType = 'spot' | 'future' | 'perpetual' | 'option' | 'combo'
+export type SymbolType = 'spot' | 'future' | 'perpetual' | 'option' | 'combo' | 'prediction'
 
 export type DatasetType =
   | 'trades'

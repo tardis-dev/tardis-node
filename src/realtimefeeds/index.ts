@@ -35,7 +35,6 @@ import { GateIOFuturesRealTimeFeed } from './gateiofutures.ts'
 import { PoloniexRealTimeFeed } from './poloniex.ts'
 import { CoinflexRealTimeFeed } from './coinflex.ts'
 import { UpbitRealTimeFeed } from './upbit.ts'
-import { AscendexRealTimeFeed } from './ascendex.ts'
 import { DydxRealTimeFeed } from './dydx.ts'
 import { SerumRealTimeFeed } from './serum.ts'
 import { StarAtlasRealTimeFeed } from './staratlas.ts'
@@ -52,6 +51,11 @@ import { DydxV4RealTimeFeed } from './dydx_v4.ts'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
+import { LighterRealTimeFeed } from './lighter.ts'
+import { BullishRealTimeFeed } from './bullish.ts'
+import { MexcFuturesRealTimeFeed } from './mexcfutures.ts'
+import { MexcRealTimeFeed } from './mexc.ts'
+import { PolymarketRealTimeFeed } from './polymarket.ts'
 
 export * from './realtimefeed.ts'
 
@@ -91,10 +95,10 @@ const realTimeFeedsMap: {
   delta: DeltaRealTimeFeed,
   'gate-io': GateIORealTimeFeed,
   'gate-io-futures': GateIOFuturesRealTimeFeed,
+  'mexc-futures': MexcFuturesRealTimeFeed,
   poloniex: PoloniexRealTimeFeed,
   coinflex: CoinflexRealTimeFeed,
   upbit: UpbitRealTimeFeed,
-  ascendex: AscendexRealTimeFeed,
   dydx: DydxRealTimeFeed,
   serum: SerumRealTimeFeed,
   'star-atlas': StarAtlasRealTimeFeed,
@@ -114,7 +118,11 @@ const realTimeFeedsMap: {
   bitget: BitgetRealTimeFeed,
   'bitget-futures': BitgetFuturesRealTimeFeed,
   'coinbase-international': CoinbaseInternationalRealTimeFeed,
-  hyperliquid: HyperliquidRealTimeFeed
+  hyperliquid: HyperliquidRealTimeFeed,
+  lighter: LighterRealTimeFeed,
+  bullish: BullishRealTimeFeed,
+  mexc: MexcRealTimeFeed,
+  polymarket: PolymarketRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {

@@ -1,10 +1,19 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.binance.org/api-reference/dex-api/ws-streams.html
 
-export const binanceDexTradesMapper: Mapper<'binance-dex', Trade> = {
+export const binanceDexMappers = exchangeMappers({
+  'binance-dex': {
+    trades: () => binanceDexTradesMapper,
+    bookChanges: () => binanceDexBookChangeMapper,
+    bookTickers: () => binanceDexBookTickerMapper
+  }
+})
+
+const binanceDexTradesMapper: Mapper<'binance-dex', Trade> = {
   canHandle(message: BinanceDexResponse<any>) {
     return message.stream === 'trades'
   },
@@ -43,7 +52,7 @@ const mapBookLevel = (level: BinanceDexBookLevel) => {
   return { price, amount }
 }
 
-export const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
+const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
   canHandle(message: BinanceDexResponse<any>) {
     return message.stream === 'marketDiff' || message.stream === 'depthSnapshot'
   },
@@ -94,7 +103,7 @@ export const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
   }
 }
 
-export const binanceDexBookTickerMapper: Mapper<'binance-dex', BookTicker> = {
+const binanceDexBookTickerMapper: Mapper<'binance-dex', BookTicker> = {
   canHandle(message: BinanceDexResponse<any>) {
     return message.stream === 'ticker'
   },

@@ -10,6 +10,7 @@ const defaultOptions: Options = {
   datasetsEndpoint: 'https://datasets.tardis.dev/v1',
   cacheDir: path.join(os.tmpdir(), '.tardis-cache'),
   apiKey: '',
+  dataFeedCompression: 'zstd',
   _userAgent: `tardis-dev/${packageJson.version} (+https://github.com/tardis-dev/tardis-node)`
 }
 
@@ -28,5 +29,8 @@ type Options = {
   datasetsEndpoint: string
   cacheDir: string
   apiKey: string
+  dataFeedCompression: DataFeedCompression
   _userAgent: string
 }
+
+export type DataFeedCompression = 'gzip' | 'zstd'

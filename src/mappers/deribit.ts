@@ -1,8 +1,20 @@
-import { asNumberIfValid } from '../handy.ts'
+import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.deribit.com/v2/#subscriptions
+
+export const deribitMappers = exchangeMappers({
+  deribit: {
+    trades: () => deribitTradesMapper,
+    bookChanges: () => deribitBookChangeMapper,
+    derivativeTickers: () => new DeribitDerivativeTickerMapper(),
+    optionsSummary: () => new DeribitOptionSummaryMapper(),
+    liquidations: () => deribitLiquidationsMapper,
+    bookTickers: () => deribitBookTickerMapper
+  }
+})
 
 function deribitCasing(symbols?: string[]) {
   if (symbols !== undefined) {
@@ -24,7 +36,7 @@ function deribitCasing(symbols?: string[]) {
   return
 }
 
-export const deribitTradesMapper: Mapper<'deribit', Trade> = {
+const deribitTradesMapper: Mapper<'deribit', Trade> = {
   canHandle(message: any) {
     const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
     if (channel === undefined) {
@@ -69,7 +81,7 @@ const mapBookLevel = (level: DeribitBookLevel) => {
   return { price, amount }
 }
 
-export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
+const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
   canHandle(message: any) {
     const channel = message.params && (message.params.channel as string | undefined)
     if (channel === undefined) {
@@ -111,7 +123,7 @@ export const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
   }
 }
 
-export class DeribitDerivativeTickerMapper implements Mapper<'deribit', DerivativeTicker> {
+class DeribitDerivativeTickerMapper implements Mapper<'deribit', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: any) {
@@ -151,7 +163,7 @@ export class DeribitDerivativeTickerMapper implements Mapper<'deribit', Derivati
   }
 }
 
-export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSummary> {
+class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSummary> {
   getFilters(symbols?: string[]) {
     symbols = deribitCasing(symbols)
 
@@ -200,15 +212,15 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
       strikePrice,
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(optionInfo.best_bid_price),
-      bestBidAmount: asNumberIfValid(optionInfo.best_bid_amount),
-      bestBidIV: asNumberIfValid(optionInfo.bid_iv),
+      bestBidPrice: asNonZeroNumberOrUndefined(optionInfo.best_bid_price),
+      bestBidAmount: asNonZeroNumberOrUndefined(optionInfo.best_bid_amount),
+      bestBidIV: asNonZeroNumberOrUndefined(optionInfo.bid_iv),
 
-      bestAskPrice: asNumberIfValid(optionInfo.best_ask_price),
-      bestAskAmount: asNumberIfValid(optionInfo.best_ask_amount),
-      bestAskIV: asNumberIfValid(optionInfo.ask_iv),
+      bestAskPrice: asNonZeroNumberOrUndefined(optionInfo.best_ask_price),
+      bestAskAmount: asNonZeroNumberOrUndefined(optionInfo.best_ask_amount),
+      bestAskIV: asNonZeroNumberOrUndefined(optionInfo.ask_iv),
 
-      lastPrice: asNumberIfValid(optionInfo.last_price),
+      lastPrice: asNonZeroNumberOrUndefined(optionInfo.last_price),
       openInterest: optionInfo.open_interest,
 
       markPrice: optionInfo.mark_price,
@@ -231,7 +243,7 @@ export class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSumma
   }
 }
 
-export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
+const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
   canHandle(message: any) {
     const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
     if (channel === undefined) {
@@ -279,7 +291,7 @@ export const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
   }
 }
 
-export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
+const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
   canHandle(message: any) {
     const channel = message.params !== undefined ? (message.params.channel as string | undefined) : undefined
     if (channel === undefined) {
@@ -308,10 +320,10 @@ export const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
       symbol: deribitTicker.instrument_name.toUpperCase(),
       exchange: 'deribit',
 
-      askAmount: asNumberIfValid(deribitTicker.best_ask_amount),
-      askPrice: asNumberIfValid(deribitTicker.best_ask_price),
-      bidPrice: asNumberIfValid(deribitTicker.best_bid_price),
-      bidAmount: asNumberIfValid(deribitTicker.best_bid_amount),
+      askAmount: asNonZeroNumberOrUndefined(deribitTicker.best_ask_amount),
+      askPrice: asNonZeroNumberOrUndefined(deribitTicker.best_ask_price),
+      bidPrice: asNonZeroNumberOrUndefined(deribitTicker.best_bid_price),
+      bidAmount: asNonZeroNumberOrUndefined(deribitTicker.best_bid_amount),
 
       timestamp: new Date(deribitTicker.timestamp),
       localTimestamp: localTimestamp

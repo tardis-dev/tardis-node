@@ -27,20 +27,23 @@ export class BitnomialRealTimeFeed extends RealTimeFeedBase {
           product_codes: filter.symbols
         }
       })
-      .reduce((prev, current) => {
-        const matchingExisting = prev.find((c) => c.name === current.name)
-        if (matchingExisting !== undefined) {
-          for (const symbol of current.product_codes) {
-            if (matchingExisting.product_codes.includes(symbol) === false) {
-              matchingExisting.product_codes.push(symbol)
+      .reduce(
+        (prev, current) => {
+          const matchingExisting = prev.find((c) => c.name === current.name)
+          if (matchingExisting !== undefined) {
+            for (const symbol of current.product_codes) {
+              if (matchingExisting.product_codes.includes(symbol) === false) {
+                matchingExisting.product_codes.push(symbol)
+              }
             }
+          } else {
+            prev.push(current)
           }
-        } else {
-          prev.push(current)
-        }
 
-        return prev
-      }, [] as { name: string; product_codes: string[] }[])
+          return prev
+        },
+        [] as { name: string; product_codes: string[] }[]
+      )
 
     return [
       {

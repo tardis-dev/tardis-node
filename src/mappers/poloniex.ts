@@ -1,8 +1,24 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
-export class PoloniexV2TradesMapper implements Mapper<'poloniex', Trade> {
+const POLONIEX_V2_API_SWITCH_DATE = new Date('2022-08-02T00:00:00.000Z')
+
+export const poloniexMappers = exchangeMappers({
+  poloniex: {
+    trades: mapper([
+      { until: POLONIEX_V2_API_SWITCH_DATE, use: () => new PoloniexTradesMapper() },
+      { use: () => new PoloniexV2TradesMapper() }
+    ]),
+    bookChanges: mapper([
+      { until: POLONIEX_V2_API_SWITCH_DATE, use: () => new PoloniexBookChangeMapper() },
+      { use: () => new PoloniexV2BookChangeMapper() }
+    ])
+  }
+})
+
+class PoloniexV2TradesMapper implements Mapper<'poloniex', Trade> {
   canHandle(message: any) {
     return message.channel === 'trades' && message.data !== undefined && message.data.length > 0
   }
@@ -41,7 +57,7 @@ const mapBookLevelV2 = (level: [string, string]) => {
     amount: Number(level[1])
   }
 }
-export class PoloniexV2BookChangeMapper implements Mapper<'poloniex', BookChange> {
+class PoloniexV2BookChangeMapper implements Mapper<'poloniex', BookChange> {
   canHandle(message: any) {
     return message.channel === 'book_lv2' && message.data !== undefined && message.data.length > 0
   }
@@ -75,7 +91,7 @@ export class PoloniexV2BookChangeMapper implements Mapper<'poloniex', BookChange
   }
 }
 
-export class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
+class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   canHandle(message: PoloniexPriceAggreatedMessage) {
@@ -151,7 +167,7 @@ const mapBookLevel = (level: PoloniexBookUpdate) => {
   }
 }
 
-export class PoloniexBookChangeMapper implements Mapper<'poloniex', BookChange> {
+class PoloniexBookChangeMapper implements Mapper<'poloniex', BookChange> {
   private readonly _channelIdToSymbolMap: Map<number, string> = new Map()
 
   canHandle(message: PoloniexPriceAggreatedMessage) {

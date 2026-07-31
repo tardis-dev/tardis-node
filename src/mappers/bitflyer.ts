@@ -1,8 +1,17 @@
 import { parseμs, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
+export const bitflyerMappers = exchangeMappers({
+  bitflyer: {
+    trades: () => bitflyerTradesMapper,
+    bookChanges: () => new BitflyerBookChangeMapper(),
+    bookTickers: () => bitflyerBookTickerMapper
+  }
+})
+
+const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
     return message.params.channel.startsWith('lightning_executions')
   },
@@ -46,7 +55,7 @@ const mapBookLevel = ({ price, size }: BitflyerBookLevel) => {
   return { price, amount: size }
 }
 
-export class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
+class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
   private readonly _snapshotsInfo: Map<string, boolean> = new Map()
 
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
@@ -95,7 +104,7 @@ export class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> 
   }
 }
 
-export const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
+const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
   canHandle(message: BitflyerTicker) {
     return message.params.channel.startsWith('lightning_ticker')
   },

@@ -1,7 +1,11 @@
+import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import {
   clearCache,
   Exchange,
   EXCHANGES,
+  init,
   normalizeBookChanges,
   normalizeDerivativeTickers,
   normalizeTrades,
@@ -22,9 +26,12 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 describe('replay', () => {
-  beforeEach(() => {
-    return clearCache()
-  }, 1000 * 60 * 10)
+  beforeEach(
+    () => {
+      return clearCache()
+    },
+    1000 * 60 * 10
+  )
 
   test(
     'invalid args validation',
@@ -74,6 +81,33 @@ describe('replay', () => {
     1000 * 60 * 10
   )
 
+  test('invalid replayNormalized args validation', async () => {
+    await expect(
+      replayNormalized({ exchange: 'binance', symbols: ['btcusdt'], from: 'sdf', to: 'dsf' }, normalizeTrades).next()
+    ).rejects.toThrowError()
+
+    expect(() =>
+      replayNormalized(
+        { exchange: 'binances' as any, symbols: ['btcusdt'], from: '2019-05-05 00:00', to: '2019-05-05 00:05' },
+        normalizeTrades
+      )
+    ).toThrowError()
+
+    await expect(
+      replayNormalized(
+        { exchange: 'binance', symbols: ['btcusdt'], from: '2019-06-05 00:00', to: '2019-05-05 00:05' },
+        normalizeTrades
+      ).next()
+    ).rejects.toThrowError()
+
+    await expect(
+      replayNormalized(
+        { exchange: 'binance', symbols: ['btcusdt'], from: '2019-06-05 00:00Z', to: '2019-05-05 00:05Z' },
+        normalizeTrades
+      ).next()
+    ).rejects.toThrowError()
+  })
+
   test(
     'replays raw Bitmex data feed (ETHUSD trades) for 1st of April 2019 and compares with not decoded sample',
     async () => {
@@ -113,6 +147,60 @@ describe('replay', () => {
 
       expect(receivedMessagesOfRawFeed).toMatchSnapshot('bitmex-received-messages')
       expect(receivedTimestampsOfRawFeed).toMatchSnapshot('bitmex-received-timestamps')
+    },
+    1000 * 60 * 10
+  )
+
+  test(
+    'replays real data using a multi-minute data feed slice',
+    async () => {
+      const cacheDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-replay-slices-'))
+
+      try {
+        init({ cacheDir })
+
+        const messages = []
+        for await (const { message } of replay({
+          exchange: 'bitmex',
+          from: '2019-05-01T00:00:00.000Z',
+          to: '2019-05-01T00:12:00.000Z',
+          filters: [
+            {
+              channel: 'trade',
+              symbols: ['ETHUSD']
+            }
+          ],
+          skipDecoding: true
+        })) {
+          messages.push(message)
+        }
+
+        const cacheFiles = listFiles(cacheDir)
+        const multiMinuteSliceFiles = cacheFiles.filter((filePath) => /\.size-(?:[2-9]|10)\.json\.(?:gz|zst)$/.test(filePath))
+
+        expect(messages.length).toBeGreaterThan(0)
+        expect(multiMinuteSliceFiles.length).toBeGreaterThan(0)
+
+        const cacheFilesAfterFirstReplay = cacheFiles.sort()
+        for await (const _ of replay({
+          exchange: 'bitmex',
+          from: '2019-05-01T00:00:00.000Z',
+          to: '2019-05-01T00:12:00.000Z',
+          filters: [
+            {
+              channel: 'trade',
+              symbols: ['ETHUSD']
+            }
+          ],
+          skipDecoding: true
+        })) {
+        }
+
+        expect(listFiles(cacheDir).sort()).toEqual(cacheFilesAfterFirstReplay)
+      } finally {
+        init()
+        rmSync(cacheDir, { force: true, recursive: true })
+      }
     },
     1000 * 60 * 10
   )
@@ -406,3 +494,14 @@ describe('replay', () => {
     1000 * 60 * 10
   )
 })
+
+function listFiles(directory: string): string[] {
+  if (existsSync(directory) === false) {
+    return []
+  }
+
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = path.join(directory, entry.name)
+    return entry.isDirectory() ? listFiles(entryPath) : [entryPath]
+  })
+}

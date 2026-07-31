@@ -25,6 +25,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'huobi-dm',
   'huobi-dm-swap',
   'gate-io-futures',
+  'mexc-futures',
   'coinflex',
   'huobi-dm-linear-swap',
   'ascendex',
@@ -35,7 +36,9 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'kucoin-futures',
   'bitget-futures',
   'coinbase-international',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter',
+  'bullish'
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
@@ -79,10 +82,22 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitget',
   'bitget-futures',
   'coinbase-international',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter',
+  'gemini',
+  'bullish',
+  'mexc',
+  'polymarket'
 ]
 
-const exchangesWithOptionsSummary: Exchange[] = ['deribit', 'okex-options', 'huobi-dm-options', 'bybit-options', 'binance-european-options']
+const exchangesWithOptionsSummary: Exchange[] = [
+  'deribit',
+  'okex-options',
+  'huobi-dm-options',
+  'bybit-options',
+  'binance-european-options',
+  'bullish'
+]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
   'ftx',
@@ -98,7 +113,9 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'bybit',
   'okex-futures',
   'okex-swap',
-  'dydx-v4'
+  'dydx-v4',
+  'bitget-futures',
+  'lighter'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -2399,6 +2416,57 @@ describe('mappers', () => {
     }
   })
 
+  test('map bitfinex book ticker messages with trailing null placeholder', () => {
+    const bitfinex = createMapper('bitfinex')
+    const mappedMessages = bitfinex.map(
+      [
+        147794,
+        [71741, 0.26742262, 71760, 1.22665447, 647, 0.00909896, 71754, 900.8715945, 73120, 70434, null],
+        1,
+        1775779200144,
+        'ticker',
+        'BTCUSD'
+      ],
+      new Date('2026-04-10T00:00:00.164Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
+  })
+
+  test('ignore bitfinex funding ticker messages for book ticker', () => {
+    const bitfinex = createMapper('bitfinex')
+    const mappedMessages = bitfinex.map(
+      [
+        129136,
+        [
+          0.000012589041095890411,
+          0.00000788,
+          90,
+          150.27107061000004,
+          4.5e-7,
+          2,
+          1775.8614332800003,
+          -0.00000245,
+          -0.0245,
+          9e-7,
+          6320.78681972,
+          0.00001729,
+          1e-8,
+          null,
+          null,
+          14121.77787059
+        ],
+        92,
+        1633910430074,
+        'ticker',
+        'BTC'
+      ],
+      new Date('2021-10-10T23:20:30.074Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
+  })
+
   test('map bitfinex derivatives messages', () => {
     const messages = [
       { event: 'subscribed', channel: 'status', chanId: 127758, key: 'deriv:tBTCF0:USTF0' },
@@ -2683,6 +2751,23 @@ describe('mappers', () => {
       }
     ])
   })
+  test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
+    const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
+    const mappedMessages = bitfinexDerivativesMapper.map(
+      [
+        138325,
+        [71800, 7.47322491, 71847, 6.16257014, 671, 0.00942826, 71840, 1393.02703679, 73198, 70493, null],
+        1,
+        1775779200139,
+        'ticker',
+        'BTCF0:USTF0'
+      ],
+      new Date('2026-04-10T00:00:00.152Z')
+    )
+
+    expect(mappedMessages).toMatchSnapshot()
+  })
+
   test('map binance messages', () => {
     const messages = [
       {
@@ -4344,12 +4429,145 @@ describe('mappers', () => {
       { type: 'trade', symbol: 'ETHUSD', event_id: 9608228023, timestamp: 1580919901276, price: '200.19', quantity: '100', side: 'block' }
     ]
 
-    const geminiMapper = createMapper('gemini')
+    const geminiMapper = createMapper('gemini', new Date('2026-07-15T23:59:59.999Z'))
 
     for (const message of messages) {
       const mappedMessages = geminiMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
+  })
+
+  test('map gemini v3 messages', () => {
+    const messages = [
+      {
+        e: 'depthUpdate',
+        E: 1783981139947514400,
+        s: 'wifusd',
+        U: 1764549594389289,
+        u: 1764549594389676,
+        b: [
+          ['0.148800', '11129.36421900'],
+          ['0.148900', '49574.82370100']
+        ],
+        a: []
+      },
+      {
+        E: 1783981140085684200,
+        s: 'btcrlusd',
+        t: 2840141014190422,
+        p: '62145.38000',
+        q: '0.0162522200',
+        m: true
+      },
+      {
+        u: 1764549594389752,
+        E: 1783981140076872200,
+        s: 'xrpgusd',
+        b: '1.0614900',
+        B: '958.69148000',
+        a: '1.0615000',
+        A: '38.39060000',
+        c: '1.0612500',
+        C: '4.71027100'
+      },
+      {
+        e: 'depthUpdate',
+        E: 1783981199886103586,
+        s: 'linkrlusd',
+        U: 1764549594426242,
+        u: 1764549594426275,
+        b: [],
+        a: [
+          ['7.8537500', '0.00000000'],
+          ['7.8538800', '0.00000000'],
+          ['7.8537400', '0.00000000']
+        ]
+      }
+    ]
+
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
+
+    for (const message of messages) {
+      const mappedMessages = geminiMapper.map(message, new Date('2026-07-24T00:00:01.275Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('mark the first gemini v3 depth update per symbol as a snapshot', () => {
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-07-24T00:00:01.275Z')
+    const isSnapshot = (message: any) => geminiMapper.map(message, localTimestamp)[0].isSnapshot
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851199088426630,
+        s: 'gusdgbp',
+        U: 1764550512767893,
+        u: 1764550512767893,
+        b: [],
+        a: [['0.75196', '1325.49900000']]
+      })
+    ).toBe(true)
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239122227005,
+        s: 'gusdgbp',
+        U: 1764550512767893,
+        u: 1764550512813829,
+        b: [['0.75074', '5201.83440000']],
+        a: [['0.75150', '5175.25940000']]
+      })
+    ).toBe(false)
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239118561200,
+        s: 'audusd',
+        U: 1764550512767846,
+        u: 1764550512813818,
+        b: [['0.696826630', '3132.880677']],
+        a: [['0.697523910', '788.989231']]
+      })
+    ).toBe(true)
+
+    expect(
+      isSnapshot({
+        e: 'depthUpdate',
+        E: 1784851239118561200,
+        s: 'emptybook',
+        U: 1764550512813818,
+        u: 1764550512813818,
+        b: [],
+        a: []
+      })
+    ).toBe(true)
+  })
+
+  test('ignore gemini v3 acknowledgement and contract status messages', () => {
+    const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
+    const localTimestamp = new Date('2026-07-24T00:00:01.000Z')
+
+    expect(geminiMapper.map({ id: 1, status: 200 }, localTimestamp)).toEqual([])
+    expect(geminiMapper.map({ u: 1764549594389752, E: 1784870400000000000, s: 'btcusd' }, localTimestamp)).toEqual([])
+    expect(
+      geminiMapper.map(
+        {
+          e: 'contractStatus',
+          E: 1784870400000,
+          s: 'gemi-btc15m2607241200-hi100000',
+          k: 'btc15m2607241200',
+          c: 'HI100000',
+          i: 134794,
+          o: 'Awaiting Approval',
+          n: 'Approved'
+        },
+        localTimestamp
+      )
+    ).toEqual([])
   })
 
   test('map bitstamp messages', () => {
@@ -4499,10 +4717,103 @@ describe('mappers', () => {
       [545, ['0.000000000', '0.000000000', '0.000000', '0.00000000', '0.00000000'], 'spread', 'LINK/ETH']
     ]
 
-    const krakenMapper = createMapper('kraken')
+    const krakenMapper = createMapper('kraken', new Date('2019-09-01T00:00:01.2750543Z'))
 
     for (const message of messages) {
       const mappedMessages = krakenMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
+      expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map kraken v2 messages', () => {
+    const messages = [
+      {
+        channel: 'trade',
+        type: 'snapshot',
+        data: [
+          {
+            symbol: 'BTC/USD',
+            side: 'buy',
+            price: 100.1,
+            qty: 0.25,
+            trade_id: 122,
+            timestamp: '2026-07-10T00:00:00.023456Z'
+          }
+        ]
+      },
+      {
+        channel: 'trade',
+        type: 'update',
+        data: [
+          {
+            symbol: 'BTC/USD',
+            side: 'buy',
+            price: 100.1,
+            qty: 0.25,
+            trade_id: 123,
+            timestamp: '2026-07-10T00:00:00.123456Z'
+          }
+        ]
+      },
+      {
+        channel: 'book',
+        type: 'snapshot',
+        data: [
+          {
+            symbol: 'AAPLx/USD',
+            bids: [{ price: 199.9, qty: 1.2 }],
+            asks: [{ price: 200.1, qty: 0.8 }],
+            checksum: 123456,
+            timestamp: '2026-07-10T00:00:01.123457Z'
+          }
+        ]
+      },
+      {
+        channel: 'book',
+        type: 'update',
+        data: [
+          {
+            symbol: 'BTC/USD',
+            bids: [{ price: 99.9, qty: 0.5 }],
+            asks: [],
+            timestamp: '2026-07-10T00:00:01.223456Z'
+          }
+        ]
+      },
+      {
+        channel: 'ticker',
+        type: 'update',
+        data: [
+          {
+            symbol: 'BTC/USD',
+            bid: 99.9,
+            bid_qty: 1.2,
+            ask: 100.1,
+            ask_qty: 2.3,
+            timestamp: '2026-07-10T00:00:02.123456Z'
+          }
+        ]
+      },
+      {
+        channel: 'ticker',
+        type: 'update',
+        data: [
+          {
+            symbol: 'ANETx/USD',
+            bid: 0,
+            bid_qty: 0,
+            ask: 0,
+            ask_qty: 0,
+            timestamp: '1970-01-01T00:00:00.000000Z'
+          }
+        ]
+      }
+    ]
+
+    const krakenMapper = createMapper('kraken', new Date('2026-07-10T00:00:00.000Z'))
+
+    for (const message of messages) {
+      const mappedMessages = krakenMapper.map(message, new Date('2026-07-10T00:00:03.275054Z'))
       expect(mappedMessages).toMatchSnapshot()
     }
   })
@@ -6726,7 +7037,19 @@ describe('mappers', () => {
         timestamp: 1669198855202180601,
         type: 'incremental'
       },
-      { sequence: 80321106, symbol: 'XRPUSDT', trades_p: [[1669198857616162039, 'Buy', '0.3758', '244.65']], type: 'incremental' }
+      { sequence: 80321106, symbol: 'XRPUSDT', trades_p: [[1669198857616162039, 'Buy', '0.3758', '244.65']], type: 'incremental' },
+      {
+        book: {
+          asks: [[1238100, 11840000000]],
+          bids: [[1238000, 10000000000]]
+        },
+        depth: 30,
+        sequence: 23906375249,
+        symbol: 'sOLUSDT',
+        timestamp: 1772323195423084785,
+        type: 'incremental'
+      },
+      { sequence: 23912236867, symbol: 'sOLUSDT', trades: [[1772323222771984119, 'Sell', 1228700, 41250000000]], type: 'incremental' }
     ]
     const phemex = createMapper('phemex')
 
@@ -8428,7 +8751,7 @@ test('map bitnomial messages', () => {
   }
 })
 
-test('map woo-x messages', () => {
+test('map woo-x legacy messages', () => {
   const messages = [
     {
       topic: 'PERP_GALA_USDT@trade',
@@ -8502,10 +8825,88 @@ test('map woo-x messages', () => {
     { topic: 'PERP_BTC_USDT@openinterest', ts: 1674432013624, data: { symbol: 'PERP_BTC_USDT', openInterest: 83.2241 } }
   ]
 
-  const wooxMapper = createMapper('woo-x', new Date('2022-08-16T00:00:00.4642130Z'))
+  const localTimestamp = new Date('2023-01-23T00:00:00.464Z')
+  const wooxMapper = createMapper('woo-x', localTimestamp)
 
   for (const message of messages) {
-    const mappedMessages = wooxMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
+    const mappedMessages = wooxMapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map woo-x v3 messages', () => {
+  const messages = [
+    {
+      topic: 'trade@PERP_ETH_USDT',
+      ts: 1782770880002,
+      data: { ts: 1782770879821, px: '1622.8', sx: '0.09', sd: 'SELL', src: 1, s: 'PERP_ETH_USDT' }
+    },
+    {
+      topic: 'trade@SPOT_ETH_USDT',
+      ts: 1782770880006,
+      data: { ts: 1782770880005, px: '1622.6', sx: '0.02', sd: 'BUY', src: 1, s: 'SPOT_ETH_USDT' }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880101,
+      data: {
+        s: 'PERP_ETH_USDT',
+        prevTs: 1782770879850,
+        ts: 1782770880100,
+        asks: [['1622.8', '0.3']],
+        bids: []
+      }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880120,
+      generated: true,
+      data: {
+        s: 'PERP_ETH_USDT',
+        ts: 1782770880000,
+        asks: [
+          ['1622.8', '0.2'],
+          ['1623.0', '0.1']
+        ],
+        bids: [['1622.7', '0.4']]
+      }
+    },
+    {
+      topic: 'orderbookupdate@PERP_ETH_USDT@50',
+      ts: 1782770880300,
+      data: {
+        s: 'PERP_ETH_USDT',
+        prevTs: 1782770880000,
+        ts: 1782770880300,
+        asks: [['1622.8', '0']],
+        bids: [['1622.6', '0.5']]
+      }
+    },
+    {
+      topic: 'bbo@PERP_ETH_USDT',
+      ts: 1782770880005,
+      data: { ts: 1782770880004, bp: '1622.7', bq: '0.4', ap: '1622.8', aq: '0.2', s: 'PERP_ETH_USDT' }
+    },
+    { topic: 'markprice@PERP_ETH_USDT', ts: 1782770880003, data: { ts: 1782770880000, px: '1622.9', s: 'PERP_ETH_USDT' } },
+    { topic: 'indexprice@SPOT_ETH_USDT', ts: 1782770880004, data: { ts: 1782770880000, px: '1622.5', s: 'SPOT_ETH_USDT' } },
+    { topic: 'openinterest@PERP_ETH_USDT', ts: 1782770880574, data: { ts: 1782770880570, oi: '95500', s: 'PERP_ETH_USDT' } },
+    {
+      topic: 'estfundingrate@PERP_ETH_USDT',
+      ts: 1782770939003,
+      data: { ts: 1782770939000, ft: 1782777600000, s: 'PERP_ETH_USDT', r: '0.00001181' }
+    },
+    {
+      topic: 'trade@PERP_ETH_USDT',
+      ts: 1782770940002,
+      data: { ts: 1782770940001, px: '1622.8', sx: '0.01', sd: 'BUY', src: 0, s: 'PERP_ETH_USDT' }
+    }
+  ]
+
+  const localTimestamp = new Date('2026-06-29T22:08:00.464Z')
+  const wooxMapper = createMapper('woo-x', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = wooxMapper.map(message, localTimestamp)
     expect(mappedMessages).toMatchSnapshot()
   }
 })
@@ -9313,6 +9714,81 @@ test('map bitget messages', () => {
   }
 })
 
+test('map bitget v3 messages', () => {
+  const messages = [
+    {
+      action: 'update',
+      arg: { instType: 'spot', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [
+        { i: '1432912488536195072', p: '76671.22', v: '0.001367', S: 'sell', T: '1777358880170', L: '1432912488536195073', isRPI: 'no' }
+      ],
+      ts: 1777358880172
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [
+        { i: '1432912488536195072', p: '76671.22', v: '0.001367', S: 'sell', T: '1777358880170', L: '1432912488536195073', isRPI: 'no' }
+      ],
+      ts: 1777358880172
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76794.01', '1.049783'],
+            ['76794.05', '0.002881']
+          ],
+          b: [
+            ['76794', '0.062194'],
+            ['76793', '0.000032']
+          ],
+          checksum: 0,
+          seq: 451275591390,
+          pseq: 0,
+          ts: '1777362656332'
+        }
+      ],
+      ts: 1777362656336
+    },
+    {
+      action: 'update',
+      arg: { instType: 'spot', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76679.99', '0'],
+            ['76681.49', '0.026085']
+          ],
+          b: [
+            ['76646.9', '0.03914'],
+            ['76439.78', '0']
+          ],
+          checksum: 1153969492,
+          seq: 451057502090,
+          pseq: 451057497631,
+          ts: '1777358880011'
+        }
+      ],
+      ts: 1777358880013
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'spot', topic: 'books1', symbol: 'BTCUSDT' },
+      data: [{ a: [['76671.23', '0.41581']], b: [['76671.22', '0.531211']], checksum: 0, seq: 451057506670, pseq: 0, ts: '1777358880105' }],
+      ts: 1777358880106
+    }
+  ]
+  const mapper = createMapper('bitget', new Date('2026-04-28T00:00:00.000Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
 test('map bitget-futures messages', () => {
   const messages = [
     { event: 'subscribe', arg: { instType: 'USDT-FUTURES', channel: 'trade', instId: 'LTCUSDT' } },
@@ -9450,6 +9926,115 @@ test('map bitget-futures messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bitget-futures v3 messages', () => {
+  const messages = [
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [{ i: '1432912492051054592', p: '76631.3', v: '0.01', S: 'buy', T: '1777358881008', L: '1432912492051054593', isRPI: 'no' }],
+      ts: 1777358881009
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'publicTrade', symbol: 'BTCUSDT' },
+      data: [{ i: '1432912492051054592', p: '76631.3', v: '0.01', S: 'buy', T: '1777358881008', L: '1432912492051054593', isRPI: 'no' }],
+      ts: 1777358881009
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76742.9', '4.2465'],
+            ['76743', '0.0001']
+          ],
+          b: [
+            ['76742.8', '2.8986'],
+            ['76742.7', '0.0001']
+          ],
+          checksum: 0,
+          seq: 483814309734,
+          pseq: 0,
+          ts: '1777362657614'
+        }
+      ],
+      ts: 1777362657617
+    },
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'books', symbol: 'BTCUSDT' },
+      data: [
+        {
+          a: [
+            ['76642', '0'],
+            ['76642.1', '0']
+          ],
+          b: [
+            ['76598.9', '0.0783'],
+            ['76596.4', '0']
+          ],
+          checksum: -431745958,
+          seq: 483415085712,
+          pseq: 483415077719,
+          ts: '1777358880000'
+        }
+      ],
+      ts: 1777358880001
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'books1', symbol: 'BTCUSDT' },
+      data: [{ a: [['76631.3', '8.8086']], b: [['76631.2', '0.9608']], checksum: 0, seq: 483415090019, pseq: 0, ts: '1777358880027' }],
+      ts: 1777358880029
+    },
+    {
+      action: 'snapshot',
+      arg: { instType: 'usdt-futures', topic: 'ticker', symbol: 'BTCUSDT' },
+      data: [
+        {
+          highPrice24h: '78237.7',
+          lowPrice24h: '76414.5',
+          openPrice24h: '77641',
+          lastPrice: '76631.3',
+          turnover24h: '2914473798.93323',
+          volume24h: '37764.7894',
+          bid1Price: '76631.2',
+          ask1Price: '76631.3',
+          bid1Size: '0.9608',
+          ask1Size: '9.5716',
+          price24hPcnt: '-0.013',
+          indexPrice: '76671.4381686055379793',
+          markPrice: '76631.3',
+          fundingRate: '-0.00003',
+          openInterest: '29539.3825',
+          deliveryTime: '',
+          deliveryStartTime: '',
+          deliveryStatus: '',
+          nextFundingTime: '1777363200000'
+        }
+      ],
+      ts: 1777358880084
+    },
+    {
+      action: 'update',
+      arg: { instType: 'usdt-futures', topic: 'liquidation' },
+      data: [
+        { symbol: 'APEUSDT', side: 'buy', price: '0.1649', amount: '13.70319', ts: '1777358886549' },
+        { symbol: 'IPUSDT', side: 'buy', price: '0.500280739469', amount: '143.330431857868', ts: '1777358876983' }
+      ],
+      ts: 1777358897167
+    }
+  ]
+
+  const mapper = createMapper('bitget-futures', new Date('2026-04-28T00:00:00.000Z'))
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
     expect(mappedMessages).toMatchSnapshot()
   }
 })
@@ -9700,6 +10285,2451 @@ test('map hyperliquid messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish trade messages', () => {
+  const localTimestamp = new Date('2026-04-24T01:19:40.250Z')
+
+  const messages = [
+    // V1TAAnonymousTradeUpdate snapshot - recent-trade backfill should emit nothing
+    {
+      type: 'snapshot',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'AAVEUSDC',
+        createdAtTimestamp: '1745457580200000000',
+        publishedAtTimestamp: '1745457580201000000',
+        trades: [
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462721',
+            price: '94.008',
+            quantity: '1.63639338',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580158000000',
+            publishedAtTimestamp: '1745457580160000000',
+            lastUpdatedTimestamp: '1745457580158000000',
+            createdAtDatetime: '2026-04-24T01:19:40.158Z'
+          },
+          {
+            symbol: 'AAVEUSDC',
+            tradeId: '100118000001462722',
+            price: '94.009',
+            quantity: '0.125',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580159000000',
+            publishedAtTimestamp: '1745457580161000000',
+            lastUpdatedTimestamp: '1745457580159000000',
+            createdAtDatetime: '2026-04-24T01:19:40.159Z'
+          }
+        ]
+      }
+    },
+    // V1TAAnonymousTradeUpdate update - incremental trades with all taker side combinations
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580300000000',
+        publishedAtTimestamp: '1745457580301000000',
+        trades: [
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462723',
+            price: '66250.5',
+            quantity: '0.0042',
+            side: 'BUY',
+            isTaker: true,
+            createdAtTimestamp: '1745457580258000000',
+            publishedAtTimestamp: '1745457580260000000',
+            lastUpdatedTimestamp: '1745457580258000000',
+            createdAtDatetime: '2026-04-24T01:19:40.258Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462724',
+            price: '66251.5',
+            quantity: '0.0043',
+            side: 'SELL',
+            isTaker: true,
+            createdAtTimestamp: '1745457580259000000',
+            publishedAtTimestamp: '1745457580261000000',
+            lastUpdatedTimestamp: '1745457580259000000',
+            createdAtDatetime: '2026-04-24T01:19:40.259Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462725',
+            price: '66252.5',
+            quantity: '0.0044',
+            side: 'BUY',
+            isTaker: false,
+            createdAtTimestamp: '1745457580260000000',
+            publishedAtTimestamp: '1745457580262000000',
+            lastUpdatedTimestamp: '1745457580260000000',
+            createdAtDatetime: '2026-04-24T01:19:40.260Z'
+          },
+          {
+            symbol: 'BTCUSD',
+            tradeId: '100118000001462726',
+            price: '66253.5',
+            quantity: '0.0045',
+            side: 'SELL',
+            isTaker: false,
+            createdAtTimestamp: '1745457580261000000',
+            publishedAtTimestamp: '1745457580263000000',
+            lastUpdatedTimestamp: '1745457580261000000',
+            createdAtDatetime: '2026-04-24T01:19:40.261Z'
+          }
+        ]
+      }
+    },
+    // Empty trade batch should emit nothing
+    {
+      type: 'update',
+      dataType: 'V1TAAnonymousTradeUpdate',
+      data: {
+        symbol: 'BTCUSD',
+        createdAtTimestamp: '1745457580400000000',
+        publishedAtTimestamp: '1745457580401000000',
+        trades: []
+      }
+    },
+    // Non-trade Bullish message should not be handled by the trade mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeTrades('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish order book messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel2 snapshot - initial order book state
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859490',
+        bids: ['94.5190', '56.33894018', '94.4890', '53.70000000', '94.4670', '5.00000000', '94.4660', '1.08000000'],
+        asks: ['94.9730', '6.08000000', '94.9840', '8.42081721', '94.9850', '53.70000000', '95.0780', '5.00000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumberRange: [428371450, 428371450],
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel2 update uses the same payload shape; no updates were present in the captured slices
+    {
+      type: 'update',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: ['0.2507', '11800.00000', '0.2506', '0.00000'],
+        asks: ['0.2513', '9800.00000', '0.2514', '25000.00000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [24919768, 24919769],
+        symbol: 'ADAUSDC'
+      }
+    },
+    // Empty book snapshot still emits an empty book_change snapshot
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel2',
+      data: {
+        timestamp: '1777035859138',
+        bids: [],
+        asks: [],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-24T13:04:19.138Z',
+        sequenceNumberRange: [4536455, 4536455],
+        symbol: 'AAVEAUSD'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookChanges('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish book ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T13:04:20.6363752Z')
+
+  const messages = [
+    // V1TALevel1 snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035859490',
+        bid: ['94.5190', '56.33894018'],
+        ask: ['94.9730', '6.08000000'],
+        publishedAtTimestamp: '1777035860092',
+        datetime: '2026-04-24T13:04:19.490Z',
+        sequenceNumber: '428371450',
+        symbol: 'AAVEUSDC'
+      }
+    },
+    // V1TALevel1 update - real captured payload shape
+    {
+      type: 'update',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1777035860138',
+        bid: ['6.4290', '1.9840594'],
+        ask: ['6.4310', '59.9788953'],
+        publishedAtTimestamp: '1777035860223',
+        datetime: '2026-04-24T13:04:20.138Z',
+        sequenceNumber: '31788641',
+        symbol: 'BONK1MUSDC'
+      }
+    },
+    // Empty BBO snapshot should still emit a book_ticker with undefined price/amount values
+    {
+      type: 'snapshot',
+      dataType: 'V1TALevel1',
+      data: {
+        timestamp: '1776928933990',
+        bid: ['0.00000000', '0.00000000'],
+        ask: ['0.00000000', '0.00000000'],
+        publishedAtTimestamp: '1777035860091',
+        datetime: '2026-04-23T07:22:13.990Z',
+        sequenceNumber: '4433134',
+        symbol: 'AAVEAUSD'
+      }
+    },
+    // Non-L1 Bullish message should not be handled by the book ticker mapper
+    {
+      type: 'update',
+      dataType: 'V1TAHeartbeat',
+      data: {
+        message: 'heartbeat'
+      }
+    }
+  ]
+
+  const mapper = normalizeBookTickers('bullish', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('use local timestamp for malformed bullish order book timestamps', () => {
+  const localTimestamp = new Date('2026-07-23T10:06:27.211Z')
+  const level2Mapper = normalizeBookChanges('bullish', localTimestamp)
+  const level1Mapper = normalizeBookTickers('bullish', localTimestamp)
+
+  const level2Message = {
+    type: 'snapshot',
+    dataType: 'V1TALevel2',
+    data: {
+      symbol: 'SUSHIUSDC',
+      bids: ['0.1698', '47633.28730000', '0.1695', '79388.81220000'],
+      asks: ['0.1709', '127175.65100000'],
+      sequenceNumberRange: [302108113, 302108113],
+      datetime: '1970-01-01T00:29:44.801Z',
+      timestamp: '1784801',
+      publishedAtTimestamp: '1784801187053'
+    }
+  }
+  const level1Message = {
+    type: 'update',
+    dataType: 'V1TALevel1',
+    data: {
+      symbol: 'SUSHIUSDC',
+      bid: ['0.1698', '47633.28730000'],
+      ask: ['0.1709', '127175.65100000'],
+      sequenceNumber: '302108113',
+      datetime: '1970-01-01T00:29:44.801Z',
+      timestamp: '1784801',
+      publishedAtTimestamp: '1784801187053'
+    }
+  }
+
+  expect([...level2Mapper.map(level2Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
+  expect([...level1Mapper.map(level1Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
+})
+
+test('map bullish derivative ticker messages', () => {
+  const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
+
+  const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC derivative ticker messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
+    // V1TATickerResponse perpetual snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042734715',
+        publishedAtTimestamp: '1777042734865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:54.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '-0.001492',
+        openInterest: '647.17244459',
+        openInterestUSD: '50507926.2656',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // V1TATickerResponse perpetual update - zero fundingRate/openInterest are valid values and clear cached non-zero values
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042735715',
+        publishedAtTimestamp: '1777042735865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:55.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // V1TATickerResponse dated future snapshot - no fundingRate field
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042731879',
+        publishedAtTimestamp: '1777042734841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260426',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: '78104.8465',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:51.879Z',
+        markPrice: '78001.2667',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - stored and applied to later BTC derivative ticker messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse perpetual update - uses the latest cached BTC index price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042736715',
+        publishedAtTimestamp: '1777042736865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:56.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '0.000000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // Unrelated index price update should not emit derivative ticker messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Spot ticker should not be handled by the derivative ticker mapper
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '5.61187517',
+        average: '93.6790',
+        baseVolume: '4448.42894841',
+        bestAsk: '93.5800',
+        bestBid: '93.1320',
+        bidVolume: '57.15536018',
+        change: '0.7040',
+        close: '94.0310',
+        createdAtTimestamp: '1777042725522',
+        publishedAtTimestamp: '1777042734821',
+        high: '96.7090',
+        last: '94.0310',
+        lastTradeDatetime: '2026-04-24T13:34:13.426Z',
+        lastTradeSize: '2.22800000',
+        low: '91.3430',
+        open: '93.3270',
+        percentage: '0.75',
+        quoteVolume: '419347.8185',
+        symbol: 'AAVEUSDC',
+        type: 'ticker',
+        vwap: '94.2642',
+        currentPrice: '127.6770',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:45.522Z',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // Bullish can publish empty ticker updates; they should be ignored by derivative ticker mapper
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: null
+    }
+  ]
+
+  const mapper = normalizeDerivativeTickers('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-PERP', 'BTC-USDC-20260426'])).toMatchSnapshot()
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map bullish option summary messages', () => {
+  const localTimestamp = new Date('2026-04-24T14:58:55.000Z')
+
+  const messages = [
+    // V1TAIndexPrice snapshot - stored and applied to later BTC option summary messages
+    {
+      type: 'snapshot',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78032.2500',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:50.000Z',
+        updatedAtTimestamp: '1777042730000'
+      }
+    },
+    // V1TATickerResponse option snapshot - real captured payload shape
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042732219',
+        publishedAtTimestamp: '1777042734841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260425-70000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:52.219Z',
+        markPrice: '8133.6201',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.99981130',
+        gamma: '0.00000030',
+        theta: '-93.2574',
+        vega: '0.0247',
+        impliedVolatility: '0.7045',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TATickerResponse option snapshot - zero option mark/greeks are valid Bullish values
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042733219',
+        publishedAtTimestamp: '1777042735841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260515-150000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:53.219Z',
+        markPrice: '0.0000',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.00000000',
+        gamma: '0.00000000',
+        theta: '0.0000',
+        vega: '0.0000',
+        impliedVolatility: '0.6182',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // V1TAIndexPrice update - stored and applied to later BTC option summary messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '78040.5000',
+        assetSymbol: 'BTC',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // V1TATickerResponse option update - uses the latest cached BTC underlying price
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: null,
+        average: null,
+        baseVolume: '0.00000000',
+        change: '0.0000',
+        close: null,
+        createdAtTimestamp: '1777042734219',
+        publishedAtTimestamp: '1777042736841',
+        high: null,
+        last: null,
+        lastTradeDatetime: null,
+        lastTradeSize: '0',
+        low: null,
+        open: null,
+        percentage: '0.00',
+        quoteVolume: '0.0000',
+        symbol: 'BTC-USDC-20260425-70000-C',
+        type: 'ticker',
+        vwap: null,
+        currentPrice: null,
+        ammData: null,
+        createdAtDatetime: '2026-04-24T14:58:54.219Z',
+        markPrice: '8133.6201',
+        openInterest: '0.00000000',
+        openInterestUSD: '0.0000',
+        delta: '0.99981130',
+        gamma: '0.00000030',
+        theta: '-93.2574',
+        vega: '0.0247',
+        impliedVolatility: '0.7045',
+        otcBaseVolume: '0.00000000'
+      }
+    },
+    // Unrelated index price update should not emit option summary messages
+    {
+      type: 'update',
+      dataType: 'V1TAIndexPrice',
+      data: {
+        price: '1850.1000',
+        assetSymbol: 'ETH',
+        updatedAtDatetime: '2026-04-24T14:58:55.000Z',
+        updatedAtTimestamp: '1777042735000'
+      }
+    },
+    // Perpetual ticker should not be handled by the option summary mapper
+    {
+      type: 'snapshot',
+      dataType: 'V1TATickerResponse',
+      data: {
+        askVolume: '0.00640900',
+        average: '78127.4250',
+        baseVolume: '1304.82400234',
+        bestAsk: '78029.6000',
+        bestBid: '78029.5000',
+        bidVolume: '0.07572695',
+        change: '-195.5500',
+        close: '78029.6500',
+        createdAtTimestamp: '1777042734715',
+        publishedAtTimestamp: '1777042734865',
+        high: '78711.4873',
+        last: '78029.6500',
+        lastTradeDatetime: '2026-04-24T14:58:47.556Z',
+        lastTradeSize: '0.00113772',
+        low: '78029.6500',
+        open: '78225.2000',
+        percentage: '-0.25',
+        quoteVolume: '101796974.7337',
+        symbol: 'BTC-USDC-PERP',
+        type: 'ticker',
+        vwap: '78006.9952',
+        currentPrice: '78029.6000',
+        ammData: [],
+        createdAtDatetime: '2026-04-24T14:58:54.715Z',
+        markPrice: '78035.3950',
+        fundingRate: '-0.001492',
+        openInterest: '647.17244459',
+        openInterestUSD: '50507926.2656',
+        otcBaseVolume: '92.17200000'
+      }
+    },
+    // Bullish can publish empty ticker updates; they should be ignored by option summary mapper
+    {
+      type: 'update',
+      dataType: 'V1TATickerResponse',
+      data: null
+    }
+  ]
+
+  const mapper = normalizeOptionsSummary('bullish', localTimestamp)
+
+  expect(mapper.getFilters(['BTC-USDC-20260425-70000-C'])).toMatchSnapshot()
+
+  for (const message of messages) {
+    const mappedMessages = []
+    if (mapper.canHandle(message)) {
+      const mapped = mapper.map(message, localTimestamp)
+      if (mapped) {
+        mappedMessages.push(...mapped)
+      }
+    }
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter trade messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/trade — initial batch of recent trades (real captured message)
+    {
+      type: 'subscribed/trade',
+      channel: 'trade:1',
+      nonce: 10380968789,
+      trades: [
+        {
+          trade_id: 18240999145,
+          trade_id_str: '18240999145',
+          tx_hash: '00000011bd66332a0000019dab062502000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00006',
+          price: '75198.1',
+          usd_amount: '4.511886',
+          ask_id: 562952080517578,
+          ask_id_str: '562952080517578',
+          bid_id: 844422774647641,
+          bid_id_str: '844422774647641',
+          ask_client_id: 177669079961927,
+          ask_client_id_str: '177669079961927',
+          bid_client_id: 51630146860820,
+          bid_client_id_str: '51630146860820',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856170,
+          timestamp: 1776690799874,
+          taker_position_size_before: '0.00072',
+          taker_entry_quote_before: '54.139644',
+          taker_initial_margin_fraction_before: 200,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95094',
+          maker_entry_quote_before: '4581275.187585',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690799927875
+        },
+        {
+          trade_id: 18240999144,
+          trade_id_str: '18240999144',
+          tx_hash: '00000011bd6633290000019dab062502000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00020',
+          price: '75198.2',
+          usd_amount: '15.039640',
+          ask_id: 562952080517578,
+          ask_id_str: '562952080517578',
+          bid_id: 844422774647644,
+          bid_id_str: '844422774647644',
+          ask_client_id: 177669079961927,
+          ask_client_id_str: '177669079961927',
+          bid_client_id: 116325593583470,
+          bid_client_id_str: '116325593583470',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856170,
+          timestamp: 1776690799874,
+          taker_position_size_before: '0.00092',
+          taker_entry_quote_before: '69.178434',
+          taker_initial_margin_fraction_before: 200,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95114',
+          maker_entry_quote_before: '4581290.220250',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690799927846
+        }
+      ],
+      liquidation_trades: [
+        {
+          trade_id: 18237797923,
+          trade_id_str: '18237797923',
+          tx_hash: '00000011bcbd1dfc0000019daad62ecd000000000000000000000000000000000000000000000000',
+          type: 'liquidation',
+          market_id: 1,
+          size: '0.01664',
+          price: '75602.8',
+          usd_amount: '1258.030592',
+          ask_id: 562952080068427,
+          ask_id_str: '562952080068427',
+          bid_id: 844422775101621,
+          bid_id_str: '844422775101621',
+          ask_client_id: 177668765669007,
+          ask_client_id_str: '177668765669007',
+          bid_client_id: 0,
+          bid_client_id_str: '0',
+          ask_account_id: 281474976626509,
+          bid_account_id: 281474976600615,
+          is_maker_ask: true,
+          block_height: 218829719,
+          timestamp: 1776687656653,
+          taker_fee: 10000,
+          taker_position_size_before: '-0.01664',
+          taker_entry_quote_before: '1247.585664',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 39,
+          maker_position_size_before: '-0.00015',
+          maker_entry_quote_before: '11.282089',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1776687656681222,
+          taker_allocated_margin_usdc_before: 25585360
+        }
+      ]
+    },
+    // update/trade — single incremental trade (real captured message)
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380969080,
+      trades: [
+        {
+          trade_id: 18240999426,
+          trade_id_str: '18240999426',
+          tx_hash: '00000011bd6636f50000019dab062676000000000000000000000000000000000000000000000000',
+          type: 'trade',
+          market_id: 1,
+          size: '0.00012',
+          price: '75196.7',
+          usd_amount: '9.023604',
+          ask_id: 562952080517591,
+          ask_id_str: '562952080517591',
+          bid_id: 844422774647737,
+          bid_id_str: '844422774647737',
+          ask_client_id: 177669079994047,
+          ask_client_id_str: '177669079994047',
+          bid_client_id: 227191959496532,
+          bid_client_id_str: '227191959496532',
+          ask_account_id: 72056,
+          bid_account_id: 27927,
+          is_maker_ask: false,
+          block_height: 218856174,
+          timestamp: 1776690800246,
+          taker_position_size_before: '0.00012',
+          taker_entry_quote_before: '9.023274',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 38,
+          maker_position_size_before: '-60.95034',
+          maker_entry_quote_before: '4581230.089589',
+          maker_initial_margin_fraction_before: 500,
+          transaction_time: 1776690800252707
+        }
+      ],
+      liquidation_trades: []
+    },
+    // update/trade — liquidation_trades only, no regular trades; nothing should be emitted
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380968790,
+      trades: [],
+      liquidation_trades: [
+        {
+          trade_id: 18237797923,
+          trade_id_str: '18237797923',
+          tx_hash: '00000011bcbd1dfc0000019daad62ecd000000000000000000000000000000000000000000000000',
+          type: 'liquidation',
+          market_id: 1,
+          size: '0.01664',
+          price: '75602.8',
+          usd_amount: '1258.030592',
+          ask_id: 562952080068427,
+          ask_id_str: '562952080068427',
+          bid_id: 844422775101621,
+          bid_id_str: '844422775101621',
+          ask_client_id: 177668765669007,
+          ask_client_id_str: '177668765669007',
+          bid_client_id: 0,
+          bid_client_id_str: '0',
+          ask_account_id: 281474976626509,
+          bid_account_id: 281474976600615,
+          is_maker_ask: true,
+          block_height: 218829719,
+          timestamp: 1776687656653,
+          taker_fee: 10000,
+          taker_position_size_before: '-0.01664',
+          taker_entry_quote_before: '1247.585664',
+          taker_initial_margin_fraction_before: 200,
+          taker_position_sign_changed: true,
+          maker_fee: 39,
+          maker_position_size_before: '-0.00015',
+          maker_entry_quote_before: '11.282089',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1776687656681222,
+          taker_allocated_margin_usdc_before: 25585360
+        }
+      ]
+    },
+    // update/trade - Lighter sometimes omits liquidation_trades when there are no liquidation events
+    {
+      type: 'update/trade',
+      channel: 'trade:1',
+      nonce: 10380968791,
+      trades: []
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter order book messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/order_book — full snapshot (real captured message)
+    {
+      type: 'subscribed/order_book',
+      channel: 'order_book:1',
+      last_updated_at: 1776692222420103,
+      offset: 52072043,
+      timestamp: 1776692222437,
+      order_book: {
+        code: 0,
+        asks: [
+          { price: '75300.5', size: '0.08303' },
+          { price: '75300.7', size: '0.00331' },
+          { price: '75302.0', size: '0.13280' }
+        ],
+        bids: [
+          { price: '75300.4', size: '0.00117' },
+          { price: '75300.3', size: '0.00020' },
+          { price: '75300.1', size: '0.00020' }
+        ],
+        offset: 52072043,
+        nonce: 10382292136,
+        last_updated_at: 1776692222420103,
+        begin_nonce: 0
+      }
+    },
+    // update/order_book — incremental delta (real captured message)
+    {
+      type: 'update/order_book',
+      channel: 'order_book:1',
+      last_updated_at: 1776692222467930,
+      offset: 52072055,
+      timestamp: 1776692222475,
+      order_book: {
+        code: 0,
+        asks: [
+          { price: '75300.5', size: '0.00000' },
+          { price: '75300.7', size: '0.28364' },
+          { price: '75313.9', size: '0.61855' }
+        ],
+        bids: [
+          { price: '75300.6', size: '0.04881' },
+          { price: '75295.7', size: '0.01993' },
+          { price: '75294.3', size: '0.10792' }
+        ],
+        offset: 52072055,
+        nonce: 10382292188,
+        last_updated_at: 1776692222467930,
+        begin_nonce: 10382292136
+      }
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter market stats messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/market_stats — initial snapshot of all markets (real captured message)
+    {
+      type: 'subscribed/market_stats',
+      channel: 'market_stats:all',
+      timestamp: 1776694043429,
+      market_stats: {
+        '0': {
+          symbol: 'ETH',
+          market_id: 0,
+          index_price: '2309.89',
+          mark_price: '2308.86',
+          mid_price: '2308.52',
+          open_interest: '70209112.921092',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '2308.57',
+          current_funding_rate: '0.0011',
+          funding_rate: '0.0003',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 185243.4448,
+          daily_quote_token_volume: 424882918.347895,
+          daily_price_low: 2250.75,
+          daily_price_high: 2340.48,
+          daily_price_change: -0.8647896637453895
+        },
+        '1': {
+          symbol: 'BTC',
+          market_id: 1,
+          index_price: '75281.9',
+          mark_price: '75241.1',
+          mid_price: '75237.9',
+          open_interest: '124496091.756091',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '75232.0',
+          current_funding_rate: '0.0012',
+          funding_rate: '0.0008',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 9180.73357,
+          daily_quote_token_volume: 686539466.320927,
+          daily_price_low: 73688.4,
+          daily_price_high: 76127,
+          daily_price_change: -0.7606613942249353
+        }
+      }
+    },
+    // update/market_stats — incremental update, open_interest changed (real captured message)
+    {
+      type: 'update/market_stats',
+      channel: 'market_stats:all',
+      timestamp: 1776694043874,
+      market_stats: {
+        '0': {
+          symbol: 'ETH',
+          market_id: 0,
+          index_price: '2309.89',
+          mark_price: '2308.86',
+          mid_price: '2308.40',
+          open_interest: '70209098.837046',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '2308.57',
+          current_funding_rate: '0.0011',
+          funding_rate: '0.0003',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 185243.4448,
+          daily_quote_token_volume: 424882918.347895,
+          daily_price_low: 2250.75,
+          daily_price_high: 2340.48,
+          daily_price_change: -0.8647896637453895
+        },
+        '1': {
+          symbol: 'BTC',
+          market_id: 1,
+          index_price: '75281.9',
+          mark_price: '75241.1',
+          mid_price: '75237.8',
+          open_interest: '124496030.810800',
+          open_interest_limit: '72057594037927936.000000',
+          funding_clamp_small: '0.0500',
+          funding_clamp_big: '4.0000',
+          last_trade_price: '75232.0',
+          current_funding_rate: '0.0012',
+          funding_rate: '0.0008',
+          funding_timestamp: 1776693600000,
+          daily_base_token_volume: 9180.73357,
+          daily_quote_token_volume: 686539466.320927,
+          daily_price_low: 73688.4,
+          daily_price_high: 76127,
+          daily_price_change: -0.7606613942249353
+        }
+      }
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map lighter ticker messages', () => {
+  const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
+
+  const messages = [
+    // subscribed/ticker — initial BBO snapshot (real captured message)
+    {
+      type: 'subscribed/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695866952028,
+      nonce: 10385958485,
+      ticker: {
+        s: 'BTC',
+        a: { price: '75531.6', size: '0.53087' },
+        b: { price: '75531.5', size: '0.00120' },
+        last_updated_at: 1776695866952028
+      },
+      timestamp: 1776695867145
+    },
+    // update/ticker — BBO changed (real captured message)
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144750,
+      nonce: 10385958486,
+      ticker: {
+        s: 'BTC',
+        a: { price: '75531.6', size: '0.52927' },
+        b: { price: '75524.4', size: '0.10752' },
+        last_updated_at: 1776695867144750
+      },
+      timestamp: 1776695867147
+    },
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144751,
+      nonce: 10385958487,
+      ticker: {
+        s: 'BTC',
+        b: {},
+        last_updated_at: 1776695867144751
+      },
+      timestamp: 1776695867148
+    },
+    {
+      type: 'update/ticker',
+      channel: 'ticker:1',
+      last_updated_at: 1776695867144752,
+      nonce: 10385958488,
+      timestamp: 1776695867149
+    }
+  ]
+
+  const mapper = createMapper('lighter', localTimestamp)
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
+    expect(mappedMessages).toMatchSnapshot()
+  }
+})
+
+test('map mexc messages', () => {
+  const localTimestamp = new Date('2026-05-27T00:00:00.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        id: 0,
+        code: 0,
+        msg: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.deals.v3.api.pb@10ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000000',
+        publicAggreDeals: {
+          deals: [
+            {
+              price: '100.1',
+              quantity: '0.2',
+              tradeType: 1,
+              time: '1710000000001',
+              tradeId: '698165549569396736X0_698165549569396737X0'
+            },
+            {
+              price: '100.2',
+              quantity: '0.3',
+              tradeType: 2,
+              time: '1710000000002',
+              tradeId: '698165549569396738X0_698165549569396739X0'
+            }
+          ],
+          eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: '698165549569396736X0_698165549569396737X0',
+      price: 100.1,
+      amount: 0.2,
+      side: 'buy',
+      timestamp: new Date('2024-03-09T16:00:00.001Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: '698165549569396738X0_698165549569396739X0',
+      price: 100.2,
+      amount: 0.3,
+      side: 'sell',
+      timestamp: new Date('2024-03-09T16:00:00.002Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000000',
+        publicAggreDepths: {
+          asks: [],
+          bids: [{ price: '99.9', quantity: '0.5' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '101',
+          toVersion: '101'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000001',
+        publicAggreDepths: {
+          asks: [{ price: '100.1', quantity: '0' }],
+          bids: [{ price: '99.7', quantity: '1.1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '102',
+          toVersion: '102'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        generated: true,
+        publicAggreDepthsSnapshot: {
+          asks: [['100.1', '1.2']],
+          bids: [['99.8', '2.3']],
+          lastUpdateId: 100,
+          timestamp: 1710000000002
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [
+        { price: 99.8, amount: 2.3 },
+        { price: 99.9, amount: 0.5 },
+        { price: 99.7, amount: 1.1 }
+      ],
+      asks: [],
+      timestamp: new Date('2024-03-09T16:00:00.002Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@XENUSDT',
+        symbol: 'XENUSDT',
+        sendTime: '1781337091703'
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000003',
+        publicAggreDepths: {
+          asks: [{ price: '100.1', quantity: '0' }],
+          bids: [{ price: '99.7', quantity: '1.1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '103',
+          toVersion: '103'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [{ price: 99.7, amount: 1.1 }],
+      asks: [{ price: 100.1, amount: 0 }],
+      timestamp: new Date('2024-03-09T16:00:00.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000005',
+        publicAggreDepths: {
+          asks: [{ price: '100.3', quantity: '0.4' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '104',
+          toVersion: '104'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [],
+      asks: [{ price: 100.3, amount: 0.4 }],
+      timestamp: new Date('2024-03-09T16:00:00.005Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000006',
+        publicAggreDepths: {
+          bids: [{ price: '99.6', quantity: '0.8' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '105',
+          toVersion: '105'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [{ price: 99.6, amount: 0.8 }],
+      asks: [],
+      timestamp: new Date('2024-03-09T16:00:00.006Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000004',
+        publicAggreBookTicker: {
+          bidPrice: '99.9',
+          bidQuantity: '1.2',
+          askPrice: '100.1',
+          askQuantity: '2.3'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_ticker',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      askAmount: 2.3,
+      askPrice: 100.1,
+      bidPrice: 99.9,
+      bidAmount: 1.2,
+      timestamp: new Date('2024-03-09T16:00:00.004Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1710000000005',
+        publicAggreBookTicker: {
+          bidPrice: '100',
+          bidQuantity: '4',
+          askPrice: '',
+          askQuantity: ''
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_ticker',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      askAmount: undefined,
+      askPrice: undefined,
+      bidPrice: 100,
+      bidAmount: 4,
+      timestamp: new Date('2024-03-09T16:00:00.005Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc buffered depth updates with omitted side', () => {
+  const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800130',
+        publicAggreDepths: {
+          asks: [
+            { price: '64526.18', quantity: '0.32477055' },
+            { price: '64849.35', quantity: '0.01209236' }
+          ],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74483042021',
+          toVersion: '74483042022'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        generated: true,
+        publicAggreDepthsSnapshot: {
+          asks: [['64530.00', '1']],
+          bids: [['64520.00', '1']],
+          lastUpdateId: 74483042020,
+          timestamp: 1781740800000
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [{ price: 64520, amount: 1 }],
+      asks: [
+        { price: 64530, amount: 1 },
+        { price: 64526.18, amount: 0.32477055 },
+        { price: 64849.35, amount: 0.01209236 }
+      ],
+      timestamp: new Date('2026-06-18T00:00:00.000Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc historical buffered depth updates without enforcing full sequence', () => {
+  const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800001',
+        publicAggreDepths: {
+          bids: [{ price: '99', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '101',
+          toVersion: '101'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1781740800002',
+        publicAggreDepths: {
+          asks: [{ price: '101', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '103',
+          toVersion: '103'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        generated: true,
+        publicAggreDepthsSnapshot: {
+          asks: [],
+          bids: [],
+          lastUpdateId: 100,
+          timestamp: 1781740800003
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [{ price: 99, amount: 1 }],
+      asks: [{ price: 101, amount: 1 }],
+      timestamp: new Date('2026-06-18T00:00:00.003Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc realtime depth update throws when first update has no snapshot overlap', () => {
+  const localTimestamp = new Date()
+  const mapper = createMapper('mexc', localTimestamp)
+
+  mapper.map(
+    {
+      channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+      symbol: 'BTCUSDT',
+      generated: true,
+      publicAggreDepthsSnapshot: {
+        asks: [],
+        bids: [],
+        lastUpdateId: 100,
+        timestamp: Date.now()
+      }
+    },
+    localTimestamp
+  )
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: Date.now().toString(),
+        publicAggreDepths: {
+          asks: [{ price: '101', quantity: '1' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '102',
+          toVersion: '102'
+        }
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC depth snapshot has no overlap with first update')
+})
+
+test('map mexc live captured messages', () => {
+  const localTimestamp = new Date('2026-06-23T09:46:45.000Z')
+  const mapper = createMapper('mexc', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        generated: true,
+        publicAggreDepthsSnapshot: {
+          asks: [],
+          bids: [],
+          lastUpdateId: 74891313262,
+          timestamp: 1782208005000
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: true,
+      bids: [],
+      asks: [],
+      timestamp: new Date('2026-06-23T09:46:45.000Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208005090',
+        publicAggreDepths: {
+          asks: [],
+          bids: [{ price: '61759.73', quantity: '0.0001778' }],
+          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+          fromVersion: '74891313263',
+          toVersion: '74891313263'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      isSnapshot: false,
+      bids: [{ price: 61759.73, amount: 0.0001778 }],
+      asks: [],
+      timestamp: new Date('2026-06-23T09:46:45.090Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208005090',
+        publicAggreBookTicker: {
+          bidPrice: '62383.56',
+          bidQuantity: '0.07956651',
+          askPrice: '62383.57',
+          askQuantity: '0.09556'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_ticker',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      askAmount: 0.09556,
+      askPrice: 62383.57,
+      bidPrice: 62383.56,
+      bidAmount: 0.07956651,
+      timestamp: new Date('2026-06-23T09:46:45.090Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
+        symbol: 'BTCUSDT',
+        sendTime: '1782208006171',
+        publicAggreDeals: {
+          deals: [
+            { price: '62383.56', quantity: '0.00008235', tradeType: 2, time: '1782208006167' },
+            { price: '62383.57', quantity: '0.00019595', tradeType: 1, time: '1782208006167' },
+            { price: '62383.57', quantity: '0.00059353', tradeType: 1, time: '1782208006167' },
+            { price: '62383.56', quantity: '0.00027168', tradeType: 2, time: '1782208006168' },
+            { price: '62383.57', quantity: '0.00002555', tradeType: 2, time: '1782208006168' }
+          ],
+          eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
+        }
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.56,
+      amount: 0.00008235,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00019595,
+      side: 'buy',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00059353,
+      side: 'buy',
+      timestamp: new Date('2026-06-23T09:46:46.167Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.56,
+      amount: 0.00027168,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.168Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTCUSDT',
+      exchange: 'mexc',
+      id: undefined,
+      price: 62383.57,
+      amount: 0.00002555,
+      side: 'sell',
+      timestamp: new Date('2026-06-23T09:46:46.168Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc futures messages', () => {
+  const localTimestamp = new Date('2026-05-27T12:00:00.000Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  expect(
+    mapper.map(
+      {
+        symbol: 'BTC_USDT',
+        data: [
+          {
+            p: 115309.8,
+            v: 55,
+            T: 2,
+            O: 3,
+            M: 1,
+            t: 1755487578276,
+            i: '13064218826',
+            cts: '1755487578276'
+          },
+          {
+            p: 115309.8,
+            v: 11,
+            T: 1,
+            O: 3,
+            M: 1,
+            t: 1755487578275,
+            i: '13064218827',
+            cts: '1755487578275'
+          }
+        ],
+        channel: 'push.deal',
+        ts: 1755487578276
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'trade',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      id: '13064218826',
+      price: 115309.8,
+      amount: 55,
+      side: 'sell',
+      timestamp: new Date('2025-08-18T03:26:18.276Z'),
+      localTimestamp
+    },
+    {
+      type: 'trade',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      id: '13064218827',
+      price: 115309.8,
+      amount: 11,
+      side: 'buy',
+      timestamp: new Date('2025-08-18T03:26:18.275Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[6859.5, 3251, 1]],
+          bids: [[6858.5, 42, 7]],
+          cts: 1587442021983,
+          version: 96801927
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022003
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth.snapshot',
+        generated: true,
+        data: {
+          cts: null,
+          asks: [[6860.5, 2, 3]],
+          bids: [[6857.5, 4, 5]],
+          timestamp: 1587442021003,
+          version: 96801926
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: true,
+      bids: [
+        { price: 6857.5, amount: 4 },
+        { price: 6858.5, amount: 42 }
+      ],
+      asks: [
+        { price: 6860.5, amount: 2 },
+        { price: 6859.5, amount: 3251 }
+      ],
+      timestamp: new Date('2020-04-21T04:07:01.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [],
+          bids: [[6858.5, 7, 9]],
+          version: 96801930
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442023003
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: false,
+      bids: [{ price: 6858.5, amount: 7 }],
+      asks: [],
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[6860.5, 0, 0]],
+          bids: [[6858.5, 6, 8]],
+          begin: 96801931,
+          end: 96801931,
+          version: 96801931
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022003
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'book_change',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      isSnapshot: false,
+      bids: [{ price: 6858.5, amount: 6 }],
+      asks: [{ price: 6860.5, amount: 0 }],
+      timestamp: new Date('2020-04-21T04:07:02.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.index.price',
+        data: {
+          price: 6861.7,
+          symbol: 'BTC_USDT'
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442021003
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.fair.price',
+        data: {
+          price: 6867.5,
+          symbol: 'BTC_USDT'
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442021503
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.ticker',
+        data: {
+          ask1: 6866.5,
+          bid1: 6865,
+          fairPrice: 6867.4,
+          fundingRate: 0.0008,
+          high24Price: 7223.5,
+          indexPrice: 6861.6,
+          lastPrice: 6865.5,
+          lower24Price: 6756,
+          maxBidPrice: 7073.42,
+          minAskPrice: 6661.37,
+          riseFallRate: -0.0424,
+          riseFallValue: -304.5,
+          symbol: 'BTC_USDT',
+          timestamp: 1587442022003,
+          holdVol: 2284742,
+          volume24: 164586129,
+          riseFallRates: [-0.0424, -0.0419, -0.0407],
+          riseFallRatesOfTimezone: [-0.0402, -0.0398, -0.0388],
+          zone: 'UTC+8'
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'derivative_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      lastPrice: 6865.5,
+      openInterest: 2284742,
+      fundingRate: undefined,
+      fundingTimestamp: undefined,
+      predictedFundingRate: undefined,
+      indexPrice: 6861.6,
+      markPrice: 6867.4,
+      timestamp: new Date('2020-04-21T04:07:02.003Z'),
+      localTimestamp
+    }
+  ])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.funding.rate',
+        data: {
+          rate: 0.0012,
+          symbol: 'BTC_USDT',
+          nextSettleTime: 1587445200000
+        },
+        symbol: 'BTC_USDT',
+        ts: 1587442022503
+      },
+      localTimestamp
+    )
+  ).toEqual([])
+
+  expect(
+    mapper.map(
+      {
+        channel: 'push.ticker',
+        data: {
+          ask1: 6866.6,
+          bid1: 6865.1,
+          contractId: 10,
+          fairPrice: 6867.5,
+          fundingRate: 0.0008,
+          high24Price: 7223.5,
+          indexPrice: 6861.7,
+          lastPrice: 6865.6,
+          lower24Price: 6756,
+          maxBidPrice: 7073.42,
+          minAskPrice: 6661.37,
+          riseFallRate: -0.0424,
+          riseFallValue: -304.5,
+          symbol: 'BTC_USDT',
+          timestamp: 1587442023003,
+          holdVol: 2284743,
+          volume24: 164586129
+        },
+        symbol: 'BTC_USDT'
+      },
+      localTimestamp
+    )
+  ).toEqual([
+    {
+      type: 'derivative_ticker',
+      symbol: 'BTC_USDT',
+      exchange: 'mexc-futures',
+      lastPrice: 6865.6,
+      openInterest: 2284743,
+      fundingRate: 0.0012,
+      fundingTimestamp: new Date('2020-04-21T05:00:00.000Z'),
+      predictedFundingRate: undefined,
+      indexPrice: 6861.7,
+      markPrice: 6867.5,
+      timestamp: new Date('2020-04-21T04:07:03.003Z'),
+      localTimestamp
+    }
+  ])
+})
+
+test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
+  const localTimestamp = new Date()
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  mapper.map(
+    {
+      channel: 'push.depth.snapshot',
+      generated: true,
+      data: {
+        cts: null,
+        asks: [],
+        bids: [],
+        timestamp: Date.now(),
+        version: 100
+      },
+      symbol: 'BTC_USDT'
+    },
+    localTimestamp
+  )
+
+  expect(() =>
+    mapper.map(
+      {
+        channel: 'push.depth',
+        data: {
+          asks: [[101, 1, 1]],
+          bids: [],
+          begin: 102,
+          end: 102,
+          version: 102
+        },
+        symbol: 'BTC_USDT',
+        ts: Date.now()
+      },
+      localTimestamp
+    )
+  ).toThrow('MEXC futures depth snapshot has no overlap with first update')
+})
+
+test('map polymarket messages', () => {
+  const localTimestamp = new Date('2026-05-11T06:30:00.000Z')
+
+  const messages = [
+    // book snapshot single object
+    {
+      event_type: 'book',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      timestamp: '1778480069765',
+      hash: '45f2026aa4eb8dee21005241e2fb95c3a5cc3a78',
+      bids: [
+        { price: '0.01', size: '505' },
+        { price: '0.59', size: '15.25' }
+      ],
+      asks: [{ price: '0.99', size: '2501' }],
+      tick_size: '0.01',
+      last_trade_price: ''
+    },
+    // book snapshot array (multiple assets in one message)
+    [
+      {
+        event_type: 'book',
+        asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+        market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+        timestamp: '1778480069765',
+        hash: '45f2026aa4eb8dee21005241e2fb95c3a5cc3a78',
+        bids: [{ price: '0.60', size: '100' }],
+        asks: [{ price: '0.98', size: '200' }],
+        tick_size: '0.01',
+        last_trade_price: ''
+      },
+      {
+        event_type: 'book',
+        asset_id: '114598918128008649573289110164634285301775348261383142320713626791317488686608',
+        market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+        timestamp: '1778464937192',
+        hash: '8b2d393ef49638c22a522aa5602df5d6de7185ab',
+        bids: [{ price: '0.45', size: '50' }],
+        asks: [{ price: '0.94', size: '11.53' }],
+        tick_size: '0.01',
+        last_trade_price: ''
+      }
+    ],
+    // price_change with two different asset_ids (one bid, one ask)
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.05',
+          size: '2849.22',
+          side: 'BUY',
+          hash: '2a784b3f6149b2430b8c21cf0f3302c9d6e5a8e3',
+          best_bid: '0.99',
+          best_ask: '1'
+        },
+        {
+          asset_id: '44076628926488158747612441576415392346365146558144994485384867009865003867169',
+          price: '0.95',
+          size: '2849.22',
+          side: 'SELL',
+          hash: '2e83aa931bc04b2ce1b80e3ae79d05282e89f26b',
+          best_bid: '0',
+          best_ask: '0.01'
+        }
+      ],
+      timestamp: '1778480999942',
+      event_type: 'price_change'
+    },
+    // price_change with size 0 (level removal)
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.05',
+          size: '0',
+          side: 'BUY',
+          hash: '2a784b3f6149b2430b8c21cf0f3302c9d6e5a8e3',
+          best_bid: '0.99',
+          best_ask: '1'
+        }
+      ],
+      timestamp: '1778481000000',
+      event_type: 'price_change'
+    },
+    // price_change with multiple changes for the same asset_id
+    {
+      market: '0xa8adfd2128c320af6b3369aae60e69a88e06dd0baf98122cae11ac15bebcaff6',
+      price_changes: [
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.06',
+          size: '120',
+          side: 'BUY',
+          hash: '548f622c40bb0fe7f21b58df0c1959c0b9fd6f4a',
+          best_bid: '0.99',
+          best_ask: '1'
+        },
+        {
+          asset_id: '32029059041121237772501910512051792285371148723936508019755582547379001566932',
+          price: '0.07',
+          size: '80',
+          side: 'SELL',
+          hash: '816f43d037c549b5a9d4bf42dc1a6a3d41d4d31e',
+          best_bid: '0.99',
+          best_ask: '1'
+        }
+      ],
+      timestamp: '1778481001000',
+      event_type: 'price_change'
+    },
+    // best_bid_ask
+    {
+      market: '0xec006eb725b2454a3cf58d3bf43ddd95a03b019188c2286b3767454ec761d054',
+      asset_id: '102872648555130809031488632355736527619427659766925788934870144378212124766731',
+      best_bid: '0.48',
+      best_ask: '0.51',
+      spread: '0.03',
+      timestamp: '1778480999944',
+      event_type: 'best_bid_ask'
+    },
+    // best_bid_ask with zero top of book
+    {
+      market: '0xec006eb725b2454a3cf58d3bf43ddd95a03b019188c2286b3767454ec761d054',
+      asset_id: '102872648555130809031488632355736527619427659766925788934870144378212124766731',
+      best_bid: '0',
+      best_ask: '0',
+      spread: '0',
+      timestamp: '1778480999945',
+      event_type: 'best_bid_ask'
+    },
+    // last_trade_price
+    {
+      event_type: 'last_trade_price',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      fee_rate_bps: '0',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      price: '0.60',
+      size: '100',
+      side: 'BUY',
+      timestamp: '1778480999940',
+      transaction_hash: 'abc123def456'
+    },
+    // last_trade_price sell side
+    {
+      event_type: 'last_trade_price',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      fee_rate_bps: '0',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      price: '0.61',
+      size: '25',
+      side: 'SELL',
+      timestamp: '1778480999950',
+      transaction_hash: 'def456abc123'
+    },
+    // sport_result — no mapper, should emit nothing
+    {
+      gameId: 19439,
+      leagueAbbreviation: 'soccer',
+      slug: 'mci-liv-2025-02-03',
+      homeTeam: 'MCI',
+      awayTeam: 'LIV',
+      status: 'InProgress',
+      live: true,
+      ended: false,
+      score: '1-0',
+      period: '1H',
+      elapsed: '32:15'
+    },
+    // sport_result live shape — no mapper, should emit nothing
+    {
+      gameId: 5529405,
+      leagueAbbreviation: 'challenger',
+      homeTeam: 'Pierre Delage',
+      awayTeam: 'Roman Andres Burruchaga',
+      status: 'inprogress',
+      eventState: {
+        type: 'tennis',
+        createdAt: '2026-05-13T14:55:46.551588084Z',
+        updatedAt: '2026-05-13T14:55:46.551588084Z',
+        score: '3-6, 6-4, 2-2',
+        period: 'S3',
+        live: true,
+        ended: false,
+        tournamentName: 'Challenger Bordeaux',
+        tennisRound: 'Round of 32'
+      },
+      score: '3-6, 6-4, 2-2',
+      period: 'S3',
+      live: true,
+      ended: false
+    },
+    // tick_size_change — no mapper, should emit nothing
+    {
+      event_type: 'tick_size_change',
+      asset_id: '50004092451487013519117521377876897159157506656261391593572775546589316505011',
+      market: '0x7d325e7050162fe19c7d4dba4583cae55d1661f8b71ff6945916b8ba284eaa51',
+      old_tick_size: '0.01',
+      new_tick_size: '0.001',
+      timestamp: '1778480999940'
+    },
+    // new_market — no mapper, should emit nothing
+    {
+      id: '1031769',
+      question: 'Will NVIDIA (NVDA) close above $240 end of January?',
+      market: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      slug: 'nvda-above-240-on-january-30-2026',
+      description: 'This market will resolve to "Yes" if the official closing price is above $240.',
+      assets_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      outcomes: ['Yes', 'No'],
+      event_message: {
+        id: '125819',
+        ticker: 'nvda-above-in-january-2026',
+        slug: 'nvda-above-in-january-2026',
+        title: 'Will NVIDIA (NVDA) close above ___ end of January?',
+        description: 'This market will resolve to "Yes" if the official closing price is above the selected level.'
+      },
+      timestamp: '1766790415550',
+      event_type: 'new_market',
+      tags: ['stocks'],
+      condition_id: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      active: true,
+      clob_token_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      sports_market_type: '',
+      line: '',
+      game_start_time: '',
+      order_price_min_tick_size: '0.01',
+      group_item_title: 'NVDA above $240',
+      taker_base_fee: '1000',
+      fees_enabled: true,
+      fee_schedule: {
+        exponent: '1',
+        rate: '0.07',
+        taker_only: true,
+        rebate_rate: '0.2'
+      }
+    },
+    // market_resolved — no mapper, should emit nothing
+    {
+      id: '1031769',
+      market: '0x311d0c4b6671ab54af4970c06fcf58662516f5168997bdda209ec3db5aa6b0c1',
+      assets_ids: [
+        '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+        '31690934263385727664202099278545688007799199447969475608906331829650099442770'
+      ],
+      winning_asset_id: '76043073756653678226373981964075571318267289248134717369284518995922789326425',
+      winning_outcome: 'Yes',
+      timestamp: '1766790415550',
+      event_type: 'market_resolved',
+      tags: ['stocks']
+    }
+  ]
+
+  const mapper = createMapper('polymarket')
+
+  for (const message of messages) {
+    const mappedMessages = mapper.map(message, localTimestamp)
     expect(mappedMessages).toMatchSnapshot()
   }
 })

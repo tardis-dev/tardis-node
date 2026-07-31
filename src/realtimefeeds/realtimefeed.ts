@@ -117,7 +117,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
             message = message.toString().replace(/"id":([0-9]+),/g, '"id":"$1",') as any
           }
 
-          const messageDeserialized = JSON.parse(message as any)
+          const messageDeserialized = this.parseMessage(message)
 
           if (this.messageIsError(messageDeserialized)) {
             if (this.isIgnoredError(messageDeserialized)) {
@@ -219,9 +219,23 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     this._ws.send(JSON.stringify(msg))
   }
 
+  protected sendRaw(msg: string | Buffer) {
+    if (this._ws === undefined) {
+      return
+    }
+    if (this._ws.readyState !== WebSocket.OPEN) {
+      return
+    }
+    this._ws.send(msg)
+  }
+
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
 
   protected abstract messageIsError(message: any): boolean
+
+  protected parseMessage(message: Buffer<ArrayBufferLike>): any {
+    return JSON.parse(message as any)
+  }
 
   protected sendCustomPing: (() => void) | undefined = undefined
 
@@ -377,7 +391,11 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected readonly debug: dbg.Debugger
   private _tid: NodeJS.Timeout | undefined = undefined
 
-  constructor(exchange: string, private readonly _poolingIntervalSeconds: number, protected readonly onError?: (error: Error) => void) {
+  constructor(
+    exchange: string,
+    private readonly _poolingIntervalSeconds: number,
+    protected readonly onError?: (error: Error) => void
+  ) {
     this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
   }
 

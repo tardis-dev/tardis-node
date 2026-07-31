@@ -1,10 +1,18 @@
 import { lowerCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://www.bitstamp.net/websocket/v2/
 
-export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
+export const bitstampMappers = exchangeMappers({
+  bitstamp: {
+    trades: () => bitstampTradesMapper,
+    bookChanges: () => new BitstampBookChangeMapper()
+  }
+})
+
+const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
   canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {
     if (message.data === undefined) {
       return false
@@ -45,7 +53,7 @@ export const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
   }
 }
 
-export class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
+class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
   private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
 
   canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {

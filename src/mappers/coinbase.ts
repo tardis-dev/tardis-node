@@ -1,10 +1,19 @@
 import { parseμs, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookPriceLevel, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://docs.pro.coinbase.com/#websocket-feed
 
-export const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
+export const coinbaseMappers = exchangeMappers({
+  coinbase: {
+    trades: () => coinbaseTradesMapper,
+    bookChanges: () => new CoinbaseBookChangMapper(),
+    bookTickers: () => coinbaseBookTickerMapper
+  }
+})
+
+const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
   canHandle(message: CoinbaseTrade | CoinbaseLevel2Snapshot | CoinbaseLevel2Update) {
     return message.type === 'match'
   },
@@ -63,7 +72,7 @@ const validAmountsOnly = (level: BookPriceLevel) => {
   return true
 }
 
-export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
+class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   private readonly _symbolLastTimestampMap = new Map<string, Date>()
 
   canHandle(message: CoinbaseTrade | CoinbaseLevel2Snapshot | CoinbaseLevel2Update) {
@@ -124,13 +133,24 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
         this._symbolLastTimestampMap.set(message.product_id, timestamp)
       }
 
+      const bids: BookPriceLevel[] = []
+      const asks: BookPriceLevel[] = []
+      for (let i = 0; i < message.changes.length; i++) {
+        const change = message.changes[i]
+        if (change[0] === 'buy') {
+          bids.push(mapUpdateBookLevel(change))
+        } else if (change[0] === 'sell') {
+          asks.push(mapUpdateBookLevel(change))
+        }
+      }
+
       yield {
         type: 'book_change',
         symbol: message.product_id,
         exchange: 'coinbase',
         isSnapshot: false,
-        bids: message.changes.filter((c) => c[0] === 'buy').map(mapUpdateBookLevel),
-        asks: message.changes.filter((c) => c[0] === 'sell').map(mapUpdateBookLevel),
+        bids,
+        asks,
         timestamp,
         localTimestamp: localTimestamp
       }
@@ -138,7 +158,7 @@ export class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   }
 }
 
-export const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
+const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
   canHandle(message: CoinbaseTicker) {
     return message.type === 'ticker'
   },

@@ -1,5 +1,5 @@
 import { debug } from './debug.ts'
-import { getFilters, normalizeMessages } from './handy.ts'
+import { createNormalizedSymbolFilter, getFilters, normalizeMessages } from './handy.ts'
 import { MapperFactory } from './mappers/index.ts'
 import { createRealTimeFeed } from './realtimefeeds/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
@@ -75,10 +75,7 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
       // filter normalized messages by symbol as some exchanges do not offer subscribing to specific symbols for some of the channels
       // for example Phemex market24h channel
 
-      const upperCaseSymbols = symbols !== undefined ? symbols.map((s) => s.toUpperCase()) : undefined
-      const filter = (symbol: string) => {
-        return upperCaseSymbols === undefined || upperCaseSymbols.length === 0 || upperCaseSymbols.includes(symbol)
-      }
+      const filter = createNormalizedSymbolFilter(symbols, filters)
 
       const normalizedMessages = normalizeMessages(
         exchange,

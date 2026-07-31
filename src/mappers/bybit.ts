@@ -1,10 +1,57 @@
-import { asNumberIfValid, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, OptionSummary, Trade } from '../types.ts'
+import { BybitSpotBookChangeMapper, BybitSpotBookTickerMapper, BybitSpotTradesMapper } from './bybitspot.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
+
+const BYBIT_V5_API_SWITCH_DATE = new Date('2023-04-05T00:00:00.000Z')
+const BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE = new Date('2025-02-26T00:00:00.000Z')
+
+export const bybitMappers = exchangeMappers({
+  bybit: {
+    trades: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitTradesMapper('bybit') },
+      { use: () => new BybitV5TradesMapper('bybit') }
+    ]),
+    bookChanges: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitBookChangeMapper('bybit', { useBook200Channel: false }) },
+      { use: () => new BybitV5BookChangeMapper('bybit', { depth: 50 }) }
+    ]),
+    derivativeTickers: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitDerivativeTickerMapper() },
+      { use: () => new BybitV5DerivativeTickerMapper() }
+    ]),
+    liquidations: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitLiquidationsMapper('bybit') },
+      { until: BYBIT_V5_API_ALL_LIQUIDATION_SUPPORT_DATE, use: () => new BybitV5LiquidationsMapper('bybit') },
+      { use: () => new BybitV5AllLiquidationsMapper('bybit') }
+    ]),
+    bookTickers: () => new BybitV5BookTickerMapper('bybit')
+  },
+  'bybit-spot': {
+    trades: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitSpotTradesMapper('bybit-spot') },
+      { use: () => new BybitV5TradesMapper('bybit-spot') }
+    ]),
+    bookChanges: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitSpotBookChangeMapper('bybit-spot') },
+      { use: () => new BybitV5BookChangeMapper('bybit-spot', { depth: 50 }) }
+    ]),
+    bookTickers: mapper([
+      { until: BYBIT_V5_API_SWITCH_DATE, use: () => new BybitSpotBookTickerMapper('bybit-spot') },
+      { use: () => new BybitV5BookTickerMapper('bybit-spot') }
+    ])
+  },
+  'bybit-options': {
+    trades: () => new BybitV5TradesMapper('bybit-options'),
+    bookChanges: () => new BybitV5BookChangeMapper('bybit-options', { depth: 25 }),
+    optionsSummary: () => new BybitV5OptionSummaryMapper()
+  }
+})
 
 // v5 https://bybit-exchange.github.io/docs/v5/ws/connect
 
-export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', Trade> {
+class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BybitV5Trade) {
@@ -43,8 +90,15 @@ export class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'byb
   }
 }
 
-export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _depth: number) {}
+class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
+  private readonly _depth: number
+
+  constructor(
+    protected readonly _exchange: Exchange,
+    { depth }: { depth: number }
+  ) {
+    this._depth = depth
+  }
 
   canHandle(message: BybitV5OrderBookMessage) {
     if (message.topic === undefined) {
@@ -81,7 +135,7 @@ export class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 
   }
 }
 
-export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', BookTicker> {
+class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', BookTicker> {
   private _snapshots: {
     [key: string]: {
       askAmount: number | undefined
@@ -151,7 +205,7 @@ export class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', B
   }
 }
 
-export class BybitV5DerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
+class BybitV5DerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BybitV5DerivTickerMessage) {
@@ -210,7 +264,7 @@ export class BybitV5DerivativeTickerMapper implements Mapper<'bybit', Derivative
   }
 }
 
-export class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
+class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: BybitV5LiquidationMessage) {
     if (message.topic === undefined) {
@@ -251,7 +305,7 @@ export class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
   }
 }
 
-export class BybitV5AllLiquidationsMapper implements Mapper<'bybit', Liquidation> {
+class BybitV5AllLiquidationsMapper implements Mapper<'bybit', Liquidation> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: BybitV5AllLiquidationMessage) {
     if (message.topic === undefined) {
@@ -291,7 +345,7 @@ export class BybitV5AllLiquidationsMapper implements Mapper<'bybit', Liquidation
     }
   }
 }
-export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', OptionSummary> {
+class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', OptionSummary> {
   canHandle(message: BybitV5OptionTickerMessage) {
     if (message.topic === undefined) {
       return false
@@ -329,27 +383,27 @@ export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', Optio
       strikePrice,
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(message.data.bidPrice),
-      bestBidAmount: asNumberIfValid(message.data.bidSize),
-      bestBidIV: asNumberIfValid(message.data.bidIv),
+      bestBidPrice: asNonZeroNumberOrUndefined(message.data.bidPrice),
+      bestBidAmount: asNonZeroNumberOrUndefined(message.data.bidSize),
+      bestBidIV: asNonZeroNumberOrUndefined(message.data.bidIv),
 
-      bestAskPrice: asNumberIfValid(message.data.askPrice),
-      bestAskAmount: asNumberIfValid(message.data.askSize),
-      bestAskIV: asNumberIfValid(message.data.askIv),
+      bestAskPrice: asNonZeroNumberOrUndefined(message.data.askPrice),
+      bestAskAmount: asNonZeroNumberOrUndefined(message.data.askSize),
+      bestAskIV: asNonZeroNumberOrUndefined(message.data.askIv),
 
-      lastPrice: asNumberIfValid(message.data.lastPrice),
-      openInterest: asNumberIfValid(message.data.openInterest),
+      lastPrice: asNonZeroNumberOrUndefined(message.data.lastPrice),
+      openInterest: asNonZeroNumberOrUndefined(message.data.openInterest),
 
-      markPrice: asNumberIfValid(message.data.markPrice),
-      markIV: asNumberIfValid(message.data.markPriceIv),
+      markPrice: asNonZeroNumberOrUndefined(message.data.markPrice),
+      markIV: asNonZeroNumberOrUndefined(message.data.markPriceIv),
 
-      delta: asNumberIfValid(message.data.delta),
-      gamma: asNumberIfValid(message.data.gamma),
-      vega: asNumberIfValid(message.data.vega),
-      theta: asNumberIfValid(message.data.theta),
+      delta: asNonZeroNumberOrUndefined(message.data.delta),
+      gamma: asNonZeroNumberOrUndefined(message.data.gamma),
+      vega: asNonZeroNumberOrUndefined(message.data.vega),
+      theta: asNonZeroNumberOrUndefined(message.data.theta),
       rho: undefined,
 
-      underlyingPrice: asNumberIfValid(message.data.underlyingPrice),
+      underlyingPrice: asNonZeroNumberOrUndefined(message.data.underlyingPrice),
       underlyingIndex: '',
       timestamp: new Date(message.ts),
       localTimestamp: localTimestamp
@@ -361,7 +415,7 @@ export class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', Optio
 
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/en/websocket.md
 
-export class BybitTradesMapper implements Mapper<'bybit', Trade> {
+class BybitTradesMapper implements Mapper<'bybit', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -388,8 +442,8 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
         'trade_time_ms' in trade
           ? new Date(Number(trade.trade_time_ms))
           : 'tradeTimeMs' in trade
-          ? new Date(Number(trade.tradeTimeMs))
-          : new Date(trade.timestamp)
+            ? new Date(Number(trade.tradeTimeMs))
+            : new Date(trade.timestamp)
 
       yield {
         type: 'trade',
@@ -406,8 +460,15 @@ export class BybitTradesMapper implements Mapper<'bybit', Trade> {
   }
 }
 
-export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
-  constructor(protected readonly _exchange: Exchange, private readonly _canUseBook200Channel: boolean) {}
+class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
+  private readonly _canUseBook200Channel: boolean
+
+  constructor(
+    protected readonly _exchange: Exchange,
+    { useBook200Channel }: { useBook200Channel: boolean }
+  ) {
+    this._canUseBook200Channel = useBook200Channel
+  }
 
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -449,8 +510,8 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
         ? 'order_book' in message.data
           ? message.data.order_book
           : 'orderBook' in message.data
-          ? message.data.orderBook
-          : message.data
+            ? message.data.orderBook
+            : message.data
         : [...message.data.delete, ...message.data.update, ...message.data.insert]
 
     const timestampBybit = message.timestamp_e6 !== undefined ? Number(message.timestamp_e6) : Number(message.timestampE6)
@@ -474,7 +535,7 @@ export class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
   }
 }
 
-export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
+class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BybitDataMessage) {
@@ -572,7 +633,7 @@ export class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTi
   }
 }
 
-export class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
+class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: BybitDataMessage) {
     if (message.topic === undefined) {
@@ -858,16 +919,15 @@ type BybitInstrumentUpdate = {
   ask1Price: '21213.50'
 }
 
-type BybitInstrumentDataMessage =
-  | BybitDataMessage & {
-      timestamp_e6: string
-      timestampE6: string
-      data:
-        | BybitInstrumentUpdate
-        | {
-            update: [BybitInstrumentUpdate]
-          }
-    }
+type BybitInstrumentDataMessage = BybitDataMessage & {
+  timestamp_e6: string
+  timestampE6: string
+  data:
+    | BybitInstrumentUpdate
+    | {
+        update: [BybitInstrumentUpdate]
+      }
+}
 
 type BybitLiquidationMessage = BybitDataMessage & {
   generated: true

@@ -82,15 +82,18 @@ class Computables {
 }
 
 function createComputablesMap(computables: Computable<any>[]) {
-  return computables.reduce((acc, computable) => {
-    computable.sourceDataTypes.forEach((dataType) => {
-      const existing = acc[dataType]
-      if (!existing) {
-        acc[dataType] = [computable]
-      } else {
-        acc[dataType].push(computable)
-      }
-    })
-    return acc
-  }, {} as { [dataType: string]: Computable<any>[] })
+  return computables.reduce(
+    (acc, computable) => {
+      computable.sourceDataTypes.forEach((dataType) => {
+        const existing = acc[dataType]
+        if (!existing) {
+          acc[dataType] = [computable]
+        } else {
+          acc[dataType].push(computable)
+        }
+      })
+      return acc
+    },
+    {} as { [dataType: string]: Computable<any>[] }
+  )
 }

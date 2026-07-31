@@ -1,5 +1,14 @@
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { Trade, BookChange, DerivativeTicker } from '../types.ts'
+import { exchangeMappers } from './registry.ts'
+
+export const phemexMappers = exchangeMappers({
+  phemex: {
+    trades: () => phemexTradesMapper,
+    bookChanges: () => phemexBookChangeMapper,
+    derivativeTickers: () => new PhemexDerivativeTickerMapper()
+  }
+})
 
 // phemex provides timestamps in nanoseconds
 const fromNanoSecondsToDate = (nanos: number) => {
@@ -27,6 +36,14 @@ function getQtyScale(symbol: string) {
   return 1
 }
 
+function isExcludedFromNormalizedOutput(symbol: string) {
+  // Matches tardis-api metadata: Phemex spot OL/USDT uses sOLUSDT, which collides with SOLUSDT when normalized.
+  return symbol === 'sOLUSDT'
+}
+
+// Uppercase normalized spot symbols can be indistinguishable from native Phemex perpetual symbols.
+// Keep this list aligned with tardis-api and tardis-exporter so aliases such as SBTCUSDT can be
+// converted back to sBTCUSDT without changing native perpetual symbols such as SPKUSDT.
 const COINS_STARTING_WITH_S = [
   'SOLUSD',
   'SUSHIUSD',
@@ -40,6 +57,7 @@ const COINS_STARTING_WITH_S = [
   'STGUSD',
   'SLPUUSD',
   'SPELLUSD',
+  'SSVUSDT',
   'SSVUSD',
   'STXUSD',
   'SUIUSD',
@@ -85,14 +103,72 @@ const COINS_STARTING_WITH_S = [
   'STRKUSD',
   'SOLVUSD',
   'SPKUSDT',
-  'SAHARAUSDT'
+  'SAHARAUSDT',
+  'SOLAMIUSDT',
+  'SAPIENUSDT',
+  'SOMIUSDT',
+  'SKYUSDT',
+  'STBLUSDT',
+  'STABLEUSDT',
+  'SENTUSDT',
+  'SPORTFUNUSDT',
+  'SKRUSDT',
+  'SPACEUSDT',
+  'SPACEXUSDT',
+  'STARUSDT',
+  'SOXLUSDT',
+  'SPCXUSDT',
+  'SAMSUNGUSDT',
+  'SKHYNIXUSDT',
+  'SLXUSDT',
+  'SPX500USDT',
+  'STXXUSDT',
+  'SPYXUSDT',
+  'SP500USDT',
+  'SNDKUSDT',
+  'SKHYUSDT',
+  'SMCIUSDT',
+  'SONYUSDT',
+  'SQQQUSDT',
+  'STRCUSDT'
 ]
+
+// Phemex used the V2 `_p` channels for this short-lived, now delisted PerpetualPilot market family.
+// Exact casing matters: SIRENPUSD was a pilot, while sIRENPUSD was a separate spot instrument.
+const PERPETUAL_PILOT_SYMBOLS = new Set([
+  'ANGLERFISHPUSD',
+  'BNBCARDPUSD',
+  'BNBXBTPUSD',
+  'BUTTCOINPUSD',
+  'CRYPTOAIPUSD',
+  'CTDPUSD',
+  'DOGEAIPUSD',
+  'FULLSENDPUSD',
+  'GHIBLIPUSD',
+  'GREED3PUSD',
+  'IMGPUSD',
+  'MCPOSPUSD',
+  'PAINPUSD',
+  'PERRYPUSD',
+  'SIRENPUSD',
+  'TITCOINPUSD',
+  'TOLYPUSD',
+  'WILDNOUTPUSD'
+])
+
 function getInstrumentType(symbol: string) {
   if (/\d+$/.test(symbol)) {
     return 'future'
   }
 
-  if (COINS_STARTING_WITH_S.some((c) => symbol.startsWith(c)) || symbol.startsWith('S') === false) {
+  if (symbol.startsWith('s')) {
+    return 'spot'
+  }
+
+  if (
+    COINS_STARTING_WITH_S.some((coin) => (coin === 'SUSDT' ? symbol === coin : symbol.startsWith(coin))) ||
+    symbol.startsWith('S') === false
+  ) {
     return 'perpetual'
   }
 
@@ -100,6 +176,16 @@ function getInstrumentType(symbol: string) {
 }
 
 function getApiSymbolId(symbolId: string) {
+  // These are already exchange-native mixed-case identifiers.
+  if (symbolId.startsWith('s') || symbolId.startsWith('u100') || symbolId.startsWith('c')) {
+    return symbolId
+  }
+
+  // SIRENPUSD must not be mistaken for the uppercase alias of spot sIRENPUSD.
+  if (PERPETUAL_PILOT_SYMBOLS.has(symbolId)) {
+    return symbolId
+  }
+
   const type = getInstrumentType(symbolId)
   if (type === 'spot' && symbolId.startsWith('S')) {
     return symbolId.charAt(0).toLowerCase() + symbolId.slice(1)
@@ -115,17 +201,30 @@ function getApiSymbolId(symbolId: string) {
   return symbolId
 }
 
-function getSymbols(symbols: string[]) {
-  const perpV2Symbols = symbols.filter((s) => getInstrumentType(s) === 'perpetual' && s.endsWith('USDT')).map(getApiSymbolId)
-  const otherSymbols = symbols.filter((s) => getInstrumentType(s) !== 'perpetual' || s.endsWith('USDT') == false).map(getApiSymbolId)
+function splitSymbolsByChannelFamily(symbols: string[]) {
+  const v2Symbols: string[] = []
+  const legacySymbols: string[] = []
+
+  for (const symbol of symbols) {
+    const apiSymbolId = getApiSymbolId(symbol)
+    const usesV2Channels =
+      PERPETUAL_PILOT_SYMBOLS.has(apiSymbolId) ||
+      (getInstrumentType(symbol) === 'perpetual' && (apiSymbolId.endsWith('USDT') || apiSymbolId.endsWith('USDC')))
+
+    if (usesV2Channels) {
+      v2Symbols.push(apiSymbolId)
+    } else {
+      legacySymbols.push(apiSymbolId)
+    }
+  }
 
   return {
-    perpV2Symbols,
-    otherSymbols
+    v2Symbols,
+    legacySymbols
   }
 }
 
-export const phemexTradesMapper: Mapper<'phemex', Trade> = {
+const phemexTradesMapper: Mapper<'phemex', Trade> = {
   canHandle(message: PhemexTradeMessage) {
     return message.type === 'incremental' && ('trades' in message || 'trades_p' in message)
   },
@@ -142,20 +241,20 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
 
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'trades_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'trades',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 
@@ -163,10 +262,13 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
   },
 
   *map(message: PhemexTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+    const symbol = message.symbol
+    if (isExcludedFromNormalizedOutput(symbol)) {
+      return
+    }
+
     if ('trades' in message) {
       for (const [timestamp, side, priceEp, qty] of message.trades) {
-        const symbol = message.symbol
-
         yield {
           type: 'trade',
           symbol: symbol.toUpperCase(),
@@ -181,8 +283,6 @@ export const phemexTradesMapper: Mapper<'phemex', Trade> = {
       }
     } else if ('trades_p' in message) {
       for (const [timestamp, side, price, qty] of message.trades_p) {
-        const symbol = message.symbol
-
         yield {
           type: 'trade',
           symbol: symbol.toUpperCase(),
@@ -215,7 +315,7 @@ function mapPerpBookLevel([price, amount]: [string, string]) {
   }
 }
 
-export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
+const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   canHandle(message: PhemexBookMessage) {
     return 'book' in message || 'orderbook_p' in message
   },
@@ -232,19 +332,19 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'orderbook_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'book',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 
@@ -253,6 +353,10 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
 
   *map(message: PhemexBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const symbol = message.symbol
+    if (isExcludedFromNormalizedOutput(symbol)) {
+      return
+    }
+
     if ('book' in message) {
       const mapBookLevel = mapBookLevelForSymbol(symbol)
       yield {
@@ -281,7 +385,7 @@ export const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
   }
 }
 
-export class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker> {
+class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: PhemexTicker) {
@@ -300,19 +404,19 @@ export class PhemexDerivativeTickerMapper implements Mapper<'phemex', Derivative
       ]
     }
 
-    const { perpV2Symbols, otherSymbols } = getSymbols(symbols)
+    const { v2Symbols, legacySymbols } = splitSymbolsByChannelFamily(symbols)
     const filters = []
 
-    if (perpV2Symbols.length > 0) {
+    if (v2Symbols.length > 0) {
       filters.push({
         channel: 'perp_market24h_pack_p',
-        symbols: perpV2Symbols
+        symbols: v2Symbols
       } as const)
     }
-    if (otherSymbols.length > 0) {
+    if (legacySymbols.length > 0) {
       filters.push({
         channel: 'market24h',
-        symbols: otherSymbols
+        symbols: legacySymbols
       } as const)
     }
 

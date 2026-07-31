@@ -33,6 +33,7 @@ export const EXCHANGES = [
   'ftx-us',
   'binance-us',
   'gate-io-futures',
+  'mexc-futures',
   'gate-io',
   'okcoin',
   'bitflyer',
@@ -56,7 +57,11 @@ export const EXCHANGES = [
   'blockchain-com',
   'bitget',
   'bitget-futures',
-  'hyperliquid'
+  'hyperliquid',
+  'lighter',
+  'bullish',
+  'mexc',
+  'polymarket'
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
@@ -122,7 +127,7 @@ const DERIBIT_CHANNELS = [
   'instrument.state.any'
 ] as const
 
-const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread'] as const
+const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread', 'instrument'] as const
 
 const OKEX_CHANNELS = [
   'spot/trade',
@@ -290,7 +295,7 @@ const FTX_CHANNELS = [
   'busy'
 ] as const
 
-const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result'] as const
+const GEMINI_CHANNELS = ['trade', 'l2_updates', 'auction_open', 'auction_indicative', 'auction_result', 'depth', 'bookTicker'] as const
 
 const BITFLYER_CHANNELS = ['lightning_executions', 'lightning_board_snapshot', 'lightning_board', 'lightning_ticker'] as const
 
@@ -300,6 +305,8 @@ const BINANCE_FUTURES_CHANNELS = [
   'ticker',
   'depth',
   'markPrice',
+  'premiumIndex',
+  'indexConstituents',
   'depthSnapshot',
   'bookTicker',
   'forceOrder',
@@ -431,6 +438,16 @@ const DELTA_CHANNELS = [
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
+const MEXC_FUTURES_CHANNELS = [
+  'push.deal',
+  'push.depth',
+  'push.depth.snapshot',
+  'push.ticker',
+  'push.index.price',
+  'push.fair.price',
+  'push.funding.rate',
+  'push.contract'
+] as const
 const POLONIEX_CHANNELS = ['price_aggregated_book', 'trades', 'ticker', 'book_lv2'] as const
 const UPBIT_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 const ASCENDEX_CHANNELS = ['trades', 'depth-realtime', 'depth-snapshot-realtime', 'bbo', 'futures-pricing-data'] as const
@@ -514,11 +531,33 @@ const KUCOIN_FUTURES_CHANNELS = [
   'contractMarket/snapshot'
 ]
 
-const BITGET_CHANNELS = ['trade', 'books1', 'books15']
-const BITGET_FUTURES_CHANNELS = ['trade', 'books1', 'books15', 'ticker']
+const BITGET_CHANNELS = ['trade', 'publicTrade', 'books1', 'books15', 'books']
+const BITGET_FUTURES_CHANNELS = ['trade', 'publicTrade', 'books1', 'books15', 'books', 'ticker', 'liquidation']
 const COINBASE_INTERNATIONAL_CHANNELS = ['INSTRUMENTS', 'MATCH', 'FUNDING', 'RISK', 'LEVEL1', 'LEVEL2', 'CANDLES_ONE_MINUTE']
 
-const HYPERLIQUID_CHANNELS = ['l2Book', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']
+const HYPERLIQUID_CHANNELS = ['l2Book', 'fastBook', 'trades', 'activeAssetCtx', 'activeSpotAssetCtx', 'bbo']
+
+const LIGHTER_CHANNELS = ['order_book', 'trade', 'ticker', 'market_stats', 'spot_market_stats'] as const
+
+const BULLISH_CHANNELS = ['V1TALevel2', 'V1TALevel1', 'V1TAAnonymousTradeUpdate', 'V1TATickerResponse', 'V1TAIndexPrice'] as const
+
+const MEXC_CHANNELS = [
+  'spot@public.aggre.deals.v3.api.pb@10ms',
+  'spot@public.aggre.depth.v3.api.pb@10ms',
+  'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
+  'spot@public.aggre.bookTicker.v3.api.pb@10ms'
+] as const
+
+const POLYMARKET_CHANNELS = [
+  'book',
+  'price_change',
+  'last_trade_price',
+  'best_bid_ask',
+  'tick_size_change',
+  'sport_result',
+  'new_market',
+  'market_resolved'
+] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
   aster: ASTER_CHANNELS,
@@ -559,6 +598,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   delta: DELTA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
+  'mexc-futures': MEXC_FUTURES_CHANNELS,
   poloniex: POLONIEX_CHANNELS,
   upbit: UPBIT_CHANNELS,
   ascendex: ASCENDEX_CHANNELS,
@@ -578,5 +618,9 @@ export const EXCHANGE_CHANNELS_INFO = {
   'kucoin-futures': KUCOIN_FUTURES_CHANNELS,
   bitget: BITGET_CHANNELS,
   'bitget-futures': BITGET_FUTURES_CHANNELS,
-  hyperliquid: HYPERLIQUID_CHANNELS
+  hyperliquid: HYPERLIQUID_CHANNELS,
+  lighter: LIGHTER_CHANNELS,
+  bullish: BULLISH_CHANNELS,
+  mexc: MEXC_CHANNELS,
+  polymarket: POLYMARKET_CHANNELS
 }

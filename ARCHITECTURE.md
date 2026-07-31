@@ -13,18 +13,20 @@ Main Thread                         Worker Thread
   │                                     │
   │── Start replay ──→                  │
   │                         Fetch data slice from API
-  │                         Cache to disk (.gz file)
-  │  ←── message (sliceKey, path) ──    │
+  │                         Cache to disk (.gz/.zst file)
+  │  ←── message (sliceKey, path, size) ──
   │                         Fetch next slice...
   │                                     │
   Read cached file from disk            │
-  Decompress (gunzip)                   │
-  Split by newlines                     │
+  Decompress (gzip/zstd)                │
+  Split by newlines into batches        │
   Parse JSON messages                   │
   Yield {localTimestamp, message}       │
 ```
 
-Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined.
+Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename.
+
+`replay()` decodes one line batch at a time and still yields individual public messages in order. `replayNormalized()` consumes the same internal line batches directly, avoiding an intermediate per-message raw iterator while keeping mapper invocation lazy. This preserves async-iterator backpressure for built-in and custom normalizers while the stream's high-water mark keeps splitter read-ahead small.
 
 ## Real-time Streaming
 
@@ -32,9 +34,9 @@ Worker thread pre-fetches and caches slices while the main thread processes the 
 
 ## Mapper System
 
-Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange has mapper classes registered in `src/mappers/index.ts`.
+Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange defines its mapper registry next to its mapper classes in `src/mappers/{exchange}.ts`; `src/mappers/index.ts` aggregates those registries for the public normalizers.
 
-Some exchanges have date-based mapper versioning — different mapper implementations for different time periods when the exchange changed its API format.
+Some exchanges have date-based mapper versioning through `mapper()` entries — different mapper implementations for different time periods when the exchange changed its API format.
 
 ## Key Abstractions
 
@@ -44,4 +46,4 @@ Some exchanges have date-based mapper versioning — different mapper implementa
 
 ## Configuration
 
-Exchange definitions and channel info in `src/consts.ts`. Mapper and feed registrations in their respective `index.ts` files.
+Exchange definitions and channel info in `src/consts.ts`. Mapper registries live in each exchange mapper file and are aggregated by `src/mappers/index.ts`; feed registrations live in `src/realtimefeeds/index.ts`.

@@ -1,8 +1,18 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
-export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
+export const ascendexMappers = exchangeMappers({
+  ascendex: {
+    trades: () => new AscendexTradesMapper(),
+    bookChanges: () => new AscendexBookChangeMapper(),
+    derivativeTickers: () => new AscendexDerivativeTickerMapper(),
+    bookTickers: () => new AscendexBookTickerMapper()
+  }
+})
+
+class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   canHandle(message: AscendexTrade) {
     return message.m === 'trades'
   }
@@ -34,7 +44,7 @@ export class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
   }
 }
 
-export class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> {
+class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> {
   canHandle(message: AscendexDepthRealTime | AscendexDepthRealTimeSnapshot) {
     return message.m === 'depth-realtime' || message.m === 'depth-snapshot-realtime'
   }
@@ -77,7 +87,7 @@ export class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> 
   }
 }
 
-export class AscendexDerivativeTickerMapper implements Mapper<'ascendex', DerivativeTicker> {
+class AscendexDerivativeTickerMapper implements Mapper<'ascendex', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: AscendexFuturesData | AscendexTrade) {
@@ -122,7 +132,7 @@ export class AscendexDerivativeTickerMapper implements Mapper<'ascendex', Deriva
   }
 }
 
-export class AscendexBookTickerMapper implements Mapper<'ascendex', BookTicker> {
+class AscendexBookTickerMapper implements Mapper<'ascendex', BookTicker> {
   canHandle(message: AscendexTicker) {
     return message.m === 'bbo'
   }

@@ -1,10 +1,18 @@
 import { upperCaseSymbols } from '../handy.ts'
 import { BookChange, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
+import { exchangeMappers } from './registry.ts'
 
 // https://api.hitbtc.com/#socket-market-data
 
-export const hitBtcTradesMapper: Mapper<'hitbtc', Trade> = {
+export const hitBtcMappers = exchangeMappers({
+  hitbtc: {
+    trades: () => hitBtcTradesMapper,
+    bookChanges: () => hitBtcBookChangeMapper
+  }
+})
+
+const hitBtcTradesMapper: Mapper<'hitbtc', Trade> = {
   canHandle(message: HitBtcTradesMessage) {
     return message.method !== undefined && message.method === 'updateTrades'
   },
@@ -43,7 +51,7 @@ const mapBookLevel = (level: HitBtcBookLevel) => {
   return { price, amount }
 }
 
-export const hitBtcBookChangeMapper: Mapper<'hitbtc', BookChange> = {
+const hitBtcBookChangeMapper: Mapper<'hitbtc', BookChange> = {
   canHandle(message: HitBtcBookMessage) {
     if (message.method === undefined) {
       return false

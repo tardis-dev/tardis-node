@@ -1,13 +1,51 @@
-import { asNumberIfValid, CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Exchange, FilterForExchange, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://huobiapi.github.io/docs/spot/v1/en/#websocket-market-data
 // https://github.com/huobiapi/API_Docs_en/wiki/WS_api_reference_en
 
-export class HuobiTradesMapper
-  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', Trade>
-{
+const HUOBI_MBP_BOOK_CHANGE_SWITCH_DATE = new Date('2020-07-03T00:00:00.000Z')
+
+export const huobiMappers = exchangeMappers({
+  huobi: {
+    trades: () => new HuobiTradesMapper('huobi'),
+    bookChanges: mapper([
+      { until: HUOBI_MBP_BOOK_CHANGE_SWITCH_DATE, use: () => new HuobiBookChangeMapper('huobi') },
+      { use: () => new HuobiMBPBookChangeMapper('huobi') }
+    ]),
+    bookTickers: () => new HuobiBookTickerMapper('huobi')
+  },
+  'huobi-dm': {
+    trades: () => new HuobiTradesMapper('huobi-dm'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm')
+  },
+  'huobi-dm-swap': {
+    trades: () => new HuobiTradesMapper('huobi-dm-swap'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-swap'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm-swap'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm-swap'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm-swap')
+  },
+  'huobi-dm-linear-swap': {
+    trades: () => new HuobiTradesMapper('huobi-dm-linear-swap'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-linear-swap'),
+    derivativeTickers: () => new HuobiDerivativeTickerMapper('huobi-dm-linear-swap'),
+    liquidations: () => new HuobiLiquidationsMapper('huobi-dm-linear-swap'),
+    bookTickers: () => new HuobiBookTickerMapper('huobi-dm-linear-swap')
+  },
+  'huobi-dm-options': {
+    trades: () => new HuobiTradesMapper('huobi-dm-options'),
+    bookChanges: () => new HuobiBookChangeMapper('huobi-dm-options'),
+    optionsSummary: () => new HuobiOptionsSummaryMapper()
+  }
+})
+
+class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', Trade> {
   constructor(private readonly _exchange: Exchange) {}
   canHandle(message: HuobiDataMessage) {
     if (message.ch === undefined) {
@@ -46,9 +84,10 @@ export class HuobiTradesMapper
   }
 }
 
-export class HuobiBookChangeMapper
-  implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options', BookChange>
-{
+class HuobiBookChangeMapper implements Mapper<
+  'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap' | 'huobi-dm-options',
+  BookChange
+> {
   constructor(protected readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {
@@ -101,7 +140,7 @@ function isSnapshot(message: HuobiMBPDataMessage | HuobiMBPSnapshot): message is
   return 'rep' in message
 }
 
-export class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
+class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
   protected readonly symbolToMBPInfoMapping: {
     [key: string]: MBPInfo
   } = {}
@@ -241,7 +280,7 @@ function normalizeSymbols(symbols?: string[]) {
   return
 }
 
-export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
+class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   constructor(private readonly _exchange: Exchange) {}
@@ -322,7 +361,7 @@ export class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-d
   }
 }
 
-export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Liquidation> {
+class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', Liquidation> {
   private readonly _contractCodeToSymbolMap: Map<string, string> = new Map()
   private readonly _contractTypesSuffixes = { this_week: 'CW', next_week: 'NW', quarter: 'CQ', next_quarter: 'NQ' }
 
@@ -410,7 +449,7 @@ export class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-sw
   }
 }
 
-export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSummary> {
+class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSummary> {
   private readonly _indexPrices = new Map<string, number>()
   private readonly _openInterest = new Map<string, number>()
 
@@ -487,26 +526,26 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
       strikePrice: Number(symbolParts[4]),
       expirationDate,
 
-      bestBidPrice: asNumberIfValid(marketIndexMessage.data.bid_one),
+      bestBidPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.bid_one),
 
       bestBidAmount: undefined,
-      bestBidIV: asNumberIfValid(marketIndexMessage.data.iv_bid_one),
+      bestBidIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_bid_one),
 
-      bestAskPrice: asNumberIfValid(marketIndexMessage.data.ask_one),
+      bestAskPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.ask_one),
       bestAskAmount: undefined,
-      bestAskIV: asNumberIfValid(marketIndexMessage.data.iv_ask_one),
+      bestAskIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_ask_one),
 
-      lastPrice: asNumberIfValid(marketIndexMessage.data.last_price),
+      lastPrice: asNonZeroNumberOrUndefined(marketIndexMessage.data.last_price),
 
       openInterest,
 
-      markPrice: marketIndexMessage.data.mark_price > 0 ? asNumberIfValid(marketIndexMessage.data.mark_price) : undefined,
-      markIV: asNumberIfValid(marketIndexMessage.data.iv_mark_price),
+      markPrice: marketIndexMessage.data.mark_price > 0 ? asNonZeroNumberOrUndefined(marketIndexMessage.data.mark_price) : undefined,
+      markIV: asNonZeroNumberOrUndefined(marketIndexMessage.data.iv_mark_price),
 
-      delta: asNumberIfValid(marketIndexMessage.data.delta),
-      gamma: asNumberIfValid(marketIndexMessage.data.gamma),
-      vega: asNumberIfValid(marketIndexMessage.data.vega),
-      theta: asNumberIfValid(marketIndexMessage.data.theta),
+      delta: asNonZeroNumberOrUndefined(marketIndexMessage.data.delta),
+      gamma: asNonZeroNumberOrUndefined(marketIndexMessage.data.gamma),
+      vega: asNonZeroNumberOrUndefined(marketIndexMessage.data.vega),
+      theta: asNonZeroNumberOrUndefined(marketIndexMessage.data.theta),
       rho: undefined,
 
       underlyingPrice: lastUnderlyingPrice,
@@ -520,7 +559,7 @@ export class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', Opt
   }
 }
 
-export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookTicker> {
+class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', BookTicker> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: HuobiDataMessage) {
@@ -553,11 +592,11 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         symbol,
         exchange: this._exchange,
 
-        askAmount: asNumberIfValid(message.tick.askSize),
-        askPrice: asNumberIfValid(message.tick.ask),
+        askAmount: asNonZeroNumberOrUndefined(message.tick.askSize),
+        askPrice: asNonZeroNumberOrUndefined(message.tick.ask),
 
-        bidPrice: asNumberIfValid(message.tick.bid),
-        bidAmount: asNumberIfValid(message.tick.bidSize),
+        bidPrice: asNonZeroNumberOrUndefined(message.tick.bid),
+        bidAmount: asNonZeroNumberOrUndefined(message.tick.bidSize),
         timestamp: new Date(message.tick.quoteTime),
         localTimestamp: localTimestamp
       }
@@ -567,11 +606,11 @@ export class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huo
         symbol,
         exchange: this._exchange,
 
-        askAmount: message.tick.ask !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.ask[1]) : undefined,
-        askPrice: message.tick.ask !== undefined && message.tick.ask !== null ? asNumberIfValid(message.tick.ask[0]) : undefined,
+        askAmount: asNonZeroNumberOrUndefined(message.tick.ask?.[1]),
+        askPrice: asNonZeroNumberOrUndefined(message.tick.ask?.[0]),
 
-        bidPrice: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[0]) : undefined,
-        bidAmount: message.tick.bid !== undefined && message.tick.bid !== null ? asNumberIfValid(message.tick.bid[1]) : undefined,
+        bidPrice: asNonZeroNumberOrUndefined(message.tick.bid?.[0]),
+        bidAmount: asNonZeroNumberOrUndefined(message.tick.bid?.[1]),
         timestamp: new Date(message.tick.ts),
         localTimestamp: localTimestamp
       }
