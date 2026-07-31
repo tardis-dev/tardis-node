@@ -142,7 +142,7 @@ class AsterBookChangeMapper implements Mapper<'aster', BookChange> {
 
     if (!depthContext.validatedFirstUpdate) {
       if (
-        (depthUpdateData.U <= depthContext.lastUpdateId! + 1 && depthUpdateData.u >= depthContext.lastUpdateId! + 1) ||
+        (depthUpdateData.pu <= depthContext.lastUpdateId! && depthUpdateData.u >= depthContext.lastUpdateId!) ||
         depthContext.lastUpdateId! == -1
       ) {
         depthContext.validatedFirstUpdate = true
@@ -155,7 +155,15 @@ class AsterBookChangeMapper implements Mapper<'aster', BookChange> {
           )}, lastUpdateId: ${depthContext.lastUpdateId!}, exchange aster`
         )
       }
+    } else if (depthUpdateData.pu !== depthContext.lastUpdateId!) {
+      throw new Error(
+        `Book depth update has a sequence gap, update ${JSON.stringify(
+          depthUpdateData
+        )}, lastUpdateId: ${depthContext.lastUpdateId!}, exchange aster`
+      )
     }
+
+    depthContext.lastUpdateId = depthUpdateData.u
 
     return {
       type: 'book_change',

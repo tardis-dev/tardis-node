@@ -2630,7 +2630,7 @@ describe('mappers', () => {
   })
 
   test('map aster messages', () => {
-    const asterMapper = createMapper('aster', new Date('2026-07-29T00:00:00.000Z'))
+    const asterMapper = createMapper('aster', new Date())
     const localTimestamp = new Date('2026-07-29T00:00:01.000Z')
 
     expect(
@@ -2700,8 +2700,8 @@ describe('mappers', () => {
             E: 1591261236100,
             T: 1591261236099,
             s: 'BTCUSDT',
-            U: 101,
-            u: 102,
+            U: 120,
+            u: 122,
             pu: 100,
             b: [['5.1', '3']],
             a: [['5.3', '4']]
@@ -2722,6 +2722,58 @@ describe('mappers', () => {
       }
     ])
 
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1591261236200,
+            T: 1591261236199,
+            s: 'BTCUSDT',
+            U: 130,
+            u: 131,
+            pu: 122,
+            b: [['5.4', '6']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        isSnapshot: false,
+        bids: [{ price: 5.4, amount: 6 }],
+        asks: [],
+        timestamp: new Date('2020-06-04T09:00:36.200Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(() =>
+      Array.from(
+        asterMapper.map(
+          {
+            stream: 'btcusdt@depth@100ms',
+            data: {
+              e: 'depthUpdate',
+              E: 1591261236300,
+              T: 1591261236299,
+              s: 'BTCUSDT',
+              U: 140,
+              u: 141,
+              pu: 129,
+              b: [],
+              a: []
+            }
+          },
+          localTimestamp
+        )!
+      )
+    ).toThrow('Book depth update has a sequence gap')
     expect(
       asterMapper.map(
         {
