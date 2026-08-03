@@ -1,4 +1,4 @@
-import { CircularBuffer, lowerCaseSymbols } from '../handy.ts'
+import { asNumberOrUndefined, CircularBuffer, lowerCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -198,10 +198,10 @@ class AsterBookTickerMapper implements Mapper<'aster', BookTicker> {
       type: 'book_ticker',
       symbol: data.s,
       exchange: 'aster',
-      askAmount: data.A !== undefined ? Number(data.A) : undefined,
-      askPrice: data.a !== undefined ? Number(data.a) : undefined,
-      bidPrice: data.b !== undefined ? Number(data.b) : undefined,
-      bidAmount: data.B !== undefined ? Number(data.B) : undefined,
+      askAmount: asNumberOrUndefined(data.A),
+      askPrice: asNumberOrUndefined(data.a),
+      bidPrice: asNumberOrUndefined(data.b),
+      bidAmount: asNumberOrUndefined(data.B),
       timestamp: data.E !== undefined ? new Date(data.E) : localTimestamp,
       localTimestamp
     }
