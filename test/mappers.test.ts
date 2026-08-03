@@ -10,6 +10,7 @@ import {
 } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'aster-futures',
   'bitmex',
   'binance-futures',
   'bitfinex-derivatives',
@@ -43,6 +44,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithBookTickerInfo: Exchange[] = [
   'aster',
+  'aster-futures',
   'ascendex',
   'binance',
   'binance-futures',
@@ -100,6 +102,7 @@ const exchangesWithOptionsSummary: Exchange[] = [
 ]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
+  'aster-futures',
   'ftx',
   'bitmex',
   'deribit',
@@ -2803,6 +2806,298 @@ describe('mappers', () => {
       }
     ])
   })
+
+  test('map aster futures messages', () => {
+    const asterFuturesMapper = createMapper('aster-futures', new Date())
+    const localTimestamp = new Date('2026-08-03T10:00:00.000Z')
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@aggTrade',
+          data: {
+            e: 'aggTrade',
+            E: 1568693103463,
+            s: 'BTCUSDT',
+            a: 181349,
+            p: '10223.74',
+            q: '0.236',
+            f: 181349,
+            l: 181349,
+            T: 1568693103463,
+            m: false
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        id: '181349',
+        price: 10223.74,
+        amount: 0.236,
+        side: 'buy',
+        timestamp: new Date('2019-09-17T04:05:03.463Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948821952,
+            T: 1573948821948,
+            s: 'BTCUSDT',
+            U: 687687944,
+            u: 687687946,
+            pu: 687687943,
+            b: [['8493.78', '0.162']],
+            a: [['4096.00000000', '2.42541900']]
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 687687945,
+            bids: [['8488.36', '1.501']],
+            asks: [['4096.00000000', '1.42541900']]
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        isSnapshot: true,
+        bids: [
+          { price: 8488.36, amount: 1.501 },
+          { price: 8493.78, amount: 0.162 }
+        ],
+        asks: [{ price: 4096, amount: 2.425419 }],
+        timestamp: localTimestamp,
+        localTimestamp
+      }
+    ])
+
+    const asterFuturesOverlapEdgeMapper = createMapper('aster-futures', new Date())
+    expect(
+      asterFuturesOverlapEdgeMapper.map(
+        {
+          stream: 'ethusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 200,
+            bids: [['10', '1']],
+            asks: [['11', '2']]
+          }
+        },
+        localTimestamp
+      )
+    ).toHaveLength(1)
+    expect(
+      asterFuturesOverlapEdgeMapper.map(
+        {
+          stream: 'ethusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948821952,
+            T: 1573948821948,
+            s: 'ETHUSDT',
+            U: 199,
+            u: 200,
+            pu: 198,
+            b: [['10', '3']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'ETHUSDT',
+        exchange: 'aster-futures',
+        isSnapshot: false,
+        bids: [{ price: 10, amount: 3 }],
+        asks: [],
+        timestamp: new Date('2019-11-17T00:00:21.952Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948822952,
+            T: 1573948822948,
+            s: 'BTCUSDT',
+            U: 687687947,
+            u: 687687948,
+            pu: 687687946,
+            b: [['8493.78', '0']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        isSnapshot: false,
+        bids: [{ price: 8493.78, amount: 0 }],
+        asks: [],
+        timestamp: new Date('2019-11-17T00:00:22.952Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@markPrice@1s',
+          data: {
+            e: 'markPriceUpdate',
+            E: 1597536008000,
+            s: 'BTCUSDT',
+            p: '11857.56000000',
+            i: '11851.86949091',
+            r: '0.00015640',
+            T: 1597564800000
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'derivative_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        lastPrice: undefined,
+        openInterest: undefined,
+        fundingRate: 0.0001564,
+        fundingTimestamp: new Date('2020-08-16T08:00:00.000Z'),
+        predictedFundingRate: undefined,
+        indexPrice: 11851.86949091,
+        markPrice: 11857.56,
+        timestamp: new Date('2020-08-16T00:00:08.000Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@ticker',
+          data: { e: '24hrTicker', E: 1568693103467, s: 'BTCUSDT', c: '10223.74' }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'derivative_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        lastPrice: 10223.74,
+        openInterest: undefined,
+        fundingRate: 0.0001564,
+        fundingTimestamp: new Date('2020-08-16T08:00:00.000Z'),
+        predictedFundingRate: undefined,
+        indexPrice: 11851.86949091,
+        markPrice: 11857.56,
+        timestamp: new Date('2020-08-16T00:00:08.000Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@forceOrder',
+          data: {
+            e: 'forceOrder',
+            E: 1584059031426,
+            o: {
+              s: 'BTCUSDT',
+              S: 'BUY',
+              o: 'LIMIT',
+              f: 'IOC',
+              q: '0.014',
+              p: '4793.91',
+              ap: '4706.04',
+              X: 'FILLED',
+              l: '0.015',
+              z: '0.014',
+              T: 1584059031421
+            }
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'liquidation',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        id: undefined,
+        price: 4793.91,
+        amount: 0.014,
+        side: 'buy',
+        timestamp: new Date('2020-03-13T00:23:51.421Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@bookTicker',
+          data: {
+            e: 'bookTicker',
+            u: 185130926750,
+            s: 'BTCUSDT',
+            b: '33134.42',
+            B: '0.170',
+            a: '33139.39',
+            A: '0.380',
+            E: 1612137603571
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'aster-futures',
+        askAmount: 0.38,
+        askPrice: 33139.39,
+        bidPrice: 33134.42,
+        bidAmount: 0.17,
+        timestamp: new Date('2021-02-01T00:00:03.571Z'),
+        localTimestamp
+      }
+    ])
+  })
+
   test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
     const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
     const mappedMessages = bitfinexDerivativesMapper.map(

@@ -1,5 +1,6 @@
 import { BookChange, BookTicker, DerivativeTicker, Exchange, Liquidation, NormalizedData, OptionSummary, Trade } from '../types.ts'
 import { ascendexMappers } from './ascendex.ts'
+import { asterFuturesMappers } from './asterfutures.ts'
 import { asterMappers } from './aster.ts'
 import { binanceMappers } from './binance.ts'
 import { binanceDexMappers } from './binancedex.ts'
@@ -56,6 +57,7 @@ type Normalizer<M extends MapperCollection, U extends NormalizedData> = (<T exte
 
 const registeredMappers = mergeExchangeMappers(
   ascendexMappers,
+  asterFuturesMappers,
   asterMappers,
   binanceMappers,
   binanceDexMappers,

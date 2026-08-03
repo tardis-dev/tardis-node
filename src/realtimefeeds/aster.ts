@@ -3,9 +3,9 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class AsterRealTimeFeed extends RealTimeFeedBase {
-  protected readonly wssURL = 'wss://sstream.asterdex.com/stream'
-  protected readonly httpURL = 'https://sapi.asterdex.com/api/v3'
-  private readonly channelMappings: { [key: string]: string | undefined } = {
+  protected readonly wssURL: string = 'wss://sstream.asterdex.com/stream'
+  protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
     depth: 'depth@100ms'
   }
 
@@ -77,5 +77,14 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
     }
 
     this.debug('requested all manual snapshots successfully')
+  }
+}
+
+export class AsterFuturesRealTimeFeed extends AsterRealTimeFeed {
+  protected readonly wssURL = 'wss://fstream.asterdex.com/stream'
+  protected readonly httpURL = 'https://fapi.asterdex.com/fapi/v1'
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
+    depth: 'depth@100ms',
+    markPrice: 'markPrice@1s'
   }
 }
