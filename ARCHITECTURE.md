@@ -42,7 +42,7 @@ Some exchanges have date-based mapper versioning through `mapper()` entries — 
 
 - **`combine()`** — Merges multiple async iterables into one, ordered by timestamp. Enables cross-exchange data feeds.
 - **`compute()`** — Wraps an async iterable and produces derived data (book snapshots, trade bars) via computables.
-- **`OrderBook`** — Full limit order book reconstruction from incremental updates, using a Red-Black Tree for efficient price level management.
+- **`OrderBook`** — Full limit order book reconstruction from incremental updates, using sorted price-level pages for efficient lookup, updates, and top-of-book iteration.
 
 ## Configuration
 
