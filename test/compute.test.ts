@@ -222,6 +222,69 @@ describe('compute(messages, types)', () => {
     expect(bufferedMessages).toMatchSnapshot()
   })
 
+  test('keeps price levels isolated between shared book snapshot computables', async () => {
+    const messages = async function* (): AsyncIterableIterator<BookChange> {
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: true,
+        asks: [{ price: 101, amount: 2 }],
+        bids: [{ price: 100, amount: 1 }],
+        localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
+        timestamp: new Date('2019-08-01T00:00:00.132Z'),
+        symbol: 'XBTUSD'
+      }
+    }
+
+    const computed = compute(
+      messages(),
+      computeBookSnapshots({ depth: 1, interval: 0, name: 'depth_1' }),
+      computeBookSnapshots({ depth: 2, interval: 0, name: 'depth_2' })
+    )
+    let depth1BestBid: object | undefined
+
+    for await (const message of computed) {
+      if (message.type !== 'book_snapshot') continue
+
+      if (message.name === 'depth_1') {
+        depth1BestBid = message.bids[0]
+        ;(depth1BestBid as any).amount = 999
+      } else {
+        expect(message.bids[0]).not.toBe(depth1BestBid)
+        expect(message.bids[0].amount).toBe(1)
+      }
+    }
+  })
+
+  test('does not pass shared context to custom computable factories', async () => {
+    let factoryArgumentsCount = -1
+    const customFactory = function () {
+      factoryArgumentsCount = arguments.length
+      return {
+        sourceDataTypes: [],
+        *compute() {}
+      }
+    }
+    const messages = async function* (): AsyncIterableIterator<BookChange> {
+      yield {
+        type: 'book_change',
+        exchange: 'bitmex',
+        isSnapshot: true,
+        asks: [],
+        bids: [],
+        localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
+        timestamp: new Date('2019-08-01T00:00:00.132Z'),
+        symbol: 'XBTUSD'
+      }
+    }
+
+    for await (const _ of compute(messages(), customFactory)) {
+      // drain the iterator so the factory is created
+    }
+
+    expect(factoryArgumentsCount).toBe(0)
+  })
+
   test('should produce correct trade bars based on provided messages', async () => {
     let messages = async function* (): AsyncIterableIterator<Trade> {
       yield {

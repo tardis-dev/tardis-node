@@ -1,4 +1,5 @@
 import { Disconnect, Exchange, NormalizedData } from '../types.ts'
+import { ComputableContext, createWithContext } from './context.ts'
 
 export type Computable<T extends NormalizedData> = {
   readonly sourceDataTypes: string[]
@@ -70,7 +71,10 @@ class Computables {
     }
 
     if (this._computables[exchange]![id] === undefined) {
-      this._computables[exchange]![id] = createComputablesMap(this._computablesFactories.map((c) => c()))
+      const context: ComputableContext = new Map()
+      this._computables[exchange]![id] = createComputablesMap(
+        this._computablesFactories.map((factory) => createWithContext(factory, context))
+      )
     }
 
     return this._computables[exchange]![id]!

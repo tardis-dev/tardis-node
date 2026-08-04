@@ -2,6 +2,7 @@ import { decimalPlaces } from '../handy.ts'
 import { OrderBook, OnLevelRemovedCB } from '../orderbook.ts'
 import { BookChange, BookPriceLevel, BookSnapshot, Optional } from '../types.ts'
 import { Computable } from './computable.ts'
+import { ComputableContext, registerContextualFactory } from './context.ts'
 
 type BookSnapshotComputableOptions = {
   name?: string
@@ -12,10 +13,18 @@ type BookSnapshotComputableOptions = {
   onCrossedLevelRemoved?: OnLevelRemovedCB
 }
 
-export const computeBookSnapshots =
-  (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) =>
-  () =>
-    new BookSnapshotComputable(options)
+export const computeBookSnapshots = (options: BookSnapshotComputableOptions): (() => Computable<BookSnapshot>) => {
+  const factory = () => new BookSnapshotComputable(options)
+  registerContextualFactory(factory, (context) => new BookSnapshotComputable(options, context))
+  return factory
+}
+
+type OrderBookHandle = {
+  orderBook: OrderBook
+  isOwner: boolean
+}
+
+const sharedOrderBooksKey = Symbol('bookSnapshotOrderBooks')
 
 const emptyBookLevel = {
   price: undefined,
@@ -41,6 +50,7 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
 
   private readonly _type = 'book_snapshot'
   private readonly _orderBook: OrderBook
+  private readonly _ownsOrderBook: boolean
   private readonly _depth: number
   private readonly _interval: number
   private readonly _name: string
@@ -51,16 +61,18 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private _bids: Optional<BookPriceLevel>[] = []
   private _asks: Optional<BookPriceLevel>[] = []
 
-  constructor({ depth, name, interval, removeCrossedLevels, grouping, onCrossedLevelRemoved }: BookSnapshotComputableOptions) {
+  constructor(
+    { depth, name, interval, removeCrossedLevels, grouping, onCrossedLevelRemoved }: BookSnapshotComputableOptions,
+    context?: ComputableContext
+  ) {
     this._depth = depth
     this._interval = interval
     this._grouping = grouping
     this._groupingDecimalPlaces = this._grouping ? decimalPlaces(this._grouping) : undefined
 
-    this._orderBook = new OrderBook({
-      removeCrossedLevels,
-      onCrossedLevelRemoved
-    })
+    const orderBookHandle = getOrderBookHandle(context, removeCrossedLevels, onCrossedLevelRemoved)
+    this._orderBook = orderBookHandle.orderBook
+    this._ownsOrderBook = orderBookHandle.isOwner
 
     // initialize all bids/asks levels to empty ones
     for (let i = 0; i < this._depth; i++) {
@@ -122,7 +134,9 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   }
 
   public _update(bookChange: BookChange) {
-    this._orderBook.update(bookChange)
+    if (this._ownsOrderBook) {
+      this._orderBook.update(bookChange)
+    }
 
     if (this._grouping !== undefined) {
       this._updateSideGrouped(this._orderBook.bids(), this._bids, this._getGroupedPriceForBids)
@@ -251,4 +265,33 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private _getTimeBucket(timestamp: Date) {
     return Math.floor(timestamp.valueOf() / this._interval)
   }
+}
+
+function getOrderBookHandle(
+  context: ComputableContext | undefined,
+  removeCrossedLevels: boolean | undefined,
+  onCrossedLevelRemoved: OnLevelRemovedCB | undefined
+): OrderBookHandle {
+  if (context === undefined || onCrossedLevelRemoved !== undefined) {
+    return {
+      orderBook: new OrderBook({ removeCrossedLevels, onCrossedLevelRemoved }),
+      isOwner: true
+    }
+  }
+
+  let sharedOrderBooks = context.get(sharedOrderBooksKey) as Map<boolean, OrderBook> | undefined
+  if (sharedOrderBooks === undefined) {
+    sharedOrderBooks = new Map()
+    context.set(sharedOrderBooksKey, sharedOrderBooks)
+  }
+
+  const key = removeCrossedLevels === true
+  const sharedOrderBook = sharedOrderBooks.get(key)
+  if (sharedOrderBook !== undefined) {
+    return { orderBook: sharedOrderBook, isOwner: false }
+  }
+
+  const orderBook = new OrderBook({ removeCrossedLevels })
+  sharedOrderBooks.set(key, orderBook)
+  return { orderBook, isOwner: true }
 }
