@@ -157,7 +157,7 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       const newBid = bidLevelResult.done ? emptyBookLevel : bidLevelResult.value
 
       if (levelsChanged(this._bids[i], newBid)) {
-        this._bids[i] = { ...newBid }
+        this._bids[i] = { price: newBid.price, amount: newBid.amount }
         this._bookChanged = true
       }
 
@@ -165,7 +165,7 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       const newAsk = askLevelResult.done ? emptyBookLevel : askLevelResult.value
 
       if (levelsChanged(this._asks[i], newAsk)) {
-        this._asks[i] = { ...newAsk }
+        this._asks[i] = { price: newAsk.price, amount: newAsk.amount }
         this._bookChanged = true
       }
     }
