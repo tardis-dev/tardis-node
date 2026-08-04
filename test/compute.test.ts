@@ -9,6 +9,17 @@ import {
   Trade
 } from '../dist/index.js'
 
+const createBookChange = (bids: BookChange['bids'], asks: BookChange['asks'], isSnapshot = false): BookChange => ({
+  type: 'book_change',
+  exchange: 'bitmex',
+  isSnapshot,
+  asks,
+  bids,
+  localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
+  timestamp: new Date('2019-08-01T00:00:00.132Z'),
+  symbol: 'XBTUSD'
+})
+
 describe('compute(messages, types)', () => {
   test(
     'should compute requested types based on replayNormalized iterables',
@@ -283,6 +294,93 @@ describe('compute(messages, types)', () => {
     }
 
     expect(factoryArgumentsCount).toBe(0)
+  })
+
+  test('keeps grouped snapshots correct across outside, boundary, and refill changes', async () => {
+    const messages = async function* (): AsyncIterableIterator<BookChange> {
+      yield createBookChange(
+        [
+          { price: 10.9, amount: 1 },
+          { price: 10.4, amount: 2 },
+          { price: 9.9, amount: 3 }
+        ],
+        [
+          { price: 11.1, amount: 4 },
+          { price: 11.6, amount: 5 },
+          { price: 12.1, amount: 6 }
+        ],
+        true
+      )
+      yield createBookChange([{ price: 9.9, amount: 4 }], [{ price: 12.1, amount: 7 }])
+      yield createBookChange([{ price: 10.4, amount: 8 }], [{ price: 11.6, amount: 9 }])
+      yield createBookChange([{ price: 10.4, amount: 0 }], [{ price: 11.6, amount: 0 }])
+      yield createBookChange([{ price: 9.9, amount: 0 }], [{ price: 12.1, amount: 0 }])
+      yield createBookChange([{ price: 9.4, amount: 10 }], [{ price: 12.6, amount: 11 }])
+    }
+
+    const computed = compute(
+      messages(),
+      computeBookSnapshots({ depth: 2, grouping: 0.5, interval: 0, name: 'top_2' }),
+      computeBookSnapshots({ depth: 4, grouping: 0.5, interval: 0, name: 'full_depth' })
+    )
+    const snapshots = []
+    for await (const message of computed) {
+      if (message.type === 'book_snapshot') snapshots.push(message)
+    }
+
+    const top2 = snapshots.filter((snapshot) => snapshot.name === 'top_2')
+    const fullDepth = snapshots.filter((snapshot) => snapshot.name === 'full_depth')
+    const fullTop2 = top2.filter((snapshot) => snapshot.bids[1].price !== undefined && snapshot.asks[1].price !== undefined)
+    expect(fullTop2.map((snapshot) => snapshot.bids[1])).toEqual([
+      { price: 10, amount: 2 },
+      { price: 10, amount: 8 },
+      { price: 9.5, amount: 4 },
+      { price: 9, amount: 10 }
+    ])
+    expect(fullTop2.map((snapshot) => snapshot.asks[1])).toEqual([
+      { price: 12, amount: 5 },
+      { price: 12, amount: 9 },
+      { price: 12.5, amount: 7 },
+      { price: 13, amount: 11 }
+    ])
+    expect(fullDepth[1].bids.slice(1, 3)).toEqual([
+      { price: 10, amount: 2 },
+      { price: 9.5, amount: 4 }
+    ])
+    expect(fullDepth[1].asks.slice(1, 3)).toEqual([
+      { price: 12, amount: 5 },
+      { price: 12.5, amount: 7 }
+    ])
+  })
+
+  test('rebuilds both grouped sides when crossed levels are removed', async () => {
+    const messages = async function* (): AsyncIterableIterator<BookChange> {
+      yield createBookChange(
+        [
+          { price: 100, amount: 1 },
+          { price: 90, amount: 2 }
+        ],
+        [
+          { price: 110, amount: 3 },
+          { price: 120, amount: 4 }
+        ],
+        true
+      )
+      yield createBookChange([], [{ price: 95, amount: 5 }])
+      yield createBookChange([{ price: 115, amount: 6 }], [])
+    }
+
+    const snapshots = []
+    const computed = compute(messages(), computeBookSnapshots({ depth: 1, grouping: 10, interval: 0, removeCrossedLevels: true }))
+    for await (const message of computed) {
+      if (message.type === 'book_snapshot') snapshots.push(message)
+    }
+
+    expect(snapshots.map(({ bids, asks }) => ({ bids, asks }))).toEqual([
+      { bids: [{ price: 100, amount: 1 }], asks: [{ price: 110, amount: 3 }] },
+      { bids: [{ price: 90, amount: 2 }], asks: [{ price: 100, amount: 5 }] },
+      { bids: [{ price: 110, amount: 6 }], asks: [{ price: 120, amount: 4 }] }
+    ])
   })
 
   test('should produce correct trade bars based on provided messages', async () => {

@@ -56,10 +56,13 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
   private readonly _name: string
   private readonly _grouping: number | undefined
   private readonly _groupingDecimalPlaces: number | undefined
+  private readonly _removeCrossedLevels: boolean
 
   private _lastUpdateTimestamp: Date = new Date(-1)
   private _bids: Optional<BookPriceLevel>[] = []
   private _asks: Optional<BookPriceLevel>[] = []
+  private _groupedBidBoundary: number | undefined
+  private _groupedAskBoundary: number | undefined
 
   constructor(
     { depth, name, interval, removeCrossedLevels, grouping, onCrossedLevelRemoved }: BookSnapshotComputableOptions,
@@ -69,6 +72,7 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     this._interval = interval
     this._grouping = grouping
     this._groupingDecimalPlaces = this._grouping ? decimalPlaces(this._grouping) : undefined
+    this._removeCrossedLevels = Boolean(removeCrossedLevels)
 
     const orderBookHandle = getOrderBookHandle(context, removeCrossedLevels, onCrossedLevelRemoved)
     this._orderBook = orderBookHandle.orderBook
@@ -139,13 +143,32 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     }
 
     if (this._grouping !== undefined) {
-      this._updateSideGrouped(this._orderBook.bids(), this._bids, this._getGroupedPriceForBids)
-      this._updateSideGrouped(this._orderBook.asks(), this._asks, this._getGroupedPriceForAsks)
+      const updateBothGroupedSides = bookChange.isSnapshot || this._removeCrossedLevels
+      if (updateBothGroupedSides || this._groupedSideMayHaveChanged(bookChange.bids, this._groupedBidBoundary, false)) {
+        this._groupedBidBoundary = this._updateSideGrouped(this._orderBook.bids(), this._bids, false)
+      }
+      if (updateBothGroupedSides || this._groupedSideMayHaveChanged(bookChange.asks, this._groupedAskBoundary, true)) {
+        this._groupedAskBoundary = this._updateSideGrouped(this._orderBook.asks(), this._asks, true)
+      }
     } else {
       this._updatedNotGrouped()
     }
 
     this._lastUpdateTimestamp = bookChange.timestamp
+  }
+
+  private _groupedSideMayHaveChanged(changes: BookPriceLevel[], boundary: number | undefined, roundUp: boolean) {
+    if (changes.length === 0) return false
+    if (boundary === undefined) return true
+
+    for (const level of changes) {
+      const groupedPrice = this._getGroupedPrice(level.price, roundUp)
+      if (roundUp ? groupedPrice <= boundary : groupedPrice >= boundary) {
+        return true
+      }
+    }
+
+    return false
   }
 
   private _updatedNotGrouped() {
@@ -171,55 +194,50 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     }
   }
 
-  private _getGroupedPriceForBids = (price: number) => {
+  private _getGroupedPrice(price: number, roundUp: boolean) {
+    if (this._groupingDecimalPlaces === 0) {
+      const remainder = price % this._grouping!
+      return price - remainder + (roundUp && remainder > 0 ? this._grouping! : 0)
+    }
+
     const pow = Math.pow(10, this._groupingDecimalPlaces!)
     const pricePow = price * pow
     const groupPow = this._grouping! * pow
     const remainder = (pricePow % groupPow) / pow
 
-    return (pricePow - remainder * pow) / pow
-  }
-
-  private _getGroupedPriceForAsks = (price: number) => {
-    const pow = Math.pow(10, this._groupingDecimalPlaces!)
-    const pricePow = price * pow
-    const groupPow = this._grouping! * pow
-    const remainder = (pricePow % groupPow) / pow
-
-    return (pricePow - remainder * pow + (remainder > 0 ? groupPow : 0)) / pow
+    return (pricePow - remainder * pow + (roundUp && remainder > 0 ? groupPow : 0)) / pow
   }
 
   private _updateSideGrouped(
     newLevels: IterableIterator<BookPriceLevel>,
     existingGroupedLevels: Optional<BookPriceLevel>[],
-    getGroupedPriceForLevel: (price: number) => number
+    roundUp: boolean
   ) {
     let currentGroupedPrice: number | undefined = undefined
     let aggAmount = 0
     let currentDepth = 0
 
     for (const notGroupedLevel of newLevels) {
-      const groupedPrice = getGroupedPriceForLevel(notGroupedLevel.price)
+      const groupedPrice = this._getGroupedPrice(notGroupedLevel.price, roundUp)
 
       if (currentGroupedPrice == undefined) {
         currentGroupedPrice = groupedPrice
       }
 
       if (currentGroupedPrice != groupedPrice) {
-        const groupedLevel = {
-          price: currentGroupedPrice,
-          amount: aggAmount
-        }
-
-        if (levelsChanged(existingGroupedLevels[currentDepth], groupedLevel)) {
-          existingGroupedLevels[currentDepth] = groupedLevel
+        const existingGroupedLevel = existingGroupedLevels[currentDepth]
+        if (existingGroupedLevel.amount !== aggAmount || existingGroupedLevel.price !== currentGroupedPrice) {
+          existingGroupedLevels[currentDepth] = {
+            price: currentGroupedPrice,
+            amount: aggAmount
+          }
           this._bookChanged = true
         }
 
         currentDepth++
 
         if (currentDepth === this._depth) {
-          break
+          return currentGroupedPrice
         }
 
         currentGroupedPrice = groupedPrice
@@ -230,16 +248,18 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
     }
 
     if (currentDepth < this._depth && aggAmount > 0) {
-      const groupedLevel = {
-        price: currentGroupedPrice,
-        amount: aggAmount
-      }
-
-      if (levelsChanged(existingGroupedLevels[currentDepth], groupedLevel)) {
-        existingGroupedLevels[currentDepth] = groupedLevel
+      const existingGroupedLevel = existingGroupedLevels[currentDepth]
+      if (existingGroupedLevel.amount !== aggAmount || existingGroupedLevel.price !== currentGroupedPrice) {
+        existingGroupedLevels[currentDepth] = {
+          price: currentGroupedPrice,
+          amount: aggAmount
+        }
         this._bookChanged = true
       }
+      currentDepth++
     }
+
+    return currentDepth === this._depth ? currentGroupedPrice : undefined
   }
 
   public _getSnapshot(bookChange: BookChange) {
