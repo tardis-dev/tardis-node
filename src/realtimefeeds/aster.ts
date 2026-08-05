@@ -1,27 +1,49 @@
-import { batch, getJSON, wait } from '../handy.ts'
+import { batch, CircularBuffer, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class AsterRealTimeFeed extends RealTimeFeedBase {
-  protected readonly wssURL = 'wss://sstream.asterdex.com/stream'
-  protected readonly httpURL = 'https://sapi.asterdex.com/api/v3'
+  private static readonly depthChannel = 'depth'
+  private static readonly depthSnapshotChannel = 'depthSnapshot'
+  private static readonly depthStream = 'depth@100ms'
+  private readonly pendingDepthSnapshotSymbols = new Set<string>()
+  private readonly bufferedDepthUpdates = new Map<string, CircularBuffer<AsterDepthUpdateData>>()
+  protected readonly wssURL: string = 'wss://sstream.asterdex.com/stream'
+  protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
+  private readonly channels = new Set([
+    'trade',
+    'ticker',
+    AsterRealTimeFeed.depthChannel,
+    AsterRealTimeFeed.depthSnapshotChannel,
+    'bookTicker'
+  ])
   private readonly channelMappings: { [key: string]: string | undefined } = {
-    depth: 'depth@100ms'
+    [AsterRealTimeFeed.depthChannel]: AsterRealTimeFeed.depthStream
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    return filters
-      .filter((f) => f.channel !== 'depthSnapshot')
+    const filtersWithSymbols = filters.map<Required<Filter<string>>>((filter) => {
+      if (!this.channels.has(filter.channel)) {
+        throw new Error(`AsterRealTimeFeed unsupported channel ${filter.channel}`)
+      }
+
+      if (!filter.symbols || filter.symbols.length === 0) {
+        throw new Error('AsterRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+      }
+
+      return filter as Required<Filter<string>>
+    })
+
+    const depthSnapshotFilters = filtersWithSymbols.filter((filter) => filter.channel === AsterRealTimeFeed.depthSnapshotChannel)
+    this.validateDepthSnapshotFilters(filtersWithSymbols, depthSnapshotFilters)
+    this.resetDepthSnapshotTracking(depthSnapshotFilters)
+
+    return filtersWithSymbols
+      .filter((f) => f.channel !== AsterRealTimeFeed.depthSnapshotChannel)
       .map((filter, index) => {
-        if (!filter.symbols || filter.symbols.length === 0) {
-          throw new Error('AsterRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
-        }
-
-        const channel = this.channelMappings[filter.channel] ?? filter.channel
-
         return {
           method: 'SUBSCRIBE',
-          params: filter.symbols.map((symbol) => `${symbol.toLowerCase()}@${channel}`),
+          params: filter.symbols.map((symbol) => `${symbol.toLowerCase()}@${this.channelMappings[filter.channel] ?? filter.channel}`),
           id: index + 1
         }
       })
@@ -43,8 +65,32 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
     return false
   }
 
+  protected override onMessage(message: any) {
+    if (message.stream?.endsWith(`@${AsterRealTimeFeed.depthStream}`) !== true || message.data?.s === undefined) {
+      return
+    }
+
+    const symbol = message.data.s.toUpperCase()
+    if (this.pendingDepthSnapshotSymbols.has(symbol) === false) {
+      return
+    }
+
+    const lastUpdateId = Number(message.data.u)
+    const previousFinalUpdateId = Number(message.data.pu)
+    if (Number.isFinite(lastUpdateId) === false || Number.isFinite(previousFinalUpdateId) === false) {
+      return
+    }
+
+    const bufferedUpdates = this.bufferedDepthUpdates.get(symbol) ?? new CircularBuffer<AsterDepthUpdateData>(2000)
+    bufferedUpdates.append({
+      lastUpdateId,
+      previousFinalUpdateId
+    })
+    this.bufferedDepthUpdates.set(symbol, bufferedUpdates)
+  }
+
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
-    const depthSnapshotFilter = filters.find((f) => f.channel === 'depthSnapshot')
+    const depthSnapshotFilter = filters.find((f) => f.channel === AsterRealTimeFeed.depthSnapshotChannel)
     if (!depthSnapshotFilter) {
       return
     }
@@ -62,13 +108,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
             return
           }
 
-          const depthSnapshotResponse = await getJSON<any>(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`)
-
-          this.manualSnapshotsBuffer.push({
-            stream: `${symbol.toLowerCase()}@depthSnapshot`,
-            generated: true,
-            data: depthSnapshotResponse.data
-          })
+          await this.provideManualSnapshot(symbol, shouldCancel)
         })
       )
 
@@ -78,4 +118,152 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 
     this.debug('requested all manual snapshots successfully')
   }
+
+  private resetDepthSnapshotTracking(filters: Required<Filter<string>>[]) {
+    this.pendingDepthSnapshotSymbols.clear()
+    this.bufferedDepthUpdates.clear()
+
+    for (const filter of filters) {
+      for (const symbol of filter.symbols) {
+        const upperCaseSymbol = symbol.toUpperCase()
+        this.pendingDepthSnapshotSymbols.add(upperCaseSymbol)
+        this.bufferedDepthUpdates.set(upperCaseSymbol, new CircularBuffer<AsterDepthUpdateData>(2000))
+      }
+    }
+  }
+
+  private validateDepthSnapshotFilters(filters: Required<Filter<string>>[], depthSnapshotFilters: Required<Filter<string>>[]) {
+    if (depthSnapshotFilters.length === 0) {
+      return
+    }
+
+    const depthSymbols = new Set(
+      filters
+        .filter((filter) => filter.channel === AsterRealTimeFeed.depthChannel)
+        .flatMap((filter) => filter.symbols.map((symbol) => symbol.toUpperCase()))
+    )
+
+    for (const filter of depthSnapshotFilters) {
+      for (const symbol of filter.symbols) {
+        if (depthSymbols.has(symbol.toUpperCase()) === false) {
+          throw new Error(
+            `AsterRealTimeFeed requires ${AsterRealTimeFeed.depthChannel} for every ${AsterRealTimeFeed.depthSnapshotChannel} symbol`
+          )
+        }
+      }
+    }
+  }
+
+  private async provideManualSnapshot(symbol: string, shouldCancel: () => boolean) {
+    const maxSnapshotRounds = 4
+    const maxSnapshotAttemptsPerRound = 3
+    const normalizedSymbol = symbol.toUpperCase()
+
+    for (let round = 0; round < maxSnapshotRounds; round++) {
+      for (let attempt = 1; attempt <= maxSnapshotAttemptsPerRound; attempt++) {
+        if (shouldCancel()) {
+          return
+        }
+
+        const { data } = await getJSON<AsterDepthSnapshotData>(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`)
+        if (this.snapshotResponseIsValid(data) === false) {
+          if (attempt < maxSnapshotAttemptsPerRound) {
+            await wait(attempt * 1000)
+          }
+          continue
+        }
+
+        const hasOverlap = await this.waitForSnapshotOverlap(normalizedSymbol, data.lastUpdateId)
+
+        if (shouldCancel()) {
+          return
+        }
+
+        if (hasOverlap === false) {
+          this.trimBufferedUpdates(normalizedSymbol)
+          if (attempt < maxSnapshotAttemptsPerRound) {
+            await wait(attempt * 1000)
+          }
+          continue
+        }
+
+        if (hasOverlap === true || attempt === maxSnapshotAttemptsPerRound) {
+          this.manualSnapshotsBuffer.push(this.createManualSnapshot(symbol, data))
+          this.pendingDepthSnapshotSymbols.delete(normalizedSymbol)
+          this.bufferedDepthUpdates.delete(normalizedSymbol)
+          return
+        }
+      }
+    }
+
+    throw new Error(`AsterRealTimeFeed could not align depth snapshot for ${normalizedSymbol}`)
+  }
+
+  private async waitForSnapshotOverlap(symbol: string, lastUpdateId: number) {
+    let hasOverlap = this.validateSnapshotOverlap(this.bufferedDepthUpdates.get(symbol), lastUpdateId)
+    for (let attempt = 0; attempt < 60; attempt++) {
+      if (hasOverlap !== undefined) {
+        return hasOverlap
+      }
+
+      await wait(100)
+      hasOverlap = this.validateSnapshotOverlap(this.bufferedDepthUpdates.get(symbol), lastUpdateId)
+    }
+
+    return hasOverlap
+  }
+
+  protected validateSnapshotOverlap(bufferedUpdates: CircularBuffer<AsterDepthUpdateData> | undefined, lastUpdateId: number) {
+    for (const update of bufferedUpdates?.items() ?? []) {
+      if (update.lastUpdateId < lastUpdateId) {
+        continue
+      }
+
+      return update.previousFinalUpdateId <= lastUpdateId && update.lastUpdateId >= lastUpdateId
+    }
+
+    return undefined
+  }
+
+  private trimBufferedUpdates(symbol: string) {
+    const bufferedUpdates = this.bufferedDepthUpdates.get(symbol)
+    if (bufferedUpdates === undefined || bufferedUpdates.count <= 100) {
+      return
+    }
+
+    const trimmed = new CircularBuffer<AsterDepthUpdateData>(2000)
+    for (const update of [...bufferedUpdates.items()].slice(-100)) {
+      trimmed.append(update)
+    }
+    this.bufferedDepthUpdates.set(symbol, trimmed)
+  }
+
+  private snapshotResponseIsValid(data: AsterDepthSnapshotData) {
+    return Number.isFinite(data.lastUpdateId) && Array.isArray(data.asks) && Array.isArray(data.bids)
+  }
+
+  private createManualSnapshot(symbol: string, data: AsterDepthSnapshotData): AsterDepthSnapshotMessage {
+    return {
+      stream: `${symbol.toLowerCase()}@${AsterRealTimeFeed.depthSnapshotChannel}`,
+      generated: true,
+      data
+    }
+  }
+}
+
+type AsterDepthSnapshotData = {
+  lastUpdateId: number
+  bids: string[][]
+  asks: string[][]
+}
+
+type AsterDepthSnapshotMessage = {
+  stream: string
+  generated: true
+  data: AsterDepthSnapshotData
+}
+
+type AsterDepthUpdateData = {
+  lastUpdateId: number
+  previousFinalUpdateId: number
 }
