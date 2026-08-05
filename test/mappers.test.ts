@@ -1,4 +1,5 @@
 import {
+  EXCHANGE_CHANNELS_INFO,
   Exchange,
   Mapper,
   normalizeBookChanges,
@@ -1590,6 +1591,68 @@ describe('mappers', () => {
     }
   })
 
+  test('map okex-futures X-Perp messages', () => {
+    const mapperTimestamp = new Date('2026-08-04T19:14:00.000Z')
+    const mapper = createMapper('okex-futures', mapperTimestamp)
+
+    expect({
+      channels: EXCHANGE_CHANNELS_INFO['okex-futures'],
+      filters: normalizeDerivativeTickers('okex-futures', mapperTimestamp).getFilters(['BTC-USD_UM_XPERP-310404'])
+    }).toMatchSnapshot()
+
+    const messages = [
+      {
+        localTimestamp: new Date('2026-08-04T19:14:00.033Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '64280',
+              open24h: '63848.2',
+              high24h: '64360.7',
+              low24h: '63265.5',
+              sodUtc0: '63465.3',
+              sodUtc8: '64075.9',
+              ts: '1785870839964'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2026-08-04T19:14:15.773Z'),
+        message: {
+          arg: { channel: 'funding-rate', instId: 'BTC-USD_UM_XPERP-310404' },
+          data: [
+            {
+              formulaType: 'withRate',
+              fundingRate: '-0.0004270396398519',
+              fundingTime: '1785888000000',
+              impactValue: '10000.0000000000000000',
+              instId: 'BTC-USD_UM_XPERP-310404',
+              instType: 'FUTURES',
+              interestRate: '0.0001000000000000',
+              maxFundingRate: '0.00375',
+              method: 'current_period',
+              minFundingRate: '-0.00375',
+              nextFundingRate: '',
+              nextFundingTime: '1785916800000',
+              premium: '-0.0008949500017283',
+              prevFundingTime: '1785859200000',
+              settFundingRate: '-0.0001996513270201',
+              settState: 'settled',
+              ts: '1785870855692'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of messages) {
+      expect(mapper.map(message, localTimestamp)).toMatchSnapshot()
+    }
+  })
+
   test('map okex-swap messages', () => {
     const messages = [
       {
@@ -1904,6 +1967,163 @@ describe('mappers', () => {
     for (const message of okexV5WithBookTickerMessages) {
       const mappedMessages = okexWithBookTickerMapper.map(message, new Date('2022-05-06T00:00:00.000Z'))
       expect(mappedMessages).toMatchSnapshot()
+    }
+  })
+
+  test('map okex USDC contracts before and after index migration', () => {
+    const usdcIndexSwitchDate = new Date('2023-04-10T08:40:00.000Z')
+    expect({
+      switchDates: normalizeDerivativeTickers.getSwitchDates('okex-swap'),
+      legacyFilters: normalizeDerivativeTickers('okex-swap', new Date(usdcIndexSwitchDate.valueOf() - 1)).getFilters(['BTC-USDC-SWAP']),
+      currentFilters: normalizeDerivativeTickers('okex-swap', usdcIndexSwitchDate).getFilters(['BTC-USDC-SWAP'])
+    }).toMatchSnapshot()
+
+    const legacyMapper = createMapper('okex-swap', new Date('2023-04-09T12:00:00.000Z'))
+    const legacyMessages = [
+      {
+        localTimestamp: new Date('2023-04-09T12:00:00.340Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '27938.9',
+              open24h: '28028.2',
+              high24h: '28095',
+              low24h: '27816.7',
+              sodUtc0: '27949.5',
+              sodUtc8: '28030.2',
+              ts: '1681041600310'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-09T12:00:00.640Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '27927.4',
+              lastSz: '50',
+              askPx: '27933.3',
+              askSz: '2068',
+              bidPx: '27933.2',
+              bidSz: '6538',
+              open24h: '28028.4',
+              high24h: '28095.6',
+              low24h: '27800',
+              sodUtc0: '27947.8',
+              sodUtc8: '28024',
+              volCcy24h: '77.6509',
+              vol24h: '776509',
+              ts: '1681041600614'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of legacyMessages) {
+      expect(legacyMapper.map(message, localTimestamp)).toMatchSnapshot()
+    }
+
+    const currentMapper = createMapper('okex-swap', new Date('2023-04-20T12:00:00.000Z'))
+    const currentMessages = [
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.119Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USDC' },
+          data: [
+            {
+              instId: 'BTC-USDC',
+              idxPx: '28621.8',
+              open24h: '29320.6',
+              high24h: '29519',
+              low24h: '28577.4',
+              sodUtc0: '28818.9',
+              sodUtc8: '29285.1',
+              ts: '1681992000093'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.129Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '28620.3',
+              lastSz: '241',
+              askPx: '28618.8',
+              askSz: '1200',
+              bidPx: '28618.7',
+              bidSz: '600',
+              open24h: '29303.8',
+              high24h: '29514.3',
+              low24h: '28543.6',
+              sodUtc0: '28808',
+              sodUtc8: '29294.4',
+              volCcy24h: '430.701',
+              vol24h: '4307010',
+              ts: '1681992000108'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.314Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '28612.1',
+              open24h: '29303.7',
+              high24h: '29515.3',
+              low24h: '28575.5',
+              sodUtc0: '28816.6',
+              sodUtc8: '29283',
+              ts: '1681992000222'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:04.362Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '28595.6',
+              lastSz: '170',
+              askPx: '28599.1',
+              askSz: '279',
+              bidPx: '28595.6',
+              bidSz: '179',
+              open24h: '29303.8',
+              high24h: '29514.3',
+              low24h: '28543.6',
+              sodUtc0: '28808',
+              sodUtc8: '29294.4',
+              volCcy24h: '431.7432',
+              vol24h: '4317432',
+              ts: '1681992004315'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of currentMessages) {
+      expect(currentMapper.map(message, localTimestamp)).toMatchSnapshot()
     }
   })
 

@@ -11021,6 +11021,142 @@ exports[`mappers map okcoin messages 6`] = `
 ]
 `;
 
+exports[`mappers map okex USDC contracts before and after index migration 1`] = `
+{
+  "currentFilters": [
+    {
+      "channel": "tickers",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "open-interest",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "mark-price",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "index-tickers",
+      "symbols": [
+        "BTC-USDC",
+      ],
+    },
+    {
+      "channel": "funding-rate",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+  ],
+  "legacyFilters": [
+    {
+      "channel": "tickers",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "open-interest",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "mark-price",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+    {
+      "channel": "index-tickers",
+      "symbols": [
+        "BTC-USD",
+      ],
+    },
+    {
+      "channel": "funding-rate",
+      "symbols": [
+        "BTC-USDC-SWAP",
+      ],
+    },
+  ],
+  "switchDates": [
+    2021-12-23T00:00:00.000Z,
+    2023-04-10T08:40:00.000Z,
+  ],
+}
+`;
+
+exports[`mappers map okex USDC contracts before and after index migration 2`] = `[]`;
+
+exports[`mappers map okex USDC contracts before and after index migration 3`] = `
+[
+  {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 27938.9,
+    "lastPrice": 27927.4,
+    "localTimestamp": 2023-04-09T12:00:00.640Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-SWAP",
+    "timestamp": 2023-04-09T12:00:00.614Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex USDC contracts before and after index migration 4`] = `[]`;
+
+exports[`mappers map okex USDC contracts before and after index migration 5`] = `
+[
+  {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 28621.8,
+    "lastPrice": 28620.3,
+    "localTimestamp": 2023-04-20T12:00:00.129Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-SWAP",
+    "timestamp": 2023-04-20T12:00:00.108Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
+exports[`mappers map okex USDC contracts before and after index migration 6`] = `[]`;
+
+exports[`mappers map okex USDC contracts before and after index migration 7`] = `
+[
+  {
+    "exchange": "okex-swap",
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "indexPrice": 28621.8,
+    "lastPrice": 28595.6,
+    "localTimestamp": 2023-04-20T12:00:04.362Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USDC-SWAP",
+    "timestamp": 2023-04-20T12:00:04.315Z,
+    "type": "derivative_ticker",
+  },
+]
+`;
+
 exports[`mappers map okex messages 1`] = `
 [
   {
@@ -11239,6 +11375,101 @@ exports[`mappers map okex messages 13`] = `
     "symbol": "BSV-USDT",
     "timestamp": 2023-10-20T00:00:12.017Z,
     "type": "trade",
+  },
+]
+`;
+
+exports[`mappers map okex-futures X-Perp messages 1`] = `
+{
+  "channels": [
+    "futures/trade",
+    "futures/depth",
+    "futures/depth_l2_tbt",
+    "futures/ticker",
+    "futures/mark_price",
+    "futures/liquidation",
+    "index/ticker",
+    "system/status",
+    "information/sentiment",
+    "information/long_short_ratio",
+    "information/margin",
+    "trades",
+    "trades-all",
+    "books-l2-tbt",
+    "bbo-tbt",
+    "books",
+    "tickers",
+    "open-interest",
+    "mark-price",
+    "funding-rate",
+    "price-limit",
+    "status",
+    "instruments",
+    "index-tickers",
+    "long-short-account-ratio",
+    "taker-volume",
+    "liquidations",
+    "public-struc-block-trades",
+    "liquidation-orders",
+    "estimated-price",
+    "long-short-account-ratio-contract",
+    "long-short-account-ratio-contract-top-trader",
+    "long-short-position-ratio-contract-top-trader",
+    "public-block-trades",
+    "taker-volume-contract",
+  ],
+  "filters": [
+    {
+      "channel": "tickers",
+      "symbols": [
+        "BTC-USD_UM_XPERP-310404",
+      ],
+    },
+    {
+      "channel": "open-interest",
+      "symbols": [
+        "BTC-USD_UM_XPERP-310404",
+      ],
+    },
+    {
+      "channel": "mark-price",
+      "symbols": [
+        "BTC-USD_UM_XPERP-310404",
+      ],
+    },
+    {
+      "channel": "index-tickers",
+      "symbols": [
+        "BTC-USD",
+      ],
+    },
+    {
+      "channel": "funding-rate",
+      "symbols": [
+        "BTC-USD_UM_XPERP-310404",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`mappers map okex-futures X-Perp messages 2`] = `[]`;
+
+exports[`mappers map okex-futures X-Perp messages 3`] = `
+[
+  {
+    "exchange": "okex-futures",
+    "fundingRate": -0.0004270396398519,
+    "fundingTimestamp": 2026-08-05T00:00:00.000Z,
+    "indexPrice": 64280,
+    "lastPrice": undefined,
+    "localTimestamp": 2026-08-04T19:14:15.773Z,
+    "markPrice": undefined,
+    "openInterest": undefined,
+    "predictedFundingRate": undefined,
+    "symbol": "BTC-USD_UM_XPERP-310404",
+    "timestamp": 2026-08-04T19:14:15.692Z,
+    "type": "derivative_ticker",
   },
 ]
 `;
