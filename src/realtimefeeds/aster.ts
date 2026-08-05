@@ -3,21 +3,21 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class AsterRealTimeFeed extends RealTimeFeedBase {
-  private static readonly depthChannel = 'depth'
-  private static readonly depthSnapshotChannel = 'depthSnapshot'
-  private static readonly depthStream = 'depth@100ms'
+  protected static readonly depthChannel = 'depth'
+  protected static readonly depthSnapshotChannel = 'depthSnapshot'
+  protected static readonly depthStream = 'depth@100ms'
   private readonly pendingDepthSnapshotSymbols = new Set<string>()
   private readonly bufferedDepthUpdates = new Map<string, CircularBuffer<AsterDepthUpdateData>>()
   protected readonly wssURL: string = 'wss://sstream.asterdex.com/stream'
   protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
-  private readonly channels = new Set([
+  protected readonly channels = new Set([
     'trade',
     'ticker',
     AsterRealTimeFeed.depthChannel,
     AsterRealTimeFeed.depthSnapshotChannel,
     'bookTicker'
   ])
-  private readonly channelMappings: { [key: string]: string | undefined } = {
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
     [AsterRealTimeFeed.depthChannel]: AsterRealTimeFeed.depthStream
   }
 
@@ -75,6 +75,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
+    const firstUpdateId = Number(message.data.U)
     const lastUpdateId = Number(message.data.u)
     const previousFinalUpdateId = Number(message.data.pu)
     if (Number.isFinite(lastUpdateId) === false || Number.isFinite(previousFinalUpdateId) === false) {
@@ -83,6 +84,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 
     const bufferedUpdates = this.bufferedDepthUpdates.get(symbol) ?? new CircularBuffer<AsterDepthUpdateData>(2000)
     bufferedUpdates.append({
+      firstUpdateId: Number.isFinite(firstUpdateId) ? firstUpdateId : undefined,
       lastUpdateId,
       previousFinalUpdateId
     })
@@ -264,6 +266,37 @@ type AsterDepthSnapshotMessage = {
 }
 
 type AsterDepthUpdateData = {
+  firstUpdateId?: number
   lastUpdateId: number
   previousFinalUpdateId: number
+}
+
+export class AsterFuturesRealTimeFeed extends AsterRealTimeFeed {
+  protected readonly wssURL: string = 'wss://fstream.asterdex.com/stream'
+  protected readonly httpURL: string = 'https://fapi.asterdex.com/fapi/v1'
+  protected readonly channels = new Set([
+    'aggTrade',
+    'ticker',
+    AsterRealTimeFeed.depthChannel,
+    AsterRealTimeFeed.depthSnapshotChannel,
+    'markPrice',
+    'forceOrder',
+    'bookTicker'
+  ])
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
+    [AsterRealTimeFeed.depthChannel]: AsterRealTimeFeed.depthStream,
+    markPrice: 'markPrice@1s'
+  }
+
+  protected override validateSnapshotOverlap(bufferedUpdates: CircularBuffer<AsterDepthUpdateData> | undefined, lastUpdateId: number) {
+    for (const update of bufferedUpdates?.items() ?? []) {
+      if (update.lastUpdateId < lastUpdateId) {
+        continue
+      }
+
+      return update.firstUpdateId !== undefined && update.firstUpdateId <= lastUpdateId && update.lastUpdateId >= lastUpdateId
+    }
+
+    return undefined
+  }
 }

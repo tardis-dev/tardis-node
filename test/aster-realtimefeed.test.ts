@@ -1,6 +1,6 @@
 import type { AddressInfo } from 'net'
 import { createServer } from 'http'
-import { AsterRealTimeFeed } from '../src/realtimefeeds/aster.ts'
+import { AsterFuturesRealTimeFeed, AsterRealTimeFeed } from '../src/realtimefeeds/aster.ts'
 import { getRealTimeFeedFactory } from '../src/realtimefeeds/index.ts'
 import { Filter } from '../src/types.ts'
 
@@ -31,8 +31,36 @@ class TestAsterRealTimeFeed extends AsterRealTimeFeed {
   }
 }
 
+class TestAsterFuturesRealTimeFeed extends AsterFuturesRealTimeFeed {
+  protected readonly httpURL: string
+
+  constructor(
+    exchange: 'aster-futures',
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    httpURL = 'https://fapi.asterdex.com/fapi/v1'
+  ) {
+    super(exchange, filters, timeoutIntervalMS)
+    this.httpURL = httpURL
+  }
+
+  map(filters: Filter<string>[]) {
+    return this.mapToSubscribeMessages(filters)
+  }
+
+  observe(message: any) {
+    this.onMessage(message)
+  }
+
+  async provideSnapshots(filters: Filter<string>[], shouldCancel = () => false) {
+    await this.provideManualSnapshots(filters, shouldCancel)
+    return this.manualSnapshotsBuffer
+  }
+}
+
 test('register aster realtime feeds', () => {
   expect(getRealTimeFeedFactory('aster')).toBeDefined()
+  expect(getRealTimeFeedFactory('aster-futures')).toBeDefined()
 })
 
 test('map aster realtime subscriptions', () => {
@@ -104,6 +132,47 @@ test('aster realtime rejects unsupported channels', () => {
       }
     ])
   ).toThrow('AsterRealTimeFeed unsupported channel unsupported')
+})
+
+test('map aster futures realtime subscriptions', () => {
+  const feed = new TestAsterFuturesRealTimeFeed('aster-futures', [], undefined)
+
+  expect(
+    feed.map([
+      {
+        channel: 'depth',
+        symbols: ['btcusdt']
+      },
+      {
+        channel: 'depthSnapshot',
+        symbols: ['btcusdt']
+      },
+      {
+        channel: 'markPrice',
+        symbols: ['btcusdt']
+      },
+      {
+        channel: 'forceOrder',
+        symbols: ['btcusdt']
+      }
+    ])
+  ).toEqual([
+    {
+      method: 'SUBSCRIBE',
+      params: ['btcusdt@depth@100ms'],
+      id: 1
+    },
+    {
+      method: 'SUBSCRIBE',
+      params: ['btcusdt@markPrice@1s'],
+      id: 2
+    },
+    {
+      method: 'SUBSCRIBE',
+      params: ['btcusdt@forceOrder'],
+      id: 3
+    }
+  ])
 })
 
 test('provide aster manual depth snapshots after buffered update overlaps', async () => {
@@ -184,12 +253,55 @@ test('retry aster manual depth snapshots until buffered update overlaps', async 
   }
 })
 
+test('retry aster futures manual depth snapshots until first update overlaps', async () => {
+  const server = await startSnapshotServer([
+    { lastUpdateId: 104, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] },
+    { lastUpdateId: 105, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']] }
+  ])
+  const feed = new TestAsterFuturesRealTimeFeed('aster-futures', [], undefined, server.url)
+
+  try {
+    const filters = [
+      {
+        channel: 'depth',
+        symbols: ['BTCUSDT']
+      },
+      {
+        channel: 'depthSnapshot',
+        symbols: ['BTCUSDT']
+      }
+    ]
+
+    feed.map(filters)
+    feed.observe(createDepthUpdate({ symbol: 'BTCUSDT', firstUpdateId: 105, lastUpdateId: 105, previousFinalUpdateId: 106 }))
+
+    const snapshots = await feed.provideSnapshots(filters)
+
+    expect(server.requestsCount).toBe(2)
+    expect(snapshots).toEqual([
+      {
+        stream: 'btcusdt@depthSnapshot',
+        generated: true,
+        data: {
+          lastUpdateId: 105,
+          asks: [['100.2', '1.2']],
+          bids: [['99.8', '0.5']]
+        }
+      }
+    ])
+  } finally {
+    await server.close()
+  }
+})
+
 function createDepthUpdate({
   symbol,
+  firstUpdateId,
   lastUpdateId,
   previousFinalUpdateId
 }: {
   symbol: string
+  firstUpdateId?: number
   lastUpdateId: number
   previousFinalUpdateId: number
 }) {
@@ -200,7 +312,7 @@ function createDepthUpdate({
       E: 1785230774524,
       T: 1785230774522,
       s: symbol,
-      U: previousFinalUpdateId + 1,
+      U: firstUpdateId ?? previousFinalUpdateId + 1,
       u: lastUpdateId,
       pu: previousFinalUpdateId,
       b: [],
