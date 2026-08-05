@@ -2,31 +2,48 @@ name: Publish New Release To NPM
 
 on:
   release:
-    # This specifies that the build will be triggered when we publish a release
     types: [published]
 
-permissions:
-  id-token: write
-  contents: write
+permissions: {}
 
 jobs:
-  publish:
-    name: Publish New Release To NPM
+  build:
+    name: Build And Pack Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - name: Checkout
+      - name: Checkout Release Tag
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate Release Tag
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ "$RELEASE_VERSION" == v* ]]; then
+            echo "Release tag must be a plain semver version without a v prefix: $RELEASE_VERSION" >&2
+            exit 1
+          fi
+
+          release_commit=$(git rev-parse HEAD)
+          if ! git merge-base --is-ancestor "$release_commit" "origin/${DEFAULT_BRANCH}"; then
+            echo "Release tag must point to a commit in the ${DEFAULT_BRANCH} history." >&2
+            exit 1
+          fi
 
       - name: Use Node.js v25.8.2
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 25.8.2
-          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
 
-      - name: Install Dependencies And Compile TS
+      - name: Install Dependencies
         run: npm ci --ignore-scripts
 
       - name: Verify Registry Signatures
@@ -35,21 +52,55 @@ jobs:
       - name: Audit Production Dependencies
         run: npm audit --omit=dev --audit-level=critical
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Release Bot"
-          git config --global user.email "deploy@tardis.dev"
-
-      - name: Update package version
-        run: npm version ${{ github.event.release.tag_name }}
+      - name: Set Package Version
+        env:
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version --ignore-scripts
 
       - name: Run Tests
-        run: npm run test
+        run: npm test
+
+      - name: Create npm Tarball
+        run: |
+          mkdir publish-artifact
+          npm pack --ignore-scripts --pack-destination publish-artifact
+
+      - name: Upload Package Artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-package
+          path: publish-artifact/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    name: Publish Package To NPM
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Use Node.js v25.8.2
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 25.8.2
+          registry-url: https://registry.npmjs.org/
+
+      - name: Download Package Artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: npm-package
+          path: publish-artifact
 
       - name: Publish Package
-        run: npm publish
-
-      - name: Push Version Changes To GitHub
-        env:
-          VERSION_BRANCH: ${{ github.event.repository.default_branch }}
-        run: git push origin "HEAD:${VERSION_BRANCH}"
+        run: |
+          shopt -s nullglob
+          tarballs=(publish-artifact/*.tgz)
+          if [[ "${#tarballs[@]}" -ne 1 ]]; then
+            echo "Expected exactly one package tarball, found ${#tarballs[@]}." >&2
+            exit 1
+          fi
+          npm publish "${tarballs[0]}" --ignore-scripts
