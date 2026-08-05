@@ -98,7 +98,7 @@ jobs:
       - name: Publish Package
         run: |
           shopt -s nullglob
-          tarballs=(publish-artifact/*.tgz)
+          tarballs=(./publish-artifact/*.tgz)
           if [[ "${#tarballs[@]}" -ne 1 ]]; then
             echo "Expected exactly one package tarball, found ${#tarballs[@]}." >&2
             exit 1
