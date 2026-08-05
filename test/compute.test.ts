@@ -353,6 +353,65 @@ describe('compute(messages, types)', () => {
     ])
   })
 
+  test('clears grouped levels when a book side shrinks', async () => {
+    const messages = async function* (): AsyncIterableIterator<BookChange> {
+      yield createBookChange(
+        [
+          { price: 100.9, amount: 1 },
+          { price: 99.9, amount: 2 },
+          { price: 98.9, amount: 3 }
+        ],
+        [
+          { price: 101.1, amount: 4 },
+          { price: 102.1, amount: 5 },
+          { price: 103.1, amount: 6 }
+        ],
+        true
+      )
+      yield createBookChange(
+        [
+          { price: 99.9, amount: 0 },
+          { price: 98.9, amount: 0 }
+        ],
+        [
+          { price: 102.1, amount: 0 },
+          { price: 103.1, amount: 0 }
+        ]
+      )
+      yield createBookChange([{ price: 100.9, amount: 0 }], [{ price: 101.1, amount: 0 }])
+    }
+
+    const snapshots = []
+    const computed = compute(messages(), computeBookSnapshots({ depth: 3, grouping: 1, interval: 0 }))
+    for await (const message of computed) {
+      if (message.type === 'book_snapshot') snapshots.push(message)
+    }
+
+    const emptyLevel = { price: undefined, amount: undefined }
+    expect(snapshots.map(({ bids, asks }) => ({ bids, asks }))).toEqual([
+      {
+        bids: [
+          { price: 100, amount: 1 },
+          { price: 99, amount: 2 },
+          { price: 98, amount: 3 }
+        ],
+        asks: [
+          { price: 102, amount: 4 },
+          { price: 103, amount: 5 },
+          { price: 104, amount: 6 }
+        ]
+      },
+      {
+        bids: [{ price: 100, amount: 1 }, emptyLevel, emptyLevel],
+        asks: [{ price: 102, amount: 4 }, emptyLevel, emptyLevel]
+      },
+      {
+        bids: [emptyLevel, emptyLevel, emptyLevel],
+        asks: [emptyLevel, emptyLevel, emptyLevel]
+      }
+    ])
+  })
+
   test('rebuilds both grouped sides when crossed levels are removed', async () => {
     const messages = async function* (): AsyncIterableIterator<BookChange> {
       yield createBookChange(

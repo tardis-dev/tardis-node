@@ -259,6 +259,13 @@ class BookSnapshotComputable implements Computable<BookSnapshot> {
       currentDepth++
     }
 
+    for (let i = currentDepth; i < this._depth; i++) {
+      if (levelsChanged(existingGroupedLevels[i], emptyBookLevel)) {
+        existingGroupedLevels[i] = emptyBookLevel
+        this._bookChanged = true
+      }
+    }
+
     return currentDepth === this._depth ? currentGroupedPrice : undefined
   }
 
