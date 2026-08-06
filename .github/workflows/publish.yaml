@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout Release Tag
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
@@ -37,10 +37,10 @@ jobs:
             exit 1
           fi
 
-      - name: Use Node.js v25.8.2
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - name: Use Node.js v26.7.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 25.8.2
+          node-version: 26.7.0
           package-manager-cache: false
 
       - name: Install Dependencies
@@ -49,8 +49,8 @@ jobs:
       - name: Verify Registry Signatures
         run: npm audit signatures
 
-      - name: Audit Production Dependencies
-        run: npm audit --omit=dev --audit-level=critical
+      - name: Audit Dependencies
+        run: npm audit --package-lock-only --audit-level=high
 
       - name: Set Package Version
         env:
@@ -64,12 +64,13 @@ jobs:
         run: |
           mkdir publish-artifact
           npm pack --ignore-scripts --pack-destination publish-artifact
+          mv publish-artifact/*.tgz publish-artifact/tardis-dev.tgz
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: npm-package
-          path: publish-artifact/*.tgz
+          path: publish-artifact/tardis-dev.tgz
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
@@ -83,10 +84,10 @@ jobs:
       id-token: write
 
     steps:
-      - name: Use Node.js v25.8.2
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - name: Use Node.js v26.7.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 25.8.2
+          node-version: 26.7.0
           registry-url: https://registry.npmjs.org/
 
       - name: Download Package Artifact
@@ -96,11 +97,4 @@ jobs:
           path: publish-artifact
 
       - name: Publish Package
-        run: |
-          shopt -s nullglob
-          tarballs=(./publish-artifact/*.tgz)
-          if [[ "${#tarballs[@]}" -ne 1 ]]; then
-            echo "Expected exactly one package tarball, found ${#tarballs[@]}." >&2
-            exit 1
-          fi
-          npm publish "${tarballs[0]}" --ignore-scripts
+        run: npm publish ./publish-artifact/tardis-dev.tgz --ignore-scripts
