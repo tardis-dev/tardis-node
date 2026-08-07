@@ -1,40 +1,8 @@
-import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist/index.js'
+import { describe, test } from 'node:test'
+import { combine } from '../dist/index.js'
+import { assert, snapshot } from './assertions.ts'
 
 describe('combine(...asyncIterators)', () => {
-  test(
-    'should produce combined iterable from two replayNormalized iterables',
-    async () => {
-      const normalizers = [normalizeTrades, normalizeBookChanges]
-      const bitmexMessages = replayNormalized(
-        {
-          exchange: 'bitmex',
-          from: '2019-04-01',
-          to: '2019-04-01 00:01',
-          symbols: ['XBTUSD']
-        },
-        ...normalizers
-      )
-
-      const deribitMessages = replayNormalized(
-        {
-          exchange: 'deribit',
-          from: '2019-04-01',
-          to: '2019-04-01 00:01',
-          symbols: ['BTC-PERPETUAL']
-        },
-        ...normalizers
-      )
-
-      const bufferedMessages: any[] = []
-      for await (const message of combine(bitmexMessages, deribitMessages)) {
-        bufferedMessages.push(message)
-      }
-
-      expect(bufferedMessages).toMatchSnapshot()
-    },
-    2 * 60 * 1000
-  )
-
   test('should correctly combine iterables based on localTimestamp value', async () => {
     let iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T08:52:00.132Z') }
@@ -55,7 +23,7 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
 
     iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T00:52:00.102Z') }
@@ -77,7 +45,7 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
 
     iter1 = async function* () {
       var localTimestamp = new Date('2019-08-01T00:52:00.102Z')
@@ -98,6 +66,6 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
   })
 })

@@ -1,10 +1,11 @@
+import { describe, test } from 'node:test'
 import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { assert } from './assertions.ts'
 import os from 'os'
 import path from 'path'
 import { execFileSync } from 'child_process'
-import { fileURLToPath } from 'url'
 
-const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+const repoRoot = process.cwd()
 
 describe('package exports', () => {
   test('supports ESM named imports', () => {
@@ -40,7 +41,7 @@ describe('package exports', () => {
       })
     )
 
-    expect(importOutput).toEqual({
+    assert.deepStrictEqual(importOutput, {
       namespaceReplay: 'function',
       namespaceStream: 'function',
       namespaceFindInstrumentSymbols: 'function',

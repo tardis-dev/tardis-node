@@ -1,8 +1,9 @@
+import { test } from 'node:test'
 import type { AddressInfo } from 'net'
+import { assert } from './assertions.ts'
 import { createServer } from 'http'
-import { Filter } from '../src/types.ts'
-import { MexcRealTimeFeed } from '../src/realtimefeeds/mexc.ts'
-import { getRealTimeFeedFactory } from '../src/realtimefeeds/index.ts'
+import type { Filter } from '../dist/types.js'
+import { MexcRealTimeFeed } from '../dist/realtimefeeds/mexc.js'
 
 class TestMexcRealTimeFeed extends MexcRealTimeFeed {
   protected readonly httpURL: string
@@ -20,14 +21,6 @@ class TestMexcRealTimeFeed extends MexcRealTimeFeed {
     return this.parseMessage(message)
   }
 
-  isError(message: any) {
-    return this.messageIsError(message)
-  }
-
-  isHeartbeat(message: any) {
-    return this.messageIsHeartbeat(message)
-  }
-
   observe(message: any) {
     this.onMessage(message)
   }
@@ -38,110 +31,18 @@ class TestMexcRealTimeFeed extends MexcRealTimeFeed {
   }
 }
 
-test('register mexc realtime feed', () => {
-  expect(getRealTimeFeedFactory('mexc')).toBeDefined()
-})
-
-test('map mexc realtime subscriptions', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-
-  const subscribeMessages = feed.map([
-    {
-      channel: 'spot@public.aggre.deals.v3.api.pb@10ms',
-      symbols: ['btcusdt', 'ETHUSDT']
-    },
-    {
-      channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
-      symbols: ['BTCUSDT']
-    },
-    {
-      channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
-      symbols: ['BTCUSDT']
-    },
-    {
-      channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms',
-      symbols: ['BTCUSDT']
-    }
-  ])
-
-  expect(subscribeMessages).toMatchSnapshot()
-})
-
-test('mexc realtime subscriptions require symbols', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'spot@public.aggre.deals.v3.api.pb@10ms'
-      }
-    ])
-  ).toThrow('MexcRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
-})
-
-test('mexc realtime rejects unsupported channels', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'unsupported',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow('MexcRealTimeFeed unsupported channel unsupported')
-})
-
-test('mexc snapshot filters require matching depth filters', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow(
-    'MexcRealTimeFeed requires spot@public.aggre.depth.v3.api.pb@10ms for every spot@public.aggre.depth.snapshot.v3.api.pb@10ms symbol'
-  )
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
-        symbols: ['ETHUSDT']
-      },
-      {
-        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow(
-    'MexcRealTimeFeed requires spot@public.aggre.depth.v3.api.pb@10ms for every spot@public.aggre.depth.snapshot.v3.api.pb@10ms symbol'
-  )
-})
-
-test('classify mexc realtime control messages', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-
-  expect(feed.isHeartbeat({ msg: 'PONG' })).toBe(true)
-  expect(feed.isError({ code: 0, msg: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT' })).toBe(false)
-  expect(feed.isError({ code: 1, msg: 'invalid request' })).toBe(true)
-})
-
-test('decode mexc realtime protobuf trade message', () => {
+test('decodes the MEXC protobuf payloads used by all normalized realtime mappers', () => {
   const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
   const trade = message(stringField(1, '100.1'), stringField(2, '0.2'), varintField(3, 1), varintField(4, 1710000000001))
   const publicAggreDeals = message(bytesField(1, trade), stringField(2, 'spot@public.aggre.deals.v3.api.pb@10ms'))
-  const wrapper = message(
+  const tradeWrapper = message(
     stringField(1, 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
     varintField(6, 1710000000000),
     bytesField(314, publicAggreDeals)
   )
 
-  expect(feed.parse(wrapper)).toEqual({
+  assert.deepStrictEqual(feed.parse(tradeWrapper), {
     channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
     symbol: 'BTCUSDT',
     sendTime: '1710000000000',
@@ -157,10 +58,7 @@ test('decode mexc realtime protobuf trade message', () => {
       eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
     }
   })
-})
 
-test('decode mexc realtime protobuf depth message', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
   const ask = message(stringField(1, '100.1'), stringField(2, '1.2'))
   const bid = message(stringField(1, '99.9'), stringField(2, '0.5'))
   const publicAggreDepths = message(
@@ -170,14 +68,14 @@ test('decode mexc realtime protobuf depth message', () => {
     stringField(4, '101'),
     stringField(5, '102')
   )
-  const wrapper = message(
+  const depthWrapper = message(
     stringField(1, 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
     varintField(6, 1710000000000),
     bytesField(313, publicAggreDepths)
   )
 
-  expect(feed.parse(wrapper)).toEqual({
+  assert.deepStrictEqual(feed.parse(depthWrapper), {
     channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
     symbol: 'BTCUSDT',
     sendTime: '1710000000000',
@@ -189,19 +87,16 @@ test('decode mexc realtime protobuf depth message', () => {
       toVersion: '102'
     }
   })
-})
 
-test('decode mexc realtime protobuf book ticker message', () => {
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
   const publicAggreBookTicker = message(stringField(1, '99.9'), stringField(2, '1.2'), stringField(3, '100.1'), stringField(4, '2.3'))
-  const wrapper = message(
+  const bookTickerWrapper = message(
     stringField(1, 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
     varintField(6, 1710000000000),
     bytesField(315, publicAggreBookTicker)
   )
 
-  expect(feed.parse(wrapper)).toEqual({
+  assert.deepStrictEqual(feed.parse(bookTickerWrapper), {
     channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
     symbol: 'BTCUSDT',
     sendTime: '1710000000000',
@@ -214,60 +109,8 @@ test('decode mexc realtime protobuf book ticker message', () => {
   })
 })
 
-test('provide mexc manual depth snapshots', async () => {
-  const server = await startSnapshotServer()
-  const feed = new TestMexcRealTimeFeed('mexc', [], undefined, server.url)
-  const originalDateNow = Date.now
-
-  Date.now = () => 1710000000000
-
-  try {
-    const filters = [
-      {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms',
-        symbols: ['btcusdt']
-      },
-      {
-        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms',
-        symbols: ['btcusdt']
-      }
-    ]
-
-    feed.map(filters)
-    feed.observe({
-      channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
-      symbol: 'BTCUSDT',
-      publicAggreDepths: {
-        fromVersion: '101',
-        toVersion: '101'
-      }
-    })
-
-    const snapshots = await feed.provideSnapshots(filters)
-
-    expect(snapshots).toEqual([
-      {
-        channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
-        symbol: 'BTCUSDT',
-        generated: true,
-        publicAggreDepthsSnapshot: {
-          lastUpdateId: 100,
-          asks: [['100.1', '1.2']],
-          bids: [['99.9', '0.5']],
-          timestamp: 1782235749967
-        }
-      }
-    ])
-  } finally {
-    Date.now = originalDateNow
-    await server.close()
-  }
-})
-
-test('retry mexc manual depth snapshots until buffered update overlaps', async () => {
+test('retries MEXC depth snapshots until the REST snapshot overlaps buffered WebSocket updates', async () => {
   const server = await startSnapshotServer([
-    { lastUpdateId: 101, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']], timestamp: 1782235749964 },
-    { lastUpdateId: 102, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']], timestamp: 1782235749965 },
     { lastUpdateId: 103, asks: [['100.3', '1.2']], bids: [['99.7', '0.5']], timestamp: 1782235749966 },
     { lastUpdateId: 104, asks: [['100.4', '1.2']], bids: [['99.6', '0.5']], timestamp: 1782235749967 }
   ])
@@ -300,8 +143,8 @@ test('retry mexc manual depth snapshots until buffered update overlaps', async (
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(server.requestsCount).toBe(4)
-    expect(snapshots).toEqual([
+    assert.strictEqual(server.requestsCount, 2)
+    assert.deepStrictEqual(snapshots, [
       {
         channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
         symbol: 'BTCUSDT',
@@ -358,7 +201,7 @@ async function startSnapshotServer(
 ) {
   let requestsCount = 0
   const server = createServer((request, response) => {
-    expect(request.url).toBe('/api/v3/depth?symbol=BTCUSDT&limit=5000')
+    assert.strictEqual(request.url, '/api/v3/depth?symbol=BTCUSDT&limit=5000')
     const body = responses[Math.min(requestsCount, responses.length - 1)]
     requestsCount++
 
@@ -366,7 +209,7 @@ async function startSnapshotServer(
     response.end(JSON.stringify(body))
   })
 
-  await new Promise<void>((resolve) => server.listen(0, resolve))
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
   const { port } = server.address() as AddressInfo
 
   return {

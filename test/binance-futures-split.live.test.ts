@@ -1,92 +1,90 @@
+import { test } from 'node:test'
 import { normalizeBookChanges, normalizeBookTickers, normalizeDerivativeTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
-import { describeLive } from './live.js'
+import { assert } from './assertions.ts'
+import { describeLive } from './live.ts'
 
 const testTimeoutMS = 40_000
 
 describeLive('binance futures supported channels live', () => {
-  test(
-    'streams normalized BTCUSDT data for supported channels without disconnects',
-    async () => {
-      const messages = streamNormalized(
-        {
-          exchange: 'binance-futures',
-          symbols: ['btcusdt'],
-          timeoutIntervalMS: 60_000,
-          withDisconnectMessages: true
-        },
-        normalizeTrades,
-        normalizeBookChanges,
-        normalizeDerivativeTickers,
-        normalizeBookTickers
-      )
+  test('streams normalized BTCUSDT data for supported channels without disconnects', { timeout: testTimeoutMS }, async () => {
+    const messages = streamNormalized(
+      {
+        exchange: 'binance-futures',
+        symbols: ['btcusdt'],
+        timeoutIntervalMS: 60_000,
+        withDisconnectMessages: true
+      },
+      normalizeTrades,
+      normalizeBookChanges,
+      normalizeDerivativeTickers,
+      normalizeBookTickers
+    )
 
-      const seen = {
-        trade: false,
-        bookSnapshot: false,
-        bookUpdate: false,
-        bookTicker: false,
-        lastPrice: false,
-        markPrice: false,
-        openInterest: false
+    const seen = {
+      trade: false,
+      bookSnapshot: false,
+      bookUpdate: false,
+      bookTicker: false,
+      lastPrice: false,
+      markPrice: false,
+      openInterest: false
+    }
+    let sawDisconnect = false
+
+    for await (const message of messages) {
+      if (message.type === 'disconnect') {
+        sawDisconnect = true
+        continue
       }
-      let sawDisconnect = false
 
-      for await (const message of messages) {
-        if (message.type === 'disconnect') {
-          sawDisconnect = true
-          continue
-        }
+      if (message.symbol !== 'BTCUSDT') {
+        continue
+      }
 
-        if (message.symbol !== 'BTCUSDT') {
-          continue
-        }
+      if (message.type === 'trade') {
+        seen.trade = true
+      }
 
-        if (message.type === 'trade') {
-          seen.trade = true
-        }
-
-        if (message.type === 'book_change') {
-          if (message.isSnapshot) {
-            seen.bookSnapshot = true
-          } else {
-            seen.bookUpdate = true
-          }
-        }
-
-        if (message.type === 'book_ticker') {
-          seen.bookTicker = true
-        }
-
-        if (message.type === 'derivative_ticker') {
-          if (message.lastPrice !== undefined) {
-            seen.lastPrice = true
-          }
-
-          if (message.markPrice !== undefined) {
-            seen.markPrice = true
-          }
-
-          if (message.openInterest !== undefined) {
-            seen.openInterest = true
-          }
-        }
-
-        if (Object.values(seen).every(Boolean)) {
-          break
+      if (message.type === 'book_change') {
+        if (message.isSnapshot) {
+          seen.bookSnapshot = true
+        } else {
+          seen.bookUpdate = true
         }
       }
 
-      expect(sawDisconnect).toBe(false)
-      expect(seen).toEqual({
-        trade: true,
-        bookSnapshot: true,
-        bookUpdate: true,
-        bookTicker: true,
-        lastPrice: true,
-        markPrice: true,
-        openInterest: true
-      })
-    },
-    testTimeoutMS
-  )
+      if (message.type === 'book_ticker') {
+        seen.bookTicker = true
+      }
+
+      if (message.type === 'derivative_ticker') {
+        if (message.lastPrice !== undefined) {
+          seen.lastPrice = true
+        }
+
+        if (message.markPrice !== undefined) {
+          seen.markPrice = true
+        }
+
+        if (message.openInterest !== undefined) {
+          seen.openInterest = true
+        }
+      }
+
+      if (Object.values(seen).every(Boolean)) {
+        break
+      }
+    }
+
+    assert.strictEqual(sawDisconnect, false)
+    assert.deepStrictEqual(seen, {
+      trade: true,
+      bookSnapshot: true,
+      bookUpdate: true,
+      bookTicker: true,
+      lastPrice: true,
+      markPrice: true,
+      openInterest: true
+    })
+  })
 })

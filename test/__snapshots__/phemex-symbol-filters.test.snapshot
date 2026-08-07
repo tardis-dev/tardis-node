@@ -1,0 +1,246 @@
+exports[`snapshots Phemex routing for ambiguous symbol families 1`] = `
+{
+  "channelFamilies": {
+    "trades": [
+      {
+        "channel": "trades_p",
+        "symbols": [
+          "SONYUSDT",
+          "BTCUSDC",
+          "u1000BONKUSDT"
+        ]
+      },
+      {
+        "channel": "trades",
+        "symbols": [
+          "sBTCUSDT",
+          "cADAUSD"
+        ]
+      }
+    ],
+    "bookChanges": [
+      {
+        "channel": "orderbook_p",
+        "symbols": [
+          "SONYUSDT",
+          "BTCUSDC",
+          "u1000BONKUSDT"
+        ]
+      },
+      {
+        "channel": "book",
+        "symbols": [
+          "sBTCUSDT",
+          "cADAUSD"
+        ]
+      }
+    ],
+    "derivativeTickers": [
+      {
+        "channel": "perp_market24h_pack_p",
+        "symbols": [
+          "SONYUSDT",
+          "BTCUSDC",
+          "u1000BONKUSDT"
+        ]
+      },
+      {
+        "channel": "market24h",
+        "symbols": [
+          "sBTCUSDT",
+          "cADAUSD"
+        ]
+      }
+    ]
+  },
+  "aliases": [
+    {
+      "symbol": "SBTCUSDT",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "sBTCUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "sBTCUSDT",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "sBTCUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "SKHYUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "SKHYUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "SMCIUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "SMCIUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "SONYUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "SONYUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "SQQQUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "STRCUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "STRCUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "U1000BONKUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "u1000BONKUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "u1000BONKUSDT",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "u1000BONKUSDT"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "CETHUSD",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "cETHUSD"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "cETHUSD",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "cETHUSD"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "SIRENPUSD",
+      "filters": [
+        {
+          "channel": "trades_p",
+          "symbols": [
+            "SIRENPUSD"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "sIRENPUSD",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "sIRENPUSD"
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "COMPUSD",
+      "filters": [
+        {
+          "channel": "trades",
+          "symbols": [
+            "COMPUSD"
+          ]
+        }
+      ]
+    }
+  ],
+  "historicalPerpetualPilot": [
+    {
+      "channel": "trades_p",
+      "symbols": [
+        "ANGLERFISHPUSD",
+        "BNBCARDPUSD",
+        "BNBXBTPUSD",
+        "BUTTCOINPUSD",
+        "CRYPTOAIPUSD",
+        "CTDPUSD",
+        "DOGEAIPUSD",
+        "FULLSENDPUSD",
+        "GHIBLIPUSD",
+        "GREED3PUSD",
+        "IMGPUSD",
+        "MCPOSPUSD",
+        "PAINPUSD",
+        "PERRYPUSD",
+        "SIRENPUSD",
+        "TITCOINPUSD",
+        "TOLYPUSD",
+        "WILDNOUTPUSD"
+      ]
+    },
+    {
+      "channel": "trades",
+      "symbols": [
+        "COMPUSD",
+        "OPUSD",
+        "sIRENPUSD"
+      ]
+    }
+  ]
+}
+`;

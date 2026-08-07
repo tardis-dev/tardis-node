@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install Dependencies And Compile TS
+      - name: Install Dependencies
         run: npm ci --ignore-scripts
 
       - name: Verify Registry Signatures

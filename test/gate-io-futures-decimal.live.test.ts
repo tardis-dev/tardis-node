@@ -1,8 +1,10 @@
+import { test } from 'node:test'
 import { normalizeBookChanges, normalizeBookTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
-import { describeLive } from './live.js'
+import { assert } from './assertions.ts'
+import { describeLive } from './live.ts'
 
 describeLive('gate-io-futures decimal size live', () => {
-  test('streams ETH_USDT data with non-zero decimal quantities and without disconnects', async () => {
+  test('streams ETH_USDT data with non-zero decimal quantities and without disconnects', { timeout: 40_000 }, async () => {
     const messages = streamNormalized(
       {
         exchange: 'gate-io-futures',
@@ -61,12 +63,12 @@ describeLive('gate-io-futures decimal size live', () => {
       await messages.return?.()
     }
 
-    expect(sawDisconnect).toBe(false)
-    expect(seen).toEqual({
+    assert.strictEqual(sawDisconnect, false)
+    assert.deepStrictEqual(seen, {
       trade: true,
       bookSnapshot: true,
       bookTicker: true,
       fractionalQuantity: true
     })
-  }, 40_000)
+  })
 })

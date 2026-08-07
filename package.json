@@ -31,7 +31,8 @@
   "homepage": "https://docs.tardis.dev/api/node-js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --experimental-vm-modules ./node_modules/jest/bin/jest.js --forceExit --runInBand",
+    "test": "npm run build && tsc -p test/tsconfig.json && node --experimental-test-module-mocks --test --test-concurrency=4 test/*.test.ts",
+    "test:update-snapshots": "npm run build && tsc -p test/tsconfig.json && node --experimental-test-module-mocks --test --test-concurrency=4 --test-update-snapshots test/*.test.ts",
     "prepare": "npm run build",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
@@ -76,34 +77,10 @@
   "devDependencies": {
     "@types/debug": "^4.1.13",
     "@types/follow-redirects": "^1.14.4",
-    "@types/jest": "^29.5.14",
     "@types/node": "^26.1.1",
     "@types/ws": "^8.18.1",
-    "jest": "^29.7.0",
     "prettier": "3.8.3",
-    "ts-jest": "^29.4.11",
     "typescript": "^6.0.3"
-  },
-  "jest": {
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "transform": {
-      "\\.(ts|tsx)?$": [
-        "ts-jest",
-        {
-          "useESM": true,
-          "tsconfig": "./test/tsconfig.json"
-        }
-      ]
-    },
-    "testEnvironment": "node",
-    "setupFiles": [
-      "./test/setup.js"
-    ]
   },
   "runkitExampleFilename": "example.js"
 }

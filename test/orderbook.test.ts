@@ -1,4 +1,6 @@
+import { describe, test } from 'node:test'
 import { OrderBook } from '../dist/index.js'
+import { assert } from './assertions.ts'
 
 describe('orderbook', () => {
   test('should update levels', () => {
@@ -18,8 +20,8 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toBeUndefined
-    expect(orderBook.bestBid()).toBeUndefined
+    assert.strictEqual(orderBook.bestAsk(), undefined)
+    assert.strictEqual(orderBook.bestBid(), undefined)
 
     // initial snapshot
     orderBook.update({
@@ -36,20 +38,20 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 120,
       amount: 1
     })
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119,
       amount: 20
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 120, amount: 1 },
       { price: 200, amount: 20 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([{ price: 119, amount: 20 }])
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [{ price: 119, amount: 20 }])
 
     // bids and asks updates
     orderBook.update({
@@ -70,22 +72,22 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 120,
       amount: 100
     })
 
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119.5,
       amount: 21
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 120, amount: 100 },
       { price: 200, amount: 20 },
       { price: 201, amount: 2000 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [
       { price: 119.5, amount: 21 },
       { price: 119, amount: 201 },
       { price: 118, amount: 200 }
@@ -103,21 +105,21 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 200,
       amount: 20
     })
 
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119.5,
       amount: 21
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 200, amount: 20 },
       { price: 201, amount: 2000 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [
       { price: 119.5, amount: 21 },
       { price: 118, amount: 200 }
     ])
@@ -137,21 +139,21 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 200,
       amount: 20
     })
 
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119.5,
       amount: 21
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 200, amount: 20 },
       { price: 201, amount: 100 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [
       { price: 119.5, amount: 21 },
       { price: 118, amount: 201 }
     ])
@@ -171,20 +173,20 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 120,
       amount: 100
     })
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119,
       amount: 200
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 120, amount: 100 },
       { price: 200, amount: 200 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([{ price: 119, amount: 200 }])
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [{ price: 119, amount: 200 }])
 
     // delete for non existing level
     orderBook.update({
@@ -198,20 +200,20 @@ describe('orderbook', () => {
       type: 'book_change'
     })
 
-    expect(orderBook.bestAsk()).toEqual({
+    assert.deepStrictEqual(orderBook.bestAsk(), {
       price: 120,
       amount: 100
     })
-    expect(orderBook.bestBid()).toEqual({
+    assert.deepStrictEqual(orderBook.bestBid(), {
       price: 119,
       amount: 200
     })
 
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 120, amount: 100 },
       { price: 200, amount: 200 }
     ])
-    expect(Array.from(orderBook.bids())).toEqual([{ price: 119, amount: 200 }])
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [{ price: 119, amount: 200 }])
   })
 
   test('matches a sorted map across snapshots, updates, and missing deletes', () => {
@@ -255,10 +257,10 @@ describe('orderbook', () => {
       const bids = [...expectedBids].sort(([priceA], [priceB]) => priceB - priceA).map(([price, amount]) => ({ price, amount }))
       const asks = [...expectedAsks].sort(([priceA], [priceB]) => priceA - priceB).map(([price, amount]) => ({ price, amount }))
 
-      expect(Array.from(orderBook.bids())).toEqual(bids)
-      expect(Array.from(orderBook.asks())).toEqual(asks)
-      expect(orderBook.bestBid()).toEqual(bids[0])
-      expect(orderBook.bestAsk()).toEqual(asks[0])
+      assert.deepStrictEqual(Array.from(orderBook.bids()), bids)
+      assert.deepStrictEqual(Array.from(orderBook.asks()), asks)
+      assert.deepStrictEqual(orderBook.bestBid(), bids[0])
+      assert.deepStrictEqual(orderBook.bestAsk(), asks[0])
     }
 
     update(
@@ -268,8 +270,8 @@ describe('orderbook', () => {
     )
 
     for (let i = 0; i < 2_000; i++) {
-      const bids = []
-      const asks = []
+      const bids: { price: number; amount: number }[] = []
+      const asks: { price: number; amount: number }[] = []
       const changes = 1 + (nextRandom() % 4)
       for (let change = 0; change < changes; change++) {
         const level = {
@@ -324,19 +326,19 @@ describe('orderbook', () => {
     )
     update([], [{ price: 98, amount: 5 }])
 
-    expect(Array.from(orderBook.bids())).toEqual([])
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [])
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 98, amount: 5 },
       { price: 101, amount: 3 },
       { price: 102, amount: 4 }
     ])
-    expect(callbackCount).toBe(2)
+    assert.strictEqual(callbackCount, 2)
 
     update([{ price: 103, amount: 6 }], [])
 
-    expect(Array.from(orderBook.bids())).toEqual([{ price: 103, amount: 6 }])
-    expect(Array.from(orderBook.asks())).toEqual([])
-    expect(callbackCount).toBe(5)
+    assert.deepStrictEqual(Array.from(orderBook.bids()), [{ price: 103, amount: 6 }])
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [])
+    assert.strictEqual(callbackCount, 5)
   })
 
   test('does not invalidate an active iterator when updating an existing level or deleting a missing level', () => {
@@ -359,9 +361,12 @@ describe('orderbook', () => {
     )
 
     const iteratorDuringUpdate = orderBook.asks()
-    expect(Array.from({ length: 7 }, () => iteratorDuringUpdate.next().value.price)).toEqual([1, 2, 3, 6, 7, 8, 12])
+    assert.deepStrictEqual(
+      Array.from({ length: 7 }, () => iteratorDuringUpdate.next().value.price),
+      [1, 2, 3, 6, 7, 8, 12]
+    )
     updateAsks([{ price: 18, amount: 180 }])
-    expect(Array.from(iteratorDuringUpdate)).toEqual([
+    assert.deepStrictEqual(Array.from(iteratorDuringUpdate), [
       { price: 16, amount: 16 },
       { price: 18, amount: 180 },
       { price: 21, amount: 21 },
@@ -370,9 +375,12 @@ describe('orderbook', () => {
     ])
 
     const iteratorDuringMissingDelete = orderBook.asks()
-    expect(Array.from({ length: 7 }, () => iteratorDuringMissingDelete.next().value.price)).toEqual([1, 2, 3, 6, 7, 8, 12])
+    assert.deepStrictEqual(
+      Array.from({ length: 7 }, () => iteratorDuringMissingDelete.next().value.price),
+      [1, 2, 3, 6, 7, 8, 12]
+    )
     updateAsks([{ price: 20, amount: 0 }])
-    expect(Array.from(iteratorDuringMissingDelete)).toEqual([
+    assert.deepStrictEqual(Array.from(iteratorDuringMissingDelete), [
       { price: 16, amount: 16 },
       { price: 18, amount: 180 },
       { price: 21, amount: 21 },
@@ -397,16 +405,16 @@ describe('orderbook', () => {
 
     updateAsks([1, 2, 3, 4].map((price) => ({ price, amount: price })))
     const iterator = orderBook.asks()
-    expect(iterator.next().value).toEqual({ price: 1, amount: 1 })
+    assert.deepStrictEqual(iterator.next().value, { price: 1, amount: 1 })
 
     updateAsks([10, 11].map((price) => ({ price, amount: price })))
 
-    expect(Array.from(iterator)).toEqual([
+    assert.deepStrictEqual(Array.from(iterator), [
       { price: 2, amount: 2 },
       { price: 3, amount: 3 },
       { price: 4, amount: 4 }
     ])
-    expect(Array.from(orderBook.asks())).toEqual([
+    assert.deepStrictEqual(Array.from(orderBook.asks()), [
       { price: 10, amount: 10 },
       { price: 11, amount: 11 }
     ])

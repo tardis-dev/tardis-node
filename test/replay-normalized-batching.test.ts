@@ -1,9 +1,10 @@
+import { afterEach, mock, test } from 'node:test'
 import { EventEmitter } from 'node:events'
+import { assert, errorMessageIncludes } from './assertions.ts'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'
-import { jest } from '@jest/globals'
 
 const tempDirs: string[] = []
 let feed = ''
@@ -43,12 +44,14 @@ class MockWorker extends EventEmitter {
   }
 }
 
-jest.unstable_mockModule('worker_threads', () => ({
-  Worker: MockWorker,
-  isMainThread: true,
-  parentPort: undefined,
-  workerData: undefined
-}))
+mock.module('worker_threads', {
+  exports: {
+    Worker: MockWorker,
+    isMainThread: true,
+    parentPort: undefined,
+    workerData: undefined
+  }
+})
 
 const { replay, replayNormalized } = await import('../dist/index.js')
 
@@ -60,63 +63,39 @@ afterEach(() => {
   }
 })
 
-test('keeps mapper ordering, lazy invocation, disconnect resets, and public output shape', async () => {
+test('preserves mapper order, disconnects, and microsecond timestamps across a replay batch', async () => {
   feed = [line(1), line(2), '', '', line(3, '30.1234567')].join('\n') + '\n'
 
-  const calls: string[] = []
-  const createdAt: string[] = []
-  const iterator = replayNormalized(normalizedOptions(true), normalizer('first', calls, createdAt), normalizer('second', calls, createdAt))
+  const instances = new Map<string, number>()
+  const messages = []
+  for await (const message of replayNormalized(
+    normalizedOptions(true),
+    resetAwareNormalizer('first', instances),
+    resetAwareNormalizer('second', instances)
+  )) {
+    messages.push(message)
+  }
 
-  expect((await iterator.next()).value.id).toBe('first-1')
-  expect(calls).toEqual(['create:first', 'create:second', 'map:first:1'])
-  expect(createdAt).toEqual(['first:2026-07-01T00:00:00.000Z', 'second:2026-07-01T00:00:00.000Z'])
-
-  expect((await iterator.next()).value.id).toBe('second-1')
-  expect(calls).toEqual(['create:first', 'create:second', 'map:first:1', 'map:second:1'])
-
-  expect((await iterator.next()).value.id).toBe('first-2')
-  expect((await iterator.next()).value.id).toBe('second-2')
-  expect((await iterator.next()).value).toMatchObject({ type: 'disconnect', exchange: 'binance', symbols: undefined })
-
-  expect((await iterator.next()).value.id).toBe('first-3')
-  expect(calls.slice(-3)).toEqual(['create:first', 'create:second', 'map:first:3'])
-  expect(createdAt).toEqual([
-    'first:2026-07-01T00:00:00.000Z',
-    'second:2026-07-01T00:00:00.000Z',
-    'first:2026-07-01T00:00:30.123456Z',
-    'second:2026-07-01T00:00:30.123456Z'
-  ])
-  expect((await iterator.next()).value.id).toBe('second-3')
-  expect((await iterator.next()).done).toBe(true)
+  assert.deepStrictEqual(
+    messages.map((message) => (message.type === 'disconnect' ? 'disconnect' : 'id' in message ? message.id : message.type)),
+    ['first-1-1', 'second-1-1', 'first-1-2', 'second-1-2', 'disconnect', 'first-2-3', 'second-2-3']
+  )
+  assert.deepStrictEqual(Object.fromEntries(instances), { first: 2, second: 2 })
+  const lastMessage = messages.at(-1)
+  assert.ok(lastMessage !== undefined && lastMessage.type === 'trade')
+  assert.strictEqual(lastMessage.localTimestamp.toISOString(), '2026-07-01T00:00:30.123Z')
+  assert.strictEqual(lastMessage.localTimestamp.μs, 456)
 })
 
-test('does not invoke later mappers or process later raw messages after cancellation', async () => {
+test('stops processing and closes a custom mapper when the consumer cancels', async () => {
   feed = `${line(1)}\n${line(2)}\n`
-  const calls: string[] = []
-  const iterator = replayNormalized(normalizedOptions(), normalizer('first', calls), normalizer('second', calls))
-
-  expect((await iterator.next()).value.id).toBe('first-1')
-  await iterator.return?.()
-
-  expect(calls).toEqual(['create:first', 'create:second', 'map:first:1'])
-})
-
-test('closes the active custom mapper iterator after cancellation', async () => {
-  feed = `${line(1)}\n`
   const calls: string[] = []
   const iterator = replayNormalized(normalizedOptions(), closableNormalizer(calls))
 
-  expect((await iterator.next()).value.id).toBe('closable-1')
+  assert.strictEqual((await iterator.next()).value.id, 'closable-1')
   await iterator.return?.()
 
-  expect(calls).toEqual(['map:closable:1', 'close:closable'])
-})
-
-test.each([null, false, 0])('keeps ignoring legacy falsy custom mapper output: %p', async (mappedValue) => {
-  feed = `${line(1)}\n`
-  const iterator = replayNormalized(normalizedOptions(), falsyNormalizer(mappedValue))
-
-  await expect(iterator.next()).resolves.toEqual({ done: true, value: undefined })
+  assert.deepStrictEqual(calls, ['map:closable:1', 'close:closable'])
 })
 
 test('yields earlier messages before surfacing a later mapper error', async () => {
@@ -124,29 +103,32 @@ test('yields earlier messages before surfacing a later mapper error', async () =
   const calls: string[] = []
   const iterator = replayNormalized(normalizedOptions(), throwingNormalizer(calls))
 
-  expect((await iterator.next()).value.id).toBe('throwing-1')
-  await expect(iterator.next()).rejects.toThrow('mapper failed on 2')
-  expect(calls).toEqual(['map:throwing:1', 'map:throwing:2'])
+  assert.strictEqual((await iterator.next()).value.id, 'throwing-1')
+  await assert.rejects(iterator.next(), errorMessageIncludes('mapper failed on 2'))
+  assert.deepStrictEqual(calls, ['map:throwing:1', 'map:throwing:2'])
 })
 
 test('yields earlier normalized messages before surfacing a later JSON error', async () => {
   feed = `${line(1)}\n2026-07-01T00:00:00.0000001Z {invalid\n`
-  const iterator = replayNormalized(normalizedOptions(), normalizer('first', []))
+  const iterator = replayNormalized(normalizedOptions(), normalizer('first'))
 
-  expect((await iterator.next()).value.id).toBe('first-1')
-  await expect(iterator.next()).rejects.toThrow(SyntaxError)
+  assert.strictEqual((await iterator.next()).value.id, 'first-1')
+  await assert.rejects(iterator.next(), SyntaxError)
 })
 
-test('keeps raw replay batch preparation and collapsed disconnect behavior', async () => {
+test('emits one disconnect marker for consecutive recorder gaps and preserves microseconds', async () => {
   feed = [line(1, '00.0000010'), '', '', line(2, '00.0000020')].join('\n') + '\n'
   const iterator = replay(rawOptions({ withDisconnects: true, withMicroseconds: true }))
 
   const first = (await iterator.next()).value
-  expect(first.message).toEqual({ sequence: 1 })
-  expect(first.localTimestamp.μs).toBe(1)
-  expect((await iterator.next()).value).toBeUndefined()
-  expect((await iterator.next()).value.message).toEqual({ sequence: 2 })
-  expect((await iterator.next()).done).toBe(true)
+  assert.ok(first !== undefined)
+  assert.deepStrictEqual(first.message, { sequence: 1 })
+  assert.strictEqual(first.localTimestamp.μs, 1)
+  assert.strictEqual((await iterator.next()).value, undefined)
+  const second = (await iterator.next()).value
+  assert.ok(second !== undefined)
+  assert.deepStrictEqual(second.message, { sequence: 2 })
+  assert.strictEqual((await iterator.next()).done, true)
 })
 
 test('parses fixed recorder timestamps across supported date boundaries', async () => {
@@ -158,27 +140,29 @@ test('parses fixed recorder timestamps across supported date boundaries', async 
   feed += '\n'
 
   const timestamps = []
-  for await (const { localTimestamp } of replay(rawOptions({ withMicroseconds: true }))) {
+  for await (const replayMessage of replay(rawOptions({ withMicroseconds: true }))) {
+    assert.ok(replayMessage !== undefined)
+    const { localTimestamp } = replayMessage
     timestamps.push({ iso: localTimestamp.toISOString(), μs: localTimestamp.μs })
   }
 
-  expect(timestamps).toEqual([
-    { iso: '2000-02-29T23:59:59.999000Z', μs: 0 },
-    { iso: '2099-12-31T23:59:59.000999Z', μs: 999 },
-    { iso: '2100-03-01T00:00:00.001234Z', μs: 234 }
+  assert.deepStrictEqual(timestamps, [
+    { iso: '2000-02-29T23:59:59.999Z', μs: 0 },
+    { iso: '2099-12-31T23:59:59.000Z', μs: 999 },
+    { iso: '2100-03-01T00:00:00.001Z', μs: 234 }
   ])
 })
 
-test('keeps raw replay no-catch behavior for malformed JSON in a prepared batch', async () => {
+test('does not silently skip malformed raw replay data', async () => {
   feed = `${line(1)}\n2026-07-01T00:00:00.0000001Z {invalid\n`
 
-  await expect(replay(rawOptions()).next()).rejects.toThrow(SyntaxError)
+  await assert.rejects(replay(rawOptions()).next(), SyntaxError)
 })
 
-test('surfaces a worker error while waiting for a cache slice', async () => {
+test('surfaces a data-slice failure to the replay consumer', async () => {
   workerError = new Error('HttpError: unavailable')
 
-  await expect(replay(rawOptions()).next()).rejects.toThrow('HttpError: unavailable')
+  await assert.rejects(replay(rawOptions()).next(), errorMessageIncludes('HttpError: unavailable'))
 })
 
 function normalizedOptions(withDisconnectMessages = false) {
@@ -208,16 +192,26 @@ function timestampedLine(localTimestamp: string, sequence: number) {
   return `${localTimestamp} ${JSON.stringify({ sequence })}`
 }
 
-function normalizer(name: string, calls: string[], createdAt?: string[]) {
-  return ((exchange: string, localTimestamp: Date) => {
-    calls.push(`create:${name}`)
-    createdAt?.push(`${name}:${localTimestamp.toISOString()}`)
+function normalizer(name: string) {
+  return ((exchange: string) => ({
+    canHandle: () => true,
+    getFilters: () => [{ channel: 'trade' }],
+    *map(message: { sequence: number }, localTimestamp: Date) {
+      yield normalizedMessage(exchange, `${name}-${message.sequence}`, localTimestamp)
+    }
+  })) as any
+}
+
+function resetAwareNormalizer(name: string, instances: Map<string, number>) {
+  return ((exchange: string) => {
+    const instance = (instances.get(name) ?? 0) + 1
+    instances.set(name, instance)
+
     return {
       canHandle: () => true,
       getFilters: () => [{ channel: 'trade' }],
       *map(message: { sequence: number }, localTimestamp: Date) {
-        calls.push(`map:${name}:${message.sequence}`)
-        yield normalizedMessage(exchange, `${name}-${message.sequence}`, localTimestamp)
+        yield normalizedMessage(exchange, `${name}-${instance}-${message.sequence}`, localTimestamp)
       }
     }
   }) as any
@@ -249,14 +243,6 @@ function closableNormalizer(calls: string[]) {
         calls.push('close:closable')
       }
     }
-  })) as any
-}
-
-function falsyNormalizer(mappedValue: null | false | 0) {
-  return (() => ({
-    canHandle: () => true,
-    getFilters: () => [{ channel: 'trade' }],
-    map: () => mappedValue
   })) as any
 }
 

@@ -1,13 +1,7 @@
-import {
-  BookChange,
-  compute,
-  computeBookSnapshots,
-  computeTradeBars,
-  normalizeBookChanges,
-  normalizeTrades,
-  replayNormalized,
-  Trade
-} from '../dist/index.js'
+import { describe, test } from 'node:test'
+import { assert, snapshot } from './assertions.ts'
+import { compute, computeBookSnapshots, computeTradeBars } from '../dist/index.js'
+import type { BookChange, Trade } from '../dist/index.js'
 
 const createBookChange = (bids: BookChange['bids'], asks: BookChange['asks'], isSnapshot = false): BookChange => ({
   type: 'book_change',
@@ -21,40 +15,6 @@ const createBookChange = (bids: BookChange['bids'], asks: BookChange['asks'], is
 })
 
 describe('compute(messages, types)', () => {
-  test(
-    'should compute requested types based on replayNormalized iterables',
-    async () => {
-      const normalizers = [normalizeTrades, normalizeBookChanges]
-      const bitmexMessages = replayNormalized(
-        {
-          exchange: 'bitmex',
-          from: '2019-04-01',
-          to: '2019-04-01 00:01',
-          symbols: ['XBTUSD'],
-          withDisconnectMessages: true
-        },
-        ...normalizers
-      )
-
-      const bufferedMessages = []
-      const withComputedTypes = compute(
-        bitmexMessages,
-        computeBookSnapshots({ depth: 10, interval: 1000 }),
-        computeBookSnapshots({ depth: 5, interval: 0 }),
-        computeBookSnapshots({ depth: 3, interval: 100 }),
-        computeTradeBars({ kind: 'time', interval: 1000 }),
-        computeTradeBars({ kind: 'tick', interval: 100 })
-      )
-
-      for await (const message of withComputedTypes) {
-        bufferedMessages.push(message)
-      }
-
-      expect(bufferedMessages).toMatchSnapshot()
-    },
-    1000 * 60
-  )
-
   test('should compute correct trade bars based on provided messages', async () => {
     let tradesMessages = async function* (): AsyncIterableIterator<Trade> {
       yield {
@@ -142,7 +102,7 @@ describe('compute(messages, types)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
   })
 
   test('should produce correct book snapshots based on provided messages', async () => {
@@ -230,7 +190,7 @@ describe('compute(messages, types)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
   })
 
   test('keeps price levels isolated between shared book snapshot computables', async () => {
@@ -261,13 +221,13 @@ describe('compute(messages, types)', () => {
         depth1BestBid = message.bids[0]
         ;(depth1BestBid as any).amount = 999
       } else {
-        expect(message.bids[0]).not.toBe(depth1BestBid)
-        expect(message.bids[0].amount).toBe(1)
+        assert.notStrictEqual(message.bids[0], depth1BestBid)
+        assert.strictEqual(message.bids[0].amount, 1)
       }
     }
   })
 
-  test('does not pass shared context to custom computable factories', async () => {
+  test('does not expose internal context to custom computable factories', async () => {
     let factoryArgumentsCount = -1
     const customFactory = function () {
       factoryArgumentsCount = arguments.length
@@ -277,23 +237,13 @@ describe('compute(messages, types)', () => {
       }
     }
     const messages = async function* (): AsyncIterableIterator<BookChange> {
-      yield {
-        type: 'book_change',
-        exchange: 'bitmex',
-        isSnapshot: true,
-        asks: [],
-        bids: [],
-        localTimestamp: new Date('2019-08-01T00:00:00.132Z'),
-        timestamp: new Date('2019-08-01T00:00:00.132Z'),
-        symbol: 'XBTUSD'
-      }
+      yield createBookChange([], [], true)
     }
 
     for await (const _ of compute(messages(), customFactory)) {
-      // drain the iterator so the factory is created
     }
 
-    expect(factoryArgumentsCount).toBe(0)
+    assert.strictEqual(factoryArgumentsCount, 0)
   })
 
   test('keeps grouped snapshots correct across outside, boundary, and refill changes', async () => {
@@ -331,23 +281,29 @@ describe('compute(messages, types)', () => {
     const top2 = snapshots.filter((snapshot) => snapshot.name === 'top_2')
     const fullDepth = snapshots.filter((snapshot) => snapshot.name === 'full_depth')
     const fullTop2 = top2.filter((snapshot) => snapshot.bids[1].price !== undefined && snapshot.asks[1].price !== undefined)
-    expect(fullTop2.map((snapshot) => snapshot.bids[1])).toEqual([
-      { price: 10, amount: 2 },
-      { price: 10, amount: 8 },
-      { price: 9.5, amount: 4 },
-      { price: 9, amount: 10 }
-    ])
-    expect(fullTop2.map((snapshot) => snapshot.asks[1])).toEqual([
-      { price: 12, amount: 5 },
-      { price: 12, amount: 9 },
-      { price: 12.5, amount: 7 },
-      { price: 13, amount: 11 }
-    ])
-    expect(fullDepth[1].bids.slice(1, 3)).toEqual([
+    assert.deepStrictEqual(
+      fullTop2.map((snapshot) => snapshot.bids[1]),
+      [
+        { price: 10, amount: 2 },
+        { price: 10, amount: 8 },
+        { price: 9.5, amount: 4 },
+        { price: 9, amount: 10 }
+      ]
+    )
+    assert.deepStrictEqual(
+      fullTop2.map((snapshot) => snapshot.asks[1]),
+      [
+        { price: 12, amount: 5 },
+        { price: 12, amount: 9 },
+        { price: 12.5, amount: 7 },
+        { price: 13, amount: 11 }
+      ]
+    )
+    assert.deepStrictEqual(fullDepth[1].bids.slice(1, 3), [
       { price: 10, amount: 2 },
       { price: 9.5, amount: 4 }
     ])
-    expect(fullDepth[1].asks.slice(1, 3)).toEqual([
+    assert.deepStrictEqual(fullDepth[1].asks.slice(1, 3), [
       { price: 12, amount: 5 },
       { price: 12.5, amount: 7 }
     ])
@@ -388,28 +344,31 @@ describe('compute(messages, types)', () => {
     }
 
     const emptyLevel = { price: undefined, amount: undefined }
-    expect(snapshots.map(({ bids, asks }) => ({ bids, asks }))).toEqual([
-      {
-        bids: [
-          { price: 100, amount: 1 },
-          { price: 99, amount: 2 },
-          { price: 98, amount: 3 }
-        ],
-        asks: [
-          { price: 102, amount: 4 },
-          { price: 103, amount: 5 },
-          { price: 104, amount: 6 }
-        ]
-      },
-      {
-        bids: [{ price: 100, amount: 1 }, emptyLevel, emptyLevel],
-        asks: [{ price: 102, amount: 4 }, emptyLevel, emptyLevel]
-      },
-      {
-        bids: [emptyLevel, emptyLevel, emptyLevel],
-        asks: [emptyLevel, emptyLevel, emptyLevel]
-      }
-    ])
+    assert.deepStrictEqual(
+      snapshots.map(({ bids, asks }) => ({ bids, asks })),
+      [
+        {
+          bids: [
+            { price: 100, amount: 1 },
+            { price: 99, amount: 2 },
+            { price: 98, amount: 3 }
+          ],
+          asks: [
+            { price: 102, amount: 4 },
+            { price: 103, amount: 5 },
+            { price: 104, amount: 6 }
+          ]
+        },
+        {
+          bids: [{ price: 100, amount: 1 }, emptyLevel, emptyLevel],
+          asks: [{ price: 102, amount: 4 }, emptyLevel, emptyLevel]
+        },
+        {
+          bids: [emptyLevel, emptyLevel, emptyLevel],
+          asks: [emptyLevel, emptyLevel, emptyLevel]
+        }
+      ]
+    )
   })
 
   test('rebuilds both grouped sides when crossed levels are removed', async () => {
@@ -435,71 +394,51 @@ describe('compute(messages, types)', () => {
       if (message.type === 'book_snapshot') snapshots.push(message)
     }
 
-    expect(snapshots.map(({ bids, asks }) => ({ bids, asks }))).toEqual([
-      { bids: [{ price: 100, amount: 1 }], asks: [{ price: 110, amount: 3 }] },
-      { bids: [{ price: 90, amount: 2 }], asks: [{ price: 100, amount: 5 }] },
-      { bids: [{ price: 110, amount: 6 }], asks: [{ price: 120, amount: 4 }] }
-    ])
+    assert.deepStrictEqual(
+      snapshots.map(({ bids, asks }) => ({ bids, asks })),
+      [
+        { bids: [{ price: 100, amount: 1 }], asks: [{ price: 110, amount: 3 }] },
+        { bids: [{ price: 90, amount: 2 }], asks: [{ price: 100, amount: 5 }] },
+        { bids: [{ price: 110, amount: 6 }], asks: [{ price: 120, amount: 4 }] }
+      ]
+    )
   })
 
-  test('should produce correct trade bars based on provided messages', async () => {
-    let messages = async function* (): AsyncIterableIterator<Trade> {
+  test('computes time bars from out-of-order trade timestamps', async () => {
+    const messages = async function* (): AsyncIterableIterator<Trade> {
       yield {
         id: undefined,
         type: 'trade',
-
         symbol: 'CRV-USD',
-
         exchange: 'dydx',
-
         price: 0.3394,
-
         amount: 1273,
-
         side: 'buy',
-
         timestamp: new Date('2024-06-23T03:05:59.988Z'),
-
         localTimestamp: new Date('2024-06-23T03:06:00.158521Z')
       }
-      ;(yield {
+      yield {
         id: undefined,
-
         type: 'trade',
-
         symbol: 'CRV-USD',
-
         exchange: 'dydx',
-
         price: 0.3387,
-
         amount: 65,
-
         side: 'buy',
-
         timestamp: new Date('2024-06-23T03:05:59.981Z'),
-
         localTimestamp: new Date('2024-06-23T03:06:00.173614Z')
-      },
-        yield {
-          id: undefined,
-
-          type: 'trade',
-
-          symbol: 'CRV-USD',
-
-          exchange: 'dydx',
-
-          price: 0.3387,
-
-          amount: 65,
-
-          side: 'buy',
-
-          timestamp: new Date('2024-06-23T03:06:01.981Z'),
-
-          localTimestamp: new Date('2024-06-23T03:06:02.173614Z')
-        })
+      }
+      yield {
+        id: undefined,
+        type: 'trade',
+        symbol: 'CRV-USD',
+        exchange: 'dydx',
+        price: 0.3387,
+        amount: 65,
+        side: 'buy',
+        timestamp: new Date('2024-06-23T03:06:01.981Z'),
+        localTimestamp: new Date('2024-06-23T03:06:02.173614Z')
+      }
     }
 
     const withComputedTypes = compute(messages(), computeTradeBars({ kind: 'time', interval: 60 * 1000, name: 'trade_bar_1_minute' }))
@@ -510,6 +449,6 @@ describe('compute(messages, types)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
   })
 })

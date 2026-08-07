@@ -5,7 +5,9 @@
     "isolatedModules": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "types": ["node", "jest"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node"],
     "noEmit": true
   },
   "include": ["."]
