@@ -2,12 +2,12 @@
   "name": "tardis-dev",
   "version": "17.2.0",
   "engines": {
-    "node": ">=24"
+    "node": ">=24.5"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=24"
+      "version": ">=24.5"
     },
     "packageManager": {
       "name": "npm",
@@ -69,7 +69,6 @@
   "dependencies": {
     "debug": "^4.4.3",
     "follow-redirects": "^1.16.0",
-    "https-proxy-agent": "^8.0.0",
     "p-map": "^7.0.5",
     "protobufjs": "^8.7.1",
     "ws": "^8.21.1"

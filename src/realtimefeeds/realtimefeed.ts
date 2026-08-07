@@ -3,7 +3,7 @@ import WebSocket, { createWebSocketStream } from 'ws'
 import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { once } from 'events'
-import { httpsProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy.ts'
+import { getProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy.ts'
 import { Exchange, Filter } from '../types.ts'
 
 export type RealTimeFeed = {
@@ -54,10 +54,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       handshakeTimeout: 10 * ONE_SEC_IN_MS,
       skipUTF8Validation: true
     } as any
-
-    if (httpsProxyAgent !== undefined) {
-      this._wsClientOptions.agent = httpsProxyAgent
-    }
   }
 
   protected async getWebSocketUrl() {
@@ -95,6 +91,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           Object.assign((this._wsClientOptions as any).headers, this.extraHeaders)
         }
 
+        this._wsClientOptions.agent = getProxyAgent(finalWssUrl)
         this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
         this._ws.onopen = this._onConnectionEstabilished
         this._ws.onclose = this._onConnectionClosed

@@ -1,15 +1,14 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, mkdirSync, rmSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import type { RequestOptions, Agent } from 'https'
+import { Agent as HttpAgent } from 'node:http'
+import { Agent as HttpsAgent, type RequestOptions } from 'node:https'
 import followRedirects from 'follow-redirects'
-import * as httpsProxyAgentPkg from 'https-proxy-agent'
 import path from 'path'
 import { debug } from './debug.ts'
 import { Mapper } from './mappers/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
-const { http, https } = followRedirects
-const { HttpsProxyAgent } = httpsProxyAgentPkg
+const { http: followRedirectsHttp, https: followRedirectsHttps } = followRedirects
 
 export function parseAsUTCDate(val: string) {
   // Treat date-only and minute-level strings as UTC instead of local time.
@@ -261,14 +260,26 @@ export function optimizeFilters(filters: Filter<any>[]) {
   return optimizedFilters
 }
 
-const httpsAgent = new https.Agent({
+const httpsAgent = new HttpsAgent({
   keepAlive: true,
   keepAliveMsecs: 10 * ONE_SEC_IN_MS,
   maxSockets: 120
 })
 
-export const httpsProxyAgent: Agent | undefined =
-  process.env.HTTP_PROXY !== undefined ? new HttpsProxyAgent(process.env.HTTP_PROXY) : undefined
+const proxyEnv =
+  process.env.HTTP_PROXY === undefined
+    ? undefined
+    : {
+        HTTP_PROXY: process.env.HTTP_PROXY,
+        HTTPS_PROXY: process.env.HTTP_PROXY
+      }
+const httpProxyAgent = proxyEnv === undefined ? undefined : new HttpAgent({ proxyEnv })
+const httpsProxyAgent = proxyEnv === undefined ? undefined : new HttpsAgent({ proxyEnv })
+
+export function getProxyAgent(url: string | URL) {
+  const protocol = new URL(url).protocol
+  return protocol === 'http:' || protocol === 'ws:' ? httpProxyAgent : httpsProxyAgent
+}
 
 const DEFAULT_FETCH_RETRY_LIMIT = 2
 
@@ -446,7 +457,7 @@ async function requestViaFetch(method: string, url: string, options: HttpRequest
 }
 
 async function requestViaProxy(method: string, url: string, options: HttpRequestOptions): Promise<HttpResponse> {
-  const requestClient = new URL(url).protocol === 'http:' ? http : https
+  const requestClient = new URL(url).protocol === 'http:' ? followRedirectsHttp : followRedirectsHttps
   const preparedRequest = prepareRequest(method, options)
 
   return await new Promise<HttpResponse>((resolve, reject) => {
@@ -455,7 +466,7 @@ async function requestViaProxy(method: string, url: string, options: HttpRequest
         url,
         {
           method,
-          agent: httpsProxyAgent,
+          agent: getProxyAgent(url),
           headers: preparedRequest.headers,
           timeout: options.timeout
         },
@@ -489,7 +500,7 @@ async function request(method: string, url: string, options: HttpRequestOptions 
   for (let attempt = 1; ; attempt += 1) {
     try {
       const response =
-        httpsProxyAgent === undefined ? await requestViaFetch(method, url, options) : await requestViaProxy(method, url, options)
+        getProxyAgent(url) === undefined ? await requestViaFetch(method, url, options) : await requestViaProxy(method, url, options)
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response
@@ -550,7 +561,6 @@ export async function download({
   acceptEncoding?: string
 }) {
   const httpRequestOptions = {
-    agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
     timeout: 90 * ONE_SEC_IN_MS,
     headers: {
       'Accept-Encoding': acceptEncoding,
@@ -635,9 +645,10 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
     let responseHeaders: Record<string, string> = {}
     await new Promise<void>((resolve, reject) => {
       const protocol = new URL(url).protocol
-      const requestClient = protocol === 'http:' ? http : https
+      const requestClient = protocol === 'http:' ? followRedirectsHttp : followRedirectsHttps
+      const agent = getProxyAgent(url) ?? (protocol === 'https:' ? httpsAgent : undefined)
       const req = requestClient
-        .get(url, { ...requestOptions, ...(protocol === 'http:' ? { agent: undefined } : {}) }, (res) => {
+        .get(url, { ...requestOptions, agent }, (res) => {
           const { statusCode } = res
           if (statusCode !== 200) {
             // read the error response text and throw it as an HttpError
