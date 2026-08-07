@@ -72,7 +72,6 @@
     "https-proxy-agent": "^8.0.0",
     "p-map": "^7.0.5",
     "protobufjs": "^8.7.1",
-    "socks-proxy-agent": "^9.0.0",
     "ws": "^8.21.1"
   },
   "devDependencies": {

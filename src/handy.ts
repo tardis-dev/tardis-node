@@ -8,10 +8,8 @@ import path from 'path'
 import { debug } from './debug.ts'
 import { Mapper } from './mappers/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
-import * as socksProxyAgentPkg from 'socks-proxy-agent'
 const { http, https } = followRedirects
 const { HttpsProxyAgent } = httpsProxyAgentPkg
-const { SocksProxyAgent } = socksProxyAgentPkg
 
 export function parseAsUTCDate(val: string) {
   // Treat date-only and minute-level strings as UTC instead of local time.
@@ -270,11 +268,7 @@ const httpsAgent = new https.Agent({
 })
 
 export const httpsProxyAgent: Agent | undefined =
-  process.env.HTTP_PROXY !== undefined
-    ? new HttpsProxyAgent(process.env.HTTP_PROXY)
-    : process.env.SOCKS_PROXY !== undefined
-      ? new SocksProxyAgent(process.env.SOCKS_PROXY)
-      : undefined
+  process.env.HTTP_PROXY !== undefined ? new HttpsProxyAgent(process.env.HTTP_PROXY) : undefined
 
 const DEFAULT_FETCH_RETRY_LIMIT = 2
 
