@@ -4,6 +4,8 @@ Public npm package (`tardis-dev`). Provides async iterator API for historical re
 
 ## Build & Test
 
+Use the Node.js version from `.nvmrc` and its bundled npm.
+
 ```bash
 npm run build        # tsc
 npm test             # build + jest
