@@ -299,7 +299,7 @@ function getOrderBookHandle(
   removeCrossedLevels: boolean | undefined,
   onCrossedLevelRemoved: OnLevelRemovedCB | undefined
 ): OrderBookHandle {
-  if (context === undefined || onCrossedLevelRemoved !== undefined) {
+  if (context === undefined) {
     return {
       orderBook: new OrderBook({ removeCrossedLevels, onCrossedLevelRemoved }),
       isOwner: true
@@ -315,10 +315,13 @@ function getOrderBookHandle(
   const key = removeCrossedLevels === true
   const sharedOrderBook = sharedOrderBooks.get(key)
   if (sharedOrderBook !== undefined) {
+    if (onCrossedLevelRemoved !== undefined) {
+      sharedOrderBook.addOnCrossedLevelRemovedCallback(onCrossedLevelRemoved)
+    }
     return { orderBook: sharedOrderBook, isOwner: false }
   }
 
-  const orderBook = new OrderBook({ removeCrossedLevels })
+  const orderBook = new OrderBook({ removeCrossedLevels, onCrossedLevelRemoved })
   sharedOrderBooks.set(key, orderBook)
   return { orderBook, isOwner: true }
 }
