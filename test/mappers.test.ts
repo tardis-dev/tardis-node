@@ -44,6 +44,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'aster',
   'ascendex',
   'binance',
   'binance-futures',
@@ -2849,6 +2850,180 @@ describe('mappers', () => {
     }
   })
 
+  test('map aster messages', () => {
+    const asterMapper = createMapper('aster', new Date())
+    const localTimestamp = new Date('2026-07-29T00:00:01.000Z')
+
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@trade',
+          data: {
+            e: 'trade',
+            E: 1591261236000,
+            s: 'BTCUSDT',
+            t: 12345,
+            p: '5.1',
+            q: '0.2',
+            T: 1591261235999,
+            m: true
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        id: '12345',
+        price: 5.1,
+        amount: 0.2,
+        side: 'sell',
+        timestamp: new Date('2020-06-04T09:00:35.999Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 100,
+            bids: [['5.0', '1.2']],
+            asks: [['5.2', '2.4']],
+            T: 1591261236000
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        isSnapshot: true,
+        bids: [{ price: 5, amount: 1.2 }],
+        asks: [{ price: 5.2, amount: 2.4 }],
+        timestamp: new Date('2020-06-04T09:00:36.000Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1591261236100,
+            T: 1591261236099,
+            s: 'BTCUSDT',
+            U: 120,
+            u: 122,
+            pu: 100,
+            b: [['5.1', '3']],
+            a: [['5.3', '4']]
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        isSnapshot: false,
+        bids: [{ price: 5.1, amount: 3 }],
+        asks: [{ price: 5.3, amount: 4 }],
+        timestamp: new Date('2020-06-04T09:00:36.100Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1591261236200,
+            T: 1591261236199,
+            s: 'BTCUSDT',
+            U: 130,
+            u: 131,
+            pu: 122,
+            b: [['5.4', '6']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        isSnapshot: false,
+        bids: [{ price: 5.4, amount: 6 }],
+        asks: [],
+        timestamp: new Date('2020-06-04T09:00:36.200Z'),
+        localTimestamp
+      }
+    ])
+
+    expect(() =>
+      Array.from(
+        asterMapper.map(
+          {
+            stream: 'btcusdt@depth@100ms',
+            data: {
+              e: 'depthUpdate',
+              E: 1591261236300,
+              T: 1591261236299,
+              s: 'BTCUSDT',
+              U: 140,
+              u: 141,
+              pu: 129,
+              b: [],
+              a: []
+            }
+          },
+          localTimestamp
+        )!
+      )
+    ).toThrow('Book depth update has a sequence gap')
+    expect(
+      asterMapper.map(
+        {
+          stream: 'btcusdt@bookTicker',
+          data: {
+            u: 400900217,
+            s: 'BTCUSDT',
+            b: '5.1',
+            B: '1.2',
+            a: '5.2',
+            A: '2.4'
+          }
+        },
+        localTimestamp
+      )
+    ).toEqual([
+      {
+        type: 'book_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'aster',
+        askAmount: 2.4,
+        askPrice: 5.2,
+        bidPrice: 5.1,
+        bidAmount: 1.2,
+        timestamp: localTimestamp,
+        localTimestamp
+      }
+    ])
+  })
   test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
     const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
     const mappedMessages = bitfinexDerivativesMapper.map(

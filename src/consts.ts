@@ -1,4 +1,5 @@
 export const EXCHANGES = [
+  'aster',
   'bitmex',
   'deribit',
   'binance-futures',
@@ -64,6 +65,8 @@ export const EXCHANGES = [
 ] as const
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
+
+const ASTER_CHANNELS = ['trade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot', 'ticker'] as const
 const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book', 'ticker'] as const
 
@@ -558,6 +561,7 @@ const POLYMARKET_CHANNELS = [
 ] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
+  aster: ASTER_CHANNELS,
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
   'coinbase-international': COINBASE_INTERNATIONAL_CHANNELS,
