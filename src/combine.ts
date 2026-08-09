@@ -1,4 +1,4 @@
-import { isManagedRealTimeIterator, mergeRealTime } from './realtimeiterator.ts'
+import { closeIterator, isManagedRealTimeIterator, mergeRealTime } from './realtimeiterator.ts'
 
 type NextMessageResultWithIndex = {
   index: number
@@ -129,8 +129,6 @@ async function* combineHistorical(
       }
     } while (aliveIteratorsCount > 0)
   } finally {
-    for (let iterator of iterators) {
-      ;(iterator as any).return()
-    }
+    await Promise.all(iterators.map((iterator) => closeIterator('stream' in iterator ? iterator.stream : iterator)))
   }
 }
