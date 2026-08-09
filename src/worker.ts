@@ -1,8 +1,8 @@
 import dbg from 'debug'
 import { existsSync } from 'node:fs'
-import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy.ts'
+import { forEachConcurrent } from './foreachconcurrent.ts'
+import { addMinutes, download, formatDateToPath, optimizeFilters, sha256, wait, cleanTempFiles } from './handy.ts'
 import type { DataFeedCompression } from './options.ts'
 import { Exchange, Filter } from './types.ts'
 const debug = dbg('tardis-dev')
@@ -123,14 +123,10 @@ async function getAvailableDataFeedSlices(
   }
 
   // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
-  await pMap(
-    sliceOffsets,
-    async (offset) => {
-      const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
-      await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
-    },
-    { concurrency: concurrencyLimit }
-  )
+  await forEachConcurrent(sliceOffsets, concurrencyLimit, async (offset) => {
+    const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
+    await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
+  })
 }
 
 async function getDataFeedSlice(

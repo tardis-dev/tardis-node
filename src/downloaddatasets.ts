@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
-import pMap from 'p-map'
 import { debug } from './debug.ts'
 import { DatasetType } from './exchangedetails.ts'
+import { forEachConcurrent } from './foreachconcurrent.ts'
 import { addDays, doubleDigit, download, parseAsUTCDate, sequence } from './handy.ts'
 import { getOptions } from './options.ts'
 import { Exchange } from './types.ts'
@@ -62,8 +62,9 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
       )
 
       // download the rest concurrently up to the CONCURRENCY_LIMIT
-      await pMap(
+      await forEachConcurrent(
         sequence(daysCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to daysCountToFetch - 1 (as we already downloaded data for the first and last day)
+        CONCURRENCY_LIMIT,
         (offset) =>
           downloadDataSet(
             getDownloadOptions({
@@ -77,8 +78,7 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
               date: addDays(startDate, offset)
             }),
             skipIfExists
-          ),
-        { concurrency: CONCURRENCY_LIMIT }
+          )
       )
       const elapsedSeconds = (new Date().valueOf() - startTimestamp) / 1000
 
