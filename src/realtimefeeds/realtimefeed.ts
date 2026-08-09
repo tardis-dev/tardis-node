@@ -2,8 +2,9 @@ import dbg from 'debug'
 import WebSocket, { createWebSocketStream } from 'ws'
 import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
-import { once } from 'events'
-import { getProxyAgent, ONE_SEC_IN_MS, optimizeFilters, wait } from '../handy.ts'
+import { setTimeout as sleep } from 'node:timers/promises'
+import { getProxyAgent, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
+import { createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
 
 export type RealTimeFeed = {
@@ -19,9 +20,18 @@ let connectionCounter = 1
 
 export type RealTimeFeedIterable = AsyncIterable<any>
 
+type RealTimeFeedConnection = {
+  id: number
+  ws: WebSocket
+  controller: AbortController
+  receivedMessagesCount: number
+}
+
+const ABORTED = Symbol('aborted')
+
 export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
-  [Symbol.asyncIterator]() {
-    return this._stream()
+  [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
+    return createManagedRealTimeIterator(this._stream(), () => this._close())
   }
 
   protected readonly debug: dbg.Debugger
@@ -29,10 +39,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected readonly throttleSubscribeMS: number = 0
   protected readonly manualSnapshotsBuffer: any[] = []
   private readonly _filters: Filter<string>[]
-  private _receivedMessagesCount = 0
-  private _ws?: WebSocket
-  private _connectionId = -1
   private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
+  private _closed = false
+  private readonly _closeController = new AbortController()
+  private _connection?: RealTimeFeedConnection
   protected readonly originHeader: string | undefined = undefined
   protected readonly extraHeaders: Record<string, string> | undefined = undefined
 
@@ -63,22 +73,40 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     return finalWssUrl
   }
 
+  private _close() {
+    if (this._closed) {
+      return
+    }
+
+    this._closed = true
+    this._closeController.abort()
+    this._closeConnection(this._connection)
+  }
+
   private async *_stream() {
-    let staleConnectionTimerId
-    let pingTimerId
     let retries = 0
 
-    while (true) {
-      try {
-        this._connectionId = connectionCounter++
-        const subscribeMessages = this.mapToSubscribeMessages(this._filters)
-        const finalWssUrl = await this.getWebSocketUrl()
+    while (this._closed === false) {
+      const connectionId = connectionCounter++
+      let connection: RealTimeFeedConnection | undefined
+      let staleConnectionTimerId: NodeJS.Timeout | undefined
+      let pingTimerId: NodeJS.Timeout | undefined
+      let connectionError: Error | undefined
 
-        this.debug('(connection id: %d) estabilishing connection to %s', this._connectionId, finalWssUrl)
+      try {
+        this.manualSnapshotsBuffer.length = 0
+        const subscribeMessages = this.mapToSubscribeMessages(this._filters)
+        const finalWssUrl = await resolveOrAbort(this.getWebSocketUrl(), this._closeController.signal)
+
+        if (finalWssUrl === ABORTED || this._closed) {
+          return
+        }
+
+        this.debug('(connection id: %d) estabilishing connection to %s', connectionId, finalWssUrl)
 
         this.debug(
           '(connection id: %d) provided filters: %o mapped to subscribe messages: %j',
-          this._connectionId,
+          connectionId,
           this._filters,
           subscribeMessages
         )
@@ -92,19 +120,31 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         }
 
         this._wsClientOptions.agent = getProxyAgent(finalWssUrl)
-        this._ws = new WebSocket(finalWssUrl, this._wsClientOptions)
-        this._ws.onopen = this._onConnectionEstabilished
-        this._ws.onclose = this._onConnectionClosed
+        const ws = new WebSocket(finalWssUrl, this._wsClientOptions)
+        const currentConnection: RealTimeFeedConnection = {
+          id: connectionId,
+          ws,
+          controller: new AbortController(),
+          receivedMessagesCount: 0
+        }
+        connection = currentConnection
+        this._connection = currentConnection
+        ws.onopen = () => this._onConnectionOpen(currentConnection, subscribeMessages)
+        ws.onclose = (event) => this._onConnectionClosed(currentConnection, event)
 
-        staleConnectionTimerId = this._monitorConnectionIfStale()
-        pingTimerId = this._sendPeriodicPing()
+        staleConnectionTimerId = this._monitorConnectionIfStale(currentConnection)
+        pingTimerId = this._sendPeriodicPing(currentConnection)
 
-        const realtimeMessagesStream = createWebSocketStream(this._ws, {
+        const realtimeMessagesStream = createWebSocketStream(ws, {
           readableObjectMode: true, // othwerwise we may end up with multiple messages returned by stream in single iteration
           readableHighWaterMark: 8096 // since we're in object mode, let's increase hwm a little from default of 16 messages buffered
         }) as unknown as AsyncIterableIterator<Buffer>
 
         for await (let message of realtimeMessagesStream) {
+          if (this._isConnectionActive(currentConnection) === false) {
+            return
+          }
+
           if (this.decompress !== undefined) {
             message = this.decompress(message)
           }
@@ -129,7 +169,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           // exclude heaartbeat messages from  received messages counter
           // connection could still be stale even if only heartbeats are provided without any data
           if (this.messageIsHeartbeat(messageDeserialized) === false) {
-            this._receivedMessagesCount++
+            currentConnection.receivedMessagesCount++
           }
 
           this.onMessage(messageDeserialized)
@@ -150,51 +190,15 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           }
         }
 
-        // clear monitoring connection timer and notify about disconnect
-        if (staleConnectionTimerId !== undefined) {
-          clearInterval(staleConnectionTimerId)
+        if (this._closed) {
+          return
         }
-        yield { __disconnect__: true }
-      } catch (error: any) {
-        if (this._onError !== undefined) {
-          this._onError(error)
+      } catch (error) {
+        if (this._closed) {
+          return
         }
-
-        retries++
-
-        const MAX_DELAY = 32 * 1000
-        const isRateLimited = error.message.includes('429')
-
-        let delay
-        if (isRateLimited) {
-          delay = (MAX_DELAY / 2) * retries
-        } else {
-          delay = Math.pow(2, retries - 1) * 1000
-
-          if (delay > MAX_DELAY) {
-            delay = MAX_DELAY
-          }
-        }
-
-        this.debug(
-          '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
-          this._connectionId,
-          this._exchange,
-          retries,
-          delay,
-          isRateLimited,
-          error
-        )
-
-        // clear monitoring connection timer and notify about disconnect
-        if (staleConnectionTimerId !== undefined) {
-          clearInterval(staleConnectionTimerId)
-        }
-        yield { __disconnect__: true }
-
-        await wait(delay)
+        connectionError = error instanceof Error ? error : new Error(String(error))
       } finally {
-        // stop timers
         if (staleConnectionTimerId !== undefined) {
           clearInterval(staleConnectionTimerId)
         }
@@ -202,28 +206,56 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         if (pingTimerId !== undefined) {
           clearInterval(pingTimerId)
         }
+
+        this._closeConnection(connection)
+      }
+
+      if (this._closed) {
+        return
+      }
+
+      let retryDelay: number | undefined
+      if (connectionError !== undefined) {
+        this._onError?.(connectionError)
+        retries++
+
+        const MAX_DELAY = 32 * 1000
+        const isRateLimited = connectionError.message.includes('429')
+        retryDelay = isRateLimited ? (MAX_DELAY / 2) * retries : Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
+
+        this.debug(
+          '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
+          connectionId,
+          this._exchange,
+          retries,
+          retryDelay,
+          isRateLimited,
+          connectionError
+        )
+      }
+
+      yield { __disconnect__: true }
+
+      if (retryDelay !== undefined) {
+        await this._wait(retryDelay, this._closeController.signal)
       }
     }
   }
 
   protected send(msg: any) {
-    if (this._ws === undefined) {
+    const ws = this._connection?.ws
+    if (ws === undefined || ws.readyState !== WebSocket.OPEN) {
       return
     }
-    if (this._ws.readyState !== WebSocket.OPEN) {
-      return
-    }
-    this._ws.send(JSON.stringify(msg))
+    ws.send(JSON.stringify(msg))
   }
 
   protected sendRaw(msg: string | Buffer) {
-    if (this._ws === undefined) {
+    const ws = this._connection?.ws
+    if (ws === undefined || ws.readyState !== WebSocket.OPEN) {
       return
     }
-    if (this._ws.readyState !== WebSocket.OPEN) {
-      return
-    }
-    this._ws.send(msg)
+    ws.send(msg)
   }
 
   protected abstract mapToSubscribeMessages(filters: Filter<string>[]): any[]
@@ -252,48 +284,48 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected decompress?: (msg: any) => Buffer
 
-  private _monitorConnectionIfStale() {
+  private _monitorConnectionIfStale(connection: RealTimeFeedConnection) {
     if (this._timeoutIntervalMS === undefined || this._timeoutIntervalMS === 0) {
       return
     }
 
     // set up timer that checks against open, but stale connections that do not return any data
     return setInterval(() => {
-      if (this._ws === undefined) {
+      if (this._isConnectionActive(connection) === false) {
         return
       }
 
-      if (this._receivedMessagesCount === 0) {
+      if (connection.receivedMessagesCount === 0) {
         this.debug(
           '(connection id: %d) did not received any messages within %d ms timeout, terminating connection...',
-          this._connectionId,
+          connection.id,
           this._timeoutIntervalMS
         )
-        this._ws!.terminate()
+        connection.ws.terminate()
       }
-      this._receivedMessagesCount = 0
+      connection.receivedMessagesCount = 0
     }, this._timeoutIntervalMS)
   }
 
-  private _sendPeriodicPing() {
+  private _sendPeriodicPing(connection: RealTimeFeedConnection) {
     return setInterval(() => {
-      if (this._ws === undefined || this._ws.readyState !== WebSocket.OPEN) {
+      if (this._isConnectionOpen(connection) === false) {
         return
       }
 
       if (this.sendCustomPing !== undefined) {
         this.sendCustomPing()
       } else {
-        this._ws.ping()
+        connection.ws.ping()
       }
     }, 5 * ONE_SEC_IN_MS)
   }
 
-  private _onConnectionEstabilished = async () => {
-    try {
-      const subscribeMessages = this.mapToSubscribeMessages(this._filters)
+  private async _onConnectionEstablished(connection: RealTimeFeedConnection, subscribeMessages: any[]) {
+    const shouldCancel = () => this._isConnectionOpen(connection) === false
 
-      let symbolsCount = this._filters.reduce((prev, curr) => {
+    try {
+      const symbolsCount = this._filters.reduce((prev, curr) => {
         if (curr.symbols !== undefined) {
           for (const symbol of curr.symbols) {
             prev.add(symbol)
@@ -304,36 +336,125 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
       await this.onConnected()
 
-      for (const message of subscribeMessages) {
-        this.send(message)
-        if (this.throttleSubscribeMS > 0) {
-          await wait(this.throttleSubscribeMS)
-        }
-      }
-
-      this.debug('(connection id: %d) established connection', this._connectionId)
-
-      //wait before fetching snapshots until we're sure we've got proper connection estabilished (received some messages)
-      while (this._receivedMessagesCount < symbolsCount * 2) {
-        await wait(100)
-      }
-      // wait a second just in case before starting fetching the snapshots
-      await wait(1 * ONE_SEC_IN_MS)
-
-      if (this._ws!.readyState === WebSocket.CLOSED) {
+      if (shouldCancel()) {
         return
       }
 
-      await this.provideManualSnapshots(this._filters, () => this._ws!.readyState === WebSocket.CLOSED)
+      for (const message of subscribeMessages) {
+        if (shouldCancel()) {
+          return
+        }
+
+        this._send(connection, message)
+        if (this.throttleSubscribeMS > 0) {
+          await this._wait(this.throttleSubscribeMS, connection.controller.signal)
+        }
+      }
+
+      this.debug('(connection id: %d) established connection', connection.id)
+
+      //wait before fetching snapshots until we're sure we've got proper connection estabilished (received some messages)
+      while (shouldCancel() === false && connection.receivedMessagesCount < symbolsCount * 2) {
+        await this._wait(100, connection.controller.signal)
+      }
+
+      if (shouldCancel()) {
+        return
+      }
+
+      // wait a second just in case before starting fetching the snapshots
+      await this._wait(1 * ONE_SEC_IN_MS, connection.controller.signal)
+
+      if (shouldCancel()) {
+        return
+      }
+
+      await this.provideManualSnapshots(this._filters, shouldCancel)
     } catch (e) {
-      this.debug('(connection id: %d) providing manual snapshots error: %o', this._connectionId, e)
-      this._ws!.emit('error', e)
+      this.debug('(connection id: %d) providing manual snapshots error: %o', connection.id, e)
+      if (this._isConnectionOpen(connection)) {
+        connection.ws.emit('error', e)
+      }
     }
   }
 
-  private _onConnectionClosed = (event: WebSocket.CloseEvent) => {
-    this.debug('(connection id: %d) connection closed %s', this._connectionId, event.reason)
+  private _onConnectionClosed(connection: RealTimeFeedConnection, event: WebSocket.CloseEvent) {
+    this.debug('(connection id: %d) connection closed %s', connection.id, event.reason)
   }
+
+  private _onConnectionOpen(connection: RealTimeFeedConnection, subscribeMessages: any[]) {
+    if (this._isConnectionActive(connection) === false) {
+      return
+    }
+
+    void this._onConnectionEstablished(connection, subscribeMessages)
+  }
+
+  private _send(connection: RealTimeFeedConnection, message: any) {
+    if (this._isConnectionOpen(connection)) {
+      connection.ws.send(JSON.stringify(message))
+    }
+  }
+
+  private _isConnectionActive(connection: RealTimeFeedConnection) {
+    return this._closed === false && this._connection === connection && connection.controller.signal.aborted === false
+  }
+
+  private _isConnectionOpen(connection: RealTimeFeedConnection) {
+    return this._isConnectionActive(connection) && connection.ws.readyState === WebSocket.OPEN
+  }
+
+  private _closeConnection(connection: RealTimeFeedConnection | undefined) {
+    if (connection === undefined) {
+      return
+    }
+
+    connection.controller.abort()
+    if (connection.ws.readyState !== WebSocket.CLOSED) {
+      connection.ws.terminate()
+    }
+
+    if (this._connection === connection) {
+      this._connection = undefined
+      this.manualSnapshotsBuffer.length = 0
+    }
+  }
+
+  private async _wait(delayMS: number, signal: AbortSignal) {
+    try {
+      await sleep(delayMS, undefined, { signal })
+    } catch (error) {
+      if (signal.aborted === false) {
+        throw error
+      }
+    }
+  }
+}
+
+function resolveOrAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T | typeof ABORTED> {
+  if (signal.aborted) {
+    return Promise.resolve(ABORTED)
+  }
+
+  return new Promise((resolve, reject) => {
+    let settled = false
+    const onAbort = () => settle(() => resolve(ABORTED))
+    const settle = (callback: () => void) => {
+      if (settled) {
+        return
+      }
+
+      settled = true
+      signal.removeEventListener('abort', onAbort)
+      callback()
+    }
+
+    signal.addEventListener('abort', onAbort, { once: true })
+    void promise.then(
+      (value) => settle(() => resolve(value)),
+      (error) => settle(() => reject(error))
+    )
+  })
 }
 
 export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIterable {
@@ -344,36 +465,9 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     private readonly _onError?: (error: Error) => void
   ) {}
 
-  [Symbol.asyncIterator]() {
-    return this._stream()
-  }
-
-  private async *_stream() {
-    const combinedStream = new PassThrough({
-      objectMode: true,
-      highWaterMark: 8096
-    })
-
-    const realTimeFeeds = this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError)
-
-    for (const realTimeFeed of realTimeFeeds) {
-      // iterate over separate real-time feeds and write their messages into combined stream
-      ;(async function writeMessagesToCombinedStream() {
-        for await (const message of realTimeFeed) {
-          if (combinedStream.destroyed) {
-            return
-          }
-
-          if (!combinedStream.write(message))
-            // Handle backpressure on write
-            await once(combinedStream, 'drain')
-        }
-      })()
-    }
-
-    for await (const message of combinedStream) {
-      yield message
-    }
+  [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
+    const realTimeFeeds = Array.from(this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError))
+    return mergeRealTime(realTimeFeeds)
   }
 
   protected abstract _getRealTimeFeeds(
@@ -387,6 +481,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
 export abstract class PoolingClientBase implements RealTimeFeedIterable {
   protected readonly debug: dbg.Debugger
   private _tid: NodeJS.Timeout | undefined = undefined
+  private _outputStream: PassThrough | undefined
 
   constructor(
     exchange: string,
@@ -396,14 +491,22 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
     this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
   }
 
-  [Symbol.asyncIterator]() {
-    return this._stream()
+  [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
+    return createManagedRealTimeIterator(this._stream(), () => this._close())
   }
 
   protected abstract poolDataToStream(outputStream: Writable): Promise<void>
 
   protected getPoolingDelayMS() {
     return this._poolingIntervalSeconds * ONE_SEC_IN_MS
+  }
+
+  private _close() {
+    if (this._tid !== undefined) {
+      clearTimeout(this._tid)
+      this._tid = undefined
+    }
+    this._outputStream?.destroy()
   }
 
   private async _startPooling(outputStream: Writable) {
@@ -436,6 +539,7 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
       objectMode: true,
       highWaterMark: 1024
     })
+    this._outputStream = stream
 
     this._startPooling(stream)
 
@@ -446,8 +550,9 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
         yield message
       }
     } finally {
-      if (this._tid !== undefined) {
-        clearInterval(this._tid)
+      this._close()
+      if (this._outputStream === stream) {
+        this._outputStream = undefined
       }
 
       this.debug('pooling finished')

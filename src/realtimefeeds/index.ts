@@ -143,7 +143,3 @@ export function createRealTimeFeed(
 
   return new RealTimeFeedFactory(exchange, filters, timeoutIntervalMS, onError)
 }
-
-export function setRealTimeFeedFactory(exchange: Exchange, realTimeFeed: RealTimeFeed) {
-  realTimeFeedsMap[exchange] = realTimeFeed
-}

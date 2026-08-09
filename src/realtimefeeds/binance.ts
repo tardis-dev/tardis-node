@@ -355,6 +355,9 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     }
 
     const exchangeInfoResponse = await getJSON<any>(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
+    if (shouldCancel()) {
+      return
+    }
     const exchangeInfo = exchangeInfoResponse.data
 
     const DELAY_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_SNAPSHOTS_DELAY_MS`
@@ -408,10 +411,17 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
             await wait(delayMS)
           }
 
+          if (shouldCancel()) {
+            return 0
+          }
+
           const depthSnapshotResponse = await getJSON<any>(
             `${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`,
             binanceHttpOptions
           )
+          if (shouldCancel()) {
+            return 0
+          }
 
           const snapshot = {
             stream: `${symbol}@depthSnapshot`,

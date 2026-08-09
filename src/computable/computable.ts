@@ -1,4 +1,5 @@
 import { Disconnect, Exchange, NormalizedData } from '../types.ts'
+import { closeIterator, createManagedRealTimeIterator, isManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { ComputableContext, createWithContext } from './context.ts'
 
 export type Computable<T extends NormalizedData> = {
@@ -39,7 +40,7 @@ async function* _compute<T extends ComputableFactory<any>[], U extends Normalize
       }
     }
   } finally {
-    messages.return!()
+    await closeIterator(messages)
   }
 }
 
@@ -47,13 +48,13 @@ export function compute<T extends ComputableFactory<any>[], U extends Normalized
   messages: AsyncIterableIterator<U>,
   ...computables: T
 ): AsyncIterableIterator<T extends ComputableFactory<infer Z>[] ? (U extends Disconnect ? U | Z | Disconnect : U | Z) : never> {
-  let _iterator = _compute(messages, ...computables)
+  const iterator = _compute(messages, ...computables)
 
-  if ((messages as any).__realtime__ === true) {
-    ;(_iterator as any).__realtime__ = true
+  if (isManagedRealTimeIterator(messages)) {
+    return createManagedRealTimeIterator(iterator, () => closeIterator(messages))
   }
 
-  return _iterator
+  return iterator
 }
 
 class Computables {
