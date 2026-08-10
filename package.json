@@ -2,12 +2,12 @@
   "name": "tardis-dev",
   "version": "18.0.1",
   "engines": {
-    "node": ">=24.5"
+    "node": ">=24.19"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=24.5"
+      "version": ">=24.19"
     },
     "packageManager": {
       "name": "npm",
@@ -73,7 +73,6 @@
     "ws": "^8.21.1"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.13",
     "@types/follow-redirects": "^1.14.4",
     "@types/node": "^26.1.1",
     "@types/ws": "^8.18.1",

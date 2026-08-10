@@ -1,11 +1,11 @@
-import dbg from 'debug'
 import { existsSync } from 'node:fs'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
+import { createDebug } from './debug.ts'
 import { forEachConcurrent } from './foreachconcurrent.ts'
 import { addMinutes, download, formatDateToPath, optimizeFilters, sha256, wait, cleanTempFiles } from './handy.ts'
 import type { DataFeedCompression } from './options.ts'
 import { Exchange, Filter } from './types.ts'
-const debug = dbg('tardis-dev')
+const debug = createDebug('tardis-dev')
 
 const DEFAULT_DATA_FEED_SLICE_SIZE = 1
 

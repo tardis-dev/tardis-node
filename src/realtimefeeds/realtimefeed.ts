@@ -1,8 +1,8 @@
-import dbg from 'debug'
 import WebSocket, { createWebSocketStream } from 'ws'
 import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { setTimeout as sleep } from 'node:timers/promises'
+import { createDebug, type DebugLogger } from '../debug.ts'
 import { getProxyAgent, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
 import { createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
@@ -34,7 +34,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     return createManagedRealTimeIterator(this._stream(), () => this._close())
   }
 
-  protected readonly debug: dbg.Debugger
+  protected readonly debug: DebugLogger
   protected abstract readonly wssURL: string
   protected readonly throttleSubscribeMS: number = 0
   protected readonly manualSnapshotsBuffer: any[] = []
@@ -53,7 +53,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     private readonly _onError?: (error: Error) => void
   ) {
     this._filters = optimizeFilters(filters)
-    this.debug = dbg(`tardis-dev:realtime:${_exchange}`)
+    this.debug = createDebug(`tardis-dev:realtime:${_exchange}`)
 
     this._wsClientOptions = {
       headers: {
@@ -479,7 +479,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
 }
 
 export abstract class PoolingClientBase implements RealTimeFeedIterable {
-  protected readonly debug: dbg.Debugger
+  protected readonly debug: DebugLogger
   private _tid: NodeJS.Timeout | undefined = undefined
   private _outputStream: PassThrough | undefined
 
@@ -488,7 +488,7 @@ export abstract class PoolingClientBase implements RealTimeFeedIterable {
     private readonly _poolingIntervalSeconds: number,
     protected readonly onError?: (error: Error) => void
   ) {
-    this.debug = dbg(`tardis-dev:pooling-client:${exchange}`)
+    this.debug = createDebug(`tardis-dev:pooling-client:${exchange}`)
   }
 
   [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {

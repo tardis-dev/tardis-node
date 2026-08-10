@@ -10,5 +10,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["."]
+  "include": [".", "../src/external-modules.d.ts"]
 }
