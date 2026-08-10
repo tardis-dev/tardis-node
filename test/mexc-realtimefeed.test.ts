@@ -31,20 +31,31 @@ class TestMexcRealTimeFeed extends MexcRealTimeFeed {
   }
 }
 
-test('decodes the MEXC protobuf payloads used by all normalized realtime mappers', () => {
+test('decodes every field used by the MEXC realtime protocol', () => {
   const feed = new TestMexcRealTimeFeed('mexc', [], undefined)
-  const trade = message(stringField(1, '100.1'), stringField(2, '0.2'), varintField(3, 1), varintField(4, 1710000000001))
+  const trade = message(
+    stringField(1, '100.1'),
+    stringField(2, '0.2'),
+    varintField(3, 1),
+    varintField(4, 1710000000001),
+    stringField(5, 'trade-1')
+  )
   const publicAggreDeals = message(bytesField(1, trade), stringField(2, 'spot@public.aggre.deals.v3.api.pb@10ms'))
   const tradeWrapper = message(
     stringField(1, 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
+    stringField(4, 'btc-usdt'),
+    varintField(5, 1709999999999),
     varintField(6, 1710000000000),
-    bytesField(314, publicAggreDeals)
+    bytesField(314, publicAggreDeals),
+    stringField(100, 'ignored future field')
   )
 
   assert.deepStrictEqual(feed.parse(tradeWrapper), {
     channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
     symbol: 'BTCUSDT',
+    symbolId: 'btc-usdt',
+    createTime: '1709999999999',
     sendTime: '1710000000000',
     publicAggreDeals: {
       deals: [
@@ -52,7 +63,8 @@ test('decodes the MEXC protobuf payloads used by all normalized realtime mappers
           price: '100.1',
           quantity: '0.2',
           tradeType: 1,
-          time: '1710000000001'
+          time: '1710000000001',
+          tradeId: 'trade-1'
         }
       ],
       eventType: 'spot@public.aggre.deals.v3.api.pb@10ms'
@@ -66,7 +78,8 @@ test('decodes the MEXC protobuf payloads used by all normalized realtime mappers
     bytesField(2, bid),
     stringField(3, 'spot@public.aggre.depth.v3.api.pb@10ms'),
     stringField(4, '101'),
-    stringField(5, '102')
+    stringField(5, '102'),
+    varintField(6, 1710000000002)
   )
   const depthWrapper = message(
     stringField(1, 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT'),
@@ -84,11 +97,19 @@ test('decodes the MEXC protobuf payloads used by all normalized realtime mappers
       bids: [{ price: '99.9', quantity: '0.5' }],
       eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
       fromVersion: '101',
-      toVersion: '102'
+      toVersion: '102',
+      lastOrderCreateTime: '1710000000002'
     }
   })
 
-  const publicAggreBookTicker = message(stringField(1, '99.9'), stringField(2, '1.2'), stringField(3, '100.1'), stringField(4, '2.3'))
+  const publicAggreBookTicker = message(
+    stringField(1, '99.9'),
+    stringField(2, '1.2'),
+    stringField(3, '100.1'),
+    stringField(4, '2.3'),
+    stringField(5, '103'),
+    varintField(6, 1710000000003)
+  )
   const bookTickerWrapper = message(
     stringField(1, 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT'),
     stringField(3, 'BTCUSDT'),
@@ -104,9 +125,23 @@ test('decodes the MEXC protobuf payloads used by all normalized realtime mappers
       bidPrice: '99.9',
       bidQuantity: '1.2',
       askPrice: '100.1',
-      askQuantity: '2.3'
+      askQuantity: '2.3',
+      version: '103',
+      lastOrderCreateTime: '1710000000003'
     }
   })
+
+  const emptyDealsWrapper = message(stringField(1, 'spot@public.aggre.deals.v3.api.pb@10ms@ETHUSDT'), bytesField(314, Buffer.alloc(0)))
+
+  assert.deepStrictEqual(feed.parse(emptyDealsWrapper), {
+    channel: 'spot@public.aggre.deals.v3.api.pb@10ms@ETHUSDT',
+    publicAggreDeals: { deals: [] }
+  })
+
+  assert.deepStrictEqual(feed.parse(message(varintField(5, 9223372036854775807n))), {
+    createTime: '9223372036854775807'
+  })
+  assert.throws(() => feed.parse(Buffer.from([0x0a, 0x02, 0x61])), /Invalid protobuf message length/)
 })
 
 test('retries MEXC depth snapshots until the REST snapshot overlaps buffered WebSocket updates', async () => {
@@ -175,7 +210,7 @@ function bytesField(fieldNumber: number, value: Buffer) {
   return Buffer.concat([tag(fieldNumber, 2), varint(value.length), value])
 }
 
-function varintField(fieldNumber: number, value: number) {
+function varintField(fieldNumber: number, value: number | bigint) {
   return Buffer.concat([tag(fieldNumber, 0), varint(value)])
 }
 
@@ -183,7 +218,7 @@ function tag(fieldNumber: number, wireType: number) {
   return varint(fieldNumber * 8 + wireType)
 }
 
-function varint(value: number) {
+function varint(value: number | bigint) {
   const bytes: number[] = []
   let remaining = BigInt(value)
   while (remaining >= 0x80n) {

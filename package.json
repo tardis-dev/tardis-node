@@ -70,7 +70,6 @@
   "dependencies": {
     "debug": "^4.4.3",
     "follow-redirects": "^1.16.0",
-    "protobufjs": "^8.7.1",
     "ws": "^8.21.1"
   },
   "devDependencies": {
