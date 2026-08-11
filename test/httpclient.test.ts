@@ -1,8 +1,16 @@
 import { test } from 'node:test'
+import { execFile } from 'node:child_process'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
-import { getJSON, postJSON } from '../dist/handy.js'
+import os from 'node:os'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { promisify } from 'node:util'
+import { download, getJSON, postJSON } from '../dist/handy.js'
 import { assert } from './assertions.ts'
+
+const execFileAsync = promisify(execFile)
 
 test('retries a temporary GET failure and returns the HTTP response', async () => {
   let requestsCount = 0
@@ -50,6 +58,54 @@ test('sends a JSON POST body and retries when requested', async () => {
     assert.deepStrictEqual(result.data, { ok: true })
   } finally {
     await server.close()
+  }
+})
+
+test('follows one download redirect without forwarding authorization to another origin', { timeout: 5000 }, async () => {
+  let redirectedAuthorization: string | undefined
+  const target = await startServer((request, response) => {
+    redirectedAuthorization = request.headers.authorization
+    response.writeHead(200).end('redirected data')
+  })
+  const source = await startServer((request, response) => {
+    assert.strictEqual(request.headers.authorization, 'Bearer secret')
+    response.writeHead(302, { Location: `${target.url}/data` }).end()
+  })
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-'))
+  const downloadPath = path.join(tempDir, 'data.bin')
+
+  try {
+    await download({ url: `${source.url}/redirect`, downloadPath, userAgent: 'tardis-node-test', apiKey: 'secret' })
+
+    assert.strictEqual(redirectedAuthorization, undefined)
+    assert.strictEqual(readFileSync(downloadPath, 'utf8'), 'redirected data')
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+    await source.close()
+    await target.close()
+  }
+})
+
+test('routes HTTP requests through the configured proxy', { timeout: 5000 }, async () => {
+  let requestedUrl: string | undefined
+  const proxy = await startServer((request, response) => {
+    requestedUrl = request.url
+    response.writeHead(200, { 'Content-Type': 'application/json' }).end('{"proxied":true}')
+  })
+  const handyModuleUrl = pathToFileURL(path.resolve('dist/handy.js')).href
+  const script = `import { getJSON } from ${JSON.stringify(handyModuleUrl)}; process.stdout.write(JSON.stringify(await getJSON('http://exchange.test/data')))`
+
+  try {
+    const { stdout } = await execFileAsync(process.execPath, ['--input-type=module', '--eval', script], {
+      env: { ...process.env, HTTP_PROXY: proxy.url, HTTPS_PROXY: proxy.url, NO_PROXY: '' }
+    })
+
+    const result = JSON.parse(stdout)
+    assert.strictEqual(requestedUrl, 'http://exchange.test/data')
+    assert.strictEqual(result.statusCode, 200)
+    assert.deepStrictEqual(result.data, { proxied: true })
+  } finally {
+    await proxy.close()
   }
 })
 

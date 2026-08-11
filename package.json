@@ -69,11 +69,9 @@
   "license": "MPL-2.0",
   "dependencies": {
     "debug": "^4.4.3",
-    "follow-redirects": "^1.16.0",
     "ws": "^8.21.1"
   },
   "devDependencies": {
-    "@types/follow-redirects": "^1.14.4",
     "@types/node": "^26.1.1",
     "@types/ws": "^8.18.1",
     "prettier": "3.8.3",
