@@ -162,7 +162,8 @@ async function getDataFeedSlice(
     }
   }
 
-  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${dataFeedCompression}`
+  const requestCompression = dataFeedCompression === 'zstd' ? 'zstd-multiframe' : dataFeedCompression
+  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${requestCompression}`
   if (requestedSliceSize > DEFAULT_DATA_FEED_SLICE_SIZE) {
     url += `&sliceSize=${requestedSliceSize}`
   }

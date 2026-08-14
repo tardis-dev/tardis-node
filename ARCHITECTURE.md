@@ -24,7 +24,7 @@ Main Thread                         Worker Thread
   Yield {localTimestamp, message}       │
 ```
 
-Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename.
+Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename. Zstandard responses always use the standard `.zst` suffix. Until Node.js natively streams concatenated frames, replay finds each frame from the standard Zstandard frame and block headers and streams the bounded frames through the built-in decoder one at a time.
 
 `replay()` decodes one line batch at a time and still yields individual public messages in order. `replayNormalized()` consumes the same internal line batches directly, avoiding an intermediate per-message raw iterator while keeping mapper invocation lazy. This preserves async-iterator backpressure for built-in and custom normalizers while the stream's high-water mark keeps splitter read-ahead small.
 
