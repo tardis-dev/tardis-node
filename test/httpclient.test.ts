@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import { execFile } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import os from 'node:os'
@@ -83,6 +83,62 @@ test('follows one download redirect without forwarding authorization to another 
     rmSync(tempDir, { force: true, recursive: true })
     await source.close()
     await target.close()
+  }
+})
+
+test('stores zstd responses with the standard zst extension', async () => {
+  const server = await startServer((_request, response) => {
+    response.writeHead(200, { 'Content-Encoding': 'zstd' }).end('payload')
+  })
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-'))
+  const downloadPath = path.join(tempDir, 'slice.json')
+
+  try {
+    const result = await download({
+      url: `${server.url}/data`,
+      downloadPath,
+      userAgent: 'tardis-node-test',
+      apiKey: '',
+      appendContentEncodingExtension: true
+    })
+
+    assert.strictEqual(result.downloadPath, `${downloadPath}.zst`)
+    assert.strictEqual(readFileSync(result.downloadPath, 'utf8'), 'payload')
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+    await server.close()
+  }
+})
+
+test('does not cache a response shorter than its content length', async () => {
+  let requestsCount = 0
+  const server = await startServer((_request, response) => {
+    requestsCount++
+    if (requestsCount === 1) {
+      response.writeHead(200, { Connection: 'close', 'Content-Encoding': 'zstd', 'Content-Length': '10' }).end('abc')
+    } else {
+      response.writeHead(404).end()
+    }
+  })
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-'))
+  const downloadPath = path.join(tempDir, 'slice.json')
+
+  try {
+    await assert.rejects(
+      download({
+        url: `${server.url}/data`,
+        downloadPath,
+        userAgent: 'tardis-node-test',
+        apiKey: '',
+        appendContentEncodingExtension: true
+      })
+    )
+    assert.strictEqual(requestsCount, 2)
+    assert.strictEqual(existsSync(`${downloadPath}.zst`), false)
+    assert.deepStrictEqual(readdirSync(tempDir), [])
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+    await server.close()
   }
 })
 
