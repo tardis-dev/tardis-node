@@ -9,6 +9,7 @@ import { Exchange } from './types.ts'
 const CONCURRENCY_LIMIT = 20
 const MILLISECONDS_IN_SINGLE_DAY = 24 * 60 * 60 * 1000
 const DEFAULT_DOWNLOAD_DIR = './datasets'
+const DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS = 120_000
 
 const options = getOptions()
 
@@ -134,7 +135,8 @@ function getDownloadOptions({
     url,
     downloadPath,
     userAgent: options._userAgent,
-    apiKey
+    apiKey,
+    attemptTimeoutMS: DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS
   }
 }
 

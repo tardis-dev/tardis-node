@@ -581,7 +581,8 @@ export async function download({
   url,
   userAgent,
   appendContentEncodingExtension = false,
-  acceptEncoding = 'gzip'
+  acceptEncoding = 'gzip',
+  attemptTimeoutMS = 90 * ONE_SEC_IN_MS
 }: {
   url: string
   downloadPath: string
@@ -589,9 +590,10 @@ export async function download({
   apiKey: string
   appendContentEncodingExtension?: boolean
   acceptEncoding?: string
+  attemptTimeoutMS?: number
 }) {
   const httpRequestOptions = {
-    timeout: 90 * ONE_SEC_IN_MS,
+    timeout: attemptTimeoutMS,
     headers: {
       'Accept-Encoding': acceptEncoding,
       'User-Agent': userAgent,
@@ -664,10 +666,10 @@ async function _downloadFile(
   // create write file stream that we'll write data into - first as unconfirmed temp file
 
   const tmpFilePath = `${downloadPath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
-  const fileWriteStream = createWriteStream(tmpFilePath)
+  let fileWriteStream: ReturnType<typeof createWriteStream> | undefined
   const cleanup = () => {
     try {
-      fileWriteStream.destroy()
+      fileWriteStream?.destroy()
       rmSync(tmpFilePath, { force: true })
     } catch {}
   }
@@ -695,6 +697,7 @@ async function _downloadFile(
       }
     }
 
+    fileWriteStream = createWriteStream(tmpFilePath)
     await pipeline(response, fileWriteStream)
     if (!response.complete) {
       throw new Error('The connection was terminated while the message was still being sent')
