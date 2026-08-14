@@ -75,6 +75,21 @@ test('Gemini replay uses the v3 depth channel after the recorded API switch', ()
   assert.deepStrictEqual(normalizeBookTickers('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
 })
 
+test('Hyperliquid replay switches from l2Book to fastBook on 2026-06-17', () => {
+  const switchDate = date('2026-06-17T00:00:00.000Z')
+  const beforeSwitch = normalizeBookChanges('hyperliquid', date('2026-06-16T23:59:59.999Z'))
+  const afterSwitch = normalizeBookChanges('hyperliquid', switchDate)
+  const data = { coin: 'BTC', time: switchDate.valueOf(), levels: [[], []] }
+
+  assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('hyperliquid'), [switchDate])
+  assert.deepStrictEqual(beforeSwitch.getFilters(['BTC']), [{ channel: 'l2Book', symbols: ['BTC'] }])
+  assert.deepStrictEqual(afterSwitch.getFilters(['BTC']), [{ channel: 'fastBook', symbols: ['BTC'] }])
+  assert.strictEqual(beforeSwitch.canHandle({ channel: 'l2Book', data }), true)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data }), false)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data: { ...data, fast: true } }), true)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'fastBook', data: { ...data, fast: true } }), true)
+})
+
 test('OKX replay follows the historical public book-channel windows', () => {
   assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT']), [
     { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] },
