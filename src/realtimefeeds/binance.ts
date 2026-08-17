@@ -169,7 +169,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
       await this._initializeRateLimitInfo()
     }
 
-    for (let index = 0; index < this._instruments.length; ) {
+    for (let index = 0; index < this._instruments.length;) {
       if (outputStream.destroyed) {
         return
       }

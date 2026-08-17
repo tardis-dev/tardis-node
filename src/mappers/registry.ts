@@ -13,8 +13,7 @@ export type MapperCreator<T extends Exchange = any, U extends NormalizedData = N
 export type MapperCollection = Record<string, MapperCreator>
 export type MapperFactory<T extends Exchange = any, U extends NormalizedData = NormalizedData> = (localTimestamp?: Date) => Mapper<T, U>
 export type MapperDefinition<T extends Exchange = any, U extends NormalizedData = NormalizedData> =
-  | MapperCreator<T, U>
-  | MapperFactory<T, U>
+  MapperCreator<T, U> | MapperFactory<T, U>
 export type ExchangeMapperDefinitions = Partial<Record<MapperKind, MapperDefinition>>
 export type ExchangeMappers = Partial<Record<Exchange, Partial<Record<MapperKind, MapperCreator>>>>
 export type ExchangeMapperDefinitionMap = Partial<Record<Exchange, ExchangeMapperDefinitions>>

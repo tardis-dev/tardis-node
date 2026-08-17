@@ -434,8 +434,7 @@ type BitfinexBooks = [number, BitfinexBookLevel | BitfinexBookLevel[], number, n
 type BitfinexStatusMessage = [number, (number | undefined)[], number, number] | BitfinexHeartbeat
 
 type BitfinexLiquidation =
-  | [number, ['pos', number, number, null, string, number, number, null, number, number, null, number][]]
-  | BitfinexHeartbeat
+  [number, ['pos', number, number, null, string, number, number, null, number, number, null, number][]] | BitfinexHeartbeat
 
 type BitfinexTicker =
   | [
