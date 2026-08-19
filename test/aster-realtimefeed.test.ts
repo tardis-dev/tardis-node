@@ -53,6 +53,10 @@ test('map aster realtime subscriptions', () => {
       {
         channel: 'trade',
         symbols: ['btcusdt', 'ethusdt']
+      },
+      {
+        channel: 'aggTrade',
+        symbols: ['btcusdt']
       }
     ]),
     [
@@ -65,6 +69,11 @@ test('map aster realtime subscriptions', () => {
         method: 'SUBSCRIBE',
         params: ['btcusdt@trade', 'ethusdt@trade'],
         id: 2
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@aggTrade'],
+        id: 3
       }
     ]
   )

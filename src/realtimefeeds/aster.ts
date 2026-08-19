@@ -12,6 +12,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
   protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
   private readonly channels = new Set([
     'trade',
+    'aggTrade',
     'ticker',
     AsterRealTimeFeed.depthChannel,
     AsterRealTimeFeed.depthSnapshotChannel,
