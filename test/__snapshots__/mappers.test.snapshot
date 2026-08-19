@@ -3800,6 +3800,108 @@ exports[`mappers > map ascendex messages 8`] = `
 ]
 `;
 
+exports[`mappers > map aster messages 1`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "BTCUSDT",
+    "exchange": "aster",
+    "id": "12345",
+    "price": 5.1,
+    "amount": 0.2,
+    "side": "sell",
+    "timestamp": "2020-06-04T09:00:35.999Z",
+    "localTimestamp": "2026-07-29T00:00:01.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster messages 2`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT",
+    "exchange": "aster",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 5,
+        "amount": 1.2
+      }
+    ],
+    "asks": [
+      {
+        "price": 5.2,
+        "amount": 2.4
+      }
+    ],
+    "timestamp": "2020-06-04T09:00:36.000Z",
+    "localTimestamp": "2026-07-29T00:00:01.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT",
+    "exchange": "aster",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 5.1,
+        "amount": 3
+      }
+    ],
+    "asks": [
+      {
+        "price": 5.3,
+        "amount": 4
+      }
+    ],
+    "timestamp": "2020-06-04T09:00:36.100Z",
+    "localTimestamp": "2026-07-29T00:00:01.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT",
+    "exchange": "aster",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 5.4,
+        "amount": 6
+      }
+    ],
+    "asks": [],
+    "timestamp": "2020-06-04T09:00:36.200Z",
+    "localTimestamp": "2026-07-29T00:00:01.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster messages 5`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "BTCUSDT",
+    "exchange": "aster",
+    "askAmount": 2.4,
+    "askPrice": 5.2,
+    "bidPrice": 5.1,
+    "bidAmount": 1.2,
+    "timestamp": "2026-07-29T00:00:01.000Z",
+    "localTimestamp": "2026-07-29T00:00:01.000Z"
+  }
+]
+`;
+
 exports[`mappers > map binance delivery messages 1`] = `
 []
 `;
