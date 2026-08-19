@@ -1,9 +1,11 @@
+import { describe, test } from 'node:test'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { assert } from './assertions.ts'
 import os from 'os'
 import path from 'path'
 import { gunzipSync } from 'node:zlib'
 import { downloadDatasets, sanitizeForFilename } from '../dist/downloaddatasets.js'
-import { describeLive } from './live.js'
+import { describeLive } from './live.ts'
 
 const LIVE_DATASET: Parameters<typeof downloadDatasets>[0] = {
   exchange: 'deribit' as const,
@@ -19,31 +21,32 @@ function createTempDir() {
 
 describe('sanitizeForFilename', () => {
   test('replaces filesystem-invalid characters', () => {
-    expect(sanitizeForFilename('a?b/c:d*e<f>g|h"i\\j')).toBe('a-b-c-d-e-f-g-h-i-j')
+    assert.strictEqual(sanitizeForFilename('a?b/c:d*e<f>g|h"i\\j'), 'a-b-c-d-e-f-g-h-i-j')
   })
 
   test('leaves normal symbols unchanged', () => {
-    expect(sanitizeForFilename('BTCUSDT')).toBe('BTCUSDT')
-    expect(sanitizeForFilename('BTC-USDT')).toBe('BTC-USDT')
-    expect(sanitizeForFilename('BTC_USDT')).toBe('BTC_USDT')
+    assert.strictEqual(sanitizeForFilename('BTCUSDT'), 'BTCUSDT')
+    assert.strictEqual(sanitizeForFilename('BTC-USDT'), 'BTC-USDT')
+    assert.strictEqual(sanitizeForFilename('BTC_USDT'), 'BTC_USDT')
   })
 })
 
 describe('downloadDatasets', () => {
-  test('skipIfExists leaves existing file untouched', async () => {
+  test('uses a filesystem-safe symbol and leaves an existing file untouched', async () => {
     const tempDir = createTempDir()
-    const existingFile = path.join(tempDir, 'deribit_trades_2024-01-01_BTC-PERPETUAL.csv.gz')
+    const existingFile = path.join(tempDir, 'deribit_trades_2024-01-01_BTC-USD.csv.gz')
 
     try {
       writeFileSync(existingFile, 'existing')
 
       await downloadDatasets({
         ...LIVE_DATASET,
+        symbols: ['BTC/USD'],
         downloadDir: tempDir,
         skipIfExists: true
       })
 
-      expect(readFileSync(existingFile, 'utf8')).toBe('existing')
+      assert.strictEqual(readFileSync(existingFile, 'utf8'), 'existing')
     } finally {
       rmSync(tempDir, { force: true, recursive: true })
     }
@@ -51,7 +54,7 @@ describe('downloadDatasets', () => {
 })
 
 describeLive('downloadDatasets live', () => {
-  test('downloads public first-day-of-month dataset without api key', async () => {
+  test('downloads public first-day-of-month dataset without api key', { timeout: 60_000 }, async () => {
     const tempDir = createTempDir()
     const filePath = path.join(tempDir, 'deribit_trades_2024-01-01_BTC-PERPETUAL.csv.gz')
 
@@ -61,19 +64,19 @@ describeLive('downloadDatasets live', () => {
         downloadDir: tempDir
       })
 
-      expect(existsSync(filePath)).toBe(true)
+      assert.strictEqual(existsSync(filePath), true)
 
       const decompressed = gunzipSync(readFileSync(filePath)).toString('utf8')
       const [header, firstRow] = decompressed.trim().split('\n')
 
-      expect(header).toBe('exchange,symbol,timestamp,local_timestamp,id,side,price,amount')
-      expect(firstRow.startsWith('deribit,BTC-PERPETUAL,')).toBe(true)
+      assert.strictEqual(header, 'exchange,symbol,timestamp,local_timestamp,id,side,price,amount')
+      assert.strictEqual(firstRow.startsWith('deribit,BTC-PERPETUAL,'), true)
     } finally {
       rmSync(tempDir, { force: true, recursive: true })
     }
-  }, 60_000)
+  })
 
-  test('uses custom filename for live download', async () => {
+  test('uses custom filename for live download', { timeout: 60_000 }, async () => {
     const tempDir = createTempDir()
     const seenSymbols: string[] = []
     const customFilePath = path.join(tempDir, 'custom/live-file.csv.gz')
@@ -88,10 +91,10 @@ describeLive('downloadDatasets live', () => {
         }
       })
 
-      expect(seenSymbols).toEqual(['BTC-PERPETUAL'])
-      expect(existsSync(customFilePath)).toBe(true)
+      assert.deepStrictEqual(seenSymbols, ['BTC-PERPETUAL'])
+      assert.strictEqual(existsSync(customFilePath), true)
     } finally {
       rmSync(tempDir, { force: true, recursive: true })
     }
-  }, 60_000)
+  })
 })

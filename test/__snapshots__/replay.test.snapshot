@@ -1,0 +1,112 @@
+exports[`replay validation > replays and normalizes a fixed two-minute Coinbase slice from the Tardis API 1`] = `
+{
+  "rawMessages": [
+    {
+      "localTimestamp": "2019-06-01T00:00:10.426Z",
+      "message": {
+        "type": "match",
+        "trade_id": 298130,
+        "maker_order_id": "48e3e5b7-cace-415e-9ab1-cfcefa597b73",
+        "taker_order_id": "3e5b4921-28de-483a-aff2-d805f3e7283f",
+        "side": "sell",
+        "size": "0.22815391",
+        "price": "90.34000000",
+        "product_id": "ZEC-USDC",
+        "sequence": 127066231,
+        "time": "2019-06-01T00:00:10.382000Z"
+      }
+    },
+    {
+      "localTimestamp": "2019-06-01T00:00:25.399Z",
+      "message": {
+        "type": "match",
+        "trade_id": 298131,
+        "maker_order_id": "48e3e5b7-cace-415e-9ab1-cfcefa597b73",
+        "taker_order_id": "3d9fe026-dd36-43ca-b9ee-b412f133984e",
+        "side": "sell",
+        "size": "10.59160694",
+        "price": "90.34000000",
+        "product_id": "ZEC-USDC",
+        "sequence": 127066374,
+        "time": "2019-06-01T00:00:25.354000Z"
+      }
+    },
+    {
+      "localTimestamp": "2019-06-01T00:00:40.725Z",
+      "message": {
+        "type": "match",
+        "trade_id": 298132,
+        "maker_order_id": "48e3e5b7-cace-415e-9ab1-cfcefa597b73",
+        "taker_order_id": "9f5118c3-6abd-4ab0-ad18-695a4459d621",
+        "side": "sell",
+        "size": "1.00000000",
+        "price": "90.34000000",
+        "product_id": "ZEC-USDC",
+        "sequence": 127066597,
+        "time": "2019-06-01T00:00:40.660000Z"
+      }
+    },
+    {
+      "localTimestamp": "2019-06-01T00:01:06.557Z",
+      "message": {
+        "type": "match",
+        "trade_id": 298133,
+        "maker_order_id": "48e3e5b7-cace-415e-9ab1-cfcefa597b73",
+        "taker_order_id": "bc625a17-3505-4160-9a3e-4d56ad2f1e38",
+        "side": "sell",
+        "size": "0.28984796",
+        "price": "90.34000000",
+        "product_id": "ZEC-USDC",
+        "sequence": 127066913,
+        "time": "2019-06-01T00:01:06.498000Z"
+      }
+    }
+  ],
+  "normalizedMessages": [
+    {
+      "type": "trade",
+      "symbol": "ZEC-USDC",
+      "exchange": "coinbase",
+      "id": "298130",
+      "price": 90.34,
+      "amount": 0.22815391,
+      "side": "buy",
+      "timestamp": "2019-06-01T00:00:10.382000Z",
+      "localTimestamp": "2019-06-01T00:00:10.426995Z"
+    },
+    {
+      "type": "trade",
+      "symbol": "ZEC-USDC",
+      "exchange": "coinbase",
+      "id": "298131",
+      "price": 90.34,
+      "amount": 10.59160694,
+      "side": "buy",
+      "timestamp": "2019-06-01T00:00:25.354000Z",
+      "localTimestamp": "2019-06-01T00:00:25.399155Z"
+    },
+    {
+      "type": "trade",
+      "symbol": "ZEC-USDC",
+      "exchange": "coinbase",
+      "id": "298132",
+      "price": 90.34,
+      "amount": 1,
+      "side": "buy",
+      "timestamp": "2019-06-01T00:00:40.660000Z",
+      "localTimestamp": "2019-06-01T00:00:40.725379Z"
+    },
+    {
+      "type": "trade",
+      "symbol": "ZEC-USDC",
+      "exchange": "coinbase",
+      "id": "298133",
+      "price": 90.34,
+      "amount": 0.28984796,
+      "side": "buy",
+      "timestamp": "2019-06-01T00:01:06.498000Z",
+      "localTimestamp": "2019-06-01T00:01:06.557779Z"
+    }
+  ]
+}
+`;

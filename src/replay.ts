@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import { EventEmitter, once } from 'events'
 import { Worker } from 'worker_threads'
-import { constants, createGunzip, createZstdDecompress } from 'zlib'
+import { constants, createGunzip } from 'zlib'
 import { BinarySplitBatchStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
@@ -12,6 +12,7 @@ import { Mapper, MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
+import { createZstdDecompressionStream } from './zstd.ts'
 
 type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
@@ -170,9 +171,10 @@ async function* replayLineBatches<T extends Exchange>({
       // response is a path to file on disk let' read it as stream
       const { slicePath: cachedSlicePath, sliceSize } = cachedSlice
       const isZstdSlice = cachedSlicePath.endsWith('.zst')
-      const linesStream = createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE })
-        // decompress it while preserving the on-disk cache in the negotiated wire format
-        .pipe(isZstdSlice ? createZstdDecompress({ chunkSize: CHUNK_SIZE }) : createGunzip(GZIP_OPTIONS))
+      const decompressedStream = isZstdSlice
+        ? createZstdDecompressionStream(cachedSlicePath, CHUNK_SIZE)
+        : createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE }).pipe(createGunzip(GZIP_OPTIONS))
+      const linesStream = decompressedStream
         .on('error', function onDecompressionError(err) {
           debug('%s decompression error %o', isZstdSlice ? 'zstd' : 'gzip', err)
           linesStream.destroy(err)

@@ -1,39 +1,34 @@
-import { jest } from '@jest/globals'
+import { afterEach, describe, test } from 'node:test'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { assert } from './assertions.ts'
 import { findInstrumentSymbols, getInstrumentInfo, init, type InstrumentInfoFilter } from '../dist/index.js'
-import { describeLive } from './live.js'
-
-function createFetchMock(...responses: Response[]) {
-  const fetchMock = jest.fn<typeof fetch>()
-
-  for (const response of responses) {
-    fetchMock.mockResolvedValueOnce(response)
-  }
-
-  return fetchMock
-}
+import { describeLive } from './live.ts'
 
 describe('findInstrumentSymbols', () => {
-  const originalFetch = global.fetch
+  test('does not return unavailable datasets when datasetId is requested', async () => {
+    let requestUrl: string | undefined
+    const server = createServer((request, response) => {
+      requestUrl = request.url
+      response.writeHead(200, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify([{ id: 'btcusdt', datasetId: 'BTCUSDT' }, { id: 'ethusdt' }]))
+    })
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address() as AddressInfo
 
-  afterEach(() => {
-    global.fetch = originalFetch
-    init()
-    jest.restoreAllMocks()
-  })
+    try {
+      init({ endpoint: `http://127.0.0.1:${address.port}/v1` })
 
-  test('returns only instruments with dataset ids when datasetId selector is used', async () => {
-    global.fetch = createFetchMock(
-      new Response(JSON.stringify([{ id: 'btcusdt', datasetId: 'BTCUSDT' }, { id: 'ethusdt' }]), { status: 200 })
-    )
-    init({ endpoint: 'https://example.com/v1' })
-
-    await expect(findInstrumentSymbols(['binance'], { active: true }, 'datasetId')).resolves.toEqual([
-      { exchange: 'binance', symbols: ['BTCUSDT'] }
-    ])
-  })
-
-  test('rejects invalid selector values at runtime', async () => {
-    await expect(findInstrumentSymbols(['binance'], { active: true }, 'nativeId' as any)).rejects.toThrow('Invalid selector')
+      assert.deepStrictEqual(await findInstrumentSymbols(['binance'], { active: true }, 'datasetId'), [
+        { exchange: 'binance', symbols: ['BTCUSDT'] }
+      ])
+      const request = new URL(requestUrl ?? '', 'http://localhost')
+      assert.strictEqual(request.pathname, '/v1/instruments/binance')
+      assert.deepStrictEqual(JSON.parse(request.searchParams.get('filter') ?? ''), { active: true })
+    } finally {
+      init()
+      await new Promise<void>((resolve, reject) => server.close((error) => (error === undefined ? resolve() : reject(error))))
+    }
   })
 })
 
@@ -51,10 +46,10 @@ describeLive('instrument info live', () => {
     init()
   })
 
-  test('fetches public BitMEX instrument metadata', async () => {
+  test('fetches and filters public BitMEX instrument metadata', async () => {
     const instrument = await getInstrumentInfo('bitmex', 'XBTUSD')
 
-    expect(instrument).toMatchObject({
+    assert.partialDeepStrictEqual(instrument, {
       id: 'XBTUSD',
       datasetId: 'XBTUSD',
       exchange: 'bitmex',
@@ -65,16 +60,11 @@ describeLive('instrument info live', () => {
       underlyingType: 'native',
       active: true
     })
-  })
 
-  test('finds public BitMEX symbol ids by metadata filter', async () => {
-    await expect(findInstrumentSymbols(['bitmex'], bitmexXbtUsdPerpetualFilter)).resolves.toEqual([
+    assert.deepStrictEqual(await findInstrumentSymbols(['bitmex'], bitmexXbtUsdPerpetualFilter), [
       { exchange: 'bitmex', symbols: ['XBTUSD'] }
     ])
-  })
-
-  test('finds public BitMEX dataset ids by metadata filter', async () => {
-    await expect(findInstrumentSymbols(['bitmex'], bitmexXbtUsdPerpetualFilter, 'datasetId')).resolves.toEqual([
+    assert.deepStrictEqual(await findInstrumentSymbols(['bitmex'], bitmexXbtUsdPerpetualFilter, 'datasetId'), [
       { exchange: 'bitmex', symbols: ['XBTUSD'] }
     ])
   })

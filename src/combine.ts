@@ -1,5 +1,4 @@
-import { PassThrough } from 'stream'
-import { once } from 'events'
+import { closeIterator, isManagedRealTimeIterator, mergeRealTime } from './realtimeiterator.ts'
 
 type NextMessageResultWithIndex = {
   index: number
@@ -11,6 +10,12 @@ type Combinable = { localTimestamp: Date }
 const DATE_MAX = new Date(8640000000000000)
 
 type OffsetMS = number | ((message: Combinable) => number)
+type IteratorPayload = AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
+type CombinedMessage<T> = T extends AsyncIterableIterator<infer U>[]
+  ? U
+  : T extends { stream: AsyncIterableIterator<infer U> }[]
+    ? U
+    : never
 
 async function nextWithIndex(
   iterator: AsyncIterableIterator<Combinable> | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS },
@@ -71,56 +76,27 @@ function findOldestResult(oldest: NextMessageResultWithIndex, current: NextMessa
 
 // combines multiple iterators from for example multiple exchanges
 // works both for real-time and historical data
-export async function* combine<
-  T extends AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
->(
-  ...iteratorsPayload: T
-): AsyncIterableIterator<
-  T extends AsyncIterableIterator<infer U>[] ? U : T extends { stream: AsyncIterableIterator<infer Z> }[] ? Z : never
-> {
+export function combine<T extends IteratorPayload>(...iteratorsPayload: T): AsyncIterableIterator<CombinedMessage<T>> {
   const iterators = iteratorsPayload.map((payload) => {
     if ('stream' in payload) {
       return payload.stream
     }
     return payload
   })
-
-  if (iterators.length === 0) {
-    return
+  if (isManagedRealTimeIterator(iterators[0])) {
+    return mergeRealTime(iterators) as AsyncIterableIterator<CombinedMessage<T>>
   }
-  // decide based on first provided iterator if we're dealing with real-time or historical data streams
-  if ((iterators[0] as any).__realtime__) {
-    const combinedStream = new PassThrough({
-      objectMode: true,
-      highWaterMark: 8096
-    })
 
-    combinedStream.setMaxListeners(iterators.length + 1)
-
-    iterators.forEach(async function writeMessagesToCombinedStream(messages) {
-      for await (const message of messages) {
-        if (combinedStream.destroyed) {
-          return
-        }
-
-        if (!combinedStream.write(message)) {
-          // Handle backpressure on write
-          await once(combinedStream, 'drain')
-        }
-      }
-    })
-
-    for await (const message of combinedStream) {
-      yield message
-    }
-  } else {
-    return yield* combineHistorical(iteratorsPayload) as any
-  }
+  return combineHistorical(iteratorsPayload) as AsyncIterableIterator<CombinedMessage<T>>
 }
 
 async function* combineHistorical(
   iterators: AsyncIterableIterator<Combinable>[] | { stream: AsyncIterableIterator<Combinable>; offsetMS: OffsetMS }[]
 ) {
+  if (iterators.length === 0) {
+    return
+  }
+
   try {
     // wait for all results to resolve
     const results = await Promise.all(iterators.map(nextWithIndex))
@@ -153,8 +129,6 @@ async function* combineHistorical(
       }
     } while (aliveIteratorsCount > 0)
   } finally {
-    for (let iterator of iterators) {
-      ;(iterator as any).return()
-    }
+    await Promise.all(iterators.map((iterator) => closeIterator('stream' in iterator ? iterator.stream : iterator)))
   }
 }

@@ -1,71 +1,13 @@
-import protobuf from 'protobufjs'
 import { CircularBuffer, getJSON, wait } from '../handy.ts'
 import type { MexcDepthSnapshotMessage } from '../mappers/mexc.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
+import { decodeMexcProtobufMessage } from './mexcprotobuf.ts'
 
 export class MexcRealTimeFeed extends RealTimeFeedBase {
   private static readonly depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
   private static readonly depthSnapshotChannel = 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms'
   private static readonly jsonObjectStart = '{'.charCodeAt(0)
-  private static pushDataV3ApiWrapper: protobuf.Type | undefined
-  /**
-   * MEXC protobuf docs at @see https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/protocol-buffers-integration
-   * and schemas from @see https://github.com/mexcdevelop/websocket-proto, mirrored in tardis-recorder/datafeeds/src/mexc/proto.
-   */
-  private static readonly pushDataV3ApiWrapperSchema = `
-    syntax = "proto3";
-
-    message PushDataV3ApiWrapper {
-      string channel = 1;
-      oneof body {
-        PublicAggreDepthsV3Api publicAggreDepths = 313;
-        PublicAggreDealsV3Api publicAggreDeals = 314;
-        PublicAggreBookTickerV3Api publicAggreBookTicker = 315;
-      }
-
-      optional string symbol = 3;
-      optional string symbolId = 4;
-      optional int64 createTime = 5;
-      optional int64 sendTime = 6;
-    }
-
-    message PublicAggreDealsV3Api {
-      repeated PublicAggreDealsV3ApiItem deals = 1;
-      string eventType = 2;
-    }
-
-    message PublicAggreDealsV3ApiItem {
-      string price = 1;
-      string quantity = 2;
-      int32 tradeType = 3;
-      int64 time = 4;
-      string tradeId = 5;
-    }
-
-    message PublicAggreDepthsV3Api {
-      repeated PublicAggreDepthV3ApiItem asks = 1;
-      repeated PublicAggreDepthV3ApiItem bids = 2;
-      string eventType = 3;
-      string fromVersion = 4;
-      string toVersion = 5;
-      int64 lastOrderCreateTime = 6;
-    }
-
-    message PublicAggreDepthV3ApiItem {
-      string price = 1;
-      string quantity = 2;
-    }
-
-    message PublicAggreBookTickerV3Api {
-      string bidPrice = 1;
-      string bidQuantity = 2;
-      string askPrice = 3;
-      string askQuantity = 4;
-      string version = 5;
-      int64 lastOrderCreateTime = 6;
-    }
-  `
 
   private readonly pendingDepthSnapshotSymbols = new Set<string>()
   private readonly bufferedDepthUpdates = new Map<string, CircularBuffer<MexcDepthUpdateData>>()
@@ -114,11 +56,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
       return JSON.parse(buffer.toString())
     }
 
-    const pushDataV3ApiWrapper = this.getPushDataV3ApiWrapper()
-    return pushDataV3ApiWrapper.toObject(pushDataV3ApiWrapper.decode(buffer), {
-      longs: String,
-      arrays: true
-    })
+    return decodeMexcProtobufMessage(buffer)
   }
 
   protected override messageIsError(message: any): boolean {
@@ -166,14 +104,6 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
 
   protected sendCustomPing = () => {
     this.send({ method: 'PING' })
-  }
-
-  private getPushDataV3ApiWrapper() {
-    MexcRealTimeFeed.pushDataV3ApiWrapper ??= protobuf
-      .parse(MexcRealTimeFeed.pushDataV3ApiWrapperSchema)
-      .root.lookupType('PushDataV3ApiWrapper')
-
-    return MexcRealTimeFeed.pushDataV3ApiWrapper
   }
 
   private resetDepthSnapshotTracking(filters: Required<Filter<string>>[]) {

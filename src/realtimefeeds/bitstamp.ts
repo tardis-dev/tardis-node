@@ -51,6 +51,9 @@ export class BitstampRealTimeFeed extends RealTimeFeedBase {
       }
 
       const { data } = await getJSON(`${this.httpURL}/order_book/${symbol}?group=1`)
+      if (shouldCancel()) {
+        return
+      }
 
       const snapshot = {
         data,

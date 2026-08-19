@@ -1,6 +1,5 @@
-import { RBTree } from 'bintrees'
-import type { RBTree as RBTreeType } from 'bintrees'
-import { BookChange, BookPriceLevel, Writeable } from './types.ts'
+import { PriceLevelTree } from './priceleveltree.ts'
+import { BookChange, BookPriceLevel } from './types.ts'
 
 export type OnLevelRemovedCB = (
   bookChange: BookChange,
@@ -11,10 +10,10 @@ export type OnLevelRemovedCB = (
 ) => void
 
 export class OrderBook {
-  private readonly _bids = new RBTree<BookPriceLevel>((nodeA, nodeB) => nodeB.price - nodeA.price)
-  private readonly _asks = new RBTree<BookPriceLevel>((nodeA, nodeB) => nodeA.price - nodeB.price)
+  private readonly _bids = new PriceLevelTree(-1)
+  private readonly _asks = new PriceLevelTree(1)
   private readonly _removeCrossedLevels: boolean | undefined
-  private readonly _onCrossedLevelRemoved: OnLevelRemovedCB | undefined
+  private _onCrossedLevelRemovedCallbacks: Set<OnLevelRemovedCB> | undefined
 
   private _receivedInitialSnapshot = false
 
@@ -23,7 +22,16 @@ export class OrderBook {
     onCrossedLevelRemoved
   }: { removeCrossedLevels?: boolean; onCrossedLevelRemoved?: OnLevelRemovedCB } = {}) {
     this._removeCrossedLevels = removeCrossedLevels
-    this._onCrossedLevelRemoved = onCrossedLevelRemoved
+    if (onCrossedLevelRemoved !== undefined) {
+      this._onCrossedLevelRemovedCallbacks = new Set([onCrossedLevelRemoved])
+    }
+  }
+
+  public addOnCrossedLevelRemovedCallback(callback: OnLevelRemovedCB) {
+    if (this._onCrossedLevelRemovedCallbacks === undefined) {
+      this._onCrossedLevelRemovedCallbacks = new Set()
+    }
+    this._onCrossedLevelRemovedCallbacks.add(callback)
   }
 
   public update(bookChange: BookChange) {
@@ -89,8 +97,10 @@ export class OrderBook {
 
         const newBestBid = this.bestBid()
         const newBestAsk = this.bestAsk()
-        if (this._onCrossedLevelRemoved !== undefined) {
-          this._onCrossedLevelRemoved(bookChange, bestBid, newBestBid, bestAsk, newBestAsk)
+        if (this._onCrossedLevelRemovedCallbacks !== undefined) {
+          for (const callback of this._onCrossedLevelRemovedCallbacks) {
+            callback(bookChange, bestBid, newBestBid, bestAsk, newBestAsk)
+          }
         }
 
         bestBid = newBestBid
@@ -147,18 +157,13 @@ export class OrderBook {
   }
 }
 
-function applyPriceLevelChanges(tree: RBTreeType<BookPriceLevel>, priceLevelChanges: BookPriceLevel[]) {
+function applyPriceLevelChanges(tree: PriceLevelTree, priceLevelChanges: BookPriceLevel[]) {
   for (const priceLevel of priceLevelChanges) {
-    const node = tree.find(priceLevel) as Writeable<BookPriceLevel>
-    const nodeExists = node !== null
-    const levelShouldBeRemoved = priceLevel.amount === 0
-
-    if (nodeExists && levelShouldBeRemoved) {
+    if (priceLevel.amount === 0) {
       tree.remove(priceLevel)
-    } else if (nodeExists) {
-      node.amount = priceLevel.amount
-    } else if (levelShouldBeRemoved === false) {
-      tree.insert({ ...priceLevel })
+      continue
     }
+
+    tree.upsert(priceLevel)
   }
 }

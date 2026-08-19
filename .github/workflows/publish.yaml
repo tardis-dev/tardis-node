@@ -2,54 +2,131 @@ name: Publish New Release To NPM
 
 on:
   release:
-    # This specifies that the build will be triggered when we publish a release
     types: [published]
 
-permissions:
-  id-token: write
-  contents: write
+permissions: {}
 
 jobs:
-  publish:
-    name: Publish New Release To NPM
+  build:
+    name: Build And Pack Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - name: Checkout Release Tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Use Node.js v25.8.2
-        uses: actions/setup-node@v6
+      - name: Validate Release Tag
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ "$RELEASE_VERSION" == v* ]]; then
+            echo "Release tag must be a plain semver version without a v prefix: $RELEASE_VERSION" >&2
+            exit 1
+          fi
+
+          release_commit=$(git rev-parse HEAD)
+          if ! git merge-base --is-ancestor "$release_commit" "origin/${DEFAULT_BRANCH}"; then
+            echo "Release tag must point to a commit in the ${DEFAULT_BRANCH} history." >&2
+            exit 1
+          fi
+
+      - name: Use Node.js v26.7.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 25.8.2
-          registry-url: https://registry.npmjs.org/
+          node-version: 26.7.0
+          package-manager-cache: false
 
-      - name: Install Dependencies And Compile TS
+      - name: Install Dependencies
         run: npm ci --ignore-scripts
 
       - name: Verify Registry Signatures
         run: npm audit signatures
 
-      - name: Audit Production Dependencies
-        run: npm audit --omit=dev --audit-level=critical
+      - name: Audit Dependencies
+        run: npm audit --package-lock-only --audit-level=high
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Release Bot"
-          git config --global user.email "deploy@tardis.dev"
-
-      - name: Update package version
-        run: npm version ${{ github.event.release.tag_name }}
+      - name: Set Package Version
+        env:
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version --ignore-scripts
 
       - name: Run Tests
-        run: npm run test
+        run: npm test
+
+      - name: Create npm Tarball
+        run: |
+          mkdir publish-artifact
+          npm pack --ignore-scripts --pack-destination publish-artifact
+          mv publish-artifact/*.tgz publish-artifact/tardis-dev.tgz
+
+      - name: Upload Package Artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-package
+          path: publish-artifact/tardis-dev.tgz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  publish:
+    name: Publish Package To NPM
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Use Node.js v26.7.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.7.0
+          registry-url: https://registry.npmjs.org/
+
+      - name: Download Package Artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: npm-package
+          path: publish-artifact
 
       - name: Publish Package
-        run: npm publish
+        run: npm publish ./publish-artifact/tardis-dev.tgz --ignore-scripts
 
-      - name: Push Version Changes To GitHub
+  update-version:
+    name: Commit Package Version
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Use Node.js v26.7.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.7.0
+          package-manager-cache: false
+
+      - name: Checkout Default Branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Commit Package Version
         env:
-          VERSION_BRANCH: ${{ github.event.repository.default_branch }}
-        run: git push origin "HEAD:${VERSION_BRANCH}"
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          git config user.name "GitHub Release Bot"
+          git config user.email "deploy@tardis.dev"
+          npm version "$RELEASE_VERSION" --no-git-tag-version --ignore-scripts
+          git add package.json package-lock.json
+          git commit -m "$RELEASE_VERSION"
+          git push origin "HEAD:${DEFAULT_BRANCH}"

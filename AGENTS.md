@@ -4,11 +4,21 @@ Public npm package (`tardis-dev`). Provides async iterator API for historical re
 
 ## Build & Test
 
+Use the Node.js version from `.nvmrc` and its bundled npm.
+
 ```bash
 npm run build        # tsc
-npm test             # build + jest
+npm test             # build + node:test
 npm run check-format # prettier check
 ```
+
+The default suite includes one short, fixed replay through the public Tardis API. Use `RUN_LIVE_TESTS=1 npm test` for the broader external exchange and Tardis API checks. Update snapshots with `npm run test:update-snapshots`.
+
+- Prefer assertions against public output and stable protocol contracts over private helpers or call shapes.
+- Use small fixed fixtures or local HTTP servers when a failure state must be controlled deterministically.
+- Snapshot stable raw-to-normalized mappings and short fixed historical replays, not unbounded live output.
+- Update snapshots with the full `npm run test:update-snapshots` command; a filtered native snapshot update prunes unmatched snapshots from the same file.
+- Add regression tests for behavior that could lose, reorder, delay, or mis-normalize market data; do not add a test solely because a helper or branch exists.
 
 ## Editing Rules
 
@@ -21,7 +31,7 @@ npm run check-format # prettier check
 
 ## Validation
 
-- `npm run build && npm test`
+- `npm test`
 - `npm run check-format`
 - Manual `replay()` / `replayNormalized()` checks must run from a real `.mjs`/`.js` file, not from `node --input-type=module` or STDIN. Replay uses worker threads, and workers inherit `execArgv`; `--input-type` makes Node reject the worker file with `ERR_INPUT_TYPE_NOT_ALLOWED`.
 

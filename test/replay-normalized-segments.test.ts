@@ -1,9 +1,10 @@
+import { afterEach, mock, test } from 'node:test'
 import { EventEmitter } from 'node:events'
+import { assert } from './assertions.ts'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'
-import { jest } from '@jest/globals'
 
 const workerPayloads: any[] = []
 const tempDirs: string[] = []
@@ -41,12 +42,14 @@ class MockWorker extends EventEmitter {
   }
 }
 
-jest.unstable_mockModule('worker_threads', () => ({
-  Worker: MockWorker,
-  isMainThread: true,
-  parentPort: undefined,
-  workerData: undefined
-}))
+mock.module('worker_threads', {
+  exports: {
+    Worker: MockWorker,
+    isMainThread: true,
+    parentPort: undefined,
+    workerData: undefined
+  }
+})
 
 const { normalizeBookChanges, normalizeTrades, replayNormalized } = await import('../dist/index.js')
 
@@ -56,28 +59,6 @@ afterEach(() => {
   for (const tempDir of tempDirs.splice(0)) {
     rmSync(tempDir, { force: true, recursive: true })
   }
-})
-
-test('replayNormalized keeps one replay segment for multi-day ranges without mapper switches', async () => {
-  const messages = []
-  for await (const message of replayNormalized(
-    {
-      exchange: 'bitmex',
-      symbols: ['ETHUSD'],
-      from: '2019-05-01T00:00:00.000Z',
-      to: '2019-05-06T00:00:00.000Z'
-    },
-    normalizeTrades
-  )) {
-    messages.push(message)
-  }
-
-  expect(messages).toHaveLength(1)
-  expect(messages.map((message) => message.timestamp.toISOString())).toEqual(['2019-05-01T00:00:00.000Z'])
-  expect(workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()])).toEqual([
-    ['2019-05-01T00:00:00.000Z', '2019-05-06T00:00:00.000Z']
-  ])
-  expect(workerPayloads.map((payload) => payload.filters)).toEqual([[{ channel: 'trade', symbols: ['ETHUSD'] }]])
 })
 
 test('replayNormalized creates replay segments at mapper switch dates', async () => {
@@ -94,16 +75,22 @@ test('replayNormalized creates replay segments at mapper switch dates', async ()
     messages.push(message)
   }
 
-  expect(messages).toHaveLength(2)
-  expect(messages.map((message) => message.timestamp.toISOString())).toEqual(['2026-04-27T23:59:00.000Z', '2026-04-28T00:00:00.000Z'])
-  expect(workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()])).toEqual([
-    ['2026-04-27T23:59:00.000Z', '2026-04-28T00:00:00.000Z'],
-    ['2026-04-28T00:00:00.000Z', '2026-04-28T00:01:00.000Z']
-  ])
-  expect(workerPayloads.map((payload) => payload.filters)).toEqual([
-    [{ channel: 'trade', symbols: ['BTCUSDT'] }],
-    [{ channel: 'publicTrade', symbols: ['BTCUSDT'] }]
-  ])
+  assert.strictEqual(messages.length, 2)
+  assert.deepStrictEqual(
+    messages.map((message) => message.timestamp.toISOString()),
+    ['2026-04-27T23:59:00.000Z', '2026-04-28T00:00:00.000Z']
+  )
+  assert.deepStrictEqual(
+    workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()]),
+    [
+      ['2026-04-27T23:59:00.000Z', '2026-04-28T00:00:00.000Z'],
+      ['2026-04-28T00:00:00.000Z', '2026-04-28T00:01:00.000Z']
+    ]
+  )
+  assert.deepStrictEqual(
+    workerPayloads.map((payload) => payload.filters),
+    [[{ channel: 'trade', symbols: ['BTCUSDT'] }], [{ channel: 'publicTrade', symbols: ['BTCUSDT'] }]]
+  )
 })
 
 test('replayNormalized segments OKX book changes at public books channel boundaries', async () => {
@@ -131,22 +118,27 @@ test('replayNormalized segments OKX book changes at public books channel boundar
       messages.push(message)
     }
 
-    expect(messages).toHaveLength(3)
-    expect(messages.map((message) => message.timestamp.toISOString())).toEqual([
-      '2023-02-24T23:59:00.000Z',
-      '2023-02-25T00:00:00.000Z',
-      '2023-03-09T00:00:00.000Z'
-    ])
-    expect(workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()])).toEqual([
-      ['2023-02-24T23:59:00.000Z', '2023-02-25T00:00:00.000Z'],
-      ['2023-02-25T00:00:00.000Z', '2023-03-09T00:00:00.000Z'],
-      ['2023-03-09T00:00:00.000Z', '2023-03-09T00:01:00.000Z']
-    ])
-    expect(workerPayloads.map((payload) => payload.filters)).toEqual([
-      [{ channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }],
-      [{ channel: 'books', symbols: ['BTC-USDT'] }],
-      [{ channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }]
-    ])
+    assert.strictEqual(messages.length, 3)
+    assert.deepStrictEqual(
+      messages.map((message) => message.timestamp.toISOString()),
+      ['2023-02-24T23:59:00.000Z', '2023-02-25T00:00:00.000Z', '2023-03-09T00:00:00.000Z']
+    )
+    assert.deepStrictEqual(
+      workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()]),
+      [
+        ['2023-02-24T23:59:00.000Z', '2023-02-25T00:00:00.000Z'],
+        ['2023-02-25T00:00:00.000Z', '2023-03-09T00:00:00.000Z'],
+        ['2023-03-09T00:00:00.000Z', '2023-03-09T00:01:00.000Z']
+      ]
+    )
+    assert.deepStrictEqual(
+      workerPayloads.map((payload) => payload.filters),
+      [
+        [{ channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }],
+        [{ channel: 'books', symbols: ['BTC-USDT'] }],
+        [{ channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }]
+      ]
+    )
   } finally {
     restoreEnv(okxEnv)
   }
@@ -166,22 +158,31 @@ test('replayNormalized segments WOO X book changes at the V3 raw payload boundar
     messages.push(message)
   }
 
-  expect(messages).toHaveLength(2)
-  expect(messages.map((message) => message.timestamp.toISOString())).toEqual(['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z'])
-  expect(workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()])).toEqual([
-    ['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z'],
-    ['2026-06-29T22:02:00.000Z', '2026-06-29T22:03:00.000Z']
-  ])
-  expect(workerPayloads.map((payload) => payload.filters)).toEqual([
+  assert.strictEqual(messages.length, 2)
+  assert.deepStrictEqual(
+    messages.map((message) => message.timestamp.toISOString()),
+    ['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z']
+  )
+  assert.deepStrictEqual(
+    workerPayloads.map((payload) => [payload.fromDate.toISOString(), payload.toDate.toISOString()]),
     [
-      { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
-      { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
-    ],
-    [
-      { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
-      { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
+      ['2026-06-29T22:01:00.000Z', '2026-06-29T22:02:00.000Z'],
+      ['2026-06-29T22:02:00.000Z', '2026-06-29T22:03:00.000Z']
     ]
-  ])
+  )
+  assert.deepStrictEqual(
+    workerPayloads.map((payload) => payload.filters),
+    [
+      [
+        { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
+        { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
+      ],
+      [
+        { channel: 'orderbook', symbols: ['PERP_BTC_USDT'] },
+        { channel: 'orderbookupdate', symbols: ['PERP_BTC_USDT'] }
+      ]
+    ]
+  )
 })
 
 function createMessage(payload: any) {

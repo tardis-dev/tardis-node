@@ -1,0 +1,580 @@
+exports[`compute(messages, types) > computes time bars from out-of-order trade timestamps 1`] = `
+[
+  {
+    "id": undefined,
+    "type": "trade",
+    "symbol": "CRV-USD",
+    "exchange": "dydx",
+    "price": 0.3394,
+    "amount": 1273,
+    "side": "buy",
+    "timestamp": "2024-06-23T03:05:59.988Z",
+    "localTimestamp": "2024-06-23T03:06:00.158Z"
+  },
+  {
+    "id": undefined,
+    "type": "trade",
+    "symbol": "CRV-USD",
+    "exchange": "dydx",
+    "price": 0.3387,
+    "amount": 65,
+    "side": "buy",
+    "timestamp": "2024-06-23T03:05:59.981Z",
+    "localTimestamp": "2024-06-23T03:06:00.173Z"
+  },
+  {
+    "id": undefined,
+    "type": "trade",
+    "symbol": "CRV-USD",
+    "exchange": "dydx",
+    "price": 0.3387,
+    "amount": 65,
+    "side": "buy",
+    "timestamp": "2024-06-23T03:06:01.981Z",
+    "localTimestamp": "2024-06-23T03:06:02.173Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "CRV-USD",
+    "exchange": "dydx",
+    "name": "trade_bar_1_minute",
+    "interval": 60000,
+    "kind": "time",
+    "open": 0.3394,
+    "high": 0.3394,
+    "low": 0.3387,
+    "close": 0.3394,
+    "volume": 1338,
+    "buyVolume": 1338,
+    "sellVolume": 0,
+    "trades": 2,
+    "vwap": 0.3393659940209267,
+    "openTimestamp": "2024-06-23T03:05:59.988Z",
+    "closeTimestamp": "2024-06-23T03:05:59.988Z",
+    "localTimestamp": "2024-06-23T03:06:02.173Z",
+    "timestamp": "2024-06-23T03:06:00.000Z"
+  }
+]
+`;
+
+exports[`compute(messages, types) > should compute correct trade bars based on provided messages 1`] = `
+[
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 200,
+    "symbol": "XBTUSD",
+    "id": "asd",
+    "price": 1000,
+    "side": "buy",
+    "timestamp": "2019-08-01T00:00:00.132Z",
+    "localTimestamp": "2019-08-01T00:00:00.132Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 2000,
+    "symbol": "XBTUSD",
+    "id": "sadasd",
+    "price": 1000,
+    "side": "buy",
+    "timestamp": "2019-08-01T00:01:00.000Z",
+    "localTimestamp": "2019-08-01T00:01:00.132Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_1_minute",
+    "interval": 60000,
+    "kind": "time",
+    "open": 1000,
+    "high": 1000,
+    "low": 1000,
+    "close": 1000,
+    "volume": 200,
+    "buyVolume": 200,
+    "sellVolume": 0,
+    "trades": 1,
+    "vwap": 1000,
+    "openTimestamp": "2019-08-01T00:00:00.132Z",
+    "closeTimestamp": "2019-08-01T00:00:00.132Z",
+    "localTimestamp": "2019-08-01T00:01:00.132Z",
+    "timestamp": "2019-08-01T00:01:00.000Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2ticks",
+    "interval": 2,
+    "kind": "tick",
+    "open": 1000,
+    "high": 1000,
+    "low": 1000,
+    "close": 1000,
+    "volume": 2200,
+    "buyVolume": 2200,
+    "sellVolume": 0,
+    "trades": 2,
+    "vwap": 1000,
+    "openTimestamp": "2019-08-01T00:00:00.132Z",
+    "closeTimestamp": "2019-08-01T00:01:00.000Z",
+    "localTimestamp": "2019-08-01T00:01:00.132Z",
+    "timestamp": "2019-08-01T00:01:00.000Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2kvol",
+    "interval": 2000,
+    "kind": "volume",
+    "open": 1000,
+    "high": 1000,
+    "low": 1000,
+    "close": 1000,
+    "volume": 2200,
+    "buyVolume": 2200,
+    "sellVolume": 0,
+    "trades": 2,
+    "vwap": 1000,
+    "openTimestamp": "2019-08-01T00:00:00.132Z",
+    "closeTimestamp": "2019-08-01T00:01:00.000Z",
+    "localTimestamp": "2019-08-01T00:01:00.132Z",
+    "timestamp": "2019-08-01T00:01:00.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 200,
+    "symbol": "XBTUSD",
+    "id": "asdssd",
+    "price": 1005,
+    "side": "sell",
+    "timestamp": "2019-08-01T00:01:01.000Z",
+    "localTimestamp": "2019-08-01T00:01:01.132Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 2000,
+    "symbol": "XBTUSD",
+    "id": "asddfssd",
+    "price": 1015,
+    "side": "buy",
+    "timestamp": "2019-08-01T00:01:02.000Z",
+    "localTimestamp": "2019-08-01T00:01:02.132Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2ticks",
+    "interval": 2,
+    "kind": "tick",
+    "open": 1005,
+    "high": 1015,
+    "low": 1005,
+    "close": 1015,
+    "volume": 2200,
+    "buyVolume": 2000,
+    "sellVolume": 200,
+    "trades": 2,
+    "vwap": 1014.0909090909091,
+    "openTimestamp": "2019-08-01T00:01:01.000Z",
+    "closeTimestamp": "2019-08-01T00:01:02.000Z",
+    "localTimestamp": "2019-08-01T00:01:02.132Z",
+    "timestamp": "2019-08-01T00:01:02.000Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2kvol",
+    "interval": 2000,
+    "kind": "volume",
+    "open": 1005,
+    "high": 1015,
+    "low": 1005,
+    "close": 1015,
+    "volume": 2200,
+    "buyVolume": 2000,
+    "sellVolume": 200,
+    "trades": 2,
+    "vwap": 1014.0909090909091,
+    "openTimestamp": "2019-08-01T00:01:01.000Z",
+    "closeTimestamp": "2019-08-01T00:01:02.000Z",
+    "localTimestamp": "2019-08-01T00:01:02.132Z",
+    "timestamp": "2019-08-01T00:01:02.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 200,
+    "symbol": "XBTUSD",
+    "id": "sdfc",
+    "price": 1013,
+    "side": "buy",
+    "timestamp": "2019-08-01T00:04:00.120Z",
+    "localTimestamp": "2019-08-01T00:04:01.132Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_1_minute",
+    "interval": 60000,
+    "kind": "time",
+    "open": 1000,
+    "high": 1015,
+    "low": 1000,
+    "close": 1015,
+    "volume": 4200,
+    "buyVolume": 4000,
+    "sellVolume": 200,
+    "trades": 3,
+    "vwap": 1007.3809523809524,
+    "openTimestamp": "2019-08-01T00:01:00.000Z",
+    "closeTimestamp": "2019-08-01T00:01:02.000Z",
+    "localTimestamp": "2019-08-01T00:04:01.132Z",
+    "timestamp": "2019-08-01T00:02:00.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 2000,
+    "symbol": "XBTUSD",
+    "id": "sdfsdfc",
+    "price": 1010,
+    "side": "sell",
+    "timestamp": "2019-08-01T00:06:00.100Z",
+    "localTimestamp": "2019-08-01T00:06:01.132Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_1_minute",
+    "interval": 60000,
+    "kind": "time",
+    "open": 1013,
+    "high": 1013,
+    "low": 1013,
+    "close": 1013,
+    "volume": 200,
+    "buyVolume": 200,
+    "sellVolume": 0,
+    "trades": 1,
+    "vwap": 1013,
+    "openTimestamp": "2019-08-01T00:04:00.120Z",
+    "closeTimestamp": "2019-08-01T00:04:00.120Z",
+    "localTimestamp": "2019-08-01T00:06:01.132Z",
+    "timestamp": "2019-08-01T00:05:00.000Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2ticks",
+    "interval": 2,
+    "kind": "tick",
+    "open": 1013,
+    "high": 1013,
+    "low": 1010,
+    "close": 1010,
+    "volume": 2200,
+    "buyVolume": 200,
+    "sellVolume": 2000,
+    "trades": 2,
+    "vwap": 1010.2727272727273,
+    "openTimestamp": "2019-08-01T00:04:00.120Z",
+    "closeTimestamp": "2019-08-01T00:06:00.100Z",
+    "localTimestamp": "2019-08-01T00:06:01.132Z",
+    "timestamp": "2019-08-01T00:06:00.100Z"
+  },
+  {
+    "type": "trade_bar",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "trade_bar_2kvol",
+    "interval": 2000,
+    "kind": "volume",
+    "open": 1013,
+    "high": 1013,
+    "low": 1010,
+    "close": 1010,
+    "volume": 2200,
+    "buyVolume": 200,
+    "sellVolume": 2000,
+    "trades": 2,
+    "vwap": 1010.2727272727273,
+    "openTimestamp": "2019-08-01T00:04:00.120Z",
+    "closeTimestamp": "2019-08-01T00:06:00.100Z",
+    "localTimestamp": "2019-08-01T00:06:01.132Z",
+    "timestamp": "2019-08-01T00:06:00.100Z"
+  }
+]
+`;
+
+exports[`compute(messages, types) > should produce correct book snapshots based on provided messages 1`] = `
+[
+  {
+    "type": "trade",
+    "exchange": "bitmex",
+    "amount": 200,
+    "symbol": "XBTUSD",
+    "id": "asd",
+    "price": 1000,
+    "side": "buy",
+    "timestamp": "2019-08-01T00:00:00.132Z",
+    "localTimestamp": "2019-08-01T00:00:00.132Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bitmex",
+    "isSnapshot": true,
+    "asks": [
+      {
+        "price": 200,
+        "amount": 20
+      },
+      {
+        "price": 120,
+        "amount": 1
+      }
+    ],
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      }
+    ],
+    "localTimestamp": "2019-08-01T00:00:00.132Z",
+    "timestamp": "2019-08-01T00:00:00.132Z",
+    "symbol": "XBTUSD"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "book_snapshot_2_1000ms",
+    "depth": 2,
+    "interval": 1000,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      },
+      {
+        "price": undefined,
+        "amount": undefined
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 1
+      },
+      {
+        "price": 200,
+        "amount": 20
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:00.132Z",
+    "localTimestamp": "2019-08-01T00:00:00.132Z"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "quotes",
+    "depth": 1,
+    "interval": 0,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 1
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:00.132Z",
+    "localTimestamp": "2019-08-01T00:00:00.132Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "asks": [
+      {
+        "price": 120,
+        "amount": 10
+      }
+    ],
+    "bids": [],
+    "localTimestamp": "2019-08-01T00:00:10.132Z",
+    "timestamp": "2019-08-01T00:00:10.132Z",
+    "symbol": "XBTUSD"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "quotes",
+    "depth": 1,
+    "interval": 0,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 10
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:10.132Z",
+    "localTimestamp": "2019-08-01T00:00:10.132Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "asks": [
+      {
+        "price": 201,
+        "amount": 10
+      }
+    ],
+    "bids": [],
+    "localTimestamp": "2019-08-01T00:00:12.132Z",
+    "timestamp": "2019-08-01T00:00:12.132Z",
+    "symbol": "XBTUSD"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "book_snapshot_2_1000ms",
+    "depth": 2,
+    "interval": 1000,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      },
+      {
+        "price": undefined,
+        "amount": undefined
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 10
+      },
+      {
+        "price": 200,
+        "amount": 20
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:11.000Z",
+    "localTimestamp": "2019-08-01T00:00:12.132Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "asks": [
+      {
+        "price": 200,
+        "amount": 220
+      }
+    ],
+    "bids": [],
+    "localTimestamp": "2019-08-01T00:00:12.132Z",
+    "timestamp": "2019-08-01T00:00:12.132Z",
+    "symbol": "XBTUSD"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bitmex",
+    "isSnapshot": false,
+    "asks": [],
+    "bids": [
+      {
+        "price": 120,
+        "amount": 20
+      }
+    ],
+    "localTimestamp": "2019-08-01T00:00:13.132Z",
+    "timestamp": "2019-08-01T00:00:13.132Z",
+    "symbol": "XBTUSD"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "book_snapshot_2_1000ms",
+    "depth": 2,
+    "interval": 1000,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 119,
+        "amount": 20
+      },
+      {
+        "price": undefined,
+        "amount": undefined
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 10
+      },
+      {
+        "price": 200,
+        "amount": 220
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:13.000Z",
+    "localTimestamp": "2019-08-01T00:00:13.132Z"
+  },
+  {
+    "type": "book_snapshot",
+    "symbol": "XBTUSD",
+    "exchange": "bitmex",
+    "name": "quotes",
+    "depth": 1,
+    "interval": 0,
+    "grouping": undefined,
+    "bids": [
+      {
+        "price": 120,
+        "amount": 20
+      }
+    ],
+    "asks": [
+      {
+        "price": 120,
+        "amount": 10
+      }
+    ],
+    "timestamp": "2019-08-01T00:00:13.132Z",
+    "localTimestamp": "2019-08-01T00:00:13.132Z"
+  }
+]
+`;

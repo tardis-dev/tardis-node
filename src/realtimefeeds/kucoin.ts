@@ -45,6 +45,9 @@ export class KucoinRealTimeFeed extends RealTimeFeedBase {
       const { data } = await getJSON<any>(`${this._httpURL}/v1/market/orderbook/level2_100?symbol=${symbol}`, {
         timeout: 10000
       })
+      if (shouldCancel()) {
+        return
+      }
 
       const snapshot = {
         type: 'message',

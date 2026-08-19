@@ -1,16 +1,18 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../src/handy.ts'
+import { describe, test } from 'node:test'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined } from '../dist/handy.js'
+import { assert } from './assertions.ts'
 
 describe('numeric parser contracts', () => {
   test('optional numeric helpers preserve only the zero behavior their names describe', () => {
-    expect(asNumberOrUndefined(0)).toBe(0)
-    expect(asNumberOrUndefined('0')).toBe(0)
-    expect(asNumberOrUndefined(Number.NaN)).toBeUndefined()
-    expect(asNumberOrUndefined('')).toBeUndefined()
+    assert.strictEqual(asNumberOrUndefined(0), 0)
+    assert.strictEqual(asNumberOrUndefined('0'), 0)
+    assert.strictEqual(asNumberOrUndefined(Number.NaN), undefined)
+    assert.strictEqual(asNumberOrUndefined(''), undefined)
 
-    expect(asNonZeroNumberOrUndefined(0)).toBeUndefined()
-    expect(asNonZeroNumberOrUndefined('0')).toBeUndefined()
-    expect(asNonZeroNumberOrUndefined('0.0')).toBeUndefined()
-    expect(asNonZeroNumberOrUndefined('')).toBeUndefined()
-    expect(asNonZeroNumberOrUndefined('1.25')).toBe(1.25)
+    assert.strictEqual(asNonZeroNumberOrUndefined(0), undefined)
+    assert.strictEqual(asNonZeroNumberOrUndefined('0'), undefined)
+    assert.strictEqual(asNonZeroNumberOrUndefined('0.0'), undefined)
+    assert.strictEqual(asNonZeroNumberOrUndefined(''), undefined)
+    assert.strictEqual(asNonZeroNumberOrUndefined('1.25'), 1.25)
   })
 })

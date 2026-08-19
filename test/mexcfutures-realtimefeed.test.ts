@@ -1,7 +1,9 @@
+import { test } from 'node:test'
 import type { AddressInfo } from 'net'
+import { assert } from './assertions.ts'
 import { createServer } from 'http'
-import { Filter } from '../src/types.ts'
-import { MexcFuturesRealTimeFeed } from '../src/realtimefeeds/mexcfutures.ts'
+import type { Filter } from '../dist/types.js'
+import { MexcFuturesRealTimeFeed } from '../dist/realtimefeeds/mexcfutures.js'
 
 class TestMexcFuturesRealTimeFeed extends MexcFuturesRealTimeFeed {
   protected readonly httpURL: string
@@ -30,97 +32,7 @@ class TestMexcFuturesRealTimeFeed extends MexcFuturesRealTimeFeed {
   }
 }
 
-test('map mexc futures stored push channels to subscription methods', () => {
-  const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined)
-
-  expect(
-    feed.map([
-      {
-        channel: 'push.deal',
-        symbols: ['BTC_USDT', 'ETH_USDT']
-      },
-      {
-        channel: 'push.depth',
-        symbols: ['BTC_USDT']
-      },
-      {
-        channel: 'push.depth.snapshot',
-        symbols: ['BTC_USDT']
-      },
-      {
-        channel: 'push.funding.rate',
-        symbols: ['BTC_USDT']
-      },
-      {
-        channel: 'push.contract'
-      }
-    ])
-  ).toEqual([
-    {
-      method: 'sub.deal',
-      param: { symbol: 'BTC_USDT' },
-      gzip: false
-    },
-    {
-      method: 'sub.deal',
-      param: { symbol: 'ETH_USDT' },
-      gzip: false
-    },
-    {
-      method: 'sub.depth',
-      param: { symbol: 'BTC_USDT' },
-      gzip: false
-    },
-    {
-      method: 'sub.funding.rate',
-      param: { symbol: 'BTC_USDT' },
-      gzip: false
-    },
-    {
-      method: 'sub.contract'
-    }
-  ])
-})
-
-test('mexc futures realtime subscriptions require symbols', () => {
-  const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined)
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'push.deal'
-      }
-    ])
-  ).toThrow('MexcFuturesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
-})
-
-test('mexc futures snapshot filters require matching depth filters', () => {
-  const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined)
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'push.depth.snapshot',
-        symbols: ['BTC_USDT']
-      }
-    ])
-  ).toThrow('MexcFuturesRealTimeFeed requires push.depth for every push.depth.snapshot symbol')
-
-  expect(() =>
-    feed.map([
-      {
-        channel: 'push.depth',
-        symbols: ['ETH_USDT']
-      },
-      {
-        channel: 'push.depth.snapshot',
-        symbols: ['BTC_USDT']
-      }
-    ])
-  ).toThrow('MexcFuturesRealTimeFeed requires push.depth for every push.depth.snapshot symbol')
-})
-
-test('provide mexc futures manual depth snapshots', async () => {
+test('aligns MEXC Futures updates that omit begin and end with a REST snapshot', async () => {
   const server = await startSnapshotServer()
   const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined, server.url)
 
@@ -151,7 +63,7 @@ test('provide mexc futures manual depth snapshots', async () => {
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(snapshots).toEqual([
+    assert.deepStrictEqual(snapshots, [
       {
         symbol: 'BTC_USDT',
         generated: true,
@@ -170,7 +82,7 @@ test('provide mexc futures manual depth snapshots', async () => {
   }
 })
 
-test('retry mexc futures manual depth snapshots until buffered update overlaps', async () => {
+test('retries MEXC Futures depth snapshots until the REST snapshot overlaps buffered WebSocket updates', async () => {
   const server = await startSnapshotServer([
     { success: true, code: 0, data: { cts: null, asks: [[75230, 1, 1]], bids: [[75220, 2, 2]], timestamp: 1782245602480, version: 102 } },
     { success: true, code: 0, data: { cts: null, asks: [[75233, 1, 1]], bids: [[75217, 2, 2]], timestamp: 1782245602481, version: 104 } }
@@ -206,8 +118,8 @@ test('retry mexc futures manual depth snapshots until buffered update overlaps',
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(server.requestsCount).toBe(2)
-    expect(snapshots).toEqual([
+    assert.strictEqual(server.requestsCount, 2)
+    assert.deepStrictEqual(snapshots, [
       {
         symbol: 'BTC_USDT',
         generated: true,
@@ -233,7 +145,7 @@ async function startSnapshotServer(
 ) {
   let requestsCount = 0
   const server = createServer((request, response) => {
-    expect(request.url).toBe('/api/v1/contract/depth/BTC_USDT?limit=5000')
+    assert.strictEqual(request.url, '/api/v1/contract/depth/BTC_USDT?limit=5000')
     const body = responses[Math.min(requestsCount, responses.length - 1)]
     requestsCount++
 

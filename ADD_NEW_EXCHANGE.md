@@ -15,7 +15,7 @@ In `src/consts.ts`:
 
 ### 2. Create mappers
 
-Create `src/mappers/{exchange}.ts`. Each mapper class implements the Mapper interface — look at existing mapper implementations to find an exchange with a similar message format.
+Create `src/mappers/{exchange}.ts`. Implement `Mapper` from the target exchange contract. Use existing mappers for library conventions. Share only mapping or state behavior whose exchange or protocol semantics change together; keep variant-specific behavior with the variant.
 
 Before coding, inspect the contract in this order:
 
@@ -39,7 +39,7 @@ Mappers to implement depend on what the exchange provides: trades, book changes,
 
 Mapper decisions to make explicit:
 
-- **Symbols** — use the same exchange symbol value across mapper output, replay filters, real-time subscription filters, and customer-facing filters. If the exchange exposes more than one identifier, choose the identifier used by the Exchanges API and keep conversions explicit.
+- **Symbols** — `availableSymbols[].id` from the Exchanges API is the case-sensitive public symbol used in native replay filters and real-time subscriptions. Normalized output uses the uppercase canonical instrument ID. Keep any subscription conversion explicit.
 - **Filters** — implement `getFilters()` for each mapper to request the channels needed by that normalizer in `replayNormalized()` and `streamNormalized()`. Return only channels defined for that exchange in `src/consts.ts`.
 - **Message roles** — map snapshots, deltas, trades, ticker updates, status messages, and acknowledgements according to the exchange contract, not the channel name alone.
 - **Generated snapshots** — when `normalizeBookChanges()` needs a generated or REST-backed snapshot, prove the snapshot can synchronize with buffered deltas in both real-time and replay paths.
@@ -62,6 +62,14 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
 
 Register in `src/realtimefeeds/index.ts`.
+
+### Adding a channel to an existing exchange
+
+When adding a channel to an existing exchange, extend its constants. If `stream()` should expose it, extend the current real-time feed. For REST-backed channels, implement the endpoint's cadence and rate-limit contract explicitly. Change mappers only when the channel contributes to normalized output.
+
+### Upgrading an existing exchange API
+
+When stored raw payloads change, keep old and new parsing in separate mapper classes selected by the UTC recorder cutover. Base both versions on real messages and release support for the new stored format before recorder starts writing it. Before a future cutover, test the new mapper directly on captured payloads or temporarily place the test cutover before the recorded slice, then restore the final UTC date; local E2E with a pre-cutover slice selects the old mapper. Update the real-time feed when the live subscription contract changes, coordinating that release with upstream availability.
 
 ### 4. Test
 
@@ -95,13 +103,11 @@ node example.js stream <exchange> <symbol> <channel>
 node example.js --normalized stream <exchange> <symbol> <data-type>
 node example.js replay <exchange> <symbol> <channel> <from> <to>
 node example.js --normalized replay <exchange> <symbol> <data-type> <from> <to>
-node example.js --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay <exchange> <symbol> <channel> <from> <to>
-node example.js --normalized --endpoint http://127.0.0.1:8787/v1 --api-key TD.LOCAL.DEV.API.KEY --limit 3 replay <exchange> <symbol> <data-type> <from> <to>
 ```
 
-For order book changes, confirm the expected snapshot behavior: snapshot-capable feeds should emit an initial `book_change` with `isSnapshot=true`, then deltas with `isSnapshot=false` when the exchange contract provides deltas. For trades, tickers, liquidations, and other mapped data types, confirm that messages are produced for the requested symbol and that key fields are populated from the documented exchange semantics.
+These commands use the public API or the exchange's live WebSocket API. For local recorder → filters → API replay, use the workspace [Local End-to-End Development](../README.md#local-end-to-end-development) workflow.
 
-For order book changes, also confirm that the first snapshot version can be synchronized with the first emitted deltas for both real-time and replay paths. For trades, confirm whether the first trade message is a true incremental trade or a recent-trades backfill that should not be normalized.
+For order book changes, confirm the initial `book_change` has `isSnapshot=true`, later deltas have `isSnapshot=false`, and the first snapshot synchronizes with the first deltas in real-time and replay. For trades, confirm whether the first message is incremental or a recent-trades backfill that should not be normalized. For other mapped types, confirm messages and required fields for the requested symbol.
 
 If a channel is intentionally state-only or should emit nothing for a message variant, validate the paired channel or later payload that should produce the normalized output. Record the symbol, time range, raw channel, normalized type, and any skipped live or replay checks in the PR notes.
 

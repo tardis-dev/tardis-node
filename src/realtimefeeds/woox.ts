@@ -46,6 +46,9 @@ export class WooxRealTimeFeed extends RealTimeFeedBase {
       const response = await getJSON<WooxOrderBookSnapshotResponse>(
         `${this.httpURL}/v3/public/orderbook?symbol=${symbol}&maxLevel=${ORDER_BOOK_DEPTH}`
       )
+      if (shouldCancel()) {
+        return
+      }
 
       if (response.data.success === false) {
         throw new Error(`Woox orderbook snapshot request failed: ${JSON.stringify(response.data)}`)

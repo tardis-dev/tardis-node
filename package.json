@@ -1,17 +1,17 @@
 {
   "name": "tardis-dev",
-  "version": "17.1.0",
+  "version": "18.1.0",
   "engines": {
-    "node": ">=25"
+    "node": ">=24.19"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=25"
+      "version": ">=24.19"
     },
     "packageManager": {
       "name": "npm",
-      "version": ">=11.11.1"
+      "version": ">=11.17.0"
     }
   },
   "description": "Convenient access to tick-level historical and real-time cryptocurrency market data via Node.js",
@@ -31,8 +31,8 @@
   "homepage": "https://docs.tardis.dev/api/node-js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "precommit": "lint-staged",
-    "test": "npm run build && node --experimental-vm-modules ./node_modules/jest/bin/jest.js --forceExit --runInBand",
+    "test": "npm run build && tsc -p test/tsconfig.json && node --experimental-test-module-mocks --test --test-concurrency=4 test/*.test.ts",
+    "test:update-snapshots": "npm run build && tsc -p test/tsconfig.json && node --experimental-test-module-mocks --test --test-concurrency=4 --test-update-snapshots test/*.test.ts",
     "prepare": "npm run build",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
@@ -68,51 +68,14 @@
   ],
   "license": "MPL-2.0",
   "dependencies": {
-    "bintrees": "^1.0.2",
     "debug": "^4.4.3",
-    "follow-redirects": "^1.16.0",
-    "https-proxy-agent": "^8.0.0",
-    "p-map": "^7.0.5",
-    "protobufjs": "^8.7.1",
-    "socks-proxy-agent": "^9.0.0",
     "ws": "^8.21.1"
   },
   "devDependencies": {
-    "@types/bintrees": "^1.0.6",
-    "@types/debug": "^4.1.13",
-    "@types/follow-redirects": "^1.14.4",
-    "@types/jest": "^29.5.14",
     "@types/node": "^26.1.1",
     "@types/ws": "^8.18.1",
-    "jest": "^29.7.0",
-    "lint-staged": "^16.4.0",
-    "prettier": "3.8.3",
-    "ts-jest": "^29.4.11",
+    "prettier": "3.9.6",
     "typescript": "^6.0.3"
-  },
-  "lint-staged": {
-    "*.ts": "prettier --write"
-  },
-  "jest": {
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "transform": {
-      "\\.(ts|tsx)?$": [
-        "ts-jest",
-        {
-          "useESM": true,
-          "tsconfig": "./test/tsconfig.json"
-        }
-      ]
-    },
-    "testEnvironment": "node",
-    "setupFiles": [
-      "./test/setup.js"
-    ]
   },
   "runkitExampleFilename": "example.js"
 }

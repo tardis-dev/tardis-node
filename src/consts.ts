@@ -189,6 +189,7 @@ const OKEX_FUTURES_CHANNELS = [
   'tickers',
   'open-interest',
   'mark-price',
+  'funding-rate',
   'price-limit',
   'status',
   'instruments',

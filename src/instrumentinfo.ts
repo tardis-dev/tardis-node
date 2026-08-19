@@ -109,6 +109,8 @@ export type ContractType =
   | 'interest_rate_swap'
   | 'repo'
   | 'index'
+  | 'linear_xperp'
+  | 'inverse_xperp'
 
 export type UnderlyingType = 'native' | 'equity' | 'commodity' | 'fixed_income' | 'fx' | 'index' | 'pre_market'
 
@@ -179,13 +181,16 @@ export interface InstrumentInfo {
     amountIncrement?: number
     contractMultiplier?: number
     minTradeAmount?: number
+    minNotional?: number
     makerFee?: number
     takerFee?: number
     quanto?: boolean
     inverse?: boolean
     settlementCurrency?: string
     underlyingIndex?: string
+    underlyingType?: UnderlyingType
     contractType?: ContractType
+    expiry?: string
     quoteCurrency?: string
     type?: string
   }[]
