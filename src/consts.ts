@@ -66,7 +66,7 @@ export const EXCHANGES = [
 
 const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
 
-const ASTER_CHANNELS = ['trade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
+const ASTER_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 const BINANCE_DEX_CHANNELS = ['trades', 'marketDiff', 'depthSnapshot', 'ticker'] as const
 const BITFINEX_CHANNELS = ['trades', 'book', 'raw_book', 'ticker'] as const
 
