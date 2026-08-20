@@ -1,26 +1,22 @@
-import { createNormalizedSymbolFilter } from '../src/handy.ts'
-import { Filter } from '../src/types.ts'
+import { describe, test } from 'node:test'
+import { createNormalizedSymbolFilter } from '../dist/handy.js'
+import { assert } from './assertions.ts'
+import type { Filter } from '../dist/types.js'
 
 describe('createNormalizedSymbolFilter', () => {
-  test('keeps exact mixed-case symbols and uppercase aliases', () => {
+  test('preserves mixed-case exchange symbols while matching normalized aliases', () => {
     const filters: Filter<string>[] = [{ channel: 'trade', symbols: ['AAPLX/USD'] }]
     const filter = createNormalizedSymbolFilter(['AAPLx/USD'], filters)
 
-    expect(filter?.('AAPLx/USD')).toBe(true)
-    expect(filter?.('AAPLX/USD')).toBe(true)
-    expect(filter?.('aaplx/usd')).toBe(false)
-    expect(filter?.('MSFTx/USD')).toBe(false)
-  })
+    assert.strictEqual(filter?.('AAPLx/USD'), true)
+    assert.strictEqual(filter?.('AAPLX/USD'), true)
+    assert.strictEqual(filter?.('aaplx/usd'), false)
+    assert.strictEqual(filter?.('MSFTx/USD'), false)
 
-  test('keeps mapper-translated mixed-case symbols', () => {
-    const filters: Filter<string>[] = [{ channel: 'trade', symbols: ['AAPLx/USD'] }]
-    const filter = createNormalizedSymbolFilter(['aaplx/usd'], filters)
+    const translatedFilter = createNormalizedSymbolFilter(['aaplx/usd'], [{ channel: 'trade', symbols: ['AAPLx/USD'] }])
+    assert.strictEqual(translatedFilter?.('AAPLx/USD'), true)
 
-    expect(filter?.('AAPLx/USD')).toBe(true)
-  })
-
-  test('does not filter when symbols are omitted', () => {
-    expect(createNormalizedSymbolFilter(undefined, [])).toBeUndefined()
-    expect(createNormalizedSymbolFilter([], [])).toBeUndefined()
+    assert.strictEqual(createNormalizedSymbolFilter(undefined, []), undefined)
+    assert.strictEqual(createNormalizedSymbolFilter([], []), undefined)
   })
 })

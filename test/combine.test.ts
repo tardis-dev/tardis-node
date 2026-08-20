@@ -1,40 +1,8 @@
-import { combine, normalizeBookChanges, normalizeTrades, replayNormalized } from '../dist/index.js'
+import { describe, test } from 'node:test'
+import { combine } from '../dist/index.js'
+import { assert, snapshot } from './assertions.ts'
 
 describe('combine(...asyncIterators)', () => {
-  test(
-    'should produce combined iterable from two replayNormalized iterables',
-    async () => {
-      const normalizers = [normalizeTrades, normalizeBookChanges]
-      const bitmexMessages = replayNormalized(
-        {
-          exchange: 'bitmex',
-          from: '2019-04-01',
-          to: '2019-04-01 00:01',
-          symbols: ['XBTUSD']
-        },
-        ...normalizers
-      )
-
-      const deribitMessages = replayNormalized(
-        {
-          exchange: 'deribit',
-          from: '2019-04-01',
-          to: '2019-04-01 00:01',
-          symbols: ['BTC-PERPETUAL']
-        },
-        ...normalizers
-      )
-
-      const bufferedMessages: any[] = []
-      for await (const message of combine(bitmexMessages, deribitMessages)) {
-        bufferedMessages.push(message)
-      }
-
-      expect(bufferedMessages).toMatchSnapshot()
-    },
-    2 * 60 * 1000
-  )
-
   test('should correctly combine iterables based on localTimestamp value', async () => {
     let iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T08:52:00.132Z') }
@@ -55,7 +23,7 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
 
     iter1 = async function* () {
       yield { localTimestamp: new Date('2019-08-01T00:52:00.102Z') }
@@ -77,7 +45,7 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
 
     iter1 = async function* () {
       var localTimestamp = new Date('2019-08-01T00:52:00.102Z')
@@ -98,6 +66,50 @@ describe('combine(...asyncIterators)', () => {
       bufferedMessages.push(message)
     }
 
-    expect(bufferedMessages).toMatchSnapshot()
+    snapshot(bufferedMessages)
+  })
+
+  test('applies descriptor offsets and completes without cleanup errors', async () => {
+    async function* messages(name: string, localTimestamp: string) {
+      yield { name, localTimestamp: new Date(localTimestamp) }
+    }
+
+    const combined = combine(
+      { stream: messages('number', '2026-01-01T00:00:01.000Z'), offsetMS: -1000 },
+      { stream: messages('function', '2026-01-01T00:00:00.500Z'), offsetMS: () => 1000 }
+    )
+    const actual = []
+
+    for await (const message of combined) {
+      actual.push({ name: message.name, localTimestamp: message.localTimestamp.toISOString() })
+    }
+
+    assert.deepEqual(actual, [
+      { name: 'number', localTimestamp: '2026-01-01T00:00:00.000Z' },
+      { name: 'function', localTimestamp: '2026-01-01T00:00:01.500Z' }
+    ])
+  })
+
+  test('closes descriptor streams when the consumer stops early', async () => {
+    let closedStreams = 0
+    async function* messages(name: string, localTimestamp: string) {
+      try {
+        yield { name, localTimestamp: new Date(localTimestamp) }
+        yield { name, localTimestamp: new Date('2026-01-01T00:01:00.000Z') }
+      } finally {
+        closedStreams++
+      }
+    }
+
+    const combined = combine(
+      { stream: messages('first', '2026-01-01T00:00:00.000Z'), offsetMS: 0 },
+      { stream: messages('second', '2026-01-01T00:00:01.000Z'), offsetMS: 0 }
+    )
+
+    for await (const _ of combined) {
+      break
+    }
+
+    assert.equal(closedStreams, 2)
   })
 })

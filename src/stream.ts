@@ -1,6 +1,7 @@
 import { debug } from './debug.ts'
 import { createNormalizedSymbolFilter, getFilters, normalizeMessages } from './handy.ts'
 import { MapperFactory } from './mappers/index.ts'
+import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from './realtimeiterator.ts'
 import { createRealTimeFeed } from './realtimefeeds/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
 
@@ -9,31 +10,50 @@ type StreamNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z ext
   ? MapperOutput<U[number]> | Disconnect
   : MapperOutput<U[number]>
 
-async function* _stream<T extends Exchange, U extends boolean = false>({
-  exchange,
-  filters,
-  timeoutIntervalMS = 10000,
-  withDisconnects = undefined,
-  onError = undefined
-}: StreamOptions<T, U>): AsyncIterableIterator<
-  U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
-> {
+type StreamState = {
+  activeIterator?: AsyncIterator<any>
+}
+
+type NormalizedStreamState = {
+  closed: boolean
+  activeIterator?: ManagedRealTimeIterator<any>
+}
+
+async function* _stream<T extends Exchange, U extends boolean = false>(
+  { exchange, filters, timeoutIntervalMS = 10000, withDisconnects = undefined, onError = undefined }: StreamOptions<T, U>,
+  state: StreamState
+): AsyncIterableIterator<U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }> {
   validateStreamOptions(filters)
 
   const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, onError)
+  const messages = realTimeFeed[Symbol.asyncIterator]()
+  state.activeIterator = messages
 
-  for await (const message of realTimeFeed) {
-    if (message.__disconnect__ === true) {
-      // __disconnect__ message means that websocket connection has been closed
-      // notify about it by yielding undefined if flag is set
-      if (withDisconnects) {
-        yield undefined as any
+  try {
+    while (true) {
+      const result = await messages.next()
+      if (result.done) {
+        return
       }
-    } else {
-      yield {
-        localTimestamp: new Date(),
-        message
-      } as any
+
+      const message = result.value
+      if (message.__disconnect__ === true) {
+        // __disconnect__ message means that websocket connection has been closed
+        // notify about it by yielding undefined if flag is set
+        if (withDisconnects) {
+          yield undefined as any
+        }
+      } else {
+        yield {
+          localTimestamp: new Date(),
+          message
+        } as any
+      }
+    }
+  } finally {
+    if (state.activeIterator === messages) {
+      state.activeIterator = undefined
+      await messages.return?.()
     }
   }
 }
@@ -47,30 +67,35 @@ export function stream<T extends Exchange, U extends boolean = false>({
 }: StreamOptions<T, U>): AsyncIterableIterator<
   U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
 > {
-  let _iterator = _stream({ exchange, filters, timeoutIntervalMS, withDisconnects, onError })
+  const state: StreamState = {}
+  const iterator = _stream({ exchange, filters, timeoutIntervalMS, withDisconnects, onError }, state)
 
-  ;(_iterator as any).__realtime__ = true
-
-  return _iterator
+  return createManagedRealTimeIterator(iterator, () => {
+    const activeIterator = state.activeIterator
+    state.activeIterator = undefined
+    return activeIterator?.return?.()
+  })
 }
 
 async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
+  state: NormalizedStreamState,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
-  while (true) {
+  while (state.closed === false) {
     try {
       const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
       const mappers = createMappers(new Date())
       const filters = getFilters(mappers, symbols)
 
-      const messages = _stream({
+      const messages = stream({
         exchange,
         withDisconnects: true,
         timeoutIntervalMS,
         filters,
         onError
-      })
+      }) as ManagedRealTimeIterator<any>
+      state.activeIterator = messages
 
       // filter normalized messages by symbol as some exchanges do not offer subscribing to specific symbols for some of the channels
       // for example Phemex market24h channel
@@ -92,6 +117,10 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
         yield message
       }
     } catch (error: any) {
+      if (state.closed) {
+        return
+      }
+
       if (onError !== undefined) {
         onError(error)
       }
@@ -145,9 +174,13 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
   { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
-  let _iterator = _streamNormalized({ exchange, symbols, timeoutIntervalMS, withDisconnectMessages, onError }, ...normalizers)
+  const state: NormalizedStreamState = { closed: false }
+  const iterator = _streamNormalized({ exchange, symbols, timeoutIntervalMS, withDisconnectMessages, onError }, state, ...normalizers)
 
-  ;(_iterator as any).__realtime__ = true
-
-  return _iterator
+  return createManagedRealTimeIterator(iterator, () => {
+    state.closed = true
+    const activeIterator = state.activeIterator
+    state.activeIterator = undefined
+    return activeIterator?.return?.()
+  })
 }

@@ -5,8 +5,10 @@
     "isolatedModules": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "types": ["node", "jest"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node"],
     "noEmit": true
   },
-  "include": ["."]
+  "include": [".", "../src/external-modules.d.ts"]
 }

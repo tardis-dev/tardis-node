@@ -1,13 +1,14 @@
-import dbg from 'debug'
 import { existsSync } from 'node:fs'
-import pMap from 'p-map'
 import { isMainThread, parentPort, workerData } from 'worker_threads'
-import { addMinutes, download, formatDateToPath, optimizeFilters, sequence, sha256, wait, cleanTempFiles } from './handy.ts'
+import { createDebug } from './debug.ts'
+import { forEachConcurrent } from './foreachconcurrent.ts'
+import { addMinutes, download, formatDateToPath, optimizeFilters, sha256, wait, cleanTempFiles } from './handy.ts'
 import type { DataFeedCompression } from './options.ts'
 import { Exchange, Filter } from './types.ts'
-const debug = dbg('tardis-dev')
+const debug = createDebug('tardis-dev')
 
 const DEFAULT_DATA_FEED_SLICE_SIZE = 1
+const DATA_FEED_DOWNLOAD_ATTEMPT_TIMEOUT_MS = 135_000
 
 if (isMainThread) {
   debug('current worker is not meant to run in main thread')
@@ -123,14 +124,10 @@ async function getAvailableDataFeedSlices(
   }
 
   // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
-  await pMap(
-    sliceOffsets,
-    async (offset) => {
-      const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
-      await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
-    },
-    { concurrency: concurrencyLimit }
-  )
+  await forEachConcurrent(sliceOffsets, concurrencyLimit, async (offset) => {
+    const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
+    await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
+  })
 }
 
 async function getDataFeedSlice(
@@ -166,7 +163,8 @@ async function getDataFeedSlice(
     }
   }
 
-  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${dataFeedCompression}`
+  const requestCompression = dataFeedCompression === 'zstd' ? 'zstd-multiframe' : dataFeedCompression
+  let url = `${endpoint}/data-feeds/${exchange}?from=${fromDate.toISOString()}&offset=${offset}&compression=${requestCompression}`
   if (requestedSliceSize > DEFAULT_DATA_FEED_SLICE_SIZE) {
     url += `&sliceSize=${requestedSliceSize}`
   }
@@ -181,7 +179,8 @@ async function getDataFeedSlice(
     url,
     userAgent,
     appendContentEncodingExtension: true,
-    acceptEncoding: dataFeedCompression === 'gzip' ? 'gzip' : 'zstd, gzip'
+    acceptEncoding: dataFeedCompression === 'gzip' ? 'gzip' : 'zstd, gzip',
+    attemptTimeoutMS: DATA_FEED_DOWNLOAD_ATTEMPT_TIMEOUT_MS
   })
   const responseSliceSize = Number(downloadResult.headers['x-slice-size'])
   const suggestedSliceSize = Number(downloadResult.headers['x-suggested-slice-size'] ?? DEFAULT_DATA_FEED_SLICE_SIZE)

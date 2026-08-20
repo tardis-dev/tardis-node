@@ -1,17 +1,13 @@
 import crypto, { createHash } from 'crypto'
 import { createWriteStream, mkdirSync, rmSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import type { RequestOptions, Agent } from 'https'
-import followRedirects from 'follow-redirects'
-import * as httpsProxyAgentPkg from 'https-proxy-agent'
+import { Agent as HttpAgent, request as httpRequest, type IncomingMessage } from 'node:http'
+import { Agent as HttpsAgent, request as httpsRequest, type RequestOptions } from 'node:https'
+import { pipeline } from 'node:stream/promises'
 import path from 'path'
 import { debug } from './debug.ts'
 import { Mapper } from './mappers/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
-import * as socksProxyAgentPkg from 'socks-proxy-agent'
-const { http, https } = followRedirects
-const { HttpsProxyAgent } = httpsProxyAgentPkg
-const { SocksProxyAgent } = socksProxyAgentPkg
 
 export function parseAsUTCDate(val: string) {
   // Treat date-only and minute-level strings as UTC instead of local time.
@@ -263,18 +259,26 @@ export function optimizeFilters(filters: Filter<any>[]) {
   return optimizedFilters
 }
 
-const httpsAgent = new https.Agent({
+const httpsAgent = new HttpsAgent({
   keepAlive: true,
   keepAliveMsecs: 10 * ONE_SEC_IN_MS,
   maxSockets: 120
 })
 
-export const httpsProxyAgent: Agent | undefined =
-  process.env.HTTP_PROXY !== undefined
-    ? new HttpsProxyAgent(process.env.HTTP_PROXY)
-    : process.env.SOCKS_PROXY !== undefined
-      ? new SocksProxyAgent(process.env.SOCKS_PROXY)
-      : undefined
+const proxyEnv =
+  process.env.HTTP_PROXY === undefined
+    ? undefined
+    : {
+        HTTP_PROXY: process.env.HTTP_PROXY,
+        HTTPS_PROXY: process.env.HTTP_PROXY
+      }
+const httpProxyAgent = proxyEnv === undefined ? undefined : new HttpAgent({ proxyEnv })
+const httpsProxyAgent = proxyEnv === undefined ? undefined : new HttpsAgent({ proxyEnv })
+
+export function getProxyAgent(url: string | URL) {
+  const protocol = new URL(url).protocol
+  return protocol === 'http:' || protocol === 'ws:' ? httpProxyAgent : httpsProxyAgent
+}
 
 const DEFAULT_FETCH_RETRY_LIMIT = 2
 
@@ -451,42 +455,73 @@ async function requestViaFetch(method: string, url: string, options: HttpRequest
   }
 }
 
-async function requestViaProxy(method: string, url: string, options: HttpRequestOptions): Promise<HttpResponse> {
-  const requestClient = new URL(url).protocol === 'http:' ? http : https
-  const preparedRequest = prepareRequest(method, options)
+type DownloadRequestOptions = {
+  headers: Record<string, string>
+  timeout: number
+}
 
-  return await new Promise<HttpResponse>((resolve, reject) => {
-    const request = requestClient
-      .request(
-        url,
-        {
-          method,
-          agent: httpsProxyAgent,
-          headers: preparedRequest.headers,
-          timeout: options.timeout
-        },
-        (response) => {
-          response.setEncoding('utf8')
-          let body = ''
-          response.on('error', reject)
-          response.on('data', (chunk) => (body += chunk))
-          response.on('end', () => {
-            resolve(createHttpResponse(response.statusCode ?? 0, parseNodeResponseHeaders(response.headers), body))
-          })
-        }
-      )
-      .on('error', reject)
-      .on('timeout', () => {
-        reject(new Error('Request timed out'))
-        request.destroy()
-      })
+function sendHttpRequest(url: string | URL, options: RequestOptions, body?: string): Promise<IncomingMessage> {
+  const requestUrl = new URL(url)
+  const requestClient = requestUrl.protocol === 'http:' ? httpRequest : httpsRequest
+  const agent = getProxyAgent(requestUrl) ?? (requestUrl.protocol === 'https:' ? httpsAgent : undefined)
 
-    if (preparedRequest.body !== undefined) {
-      request.write(preparedRequest.body)
+  return new Promise((resolve, reject) => {
+    const request = requestClient(requestUrl, { ...options, agent }, resolve)
+
+    request.once('error', reject)
+    request.once('timeout', () => request.destroy(new Error('Request timed out')))
+    if (body !== undefined) {
+      request.write(body)
     }
-
     request.end()
   })
+}
+
+async function openDownloadResponse(url: string, options: DownloadRequestOptions) {
+  const response = await sendHttpRequest(url, options)
+  const statusCode = response.statusCode ?? 0
+  const location = response.headers.location
+  if (location === undefined || statusCode < 300 || statusCode >= 400) {
+    return response
+  }
+
+  response.destroy()
+  const sourceUrl = new URL(url)
+  const redirectUrl = new URL(location, sourceUrl)
+  const headers: Record<string, string> = { ...options.headers }
+  if (sourceUrl.origin !== redirectUrl.origin) {
+    delete headers.Authorization
+    delete headers.authorization
+  }
+
+  return sendHttpRequest(redirectUrl, {
+    ...options,
+    headers
+  })
+}
+
+async function readResponseText(response: IncomingMessage) {
+  response.setEncoding('utf8')
+  let body = ''
+  for await (const chunk of response) {
+    body += chunk
+  }
+  return body
+}
+
+async function requestViaProxy(method: string, url: string, options: HttpRequestOptions): Promise<HttpResponse> {
+  const preparedRequest = prepareRequest(method, options)
+  const response = await sendHttpRequest(
+    url,
+    {
+      method,
+      headers: preparedRequest.headers,
+      timeout: options.timeout
+    },
+    preparedRequest.body
+  )
+
+  return createHttpResponse(response.statusCode ?? 0, parseNodeResponseHeaders(response.headers), await readResponseText(response))
 }
 
 async function request(method: string, url: string, options: HttpRequestOptions = {}) {
@@ -495,7 +530,7 @@ async function request(method: string, url: string, options: HttpRequestOptions 
   for (let attempt = 1; ; attempt += 1) {
     try {
       const response =
-        httpsProxyAgent === undefined ? await requestViaFetch(method, url, options) : await requestViaProxy(method, url, options)
+        getProxyAgent(url) === undefined ? await requestViaFetch(method, url, options) : await requestViaProxy(method, url, options)
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response
@@ -546,7 +581,8 @@ export async function download({
   url,
   userAgent,
   appendContentEncodingExtension = false,
-  acceptEncoding = 'gzip'
+  acceptEncoding = 'gzip',
+  attemptTimeoutMS = 90 * ONE_SEC_IN_MS
 }: {
   url: string
   downloadPath: string
@@ -554,10 +590,10 @@ export async function download({
   apiKey: string
   appendContentEncodingExtension?: boolean
   acceptEncoding?: string
+  attemptTimeoutMS?: number
 }) {
   const httpRequestOptions = {
-    agent: httpsProxyAgent !== undefined ? httpsProxyAgent : httpsAgent,
-    timeout: 90 * ONE_SEC_IN_MS,
+    timeout: attemptTimeoutMS,
     headers: {
       'Accept-Encoding': acceptEncoding,
       'User-Agent': userAgent,
@@ -618,17 +654,22 @@ export function cleanTempFiles() {
   tmpFileCleanups.forEach((cleanup) => cleanup())
 }
 
-async function _downloadFile(requestOptions: RequestOptions, url: string, downloadPath: string, appendContentEncodingExtension: boolean) {
+async function _downloadFile(
+  requestOptions: DownloadRequestOptions,
+  url: string,
+  downloadPath: string,
+  appendContentEncodingExtension: boolean
+) {
   // first ensure that directory where we want to download file exists
   mkdirSync(path.dirname(downloadPath), { recursive: true })
 
   // create write file stream that we'll write data into - first as unconfirmed temp file
 
   const tmpFilePath = `${downloadPath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
-  const fileWriteStream = createWriteStream(tmpFilePath)
+  let fileWriteStream: ReturnType<typeof createWriteStream> | undefined
   const cleanup = () => {
     try {
-      fileWriteStream.destroy()
+      fileWriteStream?.destroy()
       rmSync(tmpFilePath, { force: true })
     } catch {}
   }
@@ -638,58 +679,29 @@ async function _downloadFile(requestOptions: RequestOptions, url: string, downlo
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
-    let responseHeaders: Record<string, string> = {}
-    await new Promise<void>((resolve, reject) => {
-      const protocol = new URL(url).protocol
-      const requestClient = protocol === 'http:' ? http : https
-      const req = requestClient
-        .get(url, { ...requestOptions, ...(protocol === 'http:' ? { agent: undefined } : {}) }, (res) => {
-          const { statusCode } = res
-          if (statusCode !== 200) {
-            // read the error response text and throw it as an HttpError
-            res.setEncoding('utf8')
-            let body = ''
-            res.on('error', reject)
-            res.on('data', (chunk) => (body += chunk))
-            res.on('end', () => {
-              reject(new HttpError(statusCode!, body, url))
-            })
-          } else {
-            responseHeaders = parseNodeResponseHeaders(res.headers)
-            if (appendContentEncodingExtension) {
-              const contentEncoding = asSingleHeaderValue(res.headers['content-encoding'])
-              if (contentEncoding === 'zstd') {
-                finalDownloadPath = `${downloadPath}.zst`
-              } else if (contentEncoding === undefined || contentEncoding === 'gzip') {
-                finalDownloadPath = `${downloadPath}.gz`
-              } else {
-                reject(new Error(`Unsupported data feed content encoding: ${contentEncoding}`))
-                return
-              }
-            }
+    const response = await openDownloadResponse(url, requestOptions)
+    const { statusCode } = response
+    if (statusCode !== 200) {
+      throw new HttpError(statusCode ?? 0, await readResponseText(response), url)
+    }
 
-            // consume the response stream by writing it to the file
-            res
-              .on('error', reject)
-              .on('aborted', () => reject(new Error('Request aborted')))
-              .pipe(fileWriteStream)
-              .on('error', reject)
-              .on('finish', () => {
-                if (res.complete) {
-                  resolve()
-                } else {
-                  reject(new Error('The connection was terminated while the message was still being sent'))
-                }
-              })
-          }
-        })
-        .on('error', reject)
-        .on('timeout', () => {
-          debug('download file request timeout, %s', url)
-          reject(new Error('Request timed out'))
-          req.destroy()
-        })
-    })
+    const responseHeaders = parseNodeResponseHeaders(response.headers)
+    if (appendContentEncodingExtension) {
+      const contentEncoding = asSingleHeaderValue(response.headers['content-encoding'])
+      if (contentEncoding === 'zstd') {
+        finalDownloadPath = `${downloadPath}.zst`
+      } else if (contentEncoding === undefined || contentEncoding === 'gzip') {
+        finalDownloadPath = `${downloadPath}.gz`
+      } else {
+        throw new Error(`Unsupported data feed content encoding: ${contentEncoding}`)
+      }
+    }
+
+    fileWriteStream = createWriteStream(tmpFilePath)
+    await pipeline(response, fileWriteStream)
+    if (!response.complete) {
+      throw new Error('The connection was terminated while the message was still being sent')
+    }
 
     // finally when saving from the network to file has succeded, rename tmp file to normal name
     // then we're sure that responses is 100% saved and also even if different process was doing the same we're good

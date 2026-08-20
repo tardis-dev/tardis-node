@@ -1,8 +1,10 @@
 import type { AddressInfo } from 'net'
 import { createServer } from 'http'
-import { AsterFuturesRealTimeFeed, AsterRealTimeFeed } from '../src/realtimefeeds/aster.ts'
-import { getRealTimeFeedFactory } from '../src/realtimefeeds/index.ts'
-import { Filter } from '../src/types.ts'
+import { test } from 'node:test'
+import { assert, errorMessageIncludes } from './assertions.ts'
+import { AsterFuturesRealTimeFeed, AsterRealTimeFeed } from '../dist/realtimefeeds/aster.js'
+import { getRealTimeFeedFactory } from '../dist/realtimefeeds/index.js'
+import type { Filter } from '../dist/types.js'
 
 class TestAsterRealTimeFeed extends AsterRealTimeFeed {
   protected readonly httpURL: string
@@ -59,14 +61,14 @@ class TestAsterFuturesRealTimeFeed extends AsterFuturesRealTimeFeed {
 }
 
 test('register aster realtime feeds', () => {
-  expect(getRealTimeFeedFactory('aster')).toBeDefined()
-  expect(getRealTimeFeedFactory('aster-futures')).toBeDefined()
+  assert.ok(getRealTimeFeedFactory('aster'))
+  assert.ok(getRealTimeFeedFactory('aster-futures'))
 })
 
 test('map aster realtime subscriptions', () => {
   const feed = new TestAsterRealTimeFeed('aster', [], undefined)
 
-  expect(
+  assert.deepEqual(
     feed.map([
       {
         channel: 'depth',
@@ -79,65 +81,81 @@ test('map aster realtime subscriptions', () => {
       {
         channel: 'trade',
         symbols: ['btcusdt', 'ethusdt']
+      },
+      {
+        channel: 'aggTrade',
+        symbols: ['btcusdt']
       }
-    ])
-  ).toEqual([
-    {
-      method: 'SUBSCRIBE',
-      params: ['btcusdt@depth@100ms'],
-      id: 1
-    },
-    {
-      method: 'SUBSCRIBE',
-      params: ['btcusdt@trade', 'ethusdt@trade'],
-      id: 2
-    }
-  ])
+    ]),
+    [
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@depth@100ms'],
+        id: 1
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@trade', 'ethusdt@trade'],
+        id: 2
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@aggTrade'],
+        id: 3
+      }
+    ]
+  )
 })
 
 test('aster snapshot filters require matching depth filters', () => {
   const feed = new TestAsterRealTimeFeed('aster', [], undefined)
 
-  expect(() =>
-    feed.map([
-      {
-        channel: 'depthSnapshot',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow('AsterRealTimeFeed requires depth for every depthSnapshot symbol')
+  assert.throws(
+    () =>
+      feed.map([
+        {
+          channel: 'depthSnapshot',
+          symbols: ['BTCUSDT']
+        }
+      ]),
+    errorMessageIncludes('AsterRealTimeFeed requires depth for every depthSnapshot symbol')
+  )
 
-  expect(() =>
-    feed.map([
-      {
-        channel: 'depth',
-        symbols: ['ETHUSDT']
-      },
-      {
-        channel: 'depthSnapshot',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow('AsterRealTimeFeed requires depth for every depthSnapshot symbol')
+  assert.throws(
+    () =>
+      feed.map([
+        {
+          channel: 'depth',
+          symbols: ['ETHUSDT']
+        },
+        {
+          channel: 'depthSnapshot',
+          symbols: ['BTCUSDT']
+        }
+      ]),
+    errorMessageIncludes('AsterRealTimeFeed requires depth for every depthSnapshot symbol')
+  )
 })
 
 test('aster realtime rejects unsupported channels', () => {
   const feed = new TestAsterRealTimeFeed('aster', [], undefined)
 
-  expect(() =>
-    feed.map([
-      {
-        channel: 'unsupported',
-        symbols: ['BTCUSDT']
-      }
-    ])
-  ).toThrow('AsterRealTimeFeed unsupported channel unsupported')
+  assert.throws(
+    () =>
+      feed.map([
+        {
+          channel: 'unsupported',
+          symbols: ['BTCUSDT']
+        }
+      ]),
+    errorMessageIncludes('AsterRealTimeFeed unsupported channel unsupported')
+  )
 })
 
 test('map aster futures realtime subscriptions', () => {
   const feed = new TestAsterFuturesRealTimeFeed('aster-futures', [], undefined)
 
-  expect(
+  assert.deepEqual(
     feed.map([
       {
         channel: 'depth',
@@ -155,24 +173,25 @@ test('map aster futures realtime subscriptions', () => {
         channel: 'forceOrder',
         symbols: ['btcusdt']
       }
-    ])
-  ).toEqual([
-    {
-      method: 'SUBSCRIBE',
-      params: ['btcusdt@depth@100ms'],
-      id: 1
-    },
-    {
-      method: 'SUBSCRIBE',
-      params: ['btcusdt@markPrice@1s'],
-      id: 2
-    },
-    {
-      method: 'SUBSCRIBE',
-      params: ['btcusdt@forceOrder'],
-      id: 3
-    }
-  ])
+    ]),
+    [
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@depth@100ms'],
+        id: 1
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@markPrice@1s'],
+        id: 2
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@forceOrder'],
+        id: 3
+      }
+    ]
+  )
 })
 
 test('provide aster manual depth snapshots after buffered update overlaps', async () => {
@@ -196,7 +215,7 @@ test('provide aster manual depth snapshots after buffered update overlaps', asyn
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(snapshots).toEqual([
+    assert.deepEqual(snapshots, [
       {
         stream: 'btcusdt@depthSnapshot',
         generated: true,
@@ -236,8 +255,8 @@ test('retry aster manual depth snapshots until buffered update overlaps', async 
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(server.requestsCount).toBe(2)
-    expect(snapshots).toEqual([
+    assert.equal(server.requestsCount, 2)
+    assert.deepEqual(snapshots, [
       {
         stream: 'btcusdt@depthSnapshot',
         generated: true,
@@ -277,8 +296,8 @@ test('retry aster futures manual depth snapshots until first update overlaps', a
 
     const snapshots = await feed.provideSnapshots(filters)
 
-    expect(server.requestsCount).toBe(2)
-    expect(snapshots).toEqual([
+    assert.equal(server.requestsCount, 2)
+    assert.deepEqual(snapshots, [
       {
         stream: 'btcusdt@depthSnapshot',
         generated: true,
@@ -324,7 +343,7 @@ function createDepthUpdate({
 async function startSnapshotServer(responses: AsterTestDepthSnapshotResponse[]) {
   let requestsCount = 0
   const server = createServer((request, response) => {
-    expect(request.url).toBe('/depth?symbol=BTCUSDT&limit=1000')
+    assert.equal(request.url, '/depth?symbol=BTCUSDT&limit=1000')
     const body = responses[Math.min(requestsCount, responses.length - 1)]
     requestsCount++
 

@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
-import pMap from 'p-map'
 import { debug } from './debug.ts'
 import { DatasetType } from './exchangedetails.ts'
+import { forEachConcurrent } from './foreachconcurrent.ts'
 import { addDays, doubleDigit, download, parseAsUTCDate, sequence } from './handy.ts'
 import { getOptions } from './options.ts'
 import { Exchange } from './types.ts'
@@ -9,6 +9,7 @@ import { Exchange } from './types.ts'
 const CONCURRENCY_LIMIT = 20
 const MILLISECONDS_IN_SINGLE_DAY = 24 * 60 * 60 * 1000
 const DEFAULT_DOWNLOAD_DIR = './datasets'
+const DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS = 120_000
 
 const options = getOptions()
 
@@ -62,8 +63,9 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
       )
 
       // download the rest concurrently up to the CONCURRENCY_LIMIT
-      await pMap(
+      await forEachConcurrent(
         sequence(daysCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to daysCountToFetch - 1 (as we already downloaded data for the first and last day)
+        CONCURRENCY_LIMIT,
         (offset) =>
           downloadDataSet(
             getDownloadOptions({
@@ -77,8 +79,7 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
               date: addDays(startDate, offset)
             }),
             skipIfExists
-          ),
-        { concurrency: CONCURRENCY_LIMIT }
+          )
       )
       const elapsedSeconds = (new Date().valueOf() - startTimestamp) / 1000
 
@@ -134,7 +135,8 @@ function getDownloadOptions({
     url,
     downloadPath,
     userAgent: options._userAgent,
-    apiKey
+    apiKey,
+    attemptTimeoutMS: DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS
   }
 }
 

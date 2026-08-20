@@ -9,6 +9,7 @@ const OKEX_V5_API_SWITCH_DATE = new Date('2021-12-23T00:00:00.000Z')
 const OKEX_V5_TBT_BOOK_TICKER_RELEASE_DATE = new Date('2022-05-06T00:00:00.000Z')
 const OKX_PUBLIC_BOOKS_CHANNEL_START_DATE = new Date('2023-02-25T00:00:00.000Z')
 const OKX_PUBLIC_BOOKS_CHANNEL_END_DATE = new Date('2023-03-09T00:00:00.000Z')
+const OKEX_USDC_INDEX_SWITCH_DATE = new Date('2023-04-10T08:40:00.000Z')
 const OKEX_PUBLIC_BOOKS_SWITCH_DATE = new Date('2026-05-21T00:00:00.000Z')
 const OKEX_SPOT_DEPTH_L2_TBT_SWITCH_DATE = new Date('2020-04-10T00:00:00.000Z')
 const OKEX_FUTURES_DEPTH_L2_TBT_SWITCH_DATE = new Date('2019-12-05T00:00:00.000Z')
@@ -33,7 +34,11 @@ export const okexMappers = exchangeMappers({
     }),
     derivativeTickers: mapper([
       { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexDerivativeTickerMapper('okex-futures') },
-      { use: () => new OkexV5DerivativeTickerMapper('okex-futures') }
+      {
+        until: OKEX_USDC_INDEX_SWITCH_DATE,
+        use: () => new OkexV5DerivativeTickerMapper('okex-futures', { useLegacyUSDCIndex: true })
+      },
+      { use: () => new OkexV5DerivativeTickerMapper('okex-futures', { useLegacyUSDCIndex: false }) }
     ]),
     liquidations: mapper([
       { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexLiquidationsMapper('okex-futures', { market: 'futures' }) },
@@ -46,7 +51,11 @@ export const okexMappers = exchangeMappers({
     bookChanges: okexBookChangesMapper('okex-swap', { market: 'swap', depthL2TbtSwitchDate: OKEX_SWAP_DEPTH_L2_TBT_SWITCH_DATE }),
     derivativeTickers: mapper([
       { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexDerivativeTickerMapper('okex-swap') },
-      { use: () => new OkexV5DerivativeTickerMapper('okex-swap') }
+      {
+        until: OKEX_USDC_INDEX_SWITCH_DATE,
+        use: () => new OkexV5DerivativeTickerMapper('okex-swap', { useLegacyUSDCIndex: true })
+      },
+      { use: () => new OkexV5DerivativeTickerMapper('okex-swap', { useLegacyUSDCIndex: false }) }
     ]),
     liquidations: mapper([
       { until: OKEX_V5_API_SWITCH_DATE, use: () => new OkexLiquidationsMapper('okex-swap', { market: 'swap' }) },
@@ -366,11 +375,14 @@ class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
   private readonly _indexPrices = new Map<string, number>()
 
-  private _futuresChannels = ['tickers', 'open-interest', 'mark-price', 'index-tickers'] as const
+  private _futuresChannels = ['tickers', 'open-interest', 'mark-price', 'index-tickers', 'funding-rate'] as const
 
   private _swapChannels = ['tickers', 'open-interest', 'mark-price', 'index-tickers', 'funding-rate'] as const
 
-  constructor(private readonly _exchange: Exchange) {}
+  constructor(
+    private readonly _exchange: Exchange,
+    private readonly _options: { useLegacyUSDCIndex: boolean }
+  ) {}
 
   canHandle(message: any) {
     const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
@@ -388,14 +400,7 @@ class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap
     const channels = this._exchange === 'okex-futures' ? this._futuresChannels : this._swapChannels
     return channels.map((channel) => {
       if (channel === 'index-tickers') {
-        const indexes =
-          symbols !== undefined
-            ? symbols.map((s) => {
-                const symbolParts = s.split('-')
-                const quotePart = symbolParts[1] === 'USDC' ? 'USD' : symbolParts[1]
-                return `${symbolParts[0]}-${quotePart}`
-              })
-            : undefined
+        const indexes = symbols !== undefined ? symbols.map((symbol) => this._getIndexSymbol(symbol)) : undefined
 
         return {
           channel,
@@ -429,11 +434,7 @@ class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap
 
     for (const dataMessage of message.data) {
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(dataMessage.instId, this._exchange)
-      const symbolParts = dataMessage.instId.split('-')
-      const quotePart = symbolParts[1] === 'USDC' ? 'USD' : symbolParts[1]
-
-      const indexSymbol = `${symbolParts[0]}-${quotePart}`
-
+      const indexSymbol = this._getIndexSymbol(dataMessage.instId)
       const indexPrice = this._indexPrices.get(indexSymbol)
 
       if (indexPrice !== undefined) {
@@ -473,6 +474,10 @@ class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap
         if (fundingRateMessage.nextFundingRate !== undefined && fundingRateMessage.nextFundingRate !== '') {
           pendingTickerInfo.updatePredictedFundingRate(Number(fundingRateMessage.nextFundingRate))
         }
+
+        if (fundingRateMessage.ts !== undefined) {
+          pendingTickerInfo.updateTimestamp(new Date(Number(fundingRateMessage.ts)))
+        }
       }
 
       if (message.arg.channel === 'tickers') {
@@ -490,6 +495,13 @@ class OkexV5DerivativeTickerMapper implements Mapper<'okex-futures' | 'okex-swap
         yield pendingTickerInfo.getSnapshot(localTimestamp)
       }
     }
+  }
+
+  private _getIndexSymbol(instrumentId: string) {
+    const symbolParts = instrumentId.split('-')
+    const quoteCurrency = symbolParts[1].split('_')[0]
+    const indexQuoteCurrency = quoteCurrency === 'USDC' && this._options.useLegacyUSDCIndex ? 'USD' : quoteCurrency
+    return `${symbolParts[0]}-${indexQuoteCurrency}`
   }
 }
 
@@ -808,7 +820,16 @@ type OkexV5IndexTickerMessage = {
 
 type OkexV5FundingRateMessage = {
   arg: { channel: 'funding-rate'; instId: string }
-  data: [{ fundingRate: '0.00048105' | undefined; fundingTime: '1640131200000'; instId: string; instType: 'SWAP'; nextFundingRate: '' }]
+  data: [
+    {
+      fundingRate: '0.00048105' | undefined
+      fundingTime: '1640131200000'
+      instId: string
+      instType: 'SWAP' | 'FUTURES'
+      nextFundingRate: ''
+      ts?: '1640131200000'
+    }
+  ]
 }
 
 type OkexV5LiquidationMessage = {

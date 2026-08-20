@@ -1,11 +1,16 @@
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, mapper } from './registry.ts'
+
+const HYPERLIQUID_FAST_BOOK_SWITCH_DATE = new Date('2026-06-17T00:00:00.000Z')
 
 export const hyperliquidMappers = exchangeMappers({
   hyperliquid: {
     trades: () => new HyperliquidTradesMapper(),
-    bookChanges: () => new HyperliquidBookChangeMapper(),
+    bookChanges: mapper([
+      { until: HYPERLIQUID_FAST_BOOK_SWITCH_DATE, use: () => new HyperliquidBookChangeMapper('l2Book') },
+      { use: () => new HyperliquidBookChangeMapper('fastBook') }
+    ]),
     derivativeTickers: () => new HyperliquidDerivativeTickerMapper(),
     bookTickers: () => new HyperliquidBookTickerMapper()
   }
@@ -78,8 +83,14 @@ function mapHyperliquidLevel(level: HyperliquidWsLevel) {
   }
 }
 class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookChange> {
+  constructor(private readonly filterChannel: HyperliquidBookChannel) {}
+
   canHandle(message: HyperliquidWsBookMessage) {
-    return message.channel === 'l2Book'
+    // Hyperliquid returns channel=l2Book for both live feeds and marks only the fast feed with data.fast=true.
+    // The recorder rewrites that channel to fastBook so historical data can distinguish the two feeds.
+    const isFastBook = message.channel === 'fastBook' || (message.channel === 'l2Book' && message.data.fast === true)
+
+    return this.filterChannel === 'fastBook' ? isFastBook : message.channel === 'l2Book' && isFastBook === false
   }
 
   getFilters(symbols?: string[]) {
@@ -87,7 +98,7 @@ class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookChange> {
 
     return [
       {
-        channel: 'l2Book',
+        channel: this.filterChannel,
         symbols
       }
     ]
@@ -206,13 +217,16 @@ type HyperliquidTradeMessage = {
 }
 
 type HyperliquidWsBookMessage = {
-  channel: 'l2Book'
+  channel: HyperliquidBookChannel
   data: {
     coin: 'ATOM'
     time: 1730160007687
     levels: [HyperliquidWsLevel[], HyperliquidWsLevel[]]
+    fast?: boolean
   }
 }
+
+type HyperliquidBookChannel = 'l2Book' | 'fastBook'
 
 type HyperliquidWsLevel = {
   px: string // price

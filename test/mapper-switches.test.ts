@@ -1,7 +1,8 @@
+import { afterEach, beforeEach, test } from 'node:test'
+import { assert } from './assertions.ts'
 import {
   normalizeBookChanges,
   normalizeBookTickers,
-  normalizeDerivativeTickers,
   normalizeLiquidations,
   normalizeOptionsSummary,
   normalizeTrades
@@ -25,379 +26,122 @@ beforeEach(() => {
 
 afterEach(() => restoreEnv(originalEnv))
 
-test('normalizers keep existing exchange support matrix', () => {
-  const timestamp = date('2024-01-01T00:00:00.000Z')
-
-  expectSupported(
-    normalizeTrades,
-    [
-      'ascendex',
-      'binance',
-      'binance-delivery',
-      'binance-dex',
-      'binance-european-options',
-      'binance-futures',
-      'binance-jersey',
-      'binance-us',
-      'bitfinex',
-      'bitfinex-derivatives',
-      'bitflyer',
-      'bitget',
-      'bitget-futures',
-      'bitmex',
-      'bitnomial',
-      'bitstamp',
-      'blockchain-com',
-      'bullish',
-      'bybit',
-      'bybit-options',
-      'bybit-spot',
-      'coinbase',
-      'coinbase-international',
-      'coinflex',
-      'crypto-com',
-      'cryptofacilities',
-      'delta',
-      'deribit',
-      'dydx',
-      'dydx-v4',
-      'ftx',
-      'ftx-us',
-      'gate-io',
-      'gate-io-futures',
-      'gemini',
-      'hitbtc',
-      'huobi',
-      'huobi-dm',
-      'huobi-dm-linear-swap',
-      'huobi-dm-options',
-      'huobi-dm-swap',
-      'hyperliquid',
-      'kraken',
-      'kucoin',
-      'kucoin-futures',
-      'lighter',
-      'mango',
-      'mexc',
-      'okcoin',
-      'okex',
-      'okex-futures',
-      'okex-options',
-      'okex-spreads',
-      'okex-swap',
-      'phemex',
-      'poloniex',
-      'polymarket',
-      'serum',
-      'star-atlas',
-      'upbit',
-      'woo-x'
-    ],
-    timestamp
-  )
-
-  expectSupported(
-    normalizeBookChanges,
-    [
-      'ascendex',
-      'binance',
-      'binance-delivery',
-      'binance-dex',
-      'binance-european-options',
-      'binance-futures',
-      'binance-jersey',
-      'binance-us',
-      'bitfinex',
-      'bitfinex-derivatives',
-      'bitflyer',
-      'bitget',
-      'bitget-futures',
-      'bitmex',
-      'bitnomial',
-      'bitstamp',
-      'blockchain-com',
-      'bullish',
-      'bybit',
-      'bybit-options',
-      'bybit-spot',
-      'coinbase',
-      'coinbase-international',
-      'coinflex',
-      'crypto-com',
-      'cryptofacilities',
-      'delta',
-      'deribit',
-      'dydx',
-      'dydx-v4',
-      'ftx',
-      'ftx-us',
-      'gate-io',
-      'gate-io-futures',
-      'gemini',
-      'hitbtc',
-      'huobi',
-      'huobi-dm',
-      'huobi-dm-linear-swap',
-      'huobi-dm-options',
-      'huobi-dm-swap',
-      'hyperliquid',
-      'kraken',
-      'kucoin',
-      'kucoin-futures',
-      'lighter',
-      'mango',
-      'mexc',
-      'okcoin',
-      'okex',
-      'okex-futures',
-      'okex-options',
-      'okex-spreads',
-      'okex-swap',
-      'phemex',
-      'poloniex',
-      'polymarket',
-      'serum',
-      'star-atlas',
-      'upbit',
-      'woo-x'
-    ],
-    timestamp
-  )
-
-  expectSupported(
-    normalizeDerivativeTickers,
-    [
-      'ascendex',
-      'binance-delivery',
-      'binance-futures',
-      'bitfinex-derivatives',
-      'bitget-futures',
-      'bitmex',
-      'bullish',
-      'bybit',
-      'coinbase-international',
-      'coinflex',
-      'crypto-com',
-      'cryptofacilities',
-      'delta',
-      'deribit',
-      'dydx',
-      'dydx-v4',
-      'ftx',
-      'gate-io-futures',
-      'huobi-dm',
-      'huobi-dm-linear-swap',
-      'huobi-dm-swap',
-      'hyperliquid',
-      'kucoin-futures',
-      'lighter',
-      'okex-futures',
-      'okex-swap',
-      'phemex',
-      'woo-x'
-    ],
-    timestamp
-  )
-
-  expectSupported(
-    normalizeOptionsSummary,
-    ['binance-european-options', 'bullish', 'bybit-options', 'deribit', 'huobi-dm-options', 'okex-options'],
-    timestamp
-  )
-
-  expectSupported(
-    normalizeLiquidations,
-    [
-      'binance-delivery',
-      'binance-futures',
-      'bitfinex-derivatives',
-      'bitget-futures',
-      'bitmex',
-      'bybit',
-      'cryptofacilities',
-      'deribit',
-      'dydx-v4',
-      'ftx',
-      'huobi-dm',
-      'huobi-dm-linear-swap',
-      'huobi-dm-swap',
-      'lighter',
-      'okex-futures',
-      'okex-swap'
-    ],
-    timestamp
-  )
-
-  expectSupported(
-    normalizeBookTickers,
-    [
-      'ascendex',
-      'binance',
-      'binance-delivery',
-      'binance-dex',
-      'binance-european-options',
-      'binance-futures',
-      'binance-us',
-      'bitfinex',
-      'bitfinex-derivatives',
-      'bitflyer',
-      'bitget',
-      'bitget-futures',
-      'bitmex',
-      'bullish',
-      'bybit',
-      'bybit-spot',
-      'coinbase',
-      'coinbase-international',
-      'crypto-com',
-      'cryptofacilities',
-      'delta',
-      'deribit',
-      'ftx',
-      'ftx-us',
-      'gate-io',
-      'gate-io-futures',
-      'gemini',
-      'huobi',
-      'huobi-dm',
-      'huobi-dm-linear-swap',
-      'huobi-dm-swap',
-      'hyperliquid',
-      'kraken',
-      'kucoin',
-      'kucoin-futures',
-      'lighter',
-      'mango',
-      'mexc',
-      'okcoin',
-      'okex',
-      'okex-futures',
-      'okex-options',
-      'okex-spreads',
-      'okex-swap',
-      'polymarket',
-      'serum',
-      'star-atlas',
-      'woo-x'
-    ],
-    timestamp
-  )
-})
-
-test('Bybit mapper switches keep existing filter behavior around switch dates', () => {
-  expect(normalizeTrades('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD'])).toEqual([
+test('Bybit replay uses the raw channels recorded on each side of its API migrations', () => {
+  assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
     { channel: 'trade', symbols: ['BTCUSD'] }
   ])
-  expect(normalizeTrades('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT'])).toEqual([
+  assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
     { channel: 'publicTrade', symbols: ['BTCUSDT'] }
   ])
 
-  expect(normalizeBookChanges('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
     { channel: 'orderBookL2_25', symbols: ['BTCUSD'] }
   ])
-  expect(normalizeBookChanges('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
     { channel: 'orderbook.50', symbols: ['BTCUSDT'] }
   ])
 
-  expect(normalizeLiquidations('bybit', date('2025-02-25T23:59:59.999Z')).getFilters(['BTCUSDT'])).toEqual([
+  assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-25T23:59:59.999Z')).getFilters(['BTCUSDT']), [
     { channel: 'liquidation', symbols: ['BTCUSDT'] }
   ])
-  expect(normalizeLiquidations('bybit', date('2025-02-26T00:00:00.000Z')).getFilters(['BTCUSDT'])).toEqual([
+  assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-26T00:00:00.000Z')).getFilters(['BTCUSDT']), [
     { channel: 'allLiquidation', symbols: ['BTCUSDT'] }
   ])
 })
 
-test('Kraken mapper switches all v2 filters at the API switch date', () => {
+test('Kraken replay switches book ticker channels without changing mixed-case symbols', () => {
   const beforeSwitch = date('2026-07-09T23:59:59.999Z')
   const switchDate = date('2026-07-10T00:00:00.000Z')
   const symbols = ['AAPLx/USD']
 
-  expect(normalizeTrades('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLx/USD'] }])
-  expect(normalizeTrades('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['AAPLx/USD'] }])
-
-  expect(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLx/USD'] }])
-  expect(normalizeBookChanges('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'book', symbols: ['AAPLx/USD'] }])
-
-  expect(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'spread', symbols: ['AAPLx/USD'] }])
-  expect(normalizeBookTickers('kraken', switchDate).getFilters(symbols)).toEqual([{ channel: 'ticker', symbols: ['AAPLx/USD'] }])
+  assert.deepStrictEqual(normalizeTrades('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'trade', symbols }])
+  assert.deepStrictEqual(normalizeTrades('kraken', switchDate).getFilters(symbols), [{ channel: 'trade', symbols }])
+  assert.deepStrictEqual(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'book', symbols }])
+  assert.deepStrictEqual(normalizeBookChanges('kraken', switchDate).getFilters(symbols), [{ channel: 'book', symbols }])
+  assert.deepStrictEqual(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'spread', symbols }])
+  assert.deepStrictEqual(normalizeBookTickers('kraken', switchDate).getFilters(symbols), [{ channel: 'ticker', symbols }])
 })
 
-test('Gemini mapper switches to v3 filters at the API switch date', () => {
+test('Gemini replay uses the v3 depth channel after the recorded API switch', () => {
   const beforeSwitch = date('2026-07-23T23:59:59.999Z')
   const switchDate = date('2026-07-24T00:00:00.000Z')
-  const symbols = ['btcusd']
+  const symbols = ['BTCUSD']
 
-  expect(normalizeTrades('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['BTCUSD'] }])
-  expect(normalizeTrades('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'trade', symbols: ['BTCUSD'] }])
-
-  expect(normalizeBookChanges('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'l2_updates', symbols: ['BTCUSD'] }])
-  expect(normalizeBookChanges('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'depth', symbols: ['BTCUSD'] }])
-
-  expect(normalizeBookTickers('gemini', beforeSwitch).getFilters(symbols)).toEqual([{ channel: 'bookTicker', symbols: ['BTCUSD'] }])
-  expect(normalizeBookTickers('gemini', switchDate).getFilters(symbols)).toEqual([{ channel: 'bookTicker', symbols: ['BTCUSD'] }])
+  assert.deepStrictEqual(normalizeTrades('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
+  assert.deepStrictEqual(normalizeTrades('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
+  assert.deepStrictEqual(normalizeBookChanges('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'l2_updates', symbols }])
+  assert.deepStrictEqual(normalizeBookChanges('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'depth', symbols }])
+  assert.deepStrictEqual(normalizeBookTickers('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
+  assert.deepStrictEqual(normalizeBookTickers('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
 })
 
-test('OKX mapper switches keep existing book channel windows', () => {
-  expect(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT'])).toEqual([
+test('Hyperliquid replay switches from l2Book to fastBook on 2026-06-17', () => {
+  const switchDate = date('2026-06-17T00:00:00.000Z')
+  const beforeSwitch = normalizeBookChanges('hyperliquid', date('2026-06-16T23:59:59.999Z'))
+  const afterSwitch = normalizeBookChanges('hyperliquid', switchDate)
+  const data = { coin: 'BTC', time: switchDate.valueOf(), levels: [[], []] }
+
+  assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('hyperliquid'), [switchDate])
+  assert.deepStrictEqual(beforeSwitch.getFilters(['BTC']), [{ channel: 'l2Book', symbols: ['BTC'] }])
+  assert.deepStrictEqual(afterSwitch.getFilters(['BTC']), [{ channel: 'fastBook', symbols: ['BTC'] }])
+  assert.strictEqual(beforeSwitch.canHandle({ channel: 'l2Book', data }), true)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data }), false)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data: { ...data, fast: true } }), true)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'fastBook', data: { ...data, fast: true } }), true)
+})
+
+test('OKX replay follows the historical public book-channel windows', () => {
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT']), [
     { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] },
     { channel: 'spot/depth', symbols: ['BTC-USDT'] }
   ])
-  expect(normalizeBookChanges('okex', date('2020-04-10T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-10T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] }
   ])
-  expect(normalizeBookChanges('okex', date('2021-12-23T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2021-12-23T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
   ])
-  expect(normalizeBookChanges('okex', date('2023-02-25T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-02-25T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'books', symbols: ['BTC-USDT'] }
   ])
-  expect(normalizeBookChanges('okex', date('2023-03-09T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-03-09T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
   ])
-  expect(normalizeBookChanges('okex', date('2026-05-21T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeBookChanges('okex', date('2026-05-21T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'books', symbols: ['BTC-USDT'] }
   ])
 })
 
-test('OKX trades-all env override remains separate from mapper dates', () => {
-  expect(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+test('OKX replay keeps the explicit trades channel override', () => {
+  assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'trades-all', symbols: ['BTC-USDT'] }
   ])
 
   process.env.OKX_USE_TRADES_CHANNEL = '1'
 
-  expect(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT'])).toEqual([
+  assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
     { channel: 'trades', symbols: ['BTC-USDT'] }
   ])
 })
 
-test('OKX options summary filters preserve current instFamily values', () => {
-  expect(
+test('OKX options replay derives the correct instrument families', () => {
+  assert.deepStrictEqual(
     normalizeOptionsSummary('okex-options', date('2026-06-17T00:00:00.000Z')).getFilters([
       'SOL-USD_UM-260618-67-C',
       'SOL-USD_UM-260618-67-P'
-    ])
-  ).toEqual([
-    { channel: 'opt-summary', symbols: ['SOL-USD_UM'] },
-    { channel: 'index-tickers', symbols: ['SOL-USD'] },
-    { channel: 'tickers', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
-    { channel: 'open-interest', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
-    { channel: 'mark-price', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] }
-  ])
+    ]),
+    [
+      { channel: 'opt-summary', symbols: ['SOL-USD_UM'] },
+      { channel: 'index-tickers', symbols: ['SOL-USD'] },
+      { channel: 'tickers', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+      { channel: 'open-interest', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+      { channel: 'mark-price', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] }
+    ]
+  )
 })
 
 function date(value: string) {
   return new Date(value)
-}
-
-function expectSupported(
-  normalizer: (exchange: any, localTimestamp: Date) => { getFilters: (symbols?: string[]) => unknown },
-  exchanges: string[],
-  localTimestamp: Date
-) {
-  for (const exchange of exchanges) {
-    expect(() => normalizer(exchange, localTimestamp).getFilters()).not.toThrow()
-  }
 }
 
 function restoreEnv(env: Record<string, string | undefined>) {

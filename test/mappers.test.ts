@@ -1,6 +1,7 @@
+import { describe, test } from 'node:test'
+import { assert, errorMessageIncludes, snapshot } from './assertions.ts'
 import {
-  Exchange,
-  Mapper,
+  EXCHANGE_CHANNELS_INFO,
   normalizeBookChanges,
   normalizeDerivativeTickers,
   normalizeTrades,
@@ -8,6 +9,7 @@ import {
   normalizeLiquidations,
   normalizeBookTickers
 } from '../dist/index.js'
+import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'aster-futures',
@@ -640,7 +642,7 @@ describe('mappers', () => {
     const deribitMapper = createMapper('deribit')
     for (const message of messages) {
       const mappedMessages = deribitMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -995,7 +997,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = bitmexMapper.map(message, new Date('2019-06-01T00:00:28.6199940Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -1123,7 +1125,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okexMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const okexV5Mapper = createMapper('okex', new Date('2021-12-23T00:00:00.000Z'))
@@ -1189,7 +1191,7 @@ describe('mappers', () => {
 
     for (const message of okexV5Messages) {
       const mappedMessages = okexV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -1377,7 +1379,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okexFuturesMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const messagesTickByTick = [
@@ -1459,7 +1461,7 @@ describe('mappers', () => {
 
     for (const message of messagesTickByTick) {
       const mappedMessages = okexFuturesMapper.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const okexFuturesV5Mapper = createMapper('okex-futures', new Date('2021-12-23T00:00:00.000Z'))
@@ -1590,7 +1592,69 @@ describe('mappers', () => {
 
     for (const message of okexFuturesV5Messages) {
       const mappedMessages = okexFuturesV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
+    }
+  })
+
+  test('map okex-futures X-Perp messages', () => {
+    const mapperTimestamp = new Date('2026-08-04T19:14:00.000Z')
+    const mapper = createMapper('okex-futures', mapperTimestamp)
+
+    snapshot({
+      channels: EXCHANGE_CHANNELS_INFO['okex-futures'],
+      filters: normalizeDerivativeTickers('okex-futures', mapperTimestamp).getFilters(['BTC-USD_UM_XPERP-310404'])
+    })
+
+    const messages = [
+      {
+        localTimestamp: new Date('2026-08-04T19:14:00.033Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '64280',
+              open24h: '63848.2',
+              high24h: '64360.7',
+              low24h: '63265.5',
+              sodUtc0: '63465.3',
+              sodUtc8: '64075.9',
+              ts: '1785870839964'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2026-08-04T19:14:15.773Z'),
+        message: {
+          arg: { channel: 'funding-rate', instId: 'BTC-USD_UM_XPERP-310404' },
+          data: [
+            {
+              formulaType: 'withRate',
+              fundingRate: '-0.0004270396398519',
+              fundingTime: '1785888000000',
+              impactValue: '10000.0000000000000000',
+              instId: 'BTC-USD_UM_XPERP-310404',
+              instType: 'FUTURES',
+              interestRate: '0.0001000000000000',
+              maxFundingRate: '0.00375',
+              method: 'current_period',
+              minFundingRate: '-0.00375',
+              nextFundingRate: '',
+              nextFundingTime: '1785916800000',
+              premium: '-0.0008949500017283',
+              prevFundingTime: '1785859200000',
+              settFundingRate: '-0.0001996513270201',
+              settState: 'settled',
+              ts: '1785870855692'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of messages) {
+      snapshot(mapper.map(message, localTimestamp))
     }
   })
 
@@ -1728,7 +1792,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okexSwap.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     let messagesWithTickByTickBook = [
@@ -1776,7 +1840,7 @@ describe('mappers', () => {
 
     for (const message of messagesWithTickByTickBook) {
       const mappedMessages = okexSwap.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const okexSwapV5Mapper = createMapper('okex-swap', new Date('2021-12-23T00:00:00.000Z'))
@@ -1870,7 +1934,7 @@ describe('mappers', () => {
     ]
     for (const message of okexSwapV5Messages) {
       const mappedMessages = okexSwapV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const okexV5WithBookTickerMessages = [
@@ -1907,7 +1971,164 @@ describe('mappers', () => {
 
     for (const message of okexV5WithBookTickerMessages) {
       const mappedMessages = okexWithBookTickerMapper.map(message, new Date('2022-05-06T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
+    }
+  })
+
+  test('map okex USDC contracts before and after index migration', () => {
+    const usdcIndexSwitchDate = new Date('2023-04-10T08:40:00.000Z')
+    snapshot({
+      switchDates: normalizeDerivativeTickers.getSwitchDates('okex-swap'),
+      legacyFilters: normalizeDerivativeTickers('okex-swap', new Date(usdcIndexSwitchDate.valueOf() - 1)).getFilters(['BTC-USDC-SWAP']),
+      currentFilters: normalizeDerivativeTickers('okex-swap', usdcIndexSwitchDate).getFilters(['BTC-USDC-SWAP'])
+    })
+
+    const legacyMapper = createMapper('okex-swap', new Date('2023-04-09T12:00:00.000Z'))
+    const legacyMessages = [
+      {
+        localTimestamp: new Date('2023-04-09T12:00:00.340Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '27938.9',
+              open24h: '28028.2',
+              high24h: '28095',
+              low24h: '27816.7',
+              sodUtc0: '27949.5',
+              sodUtc8: '28030.2',
+              ts: '1681041600310'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-09T12:00:00.640Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '27927.4',
+              lastSz: '50',
+              askPx: '27933.3',
+              askSz: '2068',
+              bidPx: '27933.2',
+              bidSz: '6538',
+              open24h: '28028.4',
+              high24h: '28095.6',
+              low24h: '27800',
+              sodUtc0: '27947.8',
+              sodUtc8: '28024',
+              volCcy24h: '77.6509',
+              vol24h: '776509',
+              ts: '1681041600614'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of legacyMessages) {
+      snapshot(legacyMapper.map(message, localTimestamp))
+    }
+
+    const currentMapper = createMapper('okex-swap', new Date('2023-04-20T12:00:00.000Z'))
+    const currentMessages = [
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.119Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USDC' },
+          data: [
+            {
+              instId: 'BTC-USDC',
+              idxPx: '28621.8',
+              open24h: '29320.6',
+              high24h: '29519',
+              low24h: '28577.4',
+              sodUtc0: '28818.9',
+              sodUtc8: '29285.1',
+              ts: '1681992000093'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.129Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '28620.3',
+              lastSz: '241',
+              askPx: '28618.8',
+              askSz: '1200',
+              bidPx: '28618.7',
+              bidSz: '600',
+              open24h: '29303.8',
+              high24h: '29514.3',
+              low24h: '28543.6',
+              sodUtc0: '28808',
+              sodUtc8: '29294.4',
+              volCcy24h: '430.701',
+              vol24h: '4307010',
+              ts: '1681992000108'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:00.314Z'),
+        message: {
+          arg: { channel: 'index-tickers', instId: 'BTC-USD' },
+          data: [
+            {
+              instId: 'BTC-USD',
+              idxPx: '28612.1',
+              open24h: '29303.7',
+              high24h: '29515.3',
+              low24h: '28575.5',
+              sodUtc0: '28816.6',
+              sodUtc8: '29283',
+              ts: '1681992000222'
+            }
+          ]
+        }
+      },
+      {
+        localTimestamp: new Date('2023-04-20T12:00:04.362Z'),
+        message: {
+          arg: { channel: 'tickers', instId: 'BTC-USDC-SWAP' },
+          data: [
+            {
+              instType: 'SWAP',
+              instId: 'BTC-USDC-SWAP',
+              last: '28595.6',
+              lastSz: '170',
+              askPx: '28599.1',
+              askSz: '279',
+              bidPx: '28595.6',
+              bidSz: '179',
+              open24h: '29303.8',
+              high24h: '29514.3',
+              low24h: '28543.6',
+              sodUtc0: '28808',
+              sodUtc8: '29294.4',
+              volCcy24h: '431.7432',
+              vol24h: '4317432',
+              ts: '1681992004315'
+            }
+          ]
+        }
+      }
+    ]
+
+    for (const { message, localTimestamp } of currentMessages) {
+      snapshot(currentMapper.map(message, localTimestamp))
     }
   })
 
@@ -2194,14 +2415,14 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okexOptions.map(message, new Date('2019-08-01T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     okexOptions = createMapper('okex-options', new Date('2020-02-08'))
 
     for (const message of messages) {
       const mappedMessages = okexOptions.map(message, new Date('2020-02-08T00:00:02.9970505Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const okexOptionsV5Mapper = createMapper('okex-options', new Date('2021-12-23T00:00:00.000Z'))
@@ -2343,7 +2564,7 @@ describe('mappers', () => {
 
     for (const message of okexOptionsV5Messages) {
       const mappedMessages = okexOptionsV5Mapper.map(message, new Date('2021-12-23T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -2415,7 +2636,7 @@ describe('mappers', () => {
     const bitfinex = createMapper('bitfinex')
     for (const message of messages) {
       const mappedMessages = bitfinex.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -2433,7 +2654,7 @@ describe('mappers', () => {
       new Date('2026-04-10T00:00:00.164Z')
     )
 
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   })
 
   test('ignore bitfinex funding ticker messages for book ticker', () => {
@@ -2467,7 +2688,7 @@ describe('mappers', () => {
       new Date('2021-10-10T23:20:30.074Z')
     )
 
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   })
 
   test('map bitfinex derivatives messages', () => {
@@ -2628,7 +2849,7 @@ describe('mappers', () => {
     for (const message of messages) {
       const mappedMessages = bitfinexDerivativesMapper.map(message, new Date('2019-08-01T00:00:02.4965581Z'))
 
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -2636,7 +2857,7 @@ describe('mappers', () => {
     const asterMapper = createMapper('aster', new Date())
     const localTimestamp = new Date('2026-07-29T00:00:01.000Z')
 
-    expect(
+    snapshot(
       asterMapper.map(
         {
           stream: 'btcusdt@trade',
@@ -2653,21 +2874,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'trade',
-        symbol: 'BTCUSDT',
-        exchange: 'aster',
-        id: '12345',
-        price: 5.1,
-        amount: 0.2,
-        side: 'sell',
-        timestamp: new Date('2020-06-04T09:00:35.999Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterMapper.map(
         {
           stream: 'btcusdt@depthSnapshot',
@@ -2681,20 +2890,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'BTCUSDT',
-        exchange: 'aster',
-        isSnapshot: true,
-        bids: [{ price: 5, amount: 1.2 }],
-        asks: [{ price: 5.2, amount: 2.4 }],
-        timestamp: new Date('2020-06-04T09:00:36.000Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterMapper.map(
         {
           stream: 'btcusdt@depth@100ms',
@@ -2712,20 +2910,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'BTCUSDT',
-        exchange: 'aster',
-        isSnapshot: false,
-        bids: [{ price: 5.1, amount: 3 }],
-        asks: [{ price: 5.3, amount: 4 }],
-        timestamp: new Date('2020-06-04T09:00:36.100Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterMapper.map(
         {
           stream: 'btcusdt@depth@100ms',
@@ -2743,41 +2930,32 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'BTCUSDT',
-        exchange: 'aster',
-        isSnapshot: false,
-        bids: [{ price: 5.4, amount: 6 }],
-        asks: [],
-        timestamp: new Date('2020-06-04T09:00:36.200Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(() =>
-      Array.from(
-        asterMapper.map(
-          {
-            stream: 'btcusdt@depth@100ms',
-            data: {
-              e: 'depthUpdate',
-              E: 1591261236300,
-              T: 1591261236299,
-              s: 'BTCUSDT',
-              U: 140,
-              u: 141,
-              pu: 129,
-              b: [],
-              a: []
-            }
-          },
-          localTimestamp
-        )!
-      )
-    ).toThrow('Book depth update has a sequence gap')
-    expect(
+    assert.throws(
+      () =>
+        Array.from(
+          asterMapper.map(
+            {
+              stream: 'btcusdt@depth@100ms',
+              data: {
+                e: 'depthUpdate',
+                E: 1591261236300,
+                T: 1591261236299,
+                s: 'BTCUSDT',
+                U: 140,
+                u: 141,
+                pu: 129,
+                b: [],
+                a: []
+              }
+            },
+            localTimestamp
+          )!
+        ),
+      errorMessageIncludes('Book depth update has a sequence gap')
+    )
+    snapshot(
       asterMapper.map(
         {
           stream: 'btcusdt@bookTicker',
@@ -2792,26 +2970,14 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_ticker',
-        symbol: 'BTCUSDT',
-        exchange: 'aster',
-        askAmount: 2.4,
-        askPrice: 5.2,
-        bidPrice: 5.1,
-        bidAmount: 1.2,
-        timestamp: localTimestamp,
-        localTimestamp
-      }
-    ])
+    )
   })
 
   test('map aster futures messages', () => {
     const asterFuturesMapper = createMapper('aster-futures', new Date())
     const localTimestamp = new Date('2026-08-03T10:00:00.000Z')
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@aggTrade',
@@ -2830,21 +2996,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'trade',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        id: '181349',
-        price: 10223.74,
-        amount: 0.236,
-        side: 'buy',
-        timestamp: new Date('2019-09-17T04:05:03.463Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@depth@100ms',
@@ -2862,9 +3016,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@depthSnapshot',
@@ -2877,24 +3031,10 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        isSnapshot: true,
-        bids: [
-          { price: 8488.36, amount: 1.501 },
-          { price: 8493.78, amount: 0.162 }
-        ],
-        asks: [{ price: 4096, amount: 2.425419 }],
-        timestamp: localTimestamp,
-        localTimestamp
-      }
-    ])
+    )
 
     const asterFuturesOverlapEdgeMapper = createMapper('aster-futures', new Date())
-    expect(
+    assert.equal(
       asterFuturesOverlapEdgeMapper.map(
         {
           stream: 'ethusdt@depthSnapshot',
@@ -2906,9 +3046,10 @@ describe('mappers', () => {
           }
         },
         localTimestamp
-      )
-    ).toHaveLength(1)
-    expect(
+      ).length,
+      1
+    )
+    snapshot(
       asterFuturesOverlapEdgeMapper.map(
         {
           stream: 'ethusdt@depth@100ms',
@@ -2926,20 +3067,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'ETHUSDT',
-        exchange: 'aster-futures',
-        isSnapshot: false,
-        bids: [{ price: 10, amount: 3 }],
-        asks: [],
-        timestamp: new Date('2019-11-17T00:00:21.952Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@depth@100ms',
@@ -2957,20 +3087,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_change',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        isSnapshot: false,
-        bids: [{ price: 8493.78, amount: 0 }],
-        asks: [],
-        timestamp: new Date('2019-11-17T00:00:22.952Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@markPrice@1s',
@@ -2986,24 +3105,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'derivative_ticker',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        lastPrice: undefined,
-        openInterest: undefined,
-        fundingRate: 0.0001564,
-        fundingTimestamp: new Date('2020-08-16T08:00:00.000Z'),
-        predictedFundingRate: undefined,
-        indexPrice: 11851.86949091,
-        markPrice: 11857.56,
-        timestamp: new Date('2020-08-16T00:00:08.000Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@ticker',
@@ -3011,24 +3115,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'derivative_ticker',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        lastPrice: 10223.74,
-        openInterest: undefined,
-        fundingRate: 0.0001564,
-        fundingTimestamp: new Date('2020-08-16T08:00:00.000Z'),
-        predictedFundingRate: undefined,
-        indexPrice: 11851.86949091,
-        markPrice: 11857.56,
-        timestamp: new Date('2020-08-16T00:00:08.000Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@forceOrder',
@@ -3052,21 +3141,9 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'liquidation',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        id: undefined,
-        price: 4793.91,
-        amount: 0.014,
-        side: 'buy',
-        timestamp: new Date('2020-03-13T00:23:51.421Z'),
-        localTimestamp
-      }
-    ])
+    )
 
-    expect(
+    snapshot(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@bookTicker',
@@ -3083,19 +3160,7 @@ describe('mappers', () => {
         },
         localTimestamp
       )
-    ).toEqual([
-      {
-        type: 'book_ticker',
-        symbol: 'BTCUSDT',
-        exchange: 'aster-futures',
-        askAmount: 0.38,
-        askPrice: 33139.39,
-        bidPrice: 33134.42,
-        bidAmount: 0.17,
-        timestamp: new Date('2021-02-01T00:00:03.571Z'),
-        localTimestamp
-      }
-    ])
+    )
   })
 
   test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
@@ -3112,7 +3177,7 @@ describe('mappers', () => {
       new Date('2026-04-10T00:00:00.152Z')
     )
 
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   })
 
   test('map binance messages', () => {
@@ -3284,7 +3349,7 @@ describe('mappers', () => {
     const binanceMapper = createMapper('binance', new Date())
     for (const message of messages) {
       const mappedMessages = binanceMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -3405,7 +3470,7 @@ describe('mappers', () => {
     const binanceDexMapper = createMapper('binance-dex')
     for (const message of messages) {
       const mappedMessages = binanceDexMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -3604,7 +3669,7 @@ describe('mappers', () => {
     const binanceFuturesMapper = createMapper('binance-futures', new Date())
     for (const message of messages) {
       const mappedMessages = binanceFuturesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -3737,7 +3802,7 @@ describe('mappers', () => {
     const binanceDelivery = createMapper('binance-delivery', new Date())
     for (const message of messages) {
       const mappedMessages = binanceDelivery.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -3779,7 +3844,7 @@ describe('mappers', () => {
     const ftxUSMapper = createMapper('ftx-us', new Date())
     for (const message of messages) {
       const mappedMessages = ftxUSMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4031,21 +4096,21 @@ describe('mappers', () => {
     let deltaMapper = createMapper('delta', new Date('2020-10-13T00:00:01.2750543Z'))
     for (const message of messages) {
       const mappedMessages = deltaMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     deltaMapper = createMapper('delta', new Date('2020-10-14T00:00:01.2750543Z'))
 
     for (const message of v2Messages) {
       const mappedMessages = deltaMapper.map(message, new Date('2020-10-14T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     deltaMapper = createMapper('delta', new Date('2023-04-01T00:00:00.000Z'))
 
     for (const message of newOrderBookMessages) {
       const mappedMessages = deltaMapper.map(message, new Date('2023-04-01T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4264,7 +4329,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const newerMessages = [
@@ -4302,7 +4367,7 @@ describe('mappers', () => {
 
     for (const message of newerMessages) {
       const mappedMessages = cryptofacilitiesMapper.map(message, new Date('2022-09-30T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4411,7 +4476,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = bitflyerMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4643,7 +4708,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = ftxMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4746,7 +4811,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = coinbaseMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4780,7 +4845,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = geminiMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4836,7 +4901,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = geminiMapper.map(message, new Date('2026-07-24T00:00:01.275Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -4845,7 +4910,7 @@ describe('mappers', () => {
     const localTimestamp = new Date('2026-07-24T00:00:01.275Z')
     const isSnapshot = (message: any) => geminiMapper.map(message, localTimestamp)[0].isSnapshot
 
-    expect(
+    assert.strictEqual(
       isSnapshot({
         e: 'depthUpdate',
         E: 1784851199088426630,
@@ -4854,10 +4919,11 @@ describe('mappers', () => {
         u: 1764550512767893,
         b: [],
         a: [['0.75196', '1325.49900000']]
-      })
-    ).toBe(true)
+      }),
+      true
+    )
 
-    expect(
+    assert.strictEqual(
       isSnapshot({
         e: 'depthUpdate',
         E: 1784851239122227005,
@@ -4866,10 +4932,11 @@ describe('mappers', () => {
         u: 1764550512813829,
         b: [['0.75074', '5201.83440000']],
         a: [['0.75150', '5175.25940000']]
-      })
-    ).toBe(false)
+      }),
+      false
+    )
 
-    expect(
+    assert.strictEqual(
       isSnapshot({
         e: 'depthUpdate',
         E: 1784851239118561200,
@@ -4878,10 +4945,11 @@ describe('mappers', () => {
         u: 1764550512813818,
         b: [['0.696826630', '3132.880677']],
         a: [['0.697523910', '788.989231']]
-      })
-    ).toBe(true)
+      }),
+      true
+    )
 
-    expect(
+    assert.strictEqual(
       isSnapshot({
         e: 'depthUpdate',
         E: 1784851239118561200,
@@ -4890,17 +4958,18 @@ describe('mappers', () => {
         u: 1764550512813818,
         b: [],
         a: []
-      })
-    ).toBe(true)
+      }),
+      true
+    )
   })
 
   test('ignore gemini v3 acknowledgement and contract status messages', () => {
     const geminiMapper = createMapper('gemini', new Date('2026-07-24T00:00:00.000Z'))
     const localTimestamp = new Date('2026-07-24T00:00:01.000Z')
 
-    expect(geminiMapper.map({ id: 1, status: 200 }, localTimestamp)).toEqual([])
-    expect(geminiMapper.map({ u: 1764549594389752, E: 1784870400000000000, s: 'btcusd' }, localTimestamp)).toEqual([])
-    expect(
+    assert.deepStrictEqual(geminiMapper.map({ id: 1, status: 200 }, localTimestamp), [])
+    assert.deepStrictEqual(geminiMapper.map({ u: 1764549594389752, E: 1784870400000000000, s: 'btcusd' }, localTimestamp), [])
+    assert.deepStrictEqual(
       geminiMapper.map(
         {
           e: 'contractStatus',
@@ -4913,8 +4982,9 @@ describe('mappers', () => {
           n: 'Approved'
         },
         localTimestamp
-      )
-    ).toEqual([])
+      ),
+      []
+    )
   })
 
   test('map bitstamp messages', () => {
@@ -5009,7 +5079,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = bitstampMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5068,7 +5138,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = krakenMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5161,7 +5231,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = krakenMapper.map(message, new Date('2026-07-10T00:00:03.275054Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5375,7 +5445,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobi.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const messagesWithMBPData = [
@@ -5541,7 +5611,7 @@ describe('mappers', () => {
 
     for (const message of messagesWithMBPData) {
       const mappedMessages = huobi.map(message, new Date('2020-07-03T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5738,7 +5808,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobiDM.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5862,7 +5932,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobiDMSwap.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -5992,7 +6062,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobiDMSwap.map(message, new Date('2020-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -6096,7 +6166,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = huobiDMOptionsMapper.map(message, new Date('2021-05-03T00:00:00.1309902Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -6453,7 +6523,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = bybit.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     bybit = createMapper('bybit', new Date('2019-12-24'))
@@ -6720,7 +6790,7 @@ describe('mappers', () => {
 
     for (const message of messagesIncludingOrderBook200) {
       const mappedMessages = bybit.map(message, new Date('2019-12-14T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const messagesV5 = [
@@ -6977,7 +7047,7 @@ describe('mappers', () => {
 
     for (const message of messagesV5) {
       const mappedMessages = bybit.map(message, new Date('2023-04-05'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const messagesAllLiquidation = [
@@ -6992,7 +7062,7 @@ describe('mappers', () => {
 
     for (const message of messagesAllLiquidation) {
       const mappedMessages = bybit.map(message, new Date('2025-02-26'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7121,7 +7191,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = mapper.map(message, new Date('2023-04-05'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7187,7 +7257,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = okcoin.map(message, new Date('2019-11-09T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7240,7 +7310,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = hitbtc.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7402,7 +7472,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = phemex.map(message, new Date('2019-12-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7490,7 +7560,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = gateIOMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const v4Messages = [
@@ -7552,7 +7622,7 @@ describe('mappers', () => {
 
     for (const message of v4Messages) {
       const mappedMessages = gateIOMapper.map(message, new Date('2023-04-29T00:00:00.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     // Test GateIOV4OrderBookV2ChangeMapper for dates >= 2025-08-01
@@ -7622,7 +7692,7 @@ describe('mappers', () => {
 
     for (const message of v4OrderBookV2Messages) {
       const mappedMessages = gateIOMapper.map(message, new Date('2025-08-01T00:00:00.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7899,7 +7969,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = gateIOFuturesMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -7919,7 +7989,7 @@ describe('mappers', () => {
       )
     )
 
-    expect(tradeMessages).toMatchSnapshot()
+    snapshot(tradeMessages)
 
     const bookTickerMessages = Array.from(
       gateIOFuturesMapper.map(
@@ -7935,7 +8005,7 @@ describe('mappers', () => {
       )
     )
 
-    expect(bookTickerMessages).toMatchSnapshot()
+    snapshot(bookTickerMessages)
 
     const bookChangeMessages = Array.from(
       gateIOFuturesMapper.map(
@@ -7954,7 +8024,7 @@ describe('mappers', () => {
       )
     )
 
-    expect(bookChangeMessages).toMatchSnapshot()
+    snapshot(bookChangeMessages)
   })
 
   test('map poloniex messages', () => {
@@ -8034,7 +8104,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = poloniexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
 
     const v2Messages = [
@@ -8094,7 +8164,7 @@ describe('mappers', () => {
 
     for (const message of v2Messages) {
       const mappedMessages = poloniexMapper.map(message, new Date('2022-08-02T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -8221,7 +8291,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = coinflexMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -8286,7 +8356,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = upbit.map(message, new Date('2021-03-02T23:59:59.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -8341,7 +8411,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = ascendexMapper.map(message, new Date('2021-05-24T00:59:59.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -8497,7 +8567,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = dydxMapper.map(message, new Date('2021-05-01T00:00:37.000Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 
@@ -8550,7 +8620,7 @@ describe('mappers', () => {
 
     for (const message of messages) {
       const mappedMessages = serumMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
-      expect(mappedMessages).toMatchSnapshot()
+      snapshot(mappedMessages)
     }
   })
 })
@@ -8594,7 +8664,7 @@ test('map bybit spot messages', () => {
 
   for (const message of messages) {
     const mappedMessages = bybitSpotMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 
   const messagesV5 = [
@@ -8659,7 +8729,7 @@ test('map bybit spot messages', () => {
 
   for (const message of messagesV5) {
     const mappedMessages = bybitSpotMapper.map(message, new Date('2023-04-05T00:00:59.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -8843,7 +8913,7 @@ test('map crypto-com messages', () => {
 
   for (const message of messages) {
     const mappedMessages = cryptoComMapper.map(message, new Date('2021-05-22T00:00:59.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9043,7 +9113,7 @@ test('map kucoin messages', () => {
 
   for (const message of messages) {
     const mappedMessages = kucoinMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9094,7 +9164,7 @@ test('map bitnomial messages', () => {
 
   for (const message of messages) {
     const mappedMessages = bitnomialMapper.map(message, new Date('2022-08-16T00:00:00.4642130Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9177,7 +9247,7 @@ test('map woo-x legacy messages', () => {
 
   for (const message of messages) {
     const mappedMessages = wooxMapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9254,7 +9324,7 @@ test('map woo-x v3 messages', () => {
 
   for (const message of messages) {
     const mappedMessages = wooxMapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9400,7 +9470,7 @@ test('map binance-european-options messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2023-10-01T00:00:00.0816546Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9572,7 +9642,7 @@ test('map binance-european-options messages v2', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2025-12-17T00:00:00.0816546Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9614,7 +9684,7 @@ test('map okex-spreads messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2023-12-22T00:00:00.0816546Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9820,7 +9890,7 @@ test('map kucoin-futures messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-01-22T00:00:00.0816546Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -9985,7 +10055,7 @@ test('map dydx-v4 messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10057,7 +10127,7 @@ test('map bitget messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10132,7 +10202,7 @@ test('map bitget v3 messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10273,7 +10343,7 @@ test('map bitget-futures messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10382,7 +10452,7 @@ test('map bitget-futures v3 messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2026-04-28T00:00:00.000Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 test('map coinbase-international messages', () => {
@@ -10476,7 +10546,7 @@ test('map coinbase-international messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10632,7 +10702,7 @@ test('map hyperliquid messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10767,7 +10837,7 @@ test('map bullish trade messages', () => {
         mappedMessages.push(...mapped)
       }
     }
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10829,7 +10899,7 @@ test('map bullish order book messages', () => {
         mappedMessages.push(...mapped)
       }
     }
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10899,7 +10969,7 @@ test('map bullish book ticker messages', () => {
         mappedMessages.push(...mapped)
       }
     }
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -10935,8 +11005,12 @@ test('use local timestamp for malformed bullish order book timestamps', () => {
     }
   }
 
-  expect([...level2Mapper.map(level2Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
-  expect([...level1Mapper.map(level1Message, localTimestamp)][0].timestamp).toBe(localTimestamp)
+  const level2Result = level2Mapper.map(level2Message, localTimestamp)
+  const level1Result = level1Mapper.map(level1Message, localTimestamp)
+  assert.ok(level2Result !== undefined)
+  assert.ok(level1Result !== undefined)
+  assert.strictEqual([...level2Result][0].timestamp, localTimestamp)
+  assert.strictEqual([...level1Result][0].timestamp, localTimestamp)
 })
 
 test('map bullish derivative ticker messages', () => {
@@ -11158,7 +11232,7 @@ test('map bullish derivative ticker messages', () => {
 
   const mapper = normalizeDerivativeTickers('bullish', localTimestamp)
 
-  expect(mapper.getFilters(['BTC-USDC-PERP', 'BTC-USDC-20260426'])).toMatchSnapshot()
+  snapshot(mapper.getFilters(['BTC-USDC-PERP', 'BTC-USDC-20260426']))
 
   for (const message of messages) {
     const mappedMessages = []
@@ -11168,7 +11242,7 @@ test('map bullish derivative ticker messages', () => {
         mappedMessages.push(...mapped)
       }
     }
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11366,7 +11440,7 @@ test('map bullish option summary messages', () => {
 
   const mapper = normalizeOptionsSummary('bullish', localTimestamp)
 
-  expect(mapper.getFilters(['BTC-USDC-20260425-70000-C'])).toMatchSnapshot()
+  snapshot(mapper.getFilters(['BTC-USDC-20260425-70000-C']))
 
   for (const message of messages) {
     const mappedMessages = []
@@ -11376,7 +11450,7 @@ test('map bullish option summary messages', () => {
         mappedMessages.push(...mapped)
       }
     }
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11587,7 +11661,7 @@ test('map lighter trade messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11651,7 +11725,7 @@ test('map lighter order book messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11761,7 +11835,7 @@ test('map lighter market stats messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11822,7 +11896,7 @@ test('map lighter ticker messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })
 
@@ -11830,7 +11904,7 @@ test('map mexc messages', () => {
   const localTimestamp = new Date('2026-05-27T00:00:00.000Z')
   const mapper = createMapper('mexc', localTimestamp)
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         id: 0,
@@ -11838,10 +11912,11 @@ test('map mexc messages', () => {
         msg: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT'
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.deals.v3.api.pb@10ms@XENUSDT',
@@ -11849,10 +11924,11 @@ test('map mexc messages', () => {
         sendTime: '1781337091703'
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@XENUSDT',
@@ -11860,10 +11936,11 @@ test('map mexc messages', () => {
         sendTime: '1781337091703'
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
@@ -11890,33 +11967,34 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: '698165549569396736X0_698165549569396737X0',
-      price: 100.1,
-      amount: 0.2,
-      side: 'buy',
-      timestamp: new Date('2024-03-09T16:00:00.001Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: '698165549569396738X0_698165549569396739X0',
-      price: 100.2,
-      amount: 0.3,
-      side: 'sell',
-      timestamp: new Date('2024-03-09T16:00:00.002Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: '698165549569396736X0_698165549569396737X0',
+        price: 100.1,
+        amount: 0.2,
+        side: 'buy',
+        timestamp: new Date('2024-03-09T16:00:00.001Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: '698165549569396738X0_698165549569396739X0',
+        price: 100.2,
+        amount: 0.3,
+        side: 'sell',
+        timestamp: new Date('2024-03-09T16:00:00.002Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -11931,10 +12009,11 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -11949,10 +12028,11 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
@@ -11966,25 +12046,26 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: true,
-      bids: [
-        { price: 99.8, amount: 2.3 },
-        { price: 99.9, amount: 0.5 },
-        { price: 99.7, amount: 1.1 }
-      ],
-      asks: [],
-      timestamp: new Date('2024-03-09T16:00:00.002Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: true,
+        bids: [
+          { price: 99.8, amount: 2.3 },
+          { price: 99.9, amount: 0.5 },
+          { price: 99.7, amount: 1.1 }
+        ],
+        asks: [],
+        timestamp: new Date('2024-03-09T16:00:00.002Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@XENUSDT',
@@ -11992,10 +12073,11 @@ test('map mexc messages', () => {
         sendTime: '1781337091703'
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12010,21 +12092,22 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: false,
-      bids: [{ price: 99.7, amount: 1.1 }],
-      asks: [{ price: 100.1, amount: 0 }],
-      timestamp: new Date('2024-03-09T16:00:00.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: false,
+        bids: [{ price: 99.7, amount: 1.1 }],
+        asks: [{ price: 100.1, amount: 0 }],
+        timestamp: new Date('2024-03-09T16:00:00.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12038,21 +12121,22 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: false,
-      bids: [],
-      asks: [{ price: 100.3, amount: 0.4 }],
-      timestamp: new Date('2024-03-09T16:00:00.005Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: false,
+        bids: [],
+        asks: [{ price: 100.3, amount: 0.4 }],
+        timestamp: new Date('2024-03-09T16:00:00.005Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12066,21 +12150,22 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: false,
-      bids: [{ price: 99.6, amount: 0.8 }],
-      asks: [],
-      timestamp: new Date('2024-03-09T16:00:00.006Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: false,
+        bids: [{ price: 99.6, amount: 0.8 }],
+        asks: [],
+        timestamp: new Date('2024-03-09T16:00:00.006Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
@@ -12094,22 +12179,23 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_ticker',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      askAmount: 2.3,
-      askPrice: 100.1,
-      bidPrice: 99.9,
-      bidAmount: 1.2,
-      timestamp: new Date('2024-03-09T16:00:00.004Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        askAmount: 2.3,
+        askPrice: 100.1,
+        bidPrice: 99.9,
+        bidAmount: 1.2,
+        timestamp: new Date('2024-03-09T16:00:00.004Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
@@ -12123,27 +12209,28 @@ test('map mexc messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_ticker',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      askAmount: undefined,
-      askPrice: undefined,
-      bidPrice: 100,
-      bidAmount: 4,
-      timestamp: new Date('2024-03-09T16:00:00.005Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        askAmount: undefined,
+        askPrice: undefined,
+        bidPrice: 100,
+        bidAmount: 4,
+        timestamp: new Date('2024-03-09T16:00:00.005Z'),
+        localTimestamp
+      }
+    ]
+  )
 })
 
 test('map mexc buffered depth updates with omitted side', () => {
   const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
   const mapper = createMapper('mexc', localTimestamp)
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12160,10 +12247,11 @@ test('map mexc buffered depth updates with omitted side', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
@@ -12177,30 +12265,31 @@ test('map mexc buffered depth updates with omitted side', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: true,
-      bids: [{ price: 64520, amount: 1 }],
-      asks: [
-        { price: 64530, amount: 1 },
-        { price: 64526.18, amount: 0.32477055 },
-        { price: 64849.35, amount: 0.01209236 }
-      ],
-      timestamp: new Date('2026-06-18T00:00:00.000Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: true,
+        bids: [{ price: 64520, amount: 1 }],
+        asks: [
+          { price: 64530, amount: 1 },
+          { price: 64526.18, amount: 0.32477055 },
+          { price: 64849.35, amount: 0.01209236 }
+        ],
+        timestamp: new Date('2026-06-18T00:00:00.000Z'),
+        localTimestamp
+      }
+    ]
+  )
 })
 
 test('map mexc historical buffered depth updates without enforcing full sequence', () => {
   const localTimestamp = new Date('2026-06-18T00:00:00.000Z')
   const mapper = createMapper('mexc', localTimestamp)
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12214,10 +12303,11 @@ test('map mexc historical buffered depth updates without enforcing full sequence
         }
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12231,10 +12321,11 @@ test('map mexc historical buffered depth updates without enforcing full sequence
         }
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
@@ -12248,19 +12339,20 @@ test('map mexc historical buffered depth updates without enforcing full sequence
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: true,
-      bids: [{ price: 99, amount: 1 }],
-      asks: [{ price: 101, amount: 1 }],
-      timestamp: new Date('2026-06-18T00:00:00.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: true,
+        bids: [{ price: 99, amount: 1 }],
+        asks: [{ price: 101, amount: 1 }],
+        timestamp: new Date('2026-06-18T00:00:00.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 })
 
 test('map mexc realtime depth update throws when first update has no snapshot overlap', () => {
@@ -12282,29 +12374,31 @@ test('map mexc realtime depth update throws when first update has no snapshot ov
     localTimestamp
   )
 
-  expect(() =>
-    mapper.map(
-      {
-        channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
-        symbol: 'BTCUSDT',
-        sendTime: Date.now().toString(),
-        publicAggreDepths: {
-          asks: [{ price: '101', quantity: '1' }],
-          eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
-          fromVersion: '102',
-          toVersion: '102'
-        }
-      },
-      localTimestamp
-    )
-  ).toThrow('MEXC depth snapshot has no overlap with first update')
+  assert.throws(
+    () =>
+      mapper.map(
+        {
+          channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
+          symbol: 'BTCUSDT',
+          sendTime: Date.now().toString(),
+          publicAggreDepths: {
+            asks: [{ price: '101', quantity: '1' }],
+            eventType: 'spot@public.aggre.depth.v3.api.pb@10ms',
+            fromVersion: '102',
+            toVersion: '102'
+          }
+        },
+        localTimestamp
+      ),
+    errorMessageIncludes('MEXC depth snapshot has no overlap with first update')
+  )
 })
 
 test('map mexc live captured messages', () => {
   const localTimestamp = new Date('2026-06-23T09:46:45.000Z')
   const mapper = createMapper('mexc', localTimestamp)
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
@@ -12318,21 +12412,22 @@ test('map mexc live captured messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: true,
-      bids: [],
-      asks: [],
-      timestamp: new Date('2026-06-23T09:46:45.000Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: true,
+        bids: [],
+        asks: [],
+        timestamp: new Date('2026-06-23T09:46:45.000Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.depth.v3.api.pb@10ms@BTCUSDT',
@@ -12347,21 +12442,22 @@ test('map mexc live captured messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      isSnapshot: false,
-      bids: [{ price: 61759.73, amount: 0.0001778 }],
-      asks: [],
-      timestamp: new Date('2026-06-23T09:46:45.090Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        isSnapshot: false,
+        bids: [{ price: 61759.73, amount: 0.0001778 }],
+        asks: [],
+        timestamp: new Date('2026-06-23T09:46:45.090Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT',
@@ -12375,22 +12471,23 @@ test('map mexc live captured messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_ticker',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      askAmount: 0.09556,
-      askPrice: 62383.57,
-      bidPrice: 62383.56,
-      bidAmount: 0.07956651,
-      timestamp: new Date('2026-06-23T09:46:45.090Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_ticker',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        askAmount: 0.09556,
+        askPrice: 62383.57,
+        bidPrice: 62383.56,
+        bidAmount: 0.07956651,
+        timestamp: new Date('2026-06-23T09:46:45.090Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'spot@public.aggre.deals.v3.api.pb@10ms@BTCUSDT',
@@ -12408,71 +12505,72 @@ test('map mexc live captured messages', () => {
         }
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: undefined,
-      price: 62383.56,
-      amount: 0.00008235,
-      side: 'sell',
-      timestamp: new Date('2026-06-23T09:46:46.167Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: undefined,
-      price: 62383.57,
-      amount: 0.00019595,
-      side: 'buy',
-      timestamp: new Date('2026-06-23T09:46:46.167Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: undefined,
-      price: 62383.57,
-      amount: 0.00059353,
-      side: 'buy',
-      timestamp: new Date('2026-06-23T09:46:46.167Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: undefined,
-      price: 62383.56,
-      amount: 0.00027168,
-      side: 'sell',
-      timestamp: new Date('2026-06-23T09:46:46.168Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTCUSDT',
-      exchange: 'mexc',
-      id: undefined,
-      price: 62383.57,
-      amount: 0.00002555,
-      side: 'sell',
-      timestamp: new Date('2026-06-23T09:46:46.168Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: undefined,
+        price: 62383.56,
+        amount: 0.00008235,
+        side: 'sell',
+        timestamp: new Date('2026-06-23T09:46:46.167Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: undefined,
+        price: 62383.57,
+        amount: 0.00019595,
+        side: 'buy',
+        timestamp: new Date('2026-06-23T09:46:46.167Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: undefined,
+        price: 62383.57,
+        amount: 0.00059353,
+        side: 'buy',
+        timestamp: new Date('2026-06-23T09:46:46.167Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: undefined,
+        price: 62383.56,
+        amount: 0.00027168,
+        side: 'sell',
+        timestamp: new Date('2026-06-23T09:46:46.168Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTCUSDT',
+        exchange: 'mexc',
+        id: undefined,
+        price: 62383.57,
+        amount: 0.00002555,
+        side: 'sell',
+        timestamp: new Date('2026-06-23T09:46:46.168Z'),
+        localTimestamp
+      }
+    ]
+  )
 })
 
 test('map mexc futures messages', () => {
   const localTimestamp = new Date('2026-05-27T12:00:00.000Z')
   const mapper = createMapper('mexc-futures', localTimestamp)
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         symbol: 'BTC_USDT',
@@ -12502,33 +12600,34 @@ test('map mexc futures messages', () => {
         ts: 1755487578276
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'trade',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      id: '13064218826',
-      price: 115309.8,
-      amount: 55,
-      side: 'sell',
-      timestamp: new Date('2025-08-18T03:26:18.276Z'),
-      localTimestamp
-    },
-    {
-      type: 'trade',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      id: '13064218827',
-      price: 115309.8,
-      amount: 11,
-      side: 'buy',
-      timestamp: new Date('2025-08-18T03:26:18.275Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'trade',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        id: '13064218826',
+        price: 115309.8,
+        amount: 55,
+        side: 'sell',
+        timestamp: new Date('2025-08-18T03:26:18.276Z'),
+        localTimestamp
+      },
+      {
+        type: 'trade',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        id: '13064218827',
+        price: 115309.8,
+        amount: 11,
+        side: 'buy',
+        timestamp: new Date('2025-08-18T03:26:18.275Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.depth',
@@ -12542,10 +12641,11 @@ test('map mexc futures messages', () => {
         ts: 1587442022003
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.depth.snapshot',
@@ -12560,27 +12660,28 @@ test('map mexc futures messages', () => {
         symbol: 'BTC_USDT'
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      isSnapshot: true,
-      bids: [
-        { price: 6857.5, amount: 4 },
-        { price: 6858.5, amount: 42 }
-      ],
-      asks: [
-        { price: 6860.5, amount: 2 },
-        { price: 6859.5, amount: 3251 }
-      ],
-      timestamp: new Date('2020-04-21T04:07:01.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        isSnapshot: true,
+        bids: [
+          { price: 6857.5, amount: 4 },
+          { price: 6858.5, amount: 42 }
+        ],
+        asks: [
+          { price: 6860.5, amount: 2 },
+          { price: 6859.5, amount: 3251 }
+        ],
+        timestamp: new Date('2020-04-21T04:07:01.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.depth',
@@ -12593,21 +12694,22 @@ test('map mexc futures messages', () => {
         ts: 1587442023003
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      isSnapshot: false,
-      bids: [{ price: 6858.5, amount: 7 }],
-      asks: [],
-      timestamp: new Date('2020-04-21T04:07:03.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        isSnapshot: false,
+        bids: [{ price: 6858.5, amount: 7 }],
+        asks: [],
+        timestamp: new Date('2020-04-21T04:07:03.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.depth',
@@ -12622,21 +12724,22 @@ test('map mexc futures messages', () => {
         ts: 1587442022003
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'book_change',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      isSnapshot: false,
-      bids: [{ price: 6858.5, amount: 6 }],
-      asks: [{ price: 6860.5, amount: 0 }],
-      timestamp: new Date('2020-04-21T04:07:02.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'book_change',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        isSnapshot: false,
+        bids: [{ price: 6858.5, amount: 6 }],
+        asks: [{ price: 6860.5, amount: 0 }],
+        timestamp: new Date('2020-04-21T04:07:02.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.index.price',
@@ -12648,10 +12751,11 @@ test('map mexc futures messages', () => {
         ts: 1587442021003
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.fair.price',
@@ -12663,10 +12767,11 @@ test('map mexc futures messages', () => {
         ts: 1587442021503
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.ticker',
@@ -12694,25 +12799,26 @@ test('map mexc futures messages', () => {
         symbol: 'BTC_USDT'
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'derivative_ticker',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      lastPrice: 6865.5,
-      openInterest: 2284742,
-      fundingRate: undefined,
-      fundingTimestamp: undefined,
-      predictedFundingRate: undefined,
-      indexPrice: 6861.6,
-      markPrice: 6867.4,
-      timestamp: new Date('2020-04-21T04:07:02.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'derivative_ticker',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        lastPrice: 6865.5,
+        openInterest: 2284742,
+        fundingRate: undefined,
+        fundingTimestamp: undefined,
+        predictedFundingRate: undefined,
+        indexPrice: 6861.6,
+        markPrice: 6867.4,
+        timestamp: new Date('2020-04-21T04:07:02.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.funding.rate',
@@ -12725,10 +12831,11 @@ test('map mexc futures messages', () => {
         ts: 1587442022503
       },
       localTimestamp
-    )
-  ).toEqual([])
+    ),
+    []
+  )
 
-  expect(
+  assert.deepStrictEqual(
     mapper.map(
       {
         channel: 'push.ticker',
@@ -12754,23 +12861,24 @@ test('map mexc futures messages', () => {
         symbol: 'BTC_USDT'
       },
       localTimestamp
-    )
-  ).toEqual([
-    {
-      type: 'derivative_ticker',
-      symbol: 'BTC_USDT',
-      exchange: 'mexc-futures',
-      lastPrice: 6865.6,
-      openInterest: 2284743,
-      fundingRate: 0.0012,
-      fundingTimestamp: new Date('2020-04-21T05:00:00.000Z'),
-      predictedFundingRate: undefined,
-      indexPrice: 6861.7,
-      markPrice: 6867.5,
-      timestamp: new Date('2020-04-21T04:07:03.003Z'),
-      localTimestamp
-    }
-  ])
+    ),
+    [
+      {
+        type: 'derivative_ticker',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        lastPrice: 6865.6,
+        openInterest: 2284743,
+        fundingRate: 0.0012,
+        fundingTimestamp: new Date('2020-04-21T05:00:00.000Z'),
+        predictedFundingRate: undefined,
+        indexPrice: 6861.7,
+        markPrice: 6867.5,
+        timestamp: new Date('2020-04-21T04:07:03.003Z'),
+        localTimestamp
+      }
+    ]
+  )
 })
 
 test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
@@ -12793,23 +12901,25 @@ test('map mexc futures realtime depth update throws when first update has no sna
     localTimestamp
   )
 
-  expect(() =>
-    mapper.map(
-      {
-        channel: 'push.depth',
-        data: {
-          asks: [[101, 1, 1]],
-          bids: [],
-          begin: 102,
-          end: 102,
-          version: 102
+  assert.throws(
+    () =>
+      mapper.map(
+        {
+          channel: 'push.depth',
+          data: {
+            asks: [[101, 1, 1]],
+            bids: [],
+            begin: 102,
+            end: 102,
+            version: 102
+          },
+          symbol: 'BTC_USDT',
+          ts: Date.now()
         },
-        symbol: 'BTC_USDT',
-        ts: Date.now()
-      },
-      localTimestamp
-    )
-  ).toThrow('MEXC futures depth snapshot has no overlap with first update')
+        localTimestamp
+      ),
+    errorMessageIncludes('MEXC futures depth snapshot has no overlap with first update')
+  )
 })
 
 test('map polymarket messages', () => {
@@ -13077,6 +13187,6 @@ test('map polymarket messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
-    expect(mappedMessages).toMatchSnapshot()
+    snapshot(mappedMessages)
   }
 })

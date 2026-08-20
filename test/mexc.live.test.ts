@@ -1,8 +1,10 @@
+import { test } from 'node:test'
 import { normalizeBookChanges, normalizeBookTickers, normalizeTrades, streamNormalized } from '../dist/index.js'
-import { describeLive } from './live.js'
+import { assert } from './assertions.ts'
+import { describeLive } from './live.ts'
 
 describeLive('mexc live', () => {
-  test('streams normalized BTCUSDT data for all mappers', async () => {
+  test('streams normalized BTCUSDT data for all mappers', { timeout: 40_000 }, async () => {
     const messages = streamNormalized(
       {
         exchange: 'mexc',
@@ -58,12 +60,12 @@ describeLive('mexc live', () => {
       await messages.return?.()
     }
 
-    expect(sawDisconnect).toBe(false)
-    expect(seen).toEqual({
+    assert.strictEqual(sawDisconnect, false)
+    assert.deepStrictEqual(seen, {
       trade: true,
       bookSnapshot: true,
       bookDelta: true,
       bookTicker: true
     })
-  }, 40_000)
+  })
 })

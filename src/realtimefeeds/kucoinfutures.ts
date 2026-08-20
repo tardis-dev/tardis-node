@@ -77,6 +77,9 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
       }
 
       const { data } = await getJSON<any>(`${this._httpURL}/v1/level2/snapshot?symbol=${symbol}`, kucoinHttpOptions)
+      if (shouldCancel()) {
+        return
+      }
 
       const snapshot = {
         type: 'message',

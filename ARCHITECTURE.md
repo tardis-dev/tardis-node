@@ -24,13 +24,13 @@ Main Thread                         Worker Thread
   Yield {localTimestamp, message}       │
 ```
 
-Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename.
+Worker thread pre-fetches and caches slices while the main thread processes the current one. This keeps I/O and CPU pipelined. Normal replay fetches the first and last minute as one-minute requests, uses the returned suggested slice size for the middle of the range, and caches multi-minute responses as start-minute files with a `.size-{minutes}` suffix. One-minute cache paths keep the legacy filename. Zstandard responses always use the standard `.zst` suffix. Until Node.js natively streams concatenated frames, replay finds each frame from the standard Zstandard frame and block headers and streams the bounded frames through the built-in decoder one at a time.
 
 `replay()` decodes one line batch at a time and still yields individual public messages in order. `replayNormalized()` consumes the same internal line batches directly, avoiding an intermediate per-message raw iterator while keeping mapper invocation lazy. This preserves async-iterator backpressure for built-in and custom normalizers while the stream's high-water mark keeps splitter read-ahead small.
 
 ## Real-time Streaming
 
-`RealTimeFeedBase` manages WebSocket connections to exchanges. Handles connection lifecycle (connect, subscribe, validate, reconnect on failure). Exchange-specific feeds extend the base class with subscription formats and message handling.
+`RealTimeFeedBase` manages WebSocket connections to exchanges. Handles connection lifecycle (connect, subscribe, validate, reconnect on failure). Exchange-specific feeds extend the base class with subscription formats and message handling. Breaking real-time iteration or calling its standard `return()` closes the underlying feeds before finishing iterator cleanup, including quiet feeds whose `next()` is still pending.
 
 ## Mapper System
 
@@ -40,9 +40,9 @@ Some exchanges have date-based mapper versioning through `mapper()` entries — 
 
 ## Key Abstractions
 
-- **`combine()`** — Merges multiple async iterables into one, ordered by timestamp. Enables cross-exchange data feeds.
+- **`combine()`** — Merges multiple async iterables into one. Historical streams are ordered by local timestamp. Real-time inputs must all be managed Tardis iterators from `stream()` or `streamNormalized()`, optionally passed through `compute()` or `combine()`; they are emitted as they arrive. Do not mix historical and real-time inputs.
 - **`compute()`** — Wraps an async iterable and produces derived data (book snapshots, trade bars) via computables.
-- **`OrderBook`** — Full limit order book reconstruction from incremental updates, using a Red-Black Tree for efficient price level management.
+- **`OrderBook`** — Full limit order book reconstruction from incremental updates, using sorted price-level pages for efficient lookup, updates, and top-of-book iteration.
 
 ## Configuration
 

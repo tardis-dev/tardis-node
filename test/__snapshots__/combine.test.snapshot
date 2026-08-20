@@ -1,0 +1,61 @@
+exports[`combine(...asyncIterators) > should correctly combine iterables based on localTimestamp value 1`] = `
+[
+  {
+    "localTimestamp": "2019-08-01T00:52:00.132Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T00:52:00.133Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:52:00.132Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:53:00.130Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:53:00.130Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:53:00.131Z"
+  }
+]
+`;
+
+exports[`combine(...asyncIterators) > should correctly combine iterables based on localTimestamp value 2`] = `
+[
+  {
+    "localTimestamp": "2019-08-01T00:52:00.102Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T00:52:00.132Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T00:52:00.133Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T00:53:00.130Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:53:00.130Z"
+  },
+  {
+    "localTimestamp": "2019-08-01T08:53:00.131Z"
+  },
+  {
+    "localTimestamp": "2019-08-02T08:53:00.131Z"
+  }
+]
+`;
+
+exports[`combine(...asyncIterators) > should correctly combine iterables based on localTimestamp value 3`] = `
+[
+  {
+    "localTimestamp": "2019-08-01T00:52:00.102102Z",
+    "name": "iter2"
+  },
+  {
+    "localTimestamp": "2019-08-01T00:52:00.102202Z",
+    "name": "iter1"
+  }
+]
+`;
