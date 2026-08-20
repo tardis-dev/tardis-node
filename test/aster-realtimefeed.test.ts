@@ -2,7 +2,7 @@ import type { AddressInfo } from 'net'
 import { createServer } from 'http'
 import { test } from 'node:test'
 import { assert, errorMessageIncludes } from './assertions.ts'
-import { AsterFuturesRealTimeFeed, AsterRealTimeFeed } from '../dist/realtimefeeds/aster.js'
+import { AsterFuturesWebSocketRealTimeFeed, AsterRealTimeFeed } from '../dist/realtimefeeds/aster.js'
 import { getRealTimeFeedFactory } from '../dist/realtimefeeds/index.js'
 import type { Filter } from '../dist/types.js'
 
@@ -33,14 +33,14 @@ class TestAsterRealTimeFeed extends AsterRealTimeFeed {
   }
 }
 
-class TestAsterFuturesRealTimeFeed extends AsterFuturesRealTimeFeed {
+class TestAsterFuturesRealTimeFeed extends AsterFuturesWebSocketRealTimeFeed {
   protected readonly httpURL: string
 
   constructor(
     exchange: 'aster-futures',
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    httpURL = 'https://fapi.asterdex.com/fapi/v1'
+    httpURL = 'https://fapi.asterdex.com/fapi/v3'
   ) {
     super(exchange, filters, timeoutIntervalMS)
     this.httpURL = httpURL
@@ -166,29 +166,47 @@ test('map aster futures realtime subscriptions', () => {
         symbols: ['btcusdt']
       },
       {
+        channel: 'trade',
+        symbols: ['btcusdt']
+      },
+      {
         channel: 'markPrice',
         symbols: ['btcusdt']
       },
       {
         channel: 'forceOrder',
         symbols: ['btcusdt']
+      },
+      {
+        channel: 'assetIndex',
+        symbols: ['btcusd']
       }
     ]),
     [
       {
         method: 'SUBSCRIBE',
-        params: ['btcusdt@depth@100ms'],
+        params: ['btcusdt@depth@0ms'],
         id: 1
       },
       {
         method: 'SUBSCRIBE',
-        params: ['btcusdt@markPrice@1s'],
+        params: ['btcusdt@trade'],
         id: 2
       },
       {
         method: 'SUBSCRIBE',
-        params: ['btcusdt@forceOrder'],
+        params: ['btcusdt@markPrice@1s'],
         id: 3
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@forceOrder'],
+        id: 4
+      },
+      {
+        method: 'SUBSCRIBE',
+        params: ['btcusd@assetIndex'],
+        id: 5
       }
     ]
   )
@@ -292,7 +310,9 @@ test('retry aster futures manual depth snapshots until first update overlaps', a
     ]
 
     feed.map(filters)
-    feed.observe(createDepthUpdate({ symbol: 'BTCUSDT', firstUpdateId: 105, lastUpdateId: 105, previousFinalUpdateId: 106 }))
+    feed.observe(
+      createDepthUpdate({ symbol: 'BTCUSDT', firstUpdateId: 105, lastUpdateId: 105, previousFinalUpdateId: 106, stream: 'depth@0ms' })
+    )
 
     const snapshots = await feed.provideSnapshots(filters)
 
@@ -317,15 +337,17 @@ function createDepthUpdate({
   symbol,
   firstUpdateId,
   lastUpdateId,
-  previousFinalUpdateId
+  previousFinalUpdateId,
+  stream = 'depth@100ms'
 }: {
   symbol: string
   firstUpdateId?: number
   lastUpdateId: number
   previousFinalUpdateId: number
+  stream?: string
 }) {
   return {
-    stream: `${symbol.toLowerCase()}@depth@100ms`,
+    stream: `${symbol.toLowerCase()}@${stream}`,
     data: {
       e: 'depthUpdate',
       E: 1785230774524,

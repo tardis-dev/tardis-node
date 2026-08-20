@@ -1,5 +1,6 @@
 import { debug } from '../debug.ts'
 import { asNumberOrUndefined, CircularBuffer, lowerCaseSymbols } from '../handy.ts'
+import type { AsterFuturesOpenInterestData } from '../realtimefeeds/aster.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -27,19 +28,19 @@ function shouldIgnoreBookSnapshotOverlap(date?: Date) {
 
 class AsterFuturesTradesMapper implements Mapper<'aster-futures', Trade> {
   canHandle(message: AsterFuturesMessage<any>) {
-    return message.stream?.endsWith('@aggTrade') === true
+    return message.stream?.endsWith('@trade') === true || message.stream?.endsWith('@aggTrade') === true
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'aggTrade', symbols: lowerCaseSymbols(symbols) } as const]
+    return [{ channel: 'trade', symbols: lowerCaseSymbols(symbols) } as const]
   }
 
-  *map({ data }: AsterFuturesMessage<AsterFuturesAggTradeData>, localTimestamp: Date) {
+  *map({ data }: AsterFuturesMessage<AsterFuturesTradeData | AsterFuturesAggTradeData>, localTimestamp: Date) {
     const trade: Trade = {
       type: 'trade',
       symbol: data.s,
       exchange: 'aster-futures',
-      id: String(data.a),
+      id: String(data.e === 'trade' ? data.t : data.a),
       price: Number(data.p),
       amount: Number(data.q),
       side: data.m ? 'sell' : 'buy',
@@ -193,37 +194,47 @@ class AsterFuturesDerivativeTickerMapper implements Mapper<'aster-futures', Deri
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: AsterFuturesMessage<any>) {
-    return message.stream?.includes('@markPrice') === true || message.stream?.endsWith('@ticker') === true
+    return (
+      message.stream?.includes('@markPrice') === true ||
+      message.stream?.endsWith('@ticker') === true ||
+      message.stream?.endsWith('@openInterest') === true
+    )
   }
 
   getFilters(symbols?: string[]) {
     return [
       { channel: 'markPrice', symbols: lowerCaseSymbols(symbols) } as const,
-      { channel: 'ticker', symbols: lowerCaseSymbols(symbols) } as const
+      { channel: 'ticker', symbols: lowerCaseSymbols(symbols) } as const,
+      { channel: 'openInterest', symbols: lowerCaseSymbols(symbols) } as const
     ]
   }
 
   *map(
-    message: AsterFuturesMessage<AsterFuturesMarkPriceData | AsterFuturesTickerData>,
+    { data }: AsterFuturesMessage<AsterFuturesMarkPriceData | AsterFuturesTickerData | AsterFuturesOpenInterestData>,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
-    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.data.s, 'aster-futures')
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo('s' in data ? data.s : data.symbol, 'aster-futures')
 
-    if (message.data.e === 'markPriceUpdate') {
-      pendingTickerInfo.updateMarkPrice(Number(message.data.p))
-      if (message.data.i !== undefined) {
-        pendingTickerInfo.updateIndexPrice(Number(message.data.i))
+    if ('e' in data) {
+      if (data.e === 'markPriceUpdate') {
+        pendingTickerInfo.updateMarkPrice(Number(data.p))
+        if (data.i !== undefined) {
+          pendingTickerInfo.updateIndexPrice(Number(data.i))
+        }
+        if (data.r !== '' && data.T !== 0) {
+          pendingTickerInfo.updateFundingRate(Number(data.r))
+          pendingTickerInfo.updateFundingTimestamp(new Date(data.T))
+        }
+        pendingTickerInfo.updateTimestamp(new Date(data.E))
       }
-      if (message.data.r !== '' && message.data.T !== 0) {
-        pendingTickerInfo.updateFundingRate(Number(message.data.r))
-        pendingTickerInfo.updateFundingTimestamp(new Date(message.data.T))
-      }
-      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
-    }
 
-    if (message.data.e === '24hrTicker') {
-      pendingTickerInfo.updateLastPrice(Number(message.data.c))
-      pendingTickerInfo.updateTimestamp(new Date(message.data.E))
+      if (data.e === '24hrTicker') {
+        pendingTickerInfo.updateLastPrice(Number(data.c))
+        pendingTickerInfo.updateTimestamp(new Date(data.E))
+      }
+    } else if ('openInterest' in data) {
+      pendingTickerInfo.updateOpenInterest(Number(data.openInterest))
+      pendingTickerInfo.updateTimestamp(new Date(data.time))
     }
 
     if (pendingTickerInfo.hasChanged()) {
@@ -303,6 +314,17 @@ type AsterFuturesAggTradeData = {
   q: string
   f: number
   l: number
+  T: number
+  m: boolean
+}
+
+type AsterFuturesTradeData = {
+  e: 'trade'
+  E: number
+  s: string
+  t: number
+  p: string
+  q: string
   T: number
   m: boolean
 }

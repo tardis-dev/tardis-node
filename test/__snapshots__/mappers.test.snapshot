@@ -3806,6 +3806,54 @@ exports[`mappers > map aster futures messages 1`] = `
     "type": "trade",
     "symbol": "BTCUSDT",
     "exchange": "aster-futures",
+    "id": "181350",
+    "price": 10224.5,
+    "amount": 0.125,
+    "side": "sell",
+    "timestamp": "2019-09-17T04:05:03.462Z",
+    "localTimestamp": "2026-08-03T10:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster futures messages 10`] = `
+[
+  {
+    "type": "liquidation",
+    "symbol": "BTCUSDT",
+    "exchange": "aster-futures",
+    "id": undefined,
+    "price": 4793.91,
+    "amount": 0.014,
+    "side": "buy",
+    "timestamp": "2020-03-13T00:23:51.421Z",
+    "localTimestamp": "2026-08-03T10:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster futures messages 11`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "BTCUSDT",
+    "exchange": "aster-futures",
+    "askAmount": 0.38,
+    "askPrice": 33139.39,
+    "bidPrice": 33134.42,
+    "bidAmount": 0.17,
+    "timestamp": "2021-02-01T00:00:03.571Z",
+    "localTimestamp": "2026-08-03T10:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster futures messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "BTCUSDT",
+    "exchange": "aster-futures",
     "id": "181349",
     "price": 10223.74,
     "amount": 0.236,
@@ -3816,11 +3864,30 @@ exports[`mappers > map aster futures messages 1`] = `
 ]
 `;
 
-exports[`mappers > map aster futures messages 2`] = `
+exports[`mappers > map aster futures messages 3`] = `
 []
 `;
 
-exports[`mappers > map aster futures messages 3`] = `
+exports[`mappers > map aster futures messages 4`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSDT",
+    "exchange": "aster-futures",
+    "lastPrice": undefined,
+    "openInterest": 6196.323,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": undefined,
+    "markPrice": undefined,
+    "timestamp": "2026-08-18T13:31:54.451Z",
+    "localTimestamp": "2026-08-03T10:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map aster futures messages 5`] = `
 [
   {
     "type": "book_change",
@@ -3849,7 +3916,7 @@ exports[`mappers > map aster futures messages 3`] = `
 ]
 `;
 
-exports[`mappers > map aster futures messages 4`] = `
+exports[`mappers > map aster futures messages 6`] = `
 [
   {
     "type": "book_change",
@@ -3869,7 +3936,7 @@ exports[`mappers > map aster futures messages 4`] = `
 ]
 `;
 
-exports[`mappers > map aster futures messages 5`] = `
+exports[`mappers > map aster futures messages 7`] = `
 [
   {
     "type": "book_change",
@@ -3889,7 +3956,7 @@ exports[`mappers > map aster futures messages 5`] = `
 ]
 `;
 
-exports[`mappers > map aster futures messages 6`] = `
+exports[`mappers > map aster futures messages 8`] = `
 [
   {
     "type": "derivative_ticker",
@@ -3908,7 +3975,7 @@ exports[`mappers > map aster futures messages 6`] = `
 ]
 `;
 
-exports[`mappers > map aster futures messages 7`] = `
+exports[`mappers > map aster futures messages 9`] = `
 [
   {
     "type": "derivative_ticker",
@@ -3922,38 +3989,6 @@ exports[`mappers > map aster futures messages 7`] = `
     "indexPrice": 11851.86949091,
     "markPrice": 11857.56,
     "timestamp": "2020-08-16T00:00:08.000Z",
-    "localTimestamp": "2026-08-03T10:00:00.000Z"
-  }
-]
-`;
-
-exports[`mappers > map aster futures messages 8`] = `
-[
-  {
-    "type": "liquidation",
-    "symbol": "BTCUSDT",
-    "exchange": "aster-futures",
-    "id": undefined,
-    "price": 4793.91,
-    "amount": 0.014,
-    "side": "buy",
-    "timestamp": "2020-03-13T00:23:51.421Z",
-    "localTimestamp": "2026-08-03T10:00:00.000Z"
-  }
-]
-`;
-
-exports[`mappers > map aster futures messages 9`] = `
-[
-  {
-    "type": "book_ticker",
-    "symbol": "BTCUSDT",
-    "exchange": "aster-futures",
-    "askAmount": 0.38,
-    "askPrice": 33139.39,
-    "bidPrice": 33134.42,
-    "bidAmount": 0.17,
-    "timestamp": "2021-02-01T00:00:03.571Z",
     "localTimestamp": "2026-08-03T10:00:00.000Z"
   }
 ]

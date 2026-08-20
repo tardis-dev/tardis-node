@@ -2977,6 +2977,31 @@ describe('mappers', () => {
     const asterFuturesMapper = createMapper('aster-futures', new Date())
     const localTimestamp = new Date('2026-08-03T10:00:00.000Z')
 
+    assert.deepEqual(normalizeTrades('aster-futures', localTimestamp).getFilters(['BTCUSDT']), [{ channel: 'trade', symbols: ['btcusdt'] }])
+    assert.deepEqual(normalizeDerivativeTickers('aster-futures', localTimestamp).getFilters(['BTCUSDT']), [
+      { channel: 'markPrice', symbols: ['btcusdt'] },
+      { channel: 'ticker', symbols: ['btcusdt'] },
+      { channel: 'openInterest', symbols: ['btcusdt'] }
+    ])
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@trade',
+          data: {
+            e: 'trade',
+            E: 1568693103463,
+            s: 'BTCUSDT',
+            t: 181350,
+            p: '10224.50',
+            q: '0.125',
+            T: 1568693103462,
+            m: true
+          }
+        },
+        localTimestamp
+      )
+    )
+
     snapshot(
       asterFuturesMapper.map(
         {
@@ -3018,6 +3043,22 @@ describe('mappers', () => {
       )
     )
 
+    const asterFuturesOpenInterestMapper = createMapper('aster-futures', new Date())
+    snapshot(
+      asterFuturesOpenInterestMapper.map(
+        {
+          stream: 'btcusdt@openInterest',
+          generated: true,
+          data: {
+            symbol: 'BTCUSDT',
+            openInterest: '6196.323',
+            time: 1787059914451
+          }
+        },
+        localTimestamp
+      )
+    )
+
     snapshot(
       asterFuturesMapper.map(
         {
@@ -3052,7 +3093,7 @@ describe('mappers', () => {
     snapshot(
       asterFuturesOverlapEdgeMapper.map(
         {
-          stream: 'ethusdt@depth@100ms',
+          stream: 'ethusdt@depth@0ms',
           data: {
             e: 'depthUpdate',
             E: 1573948821952,
@@ -3072,7 +3113,7 @@ describe('mappers', () => {
     snapshot(
       asterFuturesMapper.map(
         {
-          stream: 'btcusdt@depth@100ms',
+          stream: 'btcusdt@depth@0ms',
           data: {
             e: 'depthUpdate',
             E: 1573948822952,
