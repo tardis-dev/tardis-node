@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'aster-futures',
   'bitmex',
   'binance-futures',
   'bitfinex-derivatives',
@@ -45,6 +46,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithBookTickerInfo: Exchange[] = [
   'aster',
+  'aster-futures',
   'ascendex',
   'binance',
   'binance-futures',
@@ -102,6 +104,7 @@ const exchangesWithOptionsSummary: Exchange[] = [
 ]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
+  'aster-futures',
   'ftx',
   'bitmex',
   'deribit',
@@ -2969,6 +2972,238 @@ describe('mappers', () => {
       )
     )
   })
+
+  test('map aster futures messages', () => {
+    const asterFuturesMapper = createMapper('aster-futures', new Date())
+    const localTimestamp = new Date('2026-08-03T10:00:00.000Z')
+
+    assert.deepEqual(normalizeTrades('aster-futures', localTimestamp).getFilters(['BTCUSDT']), [{ channel: 'trade', symbols: ['btcusdt'] }])
+    assert.deepEqual(normalizeDerivativeTickers('aster-futures', localTimestamp).getFilters(['BTCUSDT']), [
+      { channel: 'markPrice', symbols: ['btcusdt'] },
+      { channel: 'ticker', symbols: ['btcusdt'] },
+      { channel: 'openInterest', symbols: ['btcusdt'] }
+    ])
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@trade',
+          data: {
+            e: 'trade',
+            E: 1568693103463,
+            s: 'BTCUSDT',
+            t: 181350,
+            p: '10224.50',
+            q: '0.125',
+            T: 1568693103462,
+            m: true
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@aggTrade',
+          data: {
+            e: 'aggTrade',
+            E: 1568693103463,
+            s: 'BTCUSDT',
+            a: 181349,
+            p: '10223.74',
+            q: '0.236',
+            f: 181349,
+            l: 181349,
+            T: 1568693103463,
+            m: false
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948821952,
+            T: 1573948821948,
+            s: 'BTCUSDT',
+            U: 687687944,
+            u: 687687946,
+            pu: 687687943,
+            b: [['8493.78', '0.162']],
+            a: [['4096.00000000', '2.42541900']]
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    const asterFuturesOpenInterestMapper = createMapper('aster-futures', new Date())
+    snapshot(
+      asterFuturesOpenInterestMapper.map(
+        {
+          stream: 'btcusdt@openInterest',
+          generated: true,
+          data: {
+            symbol: 'BTCUSDT',
+            openInterest: '6196.323',
+            time: 1787059914451
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 687687945,
+            bids: [['8488.36', '1.501']],
+            asks: [['4096.00000000', '1.42541900']]
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    const asterFuturesOverlapEdgeMapper = createMapper('aster-futures', new Date())
+    assert.equal(
+      asterFuturesOverlapEdgeMapper.map(
+        {
+          stream: 'ethusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 200,
+            bids: [['10', '1']],
+            asks: [['11', '2']]
+          }
+        },
+        localTimestamp
+      ).length,
+      1
+    )
+    snapshot(
+      asterFuturesOverlapEdgeMapper.map(
+        {
+          stream: 'ethusdt@depth@0ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948821952,
+            T: 1573948821948,
+            s: 'ETHUSDT',
+            U: 199,
+            u: 200,
+            pu: 198,
+            b: [['10', '3']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@depth@0ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948822952,
+            T: 1573948822948,
+            s: 'BTCUSDT',
+            U: 687687947,
+            u: 687687948,
+            pu: 687687946,
+            b: [['8493.78', '0']],
+            a: []
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@markPrice@1s',
+          data: {
+            e: 'markPriceUpdate',
+            E: 1597536008000,
+            s: 'BTCUSDT',
+            p: '11857.56000000',
+            i: '11851.86949091',
+            r: '0.00015640',
+            T: 1597564800000
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@ticker',
+          data: { e: '24hrTicker', E: 1568693103467, s: 'BTCUSDT', c: '10223.74' }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@forceOrder',
+          data: {
+            e: 'forceOrder',
+            E: 1584059031426,
+            o: {
+              s: 'BTCUSDT',
+              S: 'BUY',
+              o: 'LIMIT',
+              f: 'IOC',
+              q: '0.014',
+              p: '4793.91',
+              ap: '4706.04',
+              X: 'FILLED',
+              l: '0.015',
+              z: '0.014',
+              T: 1584059031421
+            }
+          }
+        },
+        localTimestamp
+      )
+    )
+
+    snapshot(
+      asterFuturesMapper.map(
+        {
+          stream: 'btcusdt@bookTicker',
+          data: {
+            e: 'bookTicker',
+            u: 185130926750,
+            s: 'BTCUSDT',
+            b: '33134.42',
+            B: '0.170',
+            a: '33139.39',
+            A: '0.380',
+            E: 1612137603571
+          }
+        },
+        localTimestamp
+      )
+    )
+  })
+
   test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
     const bitfinexDerivativesMapper = createMapper('bitfinex-derivatives')
     const mappedMessages = bitfinexDerivativesMapper.map(

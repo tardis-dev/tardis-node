@@ -1,16 +1,17 @@
+import { Writable } from 'stream'
 import { batch, CircularBuffer, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 export class AsterRealTimeFeed extends RealTimeFeedBase {
-  private static readonly depthChannel = 'depth'
-  private static readonly depthSnapshotChannel = 'depthSnapshot'
-  private static readonly depthStream = 'depth@100ms'
+  protected static readonly depthChannel = 'depth'
+  protected static readonly depthSnapshotChannel = 'depthSnapshot'
+  protected readonly depthStream: string = 'depth@100ms'
   private readonly pendingDepthSnapshotSymbols = new Set<string>()
   private readonly bufferedDepthUpdates = new Map<string, CircularBuffer<AsterDepthUpdateData>>()
   protected readonly wssURL: string = 'wss://sstream.asterdex.com/stream'
   protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
-  private readonly channels = new Set([
+  protected readonly channels = new Set([
     'trade',
     'aggTrade',
     'ticker',
@@ -18,8 +19,8 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
     AsterRealTimeFeed.depthSnapshotChannel,
     'bookTicker'
   ])
-  private readonly channelMappings: { [key: string]: string | undefined } = {
-    [AsterRealTimeFeed.depthChannel]: AsterRealTimeFeed.depthStream
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
+    [AsterRealTimeFeed.depthChannel]: this.depthStream
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -67,7 +68,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected override onMessage(message: any) {
-    if (message.stream?.endsWith(`@${AsterRealTimeFeed.depthStream}`) !== true || message.data?.s === undefined) {
+    if (message.stream?.endsWith(`@${this.depthStream}`) !== true || message.data?.s === undefined) {
       return
     }
 
@@ -76,6 +77,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
+    const firstUpdateId = Number(message.data.U)
     const lastUpdateId = Number(message.data.u)
     const previousFinalUpdateId = Number(message.data.pu)
     if (Number.isFinite(lastUpdateId) === false || Number.isFinite(previousFinalUpdateId) === false) {
@@ -84,6 +86,7 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 
     const bufferedUpdates = this.bufferedDepthUpdates.get(symbol) ?? new CircularBuffer<AsterDepthUpdateData>(2000)
     bufferedUpdates.append({
+      firstUpdateId: Number.isFinite(firstUpdateId) ? firstUpdateId : undefined,
       lastUpdateId,
       previousFinalUpdateId
     })
@@ -265,6 +268,105 @@ type AsterDepthSnapshotMessage = {
 }
 
 type AsterDepthUpdateData = {
+  firstUpdateId?: number
   lastUpdateId: number
   previousFinalUpdateId: number
+}
+
+export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    const webSocketFilters = filters.filter((filter) => filter.channel !== 'openInterest')
+    if (webSocketFilters.length > 0) {
+      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError)
+    }
+
+    const openInterestFilters = filters.filter((filter) => filter.channel === 'openInterest')
+    if (openInterestFilters.length > 0) {
+      for (const filter of openInterestFilters) {
+        if (!filter.symbols || filter.symbols.length === 0) {
+          throw new Error('AsterFuturesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+        }
+      }
+
+      yield new AsterFuturesOpenInterestClient(
+        exchange,
+        'https://fapi.asterdex.com/fapi/v3',
+        openInterestFilters.flatMap((filter) => filter.symbols!),
+        onError
+      )
+    }
+  }
+}
+
+export class AsterFuturesWebSocketRealTimeFeed extends AsterRealTimeFeed {
+  protected readonly wssURL: string = 'wss://fstream.asterdex.com/stream'
+  protected readonly httpURL: string = 'https://fapi.asterdex.com/fapi/v3'
+  protected readonly depthStream = 'depth@0ms'
+  protected readonly channels = new Set([
+    'trade',
+    'aggTrade',
+    'ticker',
+    AsterRealTimeFeed.depthChannel,
+    AsterRealTimeFeed.depthSnapshotChannel,
+    'markPrice',
+    'forceOrder',
+    'bookTicker',
+    'assetIndex'
+  ])
+  protected readonly channelMappings: { [key: string]: string | undefined } = {
+    [AsterRealTimeFeed.depthChannel]: this.depthStream,
+    markPrice: 'markPrice@1s'
+  }
+
+  protected override validateSnapshotOverlap(bufferedUpdates: CircularBuffer<AsterDepthUpdateData> | undefined, lastUpdateId: number) {
+    for (const update of bufferedUpdates?.items() ?? []) {
+      if (update.lastUpdateId < lastUpdateId) {
+        continue
+      }
+
+      return (
+        (update.firstUpdateId !== undefined && update.firstUpdateId <= lastUpdateId && update.lastUpdateId >= lastUpdateId) ||
+        update.previousFinalUpdateId === lastUpdateId
+      )
+    }
+
+    return undefined
+  }
+}
+
+class AsterFuturesOpenInterestClient extends PoolingClientBase {
+  constructor(
+    exchange: string,
+    private readonly httpURL: string,
+    private readonly instruments: string[],
+    onError?: (error: Error) => void
+  ) {
+    super(exchange, 6, onError)
+  }
+
+  protected async poolDataToStream(outputStream: Writable) {
+    for (const instrument of this.instruments) {
+      if (outputStream.destroyed) {
+        return
+      }
+
+      const response = await getJSON<AsterFuturesOpenInterestData>(`${this.httpURL}/openInterest?symbol=${instrument.toLowerCase()}`, {
+        timeout: 2500
+      })
+
+      if (outputStream.writable) {
+        outputStream.write({
+          stream: `${instrument.toLowerCase()}@openInterest`,
+          generated: true,
+          data: response.data
+        })
+      }
+    }
+  }
+}
+
+export type AsterFuturesOpenInterestData = {
+  symbol: string
+  openInterest: string
+  time: number
 }
