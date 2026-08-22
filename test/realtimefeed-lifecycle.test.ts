@@ -7,6 +7,7 @@ import { assert } from './assertions.ts'
 import { combine, compute, normalizeLiquidations, normalizeTrades, streamNormalized } from '../dist/index.js'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from '../dist/realtimefeeds/realtimefeed.js'
 import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from '../dist/realtimeiterator.js'
+import { HttpClientError } from '../dist/handy.js'
 
 test('return and async disposal are idempotent and prevent a source from starting', async () => {
   let starts = 0
@@ -342,6 +343,62 @@ test('return does not wait for WebSocket URL discovery', async () => {
   }
 })
 
+test('backs off after an HTTP 418 snapshot error and cancels the wait when closed', async () => {
+  const server = new WebSocketServer({ host: '127.0.0.1', port: 0 })
+  await once(server, 'listening')
+
+  const address = server.address()
+  assert.ok(address !== null && typeof address === 'object')
+
+  const sockets = new Set<WebSocket>()
+  let connections = 0
+  server.on('connection', (socket) => {
+    sockets.add(socket)
+    connections++
+    const connection = connections
+    const messages = setInterval(() => {
+      if (socket.readyState === 1) {
+        socket.send(JSON.stringify({ connection }))
+      }
+    }, 20)
+    socket.once('close', () => {
+      clearInterval(messages)
+      sockets.delete(socket)
+    })
+    socket.send(JSON.stringify({ connection }))
+  })
+
+  const feed = new RateLimitedSnapshotRealTimeFeed(`ws://127.0.0.1:${address.port}`)
+  const iterator = feed[Symbol.asyncIterator]()
+  let pendingReconnect: PromiseLike<IteratorResult<any>> | undefined
+
+  try {
+    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { connection: 1 })
+    await waitFor(() => feed.snapshotCalls === 1, 2000)
+
+    let message: IteratorResult<any>
+    do {
+      message = await withTimeout(iterator.next())
+    } while (message.value?.__disconnect__ !== true)
+
+    pendingReconnect = iterator.next()
+    await sleep(1100)
+    assert.strictEqual(connections, 1)
+
+    await withTimeout(iterator.return(), 500)
+    assert.deepStrictEqual(await withTimeout(pendingReconnect), { done: true, value: undefined })
+  } finally {
+    try {
+      await withTimeout(iterator.return())
+    } finally {
+      for (const socket of sockets) {
+        socket.terminate()
+      }
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+    }
+  }
+})
+
 class TestMultiConnectionFeed extends MultiConnectionRealTimeFeedBase {
   private readonly feeds: Array<ControlledFeed | ControlledPollingFeed>
 
@@ -499,6 +556,29 @@ class TestSnapshotRealTimeFeed extends RealTimeFeedBase {
       this.manualSnapshotsBuffer.push({ oldSnapshot: true })
     }
     this.firstSnapshotFinished = true
+  }
+}
+
+class RateLimitedSnapshotRealTimeFeed extends RealTimeFeedBase {
+  protected readonly wssURL: string
+  snapshotCalls = 0
+
+  constructor(wssURL: string) {
+    super('test', [], undefined)
+    this.wssURL = wssURL
+  }
+
+  protected mapToSubscribeMessages() {
+    return []
+  }
+
+  protected messageIsError() {
+    return false
+  }
+
+  protected async provideManualSnapshots() {
+    this.snapshotCalls++
+    throw new HttpClientError({ statusCode: 418, headers: {}, body: 'IP banned' }, 'GET', 'https://exchange.test/depth')
   }
 }
 

@@ -3,7 +3,7 @@ import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { createDebug, type DebugLogger } from '../debug.ts'
-import { getProxyAgent, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
+import { getProxyAgent, HttpClientError, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
 import { createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
 
@@ -220,8 +220,15 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
         retries++
 
         const MAX_DELAY = 32 * 1000
-        const isRateLimited = connectionError.message.includes('429')
-        retryDelay = isRateLimited ? (MAX_DELAY / 2) * retries : Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
+        const httpError = connectionError instanceof HttpClientError ? connectionError : undefined
+        const isRateLimited = httpError?.status === 418 || httpError?.status === 429 || connectionError.message.includes('429')
+
+        if (isRateLimited) {
+          const fallbackDelay = httpError?.status === 418 ? 2 * 60 * 1000 : (MAX_DELAY / 2) * retries
+          retryDelay = httpError?.retryAfterMS ?? fallbackDelay
+        } else {
+          retryDelay = Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
+        }
 
         this.debug(
           '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
@@ -373,7 +380,9 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     } catch (e) {
       this.debug('(connection id: %d) providing manual snapshots error: %o', connection.id, e)
       if (this._isConnectionOpen(connection)) {
+        // createWebSocketStream propagates a manually emitted error only after the WebSocket closes.
         connection.ws.emit('error', e)
+        connection.ws.terminate()
       }
     }
   }

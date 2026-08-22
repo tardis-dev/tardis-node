@@ -76,13 +76,18 @@ export class HttpError extends Error {
   }
 }
 
-class HttpClientError extends Error {
+export class HttpClientError extends Error {
+  public readonly status: number
+  public readonly retryAfterMS: number | undefined
+
   constructor(
     public readonly response: HttpResponse,
     public readonly method: string,
     public readonly url: string
   ) {
     super(`HTTP ${method} ${url} failed with status ${response.statusCode}`)
+    this.status = response.statusCode
+    this.retryAfterMS = getRetryAfterDelayMS(response.headers)
   }
 }
 

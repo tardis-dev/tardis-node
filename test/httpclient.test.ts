@@ -7,7 +7,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
-import { download, getJSON, postJSON } from '../dist/handy.js'
+import { download, getJSON, HttpClientError, postJSON } from '../dist/handy.js'
 import { assert } from './assertions.ts'
 
 const execFileAsync = promisify(execFile)
@@ -56,6 +56,23 @@ test('sends a JSON POST body and retries when requested', async () => {
       { method: 'POST', body: '{"ping":"pong"}' }
     ])
     assert.deepStrictEqual(result.data, { ok: true })
+  } finally {
+    await server.close()
+  }
+})
+
+test('does not retry an HTTP 418 response when it is excluded from retryable statuses', async () => {
+  let requestsCount = 0
+  const server = await startServer((_request, response) => {
+    requestsCount++
+    response.writeHead(418, { 'Retry-After': '120' }).end('IP banned')
+  })
+
+  try {
+    await assert.rejects(
+      getJSON(`${server.url}/json`, { retry: { limit: 10, statusCodes: [429, 500, 403] } }),
+      (error) => error instanceof HttpClientError && error.status === 418 && error.retryAfterMS === 120_000 && requestsCount === 1
+    )
   } finally {
     await server.close()
   }
