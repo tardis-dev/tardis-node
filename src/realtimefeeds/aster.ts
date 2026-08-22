@@ -1,14 +1,30 @@
 import { Writable } from 'stream'
-import { batch, CircularBuffer, getJSON, wait } from '../handy.ts'
+import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
+
+const asterHttpOptions = {
+  timeout: 10 * 1000,
+  retry: {
+    limit: 10,
+    statusCodes: [429, 500, 403],
+    maxRetryAfter: 120 * 1000
+  }
+}
+
+const DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER = 100
+const DEFAULT_OPEN_INTEREST_POLLING_INTERVAL_MS = 30 * 1000
+const OPEN_INTEREST_BATCH_SIZE = 10
+const OPEN_INTEREST_REQUEST_WEIGHT = 1
+const OPEN_INTEREST_POLLING_RECOVERY_MS = 1000
+const OPEN_INTEREST_MAX_POLLING_INTERVAL_MS = 60 * 1000
 
 export class AsterRealTimeFeed extends RealTimeFeedBase {
   protected static readonly depthChannel = 'depth'
   protected static readonly depthSnapshotChannel = 'depthSnapshot'
-  protected readonly depthStream: string = 'depth@100ms'
-  private readonly pendingDepthSnapshotSymbols = new Set<string>()
-  private readonly bufferedDepthUpdates = new Map<string, CircularBuffer<AsterDepthUpdateData>>()
+  protected readonly depthStream: string = 'depth@0ms'
+  protected readonly depthRequestRequestWeight = 20
   protected readonly wssURL: string = 'wss://sstream.asterdex.com/stream'
   protected readonly httpURL: string = 'https://sapi.asterdex.com/api/v3'
   protected readonly channels = new Set([
@@ -38,7 +54,6 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 
     const depthSnapshotFilters = filtersWithSymbols.filter((filter) => filter.channel === AsterRealTimeFeed.depthSnapshotChannel)
     this.validateDepthSnapshotFilters(filtersWithSymbols, depthSnapshotFilters)
-    this.resetDepthSnapshotTracking(depthSnapshotFilters)
 
     return filtersWithSymbols
       .filter((f) => f.channel !== AsterRealTimeFeed.depthSnapshotChannel)
@@ -67,73 +82,91 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
     return false
   }
 
-  protected override onMessage(message: any) {
-    if (message.stream?.endsWith(`@${this.depthStream}`) !== true || message.data?.s === undefined) {
-      return
-    }
-
-    const symbol = message.data.s.toUpperCase()
-    if (this.pendingDepthSnapshotSymbols.has(symbol) === false) {
-      return
-    }
-
-    const firstUpdateId = Number(message.data.U)
-    const lastUpdateId = Number(message.data.u)
-    const previousFinalUpdateId = Number(message.data.pu)
-    if (Number.isFinite(lastUpdateId) === false || Number.isFinite(previousFinalUpdateId) === false) {
-      return
-    }
-
-    const bufferedUpdates = this.bufferedDepthUpdates.get(symbol) ?? new CircularBuffer<AsterDepthUpdateData>(2000)
-    bufferedUpdates.append({
-      firstUpdateId: Number.isFinite(firstUpdateId) ? firstUpdateId : undefined,
-      lastUpdateId,
-      previousFinalUpdateId
-    })
-    this.bufferedDepthUpdates.set(symbol, bufferedUpdates)
-  }
-
   protected async provideManualSnapshots(filters: Filter<string>[], shouldCancel: () => boolean) {
     const depthSnapshotFilter = filters.find((f) => f.channel === AsterRealTimeFeed.depthSnapshotChannel)
     if (!depthSnapshotFilter) {
       return
     }
 
-    for (const symbolsBatch of batch(depthSnapshotFilter.symbols!, 4)) {
+    const exchangeInfoResponse = await getJSON<any>(`${this.httpURL}/exchangeInfo`, asterHttpOptions)
+    if (shouldCancel()) {
+      return
+    }
+    const exchangeInfo = exchangeInfoResponse.data
+
+    const DELAY_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_SNAPSHOTS_DELAY_MS`
+    const currentWeightLimit = getRequestWeightLimit(this._exchange, exchangeInfo)
+
+    const usedWeight = parseRequestWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m']) ?? 0
+
+    this.debug('current x-mbx-used-weight-1m limit: %s, already used weight: %s', currentWeightLimit, usedWeight)
+
+    const concurrencyLimit = Math.max(getExchangeScopedNumberEnv(this._exchange, 'CONCURRENCY_LIMIT', 4), 1)
+
+    this.debug('current snapshots requests concurrency limit: %s', concurrencyLimit)
+
+    const minWeightBuffer = Math.max(
+      getExchangeScopedNumberEnv(this._exchange, 'MIN_AVAILABLE_WEIGHT_BUFFER', 2 * concurrencyLimit * this.depthRequestRequestWeight),
+      0
+    )
+    const requestWeightLimiter = new RequestWeightLimiter(currentWeightLimit, minWeightBuffer, usedWeight)
+
+    for (const symbolsBatch of batch(depthSnapshotFilter.symbols!, concurrencyLimit)) {
       if (shouldCancel()) {
         return
       }
 
       this.debug('requesting manual snapshots for: %s', symbolsBatch)
 
-      await Promise.all(
+      await requestWeightLimiter.waitForAvailableWeight(symbolsBatch.length * this.depthRequestRequestWeight, (delayMS) => {
+        this.debug(
+          'reached rate limit (x-mbx-used-weight-1m limit: %s, used weight: %s, minimum available weight buffer: %s), waiting: %s seconds',
+          currentWeightLimit,
+          requestWeightLimiter.usedWeight,
+          minWeightBuffer,
+          Math.ceil(delayMS / 1000)
+        )
+      })
+
+      const usedWeights = await Promise.all(
         symbolsBatch.map(async (symbol) => {
           if (shouldCancel()) {
-            return
+            return 0
           }
 
-          await this.provideManualSnapshot(symbol, shouldCancel)
+          const depthSnapshotResponse = await getJSON<any>(
+            `${this.httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`,
+            asterHttpOptions
+          )
+          if (shouldCancel()) {
+            return 0
+          }
+
+          const snapshot = {
+            stream: `${symbol.toLowerCase()}@${AsterRealTimeFeed.depthSnapshotChannel}`,
+            generated: true,
+            data: depthSnapshotResponse.data
+          }
+
+          this.manualSnapshotsBuffer.push(snapshot)
+
+          if (process.env[DELAY_ENV] !== undefined) {
+            const msToWait = Number.parseInt(process.env[DELAY_ENV] as string)
+
+            await wait(msToWait)
+          }
+
+          return parseRequestWeightHeader(depthSnapshotResponse.headers['x-mbx-used-weight-1m'])
         })
       )
 
-      await wait(100)
-      this.debug('requested manual snapshots successfully for: %s', symbolsBatch)
+      const maxUsedWeight = Math.max(...usedWeights.map((weight) => weight ?? 0))
+      requestWeightLimiter.updateUsedWeight(maxUsedWeight || undefined, symbolsBatch.length * this.depthRequestRequestWeight)
+
+      this.debug('requested manual snapshots successfully for: %s, used weight: %s', symbolsBatch, requestWeightLimiter.usedWeight)
     }
 
     this.debug('requested all manual snapshots successfully')
-  }
-
-  private resetDepthSnapshotTracking(filters: Required<Filter<string>>[]) {
-    this.pendingDepthSnapshotSymbols.clear()
-    this.bufferedDepthUpdates.clear()
-
-    for (const filter of filters) {
-      for (const symbol of filter.symbols) {
-        const upperCaseSymbol = symbol.toUpperCase()
-        this.pendingDepthSnapshotSymbols.add(upperCaseSymbol)
-        this.bufferedDepthUpdates.set(upperCaseSymbol, new CircularBuffer<AsterDepthUpdateData>(2000))
-      }
-    }
   }
 
   private validateDepthSnapshotFilters(filters: Required<Filter<string>>[], depthSnapshotFilters: Required<Filter<string>>[]) {
@@ -157,120 +190,6 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
       }
     }
   }
-
-  private async provideManualSnapshot(symbol: string, shouldCancel: () => boolean) {
-    const maxSnapshotRounds = 4
-    const maxSnapshotAttemptsPerRound = 3
-    const normalizedSymbol = symbol.toUpperCase()
-
-    for (let round = 0; round < maxSnapshotRounds; round++) {
-      for (let attempt = 1; attempt <= maxSnapshotAttemptsPerRound; attempt++) {
-        if (shouldCancel()) {
-          return
-        }
-
-        const { data } = await getJSON<AsterDepthSnapshotData>(`${this.httpURL}/depth?symbol=${symbol}&limit=1000`)
-        if (this.snapshotResponseIsValid(data) === false) {
-          if (attempt < maxSnapshotAttemptsPerRound) {
-            await wait(attempt * 1000)
-          }
-          continue
-        }
-
-        const hasOverlap = await this.waitForSnapshotOverlap(normalizedSymbol, data.lastUpdateId)
-
-        if (shouldCancel()) {
-          return
-        }
-
-        if (hasOverlap === false) {
-          this.trimBufferedUpdates(normalizedSymbol)
-          if (attempt < maxSnapshotAttemptsPerRound) {
-            await wait(attempt * 1000)
-          }
-          continue
-        }
-
-        if (hasOverlap === true || attempt === maxSnapshotAttemptsPerRound) {
-          this.manualSnapshotsBuffer.push(this.createManualSnapshot(symbol, data))
-          this.pendingDepthSnapshotSymbols.delete(normalizedSymbol)
-          this.bufferedDepthUpdates.delete(normalizedSymbol)
-          return
-        }
-      }
-    }
-
-    throw new Error(`AsterRealTimeFeed could not align depth snapshot for ${normalizedSymbol}`)
-  }
-
-  private async waitForSnapshotOverlap(symbol: string, lastUpdateId: number) {
-    let hasOverlap = this.validateSnapshotOverlap(this.bufferedDepthUpdates.get(symbol), lastUpdateId)
-    for (let attempt = 0; attempt < 60; attempt++) {
-      if (hasOverlap !== undefined) {
-        return hasOverlap
-      }
-
-      await wait(100)
-      hasOverlap = this.validateSnapshotOverlap(this.bufferedDepthUpdates.get(symbol), lastUpdateId)
-    }
-
-    return hasOverlap
-  }
-
-  protected validateSnapshotOverlap(bufferedUpdates: CircularBuffer<AsterDepthUpdateData> | undefined, lastUpdateId: number) {
-    for (const update of bufferedUpdates?.items() ?? []) {
-      if (update.lastUpdateId < lastUpdateId) {
-        continue
-      }
-
-      return update.previousFinalUpdateId <= lastUpdateId && update.lastUpdateId >= lastUpdateId
-    }
-
-    return undefined
-  }
-
-  private trimBufferedUpdates(symbol: string) {
-    const bufferedUpdates = this.bufferedDepthUpdates.get(symbol)
-    if (bufferedUpdates === undefined || bufferedUpdates.count <= 100) {
-      return
-    }
-
-    const trimmed = new CircularBuffer<AsterDepthUpdateData>(2000)
-    for (const update of [...bufferedUpdates.items()].slice(-100)) {
-      trimmed.append(update)
-    }
-    this.bufferedDepthUpdates.set(symbol, trimmed)
-  }
-
-  private snapshotResponseIsValid(data: AsterDepthSnapshotData) {
-    return Number.isFinite(data.lastUpdateId) && Array.isArray(data.asks) && Array.isArray(data.bids)
-  }
-
-  private createManualSnapshot(symbol: string, data: AsterDepthSnapshotData): AsterDepthSnapshotMessage {
-    return {
-      stream: `${symbol.toLowerCase()}@${AsterRealTimeFeed.depthSnapshotChannel}`,
-      generated: true,
-      data
-    }
-  }
-}
-
-type AsterDepthSnapshotData = {
-  lastUpdateId: number
-  bids: string[][]
-  asks: string[][]
-}
-
-type AsterDepthSnapshotMessage = {
-  stream: string
-  generated: true
-  data: AsterDepthSnapshotData
-}
-
-type AsterDepthUpdateData = {
-  firstUpdateId?: number
-  lastUpdateId: number
-  previousFinalUpdateId: number
 }
 
 export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
@@ -301,7 +220,6 @@ export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 export class AsterFuturesWebSocketRealTimeFeed extends AsterRealTimeFeed {
   protected readonly wssURL: string = 'wss://fstream.asterdex.com/stream'
   protected readonly httpURL: string = 'https://fapi.asterdex.com/fapi/v3'
-  protected readonly depthStream = 'depth@0ms'
   protected readonly channels = new Set([
     'trade',
     'aggTrade',
@@ -317,50 +235,148 @@ export class AsterFuturesWebSocketRealTimeFeed extends AsterRealTimeFeed {
     [AsterRealTimeFeed.depthChannel]: this.depthStream,
     markPrice: 'markPrice@1s'
   }
-
-  protected override validateSnapshotOverlap(bufferedUpdates: CircularBuffer<AsterDepthUpdateData> | undefined, lastUpdateId: number) {
-    for (const update of bufferedUpdates?.items() ?? []) {
-      if (update.lastUpdateId < lastUpdateId) {
-        continue
-      }
-
-      return (
-        (update.firstUpdateId !== undefined && update.firstUpdateId <= lastUpdateId && update.lastUpdateId >= lastUpdateId) ||
-        update.previousFinalUpdateId === lastUpdateId
-      )
-    }
-
-    return undefined
-  }
 }
 
 class AsterFuturesOpenInterestClient extends PoolingClientBase {
+  private readonly _minPollingIntervalMS: number
+  private readonly _minAvailableWeightBuffer: number
+  private readonly _maxPollingIntervalMS: number
+  private _currentPollingIntervalMS: number
+  private _requestWeightLimiter: RequestWeightLimiter | undefined
+
   constructor(
-    exchange: string,
-    private readonly httpURL: string,
-    private readonly instruments: string[],
+    private readonly _exchange: string,
+    private readonly _httpURL: string,
+    private readonly _instruments: string[],
     onError?: (error: Error) => void
   ) {
-    super(exchange, 6, onError)
+    const minPollingIntervalMS = Math.max(
+      getExchangeScopedNumberEnv(_exchange, 'OPEN_INTEREST_POLLING_INTERVAL_MS', DEFAULT_OPEN_INTEREST_POLLING_INTERVAL_MS),
+      1000
+    )
+
+    super(_exchange, minPollingIntervalMS / 1000, onError)
+
+    this._minPollingIntervalMS = minPollingIntervalMS
+    this._maxPollingIntervalMS = Math.max(this._minPollingIntervalMS, OPEN_INTEREST_MAX_POLLING_INTERVAL_MS)
+    this._currentPollingIntervalMS = minPollingIntervalMS
+    this._minAvailableWeightBuffer = Math.max(
+      getExchangeScopedNumberEnv(_exchange, 'MIN_AVAILABLE_WEIGHT_BUFFER', DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER),
+      0
+    )
+
+    const configuredRequestWeightLimit = getExchangeScopedNumberEnv(_exchange, 'REQUEST_WEIGHT_LIMIT', 0)
+    if (configuredRequestWeightLimit > 0) {
+      this._requestWeightLimiter = new RequestWeightLimiter(configuredRequestWeightLimit, this._minAvailableWeightBuffer)
+    }
+  }
+
+  protected getPoolingDelayMS() {
+    return this._currentPollingIntervalMS
   }
 
   protected async poolDataToStream(outputStream: Writable) {
-    for (const instrument of this.instruments) {
+    let waitedForRateLimit = false
+
+    if (this._requestWeightLimiter === undefined) {
+      await this._initializeRateLimitInfo()
+    }
+
+    for (let index = 0; index < this._instruments.length;) {
       if (outputStream.destroyed) {
         return
       }
 
-      const response = await getJSON<AsterFuturesOpenInterestData>(`${this.httpURL}/openInterest?symbol=${instrument.toLowerCase()}`, {
-        timeout: 2500
-      })
-
-      if (outputStream.writable) {
-        outputStream.write({
-          stream: `${instrument.toLowerCase()}@openInterest`,
-          generated: true,
-          data: response.data
-        })
+      if (await this._waitForAvailableWeight()) {
+        waitedForRateLimit = true
       }
+      if (outputStream.destroyed) {
+        return
+      }
+
+      const batchSize = Math.min(OPEN_INTEREST_BATCH_SIZE, Math.floor(this._requestWeightLimiter!.availableWeight))
+      const instrumentsBatch = this._instruments.slice(index, index + batchSize)
+      index += instrumentsBatch.length
+
+      const results = await Promise.allSettled(
+        instrumentsBatch.map(async (instrument) => {
+          const openInterestResponse = await getJSON<AsterFuturesOpenInterestData>(
+            `${this._httpURL}/openInterest?symbol=${instrument.toUpperCase()}`,
+            asterHttpOptions
+          )
+
+          return {
+            instrument,
+            usedWeight: parseRequestWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m']),
+            data: openInterestResponse.data
+          }
+        })
+      )
+
+      let maxUsedWeight: number | undefined
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          this._notifyError(result.reason)
+          continue
+        }
+
+        if (result.value.usedWeight !== undefined) {
+          maxUsedWeight = Math.max(maxUsedWeight ?? 0, result.value.usedWeight)
+        }
+
+        if (outputStream.writable) {
+          outputStream.write({
+            stream: `${result.value.instrument.toLowerCase()}@openInterest`,
+            generated: true,
+            data: result.value.data
+          })
+        }
+      }
+
+      this._requestWeightLimiter!.updateUsedWeight(maxUsedWeight, instrumentsBatch.length * OPEN_INTEREST_REQUEST_WEIGHT)
+    }
+
+    if (waitedForRateLimit) {
+      this._currentPollingIntervalMS = Math.min(this._currentPollingIntervalMS + this._minPollingIntervalMS, this._maxPollingIntervalMS)
+    } else {
+      this._currentPollingIntervalMS = Math.max(
+        this._minPollingIntervalMS,
+        this._currentPollingIntervalMS - OPEN_INTEREST_POLLING_RECOVERY_MS
+      )
+    }
+  }
+
+  private async _waitForAvailableWeight() {
+    return this._requestWeightLimiter!.waitForAvailableWeight(OPEN_INTEREST_REQUEST_WEIGHT, (delayMS) => {
+      this.debug(
+        'open interest reached rate limit (limit: %s, used: %s, minimum available buffer: %s), waiting %s ms',
+        this._requestWeightLimiter!.limit,
+        this._requestWeightLimiter!.usedWeight,
+        this._requestWeightLimiter!.minAvailableWeightBuffer,
+        delayMS
+      )
+    })
+  }
+
+  private async _initializeRateLimitInfo() {
+    const exchangeInfoResponse = await getJSON<any>(`${this._httpURL}/exchangeInfo`, asterHttpOptions)
+    const exchangeInfo = exchangeInfoResponse.data
+
+    this._requestWeightLimiter = new RequestWeightLimiter(
+      getRequestWeightLimit(this._exchange, exchangeInfo),
+      this._minAvailableWeightBuffer,
+      parseRequestWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m'])
+    )
+  }
+
+  private _notifyError(error: unknown) {
+    const normalizedError = error instanceof Error ? error : new Error(String(error))
+
+    this.debug('open interest request error %o', normalizedError)
+
+    if (this.onError !== undefined) {
+      this.onError(normalizedError)
     }
   }
 }

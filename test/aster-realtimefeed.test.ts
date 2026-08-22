@@ -23,10 +23,6 @@ class TestAsterRealTimeFeed extends AsterRealTimeFeed {
     return this.mapToSubscribeMessages(filters)
   }
 
-  observe(message: any) {
-    this.onMessage(message)
-  }
-
   async provideSnapshots(filters: Filter<string>[], shouldCancel = () => false) {
     await this.provideManualSnapshots(filters, shouldCancel)
     return this.manualSnapshotsBuffer
@@ -34,29 +30,8 @@ class TestAsterRealTimeFeed extends AsterRealTimeFeed {
 }
 
 class TestAsterFuturesRealTimeFeed extends AsterFuturesWebSocketRealTimeFeed {
-  protected readonly httpURL: string
-
-  constructor(
-    exchange: 'aster-futures',
-    filters: Filter<string>[],
-    timeoutIntervalMS: number | undefined,
-    httpURL = 'https://fapi.asterdex.com/fapi/v3'
-  ) {
-    super(exchange, filters, timeoutIntervalMS)
-    this.httpURL = httpURL
-  }
-
   map(filters: Filter<string>[]) {
     return this.mapToSubscribeMessages(filters)
-  }
-
-  observe(message: any) {
-    this.onMessage(message)
-  }
-
-  async provideSnapshots(filters: Filter<string>[], shouldCancel = () => false) {
-    await this.provideManualSnapshots(filters, shouldCancel)
-    return this.manualSnapshotsBuffer
   }
 }
 
@@ -90,7 +65,7 @@ test('map aster realtime subscriptions', () => {
     [
       {
         method: 'SUBSCRIBE',
-        params: ['btcusdt@depth@100ms'],
+        params: ['btcusdt@depth@0ms'],
         id: 1
       },
       {
@@ -212,27 +187,25 @@ test('map aster futures realtime subscriptions', () => {
   )
 })
 
-test('provide aster manual depth snapshots after buffered update overlaps', async () => {
-  const server = await startSnapshotServer([{ lastUpdateId: 100, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] }])
+test('provide aster manual depth snapshot', async () => {
+  const server = await startSnapshotServer({ lastUpdateId: 100, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] })
   const feed = new TestAsterRealTimeFeed('aster', [], undefined, server.url)
 
   try {
     const filters = [
       {
         channel: 'depth',
-        symbols: ['BTCUSDT']
+        symbols: ['btcusdt']
       },
       {
         channel: 'depthSnapshot',
-        symbols: ['BTCUSDT']
+        symbols: ['btcusdt']
       }
     ]
 
-    feed.map(filters)
-    feed.observe(createDepthUpdate({ symbol: 'BTCUSDT', lastUpdateId: 101, previousFinalUpdateId: 100 }))
-
     const snapshots = await feed.provideSnapshots(filters)
 
+    assert.equal(server.requestsCount, 1)
     assert.deepEqual(snapshots, [
       {
         stream: 'btcusdt@depthSnapshot',
@@ -249,128 +222,20 @@ test('provide aster manual depth snapshots after buffered update overlaps', asyn
   }
 })
 
-test('retry aster manual depth snapshots until buffered update overlaps', async () => {
-  const server = await startSnapshotServer([
-    { lastUpdateId: 102, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] },
-    { lastUpdateId: 104, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']] }
-  ])
-  const feed = new TestAsterRealTimeFeed('aster', [], undefined, server.url)
-
-  try {
-    const filters = [
-      {
-        channel: 'depth',
-        symbols: ['BTCUSDT']
-      },
-      {
-        channel: 'depthSnapshot',
-        symbols: ['BTCUSDT']
-      }
-    ]
-
-    feed.map(filters)
-    feed.observe(createDepthUpdate({ symbol: 'BTCUSDT', lastUpdateId: 105, previousFinalUpdateId: 104 }))
-
-    const snapshots = await feed.provideSnapshots(filters)
-
-    assert.equal(server.requestsCount, 2)
-    assert.deepEqual(snapshots, [
-      {
-        stream: 'btcusdt@depthSnapshot',
-        generated: true,
-        data: {
-          lastUpdateId: 104,
-          asks: [['100.2', '1.2']],
-          bids: [['99.8', '0.5']]
-        }
-      }
-    ])
-  } finally {
-    await server.close()
-  }
-})
-
-test('retry aster futures manual depth snapshots until first update overlaps', async () => {
-  const server = await startSnapshotServer([
-    { lastUpdateId: 104, asks: [['100.1', '1.2']], bids: [['99.9', '0.5']] },
-    { lastUpdateId: 105, asks: [['100.2', '1.2']], bids: [['99.8', '0.5']] }
-  ])
-  const feed = new TestAsterFuturesRealTimeFeed('aster-futures', [], undefined, server.url)
-
-  try {
-    const filters = [
-      {
-        channel: 'depth',
-        symbols: ['BTCUSDT']
-      },
-      {
-        channel: 'depthSnapshot',
-        symbols: ['BTCUSDT']
-      }
-    ]
-
-    feed.map(filters)
-    feed.observe(
-      createDepthUpdate({ symbol: 'BTCUSDT', firstUpdateId: 105, lastUpdateId: 105, previousFinalUpdateId: 106, stream: 'depth@0ms' })
-    )
-
-    const snapshots = await feed.provideSnapshots(filters)
-
-    assert.equal(server.requestsCount, 2)
-    assert.deepEqual(snapshots, [
-      {
-        stream: 'btcusdt@depthSnapshot',
-        generated: true,
-        data: {
-          lastUpdateId: 105,
-          asks: [['100.2', '1.2']],
-          bids: [['99.8', '0.5']]
-        }
-      }
-    ])
-  } finally {
-    await server.close()
-  }
-})
-
-function createDepthUpdate({
-  symbol,
-  firstUpdateId,
-  lastUpdateId,
-  previousFinalUpdateId,
-  stream = 'depth@100ms'
-}: {
-  symbol: string
-  firstUpdateId?: number
-  lastUpdateId: number
-  previousFinalUpdateId: number
-  stream?: string
-}) {
-  return {
-    stream: `${symbol.toLowerCase()}@${stream}`,
-    data: {
-      e: 'depthUpdate',
-      E: 1785230774524,
-      T: 1785230774522,
-      s: symbol,
-      U: firstUpdateId ?? previousFinalUpdateId + 1,
-      u: lastUpdateId,
-      pu: previousFinalUpdateId,
-      b: [],
-      a: []
-    }
-  }
-}
-
-async function startSnapshotServer(responses: AsterTestDepthSnapshotResponse[]) {
+async function startSnapshotServer(snapshot: AsterTestDepthSnapshotResponse) {
   let requestsCount = 0
   const server = createServer((request, response) => {
+    if (request.url === '/exchangeInfo') {
+      response.writeHead(200, { 'Content-Type': 'application/json', 'x-mbx-used-weight-1m': '1' })
+      response.end(JSON.stringify({ rateLimits: [{ rateLimitType: 'REQUEST_WEIGHT', limit: 6000 }] }))
+      return
+    }
+
     assert.equal(request.url, '/depth?symbol=BTCUSDT&limit=1000')
-    const body = responses[Math.min(requestsCount, responses.length - 1)]
     requestsCount++
 
-    response.writeHead(200, { 'Content-Type': 'application/json' })
-    response.end(JSON.stringify(body))
+    response.writeHead(200, { 'Content-Type': 'application/json', 'x-mbx-used-weight-1m': '21' })
+    response.end(JSON.stringify(snapshot))
   })
 
   await new Promise<void>((resolve) => server.listen(0, resolve))
