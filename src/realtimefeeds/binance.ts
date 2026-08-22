@@ -2,12 +2,13 @@ import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const binanceHttpOptions = {
   timeout: 10 * 1000,
   retry: {
     limit: 10,
-    statusCodes: [418, 429, 500, 403],
+    statusCodes: [429, 500, 403],
     maxRetryAfter: 120 * 1000
   }
 }
@@ -24,29 +25,6 @@ const BINANCE_FUTURES_PUBLIC_STREAM_PATH = '/public/stream'
 const BINANCE_FUTURES_MARKET_STREAM_PATH = '/market/stream'
 
 type BinanceFuturesStreamPath = typeof BINANCE_FUTURES_PUBLIC_STREAM_PATH | typeof BINANCE_FUTURES_MARKET_STREAM_PATH
-
-function parseBinanceWeightHeader(headerValue: string | undefined) {
-  if (headerValue === undefined) {
-    return undefined
-  }
-
-  const parsed = Number.parseInt(headerValue, 10)
-
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function getExchangeScopedNumberEnv(exchange: string, suffix: string, fallback: number) {
-  const envName = `${exchange.toUpperCase().replace(/-/g, '_')}_${suffix}`
-  const rawValue = process.env[envName]
-
-  if (rawValue === undefined) {
-    return fallback
-  }
-
-  const parsed = Number.parseInt(rawValue, 10)
-
-  return Number.isFinite(parsed) ? parsed : fallback
-}
 
 function getExchangeScopedWssUrlEnv(exchange: string) {
   const envName = `WSS_URL_${exchange.toUpperCase().replace(/-/g, '_')}`
@@ -66,31 +44,6 @@ function getBinanceFuturesWebSocketUrl(exchange: string, streamPath: BinanceFutu
   const normalizedBaseUrl = normalizeBinanceSplitWsBaseUrl(configuredWssUrl)
 
   return `${normalizedBaseUrl}${streamPath}`
-}
-
-function getBinanceRequestWeightLimit(exchange: string, exchangeInfo: any) {
-  const configuredLimit = getExchangeScopedNumberEnv(exchange, 'REQUEST_WEIGHT_LIMIT', 0)
-  if (configuredLimit > 0) {
-    return configuredLimit
-  }
-
-  const requestWeightLimit = exchangeInfo.rateLimits.find((d: any) => d.rateLimitType === 'REQUEST_WEIGHT')?.limit as number | undefined
-
-  if (!requestWeightLimit) {
-    throw new Error('Failed to determine Binance REQUEST_WEIGHT limit')
-  }
-
-  return requestWeightLimit
-}
-
-function getBinanceAvailableWeight(weightLimit: number, usedWeight: number, buffer: number) {
-  return weightLimit > 0 ? weightLimit - usedWeight - buffer : Infinity
-}
-
-function getDelayToNextMinuteMS() {
-  const now = new Date()
-
-  return Math.max((61 - now.getUTCSeconds()) * 1000 - now.getUTCMilliseconds(), 1)
 }
 
 abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
@@ -131,8 +84,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
   private readonly _minAvailableWeightBuffer: number
   private readonly _maxPollingIntervalMS: number
   private _currentPollingIntervalMS: number
-  private _requestWeightLimit: number
-  private _usedWeight = 0
+  private _requestWeightLimiter: RequestWeightLimiter | undefined
 
   constructor(
     private readonly _exchange: string,
@@ -150,12 +102,15 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
     this._minPollingIntervalMS = minPollingIntervalMS
     this._maxPollingIntervalMS = Math.max(this._minPollingIntervalMS, OPEN_INTEREST_MAX_POLLING_INTERVAL_MS)
     this._currentPollingIntervalMS = minPollingIntervalMS
-    this._requestWeightLimit = getExchangeScopedNumberEnv(_exchange, 'REQUEST_WEIGHT_LIMIT', 0)
-    this._minAvailableWeightBuffer = getExchangeScopedNumberEnv(
-      _exchange,
-      'MIN_AVAILABLE_WEIGHT_BUFFER',
-      DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER
+    this._minAvailableWeightBuffer = Math.max(
+      getExchangeScopedNumberEnv(_exchange, 'MIN_AVAILABLE_WEIGHT_BUFFER', DEFAULT_OPEN_INTEREST_MIN_AVAILABLE_WEIGHT_BUFFER),
+      0
     )
+
+    const configuredRequestWeightLimit = getExchangeScopedNumberEnv(_exchange, 'REQUEST_WEIGHT_LIMIT', 0)
+    if (configuredRequestWeightLimit > 0) {
+      this._requestWeightLimiter = new RequestWeightLimiter(configuredRequestWeightLimit, this._minAvailableWeightBuffer)
+    }
   }
 
   protected getPoolingDelayMS() {
@@ -165,7 +120,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
   protected async poolDataToStream(outputStream: Writable) {
     let waitedForRateLimit = false
 
-    if (!this._requestWeightLimit) {
+    if (this._requestWeightLimiter === undefined) {
       await this._initializeRateLimitInfo()
     }
 
@@ -174,13 +129,14 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
         return
       }
 
-      waitedForRateLimit = (await this._waitForAvailableWeight()) || waitedForRateLimit
-      const batchSize = this._getBatchSize()
-
-      if (batchSize <= 0) {
-        break
+      if (await this._waitForAvailableWeight()) {
+        waitedForRateLimit = true
+      }
+      if (outputStream.destroyed) {
+        return
       }
 
+      const batchSize = Math.min(OPEN_INTEREST_BATCH_SIZE, Math.floor(this._requestWeightLimiter!.availableWeight))
       const instrumentsBatch = this._instruments.slice(index, index + batchSize)
       index += instrumentsBatch.length
 
@@ -193,14 +149,13 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
 
           return {
             instrument,
-            usedWeight: parseBinanceWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m']),
+            usedWeight: parseRequestWeightHeader(openInterestResponse.headers['x-mbx-used-weight-1m']),
             data: openInterestResponse.data
           }
         })
       )
 
       let maxUsedWeight: number | undefined
-      let fulfilledCount = 0
 
       for (const result of results) {
         if (result.status === 'rejected') {
@@ -208,8 +163,9 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
           continue
         }
 
-        fulfilledCount++
-        maxUsedWeight = Math.max(maxUsedWeight ?? 0, result.value.usedWeight ?? 0)
+        if (result.value.usedWeight !== undefined) {
+          maxUsedWeight = Math.max(maxUsedWeight ?? 0, result.value.usedWeight)
+        }
 
         if (outputStream.writable) {
           outputStream.write({
@@ -220,7 +176,7 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
         }
       }
 
-      this._updateUsedWeight(maxUsedWeight || undefined, fulfilledCount * OPEN_INTEREST_REQUEST_WEIGHT)
+      this._requestWeightLimiter!.updateUsedWeight(maxUsedWeight, instrumentsBatch.length * OPEN_INTEREST_REQUEST_WEIGHT)
     }
 
     if (waitedForRateLimit) {
@@ -234,43 +190,26 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
   }
 
   private async _waitForAvailableWeight() {
-    const available = getBinanceAvailableWeight(this._requestWeightLimit, this._usedWeight, this._minAvailableWeightBuffer)
-
-    if (available >= OPEN_INTEREST_REQUEST_WEIGHT) {
-      return false
-    }
-
-    const delayMS = getDelayToNextMinuteMS()
-    this.debug(
-      'open interest reached rate limit (limit: %s, used: %s, minimum available buffer: %s), waiting %s ms',
-      this._requestWeightLimit,
-      this._usedWeight,
-      this._minAvailableWeightBuffer,
-      delayMS
-    )
-
-    await wait(delayMS)
-
-    // Binance request weight is tracked in a rolling 1-minute window. After waiting for the next minute
-    // we can resume and let the next REST response header refresh the exact current usage.
-    this._usedWeight = 0
-
-    return true
+    return this._requestWeightLimiter!.waitForAvailableWeight(OPEN_INTEREST_REQUEST_WEIGHT, (delayMS) => {
+      this.debug(
+        'open interest reached rate limit (limit: %s, used: %s, minimum available buffer: %s), waiting %s ms',
+        this._requestWeightLimiter!.limit,
+        this._requestWeightLimiter!.usedWeight,
+        this._requestWeightLimiter!.minAvailableWeightBuffer,
+        delayMS
+      )
+    })
   }
 
   private async _initializeRateLimitInfo() {
     const exchangeInfoResponse = await getJSON<any>(`${this._httpURL}/exchangeInfo`, binanceHttpOptions)
     const exchangeInfo = exchangeInfoResponse.data
 
-    this._requestWeightLimit = getBinanceRequestWeightLimit(this._exchange, exchangeInfo)
-
-    this._updateUsedWeight(parseBinanceWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m']), OPEN_INTEREST_REQUEST_WEIGHT)
-  }
-
-  private _getBatchSize() {
-    const available = getBinanceAvailableWeight(this._requestWeightLimit, this._usedWeight, this._minAvailableWeightBuffer)
-
-    return Math.min(OPEN_INTEREST_BATCH_SIZE, Math.max(0, Math.floor(available)))
+    this._requestWeightLimiter = new RequestWeightLimiter(
+      getRequestWeightLimit(this._exchange, exchangeInfo),
+      this._minAvailableWeightBuffer,
+      parseRequestWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m'])
+    )
   }
 
   private _notifyError(error: unknown) {
@@ -280,17 +219,6 @@ class BinanceFuturesOpenInterestClient extends PoolingClientBase {
 
     if (this.onError !== undefined) {
       this.onError(normalizedError)
-    }
-  }
-
-  private _updateUsedWeight(usedWeight: number | undefined, fallbackIncrement = OPEN_INTEREST_REQUEST_WEIGHT) {
-    if (usedWeight !== undefined) {
-      this._usedWeight = usedWeight
-      return
-    }
-
-    if (this._requestWeightLimit > 0 && fallbackIncrement > 0) {
-      this._usedWeight += fallbackIncrement
     }
   }
 }
@@ -361,27 +289,21 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     const exchangeInfo = exchangeInfoResponse.data
 
     const DELAY_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_SNAPSHOTS_DELAY_MS`
-    const currentWeightLimit = getBinanceRequestWeightLimit(this._exchange, exchangeInfo)
+    const currentWeightLimit = getRequestWeightLimit(this._exchange, exchangeInfo)
 
-    let usedWeight = Number.parseInt(exchangeInfoResponse.headers['x-mbx-used-weight-1m'] as string)
+    const usedWeight = parseRequestWeightHeader(exchangeInfoResponse.headers['x-mbx-used-weight-1m']) ?? 0
 
     this.debug('current x-mbx-used-weight-1m limit: %s, already used weight: %s', currentWeightLimit, usedWeight)
 
-    let concurrencyLimit = 4
-
-    const CONCURRENCY_LIMIT_WEIGHT_ENV = `${this._exchange.toUpperCase().replace(/-/g, '_')}_CONCURRENCY_LIMIT`
-
-    if (process.env[CONCURRENCY_LIMIT_WEIGHT_ENV] !== undefined) {
-      concurrencyLimit = Number.parseInt(process.env[CONCURRENCY_LIMIT_WEIGHT_ENV] as string)
-    }
+    const concurrencyLimit = Math.max(getExchangeScopedNumberEnv(this._exchange, 'CONCURRENCY_LIMIT', 4), 1)
 
     this.debug('current snapshots requests concurrency limit: %s', concurrencyLimit)
 
-    const minWeightBuffer = getExchangeScopedNumberEnv(
-      this._exchange,
-      'MIN_AVAILABLE_WEIGHT_BUFFER',
-      2 * concurrencyLimit * this._depthRequestRequestWeight
+    const minWeightBuffer = Math.max(
+      getExchangeScopedNumberEnv(this._exchange, 'MIN_AVAILABLE_WEIGHT_BUFFER', 2 * concurrencyLimit * this._depthRequestRequestWeight),
+      0
     )
+    const requestWeightLimiter = new RequestWeightLimiter(currentWeightLimit, minWeightBuffer, usedWeight)
 
     for (const symbolsBatch of batch(depthSnapshotFilter.symbols!, concurrencyLimit)) {
       if (shouldCancel()) {
@@ -390,27 +312,18 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
       this.debug('requesting manual snapshots for: %s', symbolsBatch)
 
+      await requestWeightLimiter.waitForAvailableWeight(symbolsBatch.length * this._depthRequestRequestWeight, (delayMS) => {
+        this.debug(
+          'reached rate limit (x-mbx-used-weight-1m limit: %s, used weight: %s, minimum available weight buffer: %s), waiting: %s seconds',
+          currentWeightLimit,
+          requestWeightLimiter.usedWeight,
+          minWeightBuffer,
+          Math.ceil(delayMS / 1000)
+        )
+      })
+
       const usedWeights = await Promise.all(
         symbolsBatch.map(async (symbol) => {
-          if (shouldCancel()) {
-            return 0
-          }
-
-          const isOverRateLimit = getBinanceAvailableWeight(currentWeightLimit, usedWeight, minWeightBuffer) < 0
-
-          if (isOverRateLimit) {
-            const delayMS = getDelayToNextMinuteMS()
-            this.debug(
-              'reached rate limit (x-mbx-used-weight-1m limit: %s, used weight: %s, minimum available weight buffer: %s), waiting: %s seconds',
-              currentWeightLimit,
-              usedWeight,
-              minWeightBuffer,
-              Math.ceil(delayMS / 1000)
-            )
-
-            await wait(delayMS)
-          }
-
           if (shouldCancel()) {
             return 0
           }
@@ -437,13 +350,14 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
             await wait(msToWait)
           }
 
-          return Number.parseInt(depthSnapshotResponse.headers['x-mbx-used-weight-1m'] as string)
+          return parseRequestWeightHeader(depthSnapshotResponse.headers['x-mbx-used-weight-1m'])
         })
       )
 
-      usedWeight = Math.max(...usedWeights)
+      const maxUsedWeight = Math.max(...usedWeights.map((weight) => weight ?? 0))
+      requestWeightLimiter.updateUsedWeight(maxUsedWeight || undefined, symbolsBatch.length * this._depthRequestRequestWeight)
 
-      this.debug('requested manual snapshots successfully for: %s, used weight: %s', symbolsBatch, usedWeight)
+      this.debug('requested manual snapshots successfully for: %s, used weight: %s', symbolsBatch, requestWeightLimiter.usedWeight)
     }
     this.debug('requested all manual snapshots successfully')
   }
