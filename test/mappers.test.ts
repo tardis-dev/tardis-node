@@ -3882,6 +3882,62 @@ describe('mappers', () => {
     }
   })
 
+  test('map binance futures update that directly continues the snapshot', () => {
+    const localTimestamp = new Date()
+    const mapper = createMapper('binance-futures', localTimestamp)
+
+    assert.deepStrictEqual(
+      mapper.map(
+        {
+          stream: 'btcusdt@depth@100ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1787227200100,
+            T: 1787227200099,
+            s: 'BTCUSDT',
+            U: 150,
+            u: 160,
+            pu: 100,
+            b: [['100', '2']],
+            a: []
+          }
+        },
+        localTimestamp
+      ),
+      []
+    )
+
+    assert.deepStrictEqual(
+      mapper.map(
+        {
+          stream: 'btcusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 100,
+            bids: [['99', '1']],
+            asks: [['101', '1']]
+          }
+        },
+        localTimestamp
+      ),
+      [
+        {
+          type: 'book_change',
+          symbol: 'BTCUSDT',
+          exchange: 'binance-futures',
+          isSnapshot: true,
+          bids: [
+            { price: 99, amount: 1 },
+            { price: 100, amount: 2 }
+          ],
+          asks: [{ price: 101, amount: 1 }],
+          timestamp: localTimestamp,
+          localTimestamp
+        }
+      ]
+    )
+  })
+
   test('map binance delivery messages', () => {
     const messages = [
       { id: 1000, result: null },

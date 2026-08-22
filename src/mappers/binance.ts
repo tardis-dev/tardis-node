@@ -278,9 +278,14 @@ class BinanceFuturesBookChangeMapper extends BinanceBookChangeMapper implements 
       return
     }
 
-    // The first processed should have U <= lastUpdateId AND u >= lastUpdateId
+    // Binance documents a first update that contains the snapshot boundary. Live
+    // USD-M and COIN-M streams can instead continue it directly with pu == lastUpdateId.
+    // Both relations join the buffered stream to the snapshot without an update gap.
     if (!depthContext.validatedFirstUpdate) {
-      if (binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId) {
+      const containsSnapshotBoundary = binanceDepthUpdateData.U <= lastUpdateId && binanceDepthUpdateData.u >= lastUpdateId
+      const continuesSnapshotDirectly = binanceDepthUpdateData.pu === lastUpdateId
+
+      if (containsSnapshotBoundary || continuesSnapshotDirectly) {
         depthContext.validatedFirstUpdate = true
       } else {
         const message = `Book depth snaphot has no overlap with first update, update ${JSON.stringify(
