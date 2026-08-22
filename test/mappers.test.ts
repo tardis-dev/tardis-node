@@ -2895,7 +2895,7 @@ describe('mappers', () => {
     snapshot(
       asterMapper.map(
         {
-          stream: 'btcusdt@depth@100ms',
+          stream: 'btcusdt@depth@0ms',
           data: {
             e: 'depthUpdate',
             E: 1591261236100,
@@ -2915,7 +2915,7 @@ describe('mappers', () => {
     snapshot(
       asterMapper.map(
         {
-          stream: 'btcusdt@depth@100ms',
+          stream: 'btcusdt@depth@0ms',
           data: {
             e: 'depthUpdate',
             E: 1591261236200,
@@ -2937,7 +2937,7 @@ describe('mappers', () => {
         Array.from(
           asterMapper.map(
             {
-              stream: 'btcusdt@depth@100ms',
+              stream: 'btcusdt@depth@0ms',
               data: {
                 e: 'depthUpdate',
                 E: 1591261236300,
@@ -3002,7 +3002,28 @@ describe('mappers', () => {
       )
     )
 
-    snapshot(
+    assert.deepEqual(
+      asterFuturesMapper.map(
+        {
+          stream: 'dogeusdt@trade',
+          data: {
+            e: 'trade',
+            E: 1787302843505,
+            T: 1787302843450,
+            s: 'DOGEUSDT',
+            t: 21955616,
+            p: '0.086245',
+            q: '3894',
+            X: 'INSURANCE_FUND',
+            m: true
+          }
+        },
+        localTimestamp
+      ),
+      []
+    )
+
+    assert.deepEqual(
       asterFuturesMapper.map(
         {
           stream: 'btcusdt@aggTrade',
@@ -3020,13 +3041,14 @@ describe('mappers', () => {
           }
         },
         localTimestamp
-      )
+      ),
+      []
     )
 
     snapshot(
       asterFuturesMapper.map(
         {
-          stream: 'btcusdt@depth@100ms',
+          stream: 'btcusdt@depth@0ms',
           data: {
             e: 'depthUpdate',
             E: 1573948821952,
@@ -3099,15 +3121,46 @@ describe('mappers', () => {
             E: 1573948821952,
             T: 1573948821948,
             s: 'ETHUSDT',
-            U: 199,
-            u: 200,
-            pu: 198,
+            U: 201,
+            u: 201,
+            pu: 200,
             b: [['10', '3']],
             a: []
           }
         },
         localTimestamp
       )
+    )
+    assert.deepEqual(
+      asterFuturesOverlapEdgeMapper.map(
+        {
+          stream: 'ethusdt@depth@0ms',
+          data: {
+            e: 'depthUpdate',
+            E: 1573948822052,
+            T: 1573948822048,
+            s: 'ETHUSDT',
+            U: 202,
+            u: 203,
+            pu: 201,
+            b: [['9', '2']],
+            a: [['11', '0']]
+          }
+        },
+        localTimestamp
+      ),
+      [
+        {
+          type: 'book_change',
+          symbol: 'ETHUSDT',
+          exchange: 'aster-futures',
+          isSnapshot: false,
+          bids: [{ price: 9, amount: 2 }],
+          asks: [{ price: 11, amount: 0 }],
+          timestamp: new Date(1573948822052),
+          localTimestamp
+        }
+      ]
     )
 
     snapshot(
@@ -3202,6 +3255,121 @@ describe('mappers', () => {
         localTimestamp
       )
     )
+  })
+
+  test('reject Aster realtime depth updates without snapshot overlap', () => {
+    const localTimestamp = new Date('2026-08-22T10:00:00.000Z')
+
+    for (const exchange of ['aster', 'aster-futures'] as const) {
+      const mapper = createMapper(exchange, new Date())
+
+      mapper.map(
+        {
+          stream: 'btcusdt@depthSnapshot',
+          generated: true,
+          data: {
+            lastUpdateId: 100,
+            bids: [['99', '1']],
+            asks: [['101', '1']]
+          }
+        },
+        localTimestamp
+      )
+
+      assert.throws(
+        () =>
+          mapper.map(
+            {
+              stream: 'btcusdt@depth@0ms',
+              data: {
+                e: 'depthUpdate',
+                E: 1787392800100,
+                T: 1787392800099,
+                s: 'BTCUSDT',
+                U: 102,
+                u: 102,
+                pu: 101,
+                b: [],
+                a: []
+              }
+            },
+            localTimestamp
+          ),
+        errorMessageIncludes('Book depth snapshot has no overlap with first update')
+      )
+    }
+  })
+
+  test('merge buffered Aster depth changes into normalized snapshots', () => {
+    const localTimestamp = new Date()
+
+    for (const exchange of ['aster', 'aster-futures'] as const) {
+      const mapper = normalizeBookChanges(exchange, localTimestamp)
+      const update = {
+        stream: 'btcusdt@depth@0ms',
+        data: {
+          e: 'depthUpdate',
+          E: 1787302843505,
+          T: 1787302843450,
+          s: 'BTCUSDT',
+          U: 101,
+          u: 101,
+          pu: 100,
+          b: [
+            ['99', '0'],
+            ['97', '3'],
+            ['96', '0']
+          ],
+          a: [
+            ['101', '4'],
+            ['102', '0'],
+            ['103', '5']
+          ]
+        }
+      }
+
+      assert.deepEqual(Array.from(mapper.map(update, localTimestamp) ?? []), [])
+      assert.deepEqual(
+        Array.from(
+          mapper.map(
+            {
+              stream: 'btcusdt@depthSnapshot',
+              generated: true,
+              data: {
+                lastUpdateId: 100,
+                bids: [
+                  ['99', '1'],
+                  ['98', '2']
+                ],
+                asks: [
+                  ['101', '1'],
+                  ['102', '2']
+                ]
+              }
+            },
+            localTimestamp
+          ) ?? []
+        ),
+        [
+          {
+            type: 'book_change',
+            symbol: 'BTCUSDT',
+            exchange,
+            isSnapshot: true,
+            bids: [
+              { price: 98, amount: 2 },
+              { price: 97, amount: 3 }
+            ],
+            asks: [
+              { price: 101, amount: 4 },
+              { price: 103, amount: 5 }
+            ],
+            timestamp: localTimestamp,
+            localTimestamp
+          }
+        ]
+      )
+    }
   })
 
   test('map bitfinex derivatives book ticker messages with trailing null placeholder', () => {
