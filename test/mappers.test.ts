@@ -3300,10 +3300,10 @@ describe('mappers', () => {
     }
   })
 
-  test('merge buffered Aster depth changes into normalized snapshots', () => {
+  test('merge buffered depth changes into normalized snapshots', () => {
     const localTimestamp = new Date()
 
-    for (const exchange of ['aster', 'aster-futures'] as const) {
+    for (const exchange of ['aster', 'aster-futures', 'binance', 'binance-futures'] as const) {
       const mapper = normalizeBookChanges(exchange, localTimestamp)
       const update = {
         stream: 'btcusdt@depth@0ms',
@@ -3312,9 +3312,9 @@ describe('mappers', () => {
           E: 1787302843505,
           T: 1787302843450,
           s: 'BTCUSDT',
-          U: 101,
+          U: 100,
           u: 101,
-          pu: 100,
+          pu: 99,
           b: [
             ['99', '0'],
             ['97', '3'],

@@ -164,28 +164,15 @@ class BinanceBookChangeMapper implements Mapper<
       //  mark given symbol depth info that has snapshot processed
       symbolDepthInfo.lastUpdateId = binanceDepthSnapshotData.lastUpdateId
       symbolDepthInfo.snapshotProcessed = true
+      const bidsByPrice = new Map(binanceDepthSnapshotData.bids.map((level) => [level[0], level]))
+      const asksByPrice = new Map(binanceDepthSnapshotData.asks.map((level) => [level[0], level]))
 
       // if there were any depth updates buffered, let's proccess those by adding to or updating the initial snapshot
       for (const update of symbolDepthInfo.bufferedUpdates.items()) {
         const bookChange = this.mapBookDepthUpdate(update, localTimestamp)
         if (bookChange !== undefined) {
-          for (const bid of update.b) {
-            const matchingBid = binanceDepthSnapshotData.bids.find((b) => b[0] === bid[0])
-            if (matchingBid !== undefined) {
-              matchingBid[1] = bid[1]
-            } else {
-              binanceDepthSnapshotData.bids.push(bid)
-            }
-          }
-
-          for (const ask of update.a) {
-            const matchingAsk = binanceDepthSnapshotData.asks.find((a) => a[0] === ask[0])
-            if (matchingAsk !== undefined) {
-              matchingAsk[1] = ask[1]
-            } else {
-              binanceDepthSnapshotData.asks.push(ask)
-            }
-          }
+          this.applyLevelUpdates(bidsByPrice, update.b)
+          this.applyLevelUpdates(asksByPrice, update.a)
         }
       }
 
@@ -197,8 +184,8 @@ class BinanceBookChangeMapper implements Mapper<
         symbol,
         exchange: this.exchange,
         isSnapshot: true,
-        bids: binanceDepthSnapshotData.bids.map(this.mapBookLevel),
-        asks: binanceDepthSnapshotData.asks.map(this.mapBookLevel),
+        bids: [...bidsByPrice.values()].map(this.mapBookLevel),
+        asks: [...asksByPrice.values()].map(this.mapBookLevel),
         timestamp: binanceDepthSnapshotData.T !== undefined ? fromMicroSecondsToDate(binanceDepthSnapshotData.T) : localTimestamp,
         localTimestamp
       }
@@ -265,6 +252,16 @@ class BinanceBookChangeMapper implements Mapper<
     const price = Number(level[0])
     const amount = Number(level[1])
     return { price, amount }
+  }
+
+  private applyLevelUpdates(levelsByPrice: Map<string, BinanceBookLevel>, updates: BinanceBookLevel[]) {
+    for (const level of updates) {
+      if (Number(level[1]) === 0) {
+        levelsByPrice.delete(level[0])
+      } else {
+        levelsByPrice.set(level[0], level)
+      }
+    }
   }
 }
 
