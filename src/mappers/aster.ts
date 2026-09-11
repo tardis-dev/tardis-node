@@ -306,6 +306,9 @@ class AsterFuturesDerivativeTickerMapper implements Mapper<'aster-futures', Deri
         pendingTickerInfo.updateTimestamp(new Date(data.E))
       }
     } else if ('openInterest' in data) {
+      if (data.time === 0) {
+        return
+      }
       pendingTickerInfo.updateOpenInterest(Number(data.openInterest))
       pendingTickerInfo.updateTimestamp(new Date(data.time))
     }

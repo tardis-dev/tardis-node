@@ -3257,6 +3257,25 @@ describe('mappers', () => {
     )
   })
 
+  test('ignore Aster futures open interest with zero time', () => {
+    const localTimestamp = new Date('2026-09-11T09:03:06.069Z')
+    const mapper = createMapper('aster-futures', localTimestamp)
+    const messages = mapper.map(
+      { stream: 'laptop@openInterest', generated: true, data: { symbol: 'LAPTOP', openInterest: '0', time: 0 } },
+      localTimestamp
+    )
+
+    assert.deepEqual(messages, [])
+
+    const validMessages = mapper.map(
+      { stream: 'laptop@openInterest', generated: true, data: { symbol: 'LAPTOP', openInterest: '0', time: localTimestamp.valueOf() } },
+      localTimestamp
+    )
+    assert.equal(validMessages.length, 1)
+    assert.equal(validMessages[0].openInterest, 0)
+    assert.deepEqual(validMessages[0].timestamp, localTimestamp)
+  })
+
   test('reject Aster realtime depth updates without snapshot overlap', () => {
     const localTimestamp = new Date('2026-08-22T10:00:00.000Z')
 
