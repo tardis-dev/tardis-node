@@ -295,14 +295,23 @@ export type LighterTrade = {
   taker_initial_margin_fraction_before?: number
   taker_position_sign_changed?: boolean
   taker_allocated_margin_usdc_before?: number
+  taker_allocated_margin_usdc_after?: number
   maker_fee?: number
   maker_position_size_before?: string
   maker_entry_quote_before?: string
   maker_initial_margin_fraction_before?: number
   maker_position_sign_changed?: boolean
+  maker_allocated_margin_usdc_before?: number
+  maker_allocated_margin_usdc_after?: number
   transaction_time: number
   ask_account_pnl?: string
   bid_account_pnl?: string
+  integrator_taker_fee?: number
+  integrator_taker_fee_collector_index?: number
+  integrator_maker_fee?: number
+  integrator_maker_fee_collector_index?: number
+  ask_order_version?: number
+  bid_order_version?: number
 }
 
 export type LighterTradeMessage = {
@@ -319,6 +328,8 @@ export type LighterMarketStats = {
   index_price: string
   mark_price: string
   mid_price: string
+  best_ask_price: string
+  best_bid_price: string
   open_interest: string
   open_interest_limit: string
   funding_clamp_small: string
@@ -332,6 +343,8 @@ export type LighterMarketStats = {
   daily_price_low: number
   daily_price_high: number
   daily_price_change: number
+  base_interest_rate: string
+  premium?: string
 }
 
 export type LighterMarketStatsAllMessage = {
@@ -355,6 +368,8 @@ export type LighterSpotMarketStats = {
   market_id: number
   index_price: string
   mid_price: string
+  best_ask_price: string
+  best_bid_price: string
   last_trade_price: string
   daily_base_token_volume: number
   daily_quote_token_volume: number
