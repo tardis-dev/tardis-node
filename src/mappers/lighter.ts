@@ -4,14 +4,21 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
 
 export const lighterMappers = exchangeMappers({
-  lighter: {
-    trades: () => new LighterTradesMapper(),
-    bookChanges: () => new LighterBookChangeMapper(),
-    derivativeTickers: () => new LighterDerivativeTickerMapper(),
-    liquidations: () => new LighterLiquidationMapper(),
-    bookTickers: () => new LighterBookTickerMapper()
-  }
+  lighter: createLighterMappers('lighter'),
+  'lighter-rh': createLighterMappers('lighter-rh')
 })
+
+type LighterExchange = 'lighter' | 'lighter-rh'
+
+function createLighterMappers<T extends LighterExchange>(exchange: T) {
+  return {
+    trades: () => new LighterTradesMapper(exchange),
+    bookChanges: () => new LighterBookChangeMapper(exchange),
+    derivativeTickers: () => new LighterDerivativeTickerMapper(exchange),
+    liquidations: () => new LighterLiquidationMapper(exchange),
+    bookTickers: () => new LighterBookTickerMapper(exchange)
+  }
+}
 
 function parseChannelMarketId(channel: string): string | undefined {
   const colonIndex = channel.indexOf(':')
@@ -25,7 +32,9 @@ function parseChannelMarketId(channel: string): string | undefined {
   return suffix
 }
 
-class LighterTradesMapper implements Mapper<'lighter', Trade> {
+class LighterTradesMapper<T extends LighterExchange> implements Mapper<T, Trade> {
+  constructor(private readonly exchange: T) {}
+
   canHandle(message: LighterTradeMessage) {
     return message.type === 'update/trade'
   }
@@ -44,7 +53,7 @@ class LighterTradesMapper implements Mapper<'lighter', Trade> {
       yield {
         type: 'trade',
         symbol: trade.market_id.toString(),
-        exchange: 'lighter',
+        exchange: this.exchange,
         id: trade.trade_id_str,
         price: Number(trade.price),
         amount: Number(trade.size),
@@ -56,7 +65,9 @@ class LighterTradesMapper implements Mapper<'lighter', Trade> {
   }
 }
 
-class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
+class LighterLiquidationMapper<T extends LighterExchange> implements Mapper<T, Liquidation> {
+  constructor(private readonly exchange: T) {}
+
   canHandle(message: LighterTradeMessage) {
     return message.type === 'update/trade'
   }
@@ -83,7 +94,7 @@ class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
       yield {
         type: 'liquidation',
         symbol: trade.market_id.toString(),
-        exchange: 'lighter',
+        exchange: this.exchange,
         id: trade.trade_id_str,
         price: Number(trade.price),
         amount: Number(trade.size),
@@ -95,7 +106,9 @@ class LighterLiquidationMapper implements Mapper<'lighter', Liquidation> {
   }
 }
 
-class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
+class LighterBookChangeMapper<T extends LighterExchange> implements Mapper<T, BookChange> {
+  constructor(private readonly exchange: T) {}
+
   canHandle(message: LighterOrderBookMessage) {
     return message.type === 'subscribed/order_book' || message.type === 'update/order_book'
   }
@@ -116,7 +129,7 @@ class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
     yield {
       type: 'book_change',
       symbol,
-      exchange: 'lighter',
+      exchange: this.exchange,
       isSnapshot: message.type === 'subscribed/order_book',
       bids: message.order_book.bids.map(this.mapLevel),
       asks: message.order_book.asks.map(this.mapLevel),
@@ -133,7 +146,9 @@ class LighterBookChangeMapper implements Mapper<'lighter', BookChange> {
   }
 }
 
-class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
+class LighterBookTickerMapper<T extends LighterExchange> implements Mapper<T, BookTicker> {
+  constructor(private readonly exchange: T) {}
+
   canHandle(message: LighterTickerMessage) {
     return message.type === 'update/ticker'
   }
@@ -154,7 +169,7 @@ class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
     yield {
       type: 'book_ticker',
       symbol,
-      exchange: 'lighter',
+      exchange: this.exchange,
       askAmount: asNonZeroNumberOrUndefined(message.ticker?.a?.size),
       askPrice: asNonZeroNumberOrUndefined(message.ticker?.a?.price),
       bidPrice: asNonZeroNumberOrUndefined(message.ticker?.b?.price),
@@ -165,8 +180,10 @@ class LighterBookTickerMapper implements Mapper<'lighter', BookTicker> {
   }
 }
 
-class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicker> {
+class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper<T, DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  constructor(private readonly exchange: T) {}
 
   canHandle(message: LighterMarketStatsMessage) {
     return message.type === 'update/market_stats'
@@ -183,7 +200,7 @@ class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicke
 
   *map(message: LighterMarketStatsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const entry of this.iterateMarketStats(message)) {
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), 'lighter')
+      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), this.exchange)
 
       pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
       pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
@@ -210,12 +227,12 @@ class LighterDerivativeTickerMapper implements Mapper<'lighter', DerivativeTicke
   }
 }
 
-type LighterLevel = {
+export type LighterLevel = {
   price: string
   size: string
 }
 
-type LighterOrderBook = {
+export type LighterOrderBook = {
   asks: LighterLevel[]
   bids: LighterLevel[]
   code: number
@@ -225,7 +242,7 @@ type LighterOrderBook = {
   last_updated_at: number
 }
 
-type LighterOrderBookMessage = {
+export type LighterOrderBookMessage = {
   type: 'subscribed/order_book' | 'update/order_book'
   channel: `order_book:${number}`
   last_updated_at: number
@@ -234,14 +251,14 @@ type LighterOrderBookMessage = {
   order_book: LighterOrderBook
 }
 
-type LighterTicker = {
+export type LighterTicker = {
   s: string
   a?: Partial<LighterLevel>
   b?: Partial<LighterLevel>
   last_updated_at: number
 }
 
-type LighterTickerMessage = {
+export type LighterTickerMessage = {
   type: 'subscribed/ticker' | 'update/ticker'
   channel: `ticker:${number}`
   last_updated_at: number
@@ -250,7 +267,7 @@ type LighterTickerMessage = {
   timestamp: number
 }
 
-type LighterTrade = {
+export type LighterTrade = {
   trade_id: number
   trade_id_str: string
   tx_hash: string
@@ -288,7 +305,7 @@ type LighterTrade = {
   bid_account_pnl?: string
 }
 
-type LighterTradeMessage = {
+export type LighterTradeMessage = {
   type: 'subscribed/trade' | 'update/trade'
   channel: `trade:${number}`
   nonce: number
@@ -296,7 +313,7 @@ type LighterTradeMessage = {
   liquidation_trades?: LighterTrade[]
 }
 
-type LighterMarketStats = {
+export type LighterMarketStats = {
   symbol: string
   market_id: number
   index_price: string
@@ -317,23 +334,23 @@ type LighterMarketStats = {
   daily_price_change: number
 }
 
-type LighterMarketStatsAllMessage = {
+export type LighterMarketStatsAllMessage = {
   type: 'subscribed/market_stats' | 'update/market_stats'
   channel: 'market_stats:all'
   timestamp: number
   market_stats: Record<string, LighterMarketStats>
 }
 
-type LighterMarketStatsMarketIdMessage = {
+export type LighterMarketStatsMarketIdMessage = {
   type: 'subscribed/market_stats' | 'update/market_stats'
   channel: `market_stats:${number}`
   timestamp: number
   market_stats: LighterMarketStats
 }
 
-type LighterMarketStatsMessage = LighterMarketStatsAllMessage | LighterMarketStatsMarketIdMessage
+export type LighterMarketStatsMessage = LighterMarketStatsAllMessage | LighterMarketStatsMarketIdMessage
 
-type LighterSpotMarketStats = {
+export type LighterSpotMarketStats = {
   symbol: string
   market_id: number
   index_price: string
@@ -346,18 +363,18 @@ type LighterSpotMarketStats = {
   daily_price_change: number
 }
 
-type LighterSpotMarketStatsAllMessage = {
+export type LighterSpotMarketStatsAllMessage = {
   type: 'subscribed/spot_market_stats' | 'update/spot_market_stats'
   channel: 'spot_market_stats:all'
   timestamp: number
   spot_market_stats: Record<string, LighterSpotMarketStats>
 }
 
-type LighterSpotMarketStatsMarketIdMessage = {
+export type LighterSpotMarketStatsMarketIdMessage = {
   type: 'subscribed/spot_market_stats' | 'update/spot_market_stats'
   channel: `spot_market_stats:${number}`
   timestamp: number
   spot_market_stats: LighterSpotMarketStats
 }
 
-type LighterSpotMarketStatsMessage = LighterSpotMarketStatsAllMessage | LighterSpotMarketStatsMarketIdMessage
+export type LighterSpotMarketStatsMessage = LighterSpotMarketStatsAllMessage | LighterSpotMarketStatsMarketIdMessage

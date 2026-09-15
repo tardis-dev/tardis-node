@@ -2700,6 +2700,82 @@ exports[`map kucoin-futures messages 9`] = `
 ]
 `;
 
+exports[`map lighter RH market stats messages 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "lastPrice": 2521.18,
+    "openInterest": 20701782.30043,
+    "fundingRate": 0.0012,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 2521.98,
+    "markPrice": 2521.42,
+    "timestamp": "2026-09-14T08:32:02.769Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH order book messages 1`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 2521.18,
+        "amount": 0.3966
+      }
+    ],
+    "asks": [
+      {
+        "price": 2521.52,
+        "amount": 0.2321
+      }
+    ],
+    "timestamp": "2026-09-14T08:32:01.136Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH ticker messages 1`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "askAmount": 0.2321,
+    "askPrice": 2521.52,
+    "bidPrice": 2521.19,
+    "bidAmount": 1.3554,
+    "timestamp": "2026-09-14T08:32:01.652Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH trade messages 1`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "id": "661593832",
+    "price": 2521.18,
+    "amount": 0.0523,
+    "side": "sell",
+    "timestamp": "2026-09-14T08:32:02.541Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
 exports[`map lighter market stats messages 1`] = `
 []
 `;

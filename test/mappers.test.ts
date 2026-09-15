@@ -41,6 +41,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'coinbase-international',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'bullish'
 ]
 
@@ -88,6 +89,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'coinbase-international',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'gemini',
   'bullish',
   'mexc',
@@ -120,7 +122,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'okex-swap',
   'dydx-v4',
   'bitget-futures',
-  'lighter'
+  'lighter',
+  'lighter-rh'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -12181,6 +12184,164 @@ test('map lighter ticker messages', () => {
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
     snapshot(mappedMessages)
+  }
+})
+
+test('map lighter RH trade messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/trade — real captured RH message
+    {
+      channel: 'trade:0',
+      liquidation_trades: [],
+      nonce: 1777827447,
+      trades: [
+        {
+          trade_id: 661593832,
+          trade_id_str: '661593832',
+          tx_hash: '08573b0bdb7adecdddd080a173b994dc7275b7ec0bd4c33931e472cdd7cae5debf8eb4c7ec8be860',
+          type: 'trade',
+          market_id: 0,
+          size: '0.0523',
+          price: '2521.18',
+          usd_amount: '131.857714',
+          ask_id: 281475049306654,
+          ask_id_str: '281475049306654',
+          bid_id: 562949877266857,
+          bid_id_str: '562949877266857',
+          ask_client_id: 105349662651628,
+          ask_client_id_str: '105349662651628',
+          bid_client_id: 560867,
+          bid_client_id_str: '560867',
+          ask_account_id: 23521,
+          bid_account_id: 4838,
+          is_maker_ask: false,
+          block_height: 21843648,
+          timestamp: 1789374722541,
+          taker_position_size_before: '0.0000',
+          taker_entry_quote_before: '0.000000',
+          taker_initial_margin_fraction_before: 5000,
+          taker_position_sign_changed: true,
+          maker_fee: 102,
+          maker_position_size_before: '-2.3285',
+          maker_entry_quote_before: '5876.196844',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1789374722613391,
+          maker_allocated_margin_usdc_before: 118083597,
+          maker_allocated_margin_usdc_after: 115431344,
+          ask_order_version: 0,
+          bid_order_version: 0
+        }
+      ],
+      type: 'update/trade'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH order book messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // subscribed/order_book — real captured RH snapshot
+    {
+      channel: 'order_book:0',
+      last_updated_at: 1789374721048002,
+      offset: 11835516,
+      order_book: {
+        code: 0,
+        asks: [{ price: '2521.52', size: '0.2321' }],
+        bids: [{ price: '2521.18', size: '0.3966' }],
+        offset: 11835516,
+        nonce: 1777826317,
+        last_updated_at: 1789374721048002,
+        begin_nonce: 0
+      },
+      timestamp: 1789374721136,
+      type: 'subscribed/order_book'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH market stats messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/market_stats — real captured RH message
+    {
+      channel: 'market_stats:0',
+      market_stats: {
+        symbol: 'ETH',
+        market_id: 0,
+        index_price: '2521.98',
+        mark_price: '2521.42',
+        mid_price: '2521.35',
+        best_ask_price: '2521.52',
+        best_bid_price: '2521.18',
+        open_interest: '20701782.300430',
+        open_interest_limit: '72057594037927936.000000',
+        funding_clamp_small: '0.0500',
+        funding_clamp_big: '4.0000',
+        last_trade_price: '2521.18',
+        current_funding_rate: '0.0012',
+        funding_rate: '0.0012',
+        funding_timestamp: 1789372800000,
+        daily_base_token_volume: 25607.4639,
+        daily_quote_token_volume: 63982448.703414,
+        daily_price_low: 2461.78,
+        daily_price_high: 2532.01,
+        daily_price_change: 1.5223194334282182,
+        base_interest_rate: '0.0100',
+        premium: '-0.0104'
+      },
+      timestamp: 1789374722769,
+      type: 'update/market_stats'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH ticker messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/ticker — real captured RH message
+    {
+      channel: 'ticker:0',
+      last_updated_at: 1789374721651704,
+      nonce: 1777826727,
+      ticker: {
+        s: 'ETH',
+        a: { price: '2521.52', size: '0.2321' },
+        b: { price: '2521.19', size: '1.3554' },
+        last_updated_at: 1789374721651704
+      },
+      timestamp: 1789374721652,
+      type: 'update/ticker'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
   }
 })
 
