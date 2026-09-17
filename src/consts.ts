@@ -1,6 +1,7 @@
 export const EXCHANGES = [
   'aster',
   'aster-futures',
+  'bitvavo',
   'bitmex',
   'deribit',
   'binance-futures',
@@ -109,6 +110,7 @@ const BITMEX_CHANNELS = [
 ] as const
 
 const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book'] as const
+const BITVAVO_CHANNELS = ['book', 'getBook', 'trade', 'ticker'] as const
 
 const COINBASE_CHANNELS = [
   'match',
@@ -584,6 +586,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   deribit: DERIBIT_CHANNELS,
   cryptofacilities: CRYPTOFACILITIES_CHANNELS,
   bitstamp: BITSTAMP_CHANNELS,
+  bitvavo: BITVAVO_CHANNELS,
   kraken: KRAKEN_CHANNELS,
   okex: OKEX_CHANNELS,
   'okex-swap': OKEX_SWAP_CHANNELS,
