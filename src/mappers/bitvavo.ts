@@ -128,6 +128,8 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
 }
 
 class BitvavoBookTickerMapper implements Mapper<'bitvavo', BookTicker> {
+  private readonly quotesByMarket = new Map<string, BitvavoQuote>()
+
   canHandle(message: BitvavoMessage): message is BitvavoTickerMessage {
     return (
       'event' in message &&
@@ -141,14 +143,31 @@ class BitvavoBookTickerMapper implements Mapper<'bitvavo', BookTicker> {
   }
 
   *map(message: BitvavoTickerMessage, localTimestamp: Date): IterableIterator<BookTicker> {
+    let quote = this.quotesByMarket.get(message.market)
+    if (quote === undefined) {
+      quote = { askAmount: undefined, askPrice: undefined, bidAmount: undefined, bidPrice: undefined }
+      this.quotesByMarket.set(message.market, quote)
+    }
+
+    // Recorded ticker payloads omit unchanged fields, so retain the previous quote per market.
+    if ('bestAskSize' in message) {
+      quote.askAmount = asNonZeroNumberOrUndefined(message.bestAskSize)
+    }
+    if ('bestAsk' in message) {
+      quote.askPrice = asNonZeroNumberOrUndefined(message.bestAsk)
+    }
+    if ('bestBidSize' in message) {
+      quote.bidAmount = asNonZeroNumberOrUndefined(message.bestBidSize)
+    }
+    if ('bestBid' in message) {
+      quote.bidPrice = asNonZeroNumberOrUndefined(message.bestBid)
+    }
+
     yield {
       type: 'book_ticker',
       symbol: message.market,
       exchange: 'bitvavo',
-      askAmount: asNonZeroNumberOrUndefined(message.bestAskSize),
-      askPrice: asNonZeroNumberOrUndefined(message.bestAsk),
-      bidAmount: asNonZeroNumberOrUndefined(message.bestBidSize),
-      bidPrice: asNonZeroNumberOrUndefined(message.bestBid),
+      ...quote,
       timestamp: localTimestamp,
       localTimestamp
     }
@@ -216,6 +235,13 @@ type BitvavoTickerMessage = {
   bestBid?: string
   bestBidSize?: string
   lastPrice?: string
+}
+
+type BitvavoQuote = {
+  askAmount: number | undefined
+  askPrice: number | undefined
+  bidAmount: number | undefined
+  bidPrice: number | undefined
 }
 
 type BitvavoControlMessage = {

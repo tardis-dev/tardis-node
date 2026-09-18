@@ -4,6 +4,7 @@ import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws-mdpro.bitvavo.com/v2/'
+  protected readonly throttleSubscribeMS = 25
   private nextRequestId = 1
   private pendingAuthentication?: {
     resolve: () => void

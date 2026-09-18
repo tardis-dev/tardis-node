@@ -13299,6 +13299,65 @@ test('map bitvavo messages', () => {
   }
 })
 
+test('preserves unchanged Bitvavo ticker fields and handles explicit removals', () => {
+  const localTimestamp = new Date('2026-09-16T07:36:12.000Z')
+  const mapper = createMapper('bitvavo', localTimestamp)
+
+  mapper.map(
+    {
+      event: 'ticker',
+      market: 'ETH-EUR',
+      bestBid: '100',
+      bestBidSize: '2',
+      bestAsk: '101',
+      bestAskSize: '3'
+    },
+    localTimestamp
+  )
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '99', bestBidSize: '4' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 3,
+      askPrice: 101,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestAsk: '102', bestAskSize: '5' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '0', bestBidSize: '0' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: undefined,
+      bidPrice: undefined,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+})
+
 test('map polymarket messages', () => {
   const localTimestamp = new Date('2026-05-11T06:30:00.000Z')
 
