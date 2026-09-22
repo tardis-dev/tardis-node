@@ -646,6 +646,103 @@ describe('mappers', () => {
     }
   })
 
+  test('map deribit skips book updates already covered by the snapshot', () => {
+    const localTimestamp = new Date('2026-09-22T00:00:04.107Z')
+    const mapper = normalizeBookChanges('deribit', localTimestamp)
+    // Recorded XRP_USDC-22SEP26-1d52-C startup overlap on 2026-09-22.
+    const messages = [
+      {
+        timestamp: 1790035202619,
+        type: 'snapshot',
+        change_id: 193075751593,
+        bids: [['new', 0.0205, 25000]],
+        asks: [['new', 0.028, 25000]]
+      },
+      {
+        timestamp: 1790035202489,
+        type: 'change',
+        change_id: 193075750635,
+        prev_change_id: 193075747266,
+        bids: [['change', 0.021, 25000]],
+        asks: []
+      },
+      {
+        timestamp: 1790035202619,
+        type: 'change',
+        change_id: 193075751593,
+        prev_change_id: 193075750635,
+        bids: [
+          ['delete', 0.021, 0],
+          ['new', 0.0205, 25000]
+        ],
+        asks: []
+      },
+      {
+        timestamp: 1790035203098,
+        type: 'change',
+        change_id: 193075755879,
+        prev_change_id: 193075751593,
+        bids: [],
+        asks: [
+          ['new', 0.0275, 25000],
+          ['delete', 0.028, 0]
+        ]
+      }
+    ].map((data) => ({
+      params: { channel: 'book.XRP_USDC-22SEP26-1d52-C.raw', data: { instrument_name: 'XRP_USDC-22SEP26-1d52-C', ...data } }
+    }))
+
+    const normalized = messages.flatMap((message) => Array.from(mapper.map(message, localTimestamp) ?? []))
+    assert.deepStrictEqual(
+      normalized.map(({ isSnapshot, bids, asks }) => ({ isSnapshot, bids, asks })),
+      [
+        { isSnapshot: true, bids: [{ price: 0.0205, amount: 25000 }], asks: [{ price: 0.028, amount: 25000 }] },
+        {
+          isSnapshot: false,
+          bids: [],
+          asks: [
+            { price: 0.0275, amount: 25000 },
+            { price: 0.028, amount: 0 }
+          ]
+        }
+      ]
+    )
+  })
+
+  test('map deribit keeps snapshot alignment separate by instrument and mapper and resets it on snapshots', () => {
+    const localTimestamp = new Date('2026-09-22T00:00:00Z')
+    const mapper = normalizeBookChanges('deribit', localTimestamp)
+    const mapBook = (target: typeof mapper, symbol: string, changeId: number, previousId?: number, type?: 'snapshot' | 'change') =>
+      Array.from(
+        target.map(
+          {
+            params: {
+              channel: `book.${symbol}.raw`,
+              data: {
+                instrument_name: symbol,
+                timestamp: localTimestamp.valueOf(),
+                change_id: changeId,
+                prev_change_id: previousId,
+                type,
+                bids: [],
+                asks: []
+              }
+            }
+          },
+          localTimestamp
+        ) ?? []
+      )
+
+    assert.strictEqual(mapBook(mapper, 'BTC-PERPETUAL', 100)[0].isSnapshot, true)
+    assert.strictEqual(mapBook(mapper, 'ETH-PERPETUAL', 10, 0)[0].isSnapshot, true)
+    assert.strictEqual(mapBook(mapper, 'ETH-PERPETUAL', 11, 10).length, 1)
+    assert.deepStrictEqual(mapBook(mapper, 'BTC-PERPETUAL', 99, 98), [])
+    assert.strictEqual(mapBook(normalizeBookChanges('deribit', localTimestamp), 'BTC-PERPETUAL', 99, 98).length, 1)
+    assert.strictEqual(mapBook(mapper, 'BTC-PERPETUAL', 200, 199, 'snapshot')[0].isSnapshot, true)
+    assert.deepStrictEqual(mapBook(mapper, 'BTC-PERPETUAL', 150, 149), [])
+    assert.strictEqual(mapBook(mapper, 'BTC-PERPETUAL', 201, 200).length, 1)
+  })
+
   test('map bitmex messages', () => {
     const messages = [
       {

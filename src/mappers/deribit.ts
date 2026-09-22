@@ -8,7 +8,7 @@ import { exchangeMappers } from './registry.ts'
 export const deribitMappers = exchangeMappers({
   deribit: {
     trades: () => deribitTradesMapper,
-    bookChanges: () => deribitBookChangeMapper,
+    bookChanges: () => new DeribitBookChangeMapper(),
     derivativeTickers: () => new DeribitDerivativeTickerMapper(),
     optionsSummary: () => new DeribitOptionSummaryMapper(),
     liquidations: () => deribitLiquidationsMapper,
@@ -81,7 +81,9 @@ const mapBookLevel = (level: DeribitBookLevel) => {
   return { price, amount }
 }
 
-const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
+class DeribitBookChangeMapper implements Mapper<'deribit', BookChange> {
+  private readonly _snapshotChangeIds = new Map<string, number>()
+
   canHandle(message: any) {
     const channel = message.params && (message.params.channel as string | undefined)
     if (channel === undefined) {
@@ -89,18 +91,18 @@ const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
     }
 
     return channel.startsWith('book')
-  },
+  }
 
   getFilters(symbols?: string[]) {
     symbols = deribitCasing(symbols)
 
     return [
       {
-        channel: 'book',
+        channel: 'book' as const,
         symbols
       }
     ]
-  },
+  }
 
   *map(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const deribitBookChange = message.params.data
@@ -109,6 +111,16 @@ const deribitBookChangeMapper: Mapper<'deribit', BookChange> = {
       (deribitBookChange.type !== undefined && deribitBookChange.type === 'snapshot') ||
       deribitBookChange.prev_change_id === undefined ||
       deribitBookChange.prev_change_id === 0
+
+    if (isSnapshot) {
+      this._snapshotChangeIds.set(deribitBookChange.instrument_name, deribitBookChange.change_id)
+    } else {
+      const snapshotChangeId = this._snapshotChangeIds.get(deribitBookChange.instrument_name)
+      // Deribit can send queued changes already covered by the preceding snapshot.
+      if (snapshotChangeId !== undefined && deribitBookChange.change_id <= snapshotChangeId) {
+        return
+      }
+    }
 
     yield {
       type: 'book_change',
@@ -361,6 +373,7 @@ type DeribitBookMessage = DeribitMessage & {
     data: {
       timestamp: number
       instrument_name: string
+      change_id: number
       prev_change_id?: number
       bids: DeribitBookLevel[]
       asks: DeribitBookLevel[]
