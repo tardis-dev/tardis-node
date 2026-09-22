@@ -2,7 +2,7 @@ import { debug } from './debug.ts'
 import { createNormalizedSymbolFilter, getFilters, normalizeMessages } from './handy.ts'
 import { MapperFactory } from './mappers/index.ts'
 import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from './realtimeiterator.ts'
-import { createRealTimeFeed } from './realtimefeeds/index.ts'
+import { createRealTimeFeed, getRealTimeFeedFactory } from './realtimefeeds/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
 
 type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
@@ -82,6 +82,8 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
   state: NormalizedStreamState,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
+  getRealTimeFeedFactory(exchange)
+
   while (state.closed === false) {
     try {
       const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))

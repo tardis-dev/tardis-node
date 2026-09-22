@@ -10,7 +10,6 @@ import {
 import { BinanceDexRealTimeFeed } from './binancedex.ts'
 import { BitfinexRealTimeFeed } from './bitfinex.ts'
 import { BitflyerRealTimeFeed } from './bitflyer.ts'
-import { BitmexRealTimeFeed } from './bitmex.ts'
 import { BitstampRealTimeFeed } from './bitstamp.ts'
 import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed } from './bybit.ts'
 import { CoinbaseRealTimeFeed } from './coinbase.ts'
@@ -65,7 +64,6 @@ const realTimeFeedsMap: {
 } = {
   aster: AsterRealTimeFeed,
   'aster-futures': AsterFuturesRealTimeFeed,
-  bitmex: BitmexRealTimeFeed,
   binance: BinanceRealTimeFeed,
   'binance-jersey': BinanceJerseyRealTimeFeed,
   'binance-us': BinanceUSRealTimeFeed,
@@ -133,7 +131,7 @@ export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
     return realTimeFeedsMap[exchange]!
   }
 
-  throw new Error(`not supported exchange ${exchange}`)
+  throw new Error(`Real-time streaming is not supported for exchange ${exchange}`)
 }
 
 export function createRealTimeFeed(

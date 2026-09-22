@@ -4,10 +4,34 @@ import { test } from 'node:test'
 import { type Writable } from 'node:stream'
 import { type WebSocket, WebSocketServer } from 'ws'
 import { assert } from './assertions.ts'
-import { combine, compute, normalizeLiquidations, normalizeTrades, streamNormalized } from '../dist/index.js'
+import { combine, compute, normalizeLiquidations, normalizeTrades, stream, streamNormalized } from '../dist/index.js'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from '../dist/realtimefeeds/realtimefeed.js'
 import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from '../dist/realtimeiterator.js'
 import { HttpClientError } from '../dist/handy.js'
+
+test('rejects retired BitMEX raw streaming', async () => {
+  const messages = stream({ exchange: 'bitmex', filters: [{ channel: 'trade', symbols: ['XBTUSD'] }] })
+
+  await assert.rejects(messages.next(), /Real-time streaming is not supported for exchange bitmex/)
+  assert.deepStrictEqual(await messages.next(), { done: true, value: undefined })
+})
+
+for (const withDisconnectMessages of [false, true]) {
+  test(`rejects retired BitMEX normalized streaming without retrying (withDisconnectMessages=${withDisconnectMessages})`, async () => {
+    const messages = streamNormalized(
+      {
+        exchange: 'bitmex',
+        symbols: ['XBTUSD'],
+        withDisconnectMessages,
+        onError: () => assert.fail('An unsupported exchange must reject iteration instead of entering the retry loop')
+      },
+      normalizeTrades
+    )
+
+    await assert.rejects(messages.next(), /Real-time streaming is not supported for exchange bitmex/)
+    assert.deepStrictEqual(await messages.next(), { done: true, value: undefined })
+  })
+}
 
 test('return and async disposal are idempotent and prevent a source from starting', async () => {
   let starts = 0
