@@ -5338,6 +5338,12 @@ exports[`mappers > map bithumb messages 3`] = `
     "symbol": "KRW-BTC",
     "exchange": "bithumb",
     "isSnapshot": true,
+    "asks": [
+      {
+        "price": 116280000,
+        "amount": 0.0168
+      }
+    ],
     "bids": [
       {
         "price": 116263000,
@@ -5346,12 +5352,6 @@ exports[`mappers > map bithumb messages 3`] = `
       {
         "price": 116261000,
         "amount": 0.0026
-      }
-    ],
-    "asks": [
-      {
-        "price": 116280000,
-        "amount": 0.0168
       }
     ],
     "timestamp": "2026-09-22T09:59:16.406290Z",
