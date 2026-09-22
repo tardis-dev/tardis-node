@@ -39,14 +39,14 @@ describeLive('instrument info live', () => {
     type: 'perpetual',
     contractType: 'inverse_perpetual',
     underlyingType: 'native',
-    active: true
+    active: false
   }
 
   afterEach(() => {
     init()
   })
 
-  test('fetches and filters public BitMEX instrument metadata', async () => {
+  test('fetches and filters archived BitMEX instrument metadata', async () => {
     const instrument = await getInstrumentInfo('bitmex', 'XBTUSD')
 
     assert.partialDeepStrictEqual(instrument, {
@@ -58,7 +58,7 @@ describeLive('instrument info live', () => {
       type: 'perpetual',
       contractType: 'inverse_perpetual',
       underlyingType: 'native',
-      active: true
+      active: false
     })
 
     assert.deepStrictEqual(await findInstrumentSymbols(['bitmex'], bitmexXbtUsdPerpetualFilter), [
