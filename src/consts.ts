@@ -1,6 +1,7 @@
 export const EXCHANGES = [
   'aster',
   'aster-futures',
+  'bithumb',
   'bitmex',
   'deribit',
   'binance-futures',
@@ -109,6 +110,8 @@ const BITMEX_CHANNELS = [
 ] as const
 
 const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book'] as const
+
+const BITHUMB_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 
 const COINBASE_CHANNELS = [
   'match',
@@ -578,6 +581,7 @@ const POLYMARKET_CHANNELS = [
 export const EXCHANGE_CHANNELS_INFO = {
   aster: ASTER_CHANNELS,
   'aster-futures': ASTER_FUTURES_CHANNELS,
+  bithumb: BITHUMB_CHANNELS,
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
   'coinbase-international': COINBASE_INTERNATIONAL_CHANNELS,

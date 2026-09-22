@@ -10,6 +10,7 @@ import {
 import { BinanceDexRealTimeFeed } from './binancedex.ts'
 import { BitfinexRealTimeFeed } from './bitfinex.ts'
 import { BitflyerRealTimeFeed } from './bitflyer.ts'
+import { BithumbRealTimeFeed } from './bithumb.ts'
 import { BitstampRealTimeFeed } from './bitstamp.ts'
 import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed } from './bybit.ts'
 import { CoinbaseRealTimeFeed } from './coinbase.ts'
@@ -73,6 +74,7 @@ const realTimeFeedsMap: {
   bitfinex: BitfinexRealTimeFeed,
   'bitfinex-derivatives': BitfinexRealTimeFeed,
   bitflyer: BitflyerRealTimeFeed,
+  bithumb: BithumbRealTimeFeed,
   bitstamp: BitstampRealTimeFeed,
   coinbase: CoinbaseRealTimeFeed,
   cryptofacilities: CryptofacilitiesRealTimeFeed,
