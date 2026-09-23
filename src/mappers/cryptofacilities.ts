@@ -20,7 +20,7 @@ export const cryptofacilitiesMappers = exchangeMappers({
     ]),
     optionsSummary: () => new CryptofacilitiesOptionsSummaryMapper(),
     liquidations: () => cryptofacilitiesLiquidationsMapper,
-    bookTickers: () => cryptofacilitiesBookTickerMapper
+    bookTickers: () => new CryptofacilitiesBookTickerMapper()
   }
 })
 
@@ -172,7 +172,12 @@ class CryptofacilitiesOptionsSummaryMapper implements Mapper<'cryptofacilities',
   }
 
   getFilters(symbols?: string[]) {
-    return [{ channel: 'ticker', symbols: upperCaseSymbols(symbols) } as const]
+    return [
+      {
+        channel: 'ticker',
+        symbols: upperCaseSymbols(symbols)
+      } as const
+    ]
   }
 
   *map(ticker: CryptofacilitiesOptionTicker, localTimestamp: Date): IterableIterator<OptionSummary> {
@@ -247,38 +252,32 @@ const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation
   }
 }
 
-const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
-  canHandle(message: CryptofacilitiesTicker) {
+class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', BookTicker> {
+  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesTicker {
     return message.feed === 'ticker' && message.event === undefined
-  },
+  }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
-
     return [
       {
         channel: 'ticker',
-        symbols
-      }
+        symbols: upperCaseSymbols(symbols)
+      } as const
     ]
-  },
+  }
 
   *map(cryptofacilitiesTicker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<BookTicker> {
-    const ticker: BookTicker = {
+    yield {
       type: 'book_ticker',
       symbol: cryptofacilitiesTicker.product_id,
       exchange: 'cryptofacilities',
-
-      askAmount: cryptofacilitiesTicker.ask_size,
-      askPrice: cryptofacilitiesTicker.ask,
-
-      bidPrice: cryptofacilitiesTicker.bid,
-      bidAmount: cryptofacilitiesTicker.bid_size,
+      askAmount: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.ask_size),
+      askPrice: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.ask),
+      bidPrice: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.bid),
+      bidAmount: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.bid_size),
       timestamp: new Date(cryptofacilitiesTicker.time),
       localTimestamp: localTimestamp
     }
-
-    yield ticker
   }
 }
 

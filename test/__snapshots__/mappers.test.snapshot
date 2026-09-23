@@ -7355,10 +7355,10 @@ exports[`mappers > map cryptofacilities messages 14`] = `
     "type": "book_ticker",
     "symbol": "PF_SUIUSD",
     "exchange": "cryptofacilities",
-    "askAmount": 0,
-    "askPrice": 0,
-    "bidPrice": 0,
-    "bidAmount": 0,
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidPrice": undefined,
+    "bidAmount": undefined,
     "timestamp": "2023-05-03T12:20:02.169Z",
     "localTimestamp": "2019-09-01T00:00:01.275Z"
   }
@@ -7398,10 +7398,10 @@ exports[`mappers > map cryptofacilities messages 15`] = `
     "type": "book_ticker",
     "symbol": "OF_XBTUSD_260925_50000_P",
     "exchange": "cryptofacilities",
-    "askAmount": 0,
-    "askPrice": 0,
-    "bidPrice": 0,
-    "bidAmount": 0,
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidPrice": undefined,
+    "bidAmount": undefined,
     "timestamp": "2026-09-23T07:46:27.018Z",
     "localTimestamp": "2019-09-01T00:00:01.275Z"
   }
