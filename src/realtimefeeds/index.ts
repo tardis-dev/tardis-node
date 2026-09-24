@@ -51,7 +51,7 @@ import { DydxV4RealTimeFeed } from './dydx_v4.ts'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
-import { LighterRealTimeFeed } from './lighter.ts'
+import { LighterRealTimeFeed, LighterRhRealTimeFeed } from './lighter.ts'
 import { BullishRealTimeFeed } from './bullish.ts'
 import { MexcFuturesRealTimeFeed } from './mexcfutures.ts'
 import { MexcRealTimeFeed } from './mexc.ts'
@@ -121,6 +121,7 @@ const realTimeFeedsMap: {
   'coinbase-international': CoinbaseInternationalRealTimeFeed,
   hyperliquid: HyperliquidRealTimeFeed,
   lighter: LighterRealTimeFeed,
+  'lighter-rh': LighterRhRealTimeFeed,
   bullish: BullishRealTimeFeed,
   mexc: MexcRealTimeFeed,
   polymarket: PolymarketRealTimeFeed

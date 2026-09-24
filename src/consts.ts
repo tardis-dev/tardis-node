@@ -60,6 +60,7 @@ export const EXCHANGES = [
   'bitget-futures',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'bullish',
   'mexc',
   'polymarket'
@@ -637,6 +638,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'bitget-futures': BITGET_FUTURES_CHANNELS,
   hyperliquid: HYPERLIQUID_CHANNELS,
   lighter: LIGHTER_CHANNELS,
+  'lighter-rh': LIGHTER_CHANNELS,
   bullish: BULLISH_CHANNELS,
   mexc: MEXC_CHANNELS,
   polymarket: POLYMARKET_CHANNELS
