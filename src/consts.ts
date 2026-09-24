@@ -2,6 +2,7 @@ export const EXCHANGES = [
   'aster',
   'aster-futures',
   'bithumb',
+  'bitvavo',
   'bitmex',
   'deribit',
   'binance-futures',
@@ -61,6 +62,7 @@ export const EXCHANGES = [
   'bitget-futures',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'bullish',
   'mexc',
   'polymarket'
@@ -110,6 +112,7 @@ const BITMEX_CHANNELS = [
 ] as const
 
 const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book'] as const
+const BITVAVO_CHANNELS = ['book', 'getBook', 'trade', 'ticker'] as const
 
 const BITHUMB_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
 
@@ -588,6 +591,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   deribit: DERIBIT_CHANNELS,
   cryptofacilities: CRYPTOFACILITIES_CHANNELS,
   bitstamp: BITSTAMP_CHANNELS,
+  bitvavo: BITVAVO_CHANNELS,
   kraken: KRAKEN_CHANNELS,
   okex: OKEX_CHANNELS,
   'okex-swap': OKEX_SWAP_CHANNELS,
@@ -641,6 +645,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'bitget-futures': BITGET_FUTURES_CHANNELS,
   hyperliquid: HYPERLIQUID_CHANNELS,
   lighter: LIGHTER_CHANNELS,
+  'lighter-rh': LIGHTER_CHANNELS,
   bullish: BULLISH_CHANNELS,
   mexc: MEXC_CHANNELS,
   polymarket: POLYMARKET_CHANNELS

@@ -133,7 +133,7 @@ Example showing how to quickly display real-time spread and best bid/ask info ac
 import { streamNormalized, normalizeBookChanges, combine, compute, computeBookSnapshots } from 'tardis-dev'
 
 const exchangesToStream = [
-  { exchange: 'bitmex', symbols: ['XBTUSD'] },
+  { exchange: 'binance-futures', symbols: ['btcusdt'] },
   { exchange: 'deribit', symbols: ['BTC-PERPETUAL'] },
   { exchange: 'cryptofacilities', symbols: ['PI_XBTUSD'] }
 ]
@@ -246,6 +246,8 @@ for await (const { localTimestamp, message } of messages) {
   console.log(localTimestamp, message)
 }
 ```
+
+Bitvavo real-time streaming uses Market Data Pro and requires `BITVAVO_API_KEY` and `BITVAVO_API_SECRET` environment variables.
 
 <br/>
 

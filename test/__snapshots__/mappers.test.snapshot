@@ -863,6 +863,158 @@ exports[`map bitnomial messages 4`] = `
 ]
 `;
 
+exports[`map bitvavo messages 1`] = `
+[]
+`;
+
+exports[`map bitvavo messages 10`] = `
+[]
+`;
+
+exports[`map bitvavo messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "TAO-EUR",
+    "exchange": "bitvavo",
+    "id": "00000000-0000-057b-0000-0000002c34ff",
+    "price": 187.19,
+    "amount": 1,
+    "side": "buy",
+    "timestamp": "2026-09-16T07:35:42.667191Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 3`] = `
+[]
+`;
+
+exports[`map bitvavo messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 9998,
+        "amount": 1
+      }
+    ],
+    "asks": [
+      {
+        "price": 10001,
+        "amount": 3
+      }
+    ],
+    "timestamp": "2026-09-16T07:31:51.187257Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  },
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 9999,
+        "amount": 2
+      }
+    ],
+    "asks": [],
+    "timestamp": "2026-09-16T07:36:10.613624Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 5`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": false,
+    "bids": [],
+    "asks": [
+      {
+        "price": 10001,
+        "amount": 0
+      }
+    ],
+    "timestamp": "2026-09-16T07:36:11.613624Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 6`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "BLEND-EUR",
+    "exchange": "bitvavo",
+    "askAmount": 100,
+    "askPrice": 0.05248,
+    "bidAmount": 200,
+    "bidPrice": 0.05234,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 7`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "EUL-EUR",
+    "exchange": "bitvavo",
+    "askAmount": 10,
+    "askPrice": 1.097,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 8`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "MLN-EUR",
+    "exchange": "bitvavo",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": 5,
+    "bidPrice": 1.146,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 9`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "EMPTY-EUR",
+    "exchange": "bitvavo",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
 exports[`map bullish book ticker messages 1`] = `
 [
   {
@@ -2696,6 +2848,82 @@ exports[`map kucoin-futures messages 9`] = `
     "side": "sell",
     "timestamp": "2024-01-24T04:01:03.101Z",
     "localTimestamp": "2024-01-22T00:00:00.081Z"
+  }
+]
+`;
+
+exports[`map lighter RH market stats messages 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "lastPrice": 2521.18,
+    "openInterest": 20701782.30043,
+    "fundingRate": 0.0012,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 2521.98,
+    "markPrice": 2521.42,
+    "timestamp": "2026-09-14T08:32:02.769Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH order book messages 1`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 2521.18,
+        "amount": 0.3966
+      }
+    ],
+    "asks": [
+      {
+        "price": 2521.52,
+        "amount": 0.2321
+      }
+    ],
+    "timestamp": "2026-09-14T08:32:01.136Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH ticker messages 1`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "askAmount": 0.2321,
+    "askPrice": 2521.52,
+    "bidPrice": 2521.19,
+    "bidAmount": 1.3554,
+    "timestamp": "2026-09-14T08:32:01.652Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH trade messages 1`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "id": "661593832",
+    "price": 2521.18,
+    "amount": 0.0523,
+    "side": "sell",
+    "timestamp": "2026-09-14T08:32:02.541Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
   }
 ]
 `;

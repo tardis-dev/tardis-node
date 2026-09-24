@@ -12,6 +12,7 @@ import { BitfinexRealTimeFeed } from './bitfinex.ts'
 import { BitflyerRealTimeFeed } from './bitflyer.ts'
 import { BithumbRealTimeFeed } from './bithumb.ts'
 import { BitstampRealTimeFeed } from './bitstamp.ts'
+import { BitvavoRealTimeFeed } from './bitvavo.ts'
 import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed } from './bybit.ts'
 import { CoinbaseRealTimeFeed } from './coinbase.ts'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities.ts'
@@ -52,7 +53,7 @@ import { DydxV4RealTimeFeed } from './dydx_v4.ts'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
 import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
-import { LighterRealTimeFeed } from './lighter.ts'
+import { LighterRealTimeFeed, LighterRhRealTimeFeed } from './lighter.ts'
 import { BullishRealTimeFeed } from './bullish.ts'
 import { MexcFuturesRealTimeFeed } from './mexcfutures.ts'
 import { MexcRealTimeFeed } from './mexc.ts'
@@ -76,6 +77,7 @@ const realTimeFeedsMap: {
   bitflyer: BitflyerRealTimeFeed,
   bithumb: BithumbRealTimeFeed,
   bitstamp: BitstampRealTimeFeed,
+  bitvavo: BitvavoRealTimeFeed,
   coinbase: CoinbaseRealTimeFeed,
   cryptofacilities: CryptofacilitiesRealTimeFeed,
   deribit: DeribitRealTimeDataFeed,
@@ -123,6 +125,7 @@ const realTimeFeedsMap: {
   'coinbase-international': CoinbaseInternationalRealTimeFeed,
   hyperliquid: HyperliquidRealTimeFeed,
   lighter: LighterRealTimeFeed,
+  'lighter-rh': LighterRhRealTimeFeed,
   bullish: BullishRealTimeFeed,
   mexc: MexcRealTimeFeed,
   polymarket: PolymarketRealTimeFeed
