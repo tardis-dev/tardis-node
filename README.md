@@ -247,6 +247,8 @@ for await (const { localTimestamp, message } of messages) {
 }
 ```
 
+Bitvavo real-time streaming uses Market Data Pro and requires `BITVAVO_API_KEY` and `BITVAVO_API_SECRET` environment variables.
+
 <br/>
 
 ### Replay historical market data in exchange native data format

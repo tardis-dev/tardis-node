@@ -58,6 +58,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitfinex-derivatives',
   'bitflyer',
   'bitmex',
+  'bitvavo',
   'coinbase',
   'cryptofacilities',
   'deribit',
@@ -13462,6 +13463,157 @@ test('map mexc futures realtime depth update throws when first update has no sna
       ),
     errorMessageIncludes('MEXC futures depth snapshot has no overlap with first update')
   )
+})
+
+test('map bitvavo messages', () => {
+  const localTimestamp = new Date('2026-09-16T07:36:12.000Z')
+  const mapper = createMapper('bitvavo', localTimestamp)
+  const messages = [
+    {
+      event: 'subscribed',
+      subscriptions: { book: ['BTC-EUR'], trades: ['BTC-EUR'], ticker: ['BTC-EUR'] }
+    },
+    {
+      event: 'trade',
+      id: '00000000-0000-057b-0000-0000002c34ff',
+      amount: '1',
+      price: '187.19',
+      timestamp: 1789544142667,
+      market: 'TAO-EUR',
+      side: 'buy',
+      timestampNs: 1789544142667191452
+    },
+    {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 101,
+      bids: [['9999', '2']],
+      asks: [],
+      timestamp: 1789544170613624376,
+      startMdSeqNo: 101,
+      endMdSeqNo: 101,
+      type: 'update'
+    },
+    {
+      action: 'getBook',
+      requestId: 5,
+      response: {
+        market: 'BTC-EUR',
+        nonce: 100,
+        bids: [['9998', '1']],
+        asks: [['10001', '3']],
+        timestamp: 1789543911187257474,
+        mdSeqNo: 100
+      }
+    },
+    {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 102,
+      bids: [],
+      asks: [['10001', '0']],
+      timestamp: 1789544171613624376,
+      startMdSeqNo: 102,
+      endMdSeqNo: 102,
+      type: 'update'
+    },
+    {
+      event: 'ticker',
+      market: 'BLEND-EUR',
+      bestBid: '0.05234',
+      bestBidSize: '200',
+      bestAsk: '0.05248',
+      bestAskSize: '100'
+    },
+    {
+      event: 'ticker',
+      market: 'EUL-EUR',
+      bestAsk: '1.097',
+      bestAskSize: '10'
+    },
+    {
+      event: 'ticker',
+      market: 'MLN-EUR',
+      bestBid: '1.146',
+      bestBidSize: '5'
+    },
+    {
+      event: 'ticker',
+      market: 'EMPTY-EUR',
+      bestBid: '0',
+      bestBidSize: '0',
+      bestAsk: '0',
+      bestAskSize: '0'
+    },
+    {
+      event: 'ticker',
+      market: 'LSK-EUR',
+      lastPrice: '0.42'
+    }
+  ]
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('preserves unchanged Bitvavo ticker fields and handles explicit removals', () => {
+  const localTimestamp = new Date('2026-09-16T07:36:12.000Z')
+  const mapper = createMapper('bitvavo', localTimestamp)
+
+  mapper.map(
+    {
+      event: 'ticker',
+      market: 'ETH-EUR',
+      bestBid: '100',
+      bestBidSize: '2',
+      bestAsk: '101',
+      bestAskSize: '3'
+    },
+    localTimestamp
+  )
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '99', bestBidSize: '4' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 3,
+      askPrice: 101,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestAsk: '102', bestAskSize: '5' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '0', bestBidSize: '0' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: undefined,
+      bidPrice: undefined,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
 })
 
 test('map polymarket messages', () => {
