@@ -53,7 +53,7 @@ mock.module('worker_threads', {
   }
 })
 
-const { replay, replayNormalized } = await import('../dist/index.js')
+const { normalizeTrades, replay, replayNormalized } = await import('../dist/index.js')
 
 afterEach(() => {
   feed = ''
@@ -129,6 +129,35 @@ test('emits one disconnect marker for consecutive recorder gaps and preserves mi
   assert.ok(second !== undefined)
   assert.deepStrictEqual(second.message, { sequence: 2 })
   assert.strictEqual((await iterator.next()).done, true)
+})
+
+test('preserves Bithumb trade ids beyond the JavaScript safe integer range during replay', async () => {
+  const bithumbTradeLine = (sequentialId: string, streamType: 'SNAPSHOT' | 'REALTIME', millisecond: number) =>
+    `2026-09-22T00:00:00.000000${millisecond}Z {"type":"trade","code":"KRW-BTC","trade_price":116281000,"trade_volume":0.0012,"ask_bid":"BID","trade_timestamp":179003520000${millisecond},"sequential_id":${sequentialId},"timestamp":179003520000${millisecond},"stream_type":"${streamType}"}`
+
+  // Keep the fixture values as strings until interpolation so JavaScript cannot round the unquoted JSON numbers first.
+  const snapshotId = '1077860633149466017'
+  const realtimeId = '1077860633149466018'
+  const replayRange = { from: '2026-09-22T00:00:00.000Z', to: '2026-09-22T00:01:00.000Z' }
+  feed = `${bithumbTradeLine(snapshotId, 'SNAPSHOT', 0)}\n${bithumbTradeLine(realtimeId, 'REALTIME', 1)}\n`
+
+  const rawIds = []
+  for await (const { message } of replay({
+    exchange: 'bithumb',
+    filters: [{ channel: 'trade', symbols: ['KRW-BTC'] }],
+    ...replayRange
+  })) {
+    rawIds.push(message.sequential_id)
+  }
+
+  assert.deepStrictEqual(rawIds, [snapshotId, realtimeId])
+
+  const normalizedIds = []
+  for await (const message of replayNormalized({ exchange: 'bithumb', symbols: ['KRW-BTC'], ...replayRange }, normalizeTrades)) {
+    normalizedIds.push(message.id)
+  }
+
+  assert.deepStrictEqual(normalizedIds, [realtimeId])
 })
 
 test('parses fixed recorder timestamps across supported date boundaries', async () => {

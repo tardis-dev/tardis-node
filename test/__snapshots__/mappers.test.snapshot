@@ -5539,6 +5539,55 @@ exports[`mappers > map bitflyer messages 5`] = `
 ]
 `;
 
+exports[`mappers > map bithumb messages 1`] = `
+[]
+`;
+
+exports[`mappers > map bithumb messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "KRW-BTC",
+    "exchange": "bithumb",
+    "id": "1077860633149466018",
+    "price": 116281000,
+    "amount": 0.0012,
+    "side": "sell",
+    "timestamp": "2026-09-22T09:59:11.078Z",
+    "localTimestamp": "2026-09-22T19:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bithumb messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "KRW-BTC",
+    "exchange": "bithumb",
+    "isSnapshot": true,
+    "asks": [
+      {
+        "price": 116280000,
+        "amount": 0.0168
+      }
+    ],
+    "bids": [
+      {
+        "price": 116263000,
+        "amount": 0.0521
+      },
+      {
+        "price": 116261000,
+        "amount": 0.0026
+      }
+    ],
+    "timestamp": "2026-09-22T09:59:16.406290Z",
+    "localTimestamp": "2026-09-22T19:00:00.000Z"
+  }
+]
+`;
+
 exports[`mappers > map bitmex messages 1`] = `
 [
   {

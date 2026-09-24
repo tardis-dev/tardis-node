@@ -7,6 +7,7 @@ import { binanceEuropeanOptionsMappers } from './binanceeuropeanoptions.ts'
 import { bitfinexMappers } from './bitfinex.ts'
 import { bitflyerMappers } from './bitflyer.ts'
 import { bitgetMappers } from './bitget.ts'
+import { bithumbMappers } from './bithumb.ts'
 import { bitmexMappers } from './bitmex.ts'
 import { bitnomialMappers } from './bitnomial.ts'
 import { bitstampMappers } from './bitstamp.ts'
@@ -64,6 +65,7 @@ const registeredMappers = mergeExchangeMappers(
   bitfinexMappers,
   bitflyerMappers,
   bitgetMappers,
+  bithumbMappers,
   bitmexMappers,
   bitnomialMappers,
   bitstampMappers,

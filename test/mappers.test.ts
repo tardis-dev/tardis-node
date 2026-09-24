@@ -8745,6 +8745,65 @@ describe('mappers', () => {
     }
   })
 
+  test('map bithumb messages', () => {
+    const messages = [
+      {
+        type: 'trade',
+        code: 'KRW-BTC',
+        trade_price: 116280000,
+        trade_volume: 0.0008,
+        ask_bid: 'BID',
+        prev_closing_price: 115801000,
+        change: 'RISE',
+        change_price: 479000,
+        trade_date: '2026-09-22',
+        trade_time: '18:59:10',
+        trade_timestamp: 1790071150078,
+        sequential_id: '1077860633149466017',
+        timestamp: 1790071150369,
+        stream_type: 'SNAPSHOT'
+      },
+      {
+        type: 'trade',
+        code: 'KRW-BTC',
+        trade_price: 116281000,
+        trade_volume: 0.0012,
+        ask_bid: 'ASK',
+        prev_closing_price: 115801000,
+        change: 'RISE',
+        change_price: 480000,
+        trade_date: '2026-09-22',
+        trade_time: '18:59:11',
+        trade_timestamp: 1790071151078,
+        sequential_id: '1077860633149466018',
+        timestamp: 1790071151369,
+        stream_type: 'REALTIME'
+      },
+      {
+        type: 'orderbook',
+        code: 'KRW-BTC',
+        total_ask_size: 0.0193,
+        total_bid_size: 0.0694,
+        orderbook_units: [
+          { ask_price: 116280000, bid_price: 116263000, ask_size: 0.0168, bid_size: 0.0521 },
+          { ask_price: 116282000, bid_price: 116261000, ask_size: 0, bid_size: 0.0026 }
+        ],
+        level: 1,
+        timestamp: 1790071156406290,
+        stream_type: 'SNAPSHOT'
+      }
+    ]
+
+    const bithumb = createMapper('bithumb')
+
+    assert.deepEqual(normalizeTrades('bithumb', new Date()).getFilters(['krw-btc']), [{ channel: 'trade', symbols: ['KRW-BTC'] }])
+    assert.deepEqual(normalizeBookChanges('bithumb', new Date()).getFilters(['krw-btc']), [{ channel: 'orderbook', symbols: ['KRW-BTC'] }])
+
+    for (const message of messages) {
+      snapshot(bithumb.map(message, new Date('2026-09-22T19:00:00.000Z')))
+    }
+  })
+
   test('map ascendex messages', () => {
     const messages = [
       { m: 'trades', symbol: 'BNB/USDT', data: [{ p: '233.9451', q: '0.30', ts: 1616716800368, bm: true, seqnum: 36028837135976585 }] },
