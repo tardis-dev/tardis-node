@@ -98,6 +98,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
+  'cryptofacilities',
   'deribit',
   'okex-options',
   'huobi-dm-options',
@@ -4707,6 +4708,43 @@ describe('mappers', () => {
         maturityTime: 0,
         post_only: true,
         volumeQuote: 0.0
+      },
+      {
+        time: 1790149587018,
+        product_id: 'OF_XBTUSD_260925_50000_P',
+        greeks: {
+          delta: -0.00012832103585287596,
+          gamma: 3.942985576172651e-8,
+          theta: -576.4037838901814,
+          vega: 3.162881930084608,
+          rho: -0.062452810595259305
+        },
+        bid_iv: 0,
+        ask_iv: 0,
+        mark_iv: 2.00657150457,
+        extrinsic_value: 0.40938028837,
+        leverage: '50x',
+        feed: 'ticker',
+        bid: 0,
+        ask: 0,
+        bid_size: 0,
+        ask_size: 0,
+        volume: 0,
+        dtm: 2,
+        index: 86138.89,
+        last: 0,
+        change: 0,
+        suspended: false,
+        tag: 'week',
+        pair: 'XBT:USD',
+        openInterest: 1.5,
+        markPrice: 0.40938028837,
+        maturityTime: 1790323200000,
+        post_only: false,
+        volumeQuote: 0,
+        open: 0,
+        high: 0,
+        low: 0
       }
     ]
 

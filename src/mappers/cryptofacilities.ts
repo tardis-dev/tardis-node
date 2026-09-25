@@ -1,5 +1,5 @@
-import { upperCaseSymbols } from '../handy.ts'
-import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { BookChange, BookTicker, DerivativeTicker, Liquidation, OptionSummary, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
 
@@ -18,13 +18,14 @@ export const cryptofacilitiesMappers = exchangeMappers({
       },
       { use: () => new CryptofacilitiesDerivativeTickerMapper({ useRelativeFundingRate: true }) }
     ]),
+    optionsSummary: () => new CryptofacilitiesOptionsSummaryMapper(),
     liquidations: () => cryptofacilitiesLiquidationsMapper,
-    bookTickers: () => cryptofacilitiesBookTickerMapper
+    bookTickers: () => new CryptofacilitiesBookTickerMapper()
   }
 })
 
 const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
-  canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
+  canHandle(message: CryptofacilitiesMessage) {
     return message.feed === 'trade' && message.event === undefined
   },
 
@@ -59,7 +60,7 @@ const mapBookLevel = ({ price, qty }: CryptofacilitiesBookLevel) => {
 }
 
 const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> = {
-  canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
+  canHandle(message: CryptofacilitiesMessage) {
     return message.event === undefined && (message.feed === 'book' || message.feed === 'book_snapshot')
   },
 
@@ -121,8 +122,8 @@ class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities
   }
 
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
-  canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
-    return message.feed === 'ticker' && message.event === undefined
+  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesFuturesTicker {
+    return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_') === false
   }
 
   getFilters(symbols?: string[]) {
@@ -136,7 +137,7 @@ class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities
     ]
   }
 
-  *map(ticker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+  *map(ticker: CryptofacilitiesFuturesTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(ticker.product_id, 'cryptofacilities')
 
     if (ticker.next_funding_rate_time === 0) {
@@ -165,8 +166,63 @@ class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities
   }
 }
 
+class CryptofacilitiesOptionsSummaryMapper implements Mapper<'cryptofacilities', OptionSummary> {
+  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesOptionTicker {
+    return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_')
+  }
+
+  getFilters(symbols?: string[]) {
+    return [
+      {
+        channel: 'ticker',
+        symbols: upperCaseSymbols(symbols)
+      } as const
+    ]
+  }
+
+  *map(ticker: CryptofacilitiesOptionTicker, localTimestamp: Date): IterableIterator<OptionSummary> {
+    const symbolParts = ticker.product_id.split('_')
+    const optionType = symbolParts.at(-1)
+
+    yield {
+      type: 'option_summary',
+      symbol: ticker.product_id,
+      exchange: 'cryptofacilities',
+      optionType: optionType === 'P' ? 'put' : 'call',
+      strikePrice: Number(symbolParts.at(-2)),
+      expirationDate: new Date(ticker.maturityTime),
+
+      bestBidPrice: asNonZeroNumberOrUndefined(ticker.bid),
+      bestBidAmount: asNonZeroNumberOrUndefined(ticker.bid_size),
+      bestBidIV: asNonZeroNumberOrUndefined(ticker.bid_iv),
+
+      bestAskPrice: asNonZeroNumberOrUndefined(ticker.ask),
+      bestAskAmount: asNonZeroNumberOrUndefined(ticker.ask_size),
+      bestAskIV: asNonZeroNumberOrUndefined(ticker.ask_iv),
+
+      lastPrice: asNonZeroNumberOrUndefined(ticker.last),
+      openInterest: asNumberOrUndefined(ticker.openInterest),
+
+      markPrice: asNumberOrUndefined(ticker.markPrice),
+      markIV: asNumberOrUndefined(ticker.mark_iv),
+
+      delta: asNumberOrUndefined(ticker.greeks.delta),
+      gamma: asNumberOrUndefined(ticker.greeks.gamma),
+      vega: asNumberOrUndefined(ticker.greeks.vega),
+      theta: asNumberOrUndefined(ticker.greeks.theta),
+      rho: asNumberOrUndefined(ticker.greeks.rho),
+
+      underlyingPrice: asNumberOrUndefined(ticker.index),
+      underlyingIndex: ticker.pair,
+
+      timestamp: new Date(ticker.time),
+      localTimestamp
+    }
+  }
+}
+
 const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation> = {
-  canHandle(message: CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate) {
+  canHandle(message: CryptofacilitiesMessage) {
     return message.feed === 'trade' && message.event === undefined && message.type === 'liquidation'
   },
 
@@ -196,40 +252,36 @@ const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation
   }
 }
 
-const cryptofacilitiesBookTickerMapper: Mapper<'cryptofacilities', BookTicker> = {
-  canHandle(message: CryptofacilitiesTicker) {
+class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', BookTicker> {
+  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesTicker {
     return message.feed === 'ticker' && message.event === undefined
-  },
+  }
 
   getFilters(symbols?: string[]) {
-    symbols = upperCaseSymbols(symbols)
-
     return [
       {
         channel: 'ticker',
-        symbols
-      }
+        symbols: upperCaseSymbols(symbols)
+      } as const
     ]
-  },
+  }
 
   *map(cryptofacilitiesTicker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<BookTicker> {
-    const ticker: BookTicker = {
+    yield {
       type: 'book_ticker',
       symbol: cryptofacilitiesTicker.product_id,
       exchange: 'cryptofacilities',
-
-      askAmount: cryptofacilitiesTicker.ask_size,
-      askPrice: cryptofacilitiesTicker.ask,
-
-      bidPrice: cryptofacilitiesTicker.bid,
-      bidAmount: cryptofacilitiesTicker.bid_size,
+      askAmount: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.ask_size),
+      askPrice: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.ask),
+      bidPrice: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.bid),
+      bidAmount: asNonZeroNumberOrUndefined(cryptofacilitiesTicker.bid_size),
       timestamp: new Date(cryptofacilitiesTicker.time),
       localTimestamp: localTimestamp
     }
-
-    yield ticker
   }
 }
+
+type CryptofacilitiesMessage = CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate
 
 type CryptofacilitiesTrade = {
   feed: 'trade'
@@ -243,7 +295,9 @@ type CryptofacilitiesTrade = {
   price: number
 }
 
-type CryptofacilitiesTicker =
+type CryptofacilitiesTicker = CryptofacilitiesFuturesTicker | CryptofacilitiesOptionTicker
+
+type CryptofacilitiesFuturesTicker =
   | {
       feed: 'ticker'
       event: undefined
@@ -293,6 +347,47 @@ type CryptofacilitiesTicker =
       post_only: false
       volumeQuote: 6028.1795
     }
+
+/** @see https://docs.kraken.com/exchange/api-reference/futures-websocket/ticker */
+type CryptofacilitiesOptionTicker = {
+  feed: 'ticker'
+  event?: undefined
+  product_id: string
+  time: number
+  bid: number
+  ask: number
+  bid_size: number
+  ask_size: number
+  volume: number
+  dtm: number
+  index: number
+  last: number
+  change: number
+  suspended: boolean
+  tag: string
+  pair: string
+  openInterest: number
+  markPrice: number
+  maturityTime: number
+  post_only: boolean
+  volumeQuote: number
+  bid_iv: number
+  ask_iv: number
+  mark_iv: number
+  extrinsic_value: number
+  leverage: string
+  open: number
+  high: number
+  low: number
+  greeks: {
+    iv?: number
+    delta: number
+    gamma: number
+    vega: number
+    theta: number
+    rho: number
+  }
+}
 
 type CryptofacilitiesBookLevel = {
   price: number

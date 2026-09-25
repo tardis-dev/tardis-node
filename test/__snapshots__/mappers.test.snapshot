@@ -7689,10 +7689,10 @@ exports[`mappers > map cryptofacilities messages 14`] = `
     "type": "book_ticker",
     "symbol": "PF_SUIUSD",
     "exchange": "cryptofacilities",
-    "askAmount": 0,
-    "askPrice": 0,
-    "bidPrice": 0,
-    "bidAmount": 0,
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidPrice": undefined,
+    "bidAmount": undefined,
     "timestamp": "2023-05-03T12:20:02.169Z",
     "localTimestamp": "2019-09-01T00:00:01.275Z"
   }
@@ -7700,6 +7700,49 @@ exports[`mappers > map cryptofacilities messages 14`] = `
 `;
 
 exports[`mappers > map cryptofacilities messages 15`] = `
+[
+  {
+    "type": "option_summary",
+    "symbol": "OF_XBTUSD_260925_50000_P",
+    "exchange": "cryptofacilities",
+    "optionType": "put",
+    "strikePrice": 50000,
+    "expirationDate": "2026-09-25T08:00:00.000Z",
+    "bestBidPrice": undefined,
+    "bestBidAmount": undefined,
+    "bestBidIV": undefined,
+    "bestAskPrice": undefined,
+    "bestAskAmount": undefined,
+    "bestAskIV": undefined,
+    "lastPrice": undefined,
+    "openInterest": 1.5,
+    "markPrice": 0.40938028837,
+    "markIV": 2.00657150457,
+    "delta": -0.00012832103585287596,
+    "gamma": 3.942985576172651e-8,
+    "vega": 3.162881930084608,
+    "theta": -576.4037838901814,
+    "rho": -0.062452810595259305,
+    "underlyingPrice": 86138.89,
+    "underlyingIndex": "XBT:USD",
+    "timestamp": "2026-09-23T07:46:27.018Z",
+    "localTimestamp": "2019-09-01T00:00:01.275Z"
+  },
+  {
+    "type": "book_ticker",
+    "symbol": "OF_XBTUSD_260925_50000_P",
+    "exchange": "cryptofacilities",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidPrice": undefined,
+    "bidAmount": undefined,
+    "timestamp": "2026-09-23T07:46:27.018Z",
+    "localTimestamp": "2019-09-01T00:00:01.275Z"
+  }
+]
+`;
+
+exports[`mappers > map cryptofacilities messages 16`] = `
 [
   {
     "type": "derivative_ticker",
