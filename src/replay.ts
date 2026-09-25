@@ -10,6 +10,7 @@ import { debug } from './debug.ts'
 import { addDays, createNormalizedSymbolFilter, getFilters, parseAsUTCDate, wait } from './handy.ts'
 import { Mapper, MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
+import { getMessageParser } from './parsemessage.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
 import { createZstdDecompressionStream } from './zstd.ts'
@@ -53,6 +54,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
       : { localTimestamp: Date; message: any }
 > {
   let lastMessageWasUndefined = false
+  const parseMessage = getMessageParser(exchange)
 
   const lineBatches = replayLineBatches({ exchange, from, to, filters, apiKey, autoCleanup, waitWhenDataNotYetAvailable })
   for await (const bufferLines of lineBatches) {
@@ -69,7 +71,7 @@ export async function* replay<T extends Exchange, U extends boolean = false, Z e
             message: bufferLine.slice(DATE_MESSAGE_SPLIT_INDEX + 1)
           })
         } else {
-          const message = parseReplayMessage(exchange, bufferLine)
+          const message = parseMessage(bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1))
           const localTimestamp = parseReplayTimestamp(bufferLine)
           if (withMicroseconds) {
             localTimestamp.μs = parseReplayMicroseconds(bufferLine)
@@ -244,21 +246,6 @@ async function* replayLineBatches<T extends Exchange>({
   }
 }
 
-function parseReplayMessage(exchange: Exchange, bufferLine: Buffer) {
-  let messageString = bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1)
-
-  // hack to handle huobi long numeric id for trades
-  if (exchange.startsWith('huobi-') && messageString.includes('.trade.detail')) {
-    messageString = messageString.replace(/"id":([0-9]+),/g, '"id":"$1",')
-  }
-  // hack to handle Bithumb and Upbit long numeric ids for trades
-  if ((exchange === 'bithumb' || exchange === 'upbit') && messageString.includes('sequential_id')) {
-    messageString = messageString.replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
-  }
-
-  return JSON.parse(messageString)
-}
-
 async function cleanupSlice(slicePath: string) {
   try {
     await rm(slicePath, { force: true })
@@ -394,6 +381,7 @@ async function* normalizeReplayLineBatches(
   filter?: (symbol: string) => boolean
 ) {
   // This intentionally keeps mapper calls lazy. Custom normalizers must not process later raw messages before the consumer asks for them.
+  const parseMessage = getMessageParser(exchange)
   let previousLocalTimestamp: Date | undefined
   let activeMappers: Mapper<any, any>[] | undefined = initialMappers
   if (activeMappers.length === 0) {
@@ -410,7 +398,7 @@ async function* normalizeReplayLineBatches(
         if (bufferLine.length === 0) {
           decodedMessages.push(undefined)
         } else {
-          const message = parseReplayMessage(exchange, bufferLine)
+          const message = parseMessage(bufferLine.toString('utf8', DATE_MESSAGE_SPLIT_INDEX + 1))
           const localTimestamp = parseReplayTimestamp(bufferLine)
           localTimestamp.μs = parseReplayMicroseconds(bufferLine)
           decodedMessages.push({ localTimestamp, message })

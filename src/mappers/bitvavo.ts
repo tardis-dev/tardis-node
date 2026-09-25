@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, CircularBuffer, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -181,11 +181,8 @@ function mapBookLevel([price, amount]: BitvavoBookLevel) {
   }
 }
 
-function fromNanoseconds(nanoseconds: number) {
-  const microseconds = Math.floor(nanoseconds / 1000)
-  const timestamp = new Date(microseconds / 1000)
-  timestamp.μs = microseconds % 1000
-  return timestamp
+function fromNanoseconds(nanoseconds: string) {
+  return fromMicroSecondsToDate(Number(nanoseconds.slice(0, -3)))
 }
 
 type BitvavoMessage = BitvavoTradeMessage | BitvavoBookMessage | BitvavoTickerMessage | BitvavoBookSnapshotMessage | BitvavoControlMessage
@@ -196,7 +193,7 @@ type BitvavoTradeMessage = {
   amount: string
   price: string
   timestamp: number
-  timestampNs?: number
+  timestampNs?: string
   market: string
   side: 'buy' | 'sell'
 }
@@ -207,7 +204,7 @@ type BitvavoBookMessage = {
   nonce: number
   bids: BitvavoBookLevel[]
   asks: BitvavoBookLevel[]
-  timestamp: number
+  timestamp: string
   startMdSeqNo?: number
   endMdSeqNo?: number
 }
@@ -220,7 +217,7 @@ type BitvavoBookSnapshotMessage = {
     nonce: number
     bids: BitvavoBookLevel[]
     asks: BitvavoBookLevel[]
-    timestamp: number
+    timestamp: string
     mdSeqNo?: number
   }
 }

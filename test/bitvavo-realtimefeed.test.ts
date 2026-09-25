@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, mock, test } from 'node:test'
 import type { Filter } from '../dist/types.js'
 import { BitvavoRealTimeFeed } from '../dist/realtimefeeds/bitvavo.js'
+import { normalizeTrades } from '../dist/index.js'
 import { assert, errorMessageIncludes } from './assertions.ts'
 
 class TestBitvavoRealTimeFeed extends BitvavoRealTimeFeed {
@@ -12,6 +13,10 @@ class TestBitvavoRealTimeFeed extends BitvavoRealTimeFeed {
 
   map(filters: Filter<string>[]) {
     return this.mapToSubscribeMessages(filters)
+  }
+
+  parse(message: string) {
+    return this.parseMessage(Buffer.from(message))
   }
 
   endpoint() {
@@ -66,6 +71,23 @@ test('authenticates Bitvavo Market Data Pro before subscribing', async () => {
 test('uses the Bitvavo Market Data Pro endpoint', () => {
   const feed = new TestBitvavoRealTimeFeed([])
   assert.strictEqual(feed.endpoint(), 'wss://ws-mdpro.bitvavo.com/v2/')
+})
+
+test('preserves recorded Bitvavo nanoseconds before normalizing live messages', () => {
+  const feed = new TestBitvavoRealTimeFeed([])
+  const trade = feed.parse(
+    '{"event":"trade","id":"00000000-0000-0431-0000-0000037d31c0","amount":"0.01158052","price":"75278","timestamp":1790121608063,"market":"BTC-EUR","side":"sell","timestampNs":1790121608063273941}'
+  )
+  assert.strictEqual(trade.timestamp, 1790121608063)
+  assert.strictEqual(trade.timestampNs, '1790121608063273941')
+  const [normalized] = normalizeTrades('bitvavo', new Date()).map(trade, new Date())!
+  assert.strictEqual(normalized.timestamp.toISOString(), '2026-09-23T00:00:08.063Z')
+  assert.strictEqual(normalized.timestamp.μs, 273)
+
+  const book = feed.parse(
+    '{"event":"book","market":"BTC-EUR","nonce":4252050802,"bids":[],"asks":[["75450.00","0.20300000"]],"timestamp":1790121600180154287,"startMdSeqNo":4252050802,"endMdSeqNo":4252050802,"type":"update"}'
+  )
+  assert.strictEqual(book.timestamp, '1790121600180154287')
 })
 
 test('rejects failed Bitvavo Market Data Pro authentication', async () => {

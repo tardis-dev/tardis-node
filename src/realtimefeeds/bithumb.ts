@@ -27,11 +27,6 @@ export class BithumbRealTimeFeed extends RealTimeFeedBase {
     return [[{ ticket: randomUUID() }, ...subscriptions, { format: 'DEFAULT' }]]
   }
 
-  protected parseMessage(message: Buffer<ArrayBufferLike>): any {
-    const json = message.toString().replace(/"sequential_id":([0-9]+),/g, '"sequential_id":"$1",')
-    return JSON.parse(json)
-  }
-
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
   }

@@ -13540,7 +13540,7 @@ test('map bitvavo messages', () => {
       timestamp: 1789544142667,
       market: 'TAO-EUR',
       side: 'buy',
-      timestampNs: 1789544142667191452
+      timestampNs: '1789544142667191452'
     },
     {
       event: 'book',
@@ -13548,7 +13548,7 @@ test('map bitvavo messages', () => {
       nonce: 101,
       bids: [['9999', '2']],
       asks: [],
-      timestamp: 1789544170613624376,
+      timestamp: '1789544170613624376',
       startMdSeqNo: 101,
       endMdSeqNo: 101,
       type: 'update'
@@ -13561,7 +13561,7 @@ test('map bitvavo messages', () => {
         nonce: 100,
         bids: [['9998', '1']],
         asks: [['10001', '3']],
-        timestamp: 1789543911187257474,
+        timestamp: '1789543911187257474',
         mdSeqNo: 100
       }
     },
@@ -13571,7 +13571,7 @@ test('map bitvavo messages', () => {
       nonce: 102,
       bids: [],
       asks: [['10001', '0']],
-      timestamp: 1789544171613624376,
+      timestamp: '1789544171613624376',
       startMdSeqNo: 102,
       endMdSeqNo: 102,
       type: 'update'

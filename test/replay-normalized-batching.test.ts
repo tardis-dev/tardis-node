@@ -1,10 +1,11 @@
 import { afterEach, mock, test } from 'node:test'
-import { EventEmitter } from 'node:events'
+import { EventEmitter, once } from 'node:events'
 import { assert, errorMessageIncludes } from './assertions.ts'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'
+import { WebSocketServer } from 'ws'
 
 const tempDirs: string[] = []
 let feed = ''
@@ -53,7 +54,7 @@ mock.module('worker_threads', {
   }
 })
 
-const { normalizeTrades, replay, replayNormalized } = await import('../dist/index.js')
+const { normalizeTrades, replay, replayNormalized, stream } = await import('../dist/index.js')
 
 afterEach(() => {
   feed = ''
@@ -159,6 +160,82 @@ test('preserves Bithumb trade ids beyond the JavaScript safe integer range durin
 
   assert.deepStrictEqual(normalizedIds, [realtimeId])
 })
+
+test('preserves recorded Bitvavo nanoseconds in raw and normalized replay', async () => {
+  feed =
+    '2026-09-23T00:00:08.0741562Z {"event":"trade","id":"00000000-0000-0431-0000-0000037d31c0","amount":"0.01158052","price":"75278","timestamp":1790121608063,"market":"BTC-EUR","side":"sell","timestampNs":1790121608063273941}\n'
+  const options = { exchange: 'bitvavo' as const, from: '2026-09-23T00:00:00Z', to: '2026-09-23T00:01:00Z' }
+  const messages = []
+  for await (const { message } of replay({ ...options, filters: [{ channel: 'trade', symbols: ['BTC-EUR'] }] })) {
+    messages.push(message)
+  }
+  assert.strictEqual(messages.length, 1)
+  assert.strictEqual(messages[0].timestamp, 1790121608063)
+  assert.strictEqual(messages[0].timestampNs, '1790121608063273941')
+
+  const trades = []
+  for await (const trade of replayNormalized({ ...options, symbols: ['BTC-EUR'] }, normalizeTrades)) {
+    trades.push(trade)
+  }
+  assert.strictEqual(trades.length, 1)
+  assert.strictEqual(trades[0].timestamp.toISOString(), '2026-09-23T00:00:08.063Z')
+  assert.strictEqual(trades[0].timestamp.μs, 273)
+  assert.strictEqual(trades[0].localTimestamp.μs, 156)
+})
+
+// Same payloads as the existing exchange mapper fixtures, kept as raw JSON here.
+for (const fixture of [
+  {
+    exchange: 'huobi-dm-linear-swap' as const,
+    symbol: 'EOS-USDT',
+    json: '{"ch":"market.EOS-USDT.trade.detail","ts":1606780814945,"tick":{"id":291891365,"ts":1606780814931,"data":[{"amount":6,"ts":1606780814931,"id":2918913650000,"price":3.2639,"direction":"buy"}]}}',
+    id: '2918913650000'
+  },
+  {
+    exchange: 'upbit' as const,
+    symbol: 'KRW-DOGE',
+    json: '{"type":"trade","code":"KRW-DOGE","timestamp":1614729599905,"trade_date":"2021-03-02","trade_time":"23:59:59","trade_timestamp":1614729599000,"trade_price":58.4,"trade_volume":836.12040133,"ask_bid":"ASK","prev_closing_price":57.5,"change":"RISE","change_price":0.9,"sequential_id":1614729599000000,"stream_type":"REALTIME"}',
+    id: '1614729599000000'
+  }
+]) {
+  test(`preserves the same ${fixture.exchange} trade IDs in replay and live transport`, { timeout: 10_000 }, async () => {
+    const { exchange, symbol, json, id } = fixture
+    const server = new WebSocketServer({ host: '127.0.0.1', port: 0 })
+    await once(server, 'listening')
+    const address = server.address()
+    assert.ok(address !== null && typeof address === 'object')
+    server.on('connection', (socket) => {
+      socket.once('message', () => socket.send(exchange === 'upbit' ? json : gzipSync(json)))
+    })
+    const urlKey = `WSS_URL_${exchange.toUpperCase().replace(/-/g, '_')}`
+    const previousURL = process.env[urlKey]
+    process.env[urlKey] = `ws://127.0.0.1:${address.port}`
+    const filters = [{ channel: 'trade' as const, symbols: [symbol] }]
+    const live = stream({ exchange, filters })
+    try {
+      feed = `2026-09-23T00:00:00.0000000Z ${json}\n`
+      const options = { exchange, filters, from: '2026-09-23T00:00:00Z', to: '2026-09-23T00:01:00Z' }
+      const replayed = []
+      for await (const entry of replay(options)) replayed.push(entry.message)
+      assert.strictEqual(replayed.length, 1)
+      const streamed = (await live.next()).value.message
+      assert.deepStrictEqual(streamed, replayed[0])
+      assert.strictEqual(exchange === 'upbit' ? streamed.sequential_id : streamed.tick.data[0].id, id)
+      const localTimestamp = new Date()
+      const [trade] = normalizeTrades(exchange, localTimestamp).map(streamed, localTimestamp)!
+      assert.strictEqual(trade.id, id)
+      for await (const entry of replay({ ...options, skipDecoding: true })) {
+        assert.strictEqual(entry.message.toString(), json)
+      }
+    } finally {
+      await live.return?.()
+      if (previousURL === undefined) delete process.env[urlKey]
+      else process.env[urlKey] = previousURL
+      for (const socket of server.clients) socket.terminate()
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+    }
+  })
+}
 
 test('parses fixed recorder timestamps across supported date boundaries', async () => {
   feed = [
