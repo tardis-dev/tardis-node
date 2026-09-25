@@ -1,19 +1,19 @@
 import { asNonZeroNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, Trade } from '../types.ts'
 import { Mapper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, isRealTime } from './registry.ts'
 
 export const bitvavoMappers = exchangeMappers({
   bitvavo: {
     trades: () => new BitvavoTradesMapper(),
-    bookChanges: () => new BitvavoBookChangeMapper(),
+    bookChanges: (localTimestamp) => new BitvavoBookChangeMapper({ validateSequence: isRealTime(localTimestamp) }),
     bookTickers: () => new BitvavoBookTickerMapper()
   }
 })
 
 class BitvavoTradesMapper implements Mapper<'bitvavo', Trade> {
-  canHandle(message: BitvavoMessage): message is BitvavoTradeMessage {
-    return 'event' in message && message.event === 'trade'
+  canHandle(message: BitvavoMessage) {
+    return message.event === 'trade'
   }
 
   getFilters(symbols?: string[]) {
@@ -38,8 +38,10 @@ class BitvavoTradesMapper implements Mapper<'bitvavo', Trade> {
 class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   private readonly depthInfoBySymbol = new Map<string, BitvavoDepthInfo>()
 
-  canHandle(message: BitvavoMessage): message is BitvavoBookMessage | BitvavoBookSnapshotMessage {
-    return ('event' in message && message.event === 'book') || ('action' in message && message.action === 'getBook')
+  constructor(private readonly options: { validateSequence: boolean }) {}
+
+  canHandle(message: BitvavoMessage) {
+    return message.event === 'book' || message.action === 'getBook'
   }
 
   getFilters(symbols?: string[]) {
@@ -98,7 +100,8 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
     if (lastSequence <= depthInfo.sequence!) {
       return
     }
-    if (firstSequence > depthInfo.sequence! + 1) {
+    // Recorder validates historical continuity; direct live feeds must detect gaps themselves.
+    if (this.options.validateSequence && firstSequence > depthInfo.sequence! + 1) {
       throw new Error(
         `Bitvavo book update sequence gap for ${message.market}: expected ${depthInfo.sequence! + 1}, received ${firstSequence}-${lastSequence}`
       )
@@ -130,12 +133,8 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
 class BitvavoBookTickerMapper implements Mapper<'bitvavo', BookTicker> {
   private readonly quotesByMarket = new Map<string, BitvavoQuote>()
 
-  canHandle(message: BitvavoMessage): message is BitvavoTickerMessage {
-    return (
-      'event' in message &&
-      message.event === 'ticker' &&
-      ('bestAsk' in message || 'bestAskSize' in message || 'bestBid' in message || 'bestBidSize' in message)
-    )
+  canHandle(message: BitvavoMessage) {
+    return message.event === 'ticker'
   }
 
   getFilters(symbols?: string[]) {
@@ -150,17 +149,26 @@ class BitvavoBookTickerMapper implements Mapper<'bitvavo', BookTicker> {
     }
 
     // Recorded ticker payloads omit unchanged fields, so retain the previous quote per market.
-    if ('bestAskSize' in message) {
+    let hasQuoteUpdate = false
+    if (message.bestAskSize !== undefined) {
       quote.askAmount = asNonZeroNumberOrUndefined(message.bestAskSize)
+      hasQuoteUpdate = true
     }
-    if ('bestAsk' in message) {
+    if (message.bestAsk !== undefined) {
       quote.askPrice = asNonZeroNumberOrUndefined(message.bestAsk)
+      hasQuoteUpdate = true
     }
-    if ('bestBidSize' in message) {
+    if (message.bestBidSize !== undefined) {
       quote.bidAmount = asNonZeroNumberOrUndefined(message.bestBidSize)
+      hasQuoteUpdate = true
     }
-    if ('bestBid' in message) {
+    if (message.bestBid !== undefined) {
       quote.bidPrice = asNonZeroNumberOrUndefined(message.bestBid)
+      hasQuoteUpdate = true
+    }
+
+    if (!hasQuoteUpdate) {
+      return
     }
 
     yield {
@@ -185,7 +193,7 @@ function fromNanoseconds(nanoseconds: string) {
   return fromMicroSecondsToDate(Number(nanoseconds.slice(0, -3)))
 }
 
-type BitvavoMessage = BitvavoTradeMessage | BitvavoBookMessage | BitvavoTickerMessage | BitvavoBookSnapshotMessage | BitvavoControlMessage
+type BitvavoMessage = { event?: string; action?: string }
 
 type BitvavoTradeMessage = {
   event: 'trade'
@@ -239,10 +247,6 @@ type BitvavoQuote = {
   askPrice: number | undefined
   bidAmount: number | undefined
   bidPrice: number | undefined
-}
-
-type BitvavoControlMessage = {
-  event: 'authenticate' | 'subscribed' | 'error'
 }
 
 type BitvavoDepthInfo = {

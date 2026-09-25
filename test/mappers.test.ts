@@ -13675,6 +13675,35 @@ test('preserves unchanged Bitvavo ticker fields and handles explicit removals', 
   ])
 })
 
+test('Bitvavo checks sequence gaps in live feeds and retains snapshot alignment during replay', () => {
+  for (const live of [false, true]) {
+    const localTimestamp = live ? new Date() : new Date('2026-09-23T00:00:00Z')
+    const mapper = normalizeBookChanges('bitvavo', localTimestamp)
+    const snapshot = {
+      action: 'getBook',
+      requestId: 1,
+      response: { market: 'BTC-EUR', nonce: 100, mdSeqNo: 100, timestamp: '1790121600307696747', bids: [], asks: [] }
+    }
+    const update = {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 102,
+      startMdSeqNo: 102,
+      endMdSeqNo: 102,
+      timestamp: '1790121600459180262',
+      bids: [['75278', '1']],
+      asks: []
+    }
+    assert.strictEqual([...mapper.map(snapshot, localTimestamp)!][0].isSnapshot, true)
+    assert.deepStrictEqual([...mapper.map({ ...update, nonce: 100, startMdSeqNo: 100, endMdSeqNo: 100 }, localTimestamp)!], [])
+    if (live) {
+      assert.throws(() => [...mapper.map(update, localTimestamp)!], /sequence gap/)
+    } else {
+      assert.deepStrictEqual([...mapper.map(update, localTimestamp)!][0].bids, [{ price: 75278, amount: 1 }])
+    }
+  }
+})
+
 test('map polymarket messages', () => {
   const localTimestamp = new Date('2026-05-11T06:30:00.000Z')
 
