@@ -150,7 +150,7 @@ class LighterBookTickerMapper<T extends LighterExchange> implements Mapper<T, Bo
   constructor(private readonly exchange: T) {}
 
   canHandle(message: LighterTickerMessage) {
-    return message.type === 'update/ticker'
+    return message.type === 'update/ticker' || message.type === 'subscribed/ticker'
   }
 
   getFilters(symbols?: string[]) {
@@ -186,7 +186,7 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
   constructor(private readonly exchange: T) {}
 
   canHandle(message: LighterMarketStatsMessage) {
-    return message.type === 'update/market_stats'
+    return message.type === 'update/market_stats' || message.type === 'subscribed/market_stats'
   }
 
   getFilters(_symbols?: string[]) {
@@ -204,7 +204,9 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
 
       pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
       pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
-      pendingTickerInfo.updateFundingRate(Number(entry.current_funding_rate))
+      // WS funding is an hourly percentage; normalized fundingRate is a decimal fraction.
+      // https://docs.lighter.xyz/trading/funding#funding-rate-calculation
+      pendingTickerInfo.updateFundingRate(Number(entry.current_funding_rate) / 100)
       pendingTickerInfo.updateLastPrice(Number(entry.last_trade_price))
       pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
 

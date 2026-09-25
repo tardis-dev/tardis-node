@@ -12475,6 +12475,24 @@ test('map lighter RH market stats messages', () => {
   }
 })
 
+test('map lighter RH initial BBO for a quiet market', () => {
+  const localTimestamp = new Date('2026-09-23T00:00:00.809Z')
+  const mapper = createMapper('lighter-rh', localTimestamp)
+  snapshot(
+    mapper.map(
+      {
+        channel: 'ticker:2048',
+        last_updated_at: 1790083245368184,
+        nonce: 2258095431,
+        ticker: { s: 'ETH/USDG', a: { price: '', size: '' }, b: { price: '1.05', size: '228.7524' }, last_updated_at: 1790083245368184 },
+        timestamp: 1790121600248,
+        type: 'subscribed/ticker'
+      },
+      localTimestamp
+    )
+  )
+})
+
 test('map lighter RH ticker messages', () => {
   const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
 
