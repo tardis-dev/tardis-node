@@ -3918,6 +3918,63 @@ exports[`map woo-x v3 messages 9`] = `
 ]
 `;
 
+exports[`mappers > Huobi caches open interest until the next basis or funding message 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC_CW",
+    "exchange": "huobi-dm",
+    "lastPrice": 83931.47,
+    "openInterest": 415,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84450.89333333333,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:58.383Z",
+    "localTimestamp": "2026-09-24T00:00:58.386Z"
+  }
+]
+`;
+
+exports[`mappers > Huobi caches open interest until the next basis or funding message 2`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC-USD",
+    "exchange": "huobi-dm-swap",
+    "lastPrice": undefined,
+    "openInterest": 176823,
+    "fundingRate": 0.0001,
+    "fundingTimestamp": "2026-09-24T08:00:00.000Z",
+    "predictedFundingRate": 0,
+    "indexPrice": undefined,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:05.036Z",
+    "localTimestamp": "2026-09-24T00:00:05.038Z"
+  }
+]
+`;
+
+exports[`mappers > Huobi caches open interest until the next basis or funding message 3`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC-USDT",
+    "exchange": "huobi-dm-linear-swap",
+    "lastPrice": 84359.3,
+    "openInterest": 25952001,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84395.55857142857,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:00.261Z",
+    "localTimestamp": "2026-09-24T00:00:03.390Z"
+  }
+]
+`;
+
 exports[`mappers > ignore bitfinex funding ticker messages for book ticker 1`] = `
 []
 `;
@@ -11088,22 +11145,7 @@ exports[`mappers > map huobi-dm, messages 3`] = `
 `;
 
 exports[`mappers > map huobi-dm, messages 4`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "ETH_NW",
-    "exchange": "huobi-dm",
-    "lastPrice": 244.126,
-    "openInterest": 648420,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 243.466431823,
-    "markPrice": undefined,
-    "timestamp": "2020-06-23T12:25:03.195Z",
-    "localTimestamp": "2019-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm, messages 5`] = `
@@ -11266,22 +11308,7 @@ exports[`mappers > map huobi-dm-linear-swap, messages 6`] = `
 `;
 
 exports[`mappers > map huobi-dm-linear-swap, messages 7`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "BTC-USDT",
-    "exchange": "huobi-dm-linear-swap",
-    "lastPrice": 19717.9,
-    "openInterest": 3063121,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 19695.41,
-    "markPrice": undefined,
-    "timestamp": "2020-12-01T00:00:07.036Z",
-    "localTimestamp": "2020-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm-linear-swap, messages 8`] = `
@@ -11297,7 +11324,7 @@ exports[`mappers > map huobi-dm-linear-swap, messages 8`] = `
     "predictedFundingRate": 0.000236636095370214,
     "indexPrice": 19695.41,
     "markPrice": undefined,
-    "timestamp": "2020-12-01T00:00:07.036Z",
+    "timestamp": "2020-12-01T00:00:06.356Z",
     "localTimestamp": "2020-12-01T00:00:01.275Z"
   }
 ]
@@ -11547,22 +11574,7 @@ exports[`mappers > map huobi-dm-swap, messages 6`] = `
 `;
 
 exports[`mappers > map huobi-dm-swap, messages 7`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "BTC-USD",
-    "exchange": "huobi-dm-swap",
-    "lastPrice": 9590.1,
-    "openInterest": 1711705,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 9582.975,
-    "markPrice": undefined,
-    "timestamp": "2020-06-23T09:33:43.141Z",
-    "localTimestamp": "2019-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm-swap, messages 8`] = `
@@ -11578,7 +11590,7 @@ exports[`mappers > map huobi-dm-swap, messages 8`] = `
     "predictedFundingRate": 0.000113655663368468,
     "indexPrice": 9582.975,
     "markPrice": undefined,
-    "timestamp": "2020-06-23T09:33:43.141Z",
+    "timestamp": "2020-06-23T09:33:41.703Z",
     "localTimestamp": "2019-12-01T00:00:01.275Z"
   }
 ]

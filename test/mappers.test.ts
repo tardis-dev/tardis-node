@@ -6451,6 +6451,140 @@ describe('mappers', () => {
     }
   })
 
+  test('Huobi caches open interest until the next basis or funding message', () => {
+    // Recorded on 2026-09-24, 00:00 UTC, with each OI message followed by its next ticker source.
+    const cases = [
+      {
+        exchange: 'huobi-dm',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:02.5424071Z',
+          message: {
+            ch: 'market.BTC_CW.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 415,
+                amount: 0.49445100866218594,
+                symbol: 'BTC',
+                contract_type: 'this_week',
+                contract_code: 'BTC260925',
+                trade_amount: 5.957261130112563,
+                trade_volume: 5072,
+                trade_turnover: 507200
+              }
+            ],
+            ts: 1790208002538
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:58.3860651Z',
+          message: {
+            ch: 'market.BTC_CW.basis.1min.close',
+            tick: {
+              id: 1790208000,
+              index_price: '84450.89333333333',
+              contract_price: '83931.47',
+              basis: '-519.42333333333',
+              basis_rate: '-0.00615059607816262319193134559155337'
+            },
+            ts: 1790208058383
+          }
+        }
+      },
+      {
+        exchange: 'huobi-dm-swap',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:02.8562547Z',
+          message: {
+            ch: 'market.BTC-USD.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 176823,
+                amount: 209.59656723583066,
+                symbol: 'BTC',
+                contract_code: 'BTC-USD',
+                trade_amount: 141.92348663960905,
+                trade_volume: 120402,
+                trade_turnover: 12040200
+              }
+            ],
+            ts: 1790208002852
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:05.0385187Z',
+          message: {
+            op: 'notify',
+            topic: 'public.BTC-USD.funding_rate',
+            ts: 1790208005036,
+            data: [
+              {
+                symbol: 'BTC',
+                contract_code: 'BTC-USD',
+                fee_asset: 'BTC',
+                funding_time: '1790208005000',
+                funding_rate: '0.000100000000000000',
+                estimated_rate: null,
+                settlement_time: '1790236800000'
+              }
+            ]
+          }
+        }
+      },
+      {
+        exchange: 'huobi-dm-linear-swap',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:01.4744491Z',
+          message: {
+            ch: 'market.BTC-USDT.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 25952001,
+                amount: 25952.001,
+                symbol: 'BTC',
+                value: 2189292637.9593,
+                contract_code: 'BTC-USDT',
+                trade_amount: 10157.394,
+                trade_volume: 10157394,
+                trade_turnover: 864635455.6818,
+                business_type: 'swap',
+                pair: 'BTC-USDT',
+                contract_type: 'swap',
+                trade_partition: 'USDT'
+              }
+            ],
+            ts: 1790208001461
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:03.3908656Z',
+          message: {
+            ch: 'market.BTC-USDT.basis.1min.close',
+            tick: {
+              id: 1790207940,
+              index_price: '84395.55857142857',
+              contract_price: '84359.3',
+              basis: '-36.25857142857',
+              basis_rate: '-0.00042962653535709928319732558974877'
+            },
+            ts: 1790208000261
+          }
+        }
+      }
+    ]
+
+    for (const { exchange, openInterest, nextTicker } of cases) {
+      const mapper = normalizeDerivativeTickers(exchange as Exchange, new Date(openInterest.localTimestamp))
+      assert.deepStrictEqual(Array.from(mapper.map(openInterest.message, new Date(openInterest.localTimestamp)) ?? []), [])
+      const tickers = Array.from(mapper.map(nextTicker.message, new Date(nextTicker.localTimestamp)) ?? [])
+      assert.strictEqual(tickers.length, 1)
+      assert.strictEqual(tickers[0].openInterest, openInterest.message.data[0].volume)
+      snapshot(tickers)
+    }
+  })
+
   test('map huobi-dm-options, messages', () => {
     const messages = [
       {
