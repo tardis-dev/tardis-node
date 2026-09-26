@@ -200,6 +200,11 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
 
   *map(message: LighterMarketStatsMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     for (const entry of this.iterateMarketStats(message)) {
+      // Initial snapshots retain inactive markets. Compare funding age with message time so replay behaves like live data.
+      if (entry.funding_timestamp > 0 && message.timestamp - entry.funding_timestamp > 12 * 60 * 60 * 1000) {
+        continue
+      }
+
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), this.exchange)
 
       pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))

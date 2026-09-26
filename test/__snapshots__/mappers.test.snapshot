@@ -1,3 +1,69 @@
+exports[`ignore Lighter market stats with funding older than 12 hours 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "1",
+    "exchange": "lighter",
+    "lastPrice": 84375.2,
+    "openInterest": 182560941.50528,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84396.9,
+    "markPrice": 84370.4,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "75",
+    "exchange": "lighter",
+    "lastPrice": 0.02955,
+    "openInterest": 0,
+    "fundingRate": 0.00018800000000000002,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 0.0294,
+    "markPrice": 0.02955,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  }
+]
+`;
+
+exports[`ignore Lighter market stats with funding older than 12 hours 2`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "1",
+    "exchange": "lighter-rh",
+    "lastPrice": 84375.2,
+    "openInterest": 182560941.50528,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84396.9,
+    "markPrice": 84370.4,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "75",
+    "exchange": "lighter-rh",
+    "lastPrice": 0.02955,
+    "openInterest": 0,
+    "fundingRate": 0.00018800000000000002,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 0.0294,
+    "markPrice": 0.02955,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  }
+]
+`;
+
 exports[`map binance-european-options messages 1`] = `
 [
   {

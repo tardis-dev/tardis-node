@@ -12417,6 +12417,74 @@ test('map lighter market stats messages', () => {
   }
 })
 
+test('ignore Lighter market stats with funding older than 12 hours', () => {
+  const localTimestamp = new Date('2026-09-24T00:00:00.774Z')
+  // Recorded initial snapshot; keep only relevant fields and markets. DOLO (75) last funded 10 hours earlier.
+  const message = {
+    channel: 'market_stats:all',
+    market_stats: {
+      '1': {
+        market_id: 1,
+        index_price: '84396.9',
+        mark_price: '84370.4',
+        open_interest: '182560941.505280',
+        last_trade_price: '84375.2',
+        current_funding_rate: '0.0012',
+        funding_timestamp: 1790208000001
+      },
+      '22': {
+        market_id: 22,
+        index_price: '0.05990',
+        mark_price: '0.06013',
+        open_interest: '0.000000',
+        last_trade_price: '0.06013',
+        current_funding_rate: '0.0758',
+        funding_timestamp: 1762282800001
+      },
+      '54': {
+        market_id: 54,
+        index_price: '0.062634',
+        mark_price: '0.062636',
+        open_interest: '0.000000',
+        last_trade_price: '0.062636',
+        current_funding_rate: '0.0001',
+        funding_timestamp: 1761480000002
+      },
+      '75': {
+        market_id: 75,
+        index_price: '0.02940',
+        mark_price: '0.02955',
+        open_interest: '0.000000',
+        last_trade_price: '0.02955',
+        current_funding_rate: '0.0188',
+        funding_timestamp: 1790172000001
+      }
+    },
+    timestamp: 1790208000761,
+    type: 'subscribed/market_stats'
+  }
+
+  for (const exchange of ['lighter', 'lighter-rh'] as const) {
+    snapshot(createMapper(exchange, localTimestamp).map(message, localTimestamp))
+
+    // Check the 12-hour boundary on per-market updates as well, independently of the replay's wall-clock date.
+    for (const [fundingTimestamp, expectedCount] of [
+      [message.timestamp - 12 * 60 * 60 * 1000, 1],
+      [message.timestamp - 12 * 60 * 60 * 1000 - 1, 0],
+      [0, 1]
+    ]) {
+      const update = {
+        ...message,
+        type: 'update/market_stats',
+        channel: 'market_stats:1',
+        market_stats: { ...message.market_stats['1'], funding_timestamp: fundingTimestamp }
+      }
+      const mapper = createMapper(exchange, localTimestamp)
+      assert.equal(mapper.map(update, localTimestamp).length, expectedCount)
+    }
+  }
+})
+
 test('map lighter ticker messages', () => {
   const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
 
