@@ -2954,6 +2954,20 @@ describe('mappers', () => {
     }
   })
 
+  test('ignore Bitfinex spot margin liquidations in the derivatives feed', () => {
+    const mapper = createMapper('bitfinex-derivatives')
+    const message = [
+      1459,
+      [['pos', 193578126, 1790426779162, null, 'tIOTUSD', -13.9466, 0.04529, null, 0, 1, null, null]],
+      2482474,
+      1790426779196,
+      'liquidations',
+      'global'
+    ]
+
+    assert.deepEqual(mapper.map(message, new Date('2026-09-26T12:46:19.208Z')), [])
+  })
+
   test('map aster messages', () => {
     const asterMapper = createMapper('aster', new Date())
     const localTimestamp = new Date('2026-07-29T00:00:01.000Z')

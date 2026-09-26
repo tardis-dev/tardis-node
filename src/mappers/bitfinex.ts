@@ -317,6 +317,8 @@ class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liqui
         const id = String(bitfinexLiquidation[1])
         const timestamp = new Date(bitfinexLiquidation[2])
         const symbol = bitfinexLiquidation[4].replace('t', '')
+        // liq:global also includes spot margin liquidations.
+        if (!symbol.includes('F0')) continue
         const price = bitfinexLiquidation[6]
         const amount = bitfinexLiquidation[5]
 
