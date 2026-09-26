@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { normalizeBookChanges, normalizeDerivativeTickers, normalizeTrades } from '../dist/index.js'
 import { snapshot } from './assertions.ts'
@@ -52,4 +53,12 @@ test('snapshots Phemex routing for ambiguous symbol families', () => {
     ].map((symbol) => ({ symbol, filters: normalizeTrades('phemex', localTimestamp).getFilters([symbol]) })),
     historicalPerpetualPilot: normalizeTrades('phemex', localTimestamp).getFilters([...perpetualPilotSymbols, ...legacySymbols])
   })
+})
+
+test('routes S-prefixed perpetuals through V2 without spot alias conversion', () => {
+  const symbols = ['SNXXUSDT', 'SOXSUSDT', 'SKDDUSDT', 'SKUUUSDT']
+  const date = new Date('2026-09-25')
+  assert.deepEqual(normalizeTrades('phemex', date).getFilters(symbols), [{ channel: 'trades_p', symbols }])
+  assert.deepEqual(normalizeBookChanges('phemex', date).getFilters(symbols), [{ channel: 'orderbook_p', symbols }])
+  assert.deepEqual(normalizeDerivativeTickers('phemex', date).getFilters(symbols), [{ channel: 'perp_market24h_pack_p', symbols }])
 })
