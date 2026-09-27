@@ -12431,6 +12431,65 @@ test('map lighter market stats messages', () => {
   }
 })
 
+test('ignore inactive Lighter market stats without dropping a new market before its first funding', () => {
+  const localTimestamp = new Date('2026-09-23T00:00:01.167Z')
+  // MKR/28 was still included in a recorded market_stats:all snapshot after the market became inactive.
+  const message = {
+    channel: 'market_stats:all',
+    type: 'subscribed/market_stats',
+    timestamp: 1790121601167,
+    market_stats: {
+      '28': {
+        market_id: 28,
+        index_price: '0.00',
+        mark_price: '0.00',
+        open_interest: '0.000000',
+        last_trade_price: '1699.84',
+        current_funding_rate: '0.0000',
+        funding_timestamp: 0
+      }
+    }
+  }
+
+  assert.deepStrictEqual(createMapper('lighter', localTimestamp).map(message, localTimestamp), [])
+
+  // STONK/4095 published a funding rate before its first mark/index prices or funding payment.
+  const newMarketTimestamp = new Date('2026-09-15T12:15:36.152Z')
+  const newMarket = {
+    channel: 'market_stats:all',
+    type: 'update/market_stats',
+    timestamp: 1789474536147,
+    market_stats: {
+      '4095': {
+        market_id: 4095,
+        index_price: '0.18163',
+        mark_price: '0.18163',
+        open_interest: '0.000000',
+        last_trade_price: '0.00000',
+        current_funding_rate: '0.0002',
+        funding_timestamp: 0
+      }
+    }
+  }
+
+  const initialNewMarket = {
+    ...newMarket,
+    timestamp: 1789474536047,
+    market_stats: {
+      '4095': { ...newMarket.market_stats['4095'], mark_price: '0.00000', index_price: '0.00000' }
+    }
+  }
+
+  const initialMapped = createMapper('lighter', newMarketTimestamp).map(initialNewMarket, newMarketTimestamp)
+  assert.equal(initialMapped.length, 1)
+  assert.equal(initialMapped[0].fundingRate, 0.000002)
+
+  const mapped = createMapper('lighter', newMarketTimestamp).map(newMarket, newMarketTimestamp)
+  assert.equal(mapped.length, 1)
+  assert.equal(mapped[0].symbol, '4095')
+  assert.equal(mapped[0].markPrice, 0.18163)
+})
+
 test('ignore Lighter market stats with funding older than 12 hours', () => {
   const localTimestamp = new Date('2026-09-24T00:00:00.774Z')
   // Recorded initial snapshot; keep only relevant fields and markets. DOLO (75) last funded 10 hours earlier.

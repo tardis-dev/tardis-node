@@ -204,6 +204,16 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
       if (entry.funding_timestamp > 0 && message.timestamp - entry.funding_timestamp > 12 * 60 * 60 * 1000) {
         continue
       }
+      // New markets may have funding_timestamp=0 while already publishing prices or a funding rate.
+      if (
+        entry.funding_timestamp === 0 &&
+        Number(entry.mark_price) === 0 &&
+        Number(entry.index_price) === 0 &&
+        Number(entry.open_interest) === 0 &&
+        Number(entry.current_funding_rate) === 0
+      ) {
+        continue
+      }
 
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), this.exchange)
 
