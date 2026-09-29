@@ -7850,22 +7850,27 @@ exports[`mappers > map cryptofacilities messages 15`] = `
     "underlyingIndex": "XBT:USD",
     "timestamp": "2026-09-23T07:46:27.018Z",
     "localTimestamp": "2019-09-01T00:00:01.275Z"
-  },
-  {
-    "type": "book_ticker",
-    "symbol": "OF_XBTUSD_260925_50000_P",
-    "exchange": "cryptofacilities",
-    "askAmount": undefined,
-    "askPrice": undefined,
-    "bidPrice": undefined,
-    "bidAmount": undefined,
-    "timestamp": "2026-09-23T07:46:27.018Z",
-    "localTimestamp": "2019-09-01T00:00:01.275Z"
   }
 ]
 `;
 
 exports[`mappers > map cryptofacilities messages 16`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "OF_XBTUSD_261002_90000_C",
+    "exchange": "cryptofacilities",
+    "id": "4f5d9eca-f3c3-4426-8bae-98e88c3b72d8",
+    "price": 1,
+    "amount": 0.4,
+    "side": "sell",
+    "timestamp": "2026-09-29T11:26:38.385Z",
+    "localTimestamp": "2019-09-01T00:00:01.275Z"
+  }
+]
+`;
+
+exports[`mappers > map cryptofacilities messages 17`] = `
 [
   {
     "type": "derivative_ticker",

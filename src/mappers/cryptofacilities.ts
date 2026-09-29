@@ -253,8 +253,9 @@ const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation
 }
 
 class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', BookTicker> {
-  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesTicker {
-    return message.feed === 'ticker' && message.event === undefined
+  // Options trade only through RFQ, so their ticker never carries a public best bid or offer.
+  canHandle(message: CryptofacilitiesMessage): message is CryptofacilitiesFuturesTicker {
+    return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_') === false
   }
 
   getFilters(symbols?: string[]) {
@@ -266,7 +267,7 @@ class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', Boo
     ]
   }
 
-  *map(cryptofacilitiesTicker: CryptofacilitiesTicker, localTimestamp: Date): IterableIterator<BookTicker> {
+  *map(cryptofacilitiesTicker: CryptofacilitiesFuturesTicker, localTimestamp: Date): IterableIterator<BookTicker> {
     yield {
       type: 'book_ticker',
       symbol: cryptofacilitiesTicker.product_id,
@@ -285,7 +286,7 @@ type CryptofacilitiesMessage = CryptofacilitiesTrade | CryptofacilitiesTicker | 
 
 type CryptofacilitiesTrade = {
   feed: 'trade'
-  type: 'liquidation' | 'fill'
+  type: 'liquidation' | 'fill' | 'rfq'
   uid: string | undefined
   event: undefined
   product_id: string

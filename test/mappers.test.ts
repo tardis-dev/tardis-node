@@ -4759,6 +4759,17 @@ describe('mappers', () => {
         open: 0,
         high: 0,
         low: 0
+      },
+      {
+        product_id: 'OF_XBTUSD_261002_90000_C',
+        feed: 'trade',
+        uid: '4f5d9eca-f3c3-4426-8bae-98e88c3b72d8',
+        side: 'sell',
+        type: 'rfq',
+        time: 1790681198385,
+        qty: 0.4,
+        price: 1.0,
+        seq: 2
       }
     ]
 
