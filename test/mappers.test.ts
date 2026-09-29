@@ -13776,6 +13776,60 @@ test('map mexc futures messages', () => {
   )
 })
 
+test('map mexc futures ignores empty tickers before the market opens', () => {
+  const localTimestamp = new Date('2026-09-29T05:28:48.2666934Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  // Recorded before listing: no last price, open interest, mark price or index price.
+  assert.deepStrictEqual(
+    mapper.map(
+      {
+        symbol: 'NANYAPLSTSTOCK_USDT',
+        data: {
+          symbol: 'NANYAPLSTSTOCK_USDT',
+          lastPrice: 0,
+          riseFallRate: 0,
+          volume24: 0,
+          amount24: 0,
+          lower24Price: 0,
+          high24Price: 0,
+          timestamp: 1790659727121,
+          holdVol: 0,
+          riseFallValue: 0,
+          zone: 'UTC+8',
+          riseFallRates: [null, null, null, null, null, null],
+          riseFallRatesOfTimezone: [0, 0, 0]
+        },
+        channel: 'push.ticker',
+        ts: 1790659727121
+      },
+      localTimestamp
+    ),
+    []
+  )
+})
+
+test('map mexc futures preserves an open interest update to zero', () => {
+  const localTimestamp = new Date('2026-09-29T05:28:00.000Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+  const message = {
+    symbol: 'BTC_USDT',
+    channel: 'push.ticker',
+    data: {
+      lastPrice: 83232.2,
+      fairPrice: 83234.7,
+      indexPrice: 83279.1,
+      holdVol: 516611497,
+      timestamp: 1790659678740
+    }
+  }
+
+  const [initial] = mapper.map(message, localTimestamp)
+  const [updated] = mapper.map({ ...message, data: { ...message.data, holdVol: 0 } }, localTimestamp)
+
+  assert.deepStrictEqual(updated, { ...initial, openInterest: 0 })
+})
+
 test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
   const localTimestamp = new Date()
   const mapper = createMapper('mexc-futures', localTimestamp)
