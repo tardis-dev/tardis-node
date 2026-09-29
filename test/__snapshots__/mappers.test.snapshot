@@ -7358,6 +7358,112 @@ exports[`mappers > map bybit-options messages 6`] = `
 ]
 `;
 
+exports[`mappers > map bybit-spread messages 1`] = `
+[]
+`;
+
+exports[`mappers > map bybit-spread messages 2`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT_BTC/USDT",
+    "exchange": "bybit-spread",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": -39.7,
+        "amount": 7.19
+      }
+    ],
+    "asks": [
+      {
+        "price": -23.7,
+        "amount": 7.19
+      }
+    ],
+    "timestamp": "2026-09-28T13:22:03.115Z",
+    "localTimestamp": "2026-09-28T13:22:55.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bybit-spread messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT_BTC/USDT",
+    "exchange": "bybit-spread",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": -39.5,
+        "amount": 3.596
+      },
+      {
+        "price": -39.7,
+        "amount": 3.595
+      }
+    ],
+    "asks": [
+      {
+        "price": -23.9,
+        "amount": 3.596
+      },
+      {
+        "price": -23.7,
+        "amount": 3.595
+      }
+    ],
+    "timestamp": "2026-09-28T13:22:24.995Z",
+    "localTimestamp": "2026-09-28T13:22:55.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bybit-spread messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTCUSDT-26MAR27_BTCUSDT-25DEC26",
+    "exchange": "bybit-spread",
+    "isSnapshot": false,
+    "bids": [],
+    "asks": [
+      {
+        "price": 1183.4,
+        "amount": 0
+      },
+      {
+        "price": 1186.4,
+        "amount": 0.011
+      }
+    ],
+    "timestamp": "2026-09-28T13:22:14.975Z",
+    "localTimestamp": "2026-09-28T13:22:55.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bybit-spread messages 5`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "SOLUSDT_SOL/USDT",
+    "exchange": "bybit-spread",
+    "id": "31d0fc58-933b-57b3-8378-f73da06da843",
+    "price": 19.3928,
+    "amount": 2.5,
+    "side": "sell",
+    "timestamp": "2025-04-09T03:42:22.720Z",
+    "localTimestamp": "2026-09-28T13:22:55.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bybit-spread messages 6`] = `
+[]
+`;
+
 exports[`mappers > map coinbase messages 1`] = `
 [
   {

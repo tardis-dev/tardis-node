@@ -7599,6 +7599,123 @@ describe('mappers', () => {
     }
   })
 
+  test('map bybit-spread messages', () => {
+    const bybit = createMapper('bybit-spread')
+    // Recorded book messages plus the documented spread trade example.
+    const messages = [
+      { success: true, data: { failTopics: [], successTopics: ['orderbook.25.BTCUSDT_BTC/USDT'] }, type: 'COMMAND_RESP' },
+      {
+        topic: 'orderbook.25.BTCUSDT_BTC/USDT',
+        ts: 1790601723115,
+        type: 'snapshot',
+        data: { s: 'BTCUSDT_BTC/USDT', b: [['-39.7', '7.190']], a: [['-23.7', '7.190']], u: 627576, seq: 3295545707 },
+        cts: 1790601694768
+      },
+      {
+        topic: 'orderbook.25.BTCUSDT_BTC/USDT',
+        ts: 1790601744995,
+        type: 'delta',
+        data: {
+          s: 'BTCUSDT_BTC/USDT',
+          b: [
+            ['-39.5', '3.596'],
+            ['-39.7', '3.595']
+          ],
+          a: [
+            ['-23.9', '3.596'],
+            ['-23.7', '3.595']
+          ],
+          u: 627577,
+          seq: 3295546175
+        },
+        cts: 1790601744976
+      },
+      {
+        topic: 'orderbook.25.BTCUSDT-26MAR27_BTCUSDT-25DEC26',
+        ts: 1790601734975,
+        type: 'delta',
+        data: {
+          s: 'BTCUSDT-26MAR27_BTCUSDT-25DEC26',
+          b: [],
+          a: [
+            ['1183.4', '0'],
+            ['1186.4', '0.011']
+          ],
+          u: 3104659,
+          seq: 3295546094
+        },
+        cts: 1790601734955
+      },
+      {
+        topic: 'publicTrade.SOLUSDT_SOL/USDT',
+        ts: 1744170142723,
+        type: 'snapshot',
+        data: [
+          {
+            T: 1744170142720,
+            s: 'SOLUSDT_SOL/USDT',
+            S: 'Sell',
+            v: '2.5',
+            p: '19.3928',
+            L: 'MinusTick',
+            i: '31d0fc58-933b-57b3-8378-f73da06da843',
+            seq: 1783284617
+          }
+        ]
+      },
+      {
+        topic: 'tickers.BTCUSDT_BTC/USDT',
+        ts: 1790601723189,
+        type: 'snapshot',
+        data: {
+          symbol: 'BTCUSDT_BTC/USDT',
+          bidPrice: '-39.7',
+          bidSize: '7.19',
+          askPrice: '-23.7',
+          askSize: '7.19',
+          lastPrice: '-35.2',
+          highPrice24h: '-35.2',
+          lowPrice24h: '-35.2',
+          prevPrice24h: '-35.2',
+          volume24h: '0'
+        }
+      }
+    ]
+
+    for (const message of messages) {
+      snapshot(bybit.map(message, new Date('2026-09-28T13:22:55.000Z')))
+    }
+
+    // A zero spread is a valid price, and zero book size deletes a level.
+    const trades = normalizeTrades('bybit-spread', new Date('2026-09-28'))
+    for (const price of ['-1.3', '0']) {
+      const message = {
+        topic: 'publicTrade.BTCUSDT_BTC/USDT',
+        data: [{ T: 1790601744995, s: 'BTCUSDT_BTC/USDT', S: 'Buy', v: '0.01', p: price, i: `trade-${price}` }]
+      }
+      const [trade] = [...trades.map(message, new Date('2026-09-28T13:22:55.000Z'))!]
+      assert.equal(trade.price, Number(price))
+      assert.equal(trade.side, 'buy')
+      assert.equal(trade.symbol, 'BTCUSDT_BTC/USDT')
+    }
+    const books = normalizeBookChanges('bybit-spread', new Date('2026-09-28'))
+    const [zeroLevel] = [
+      ...books.map(
+        {
+          topic: 'orderbook.25.BTCUSDT_BTC/USDT',
+          ts: 1790601744995,
+          type: 'delta',
+          data: { s: 'BTCUSDT_BTC/USDT', b: [['0', '0']], a: [] }
+        },
+        new Date('2026-09-28T13:22:55.000Z')
+      )!
+    ]
+    assert.deepEqual(zeroLevel.bids, [{ price: 0, amount: 0 }])
+    assert.equal(zeroLevel.isSnapshot, false)
+    assert.deepEqual(books.getFilters(['BTCUSDT_BTC/USDT']), [{ channel: 'orderbook.25', symbols: ['BTCUSDT_BTC/USDT'] }])
+    assert.deepEqual(trades.getFilters(['BTCUSDT_BTC/USDT']), [{ channel: 'publicTrade', symbols: ['BTCUSDT_BTC/USDT'] }])
+  })
+
   test('map bybit-options messages', () => {
     const messages = [
       {
