@@ -210,6 +210,17 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
   }
 
   *map(message: MexcFuturesTickerMessage | MexcFuturesFundingRateMessage, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    // Unopened markets send zero activity without mark or index prices.
+    if (
+      message.channel === 'push.ticker' &&
+      message.data.lastPrice === 0 &&
+      message.data.holdVol === 0 &&
+      message.data.fairPrice === undefined &&
+      message.data.indexPrice === undefined
+    ) {
+      return
+    }
+
     const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.symbol, 'mexc-futures')
 
     if (message.channel === 'push.funding.rate') {
@@ -320,10 +331,10 @@ type MexcFuturesTickerMessage = MexcFuturesMessage<
     ask1: number
     bid1: number
     contractId?: number
-    fairPrice: number
+    fairPrice?: number
     fundingRate: number
     high24Price: number
-    indexPrice: number
+    indexPrice?: number
     lastPrice: number
     lower24Price: number
     maxBidPrice: number

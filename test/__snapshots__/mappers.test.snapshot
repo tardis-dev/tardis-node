@@ -1,3 +1,69 @@
+exports[`ignore Lighter market stats with funding older than 12 hours 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "1",
+    "exchange": "lighter",
+    "lastPrice": 84375.2,
+    "openInterest": 182560941.50528,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84396.9,
+    "markPrice": 84370.4,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "75",
+    "exchange": "lighter",
+    "lastPrice": 0.02955,
+    "openInterest": 0,
+    "fundingRate": 0.00018800000000000002,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 0.0294,
+    "markPrice": 0.02955,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  }
+]
+`;
+
+exports[`ignore Lighter market stats with funding older than 12 hours 2`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "1",
+    "exchange": "lighter-rh",
+    "lastPrice": 84375.2,
+    "openInterest": 182560941.50528,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84396.9,
+    "markPrice": 84370.4,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "75",
+    "exchange": "lighter-rh",
+    "lastPrice": 0.02955,
+    "openInterest": 0,
+    "fundingRate": 0.00018800000000000002,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 0.0294,
+    "markPrice": 0.02955,
+    "timestamp": "2026-09-24T00:00:00.761Z",
+    "localTimestamp": "2026-09-24T00:00:00.774Z"
+  }
+]
+`;
+
 exports[`map binance-european-options messages 1`] = `
 [
   {
@@ -859,6 +925,158 @@ exports[`map bitnomial messages 4`] = `
     "side": "buy",
     "timestamp": "2022-09-28T16:06:39.022836Z",
     "localTimestamp": "2022-08-16T00:00:00.464Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 1`] = `
+[]
+`;
+
+exports[`map bitvavo messages 10`] = `
+[]
+`;
+
+exports[`map bitvavo messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "TAO-EUR",
+    "exchange": "bitvavo",
+    "id": "00000000-0000-057b-0000-0000002c34ff",
+    "price": 187.19,
+    "amount": 1,
+    "side": "buy",
+    "timestamp": "2026-09-16T07:35:42.667191Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 3`] = `
+[]
+`;
+
+exports[`map bitvavo messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 9998,
+        "amount": 1
+      }
+    ],
+    "asks": [
+      {
+        "price": 10001,
+        "amount": 3
+      }
+    ],
+    "timestamp": "2026-09-16T07:31:51.187257Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  },
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 9999,
+        "amount": 2
+      }
+    ],
+    "asks": [],
+    "timestamp": "2026-09-16T07:36:10.613624Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 5`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "BTC-EUR",
+    "exchange": "bitvavo",
+    "isSnapshot": false,
+    "bids": [],
+    "asks": [
+      {
+        "price": 10001,
+        "amount": 0
+      }
+    ],
+    "timestamp": "2026-09-16T07:36:11.613624Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 6`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "BLEND-EUR",
+    "exchange": "bitvavo",
+    "askAmount": 100,
+    "askPrice": 0.05248,
+    "bidAmount": 200,
+    "bidPrice": 0.05234,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 7`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "EUL-EUR",
+    "exchange": "bitvavo",
+    "askAmount": 10,
+    "askPrice": 1.097,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 8`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "MLN-EUR",
+    "exchange": "bitvavo",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": 5,
+    "bidPrice": 1.146,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
+  }
+]
+`;
+
+exports[`map bitvavo messages 9`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "EMPTY-EUR",
+    "exchange": "bitvavo",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidAmount": undefined,
+    "bidPrice": undefined,
+    "timestamp": "2026-09-16T07:36:12.000Z",
+    "localTimestamp": "2026-09-16T07:36:12.000Z"
   }
 ]
 `;
@@ -2700,8 +2918,129 @@ exports[`map kucoin-futures messages 9`] = `
 ]
 `;
 
+exports[`map lighter RH initial BBO for a quiet market 1`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "2048",
+    "exchange": "lighter-rh",
+    "askAmount": undefined,
+    "askPrice": undefined,
+    "bidPrice": 1.05,
+    "bidAmount": 228.7524,
+    "timestamp": "2026-09-23T00:00:00.248Z",
+    "localTimestamp": "2026-09-23T00:00:00.809Z"
+  }
+]
+`;
+
+exports[`map lighter RH market stats messages 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "lastPrice": 2521.18,
+    "openInterest": 20701782.30043,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 2521.98,
+    "markPrice": 2521.42,
+    "timestamp": "2026-09-14T08:32:02.769Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH order book messages 1`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 2521.18,
+        "amount": 0.3966
+      }
+    ],
+    "asks": [
+      {
+        "price": 2521.52,
+        "amount": 0.2321
+      }
+    ],
+    "timestamp": "2026-09-14T08:32:01.136Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH ticker messages 1`] = `
+[
+  {
+    "type": "book_ticker",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "askAmount": 0.2321,
+    "askPrice": 2521.52,
+    "bidPrice": 2521.19,
+    "bidAmount": 1.3554,
+    "timestamp": "2026-09-14T08:32:01.652Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
+exports[`map lighter RH trade messages 1`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "0",
+    "exchange": "lighter-rh",
+    "id": "661593832",
+    "price": 2521.18,
+    "amount": 0.0523,
+    "side": "sell",
+    "timestamp": "2026-09-14T08:32:02.541Z",
+    "localTimestamp": "2026-09-14T08:32:00.000Z"
+  }
+]
+`;
+
 exports[`map lighter market stats messages 1`] = `
-[]
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "0",
+    "exchange": "lighter",
+    "lastPrice": 2308.57,
+    "openInterest": 70209112.921092,
+    "fundingRate": 0.000011000000000000001,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 2309.89,
+    "markPrice": 2308.86,
+    "timestamp": "2026-04-20T14:07:23.429Z",
+    "localTimestamp": "2026-04-20T11:35:00.000Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "1",
+    "exchange": "lighter",
+    "lastPrice": 75232,
+    "openInterest": 124496091.756091,
+    "fundingRate": 0.000011999999999999999,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 75281.9,
+    "markPrice": 75241.1,
+    "timestamp": "2026-04-20T14:07:23.429Z",
+    "localTimestamp": "2026-04-20T11:35:00.000Z"
+  }
+]
 `;
 
 exports[`map lighter market stats messages 2`] = `
@@ -2712,7 +3051,7 @@ exports[`map lighter market stats messages 2`] = `
     "exchange": "lighter",
     "lastPrice": 2308.57,
     "openInterest": 70209098.837046,
-    "fundingRate": 0.0011,
+    "fundingRate": 0.000011000000000000001,
     "fundingTimestamp": undefined,
     "predictedFundingRate": undefined,
     "indexPrice": 2309.89,
@@ -2726,7 +3065,7 @@ exports[`map lighter market stats messages 2`] = `
     "exchange": "lighter",
     "lastPrice": 75232,
     "openInterest": 124496030.8108,
-    "fundingRate": 0.0012,
+    "fundingRate": 0.000011999999999999999,
     "fundingTimestamp": undefined,
     "predictedFundingRate": undefined,
     "indexPrice": 75281.9,
@@ -2820,7 +3159,19 @@ exports[`map lighter order book messages 2`] = `
 `;
 
 exports[`map lighter ticker messages 1`] = `
-[]
+[
+  {
+    "type": "book_ticker",
+    "symbol": "1",
+    "exchange": "lighter",
+    "askAmount": 0.53087,
+    "askPrice": 75531.6,
+    "bidPrice": 75531.5,
+    "bidAmount": 0.0012,
+    "timestamp": "2026-04-20T14:37:47.145Z",
+    "localTimestamp": "2026-04-20T11:35:00.000Z"
+  }
+]
 `;
 
 exports[`map lighter ticker messages 2`] = `
@@ -3629,6 +3980,63 @@ exports[`map woo-x v3 messages 9`] = `
     "markPrice": 1622.9,
     "timestamp": "2026-06-29T22:08:00.570Z",
     "localTimestamp": "2026-06-29T22:08:00.464Z"
+  }
+]
+`;
+
+exports[`mappers > Huobi caches open interest until the next basis or funding message 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC_CW",
+    "exchange": "huobi-dm",
+    "lastPrice": 83931.47,
+    "openInterest": 415,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84450.89333333333,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:58.383Z",
+    "localTimestamp": "2026-09-24T00:00:58.386Z"
+  }
+]
+`;
+
+exports[`mappers > Huobi caches open interest until the next basis or funding message 2`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC-USD",
+    "exchange": "huobi-dm-swap",
+    "lastPrice": undefined,
+    "openInterest": 176823,
+    "fundingRate": 0.0001,
+    "fundingTimestamp": "2026-09-24T08:00:00.000Z",
+    "predictedFundingRate": 0,
+    "indexPrice": undefined,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:05.036Z",
+    "localTimestamp": "2026-09-24T00:00:05.038Z"
+  }
+]
+`;
+
+exports[`mappers > Huobi caches open interest until the next basis or funding message 3`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC-USDT",
+    "exchange": "huobi-dm-linear-swap",
+    "lastPrice": 84359.3,
+    "openInterest": 25952001,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 84395.55857142857,
+    "markPrice": undefined,
+    "timestamp": "2026-09-24T00:00:00.261Z",
+    "localTimestamp": "2026-09-24T00:00:03.390Z"
   }
 ]
 `;
@@ -5307,6 +5715,55 @@ exports[`mappers > map bitflyer messages 5`] = `
     "bidAmount": 0.01,
     "timestamp": "2021-09-01T00:00:00.211580Z",
     "localTimestamp": "2019-09-01T00:00:01.275Z"
+  }
+]
+`;
+
+exports[`mappers > map bithumb messages 1`] = `
+[]
+`;
+
+exports[`mappers > map bithumb messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "KRW-BTC",
+    "exchange": "bithumb",
+    "id": "1077860633149466018",
+    "price": 116281000,
+    "amount": 0.0012,
+    "side": "sell",
+    "timestamp": "2026-09-22T09:59:11.078Z",
+    "localTimestamp": "2026-09-22T19:00:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map bithumb messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "symbol": "KRW-BTC",
+    "exchange": "bithumb",
+    "isSnapshot": true,
+    "asks": [
+      {
+        "price": 116280000,
+        "amount": 0.0168
+      }
+    ],
+    "bids": [
+      {
+        "price": 116263000,
+        "amount": 0.0521
+      },
+      {
+        "price": 116261000,
+        "amount": 0.0026
+      }
+    ],
+    "timestamp": "2026-09-22T09:59:16.406290Z",
+    "localTimestamp": "2026-09-22T19:00:00.000Z"
   }
 ]
 `;
@@ -10797,22 +11254,7 @@ exports[`mappers > map huobi-dm, messages 3`] = `
 `;
 
 exports[`mappers > map huobi-dm, messages 4`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "ETH_NW",
-    "exchange": "huobi-dm",
-    "lastPrice": 244.126,
-    "openInterest": 648420,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 243.466431823,
-    "markPrice": undefined,
-    "timestamp": "2020-06-23T12:25:03.195Z",
-    "localTimestamp": "2019-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm, messages 5`] = `
@@ -10975,22 +11417,7 @@ exports[`mappers > map huobi-dm-linear-swap, messages 6`] = `
 `;
 
 exports[`mappers > map huobi-dm-linear-swap, messages 7`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "BTC-USDT",
-    "exchange": "huobi-dm-linear-swap",
-    "lastPrice": 19717.9,
-    "openInterest": 3063121,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 19695.41,
-    "markPrice": undefined,
-    "timestamp": "2020-12-01T00:00:07.036Z",
-    "localTimestamp": "2020-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm-linear-swap, messages 8`] = `
@@ -11006,7 +11433,7 @@ exports[`mappers > map huobi-dm-linear-swap, messages 8`] = `
     "predictedFundingRate": 0.000236636095370214,
     "indexPrice": 19695.41,
     "markPrice": undefined,
-    "timestamp": "2020-12-01T00:00:07.036Z",
+    "timestamp": "2020-12-01T00:00:06.356Z",
     "localTimestamp": "2020-12-01T00:00:01.275Z"
   }
 ]
@@ -11256,22 +11683,7 @@ exports[`mappers > map huobi-dm-swap, messages 6`] = `
 `;
 
 exports[`mappers > map huobi-dm-swap, messages 7`] = `
-[
-  {
-    "type": "derivative_ticker",
-    "symbol": "BTC-USD",
-    "exchange": "huobi-dm-swap",
-    "lastPrice": 9590.1,
-    "openInterest": 1711705,
-    "fundingRate": undefined,
-    "fundingTimestamp": undefined,
-    "predictedFundingRate": undefined,
-    "indexPrice": 9582.975,
-    "markPrice": undefined,
-    "timestamp": "2020-06-23T09:33:43.141Z",
-    "localTimestamp": "2019-12-01T00:00:01.275Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map huobi-dm-swap, messages 8`] = `
@@ -11287,7 +11699,7 @@ exports[`mappers > map huobi-dm-swap, messages 8`] = `
     "predictedFundingRate": 0.000113655663368468,
     "indexPrice": 9582.975,
     "markPrice": undefined,
-    "timestamp": "2020-06-23T09:33:43.141Z",
+    "timestamp": "2020-06-23T09:33:41.703Z",
     "localTimestamp": "2019-12-01T00:00:01.275Z"
   }
 ]

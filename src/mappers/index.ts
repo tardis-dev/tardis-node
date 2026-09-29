@@ -7,9 +7,11 @@ import { binanceEuropeanOptionsMappers } from './binanceeuropeanoptions.ts'
 import { bitfinexMappers } from './bitfinex.ts'
 import { bitflyerMappers } from './bitflyer.ts'
 import { bitgetMappers } from './bitget.ts'
+import { bithumbMappers } from './bithumb.ts'
 import { bitmexMappers } from './bitmex.ts'
 import { bitnomialMappers } from './bitnomial.ts'
 import { bitstampMappers } from './bitstamp.ts'
+import { bitvavoMappers } from './bitvavo.ts'
 import { blockchainComMappers } from './blockchaincom.ts'
 import { bullishMappers } from './bullish.ts'
 import { bybitMappers } from './bybit.ts'
@@ -63,9 +65,11 @@ const registeredMappers = mergeExchangeMappers(
   bitfinexMappers,
   bitflyerMappers,
   bitgetMappers,
+  bithumbMappers,
   bitmexMappers,
   bitnomialMappers,
   bitstampMappers,
+  bitvavoMappers,
   blockchainComMappers,
   bullishMappers,
   bybitMappers,

@@ -41,6 +41,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
   'coinbase-international',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'bullish'
 ]
 
@@ -57,6 +58,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'bitfinex-derivatives',
   'bitflyer',
   'bitmex',
+  'bitvavo',
   'coinbase',
   'cryptofacilities',
   'deribit',
@@ -88,6 +90,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
   'coinbase-international',
   'hyperliquid',
   'lighter',
+  'lighter-rh',
   'gemini',
   'bullish',
   'mexc',
@@ -121,7 +124,8 @@ const exchangesWithLiquidationsSupport: Exchange[] = [
   'okex-swap',
   'dydx-v4',
   'bitget-futures',
-  'lighter'
+  'lighter',
+  'lighter-rh'
 ]
 
 const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
@@ -2949,6 +2953,20 @@ describe('mappers', () => {
 
       snapshot(mappedMessages)
     }
+  })
+
+  test('ignore Bitfinex spot margin liquidations in the derivatives feed', () => {
+    const mapper = createMapper('bitfinex-derivatives')
+    const message = [
+      1459,
+      [['pos', 193578126, 1790426779162, null, 'tIOTUSD', -13.9466, 0.04529, null, 0, 1, null, null]],
+      2482474,
+      1790426779196,
+      'liquidations',
+      'global'
+    ]
+
+    assert.deepEqual(mapper.map(message, new Date('2026-09-26T12:46:19.208Z')), [])
   })
 
   test('map aster messages', () => {
@@ -6485,6 +6503,140 @@ describe('mappers', () => {
     }
   })
 
+  test('Huobi caches open interest until the next basis or funding message', () => {
+    // Recorded on 2026-09-24, 00:00 UTC, with each OI message followed by its next ticker source.
+    const cases = [
+      {
+        exchange: 'huobi-dm',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:02.5424071Z',
+          message: {
+            ch: 'market.BTC_CW.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 415,
+                amount: 0.49445100866218594,
+                symbol: 'BTC',
+                contract_type: 'this_week',
+                contract_code: 'BTC260925',
+                trade_amount: 5.957261130112563,
+                trade_volume: 5072,
+                trade_turnover: 507200
+              }
+            ],
+            ts: 1790208002538
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:58.3860651Z',
+          message: {
+            ch: 'market.BTC_CW.basis.1min.close',
+            tick: {
+              id: 1790208000,
+              index_price: '84450.89333333333',
+              contract_price: '83931.47',
+              basis: '-519.42333333333',
+              basis_rate: '-0.00615059607816262319193134559155337'
+            },
+            ts: 1790208058383
+          }
+        }
+      },
+      {
+        exchange: 'huobi-dm-swap',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:02.8562547Z',
+          message: {
+            ch: 'market.BTC-USD.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 176823,
+                amount: 209.59656723583066,
+                symbol: 'BTC',
+                contract_code: 'BTC-USD',
+                trade_amount: 141.92348663960905,
+                trade_volume: 120402,
+                trade_turnover: 12040200
+              }
+            ],
+            ts: 1790208002852
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:05.0385187Z',
+          message: {
+            op: 'notify',
+            topic: 'public.BTC-USD.funding_rate',
+            ts: 1790208005036,
+            data: [
+              {
+                symbol: 'BTC',
+                contract_code: 'BTC-USD',
+                fee_asset: 'BTC',
+                funding_time: '1790208005000',
+                funding_rate: '0.000100000000000000',
+                estimated_rate: null,
+                settlement_time: '1790236800000'
+              }
+            ]
+          }
+        }
+      },
+      {
+        exchange: 'huobi-dm-linear-swap',
+        openInterest: {
+          localTimestamp: '2026-09-24T00:00:01.4744491Z',
+          message: {
+            ch: 'market.BTC-USDT.open_interest',
+            generated: true,
+            data: [
+              {
+                volume: 25952001,
+                amount: 25952.001,
+                symbol: 'BTC',
+                value: 2189292637.9593,
+                contract_code: 'BTC-USDT',
+                trade_amount: 10157.394,
+                trade_volume: 10157394,
+                trade_turnover: 864635455.6818,
+                business_type: 'swap',
+                pair: 'BTC-USDT',
+                contract_type: 'swap',
+                trade_partition: 'USDT'
+              }
+            ],
+            ts: 1790208001461
+          }
+        },
+        nextTicker: {
+          localTimestamp: '2026-09-24T00:00:03.3908656Z',
+          message: {
+            ch: 'market.BTC-USDT.basis.1min.close',
+            tick: {
+              id: 1790207940,
+              index_price: '84395.55857142857',
+              contract_price: '84359.3',
+              basis: '-36.25857142857',
+              basis_rate: '-0.00042962653535709928319732558974877'
+            },
+            ts: 1790208000261
+          }
+        }
+      }
+    ]
+
+    for (const { exchange, openInterest, nextTicker } of cases) {
+      const mapper = normalizeDerivativeTickers(exchange as Exchange, new Date(openInterest.localTimestamp))
+      assert.deepStrictEqual(Array.from(mapper.map(openInterest.message, new Date(openInterest.localTimestamp)) ?? []), [])
+      const tickers = Array.from(mapper.map(nextTicker.message, new Date(nextTicker.localTimestamp)) ?? [])
+      assert.strictEqual(tickers.length, 1)
+      assert.strictEqual(tickers[0].openInterest, openInterest.message.data[0].volume)
+      snapshot(tickers)
+    }
+  })
+
   test('map huobi-dm-options, messages', () => {
     const messages = [
       {
@@ -8776,6 +8928,65 @@ describe('mappers', () => {
     for (const message of messages) {
       const mappedMessages = upbit.map(message, new Date('2021-03-02T23:59:59.000Z'))
       snapshot(mappedMessages)
+    }
+  })
+
+  test('map bithumb messages', () => {
+    const messages = [
+      {
+        type: 'trade',
+        code: 'KRW-BTC',
+        trade_price: 116280000,
+        trade_volume: 0.0008,
+        ask_bid: 'BID',
+        prev_closing_price: 115801000,
+        change: 'RISE',
+        change_price: 479000,
+        trade_date: '2026-09-22',
+        trade_time: '18:59:10',
+        trade_timestamp: 1790071150078,
+        sequential_id: '1077860633149466017',
+        timestamp: 1790071150369,
+        stream_type: 'SNAPSHOT'
+      },
+      {
+        type: 'trade',
+        code: 'KRW-BTC',
+        trade_price: 116281000,
+        trade_volume: 0.0012,
+        ask_bid: 'ASK',
+        prev_closing_price: 115801000,
+        change: 'RISE',
+        change_price: 480000,
+        trade_date: '2026-09-22',
+        trade_time: '18:59:11',
+        trade_timestamp: 1790071151078,
+        sequential_id: '1077860633149466018',
+        timestamp: 1790071151369,
+        stream_type: 'REALTIME'
+      },
+      {
+        type: 'orderbook',
+        code: 'KRW-BTC',
+        total_ask_size: 0.0193,
+        total_bid_size: 0.0694,
+        orderbook_units: [
+          { ask_price: 116280000, bid_price: 116263000, ask_size: 0.0168, bid_size: 0.0521 },
+          { ask_price: 116282000, bid_price: 116261000, ask_size: 0, bid_size: 0.0026 }
+        ],
+        level: 1,
+        timestamp: 1790071156406290,
+        stream_type: 'SNAPSHOT'
+      }
+    ]
+
+    const bithumb = createMapper('bithumb')
+
+    assert.deepEqual(normalizeTrades('bithumb', new Date()).getFilters(['krw-btc']), [{ channel: 'trade', symbols: ['KRW-BTC'] }])
+    assert.deepEqual(normalizeBookChanges('bithumb', new Date()).getFilters(['krw-btc']), [{ channel: 'orderbook', symbols: ['KRW-BTC'] }])
+
+    for (const message of messages) {
+      snapshot(bithumb.map(message, new Date('2026-09-22T19:00:00.000Z')))
     }
   })
 
@@ -12258,6 +12469,133 @@ test('map lighter market stats messages', () => {
   }
 })
 
+test('ignore inactive Lighter market stats without dropping a new market before its first funding', () => {
+  const localTimestamp = new Date('2026-09-23T00:00:01.167Z')
+  // MKR/28 was still included in a recorded market_stats:all snapshot after the market became inactive.
+  const message = {
+    channel: 'market_stats:all',
+    type: 'subscribed/market_stats',
+    timestamp: 1790121601167,
+    market_stats: {
+      '28': {
+        market_id: 28,
+        index_price: '0.00',
+        mark_price: '0.00',
+        open_interest: '0.000000',
+        last_trade_price: '1699.84',
+        current_funding_rate: '0.0000',
+        funding_timestamp: 0
+      }
+    }
+  }
+
+  assert.deepStrictEqual(createMapper('lighter', localTimestamp).map(message, localTimestamp), [])
+
+  // STONK/4095 published a funding rate before its first mark/index prices or funding payment.
+  const newMarketTimestamp = new Date('2026-09-15T12:15:36.152Z')
+  const newMarket = {
+    channel: 'market_stats:all',
+    type: 'update/market_stats',
+    timestamp: 1789474536147,
+    market_stats: {
+      '4095': {
+        market_id: 4095,
+        index_price: '0.18163',
+        mark_price: '0.18163',
+        open_interest: '0.000000',
+        last_trade_price: '0.00000',
+        current_funding_rate: '0.0002',
+        funding_timestamp: 0
+      }
+    }
+  }
+
+  const initialNewMarket = {
+    ...newMarket,
+    timestamp: 1789474536047,
+    market_stats: {
+      '4095': { ...newMarket.market_stats['4095'], mark_price: '0.00000', index_price: '0.00000' }
+    }
+  }
+
+  const initialMapped = createMapper('lighter', newMarketTimestamp).map(initialNewMarket, newMarketTimestamp)
+  assert.equal(initialMapped.length, 1)
+  assert.equal(initialMapped[0].fundingRate, 0.000002)
+
+  const mapped = createMapper('lighter', newMarketTimestamp).map(newMarket, newMarketTimestamp)
+  assert.equal(mapped.length, 1)
+  assert.equal(mapped[0].symbol, '4095')
+  assert.equal(mapped[0].markPrice, 0.18163)
+})
+
+test('ignore Lighter market stats with funding older than 12 hours', () => {
+  const localTimestamp = new Date('2026-09-24T00:00:00.774Z')
+  // Recorded initial snapshot; keep only relevant fields and markets. DOLO (75) last funded 10 hours earlier.
+  const message = {
+    channel: 'market_stats:all',
+    market_stats: {
+      '1': {
+        market_id: 1,
+        index_price: '84396.9',
+        mark_price: '84370.4',
+        open_interest: '182560941.505280',
+        last_trade_price: '84375.2',
+        current_funding_rate: '0.0012',
+        funding_timestamp: 1790208000001
+      },
+      '22': {
+        market_id: 22,
+        index_price: '0.05990',
+        mark_price: '0.06013',
+        open_interest: '0.000000',
+        last_trade_price: '0.06013',
+        current_funding_rate: '0.0758',
+        funding_timestamp: 1762282800001
+      },
+      '54': {
+        market_id: 54,
+        index_price: '0.062634',
+        mark_price: '0.062636',
+        open_interest: '0.000000',
+        last_trade_price: '0.062636',
+        current_funding_rate: '0.0001',
+        funding_timestamp: 1761480000002
+      },
+      '75': {
+        market_id: 75,
+        index_price: '0.02940',
+        mark_price: '0.02955',
+        open_interest: '0.000000',
+        last_trade_price: '0.02955',
+        current_funding_rate: '0.0188',
+        funding_timestamp: 1790172000001
+      }
+    },
+    timestamp: 1790208000761,
+    type: 'subscribed/market_stats'
+  }
+
+  for (const exchange of ['lighter', 'lighter-rh'] as const) {
+    snapshot(createMapper(exchange, localTimestamp).map(message, localTimestamp))
+
+    // Check the 12-hour boundary on per-market updates as well, independently of the replay's wall-clock date.
+    for (const [fundingTimestamp, expectedCount] of [
+      [message.timestamp - 12 * 60 * 60 * 1000, 1],
+      [message.timestamp - 12 * 60 * 60 * 1000 - 1, 0],
+      [0, 1]
+    ]) {
+      const update = {
+        ...message,
+        type: 'update/market_stats',
+        channel: 'market_stats:1',
+        market_stats: { ...message.market_stats['1'], funding_timestamp: fundingTimestamp }
+      }
+      const mapper = createMapper(exchange, localTimestamp)
+      assert.equal(mapper.map(update, localTimestamp).length, expectedCount)
+    }
+  }
+})
+
 test('map lighter ticker messages', () => {
   const localTimestamp = new Date('2026-04-20T11:35:00.000Z')
 
@@ -12316,6 +12654,182 @@ test('map lighter ticker messages', () => {
   for (const message of messages) {
     const mappedMessages = mapper.map(message, localTimestamp)
     snapshot(mappedMessages)
+  }
+})
+
+test('map lighter RH trade messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/trade — real captured RH message
+    {
+      channel: 'trade:0',
+      liquidation_trades: [],
+      nonce: 1777827447,
+      trades: [
+        {
+          trade_id: 661593832,
+          trade_id_str: '661593832',
+          tx_hash: '08573b0bdb7adecdddd080a173b994dc7275b7ec0bd4c33931e472cdd7cae5debf8eb4c7ec8be860',
+          type: 'trade',
+          market_id: 0,
+          size: '0.0523',
+          price: '2521.18',
+          usd_amount: '131.857714',
+          ask_id: 281475049306654,
+          ask_id_str: '281475049306654',
+          bid_id: 562949877266857,
+          bid_id_str: '562949877266857',
+          ask_client_id: 105349662651628,
+          ask_client_id_str: '105349662651628',
+          bid_client_id: 560867,
+          bid_client_id_str: '560867',
+          ask_account_id: 23521,
+          bid_account_id: 4838,
+          is_maker_ask: false,
+          block_height: 21843648,
+          timestamp: 1789374722541,
+          taker_position_size_before: '0.0000',
+          taker_entry_quote_before: '0.000000',
+          taker_initial_margin_fraction_before: 5000,
+          taker_position_sign_changed: true,
+          maker_fee: 102,
+          maker_position_size_before: '-2.3285',
+          maker_entry_quote_before: '5876.196844',
+          maker_initial_margin_fraction_before: 200,
+          transaction_time: 1789374722613391,
+          maker_allocated_margin_usdc_before: 118083597,
+          maker_allocated_margin_usdc_after: 115431344,
+          ask_order_version: 0,
+          bid_order_version: 0
+        }
+      ],
+      type: 'update/trade'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH order book messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // subscribed/order_book — real captured RH snapshot
+    {
+      channel: 'order_book:0',
+      last_updated_at: 1789374721048002,
+      offset: 11835516,
+      order_book: {
+        code: 0,
+        asks: [{ price: '2521.52', size: '0.2321' }],
+        bids: [{ price: '2521.18', size: '0.3966' }],
+        offset: 11835516,
+        nonce: 1777826317,
+        last_updated_at: 1789374721048002,
+        begin_nonce: 0
+      },
+      timestamp: 1789374721136,
+      type: 'subscribed/order_book'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH market stats messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/market_stats — real captured RH message
+    {
+      channel: 'market_stats:0',
+      market_stats: {
+        symbol: 'ETH',
+        market_id: 0,
+        index_price: '2521.98',
+        mark_price: '2521.42',
+        mid_price: '2521.35',
+        best_ask_price: '2521.52',
+        best_bid_price: '2521.18',
+        open_interest: '20701782.300430',
+        open_interest_limit: '72057594037927936.000000',
+        funding_clamp_small: '0.0500',
+        funding_clamp_big: '4.0000',
+        last_trade_price: '2521.18',
+        current_funding_rate: '0.0012',
+        funding_rate: '0.0012',
+        funding_timestamp: 1789372800000,
+        daily_base_token_volume: 25607.4639,
+        daily_quote_token_volume: 63982448.703414,
+        daily_price_low: 2461.78,
+        daily_price_high: 2532.01,
+        daily_price_change: 1.5223194334282182,
+        base_interest_rate: '0.0100',
+        premium: '-0.0104'
+      },
+      timestamp: 1789374722769,
+      type: 'update/market_stats'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('map lighter RH initial BBO for a quiet market', () => {
+  const localTimestamp = new Date('2026-09-23T00:00:00.809Z')
+  const mapper = createMapper('lighter-rh', localTimestamp)
+  snapshot(
+    mapper.map(
+      {
+        channel: 'ticker:2048',
+        last_updated_at: 1790083245368184,
+        nonce: 2258095431,
+        ticker: { s: 'ETH/USDG', a: { price: '', size: '' }, b: { price: '1.05', size: '228.7524' }, last_updated_at: 1790083245368184 },
+        timestamp: 1790121600248,
+        type: 'subscribed/ticker'
+      },
+      localTimestamp
+    )
+  )
+})
+
+test('map lighter RH ticker messages', () => {
+  const localTimestamp = new Date('2026-09-14T08:32:00.000Z')
+
+  const messages = [
+    // update/ticker — real captured RH message
+    {
+      channel: 'ticker:0',
+      last_updated_at: 1789374721651704,
+      nonce: 1777826727,
+      ticker: {
+        s: 'ETH',
+        a: { price: '2521.52', size: '0.2321' },
+        b: { price: '2521.19', size: '1.3554' },
+        last_updated_at: 1789374721651704
+      },
+      timestamp: 1789374721652,
+      type: 'update/ticker'
+    }
+  ]
+
+  const mapper = createMapper('lighter-rh', localTimestamp)
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
   }
 })
 
@@ -13300,6 +13814,60 @@ test('map mexc futures messages', () => {
   )
 })
 
+test('map mexc futures ignores empty tickers before the market opens', () => {
+  const localTimestamp = new Date('2026-09-29T05:28:48.2666934Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+
+  // Recorded before listing: no last price, open interest, mark price or index price.
+  assert.deepStrictEqual(
+    mapper.map(
+      {
+        symbol: 'NANYAPLSTSTOCK_USDT',
+        data: {
+          symbol: 'NANYAPLSTSTOCK_USDT',
+          lastPrice: 0,
+          riseFallRate: 0,
+          volume24: 0,
+          amount24: 0,
+          lower24Price: 0,
+          high24Price: 0,
+          timestamp: 1790659727121,
+          holdVol: 0,
+          riseFallValue: 0,
+          zone: 'UTC+8',
+          riseFallRates: [null, null, null, null, null, null],
+          riseFallRatesOfTimezone: [0, 0, 0]
+        },
+        channel: 'push.ticker',
+        ts: 1790659727121
+      },
+      localTimestamp
+    ),
+    []
+  )
+})
+
+test('map mexc futures preserves an open interest update to zero', () => {
+  const localTimestamp = new Date('2026-09-29T05:28:00.000Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+  const message = {
+    symbol: 'BTC_USDT',
+    channel: 'push.ticker',
+    data: {
+      lastPrice: 83232.2,
+      fairPrice: 83234.7,
+      indexPrice: 83279.1,
+      holdVol: 516611497,
+      timestamp: 1790659678740
+    }
+  }
+
+  const [initial] = mapper.map(message, localTimestamp)
+  const [updated] = mapper.map({ ...message, data: { ...message.data, holdVol: 0 } }, localTimestamp)
+
+  assert.deepStrictEqual(updated, { ...initial, openInterest: 0 })
+})
+
 test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
   const localTimestamp = new Date()
   const mapper = createMapper('mexc-futures', localTimestamp)
@@ -13339,6 +13907,186 @@ test('map mexc futures realtime depth update throws when first update has no sna
       ),
     errorMessageIncludes('MEXC futures depth snapshot has no overlap with first update')
   )
+})
+
+test('map bitvavo messages', () => {
+  const localTimestamp = new Date('2026-09-16T07:36:12.000Z')
+  const mapper = createMapper('bitvavo', localTimestamp)
+  const messages = [
+    {
+      event: 'subscribed',
+      subscriptions: { book: ['BTC-EUR'], trades: ['BTC-EUR'], ticker: ['BTC-EUR'] }
+    },
+    {
+      event: 'trade',
+      id: '00000000-0000-057b-0000-0000002c34ff',
+      amount: '1',
+      price: '187.19',
+      timestamp: 1789544142667,
+      market: 'TAO-EUR',
+      side: 'buy',
+      timestampNs: '1789544142667191452'
+    },
+    {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 101,
+      bids: [['9999', '2']],
+      asks: [],
+      timestamp: '1789544170613624376',
+      startMdSeqNo: 101,
+      endMdSeqNo: 101,
+      type: 'update'
+    },
+    {
+      action: 'getBook',
+      requestId: 5,
+      response: {
+        market: 'BTC-EUR',
+        nonce: 100,
+        bids: [['9998', '1']],
+        asks: [['10001', '3']],
+        timestamp: '1789543911187257474',
+        mdSeqNo: 100
+      }
+    },
+    {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 102,
+      bids: [],
+      asks: [['10001', '0']],
+      timestamp: '1789544171613624376',
+      startMdSeqNo: 102,
+      endMdSeqNo: 102,
+      type: 'update'
+    },
+    {
+      event: 'ticker',
+      market: 'BLEND-EUR',
+      bestBid: '0.05234',
+      bestBidSize: '200',
+      bestAsk: '0.05248',
+      bestAskSize: '100'
+    },
+    {
+      event: 'ticker',
+      market: 'EUL-EUR',
+      bestAsk: '1.097',
+      bestAskSize: '10'
+    },
+    {
+      event: 'ticker',
+      market: 'MLN-EUR',
+      bestBid: '1.146',
+      bestBidSize: '5'
+    },
+    {
+      event: 'ticker',
+      market: 'EMPTY-EUR',
+      bestBid: '0',
+      bestBidSize: '0',
+      bestAsk: '0',
+      bestAskSize: '0'
+    },
+    {
+      event: 'ticker',
+      market: 'LSK-EUR',
+      lastPrice: '0.42'
+    }
+  ]
+
+  for (const message of messages) {
+    snapshot(mapper.map(message, localTimestamp))
+  }
+})
+
+test('preserves unchanged Bitvavo ticker fields and handles explicit removals', () => {
+  const localTimestamp = new Date('2026-09-16T07:36:12.000Z')
+  const mapper = createMapper('bitvavo', localTimestamp)
+
+  mapper.map(
+    {
+      event: 'ticker',
+      market: 'ETH-EUR',
+      bestBid: '100',
+      bestBidSize: '2',
+      bestAsk: '101',
+      bestAskSize: '3'
+    },
+    localTimestamp
+  )
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '99', bestBidSize: '4' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 3,
+      askPrice: 101,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestAsk: '102', bestAskSize: '5' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: 4,
+      bidPrice: 99,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+
+  assert.deepStrictEqual(mapper.map({ event: 'ticker', market: 'ETH-EUR', bestBid: '0', bestBidSize: '0' }, localTimestamp), [
+    {
+      type: 'book_ticker',
+      symbol: 'ETH-EUR',
+      exchange: 'bitvavo',
+      askAmount: 5,
+      askPrice: 102,
+      bidAmount: undefined,
+      bidPrice: undefined,
+      timestamp: localTimestamp,
+      localTimestamp
+    }
+  ])
+})
+
+test('Bitvavo checks sequence gaps in live feeds and retains snapshot alignment during replay', () => {
+  for (const live of [false, true]) {
+    const localTimestamp = live ? new Date() : new Date('2026-09-23T00:00:00Z')
+    const mapper = normalizeBookChanges('bitvavo', localTimestamp)
+    const snapshot = {
+      action: 'getBook',
+      requestId: 1,
+      response: { market: 'BTC-EUR', nonce: 100, mdSeqNo: 100, timestamp: '1790121600307696747', bids: [], asks: [] }
+    }
+    const update = {
+      event: 'book',
+      market: 'BTC-EUR',
+      nonce: 102,
+      startMdSeqNo: 102,
+      endMdSeqNo: 102,
+      timestamp: '1790121600459180262',
+      bids: [['75278', '1']],
+      asks: []
+    }
+    assert.strictEqual([...mapper.map(snapshot, localTimestamp)!][0].isSnapshot, true)
+    assert.deepStrictEqual([...mapper.map({ ...update, nonce: 100, startMdSeqNo: 100, endMdSeqNo: 100 }, localTimestamp)!], [])
+    if (live) {
+      assert.throws(() => [...mapper.map(update, localTimestamp)!], /sequence gap/)
+    } else {
+      assert.deepStrictEqual([...mapper.map(update, localTimestamp)!][0].bids, [{ price: 75278, amount: 1 }])
+    }
+  }
 })
 
 test('map polymarket messages', () => {

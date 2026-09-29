@@ -4,6 +4,7 @@ import { PassThrough, Writable } from 'stream'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { createDebug, type DebugLogger } from '../debug.ts'
 import { getProxyAgent, HttpClientError, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
+import { getMessageParser } from '../parsemessage.ts'
 import { createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
 
@@ -39,6 +40,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected readonly throttleSubscribeMS: number = 0
   protected readonly manualSnapshotsBuffer: any[] = []
   private readonly _filters: Filter<string>[]
+  private readonly _parseJson: (message: string) => any
   private _wsClientOptions: WebSocket.ClientOptions | ClientRequestArgs
   private _closed = false
   private readonly _closeController = new AbortController()
@@ -53,6 +55,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     private readonly _onError?: (error: Error) => void
   ) {
     this._filters = optimizeFilters(filters)
+    this._parseJson = getMessageParser(_exchange)
     this.debug = createDebug(`tardis-dev:realtime:${_exchange}`)
 
     this._wsClientOptions = {
@@ -147,11 +150,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
           if (this.decompress !== undefined) {
             message = this.decompress(message)
-          }
-
-          // hack to handle huobi long numeric id for trades
-          if (this._exchange.startsWith('huobi-') && message.includes('.trade.detail')) {
-            message = message.toString().replace(/"id":([0-9]+),/g, '"id":"$1",') as any
           }
 
           const messageDeserialized = this.parseMessage(message)
@@ -270,7 +268,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected abstract messageIsError(message: any): boolean
 
   protected parseMessage(message: Buffer<ArrayBufferLike>): any {
-    return JSON.parse(message as any)
+    return this._parseJson(message.toString())
   }
 
   protected sendCustomPing: (() => void) | undefined = undefined

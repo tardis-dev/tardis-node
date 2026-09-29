@@ -130,7 +130,11 @@ const COINS_STARTING_WITH_S = [
   'SMCIUSDT',
   'SONYUSDT',
   'SQQQUSDT',
-  'STRCUSDT'
+  'STRCUSDT',
+  'SNXXUSDT',
+  'SOXSUSDT',
+  'SKDDUSDT',
+  'SKUUUSDT'
 ]
 
 // Phemex used the V2 `_p` channels for this short-lived, now delisted PerpetualPilot market family.

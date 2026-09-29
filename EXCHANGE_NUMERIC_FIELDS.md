@@ -2,6 +2,21 @@
 
 Use the exchange contract for each field before choosing a parser. The key question is whether `0` is a real market value or an exchange placeholder for no value.
 
+## Preserve Precision Before Mapping
+
+Integers above `Number.MAX_SAFE_INTEGER` can lose digits during `JSON.parse`, before a mapper runs. The shared [message parser](src/parsemessage.ts) preserves affected IDs and timestamps as strings in both replay and real-time feeds. It is selected once per feed; exchanges without precision fixes use `JSON.parse` directly.
+
+Bitvavo Market Data Pro uses different units for the same field name:
+
+| Message                                                                                | Field                | Unit         | Decoded value |
+| -------------------------------------------------------------------------------------- | -------------------- | ------------ | ------------- |
+| [Trade](https://docs.bitvavo.com/docs/ws-market-data-pro-api/trades-subscription/)     | `timestamp`          | milliseconds | number        |
+| Trade                                                                                  | `timestampNs`        | nanoseconds  | string        |
+| [Book update](https://docs.bitvavo.com/docs/ws-market-data-pro-api/book-subscription/) | `timestamp`          | nanoseconds  | string        |
+| [Get order book](https://docs.bitvavo.com/docs/ws-market-data-pro-api/get-order-book/) | `response.timestamp` | nanoseconds  | string        |
+
+The Bitvavo parser quotes only 19-digit values in these timestamp fields. The mapper removes the last three digits, then converts the remaining microseconds to a number. Millisecond trade timestamps remain numeric. `replay({ skipDecoding: true })` preserves the original message bytes.
+
 ## Parser Choices
 
 | Case                                | Parser                              | Use when                                                                                              |

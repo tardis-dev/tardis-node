@@ -350,6 +350,8 @@ class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap'
         // open interest message
         const openInterest = message.data[0]
         pendingTickerInfo.updateOpenInterest(Number(openInterest.volume))
+        // Cache OI until the next basis or funding message; OI alone should not emit a ticker.
+        return
       }
 
       pendingTickerInfo.updateTimestamp(new Date(message.ts))

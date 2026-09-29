@@ -1,9 +1,7 @@
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
-export class LighterRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://mainnet.zklighter.elliot.ai/stream'
-
+abstract class RealTimeFeed extends RealTimeFeedBase {
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters.flatMap((filter) => {
       if (filter.channel === 'market_stats') {
@@ -15,7 +13,7 @@ export class LighterRealTimeFeed extends RealTimeFeedBase {
       }
 
       if (!filter.symbols || filter.symbols.length === 0) {
-        throw new Error('LighterRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+        throw new Error(`${this._exchange} RealTimeFeed requires explicitly specified symbols when subscribing to live feed`)
       }
 
       return filter.symbols.map((marketId) => ({
@@ -28,4 +26,12 @@ export class LighterRealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
   }
+}
+
+export class LighterRealTimeFeed extends RealTimeFeed {
+  protected wssURL = 'wss://mainnet.zklighter.elliot.ai/stream'
+}
+
+export class LighterRhRealTimeFeed extends RealTimeFeed {
+  protected wssURL = 'wss://api.rh.lighter.xyz/stream'
 }
