@@ -51,7 +51,6 @@ import { OkexSpreadsRealTimeFeed } from './okexspreads.ts'
 import { KucoinFuturesRealTimeFeed } from './kucoinfutures.ts'
 import { DydxV4RealTimeFeed } from './dydx_v4.ts'
 import { BitgetFuturesRealTimeFeed, BitgetRealTimeFeed } from './bitget.ts'
-import { CoinbaseInternationalRealTimeFeed } from './coinbaseinternational.ts'
 import { HyperliquidRealTimeFeed } from './hyperliquid.ts'
 import { LighterRealTimeFeed, LighterRhRealTimeFeed } from './lighter.ts'
 import { BullishRealTimeFeed } from './bullish.ts'
@@ -122,7 +121,6 @@ const realTimeFeedsMap: {
   'dydx-v4': DydxV4RealTimeFeed,
   bitget: BitgetRealTimeFeed,
   'bitget-futures': BitgetFuturesRealTimeFeed,
-  'coinbase-international': CoinbaseInternationalRealTimeFeed,
   hyperliquid: HyperliquidRealTimeFeed,
   lighter: LighterRealTimeFeed,
   'lighter-rh': LighterRhRealTimeFeed,
