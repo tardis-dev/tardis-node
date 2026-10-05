@@ -111,7 +111,7 @@ const BITMEX_CHANNELS = [
   'tradeBin1d'
 ] as const
 
-const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book'] as const
+const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book', 'funding_rate'] as const
 const BITVAVO_CHANNELS = ['book', 'getBook', 'trade', 'ticker'] as const
 
 const BITHUMB_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
