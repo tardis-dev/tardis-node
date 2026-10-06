@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib'
 import { assert, snapshot } from './assertions.ts'
 import os from 'node:os'
 import path from 'node:path'
-import { init, normalizeTrades, replay, replayNormalized } from '../dist/index.js'
+import { init, normalizeDerivativeTickers, normalizeTrades, replay, replayNormalized } from '../dist/index.js'
 
 describe('replay validation', () => {
   test('invalid args validation', async () => {
@@ -47,6 +47,75 @@ describe('replay validation', () => {
         normalizeTrades
       ).next()
     )
+  })
+
+  test('Bitstamp replay includes funding alongside trades for empty and omitted symbol lists', async () => {
+    const trade = {
+      data: { id_str: '2008233133077446656', type: 0, amount: 0.078, price: 2700.5, microtimestamp: '1790956890092000' },
+      channel: 'live_trades_ethusd-perp',
+      event: 'trade'
+    }
+    const funding = {
+      data: {
+        market: 'ethusd-perp',
+        mark_price: '2698.27193853',
+        index_price: '2697.7360000000003',
+        funding_rate: '0.000032',
+        timestamp: '1790956891',
+        next_funding_time: '1790985600'
+      },
+      channel: 'funding_rate_ethusd-perp',
+      event: 'funding_rate_saved'
+    }
+    const rows = [
+      { timestamp: '2026-10-02T16:01:30.1000000Z', message: trade },
+      { timestamp: '2026-10-02T16:01:31.1000000Z', message: funding }
+    ]
+    const cacheDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-bitstamp-replay-'))
+    const server = createServer((request, response) => {
+      const filters: { channel: string; symbols?: string[] }[] = JSON.parse(
+        new URL(request.url!, 'http://localhost').searchParams.get('filters') ?? '[]'
+      )
+      const selected = rows.filter(({ message }) =>
+        filters.some((filter) =>
+          filter.symbols?.length
+            ? filter.symbols.some((symbol) => message.channel === `${filter.channel}_${symbol}`)
+            : message.channel.startsWith(`${filter.channel}_`)
+        )
+      )
+      response.writeHead(200, { 'Content-Encoding': 'gzip' })
+      response.end(gzipSync(selected.map(({ timestamp, message }) => `${timestamp} ${JSON.stringify(message)}\n`).join('')))
+    })
+    try {
+      server.listen(0, '127.0.0.1')
+      await once(server, 'listening')
+      const address = server.address()
+      assert.ok(address !== null && typeof address !== 'string')
+      init({ endpoint: `http://127.0.0.1:${address.port}/v1`, cacheDir, dataFeedCompression: 'gzip' })
+      for (const symbols of [[], undefined]) {
+        const messages = []
+        for await (const message of replayNormalized(
+          { exchange: 'bitstamp', symbols, from: '2026-10-02T16:01:00Z', to: '2026-10-02T16:02:00Z' },
+          normalizeTrades,
+          normalizeDerivativeTickers
+        ))
+          messages.push(message)
+        assert.deepEqual(
+          messages.map((message) => message.type),
+          ['trade', 'derivative_ticker']
+        )
+        const ticker = messages[1]
+        assert.ok(ticker.type === 'derivative_ticker')
+        assert.equal(ticker.symbol, 'ETHUSD-PERP')
+        assert.equal(ticker.lastPrice, 2700.5)
+        assert.equal(ticker.fundingRate, 0.000032)
+      }
+    } finally {
+      init()
+      server.closeAllConnections()
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+      rmSync(cacheDir, { recursive: true, force: true })
+    }
   })
 
   test('Bybit spot raw replay accepts full and RPI channels and preserves their payloads', async () => {

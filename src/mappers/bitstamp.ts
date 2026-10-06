@@ -1,6 +1,6 @@
 import { lowerCaseSymbols } from '../handy.ts'
-import { BookChange, Trade } from '../types.ts'
-import { Mapper } from './mapper.ts'
+import { BookChange, DerivativeTicker, Trade } from '../types.ts'
+import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
 
 // https://www.bitstamp.net/websocket/v2/
@@ -8,12 +8,13 @@ import { exchangeMappers } from './registry.ts'
 export const bitstampMappers = exchangeMappers({
   bitstamp: {
     trades: () => bitstampTradesMapper,
-    bookChanges: () => new BitstampBookChangeMapper()
+    bookChanges: () => new BitstampBookChangeMapper(),
+    derivativeTickers: () => new BitstampDerivativeTickerMapper()
   }
 })
 
 const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
-  canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {
+  canHandle(message: BitstampMessage) {
     if (message.data === undefined) {
       return false
     }
@@ -43,7 +44,7 @@ const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
       type: 'trade',
       symbol: symbol.toUpperCase(),
       exchange: 'bitstamp',
-      id: String(bitstampTrade.id),
+      id: bitstampTrade.id_str ?? String(bitstampTrade.id),
       price: Number(bitstampTrade.price),
       amount: Number(bitstampTrade.amount),
       side: bitstampTrade.type === 0 ? 'buy' : 'sell',
@@ -53,10 +54,51 @@ const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
   }
 }
 
+class BitstampDerivativeTickerMapper implements Mapper<'bitstamp', DerivativeTicker> {
+  private readonly _pendingTickerInfoHelper = new PendingTickerInfoHelper()
+
+  canHandle(message: BitstampMessage) {
+    return (
+      message.data !== undefined &&
+      ((message.channel.startsWith('funding_rate_') && message.event === 'funding_rate_saved') ||
+        (message.channel.startsWith('live_trades_') && message.channel.endsWith('-perp') && message.event === 'trade'))
+    )
+  }
+
+  getFilters(symbols?: string[]) {
+    if (symbols?.length) {
+      symbols = lowerCaseSymbols(symbols)!.filter((symbol) => symbol.endsWith('-perp'))
+      if (symbols.length === 0) {
+        return []
+      }
+    }
+    return [{ channel: 'funding_rate', symbols } as const, { channel: 'live_trades', symbols } as const]
+  }
+
+  *map(message: BitstampTrade | BitstampFundingRate, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+    const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
+    const ticker = this._pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bitstamp')
+    if (message.event === 'trade') {
+      // Funding messages own emission and timestamps; trades only update lastPrice.
+      ticker.updateLastPrice(Number(message.data.price))
+      return
+    }
+
+    ticker.updateFundingRate(Number(message.data.funding_rate))
+    ticker.updateFundingTimestamp(new Date(Number(message.data.next_funding_time) * 1000))
+    ticker.updateMarkPrice(Number(message.data.mark_price))
+    ticker.updateIndexPrice(Number(message.data.index_price))
+    ticker.updateTimestamp(new Date(Number(message.data.timestamp) * 1000))
+    if (ticker.hasChanged()) {
+      yield ticker.getSnapshot(localTimestamp)
+    }
+  }
+}
+
 class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
   private readonly _symbolToDepthInfoMapping: { [key: string]: LocalDepthInfo } = {}
 
-  canHandle(message: BitstampTrade | BitstampDiffOrderBook | BitstampDiffOrderBookSnapshot) {
+  canHandle(message: BitstampMessage) {
     if (message.data === undefined) {
       return false
     }
@@ -176,40 +218,34 @@ class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
   }
 }
 
-type BitstampTrade = {
-  event: 'trade'
+type BitstampMessage<Event extends string = string, Data = unknown> = {
+  event: Event
   channel: string
-  data: {
+  data: Data
+}
+
+type BitstampTrade = BitstampMessage<
+  'trade',
+  {
     microtimestamp: string
     amount: number
     price: number
     type: number
     id: number
+    id_str?: string
   }
-}
-type BitstampBookLevel = [string, string]
-
-type BitstampDiffOrderBook = {
-  data: {
-    microtimestamp: string
+>
+type BitstampFundingRate = BitstampMessage<
+  'funding_rate_saved',
+  {
+    market: string
+    funding_rate: string
+    mark_price: string
+    index_price: string
     timestamp: string
-    bids: BitstampBookLevel[]
-    asks: BitstampBookLevel[]
+    next_funding_time: string
   }
-  event: 'data'
-  channel: string
-}
-
-type BitstampDiffOrderBookSnapshot = {
-  event: 'snapshot'
-  channel: string
-  data: {
-    timestamp: string
-    microtimestamp?: string
-    bids: BitstampBookLevel[]
-    asks: BitstampBookLevel[]
-  }
-}
+>
 
 type LocalDepthInfo = {
   bufferedUpdates: BitstampDiffOrderBook[]
@@ -217,3 +253,25 @@ type LocalDepthInfo = {
   lastUpdateTimestamp?: number
   lastUpdateMicroTimestamp?: number
 }
+
+type BitstampDiffOrderBook = BitstampMessage<
+  'data',
+  {
+    timestamp: string
+    microtimestamp: string
+    bids: BitstampBookLevel[]
+    asks: BitstampBookLevel[]
+  }
+>
+
+type BitstampDiffOrderBookSnapshot = BitstampMessage<
+  'snapshot',
+  {
+    timestamp: string
+    microtimestamp?: string
+    bids: BitstampBookLevel[]
+    asks: BitstampBookLevel[]
+  }
+>
+
+type BitstampBookLevel = [string, string]

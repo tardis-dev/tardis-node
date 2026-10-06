@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'bitstamp',
   'aster-futures',
   'bitmex',
   'binance-futures',
@@ -5529,6 +5530,65 @@ describe('mappers', () => {
       const mappedMessages = bitstampMapper.map(message, new Date('2019-09-01T00:00:01.2750543Z'))
       snapshot(mappedMessages)
     }
+  })
+
+  test('map Bitstamp perpetual funding and trade state', () => {
+    const localTimestamp = new Date('2026-10-02T16:01:16.126Z')
+    const mapper = normalizeDerivativeTickers('bitstamp', localTimestamp)
+    assert.deepEqual(mapper.getFilters(['BTCUSD', 'ETHUSD-PERP']), [
+      { channel: 'funding_rate', symbols: ['ethusd-perp'] },
+      { channel: 'live_trades', symbols: ['ethusd-perp'] }
+    ])
+    assert.deepEqual(mapper.getFilters(['BTCUSD']), [])
+    assert.deepEqual(mapper.getFilters([]), [
+      { channel: 'funding_rate', symbols: [] },
+      { channel: 'live_trades', symbols: [] }
+    ])
+    assert.deepEqual(mapper.getFilters(), [
+      { channel: 'funding_rate', symbols: undefined },
+      { channel: 'live_trades', symbols: undefined }
+    ])
+    const funding = {
+      data: {
+        market: 'ethusd-perp',
+        mark_price: '2698.27193853',
+        index_price: '2697.7360000000003',
+        funding_rate: '0.000032',
+        timestamp: '1790956874',
+        next_funding_time: '1790985600'
+      },
+      channel: 'funding_rate_ethusd-perp',
+      event: 'funding_rate_saved'
+    }
+    assert.equal(mapper.canHandle(funding), true)
+    assert.equal(mapper.canHandle({ event: 'bts:subscription_succeeded', channel: funding.channel, data: {} }), false)
+    const [first] = [...mapper.map(funding, localTimestamp)!]
+    assert.equal(first.fundingRate, 0.000032)
+    assert.equal(first.markPrice, 2698.27193853)
+    assert.equal(first.indexPrice, 2697.7360000000003)
+    assert.equal(first.fundingTimestamp!.toISOString(), '2026-10-03T00:00:00.000Z')
+    assert.equal(first.timestamp.toISOString(), '2026-10-02T16:01:14.000Z')
+    assert.equal(first.localTimestamp, localTimestamp)
+    assert.equal(first.symbol, 'ETHUSD-PERP')
+    assert.equal(first.lastPrice, undefined)
+    assert.equal(first.openInterest, undefined)
+    assert.deepEqual([...mapper.map(funding, localTimestamp)!], [])
+    const trade = { event: 'trade', channel: 'live_trades_ethusd-perp', data: { price: 2700.5 } }
+    assert.equal(mapper.canHandle(trade), true)
+    assert.deepEqual([...mapper.map(trade, localTimestamp)!], [])
+    assert.equal(mapper.canHandle({ ...trade, channel: 'live_trades_ethusd' }), false)
+    const [withTrade] = [...mapper.map(funding, localTimestamp)!]
+    assert.equal(withTrade.lastPrice, 2700.5)
+    for (const funding_rate of ['0', '-0.000032']) {
+      const [ticker] = [...mapper.map({ ...funding, data: { ...funding.data, funding_rate } }, localTimestamp)!]
+      assert.equal(ticker.fundingRate, Number(funding_rate))
+    }
+    const [otherSymbol] = [
+      ...mapper.map({ ...funding, channel: 'funding_rate_btcusd-perp', data: { ...funding.data, market: 'btcusd-perp' } }, localTimestamp)!
+    ]
+    assert.equal(otherSymbol.lastPrice, undefined)
+    const fresh = normalizeDerivativeTickers('bitstamp', localTimestamp)
+    assert.equal([...fresh.map(funding, localTimestamp)!][0].lastPrice, undefined)
   })
 
   test('map kraken messages', () => {
