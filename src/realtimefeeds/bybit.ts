@@ -90,6 +90,10 @@ export class BybitSpotRealTimeDataFeed extends BybitSingleConnectionRealTimeData
   protected wssURL: string = 'wss://stream.bybit.com/v5/public/spot'
 }
 
+export class BybitSpreadRealTimeDataFeed extends BybitSingleConnectionRealTimeDataFeed {
+  protected wssURL: string = 'wss://stream.bybit.com/v5/public/spread'
+}
+
 export class BybitOptionsRealTimeDataFeed extends BybitSingleConnectionRealTimeDataFeed {
   protected wssURL: string = 'wss://stream.bybit.com/v5/public/option'
 
