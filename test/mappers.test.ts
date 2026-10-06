@@ -5540,6 +5540,10 @@ describe('mappers', () => {
       { channel: 'live_trades', symbols: ['ethusd-perp'] }
     ])
     assert.deepEqual(mapper.getFilters(['BTCUSD']), [])
+    assert.deepEqual(mapper.getFilters([]), [
+      { channel: 'funding_rate', symbols: [] },
+      { channel: 'live_trades', symbols: [] }
+    ])
     assert.deepEqual(mapper.getFilters(), [
       { channel: 'funding_rate', symbols: undefined },
       { channel: 'live_trades', symbols: undefined }

@@ -66,9 +66,11 @@ class BitstampDerivativeTickerMapper implements Mapper<'bitstamp', DerivativeTic
   }
 
   getFilters(symbols?: string[]) {
-    symbols = lowerCaseSymbols(symbols)?.filter((symbol) => symbol.endsWith('-perp'))
-    if (symbols?.length === 0) {
-      return []
+    if (symbols?.length) {
+      symbols = lowerCaseSymbols(symbols)!.filter((symbol) => symbol.endsWith('-perp'))
+      if (symbols.length === 0) {
+        return []
+      }
     }
     return [{ channel: 'funding_rate', symbols } as const, { channel: 'live_trades', symbols } as const]
   }
