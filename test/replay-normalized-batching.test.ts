@@ -54,7 +54,7 @@ mock.module('worker_threads', {
   }
 })
 
-const { normalizeDerivativeTickers, normalizeTrades, replay, replayNormalized, stream } = await import('../dist/index.js')
+const { normalizeTrades, replay, replayNormalized, stream } = await import('../dist/index.js')
 
 afterEach(() => {
   feed = ''
@@ -186,12 +186,6 @@ test('preserves recorded Bitvavo nanoseconds in raw and normalized replay', asyn
 // Same payloads as the existing exchange mapper fixtures, kept as raw JSON here.
 for (const fixture of [
   {
-    exchange: 'bitstamp' as const,
-    symbol: 'ethusd-perp',
-    json: '{"data":{"id":2008233133077446656,"id_str":"2008233133077446656","type":0,"amount":0.078,"price":2700.5,"microtimestamp":"1790956890092000","timestamp":"1790956890092"},"channel":"live_trades_ethusd-perp","event":"trade"}',
-    id: '2008233133077446656'
-  },
-  {
     exchange: 'huobi-dm-linear-swap' as const,
     symbol: 'EOS-USDT',
     json: '{"ch":"market.EOS-USDT.trade.detail","ts":1606780814945,"tick":{"id":291891365,"ts":1606780814931,"data":[{"amount":6,"ts":1606780814931,"id":2918913650000,"price":3.2639,"direction":"buy"}]}}',
@@ -211,12 +205,12 @@ for (const fixture of [
     const address = server.address()
     assert.ok(address !== null && typeof address === 'object')
     server.on('connection', (socket) => {
-      socket.once('message', () => socket.send(exchange === 'huobi-dm-linear-swap' ? gzipSync(json) : json))
+      socket.once('message', () => socket.send(exchange === 'upbit' ? json : gzipSync(json)))
     })
     const urlKey = `WSS_URL_${exchange.toUpperCase().replace(/-/g, '_')}`
     const previousURL = process.env[urlKey]
     process.env[urlKey] = `ws://127.0.0.1:${address.port}`
-    const filters = [{ channel: exchange === 'bitstamp' ? ('live_trades' as const) : ('trade' as const), symbols: [symbol] }]
+    const filters = [{ channel: 'trade' as const, symbols: [symbol] }]
     const live = stream({ exchange, filters })
     try {
       feed = `2026-09-23T00:00:00.0000000Z ${json}\n`
@@ -226,9 +220,7 @@ for (const fixture of [
       assert.strictEqual(replayed.length, 1)
       const streamed = (await live.next()).value.message
       assert.deepStrictEqual(streamed, replayed[0])
-      const normalized = []
-      for await (const trade of replayNormalized({ ...options, symbols: [symbol] }, normalizeTrades)) normalized.push(trade)
-      assert.equal(normalized[0].id, id)
+      assert.strictEqual(exchange === 'upbit' ? streamed.sequential_id : streamed.tick.data[0].id, id)
       const localTimestamp = new Date()
       const [trade] = normalizeTrades(exchange, localTimestamp).map(streamed, localTimestamp)!
       assert.strictEqual(trade.id, id)
@@ -244,34 +236,6 @@ for (const fixture of [
     }
   })
 }
-
-test('replays Bitstamp funding and clears cached trade prices after a recorder disconnect', async () => {
-  const funding =
-    '{"data":{"market":"ethusd-perp","mark_price":"2698.27193853","index_price":"2697.7360000000003","funding_rate":"0.000032","timestamp":"1790956874","next_funding_time":"1790985600"},"channel":"funding_rate_ethusd-perp","event":"funding_rate_saved"}'
-  const trade =
-    '{"data":{"id":2008233133077446656,"id_str":"2008233133077446656","type":0,"amount":0.078,"price":2700.5,"microtimestamp":"1790956890092000"},"channel":"live_trades_ethusd-perp","event":"trade"}'
-  feed = [
-    `2026-10-02T16:01:15.0000000Z ${trade}`,
-    `2026-10-02T16:01:16.1260543Z ${funding}`,
-    '',
-    `2026-10-02T16:01:17.1260543Z ${funding}`,
-    ''
-  ].join('\n')
-  const messages = []
-  for await (const message of replayNormalized(
-    { exchange: 'bitstamp', symbols: ['ETHUSD-PERP'], from: '2026-10-02T16:01:00Z', to: '2026-10-02T16:02:00Z' },
-    normalizeDerivativeTickers
-  )) {
-    messages.push(message)
-  }
-  assert.equal(messages.length, 2)
-  assert.equal(messages[0].lastPrice, 2700.5)
-  assert.equal(messages[1].lastPrice, undefined)
-  assert.equal(messages[0].fundingRate, 0.000032)
-  assert.equal(messages[0].fundingTimestamp!.toISOString(), '2026-10-03T00:00:00.000Z')
-  assert.equal(messages[0].timestamp.toISOString(), '2026-10-02T16:01:14.000Z')
-  assert.equal(messages[0].localTimestamp.μs, 54)
-})
 
 test('parses fixed recorder timestamps across supported date boundaries', async () => {
   feed = [

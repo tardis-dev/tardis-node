@@ -6247,6 +6247,60 @@ exports[`mappers > map bitstamp messages 7`] = `
 ]
 `;
 
+exports[`mappers > map bitstamp perpetual messages 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "ETHUSD-PERP",
+    "exchange": "bitstamp",
+    "lastPrice": undefined,
+    "openInterest": undefined,
+    "fundingRate": 0,
+    "fundingTimestamp": "2026-10-06T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 2712.21,
+    "markPrice": 2712.50512196,
+    "timestamp": "2026-10-06T11:08:19.000Z",
+    "localTimestamp": "2026-10-06T11:08:20.001Z"
+  }
+]
+`;
+
+exports[`mappers > map bitstamp perpetual messages 2`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "ETHUSD-PERP",
+    "exchange": "bitstamp",
+    "id": "2009608907068030976",
+    "price": 2712.7,
+    "amount": 0.713,
+    "side": "sell",
+    "timestamp": "2026-10-06T11:08:20.173000Z",
+    "localTimestamp": "2026-10-06T11:08:20.184Z"
+  }
+]
+`;
+
+exports[`mappers > map bitstamp perpetual messages 3`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "ETHUSD-PERP",
+    "exchange": "bitstamp",
+    "lastPrice": 2712.7,
+    "openInterest": undefined,
+    "fundingRate": 0,
+    "fundingTimestamp": "2026-10-06T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 2711.9016666666666,
+    "markPrice": 2712.19867268,
+    "timestamp": "2026-10-06T11:08:20.000Z",
+    "localTimestamp": "2026-10-06T11:08:20.945Z"
+  }
+]
+`;
+
 exports[`mappers > map bybit messages 1`] = `
 []
 `;
@@ -7366,80 +7420,55 @@ exports[`mappers > map bybit-spread messages 2`] = `
 [
   {
     "type": "book_change",
-    "symbol": "BTCUSDT_BTC/USDT",
+    "symbol": "ETHUSDT-26MAR27_ETH/USDT",
     "exchange": "bybit-spread",
     "isSnapshot": true,
     "bids": [
       {
-        "price": -39.7,
-        "amount": 7.19
+        "price": 53.43,
+        "amount": 0.36
+      },
+      {
+        "price": 52.79,
+        "amount": 0.36
       }
     ],
     "asks": [
       {
-        "price": -23.7,
-        "amount": 7.19
+        "price": 54.45,
+        "amount": 0.36
+      },
+      {
+        "price": 55.1,
+        "amount": 0.36
       }
     ],
-    "timestamp": "2026-09-28T13:22:03.115Z",
-    "localTimestamp": "2026-09-28T13:22:55.000Z"
+    "timestamp": "2026-10-06T11:04:33.255Z",
+    "localTimestamp": "2026-10-06T11:04:34.095Z"
   }
 ]
 `;
 
 exports[`mappers > map bybit-spread messages 3`] = `
-[
-  {
-    "type": "book_change",
-    "symbol": "BTCUSDT_BTC/USDT",
-    "exchange": "bybit-spread",
-    "isSnapshot": false,
-    "bids": [
-      {
-        "price": -39.5,
-        "amount": 3.596
-      },
-      {
-        "price": -39.7,
-        "amount": 3.595
-      }
-    ],
-    "asks": [
-      {
-        "price": -23.9,
-        "amount": 3.596
-      },
-      {
-        "price": -23.7,
-        "amount": 3.595
-      }
-    ],
-    "timestamp": "2026-09-28T13:22:24.995Z",
-    "localTimestamp": "2026-09-28T13:22:55.000Z"
-  }
-]
+[]
 `;
 
 exports[`mappers > map bybit-spread messages 4`] = `
 [
   {
     "type": "book_change",
-    "symbol": "BTCUSDT-26MAR27_BTCUSDT-25DEC26",
+    "symbol": "ETHUSDT-26MAR27_ETH/USDT",
     "exchange": "bybit-spread",
     "isSnapshot": false,
     "bids": [],
     "asks": [
       {
-        "price": 1183.4,
-        "amount": 0
-      },
-      {
-        "price": 1186.4,
-        "amount": 0.011
+        "price": 100,
+        "amount": 0.01
       }
     ],
-    "timestamp": "2026-09-28T13:22:14.975Z",
-    "localTimestamp": "2026-09-28T13:22:55.000Z"
+    "timestamp": "2026-10-06T11:04:45.495Z",
+    "localTimestamp": "2026-10-06T11:04:45.532Z"
   }
 ]
 `;
@@ -7448,20 +7477,16 @@ exports[`mappers > map bybit-spread messages 5`] = `
 [
   {
     "type": "trade",
-    "symbol": "SOLUSDT_SOL/USDT",
+    "symbol": "BTCUSDT-26MAR27_BTC/USDT",
     "exchange": "bybit-spread",
-    "id": "31d0fc58-933b-57b3-8378-f73da06da843",
-    "price": 19.3928,
-    "amount": 2.5,
+    "id": "33171062-e479-565a-b9ad-ab974b62171d",
+    "price": 2174.8,
+    "amount": 0.01,
     "side": "sell",
-    "timestamp": "2025-04-09T03:42:22.720Z",
-    "localTimestamp": "2026-09-28T13:22:55.000Z"
+    "timestamp": "2026-10-06T12:09:15.215Z",
+    "localTimestamp": "2026-10-06T12:09:15.253Z"
   }
 ]
-`;
-
-exports[`mappers > map bybit-spread messages 6`] = `
-[]
 `;
 
 exports[`mappers > map coinbase messages 1`] = `

@@ -58,20 +58,17 @@ class BitstampDerivativeTickerMapper implements Mapper<'bitstamp', DerivativeTic
   private readonly _pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitstampMessage) {
-    return (
-      message.data !== undefined &&
-      ((message.channel.startsWith('funding_rate_') && message.event === 'funding_rate_saved') ||
-        (message.channel.startsWith('live_trades_') && message.channel.endsWith('-perp') && message.event === 'trade'))
-    )
+    if (message.data === undefined) {
+      return false
+    }
+    if (message.event === 'funding_rate_saved') {
+      return message.channel.startsWith('funding_rate_')
+    }
+    return message.event === 'trade' && message.channel.startsWith('live_trades_') && message.channel.endsWith('-perp')
   }
 
   getFilters(symbols?: string[]) {
-    if (symbols?.length) {
-      symbols = lowerCaseSymbols(symbols)!.filter((symbol) => symbol.endsWith('-perp'))
-      if (symbols.length === 0) {
-        return []
-      }
-    }
+    symbols = lowerCaseSymbols(symbols)
     return [{ channel: 'funding_rate', symbols } as const, { channel: 'live_trades', symbols } as const]
   }
 

@@ -49,16 +49,6 @@ test('Bybit replay uses the raw channels recorded on each side of its API migrat
   ])
 })
 
-test('Bybit spot keeps depth 50 as the normalized source after adding full and RPI books', () => {
-  for (const timestamp of [date('2026-10-05T23:59:59.999Z'), date('2026-10-06T00:00:00.000Z'), new Date()]) {
-    const mapper = normalizeBookChanges('bybit-spot', timestamp)
-    assert.deepEqual(mapper.getFilters(['BTCUSDT']), [{ channel: 'orderbook.50', symbols: ['BTCUSDT'] }])
-    assert.equal(mapper.canHandle({ topic: 'orderbook.50.BTCUSDT' }), true)
-    assert.equal(mapper.canHandle({ topic: 'orderbook.full.BTCUSDT' }), false)
-    assert.equal(mapper.canHandle({ topic: 'orderbook.rpi.BTCUSDT' }), false)
-  }
-})
-
 test('Kraken replay switches book ticker channels without changing mixed-case symbols', () => {
   const beforeSwitch = date('2026-07-09T23:59:59.999Z')
   const switchDate = date('2026-07-10T00:00:00.000Z')

@@ -132,7 +132,7 @@ class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
     return [
       {
         channel: 'instrument',
-        symbols: symbols !== undefined ? symbols.filter((s) => s.includes('/') === false) : undefined
+        symbols
       } as const
     ]
   }
