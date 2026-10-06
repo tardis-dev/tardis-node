@@ -505,7 +505,19 @@ const MANGO_CHANNELS = [
 
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
-const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt', 'orderbook.200']
+const BYBIT_SPOT_CHANNELS = [
+  'trade',
+  'bookTicker',
+  'depth',
+  'orderbook.1',
+  'orderbook.50',
+  'orderbook.200',
+  'orderbook.full',
+  'orderbook.rpi',
+  'publicTrade',
+  'tickers',
+  'lt'
+]
 
 const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding', 'estimatedfunding']
 
