@@ -6301,6 +6301,29 @@ exports[`mappers > map bitstamp perpetual messages 3`] = `
 ]
 `;
 
+exports[`mappers > map bitstamp perpetual ticker messages 1`] = `
+[]
+`;
+
+exports[`mappers > map bitstamp perpetual ticker messages 2`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSD-PERP",
+    "exchange": "bitstamp",
+    "lastPrice": undefined,
+    "openInterest": 76.65505,
+    "fundingRate": 0.000074,
+    "fundingTimestamp": "2026-10-06T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 86167.42866666667,
+    "markPrice": 86172.67972394,
+    "timestamp": "2026-10-06T14:07:54.000Z",
+    "localTimestamp": "2026-10-06T14:07:54.923Z"
+  }
+]
+`;
+
 exports[`mappers > map bybit messages 1`] = `
 []
 `;

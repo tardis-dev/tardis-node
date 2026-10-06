@@ -5592,6 +5592,60 @@ describe('mappers', () => {
     }
   })
 
+  test('map bitstamp perpetual ticker messages', () => {
+    const bitstampMapper = createMapper('bitstamp')
+    // Recorded 2026-10-06: the recorder-generated REST ticker of the BTC perpetual and the funding update of the same second.
+    const messages: [string, any][] = [
+      [
+        '2026-10-06T14:07:54.8000000Z',
+        {
+          data: {
+            timestamp: '1791295674',
+            open: '85806',
+            high: '86694',
+            low: '84976',
+            last: '86166',
+            volume: '161.74999',
+            vwap: '85989',
+            bid: '86167',
+            ask: '86168',
+            side: '1',
+            open_24: '86668',
+            percent_change_24: '-0.58',
+            market_type: 'PERPETUAL',
+            pair: 'BTC/USD-PERP',
+            market: 'BTC/USD-PERP',
+            index_price: '86170.228',
+            mark_price: '86175.54663002',
+            open_interest: '76.65505',
+            open_interest_value: '6605790.835701514601'
+          },
+          channel: 'ticker_btcusd-perp',
+          event: 'ticker',
+          generated: true
+        }
+      ],
+      [
+        '2026-10-06T14:07:54.9231614Z',
+        {
+          data: {
+            market: 'btcusd-perp',
+            mark_price: '86172.67972394',
+            index_price: '86167.42866666667',
+            funding_rate: '0.000074',
+            timestamp: '1791295674',
+            next_funding_time: '1791302400'
+          },
+          channel: 'funding_rate_btcusd-perp',
+          event: 'funding_rate_saved'
+        }
+      ]
+    ]
+    for (const [localTimestamp, message] of messages) {
+      snapshot(bitstampMapper.map(message, new Date(localTimestamp)))
+    }
+  })
+
   test('map kraken messages', () => {
     const messages = [
       [170, [['0.01136500', '2.51146536', '1561939201.587070', 's', 'l', '']], 'trade', 'LTC/XBT'],

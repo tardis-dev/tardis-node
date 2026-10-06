@@ -1,10 +1,57 @@
+import { Writable } from 'stream'
 import { getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
-export class BitstampRealTimeFeed extends RealTimeFeedBase {
+const BITSTAMP_HTTP_URL = 'https://www.bitstamp.net/api/v2'
+
+export class BitstampRealTimeFeed extends MultiConnectionRealTimeFeedBase {
+  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+    const wsFilters = filters.filter((f) => f.channel !== 'ticker')
+    if (wsFilters.length > 0) {
+      yield new BitstampWebSocketRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError)
+    }
+
+    const tickerFilters = filters.filter((f) => f.channel === 'ticker')
+    if (tickerFilters.length > 0) {
+      yield new BitstampTickerClient(
+        exchange,
+        tickerFilters.flatMap((f) => f.symbols ?? []),
+        onError
+      )
+    }
+  }
+}
+
+// Bitstamp WebSocket has no ticker channel; the recorder polls the REST ticker and stores it in this generated message shape.
+class BitstampTickerClient extends PoolingClientBase {
+  constructor(
+    exchange: string,
+    private readonly _symbols: string[],
+    onError?: (error: Error) => void
+  ) {
+    super(exchange, 6, onError)
+  }
+
+  protected async poolDataToStream(outputStream: Writable) {
+    const { data: tickers } = await getJSON<{ market: string }[]>(`${BITSTAMP_HTTP_URL}/ticker/`, { timeout: 10000 })
+
+    for (const ticker of tickers) {
+      const symbol = ticker.market.replace('/', '').toLowerCase()
+      if (this._symbols.length > 0 && this._symbols.includes(symbol) === false) {
+        continue
+      }
+
+      if (outputStream.writable) {
+        outputStream.write({ data: ticker, channel: `ticker_${symbol}`, event: 'ticker', generated: true })
+      }
+    }
+  }
+}
+
+class BitstampWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.bitstamp.net'
-  protected httpURL = 'https://www.bitstamp.net/api/v2'
+  protected httpURL = BITSTAMP_HTTP_URL
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     return filters

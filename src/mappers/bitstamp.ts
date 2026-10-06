@@ -64,20 +64,32 @@ class BitstampDerivativeTickerMapper implements Mapper<'bitstamp', DerivativeTic
     if (message.event === 'funding_rate_saved') {
       return message.channel.startsWith('funding_rate_')
     }
+    if (message.event === 'ticker') {
+      return message.channel.startsWith('ticker_') && message.channel.endsWith('-perp')
+    }
     return message.event === 'trade' && message.channel.startsWith('live_trades_') && message.channel.endsWith('-perp')
   }
 
   getFilters(symbols?: string[]) {
     symbols = lowerCaseSymbols(symbols)
-    return [{ channel: 'funding_rate', symbols } as const, { channel: 'live_trades', symbols } as const]
+    return [
+      { channel: 'funding_rate', symbols } as const,
+      { channel: 'live_trades', symbols } as const,
+      { channel: 'ticker', symbols } as const
+    ]
   }
 
-  *map(message: BitstampTrade | BitstampFundingRate, localTimestamp: Date): IterableIterator<DerivativeTicker> {
+  *map(message: BitstampTrade | BitstampFundingRate | BitstampTicker, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     const symbol = message.channel.slice(message.channel.lastIndexOf('_') + 1).toUpperCase()
     const ticker = this._pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'bitstamp')
     if (message.event === 'trade') {
       // Funding messages own emission and timestamps; trades only update lastPrice.
       ticker.updateLastPrice(Number(message.data.price))
+      return
+    }
+    if (message.event === 'ticker') {
+      // Recorder-generated REST ticker, polled every 6 seconds; it only adds open interest to the funding-driven ticker.
+      ticker.updateOpenInterest(Number(message.data.open_interest))
       return
     }
 
@@ -230,6 +242,13 @@ type BitstampTrade = BitstampMessage<
     type: number
     id: number
     id_str?: string
+  }
+>
+type BitstampTicker = BitstampMessage<
+  'ticker',
+  {
+    market: string
+    open_interest: string
   }
 >
 type BitstampFundingRate = BitstampMessage<
