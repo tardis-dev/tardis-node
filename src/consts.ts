@@ -31,6 +31,7 @@ export const EXCHANGES = [
   'bybit',
   'bybit-spot',
   'bybit-options',
+  'bybit-spread',
   'phemex',
   'delta',
   'ftx-us',
@@ -504,7 +505,19 @@ const MANGO_CHANNELS = [
 
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
-const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt', 'orderbook.200']
+const BYBIT_SPOT_CHANNELS = [
+  'trade',
+  'bookTicker',
+  'depth',
+  'orderbook.1',
+  'orderbook.50',
+  'orderbook.200',
+  'orderbook.full',
+  'orderbook.rpi',
+  'publicTrade',
+  'tickers',
+  'lt'
+]
 
 const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding', 'estimatedfunding']
 
@@ -615,6 +628,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm-swap': HUOBI_DM_SWAP_CHANNELS,
   'huobi-dm-linear-swap': HUOBI_DM_LINEAR_SWAP_CHANNELS,
   bybit: BYBIT_CHANNELS,
+  'bybit-spread': ['orderbook.25', 'publicTrade', 'tickers'],
   'bybit-spot': BYBIT_SPOT_CHANNELS,
   'bybit-options': BYBIT_OPTIONS_CHANNELS,
   okcoin: OKCOIN_CHANNELS,

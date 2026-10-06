@@ -4,7 +4,7 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class OkexSpreadsRealTimeFeed extends RealTimeFeedBase {
-  protected wssURL = 'wss://ws.okx.com:8443/ws/v5/business'
+  protected wssURL = 'wss://ws.okx.com/ws/v5/business'
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
 

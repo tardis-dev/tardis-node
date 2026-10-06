@@ -9,13 +9,13 @@ export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
 
     if (nonBusinessFilters.length > 0) {
-      yield new OkexSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/public', exchange, nonBusinessFilters, timeoutIntervalMS, onError)
+      yield new OkexSingleRealTimeFeed('wss://ws.okx.com/ws/v5/public', exchange, nonBusinessFilters, timeoutIntervalMS, onError)
     }
 
     const businessFilters = filters.filter((f) => f.channel === 'trades-all')
 
     if (businessFilters.length > 0) {
-      yield new OkexSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
+      yield new OkexSingleRealTimeFeed('wss://ws.okx.com/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
     }
   }
 }
@@ -113,19 +113,13 @@ export class OkexOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
 
     if (nonBusinessFilters.length > 0) {
-      yield new OkexOptionsSingleRealTimeFeed(
-        'wss://ws.okx.com:8443/ws/v5/public',
-        exchange,
-        nonBusinessFilters,
-        timeoutIntervalMS,
-        onError
-      )
+      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com/ws/v5/public', exchange, nonBusinessFilters, timeoutIntervalMS, onError)
     }
 
     const businessFilters = filters.filter((f) => f.channel === 'trades-all')
 
     if (businessFilters.length > 0) {
-      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com:8443/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
+      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com/ws/v5/business', exchange, businessFilters, timeoutIntervalMS, onError)
     }
   }
 }

@@ -46,12 +46,16 @@ export const bybitMappers = exchangeMappers({
     trades: () => new BybitV5TradesMapper('bybit-options'),
     bookChanges: () => new BybitV5BookChangeMapper('bybit-options', { depth: 25 }),
     optionsSummary: () => new BybitV5OptionSummaryMapper()
+  },
+  'bybit-spread': {
+    trades: () => new BybitV5TradesMapper('bybit-spread'),
+    bookChanges: () => new BybitV5BookChangeMapper('bybit-spread', { depth: 25 })
   }
 })
 
 // v5 https://bybit-exchange.github.io/docs/v5/ws/connect
 
-class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', Trade> {
+class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options' | 'bybit-spread', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BybitV5Trade) {
@@ -90,7 +94,7 @@ class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-opti
   }
 }
 
-class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options', BookChange> {
+class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-options' | 'bybit-spread', BookChange> {
   private readonly _depth: number
 
   constructor(
