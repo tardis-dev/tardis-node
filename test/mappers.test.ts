@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'coinbase-derivatives',
   'aster-futures',
   'bitmex',
   'binance-futures',
@@ -46,6 +47,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'coinbase-derivatives',
   'aster',
   'aster-futures',
   'ascendex',
@@ -170,6 +172,240 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  test('map Coinbase derivatives captured messages', () => {
+    const messages = [
+      {
+        channel: 'products',
+        generated: true,
+        events: [
+          {
+            product_id: 'BIP-20DEC30-CDE',
+            price: '85920',
+            future_product_details: {
+              open_interest: '155686',
+              funding_rate: '0.000006',
+              funding_time: '2026-10-06T09:00:00Z',
+              index_price: '85887.354276'
+            }
+          }
+        ]
+      },
+      {
+        channel: 'l2_data',
+        timestamp: '2026-10-06T09:46:58.37102425Z',
+        events: [
+          {
+            type: 'snapshot',
+            product_id: 'BIP-20DEC30-CDE',
+            updates: [
+              { side: 'bid', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85920', new_quantity: '39' },
+              { side: 'bid', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85915', new_quantity: '495' },
+              { side: 'bid', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85910', new_quantity: '523' },
+              { side: 'offer', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85930', new_quantity: '2' },
+              { side: 'offer', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85935', new_quantity: '438' },
+              { side: 'offer', event_time: '2026-10-06T09:46:58.334169Z', price_level: '85940', new_quantity: '584' }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'l2_data',
+        timestamp: '2026-10-06T09:46:58.408793Z',
+        events: [
+          {
+            type: 'update',
+            product_id: 'BIP-20DEC30-CDE',
+            updates: [
+              { side: 'bid', event_time: '2026-10-06T09:46:58.408793Z', price_level: '85900', new_quantity: '802' },
+              { side: 'bid', event_time: '2026-10-06T09:46:58.408793Z', price_level: '85895', new_quantity: '732' }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'market_trades',
+        events: [
+          {
+            type: 'snapshot',
+            trades: [
+              {
+                product_id: 'BIP-20DEC30-CDE',
+                trade_id: '127484462977',
+                price: '85920',
+                size: '4',
+                time: '2026-10-06T09:46:51.204473Z',
+                side: 'BUY'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'ticker',
+        timestamp: '2026-10-06T09:47:00.391461681Z',
+        events: [
+          {
+            type: 'snapshot',
+            tickers: [
+              {
+                product_id: 'BIP-20DEC30-CDE',
+                price: '85920',
+                best_bid: '85925',
+                best_ask: '85935',
+                best_bid_quantity: '25',
+                best_ask_quantity: '241'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'ticker',
+        timestamp: '2026-10-06T09:47:00.495358336Z',
+        events: [
+          {
+            type: 'update',
+            tickers: [
+              {
+                product_id: 'BIP-20DEC30-CDE',
+                price: '85920',
+                best_bid: '85920',
+                best_ask: '85935',
+                best_bid_quantity: '273',
+                best_ask_quantity: '435'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'market_trades',
+        events: [
+          {
+            type: 'update',
+            trades: [
+              {
+                product_id: 'BIP-20DEC30-CDE',
+                trade_id: '127484572489',
+                price: '85955',
+                size: '3',
+                time: '2026-10-06T09:47:18.401683Z',
+                side: 'SELL'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+    const mapper = createMapper('coinbase-derivatives')
+    const localTimestamp = new Date('2026-10-06T09:46:39.000Z')
+    snapshot(messages.flatMap((message) => mapper.map(message, localTimestamp)))
+  })
+
+  test('Coinbase derivatives skips trade backfill and empty quotes, and preserves zero values', () => {
+    const mapper = createMapper('coinbase-derivatives')
+    const time = new Date('2026-10-06T09:46:39.000Z')
+    assert.deepEqual(mapper.map({ channel: 'market_trades', events: [{ type: 'snapshot', trades: [] }] }, time), [])
+    assert.deepEqual(
+      mapper.map({ channel: 'ticker', timestamp: time.toISOString(), events: [{ tickers: [{ product_id: 'QUIET', price: '' }] }] }, time),
+      []
+    )
+    const product = {
+      channel: 'products',
+      generated: true,
+      events: [
+        {
+          product_id: 'BIP-20DEC30-CDE',
+          future_product_details: {
+            open_interest: '5',
+            funding_rate: '-0.0001',
+            funding_time: '2026-10-06T09:00:00Z',
+            index_price: '85900'
+          }
+        }
+      ]
+    }
+    const first = mapper.map(product, time)[0]
+    assert.equal(first.fundingTimestamp, undefined)
+    assert.equal(first.markPrice, undefined)
+    product.events[0].future_product_details.open_interest = '0'
+    product.events[0].future_product_details.funding_rate = '0'
+    const second = mapper.map(product, time)[0]
+    assert.equal(second.openInterest, 0)
+    assert.equal(second.fundingRate, 0)
+    const book = mapper.map(
+      {
+        channel: 'l2_data',
+        timestamp: time.toISOString(),
+        events: [
+          {
+            type: 'update',
+            product_id: 'BIP-20DEC30-CDE',
+            updates: [{ side: 'bid', price_level: '85900', new_quantity: '0', event_time: '2026-10-06T09:46:38.123456Z' }]
+          }
+        ]
+      },
+      time
+    )[0]
+    assert.equal(book.isSnapshot, false)
+    assert.equal(book.bids[0].amount, 0)
+    assert.equal(book.timestamp.μs, 456)
+  })
+
+  test('Coinbase derivatives emits price changes without waiting for products and retains merged fields', () => {
+    const mapper = createMapper('coinbase-derivatives')
+    const localTimestamp = new Date('2026-10-06T09:46:40.000Z')
+    const ticker = {
+      channel: 'ticker',
+      timestamp: '2026-10-06T09:46:38.123456Z',
+      events: [{ tickers: [{ product_id: 'BIP-20DEC30-CDE', price: '100' }] }]
+    }
+    const first = mapper.map(ticker, localTimestamp)
+    assert.equal(first.length, 1)
+    assert.equal(first[0].type, 'derivative_ticker')
+    assert.equal(first[0].lastPrice, 100)
+    assert.equal(first[0].timestamp.valueOf(), Date.parse(ticker.timestamp))
+    assert.equal(first[0].timestamp.μs, 456)
+    assert.equal(first[0].localTimestamp, localTimestamp)
+
+    ticker.timestamp = '2026-10-06T09:46:39.000000Z'
+    assert.deepEqual(mapper.map(ticker, localTimestamp), [])
+    ticker.events[0].tickers[0].price = '101'
+    assert.equal(mapper.map(ticker, localTimestamp)[0].lastPrice, 101)
+    ticker.events[0].tickers[0].price = '102'
+    assert.equal(mapper.map(ticker, localTimestamp)[0].lastPrice, 102)
+    assert.equal(first[0].lastPrice, 100)
+
+    const products = {
+      channel: 'products',
+      generated: true,
+      events: [
+        {
+          product_id: 'BIP-20DEC30-CDE',
+          price: '99',
+          future_product_details: { open_interest: '5', funding_rate: '0', index_price: '103' }
+        }
+      ]
+    }
+    const merged = mapper.map(products, localTimestamp)
+    assert.equal(merged.length, 1)
+    assert.equal(merged[0].lastPrice, 102)
+    assert.equal(merged[0].openInterest, 5)
+    assert.equal(merged[0].fundingRate, 0)
+    assert.equal(merged[0].indexPrice, 103)
+    assert.deepEqual(mapper.map(products, localTimestamp), [])
+
+    ticker.timestamp = '2026-10-06T09:46:41.123789Z'
+    ticker.events[0].tickers[0].price = '104'
+    const updated = mapper.map(ticker, new Date('2026-10-06T09:46:42.000Z'))[0]
+    assert.equal(updated.lastPrice, 104)
+    assert.equal(updated.openInterest, 5)
+    assert.equal(updated.fundingRate, 0)
+    assert.equal(updated.indexPrice, 103)
+    assert.equal(updated.timestamp.valueOf(), Date.parse(ticker.timestamp))
+    assert.equal(updated.timestamp.μs, 789)
+  })
+
   test('map deribit messages', () => {
     const messages = [
       {

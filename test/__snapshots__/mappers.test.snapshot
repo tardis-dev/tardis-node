@@ -4045,6 +4045,127 @@ exports[`mappers > ignore bitfinex funding ticker messages for book ticker 1`] =
 []
 `;
 
+exports[`mappers > map Coinbase derivatives captured messages 1`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BIP-20DEC30-CDE",
+    "exchange": "coinbase-derivatives",
+    "lastPrice": undefined,
+    "openInterest": 155686,
+    "fundingRate": 0.000006,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 85887.354276,
+    "markPrice": undefined,
+    "timestamp": "2026-10-06T09:46:39.000Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "coinbase-derivatives",
+    "symbol": "BIP-20DEC30-CDE",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 85920,
+        "amount": 39
+      },
+      {
+        "price": 85915,
+        "amount": 495
+      },
+      {
+        "price": 85910,
+        "amount": 523
+      }
+    ],
+    "asks": [
+      {
+        "price": 85930,
+        "amount": 2
+      },
+      {
+        "price": 85935,
+        "amount": 438
+      },
+      {
+        "price": 85940,
+        "amount": 584
+      }
+    ],
+    "timestamp": "2026-10-06T09:46:58.334169Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "coinbase-derivatives",
+    "symbol": "BIP-20DEC30-CDE",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 85900,
+        "amount": 802
+      },
+      {
+        "price": 85895,
+        "amount": 732
+      }
+    ],
+    "asks": [],
+    "timestamp": "2026-10-06T09:46:58.408793Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "BIP-20DEC30-CDE",
+    "exchange": "coinbase-derivatives",
+    "lastPrice": 85920,
+    "openInterest": 155686,
+    "fundingRate": 0.000006,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 85887.354276,
+    "markPrice": undefined,
+    "timestamp": "2026-10-06T09:47:00.391461Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "book_ticker",
+    "exchange": "coinbase-derivatives",
+    "symbol": "BIP-20DEC30-CDE",
+    "bidPrice": 85925,
+    "bidAmount": 25,
+    "askPrice": 85935,
+    "askAmount": 241,
+    "timestamp": "2026-10-06T09:47:00.391461Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "book_ticker",
+    "exchange": "coinbase-derivatives",
+    "symbol": "BIP-20DEC30-CDE",
+    "bidPrice": 85920,
+    "bidAmount": 273,
+    "askPrice": 85935,
+    "askAmount": 435,
+    "timestamp": "2026-10-06T09:47:00.495358Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "coinbase-derivatives",
+    "symbol": "BIP-20DEC30-CDE",
+    "id": "127484572489",
+    "price": 85955,
+    "amount": 3,
+    "side": "buy",
+    "timestamp": "2026-10-06T09:47:18.401683Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
+  }
+]
+`;
+
 exports[`mappers > map ascendex messages 1`] = `
 [
   {
