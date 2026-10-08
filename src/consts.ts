@@ -32,6 +32,7 @@ export const EXCHANGES = [
   'bybit',
   'bybit-spot',
   'bybit-options',
+  'bybit-spread',
   'phemex',
   'delta',
   'ftx-us',
@@ -69,7 +70,18 @@ export const EXCHANGES = [
   'polymarket'
 ] as const
 
-const BINANCE_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades', 'borrowInterest'] as const
+const BINANCE_CHANNELS = [
+  'trade',
+  'aggTrade',
+  'ticker',
+  'depth',
+  'depthSnapshot',
+  'bookTicker',
+  'recentTrades',
+  'borrowInterest',
+  'tokenNav'
+] as const
+const BINANCE_US_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker', 'recentTrades'] as const
 
 const ASTER_CHANNELS = ['trade', 'aggTrade', 'ticker', 'depth', 'depthSnapshot', 'bookTicker'] as const
 const ASTER_FUTURES_CHANNELS = [
@@ -112,7 +124,7 @@ const BITMEX_CHANNELS = [
   'tradeBin1d'
 ] as const
 
-const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book'] as const
+const BITSTAMP_CHANNELS = ['live_trades', 'live_orders', 'diff_order_book', 'funding_rate', 'ticker'] as const
 const BITVAVO_CHANNELS = ['book', 'getBook', 'trade', 'ticker'] as const
 
 const BITHUMB_CHANNELS = ['trade', 'orderbook', 'ticker'] as const
@@ -505,7 +517,21 @@ const MANGO_CHANNELS = [
 
 const HUOBI_DM_OPTIONS_CHANNELS = ['trade', 'detail', 'depth', 'bbo', 'open_interest', 'option_market_index', 'option_index'] as const
 
-const BYBIT_SPOT_CHANNELS = ['trade', 'bookTicker', 'depth', 'orderbook.1', 'orderbook.50', 'publicTrade', 'tickers', 'lt', 'orderbook.200']
+const BYBIT_SPREAD_CHANNELS = ['orderbook.25', 'publicTrade', 'tickers']
+
+const BYBIT_SPOT_CHANNELS = [
+  'trade',
+  'bookTicker',
+  'depth',
+  'orderbook.1',
+  'orderbook.50',
+  'orderbook.200',
+  'orderbook.full',
+  'orderbook.rpi',
+  'publicTrade',
+  'tickers',
+  'lt'
+]
 
 const CRYPTO_COM_CHANNELS = ['trade', 'book', 'ticker', 'settlement', 'index', 'mark', 'funding', 'estimatedfunding']
 
@@ -601,9 +627,9 @@ export const EXCHANGE_CHANNELS_INFO = {
   'okex-futures': OKEX_FUTURES_CHANNELS,
   'okex-options': OKEX_OPTIONS_CHANNELS,
   binance: BINANCE_CHANNELS,
-  'binance-jersey': BINANCE_CHANNELS,
+  'binance-jersey': BINANCE_US_CHANNELS,
   'binance-dex': BINANCE_DEX_CHANNELS,
-  'binance-us': BINANCE_CHANNELS,
+  'binance-us': BINANCE_US_CHANNELS,
   bitfinex: BITFINEX_CHANNELS,
   ftx: FTX_CHANNELS,
   'ftx-us': FTX_US_CHANNELS,
@@ -617,6 +643,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   'huobi-dm-swap': HUOBI_DM_SWAP_CHANNELS,
   'huobi-dm-linear-swap': HUOBI_DM_LINEAR_SWAP_CHANNELS,
   bybit: BYBIT_CHANNELS,
+  'bybit-spread': BYBIT_SPREAD_CHANNELS,
   'bybit-spot': BYBIT_SPOT_CHANNELS,
   'bybit-options': BYBIT_OPTIONS_CHANNELS,
   okcoin: OKCOIN_CHANNELS,

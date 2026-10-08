@@ -13,7 +13,7 @@ import { BitflyerRealTimeFeed } from './bitflyer.ts'
 import { BithumbRealTimeFeed } from './bithumb.ts'
 import { BitstampRealTimeFeed } from './bitstamp.ts'
 import { BitvavoRealTimeFeed } from './bitvavo.ts'
-import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed } from './bybit.ts'
+import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed, BybitSpreadRealTimeDataFeed } from './bybit.ts'
 import { CoinbaseRealTimeFeed } from './coinbase.ts'
 import { CoinbaseDerivativesRealTimeFeed } from './coinbasederivatives.ts'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities.ts'
@@ -112,6 +112,7 @@ const realTimeFeedsMap: {
   mango: MangoRealTimeFeed,
   'bybit-spot': BybitSpotRealTimeDataFeed,
   'bybit-options': BybitOptionsRealTimeDataFeed,
+  'bybit-spread': BybitSpreadRealTimeDataFeed,
   'crypto-com': CryptoComRealTimeFeed,
   kucoin: KucoinRealTimeFeed,
   bitnomial: BitnomialRealTimeFeed,

@@ -13,6 +13,7 @@ import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'coinbase-derivatives',
+  'bitstamp',
   'aster-futures',
   'bitmex',
   'binance-futures',
@@ -5767,6 +5768,120 @@ describe('mappers', () => {
     }
   })
 
+  test('map bitstamp perpetual messages', () => {
+    const bitstampMapper = createMapper('bitstamp')
+    // Recorded 2026-10-06: an ETH perpetual funding update, a trade whose id exceeds Number.MAX_SAFE_INTEGER, and the next funding update.
+    const messages: [string, any][] = [
+      [
+        '2026-10-06T11:08:20.0016394Z',
+        {
+          data: {
+            market: 'ethusd-perp',
+            mark_price: '2712.50512196',
+            index_price: '2712.21',
+            funding_rate: '0',
+            timestamp: '1791284899',
+            next_funding_time: '1791302400'
+          },
+          channel: 'funding_rate_ethusd-perp',
+          event: 'funding_rate_saved'
+        }
+      ],
+      [
+        '2026-10-06T11:08:20.1846384Z',
+        {
+          data: {
+            id: 2009608907068030976,
+            id_str: '2009608907068030976',
+            type: 1,
+            sell_order_id: 2058034894905472,
+            buy_order_id: 2058034796798081,
+            amount: 0.713,
+            amount_str: '0.713',
+            price: 2712.7,
+            price_str: '2712.7',
+            microtimestamp: '1791284900173000',
+            timestamp: '1791284900173'
+          },
+          channel: 'live_trades_ethusd-perp',
+          event: 'trade'
+        }
+      ],
+      [
+        '2026-10-06T11:08:20.9458590Z',
+        {
+          data: {
+            market: 'ethusd-perp',
+            mark_price: '2712.19867268',
+            index_price: '2711.9016666666666',
+            funding_rate: '0',
+            timestamp: '1791284900',
+            next_funding_time: '1791302400'
+          },
+          channel: 'funding_rate_ethusd-perp',
+          event: 'funding_rate_saved'
+        }
+      ]
+    ]
+    for (const [localTimestamp, message] of messages) {
+      snapshot(bitstampMapper.map(message, new Date(localTimestamp)))
+    }
+  })
+
+  test('map bitstamp perpetual ticker messages', () => {
+    const bitstampMapper = createMapper('bitstamp')
+    // Recorded 2026-10-06: the recorder-generated REST ticker of the BTC perpetual and the funding update of the same second.
+    const messages: [string, any][] = [
+      [
+        '2026-10-06T14:07:54.8000000Z',
+        {
+          data: {
+            timestamp: '1791295674',
+            open: '85806',
+            high: '86694',
+            low: '84976',
+            last: '86166',
+            volume: '161.74999',
+            vwap: '85989',
+            bid: '86167',
+            ask: '86168',
+            side: '1',
+            open_24: '86668',
+            percent_change_24: '-0.58',
+            market_type: 'PERPETUAL',
+            pair: 'BTC/USD-PERP',
+            market: 'BTC/USD-PERP',
+            index_price: '86170.228',
+            mark_price: '86175.54663002',
+            open_interest: '76.65505',
+            open_interest_value: '6605790.835701514601'
+          },
+          channel: 'ticker_btcusd-perp',
+          event: 'ticker',
+          generated: true
+        }
+      ],
+      [
+        '2026-10-06T14:07:54.9231614Z',
+        {
+          data: {
+            market: 'btcusd-perp',
+            mark_price: '86172.67972394',
+            index_price: '86167.42866666667',
+            funding_rate: '0.000074',
+            timestamp: '1791295674',
+            next_funding_time: '1791302400'
+          },
+          channel: 'funding_rate_btcusd-perp',
+          event: 'funding_rate_saved'
+        }
+      ]
+    ]
+    for (const [localTimestamp, message] of messages) {
+      snapshot(bitstampMapper.map(message, new Date(localTimestamp)))
+    }
+  })
+
   test('map kraken messages', () => {
     const messages = [
       [170, [['0.01136500', '2.51146536', '1561939201.587070', 's', 'l', '']], 'trade', 'LTC/XBT'],
@@ -7881,6 +7996,111 @@ describe('mappers', () => {
     for (const message of messagesAllLiquidation) {
       const mappedMessages = bybit.map(message, new Date('2025-02-26'))
       snapshot(mappedMessages)
+    }
+  })
+
+  test('map bybit-spread messages', () => {
+    const bybit = createMapper('bybit-spread')
+    // Recorded 2026-10-06: a subscription response, a book snapshot and delta, a ticker and a trade.
+    const messages: [string, any][] = [
+      [
+        '2026-10-06T11:04:34.0959816Z',
+        {
+          success: true,
+          conn_id: 'dat42tru7geqm1secqg0-14udb',
+          data: {
+            failTopics: [],
+            successTopics: [
+              'orderbook.25.ETHUSDT-27NOV26_ETHUSDT-09OCT26',
+              'orderbook.25.ETHUSDT-25DEC26_ETHUSDT-09OCT26',
+              'orderbook.25.ETHUSDT-09OCT26_ETHUSDT',
+              'orderbook.25.SOLUSDT-30OCT26_SOLUSDT-09OCT26',
+              'orderbook.25.ETHUSDT-09OCT26_ETH/USDT',
+              'orderbook.25.ETHUSDT-25JUN27_ETHUSDT-09OCT26',
+              'orderbook.25.BTCUSDT-16OCT26_BTC/USDT',
+              'orderbook.25.SOLUSDT-09OCT26_SOLUSDT',
+              'orderbook.25.ETHUSDT-30OCT26_ETHUSDT-09OCT26',
+              'orderbook.25.ETHUSDT-26MAR27_ETHUSDT-09OCT26'
+            ]
+          },
+          type: 'COMMAND_RESP'
+        }
+      ],
+      [
+        '2026-10-06T11:04:34.0959825Z',
+        {
+          topic: 'orderbook.25.ETHUSDT-26MAR27_ETH/USDT',
+          ts: 1791284673255,
+          type: 'snapshot',
+          data: {
+            s: 'ETHUSDT-26MAR27_ETH/USDT',
+            b: [
+              ['53.43', '0.36'],
+              ['52.79', '0.36']
+            ],
+            a: [
+              ['54.45', '0.36'],
+              ['55.10', '0.36']
+            ],
+            u: 2182117,
+            seq: 3301568851
+          },
+          cts: 1791284596160
+        }
+      ],
+      [
+        '2026-10-06T11:04:34.1557176Z',
+        {
+          topic: 'tickers.ETHUSDT-26MAR27_ETH/USDT',
+          ts: 1791284673189,
+          type: 'snapshot',
+          data: {
+            symbol: 'ETHUSDT-26MAR27_ETH/USDT',
+            bidPrice: '53.43',
+            bidSize: '0.36',
+            askPrice: '54.45',
+            askSize: '0.36',
+            lastPrice: '54.32',
+            highPrice24h: '55.3',
+            lowPrice24h: '53.82',
+            prevPrice24h: '54.34',
+            volume24h: '20.65'
+          }
+        }
+      ],
+      [
+        '2026-10-06T11:04:45.5326257Z',
+        {
+          topic: 'orderbook.25.ETHUSDT-26MAR27_ETH/USDT',
+          ts: 1791284685495,
+          type: 'delta',
+          data: { s: 'ETHUSDT-26MAR27_ETH/USDT', b: [], a: [['100.00', '0.01']], u: 2182118, seq: 3301569330 },
+          cts: 1791284685481
+        }
+      ],
+      [
+        '2026-10-06T12:09:15.2535641Z',
+        {
+          topic: 'publicTrade.BTCUSDT-26MAR27_BTC/USDT',
+          ts: 1791288555216,
+          type: 'snapshot',
+          data: [
+            {
+              T: 1791288555215,
+              s: 'BTCUSDT-26MAR27_BTC/USDT',
+              S: 'Sell',
+              v: '0.01',
+              p: '2174.8',
+              L: 'PlusTick',
+              i: '33171062-e479-565a-b9ad-ab974b62171d',
+              seq: 3301592836
+            }
+          ]
+        }
+      ]
+    ]
+    for (const [localTimestamp, message] of messages) {
+      snapshot(bybit.map(message, new Date(localTimestamp)))
     }
   })
 
