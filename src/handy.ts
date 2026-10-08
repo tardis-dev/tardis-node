@@ -222,6 +222,12 @@ export function parseμs(dateString: string): number {
   return 0
 }
 
+export function parseISODateWithMicroseconds(value: string) {
+  const date = new Date(value)
+  date.μs = parseμs(value)
+  return date
+}
+
 export function optimizeFilters(filters: Filter<any>[]) {
   // deduplicate filters (if the channel was provided multiple times)
   const optimizedFilters = filters.reduce((prev, current) => {

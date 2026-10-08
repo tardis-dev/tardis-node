@@ -15,6 +15,7 @@ import { BitstampRealTimeFeed } from './bitstamp.ts'
 import { BitvavoRealTimeFeed } from './bitvavo.ts'
 import { BybitOptionsRealTimeDataFeed, BybitRealTimeDataFeed, BybitSpotRealTimeDataFeed, BybitSpreadRealTimeDataFeed } from './bybit.ts'
 import { CoinbaseRealTimeFeed } from './coinbase.ts'
+import { CoinbaseDerivativesRealTimeFeed } from './coinbasederivatives.ts'
 import { CryptofacilitiesRealTimeFeed } from './cryptofacilities.ts'
 import { DeribitRealTimeDataFeed } from './deribit.ts'
 import { FtxRealTimeFeed, FtxUSRealTimeFeed } from './ftx.ts'
@@ -78,6 +79,7 @@ const realTimeFeedsMap: {
   bitstamp: BitstampRealTimeFeed,
   bitvavo: BitvavoRealTimeFeed,
   coinbase: CoinbaseRealTimeFeed,
+  'coinbase-derivatives': CoinbaseDerivativesRealTimeFeed,
   cryptofacilities: CryptofacilitiesRealTimeFeed,
   deribit: DeribitRealTimeDataFeed,
   ftx: FtxRealTimeFeed,

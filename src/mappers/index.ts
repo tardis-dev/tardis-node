@@ -16,6 +16,7 @@ import { blockchainComMappers } from './blockchaincom.ts'
 import { bullishMappers } from './bullish.ts'
 import { bybitMappers } from './bybit.ts'
 import { coinbaseMappers } from './coinbase.ts'
+import { coinbaseDerivativesMappers } from './coinbasederivatives.ts'
 import { coinbaseInternationalMappers } from './coinbaseinternational.ts'
 import { coinflexMappers } from './coinflex.ts'
 import { cryptoComMappers } from './cryptocom.ts'
@@ -74,6 +75,7 @@ const registeredMappers = mergeExchangeMappers(
   bullishMappers,
   bybitMappers,
   coinbaseMappers,
+  coinbaseDerivativesMappers,
   coinbaseInternationalMappers,
   coinflexMappers,
   cryptoComMappers,
