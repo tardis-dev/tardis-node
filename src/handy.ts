@@ -206,20 +206,23 @@ export function* batchObjects<T>(payload: T[], batchSize: number) {
 }
 
 export function parseμs(dateString: string): number {
-  // check if we have ISO 8601 format date string, e.g: 2019-06-01T00:03:03.1238784Z or 2020-07-22T00:09:16.836773Z
-  // or 2020-03-01T00:00:24.893456+00:00
-  if (dateString.length === 27 || dateString.length === 28 || dateString.length === 32 || dateString.length === 30) {
-    const hundreds = dateString.charCodeAt(23) - 48
-    const tens = dateString.charCodeAt(24) - 48
-    const ones = dateString.charCodeAt(25) - 48
-    if (hundreds >= 0 && hundreds <= 9 && tens >= 0 && tens <= 9 && ones >= 0 && ones <= 9) {
-      return hundreds * 100 + tens * 10 + ones
-    }
-
-    return Number(dateString.slice(23, 26))
+  if (dateString[19] !== '.') {
+    return 0
   }
 
-  return 0
+  // ISO fractions may omit trailing zeros. Keep digits 4–6, padding shorter fractions and truncating finer precision.
+  let microseconds = 0
+  for (let index = 20, weight = 100; index < 26; index++) {
+    const digit = dateString.charCodeAt(index) - 48
+    if (!(digit >= 0 && digit <= 9)) {
+      break
+    }
+    if (index >= 23) {
+      microseconds += digit * weight
+      weight /= 10
+    }
+  }
+  return microseconds
 }
 
 export function optimizeFilters(filters: Filter<any>[]) {
