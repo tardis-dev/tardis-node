@@ -9049,6 +9049,41 @@ describe('mappers', () => {
     assert.deepStrictEqual([...mapper.map({ ...message, result: [] }, localTimestamp)!], [])
   })
 
+  test('Gate tickers map next funding seconds and emit funding-time-only changes', () => {
+    const localTimestamp = new Date('2026-10-12T11:15:22.608Z')
+    for (const [contract, interval] of [
+      ['BTC_USD', 28800],
+      ['BTC_USDT', 14400],
+      ['BTC_USD1', 3600]
+    ] as const) {
+      const mapper = normalizeDerivativeTickers('gate-io-futures', localTimestamp)
+      // Perpetual ticker fields captured from Gate on 2026-10-12.
+      const ticker = {
+        contract,
+        last: '83389.7',
+        funding_rate: '0.000061',
+        funding_rate_indicative: '0.000061',
+        mark_price: '83389.6',
+        index_price: '83415.9',
+        total_size: '528972382'
+      }
+      const message = { channel: 'futures.tickers', event: 'update', time: 1791803722, time_ms: 1791803722334 }
+      const [historical] = [...mapper.map({ ...message, result: ticker }, localTimestamp)!]
+      assert.strictEqual(historical.fundingTimestamp, undefined)
+
+      const result = { ...ticker, funding_next_apply: 1791820800 }
+      const [initial] = [...mapper.map({ ...message, result: [result] }, localTimestamp)!]
+      assert.deepStrictEqual(initial.fundingTimestamp, new Date('2026-10-12T16:00:00Z'))
+      assert.strictEqual(initial.localTimestamp, localTimestamp)
+      assert.strictEqual(initial.timestamp.valueOf(), message.time_ms)
+      assert.deepStrictEqual([...mapper.map({ ...message, result: [result] }, localTimestamp)!], [])
+
+      const [next] = [...mapper.map({ ...message, result: { ...result, funding_next_apply: 1791820800 + interval } }, localTimestamp)!]
+      assert.strictEqual(next.fundingTimestamp?.valueOf(), Date.parse('2026-10-12T16:00:00Z') + interval * 1000)
+      assert.strictEqual(next.fundingRate, initial.fundingRate)
+    }
+  })
+
   test('Gate delivery tickers leave empty funding fields undefined', () => {
     const mapper = normalizeDerivativeTickers('gate-io-futures', new Date('2026-10-14T00:00:00Z'))
     const localTimestamp = new Date('2026-10-14T00:00:01Z')
@@ -9072,6 +9107,7 @@ describe('mappers', () => {
     const [ticker] = [...mapper.map(message, localTimestamp)!]
     assert.strictEqual(ticker.fundingRate, undefined)
     assert.strictEqual(ticker.predictedFundingRate, undefined)
+    assert.strictEqual(ticker.fundingTimestamp, undefined)
     assert.strictEqual(ticker.openInterest, 235)
     assert.strictEqual(ticker.timestamp.valueOf(), 1791797256796)
   })

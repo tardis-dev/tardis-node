@@ -1,4 +1,4 @@
-import { asNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
 import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker, Liquidation } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
@@ -207,6 +207,10 @@ class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futures', D
 
       pendingTickerInfo.updateFundingRate(asNumberOrUndefined(futuresTicker.funding_rate))
       pendingTickerInfo.updatePredictedFundingRate(asNumberOrUndefined(futuresTicker.funding_rate_indicative))
+      const fundingNextApply = asNonZeroNumberOrUndefined(futuresTicker.funding_next_apply)
+      if (fundingNextApply !== undefined) {
+        pendingTickerInfo.updateFundingTimestamp(new Date(fundingNextApply * 1000))
+      }
       pendingTickerInfo.updateIndexPrice(Number(futuresTicker.index_price))
       pendingTickerInfo.updateMarkPrice(Number(futuresTicker.mark_price))
       pendingTickerInfo.updateLastPrice(Number(futuresTicker.last))
@@ -321,6 +325,7 @@ type GateIOFuturesTicker = {
           contract: string
           last: string
           funding_rate: string
+          funding_next_apply?: number
           mark_price: string
           index_price: string
           funding_rate_indicative: string
@@ -331,6 +336,7 @@ type GateIOFuturesTicker = {
         contract: string
         last: string
         funding_rate: string
+        funding_next_apply?: number
         mark_price: string
         index_price: string
         funding_rate_indicative: string

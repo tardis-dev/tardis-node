@@ -94,6 +94,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected readonly extraHeaders = { 'X-Gate-Size-Decimal': '1' }
+  private readonly bookSequences = new Map<string, number>()
 
   constructor(
     protected readonly wssURL: string,
@@ -107,6 +108,7 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
+    this.bookSequences.clear()
     const payload = filters.flatMap((filter) => {
       if (filter.channel === 'order_book' || filter.channel === 'obu') {
         return filter.symbols!.map((symbol) => {
@@ -130,6 +132,22 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     })
 
     return payload
+  }
+
+  protected onMessage(message: any) {
+    if (message.channel !== 'futures.obu' || (message.event !== 'update' && message.event !== 'all')) {
+      return
+    }
+
+    const { result } = message
+    const previous = this.bookSequences.get(result.s)
+    if (
+      !Number.isSafeInteger(result.u) ||
+      (result.full !== true && (previous === undefined || result.U !== previous + 1 || result.u < result.U))
+    ) {
+      throw new Error(`Gate.io OBU sequence gap for ${result.s}: previous=${previous}, U=${result.U}, u=${result.u}`)
+    }
+    this.bookSequences.set(result.s, result.u)
   }
 
   protected messageIsError(message: any): boolean {

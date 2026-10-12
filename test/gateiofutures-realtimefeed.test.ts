@@ -141,3 +141,86 @@ test('Gate rejects absent symbols, unknown settlement and delivery liquidations'
     await messages.return!()
   }
 })
+
+test('Gate OBU rejects discontinuities before output and recovers from a fresh snapshot', { timeout: 15000 }, async (t) => {
+  for (const invalid of [
+    { U: 104, u: 105 }, // missing update 103
+    { U: 102, u: 102 }, // duplicate
+    { U: 103 }, // missing end sequence
+    { U: 103, u: 102 } // reversed range
+  ]) {
+    await t.test(JSON.stringify(invalid), async () => {
+      const server = new WebSocketServer({ port: 0 })
+      await once(server, 'listening')
+      const address = server.address()
+      assert.ok(address !== null && typeof address !== 'string')
+      const previousUrl = process.env.WSS_URL_GATE_IO_FUTURES
+      process.env.WSS_URL_GATE_IO_FUTURES = `ws://127.0.0.1:${address.port}`
+      let connections = 0
+      const errors: Error[] = []
+      server.on('connection', (socket) => {
+        const generation = ++connections
+        socket.once('message', () => {
+          const push = (symbol: string, result: object) =>
+            socket.send(
+              JSON.stringify({
+                channel: 'futures.obu',
+                event: 'update',
+                result: { s: `ob.${symbol}.400`, t: 1791797259343, ...result }
+              })
+            )
+          if (generation === 1) {
+            push('BTC_USDT', { full: true, u: 100, b: [['100', '1']] })
+            push('ETH_USDT', { full: true, u: 900, b: [['200', '1']] })
+            push('BTC_USDT', { U: 101, u: 102 }) // empty updates still advance sequence
+            push('BTC_USDT', { ...invalid, b: [['100', '99']] })
+            push('BTC_USDT', { U: 106, u: 107, b: [['100', '99']] })
+          } else if (generation === 2) {
+            // This would match stale sequence state if reconnect did not clear it.
+            push('BTC_USDT', { U: 103, u: 104, b: [['100', '99']] })
+          } else {
+            push('BTC_USDT', { full: true, u: 500, b: [['100', '2']] })
+            push('BTC_USDT', { U: 501, u: 502, b: [['100', '3']] })
+            push('BTC_USDT', { full: true, u: 10, b: [['100', '4']] })
+            push('BTC_USDT', { U: 11, u: 11, b: [['100', '0']] })
+          }
+        })
+      })
+      const messages = streamNormalized(
+        {
+          exchange: 'gate-io-futures',
+          symbols: ['BTC_USDT', 'ETH_USDT'],
+          withDisconnectMessages: true,
+          onError: (error) => errors.push(error)
+        },
+        normalizeBookChanges
+      )
+      try {
+        const output = []
+        for await (const message of messages) {
+          output.push(message)
+          if (message.type === 'book_change' && message.bids[0]?.amount === 0) break
+        }
+        assert.strictEqual(connections, 3)
+        assert.strictEqual(errors.length, 2)
+        assert.ok(errors.every((error) => error.message.includes('OBU sequence gap')))
+        assert.strictEqual(output.filter((message) => message.type === 'disconnect').length, 2)
+        const books = output.filter((message) => message.type === 'book_change')
+        assert.deepStrictEqual(
+          books.map((message) => message.bids[0]?.amount),
+          [1, 1, undefined, 2, 3, 4, 0]
+        )
+        assert.deepStrictEqual(
+          books.map((message) => message.isSnapshot),
+          [true, true, false, true, false, true, false]
+        )
+      } finally {
+        await messages.return!()
+        for (const socket of server.clients) socket.terminate()
+        await new Promise<void>((resolve) => server.close(() => resolve()))
+        if (previousUrl === undefined) delete process.env.WSS_URL_GATE_IO_FUTURES
+        else process.env.WSS_URL_GATE_IO_FUTURES = previousUrl
+      }
+    })
+  }
+})
