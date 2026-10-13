@@ -345,6 +345,7 @@ const BINANCE_FUTURES_CHANNELS = [
   'forceOrder',
   'openInterest',
   'fundingInfo',
+  'fundingRate',
   'insuranceBalance',
   'recentTrades',
   'compositeIndex',
@@ -353,6 +354,7 @@ const BINANCE_FUTURES_CHANNELS = [
   'globalLongShortAccountRatio',
   'takerlongshortRatio',
   '!contractInfo',
+  'tradingSession',
   'assetIndex'
 ] as const
 
