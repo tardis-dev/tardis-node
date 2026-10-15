@@ -157,7 +157,8 @@ const DERIBIT_CHANNELS = [
   'ticker',
   'quote',
   'platform_state',
-  'instrument.state.any'
+  'instrument.state.any',
+  'block_rfq.trades'
 ] as const
 
 const KRAKEN_CHANNELS = ['trade', 'ticker', 'book', 'spread', 'instrument'] as const
