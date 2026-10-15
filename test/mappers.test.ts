@@ -11221,6 +11221,44 @@ test('map dydx-v4 messages', () => {
   }
 })
 
+test('map dydx-v4 oracle prices only for markets with market data', () => {
+  const localTimestamp = new Date('2026-10-02T09:24:27.798Z')
+  const mapper = createMapper('dydx-v4', localTimestamp)
+  const oraclePrices = {
+    type: 'channel_data',
+    connection_id: '40333891-880e-4062-8ad4-02d53385f245',
+    message_id: 34143362,
+    channel: 'v4_markets',
+    version: '1.0.0',
+    contents: {
+      oraclePrices: {
+        'USDT-USD': {
+          oraclePrice: '0.999870016',
+          effectiveAt: '2026-10-02T09:24:26.824Z',
+          effectiveAtHeight: '107746002',
+          marketId: 1000000
+        },
+        'ETH-USD': { oraclePrice: '4380.5', effectiveAt: '2026-10-02T09:24:26.824Z', effectiveAtHeight: '107746002', marketId: 1 }
+      }
+    }
+  }
+  const tradingUpdate = {
+    type: 'channel_data',
+    connection_id: '40333891-880e-4062-8ad4-02d53385f245',
+    message_id: 34143363,
+    channel: 'v4_markets',
+    version: '1.0.0',
+    contents: { trading: { 'ETH-USD': { nextFundingRate: '0.0000125' } } }
+  }
+
+  assert.deepEqual([...mapper.map(oraclePrices, localTimestamp)], [])
+  const tickers = [...mapper.map(tradingUpdate, localTimestamp)] as any[]
+  assert.equal(tickers.length, 1)
+  assert.equal(tickers[0].symbol, 'ETH-USD')
+  assert.equal(tickers[0].markPrice, 4380.5)
+  assert.equal(tickers[0].fundingRate, 0.0000125)
+})
+
 test('map bitget messages', () => {
   const messages = [
     {

@@ -111,6 +111,8 @@ class DydxV4BookChangeMapper implements Mapper<'dydx-v4', BookChange> {
 
 class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker> {
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
+  // Oracle prices also cover price-only markets such as USDT-USD, so a price waits here until its market appears in a snapshot, trading update or trade.
+  private readonly _unconfirmedOraclePrices = new Map<string, number>()
 
   canHandle(message: DydxMarketsSnapshot | DyDxMarketsUpdate | DyDxTrade) {
     return message.channel === 'v4_markets' || (message.channel === 'v4_trades' && message.type === 'channel_data')
@@ -133,7 +135,7 @@ class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker
 
   *map(message: DydxMarketsSnapshot | DyDxMarketsUpdate | DyDxTrade, localTimestamp: Date): IterableIterator<DerivativeTicker> {
     if (message.channel === 'v4_trades') {
-      const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.id, 'dydx-v4')
+      const pendingTickerInfo = this._getMarketTickerInfo(message.id)
       pendingTickerInfo.updateLastPrice(Number(message.contents.trades[message.contents.trades.length - 1].price))
 
       return
@@ -143,7 +145,7 @@ class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker
       for (const key in contents) {
         const marketInfo = (contents as any)[key] as DydxMarketsSnapshotContent | DydxMarketTradeUpdate
 
-        const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(key, 'dydx-v4')
+        const pendingTickerInfo = this._getMarketTickerInfo(key)
 
         if (marketInfo.oraclePrice !== undefined) {
           pendingTickerInfo.updateMarkPrice(Number(marketInfo.oraclePrice))
@@ -167,6 +169,12 @@ class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker
     if (message.type === 'channel_data' && message.contents.oraclePrices !== undefined) {
       for (const key in message.contents.oraclePrices) {
         const oraclePriceInfo = (message.contents.oraclePrices as any)[key] as OraclePriceInfo
+        if (this.pendingTickerInfoHelper.hasPendingTickerInfo(key) === false) {
+          if (oraclePriceInfo.oraclePrice !== undefined) {
+            this._unconfirmedOraclePrices.set(key, Number(oraclePriceInfo.oraclePrice))
+          }
+          continue
+        }
         const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(key, 'dydx-v4')
         if (oraclePriceInfo.oraclePrice !== undefined) {
           pendingTickerInfo.updateMarkPrice(Number(oraclePriceInfo.oraclePrice))
@@ -178,6 +186,16 @@ class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker
         }
       }
     }
+  }
+
+  private _getMarketTickerInfo(market: string) {
+    const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(market, 'dydx-v4')
+    const oraclePrice = this._unconfirmedOraclePrices.get(market)
+    if (oraclePrice !== undefined) {
+      pendingTickerInfo.updateMarkPrice(oraclePrice)
+      this._unconfirmedOraclePrices.delete(market)
+    }
+    return pendingTickerInfo
   }
 }
 
