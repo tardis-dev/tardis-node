@@ -296,6 +296,71 @@ describe('mappers', () => {
             ]
           }
         ]
+      },
+      {
+        channel: 'market_trades',
+        timestamp: '2026-10-14T14:33:56.433116124Z',
+        events: [
+          {
+            type: 'snapshot',
+            trades: [
+              {
+                product_id: 'LNK-30OCT26-CDE',
+                trade_id: '129924816331',
+                price: '12.509',
+                size: '1',
+                time: '2026-10-14T14:28:56.833665Z',
+                side: 'SELL'
+              },
+              {
+                product_id: 'LNK-30OCT26-CDE',
+                trade_id: '129845757549',
+                price: '12.835',
+                size: '14',
+                time: '2026-10-14T12:35:32.183889Z',
+                side: 'BUY'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'market_trades',
+        timestamp: '2026-10-14T14:33:56.433521146Z',
+        events: [
+          {
+            type: 'update',
+            trades: [
+              {
+                product_id: 'LNK-30OCT26-CDE',
+                trade_id: '129845757542',
+                price: '12.835',
+                size: '1',
+                time: '2026-10-14T12:35:32.183797Z',
+                side: 'BUY'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        channel: 'market_trades',
+        timestamp: '2026-10-14T14:37:06.271284915Z',
+        events: [
+          {
+            type: 'update',
+            trades: [
+              {
+                product_id: 'LNK-30OCT26-CDE',
+                trade_id: '129929851273',
+                price: '12.449',
+                size: '2',
+                time: '2026-10-14T14:37:06.144077Z',
+                side: 'BUY'
+              }
+            ]
+          }
+        ]
       }
     ]
     const mapper = createMapper('coinbase-derivatives')

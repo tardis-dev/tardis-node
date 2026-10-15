@@ -615,7 +615,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   bithumb: BITHUMB_CHANNELS,
   bitmex: BITMEX_CHANNELS,
   coinbase: COINBASE_CHANNELS,
-  'coinbase-derivatives': ['l2_data', 'market_trades', 'ticker', 'status', 'heartbeats', 'subscriptions', 'products'],
+  'coinbase-derivatives': ['l2_data', 'market_trades', 'ticker', 'heartbeats', 'subscriptions', 'products'],
   'coinbase-international': COINBASE_INTERNATIONAL_CHANNELS,
   deribit: DERIBIT_CHANNELS,
   cryptofacilities: CRYPTOFACILITIES_CHANNELS,

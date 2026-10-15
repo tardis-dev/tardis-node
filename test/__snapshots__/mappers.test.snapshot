@@ -4162,6 +4162,17 @@ exports[`mappers > map Coinbase derivatives captured messages 1`] = `
     "side": "buy",
     "timestamp": "2026-10-06T09:47:18.401683Z",
     "localTimestamp": "2026-10-06T09:46:39.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "coinbase-derivatives",
+    "symbol": "LNK-30OCT26-CDE",
+    "id": "129929851273",
+    "price": 12.449,
+    "amount": 2,
+    "side": "sell",
+    "timestamp": "2026-10-14T14:37:06.144077Z",
+    "localTimestamp": "2026-10-06T09:46:39.000Z"
   }
 ]
 `;

@@ -13,6 +13,9 @@ export const coinbaseDerivativesMappers = exchangeMappers({
 })
 
 class CoinbaseDerivativesTradesMapper implements Mapper<'coinbase-derivatives', Trade> {
+  // Besides the subscribe snapshot, Coinbase resends recent-trade snapshots mid-connection, each followed by an update with the preceding older trades.
+  private readonly _snapshotTradeIds = new Map<string, number>()
+
   canHandle(message: CoinbaseDerivativesTrade) {
     return message.channel === 'market_trades'
   }
@@ -23,11 +26,19 @@ class CoinbaseDerivativesTradesMapper implements Mapper<'coinbase-derivatives', 
 
   *map(message: CoinbaseDerivativesTrade, localTimestamp: Date): IterableIterator<Trade> {
     for (const event of message.events) {
-      if (event.type !== 'update') {
+      if (event.type === 'snapshot') {
+        for (const trade of event.trades) {
+          const tradeId = Number(trade.trade_id)
+          this._snapshotTradeIds.set(trade.product_id, Math.max(tradeId, this._snapshotTradeIds.get(trade.product_id) ?? tradeId))
+        }
         continue
       }
 
       for (const trade of event.trades) {
+        if (Number(trade.trade_id) <= (this._snapshotTradeIds.get(trade.product_id) ?? 0)) {
+          continue
+        }
+
         yield {
           type: 'trade',
           exchange: 'coinbase-derivatives',

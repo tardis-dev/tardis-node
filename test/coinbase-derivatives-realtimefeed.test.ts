@@ -4,11 +4,7 @@ import { WebSocketServer } from 'ws'
 import * as handy from '../dist/handy.js'
 import { assert } from './assertions.ts'
 
-const products = [
-  { product_id: 'FIRST-CDE', product_venue: 'FCM', future_product_details: { venue: 'cde' } },
-  { product_id: 'SECOND-CDE', product_venue: 'OTHER', future_product_details: { venue: 'other' } },
-  { product_id: 'THIRD-CDE' }
-]
+const products = [{ product_id: 'FIRST-CDE' }, { product_id: 'SECOND-CDE' }, { product_id: 'THIRD-CDE' }]
 
 mock.module('../dist/handy.js', {
   exports: {
@@ -101,7 +97,7 @@ test('Coinbase derivatives rejects a book subscription without products', async 
   await assert.rejects(feed.next(), /require explicit symbols/)
 })
 
-test('Coinbase derivatives preserves all REST products regardless of venue', { timeout: 5000 }, async () => {
+test('Coinbase derivatives streams every REST products page without requested symbols', { timeout: 5000 }, async () => {
   const output = []
   for await (const { message } of stream({ exchange: 'coinbase-derivatives', filters: [{ channel: 'products' }] })) {
     output.push(message)
