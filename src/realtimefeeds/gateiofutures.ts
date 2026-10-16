@@ -50,14 +50,17 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
       )
     }
 
-    const deliveryContractsFilters = filters.reduce(
-      this._only((s) => /_USDT_\d{8}$/.test(s)),
-      [] as Filter<string>[]
-    )
+    // Gate has no public liquidations channel for delivery futures
+    if (filters.every((filter) => filter.channel === 'public_liquidates' && filter.symbols!.every((s) => /_USDT_\d{8}$/.test(s)))) {
+      throw new Error('Gate.io delivery futures do not support public_liquidates')
+    }
+    const deliveryContractsFilters = filters
+      .filter((filter) => filter.channel !== 'public_liquidates')
+      .reduce(
+        this._only((s) => /_USDT_\d{8}$/.test(s)),
+        [] as Filter<string>[]
+      )
     if (deliveryContractsFilters.length > 0) {
-      if (deliveryContractsFilters.some((filter) => filter.channel === 'public_liquidates')) {
-        throw new Error('Gate.io delivery futures do not support public_liquidates')
-      }
       yield new GateIOFuturesSingleConnectionRealTimeFeed(
         'wss://fx-ws.gateio.ws/v4/ws/delivery/usdt',
         100,

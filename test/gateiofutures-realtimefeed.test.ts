@@ -31,7 +31,7 @@ test('Gate routes mixed markets into separate subscriptions and retains decimal 
     filters: [
       { channel: 'obu', symbols },
       { channel: 'trades', symbols },
-      { channel: 'public_liquidates', symbols: ['ETH_USDT', 'BTC_USD1'] },
+      { channel: 'public_liquidates', symbols: ['ETH_USDT', 'BTC_USD1', 'ETH_USDT_20261023'] },
       { channel: 'order_book', symbols: ['BTC_USDT'] }
     ]
   })
@@ -56,6 +56,13 @@ test('Gate routes mixed markets into separate subscriptions and retains decimal 
       assert.deepStrictEqual(trade.payload.sort(), bookSymbols.sort())
     }
     assert.deepStrictEqual(subscriptions.find((s) => s.channel === 'futures.order_book').payload, ['BTC_USDT', '20', '0'])
+    assert.deepStrictEqual(
+      subscriptions
+        .filter((s) => s.channel === 'futures.public_liquidates')
+        .flatMap((s) => s.payload)
+        .sort(),
+      ['BTC_USD1', 'ETH_USDT']
+    )
   } finally {
     await messages.return!()
     for (const socket of server.clients) socket.terminate()
