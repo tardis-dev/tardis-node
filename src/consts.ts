@@ -476,7 +476,7 @@ const DELTA_CHANNELS = [
 ] as const
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
-const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
+const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker', 'obu', 'public_liquidates'] as const
 const MEXC_FUTURES_CHANNELS = [
   'push.deal',
   'push.depth',

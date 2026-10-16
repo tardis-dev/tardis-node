@@ -26,6 +26,25 @@ beforeEach(() => {
 
 afterEach(() => restoreEnv(originalEnv))
 
+test('Gate futures replay switches books at the October 20 OBU cutover', () => {
+  const switchDate = date('2026-10-20T00:00:00.000Z')
+  const beforeSwitch = normalizeBookChanges('gate-io-futures', date('2026-10-19T23:59:59.999Z'))
+  const afterSwitch = normalizeBookChanges('gate-io-futures', switchDate)
+
+  assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('gate-io-futures'), [switchDate])
+  assert.deepStrictEqual(beforeSwitch.getFilters(['btc_usdt']), [{ channel: 'order_book', symbols: ['BTC_USDT'] }])
+  assert.deepStrictEqual(afterSwitch.getFilters(['btc_usdt']), [{ channel: 'obu', symbols: ['BTC_USDT'] }])
+  assert.deepStrictEqual(afterSwitch.getFilters(), [{ channel: 'obu', symbols: undefined }])
+  assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), true)
+  assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), false)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), false)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), true)
+  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'all' }), true)
+  assert.deepStrictEqual(normalizeLiquidations('gate-io-futures', switchDate).getFilters(['btc_usd1']), [
+    { channel: 'public_liquidates', symbols: ['BTC_USD1'] }
+  ])
+})
+
 test('Bybit replay uses the raw channels recorded on each side of its API migrations', () => {
   assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
     { channel: 'trade', symbols: ['BTCUSD'] }

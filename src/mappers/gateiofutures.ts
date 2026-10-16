@@ -1,18 +1,76 @@
-import { upperCaseSymbols } from '../handy.ts'
-import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker } from '../types.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, upperCaseSymbols } from '../handy.ts'
+import { BookChange, DerivativeTicker, Exchange, Trade, BookTicker, Liquidation } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
-import { exchangeMappers } from './registry.ts'
+import { exchangeMappers, mapper } from './registry.ts'
 
 // https://www.gate.io/docs/futures/ws/index.html
 
 export const gateIOFuturesMappers = exchangeMappers({
   'gate-io-futures': {
     trades: () => new GateIOFuturesTradesMapper('gate-io-futures'),
-    bookChanges: () => new GateIOFuturesBookChangeMapper('gate-io-futures'),
+    bookChanges: mapper([
+      { until: new Date('2026-10-20T00:00:00.000Z'), use: () => new GateIOFuturesBookChangeMapper('gate-io-futures') },
+      { use: () => new GateIOFuturesOrderBookV2Mapper() }
+    ]),
     derivativeTickers: () => new GateIOFuturesDerivativeTickerMapper(),
-    bookTickers: () => new GateIOFuturesBookTickerMapper('gate-io-futures')
+    bookTickers: () => new GateIOFuturesBookTickerMapper('gate-io-futures'),
+    liquidations: () => new GateIOFuturesLiquidationsMapper()
   }
 })
+
+class GateIOFuturesOrderBookV2Mapper implements Mapper<'gate-io-futures', BookChange> {
+  canHandle(message: GateIOFuturesOrderBookV2) {
+    return message.channel === 'futures.obu' && (message.event === 'update' || message.event === 'all')
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'obu', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map({ result }: GateIOFuturesOrderBookV2, localTimestamp: Date): IterableIterator<BookChange> {
+    yield {
+      type: 'book_change',
+      symbol: result.s.slice(3, result.s.lastIndexOf('.')),
+      exchange: 'gate-io-futures',
+      isSnapshot: result.full === true,
+      bids: (result.b ?? []).map(this.mapBookLevel),
+      asks: (result.a ?? []).map(this.mapBookLevel),
+      timestamp: new Date(result.t),
+      localTimestamp
+    }
+  }
+
+  private mapBookLevel([price, amount]: [string, string]) {
+    return { price: Number(price), amount: Number(amount) }
+  }
+}
+
+class GateIOFuturesLiquidationsMapper implements Mapper<'gate-io-futures', Liquidation> {
+  canHandle(message: GateIOFuturesLiquidations) {
+    return message.channel === 'futures.public_liquidates' && message.event === 'update'
+  }
+
+  getFilters(symbols?: string[]) {
+    return [{ channel: 'public_liquidates', symbols: upperCaseSymbols(symbols) } as const]
+  }
+
+  *map(message: GateIOFuturesLiquidations, localTimestamp: Date): IterableIterator<Liquidation> {
+    for (const liquidation of message.result) {
+      const size = Number(liquidation.size)
+      yield {
+        type: 'liquidation',
+        symbol: liquidation.contract,
+        exchange: 'gate-io-futures',
+        id: undefined,
+        price: Number(liquidation.price),
+        amount: Math.abs(size),
+        side: size < 0 ? 'sell' : 'buy',
+        timestamp: new Date(liquidation.time),
+        localTimestamp
+      }
+    }
+  }
+}
 
 class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
@@ -147,8 +205,12 @@ class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futures', D
 
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(futuresTicker.contract, 'gate-io-futures')
 
-      pendingTickerInfo.updateFundingRate(Number(futuresTicker.funding_rate))
-      pendingTickerInfo.updatePredictedFundingRate(Number(futuresTicker.funding_rate_indicative))
+      pendingTickerInfo.updateFundingRate(asNumberOrUndefined(futuresTicker.funding_rate))
+      pendingTickerInfo.updatePredictedFundingRate(asNumberOrUndefined(futuresTicker.funding_rate_indicative))
+      const fundingNextApply = asNonZeroNumberOrUndefined(futuresTicker.funding_next_apply)
+      if (fundingNextApply !== undefined) {
+        pendingTickerInfo.updateFundingTimestamp(new Date(fundingNextApply * 1000))
+      }
       pendingTickerInfo.updateIndexPrice(Number(futuresTicker.index_price))
       pendingTickerInfo.updateMarkPrice(Number(futuresTicker.mark_price))
       pendingTickerInfo.updateLastPrice(Number(futuresTicker.last))
@@ -263,6 +325,7 @@ type GateIOFuturesTicker = {
           contract: string
           last: string
           funding_rate: string
+          funding_next_apply?: number
           mark_price: string
           index_price: string
           funding_rate_indicative: string
@@ -273,6 +336,7 @@ type GateIOFuturesTicker = {
         contract: string
         last: string
         funding_rate: string
+        funding_next_apply?: number
         mark_price: string
         index_price: string
         funding_rate_indicative: string
@@ -287,4 +351,22 @@ type GateIOFuturesBookTicker = {
   event: 'update'
   error: null
   result: { t: number; u: 3502782378; s: 'BTC_USD'; b: string; B: number | string; a: string; A: number | string }
+}
+
+type GateIOFuturesOrderBookV2 = {
+  channel: 'futures.obu'
+  event: 'update' | 'all'
+  result: {
+    s: string
+    t: number
+    full?: boolean
+    b?: [string, string][]
+    a?: [string, string][]
+  }
+}
+
+type GateIOFuturesLiquidations = {
+  channel: 'futures.public_liquidates'
+  event: 'update'
+  result: { contract: string; price: string; size: string | number; time: number }[]
 }

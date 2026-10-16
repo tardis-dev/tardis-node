@@ -9,16 +9,63 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     const inverseContractsFilters = filters.reduce(
-      this._only((s) => s.endsWith('_USDT') === false),
+      this._only((s) => s.endsWith('_USD')),
       [] as Filter<string>[]
     )
 
     if (linearContractsFilters.length > 0) {
-      yield new GateIOFuturesSingleConnectionRealTimeFeed('usdt', exchange, linearContractsFilters, timeoutIntervalMS, onError)
+      yield new GateIOFuturesSingleConnectionRealTimeFeed(
+        'wss://fx-ws.gateio.ws/v4/ws/usdt',
+        400,
+        exchange,
+        linearContractsFilters,
+        timeoutIntervalMS,
+        onError
+      )
     }
 
     if (inverseContractsFilters.length > 0) {
-      yield new GateIOFuturesSingleConnectionRealTimeFeed('btc', exchange, inverseContractsFilters, timeoutIntervalMS, onError)
+      yield new GateIOFuturesSingleConnectionRealTimeFeed(
+        'wss://fx-ws.gateio.ws/v4/ws/btc',
+        400,
+        exchange,
+        inverseContractsFilters,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    const usd1ContractsFilters = filters.reduce(
+      this._only((s) => s.endsWith('_USD1')),
+      [] as Filter<string>[]
+    )
+    if (usd1ContractsFilters.length > 0) {
+      yield new GateIOFuturesSingleConnectionRealTimeFeed(
+        'wss://fx-ws.gateio.ws/v4/ws/usd1',
+        400,
+        exchange,
+        usd1ContractsFilters,
+        timeoutIntervalMS,
+        onError
+      )
+    }
+
+    const deliveryContractsFilters = filters.reduce(
+      this._only((s) => /_USDT_\d{8}$/.test(s)),
+      [] as Filter<string>[]
+    )
+    if (deliveryContractsFilters.length > 0) {
+      if (deliveryContractsFilters.some((filter) => filter.channel === 'public_liquidates')) {
+        throw new Error('Gate.io delivery futures do not support public_liquidates')
+      }
+      yield new GateIOFuturesSingleConnectionRealTimeFeed(
+        'wss://fx-ws.gateio.ws/v4/ws/delivery/usdt',
+        100,
+        exchange,
+        deliveryContractsFilters,
+        timeoutIntervalMS,
+        onError
+      )
     }
   }
 
@@ -26,6 +73,11 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     return (prev: Filter<string>[], current: Filter<string>) => {
       if (!current.symbols || current.symbols.length === 0) {
         throw new Error('GateIOFuturesRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+      }
+      for (const symbol of current.symbols) {
+        if (!/_(USD|USDT|USD1)$/.test(symbol) && !/_USDT_\d{8}$/.test(symbol)) {
+          throw new Error(`Unsupported Gate.io futures symbol: ${symbol}`)
+        }
       }
 
       const symbols = current.symbols.filter(filter)
@@ -41,28 +93,29 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 }
 
 class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
-  protected readonly wssURL: string
   protected readonly extraHeaders = { 'X-Gate-Size-Decimal': '1' }
+  private readonly bookSequences = new Map<string, number>()
 
   constructor(
-    wsURLSuffix: string,
+    protected readonly wssURL: string,
+    private readonly orderBookDepth: 100 | 400,
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
     onError?: (error: Error) => void
   ) {
     super(exchange, filters, timeoutIntervalMS, onError)
-    this.wssURL = `wss://fx-ws.gateio.ws/v4/ws/${wsURLSuffix}`
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
+    this.bookSequences.clear()
     const payload = filters.flatMap((filter) => {
-      if (filter.channel === 'order_book') {
+      if (filter.channel === 'order_book' || filter.channel === 'obu') {
         return filter.symbols!.map((symbol) => {
           return {
             event: 'subscribe',
             channel: `futures.${filter.channel}`,
-            payload: [symbol, '20', '0'],
+            payload: filter.channel === 'obu' ? [`ob.${symbol}.${this.orderBookDepth}`] : [symbol, '20', '0'],
             time: Math.floor(new Date().valueOf() / 1000)
           }
         })
@@ -79,6 +132,22 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     })
 
     return payload
+  }
+
+  protected onMessage(message: any) {
+    if (message.channel !== 'futures.obu' || (message.event !== 'update' && message.event !== 'all')) {
+      return
+    }
+
+    const { result } = message
+    const previous = this.bookSequences.get(result.s)
+    if (
+      !Number.isSafeInteger(result.u) ||
+      (result.full !== true && (previous === undefined || result.U !== previous + 1 || result.u < result.U))
+    ) {
+      throw new Error(`Gate.io OBU sequence gap for ${result.s}: previous=${previous}, U=${result.U}, u=${result.u}`)
+    }
+    this.bookSequences.set(result.s, result.u)
   }
 
   protected messageIsError(message: any): boolean {
