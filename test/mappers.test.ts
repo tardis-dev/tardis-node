@@ -9139,7 +9139,7 @@ describe('mappers', () => {
       else process.env.__NO_REAL_TIME__ = previous
     })
 
-    const timestamp = Date.parse('2026-10-20T00:00:00Z')
+    const timestamp = Date.parse('2026-10-21T00:00:00Z')
     const messages = [
       {
         channel: 'futures.order_book',
@@ -9201,7 +9201,7 @@ describe('mappers', () => {
 
     for (const [at, expected] of [
       [
-        '2026-10-19T23:59:59.999Z',
+        '2026-10-20T23:59:59.999Z',
         [
           [true, 1, 0],
           [false, 5, 2],
@@ -9209,7 +9209,7 @@ describe('mappers', () => {
         ]
       ],
       [
-        '2026-10-20T00:00:00.000Z',
+        '2026-10-21T00:00:00.000Z',
         [
           [true, 3, 1],
           [false, 6, 3],
@@ -9237,8 +9237,8 @@ describe('mappers', () => {
   })
 
   test('map Gate futures OBU snapshots, one-sided deltas, and delivery snapshots', () => {
-    const mapper = normalizeBookChanges('gate-io-futures', new Date('2026-10-20T00:00:00Z'))
-    const localTimestamp = new Date('2026-10-20T00:00:01Z')
+    const mapper = normalizeBookChanges('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
     // Gate OBU docs: native full snapshot, followed by an incremental deletion.
     const full = {
       channel: 'futures.obu',
@@ -9307,8 +9307,8 @@ describe('mappers', () => {
   })
 
   test('map every Gate liquidation in a batch using its own time and signed order size', () => {
-    const mapper = normalizeLiquidations('gate-io-futures', new Date('2026-10-20T00:00:00Z'))
-    const localTimestamp = new Date('2026-10-20T00:00:01Z')
+    const mapper = normalizeLiquidations('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
     const message = {
       channel: 'futures.public_liquidates',
       event: 'update',
@@ -9386,8 +9386,8 @@ describe('mappers', () => {
   })
 
   test('Gate delivery tickers leave empty funding fields undefined', () => {
-    const mapper = normalizeDerivativeTickers('gate-io-futures', new Date('2026-10-20T00:00:00Z'))
-    const localTimestamp = new Date('2026-10-20T00:00:01Z')
+    const mapper = normalizeDerivativeTickers('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
     const message = {
       time: 1791797256,
       time_ms: 1791797256796,
