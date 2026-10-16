@@ -9,7 +9,7 @@ export const gateIOFuturesMappers = exchangeMappers({
   'gate-io-futures': {
     trades: () => new GateIOFuturesTradesMapper('gate-io-futures'),
     bookChanges: mapper([
-      { until: new Date('2026-10-14T00:00:00.000Z'), use: () => new GateIOFuturesBookChangeMapper('gate-io-futures') },
+      { until: new Date('2026-10-20T00:00:00.000Z'), use: () => new GateIOFuturesBookChangeMapper('gate-io-futures') },
       { use: () => new GateIOFuturesOrderBookV2Mapper() }
     ]),
     derivativeTickers: () => new GateIOFuturesDerivativeTickerMapper(),

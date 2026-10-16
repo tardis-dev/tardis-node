@@ -26,9 +26,9 @@ beforeEach(() => {
 
 afterEach(() => restoreEnv(originalEnv))
 
-test('Gate futures replay switches books at the October 14 OBU cutover', () => {
-  const switchDate = date('2026-10-14T00:00:00.000Z')
-  const beforeSwitch = normalizeBookChanges('gate-io-futures', date('2026-10-13T23:59:59.999Z'))
+test('Gate futures replay switches books at the October 20 OBU cutover', () => {
+  const switchDate = date('2026-10-20T00:00:00.000Z')
+  const beforeSwitch = normalizeBookChanges('gate-io-futures', date('2026-10-19T23:59:59.999Z'))
   const afterSwitch = normalizeBookChanges('gate-io-futures', switchDate)
 
   assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('gate-io-futures'), [switchDate])
