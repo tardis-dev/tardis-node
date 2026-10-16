@@ -437,7 +437,13 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
 
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
     const wsFilters = filters.filter(
-      (f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades' && f.channel !== 'fundingInfo' && f.channel !== 'insuranceBalance'
+      (f) =>
+        f.channel !== 'openInterest' &&
+        f.channel !== 'recentTrades' &&
+        f.channel !== 'fundingInfo' &&
+        f.channel !== 'fundingRate' &&
+        f.channel !== 'insuranceBalance' &&
+        f.channel !== 'tradingSession'
     )
 
     const publicWsFilters = wsFilters.filter((f) => BINANCE_FUTURES_PUBLIC_CHANNELS.has(f.channel))
