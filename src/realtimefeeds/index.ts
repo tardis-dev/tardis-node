@@ -33,6 +33,7 @@ import { OKCoinRealTimeFeed, OkexOptionsRealTimeFeed, OkexRealTimeFeed } from '.
 import { RealTimeFeed } from './realtimefeed.ts'
 import { PhemexRealTimeFeed } from './phemex.ts'
 import { DeltaRealTimeFeed } from './delta.ts'
+import { DeltaIndiaRealTimeFeed } from './delta_india.ts'
 import { GateIORealTimeFeed } from './gateio.ts'
 import { GateIOFuturesRealTimeFeed } from './gateiofutures.ts'
 import { PoloniexRealTimeFeed } from './poloniex.ts'
@@ -99,6 +100,7 @@ const realTimeFeedsMap: {
   hitbtc: HitBtcRealTimeFeed,
   phemex: PhemexRealTimeFeed,
   delta: DeltaRealTimeFeed,
+  'delta-india': DeltaIndiaRealTimeFeed,
   'gate-io': GateIORealTimeFeed,
   'gate-io-futures': GateIOFuturesRealTimeFeed,
   'mexc-futures': MexcFuturesRealTimeFeed,
