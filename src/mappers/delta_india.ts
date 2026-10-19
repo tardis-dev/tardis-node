@@ -105,6 +105,7 @@ class DeltaIndiaBookTickerMapper implements Mapper<'delta-india', BookTicker> {
 
 class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', DerivativeTicker> {
   private readonly pending = new PendingTickerInfoHelper()
+  private readonly markPriceTimestamps = new Map<string, number>()
 
   canHandle(message: DeltaIndiaTicker | DeltaIndiaPrice | DeltaIndiaFunding) {
     return message.type === 'ticker' || message.type === 'mark_price' || message.type === 'funding_rate'
@@ -132,7 +133,11 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
 
       const pending = this.pending.getPendingTickerInfo(symbol, 'delta-india')
       if (message.type === 'mark_price') {
-        pending.updateMarkPrice(asNumberOrUndefined(message.p))
+        const price = this.getUpdatedMarkPrice(symbol, message.p, message.ts)
+        if (price === undefined) {
+          return
+        }
+        pending.updateMarkPrice(price)
       } else {
         // Delta publishes funding rates in percentage points; normalized rates are fractions.
         pending.updateFundingRate(Number(message.fr) / 100)
@@ -154,7 +159,7 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
       const pending = this.pending.getPendingTickerInfo(ticker.s, 'delta-india')
       pending.updateLastPrice(asNumberOrUndefined(ticker.ohlc[3]))
       pending.updateOpenInterest(asNumberOrUndefined(ticker.oi[0]))
-      pending.updateMarkPrice(asNumberOrUndefined(ticker.m))
+      pending.updateMarkPrice(this.getUpdatedMarkPrice(ticker.s, ticker.m, message.ts))
       pending.updateIndexPrice(asNumberOrUndefined(message.sp))
       pending.updateTimestamp(timestamp)
 
@@ -162,6 +167,18 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
         yield pending.getSnapshot(localTimestamp)
       }
     }
+  }
+
+  private getUpdatedMarkPrice(symbol: string, value: string | null, timestamp: number) {
+    const price = asNumberOrUndefined(value)
+    const previousTimestamp = this.markPriceTimestamps.get(symbol)
+    // The slower ticker can arrive after a newer mark_price message, and vice versa.
+    if (price === undefined || (previousTimestamp !== undefined && timestamp < previousTimestamp)) {
+      return undefined
+    }
+
+    this.markPriceTimestamps.set(symbol, timestamp)
+    return price
   }
 }
 
