@@ -180,6 +180,7 @@ class DeltaIndiaOptionSummaryMapper implements Mapper<'delta-india', OptionSumma
         continue
       }
       const [side, asset, strike, expiry] = ticker.s.split('-')
+
       yield {
         type: 'option_summary',
         exchange: 'delta-india',
