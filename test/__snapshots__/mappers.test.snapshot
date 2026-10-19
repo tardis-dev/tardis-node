@@ -8866,6 +8866,223 @@ exports[`mappers > map delta messages 9`] = `
 ]
 `;
 
+exports[`mappers > map delta-india captured messages 1`] = `
+[]
+`;
+
+exports[`mappers > map delta-india captured messages 10`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSD",
+    "exchange": "delta-india",
+    "lastPrice": 81273,
+    "openInterest": 900452,
+    "fundingRate": 0.00009767216431809645,
+    "fundingTimestamp": "2026-10-17T00:00:00.000000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 81300.5,
+    "markPrice": 81273.22788379,
+    "timestamp": "2026-10-16T18:08:51.039698Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 11`] = `
+[]
+`;
+
+exports[`mappers > map delta-india captured messages 2`] = `
+[
+  {
+    "type": "trade",
+    "exchange": "delta-india",
+    "symbol": "BTCUSD",
+    "id": undefined,
+    "price": 81273,
+    "amount": 1,
+    "side": "sell",
+    "timestamp": "2026-10-16T18:08:17.937549Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "delta-india",
+    "symbol": "BTCUSD",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 81273,
+        "amount": 3975
+      },
+      {
+        "price": 81272.5,
+        "amount": 4864
+      }
+    ],
+    "asks": [
+      {
+        "price": 81273.5,
+        "amount": 2200
+      },
+      {
+        "price": 81274,
+        "amount": 2692
+      }
+    ],
+    "timestamp": "2026-10-16T18:08:17.661813Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "delta-india",
+    "symbol": "BTCUSD",
+    "isSnapshot": false,
+    "bids": [
+      {
+        "price": 81273,
+        "amount": 3976
+      },
+      {
+        "price": 81140,
+        "amount": 87
+      }
+    ],
+    "asks": [],
+    "timestamp": "2026-10-16T18:08:17.914853Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 5`] = `
+[
+  {
+    "type": "book_ticker",
+    "exchange": "delta-india",
+    "symbol": "P-BTC-81000-191026",
+    "askPrice": 522,
+    "askAmount": 4416,
+    "bidPrice": 509,
+    "bidAmount": 6974,
+    "timestamp": "2026-10-16T18:08:17.379946Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 6`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSD",
+    "exchange": "delta-india",
+    "lastPrice": 81273,
+    "openInterest": 900452,
+    "fundingRate": undefined,
+    "fundingTimestamp": undefined,
+    "predictedFundingRate": undefined,
+    "indexPrice": 81300.5,
+    "markPrice": 81273.57777161,
+    "timestamp": "2026-10-16T18:08:18.711724Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 7`] = `
+[]
+`;
+
+exports[`mappers > map delta-india captured messages 8`] = `
+[
+  {
+    "type": "option_summary",
+    "exchange": "delta-india",
+    "symbol": "C-BTC-84800-191026",
+    "optionType": "call",
+    "strikePrice": 84800,
+    "expirationDate": "2026-10-19T12:00:00.000Z",
+    "bestAskPrice": 30,
+    "bestAskAmount": 4416,
+    "bestBidPrice": 27,
+    "bestBidAmount": 8175,
+    "bestAskIV": 0.27389662,
+    "bestBidIV": 0.26869746,
+    "markIV": 0.27121047,
+    "lastPrice": 26,
+    "openInterest": 19987,
+    "markPrice": 28.4243224,
+    "delta": 0.03757211,
+    "gamma": 0.00004281,
+    "rho": 0.22751967,
+    "theta": -28.53879568,
+    "vega": 5.77273691,
+    "underlyingPrice": 81300.5,
+    "underlyingIndex": ".DEXBTUSD",
+    "timestamp": "2026-10-16T18:08:18.711724Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  },
+  {
+    "type": "option_summary",
+    "exchange": "delta-india",
+    "symbol": "P-BTC-84800-191026",
+    "optionType": "put",
+    "strikePrice": 84800,
+    "expirationDate": "2026-10-19T12:00:00.000Z",
+    "bestAskPrice": 3515,
+    "bestAskAmount": 4424,
+    "bestBidPrice": 3466,
+    "bestBidAmount": 6624,
+    "bestAskIV": 0.24465265,
+    "bestBidIV": 0.000005,
+    "markIV": 0.06366652,
+    "lastPrice": 3445,
+    "openInterest": 80,
+    "markPrice": 3499.50008017,
+    "delta": -1,
+    "gamma": 0,
+    "rho": -6.37567681,
+    "theta": 0,
+    "vega": 0,
+    "underlyingPrice": 81300.5,
+    "underlyingIndex": ".DEXBTUSD",
+    "timestamp": "2026-10-16T18:08:18.711724Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
+exports[`mappers > map delta-india captured messages 9`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSD",
+    "exchange": "delta-india",
+    "lastPrice": 81273,
+    "openInterest": 900452,
+    "fundingRate": 0.00009767216431809645,
+    "fundingTimestamp": "2026-10-17T00:00:00.000000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 81300.5,
+    "markPrice": 81273.57777161,
+    "timestamp": "2026-10-16T18:08:51.039698Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
+`;
+
 exports[`mappers > map deribit messages 1`] = `
 [
   {

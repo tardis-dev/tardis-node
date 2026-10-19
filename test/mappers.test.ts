@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'delta-india',
   'coinbase-derivatives',
   'bitstamp',
   'aster-futures',
@@ -48,6 +49,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'delta-india',
   'coinbase-derivatives',
   'aster',
   'aster-futures',
@@ -101,6 +103,7 @@ const exchangesWithBookTickerInfo: Exchange[] = [
 ]
 
 const exchangesWithOptionsSummary: Exchange[] = [
+  'delta-india',
   'cryptofacilities',
   'deribit',
   'okex-options',
@@ -173,6 +176,191 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  test('map delta-india captured messages', () => {
+    // Captured from the India public socket on 2026-10-16; book levels and option batches trimmed.
+    const messages = [
+      {
+        channels: [
+          {
+            name: 'trades',
+            symbols: ['BTCUSD', 'BTC_INR', 'C-BTC-80000-191026']
+          },
+          {
+            name: 'ob_updates',
+            symbols: ['BTCUSD', 'BTC_INR', 'C-BTC-80000-191026']
+          },
+          {
+            name: 'ob_l1',
+            symbols: ['BTCUSD', 'BTC_INR', 'BTC-191026']
+          },
+          {
+            name: 'ticker',
+            symbols: ['BTCUSD', 'BTC_INR', 'BTC-191026']
+          },
+          {
+            name: 'mark_price',
+            symbols: ['MARK:BTCUSD', 'MARK:C-BTC-80000-191026']
+          },
+          {
+            name: 'funding_rate',
+            symbols: ['BTCUSD']
+          },
+          {
+            name: 'spot_price',
+            symbols: ['.DEXBTUSD']
+          }
+        ],
+        type: 'subscriptions'
+      },
+      {
+        p: '81273.0',
+        r: 'm',
+        s: 1.0,
+        sy: 'BTCUSD',
+        t: 1792174097937549,
+        ts: 1792174098002376,
+        type: 'trades'
+      },
+      {
+        a: [
+          ['81273.5', '2200'],
+          ['81274.0', '2692']
+        ],
+        action: 'snapshot',
+        b: [
+          ['81273.0', '3975'],
+          ['81272.5', '4864']
+        ],
+        cs: 3109108501,
+        seq: 14200199,
+        sy: 'BTCUSD',
+        ts: 1792174097661813,
+        type: 'ob_updates'
+      },
+      {
+        a: [],
+        action: 'update',
+        b: [
+          ['81273.0', '3976'],
+          ['81140.0', '87']
+        ],
+        cs: 3143118289,
+        seq: 14200200,
+        sy: 'BTCUSD',
+        ts: 1792174097914853,
+        type: 'ob_updates'
+      },
+      {
+        ap: '522.0',
+        as: '4416',
+        bp: '509.0',
+        bs: '6974',
+        lts: 1792174097379946,
+        sy: 'P-BTC-81000-191026',
+        ts: 1792174097903963,
+        type: 'ob_l1'
+      },
+      {
+        d: [
+          {
+            g: [null, null, null, null, null],
+            i: 27,
+            m: '81273.57777161',
+            m24hc: '-1.1681',
+            ohlc: [82303.5, 82900.5, 80780.0, 81273.0],
+            oi: ['900452', '4287192.4100'],
+            pb: ['77206.51791868', '85333.51980486'],
+            q: ['81273.5', '3019', '81273', '3859', null],
+            qiv: [null, null, '-0.36593923'],
+            s: 'BTCUSD',
+            to: [1096022424.5884914, 1096022424.5884914]
+          }
+        ],
+        sp: '81300.5',
+        sy: 'BTCUSD',
+        ts: 1792174098711724,
+        type: 'ticker'
+      },
+      {
+        d: [
+          {
+            g: [null, null, null, null, null],
+            i: 117569,
+            m: null,
+            m24hc: '0.0000',
+            ohlc: [8313570.5, 8383023.5, 8120491.0, 8204892.0],
+            oi: ['0', '0.0000'],
+            pb: [null, null],
+            q: [null, null, null, null, null],
+            qiv: [null, null, null],
+            s: 'BTC_INR',
+            to: [0.1112030000000002, 10807.844792449998]
+          }
+        ],
+        sp: '8170710.3',
+        sy: 'BTC_INR',
+        ts: 1792174098711724,
+        type: 'ticker'
+      },
+      {
+        d: [
+          {
+            g: ['0.03757211', '0.00004281', '0.22751967', '-28.53879568', '5.77273691'],
+            i: 158697,
+            m: '28.4243224',
+            m24hc: '5831.3180',
+            ohlc: [118.0, 118.0, 20.0, 26.0],
+            oi: ['19987', '0.0000'],
+            pb: ['0.1', '394.16756097'],
+            q: ['30', '4416', '27', '8175', null],
+            qiv: ['0.27389662', '0.26869746', '0.27121047'],
+            s: 'C-BTC-84800-191026',
+            to: [2783010.7404, 2783010.7404]
+          },
+          {
+            g: ['-1.00000000', '0.00000000', '-6.37567681', '-0.00000000', '0.00000000'],
+            i: 158678,
+            m: '3499.50008017',
+            m24hc: '61.2695',
+            ohlc: [2514.0, 3861.0, 2362.0, 3445.0],
+            oi: ['80', '0.0000'],
+            pb: ['1873.97007999', '5126.03007999'],
+            q: ['3515', '4424', '3466', '6624', null],
+            qiv: ['0.24465265', '0.000005', '0.06366652'],
+            s: 'P-BTC-84800-191026',
+            to: [13590.4407, 13590.4407]
+          }
+        ],
+        sp: '81300.5',
+        sy: 'BTC-191026',
+        ts: 1792174098711724,
+        type: 'ticker'
+      },
+      {
+        fi: 28800,
+        fr: 0.009767216431809646,
+        nfr: 1792195200000000,
+        sy: 'BTCUSD',
+        ts: 1792174131039698,
+        type: 'funding_rate'
+      },
+      {
+        p: '81273.22788379',
+        sy: 'MARK:BTCUSD',
+        ts: 1792174098648749,
+        type: 'mark_price'
+      },
+      {
+        p: 81300.2,
+        sy: '.DEXBTUSD',
+        ts: null,
+        type: 'spot_price'
+      }
+    ]
+    const mapper = createMapper('delta-india')
+    for (const message of messages) snapshot(mapper.map(message, new Date('2026-10-16T18:08:20.123Z')))
+  })
+
   test('map Coinbase derivatives captured messages', () => {
     const messages = [
       {
@@ -14926,4 +15114,113 @@ test('map polymarket messages', () => {
     const mappedMessages = mapper.map(message, localTimestamp)
     snapshot(mappedMessages)
   }
+})
+
+test('Delta India maps trade event times, contract amounts, buyer role and empty quotes', () => {
+  const now = new Date('2026-10-16T18:00:00Z')
+  const trades = normalizeTrades('delta-india', now)
+  const source = { type: 'trades', sy: 'BTC_INR', p: '8000000.1', s: 0.000001, r: 'm', t: 1792174097937549, ts: 1792174098002376 }
+  const [trade] = [...trades.map(source, now)!]
+  assert.equal(trade.amount, 0.000001)
+  assert.equal(trade.side, 'sell')
+  assert.equal(trade.timestamp.toISOString(), '2026-10-16T18:08:17.937Z')
+  assert.equal(trade.timestamp.μs, 549)
+  assert.strictEqual(trade.localTimestamp, now)
+  assert.equal([...trades.map({ ...source, r: 't' }, now)!][0].side, 'buy')
+  const bbo = normalizeBookTickers('delta-india', now)
+  const [quote] = [...bbo.map({ type: 'ob_l1', sy: 'BTCUSD', ap: '0', as: '0', bp: null, bs: '', lts: source.t, ts: source.ts }, now)!]
+  assert.equal(quote.askPrice, undefined)
+  assert.equal(quote.bidPrice, undefined)
+  assert.equal(quote.askAmount, undefined)
+  assert.equal(quote.bidAmount, undefined)
+  assert.equal(quote.timestamp.μs, 549)
+})
+
+test('Delta India books wait for snapshots and reset after snapshot-load errors', () => {
+  const now = new Date('2026-10-16T18:00:00Z')
+  const books = normalizeBookChanges('delta-india', now)
+  const update = { type: 'ob_updates', action: 'update', sy: 'BTCUSD', a: [['101', '0']], b: [['100', '2']], ts: 1792174097937549 }
+  assert.deepEqual([...books.map(update, now)!], [])
+  const [snapshot] = [...books.map({ ...update, action: 'snapshot' }, now)!]
+  assert.equal(snapshot.isSnapshot, true)
+  const [delta] = [...books.map(update, now)!]
+  assert.equal(delta.isSnapshot, false)
+  assert.deepEqual(delta.asks, [{ price: 101, amount: 0 }])
+  assert.deepEqual([...books.map({ type: 'ob_updates', action: 'error', symbol: 'BTCUSD' }, now)!], [])
+  assert.deepEqual([...books.map(update, now)!], [])
+  assert.equal([...books.map({ ...update, action: 'snapshot' }, now)!][0].isSnapshot, true)
+})
+
+test('Delta India ticker mappings preserve zero values, option greeks and funding units', () => {
+  const now = new Date('2026-10-16T18:00:00Z')
+  const ts = 1792174097937549
+  const ticker = {
+    s: 'BTCUSD',
+    m: '80000',
+    ohlc: [80000, 80000, 80000, 80000],
+    oi: ['1', '0'],
+    q: ['1', '2', '3', '4', null],
+    qiv: ['0.25', '0', '-0.1'],
+    g: ['0', '0.1', '0.2', '-0.3', '0.4']
+  }
+  const derivative = normalizeDerivativeTickers('delta-india', now)
+  const [initial] = [...derivative.map({ type: 'ticker', ts, sp: '79999', d: [ticker] }, now)!]
+  assert.equal(initial.indexPrice, 79999)
+  assert.equal(initial.openInterest, 1)
+  const [zero] = [...derivative.map({ type: 'ticker', ts: ts + 1000, sp: '79999', d: [{ ...ticker, oi: ['0', '0'] }] }, now)!]
+  assert.equal(zero.openInterest, 0)
+  const [funding] = [...derivative.map({ type: 'funding_rate', sy: 'BTCUSD', fr: 0.01, nfr: 1792195200000000, ts: ts + 2000 }, now)!]
+  assert.equal(funding.fundingRate, 0.0001)
+  assert.equal(funding.fundingTimestamp!.toISOString(), '2026-10-17T00:00:00.000Z')
+  assert.equal(
+    [...derivative.map({ type: 'funding_rate', sy: 'BTCUSD', fr: 0, nfr: 1792195200000000, ts: ts + 3000 }, now)!][0].fundingRate,
+    0
+  )
+  assert.deepEqual([...derivative.map({ type: 'mark_price', sy: 'MARK:C-BTC-80000-191026', p: '1', ts }, now)!], [])
+  assert.deepEqual([...derivative.map({ type: 'ticker', ts, sp: '79999', d: [{ ...ticker, s: 'BTC_INR' }] }, now)!], [])
+  const options = normalizeOptionsSummary('delta-india', now)
+  const [option] = [
+    ...options.map({ type: 'ticker', ts, sp: '79999', d: [{ ...ticker, s: 'C-BTC-80000-191026', oi: ['0', '0'] }, ticker] }, now)!
+  ]
+  assert.equal(option.expirationDate.toISOString(), '2026-10-19T12:00:00.000Z')
+  assert.equal(option.strikePrice, 80000)
+  assert.equal(option.optionType, 'call')
+  assert.equal(option.bestAskPrice, 1)
+  assert.equal(option.bestAskAmount, 2)
+  assert.equal(option.bestBidPrice, 3)
+  assert.equal(option.bestBidAmount, 4)
+  assert.equal(option.bestAskIV, 0.25)
+  assert.equal(option.bestBidIV, 0)
+  assert.equal(option.markIV, undefined)
+  assert.equal(option.openInterest, 0)
+  assert.equal(option.delta, 0)
+  assert.equal(option.gamma, 0.1)
+  assert.equal(option.rho, 0.2)
+  assert.equal(option.theta, -0.3)
+  assert.equal(option.vega, 0.4)
+  assert.equal(option.underlyingIndex, '.DEXBTUSD')
+  assert.equal(option.underlyingPrice, 79999)
+  const [put] = [
+    ...options.map(
+      {
+        type: 'ticker',
+        ts,
+        sp: null,
+        d: [
+          {
+            ...ticker,
+            s: 'P-ETH-3000-191026',
+            q: [null, null, null, null, null],
+            qiv: [null, null, null],
+            g: [null, null, null, null, null]
+          }
+        ]
+      },
+      now
+    )!
+  ]
+  assert.equal(put.optionType, 'put')
+  assert.equal(put.underlyingIndex, '.DEETHUSD')
+  assert.equal(put.underlyingPrice, undefined)
+  assert.equal(put.delta, undefined)
 })
