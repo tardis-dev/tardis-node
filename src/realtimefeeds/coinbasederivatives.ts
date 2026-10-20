@@ -1,5 +1,5 @@
 import { Writable } from 'node:stream'
-import { batch, getJSON, optimizeFilters } from '../handy.ts'
+import { getJSON, optimizeFilters } from '../handy.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
@@ -12,16 +12,8 @@ export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeed
       }
     }
 
-    const symbols = [...new Set(wsFilters.flatMap((f) => f.symbols ?? []))]
-    const groups: Iterable<string[]> = symbols.length > 0 ? batch(symbols, 25) : wsFilters.length > 0 ? [[]] : []
-    for (const group of groups) {
-      const groupedFilters = wsFilters
-        .map((f) => ({
-          ...f,
-          symbols: f.symbols?.filter((s) => group.includes(s))
-        }))
-        .filter((f) => f.symbols?.length || ['heartbeats', 'subscriptions'].includes(f.channel))
-      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, groupedFilters, timeoutIntervalMS, onError)
+    if (wsFilters.length > 0) {
+      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError)
     }
 
     const productFilters = filters.filter((f) => f.channel === 'products')

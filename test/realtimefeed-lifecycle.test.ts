@@ -270,7 +270,7 @@ test('does not let an old onConnected task subscribe on a reconnected socket', a
     await waitFor(() => connectedCalls === 1)
 
     connectedSockets[0].close()
-    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { __disconnect__: true })
+    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { __disconnect__: true, error: undefined, delivered: true })
     assert.deepStrictEqual((await withTimeout(iterator.next())).value, { connection: 2 })
     await waitFor(() => subscriptions[1] === 1)
     assert.deepStrictEqual(subscriptions, [0, 1])
@@ -358,7 +358,7 @@ test('discards a delayed manual snapshot from a disconnected socket', async () =
     await waitFor(() => feed.snapshotCalls === 1, 2000)
 
     connectedSockets[0].close()
-    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { __disconnect__: true })
+    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { __disconnect__: true, error: undefined, delivered: true })
     assert.deepStrictEqual((await withTimeout(iterator.next())).value, { connection: 2 })
 
     feed.releaseFirstSnapshot()
@@ -434,13 +434,11 @@ test('backs off after an HTTP 418 snapshot error and cancels the wait when close
   let pendingReconnect: PromiseLike<IteratorResult<any>> | undefined
 
   try {
-    assert.deepStrictEqual((await withTimeout(iterator.next())).value, { connection: 1 })
-    await waitFor(() => feed.snapshotCalls === 1, 2000)
-
     let message: IteratorResult<any>
     do {
       message = await withTimeout(iterator.next())
     } while (message.value?.__disconnect__ !== true)
+    assert.strictEqual(feed.snapshotCalls, 1)
 
     pendingReconnect = iterator.next()
     await sleep(1100)

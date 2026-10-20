@@ -5,7 +5,7 @@ import { setTimeout as sleep } from 'node:timers/promises'
 import { createDebug, type DebugLogger } from '../debug.ts'
 import { getProxyAgent, HttpClientError, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
 import { getMessageParser } from '../parsemessage.ts'
-import { createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
+import { closeIterator, createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
 
 export type RealTimeFeed = {
@@ -19,7 +19,7 @@ export type RealTimeFeed = {
 
 let connectionCounter = 1
 
-export type RealTimeFeedIterable = AsyncIterable<any>
+export type RealTimeFeedIterable = { [Symbol.asyncIterator](): ManagedRealTimeIterator<any> }
 
 type RealTimeFeedConnection = {
   id: number
@@ -95,6 +95,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       let staleConnectionTimerId: NodeJS.Timeout | undefined
       let pingTimerId: NodeJS.Timeout | undefined
       let connectionError: Error | undefined
+      let delivered = false
 
       try {
         this.manualSnapshotsBuffer.length = 0
@@ -173,6 +174,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           this.onMessage(messageDeserialized)
 
           yield messageDeserialized
+          delivered = true
 
           if (retries > 0) {
             // reset retries counter as we've received correct message from the connection
@@ -216,33 +218,22 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       if (connectionError !== undefined) {
         this._onError?.(connectionError)
         retries++
-
-        const MAX_DELAY = 32 * 1000
-        const httpError = connectionError instanceof HttpClientError ? connectionError : undefined
-        const isRateLimited = httpError?.status === 418 || httpError?.status === 429 || connectionError.message.includes('429')
-
-        if (isRateLimited) {
-          const fallbackDelay = httpError?.status === 418 ? 2 * 60 * 1000 : (MAX_DELAY / 2) * retries
-          retryDelay = httpError?.retryAfterMS ?? fallbackDelay
-        } else {
-          retryDelay = Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
-        }
+        retryDelay = getRetryDelay(connectionError, retries)
 
         this.debug(
-          '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, rate limited: %s error message: %o',
+          '(connection id: %d) %s real-time feed connection error, retries count: %d, next retry delay: %dms, error message: %o',
           connectionId,
           this._exchange,
           retries,
           retryDelay,
-          isRateLimited,
           connectionError
         )
       }
 
-      yield { __disconnect__: true }
+      yield { __disconnect__: true, error: connectionError, delivered }
 
       if (retryDelay !== undefined) {
-        await this._wait(retryDelay, this._closeController.signal)
+        await wait(retryDelay, this._closeController.signal)
       }
     }
   }
@@ -343,7 +334,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
         this._send(connection, message)
         if (this.throttleSubscribeMS > 0) {
-          await this._wait(this.throttleSubscribeMS, connection.controller.signal)
+          await wait(this.throttleSubscribeMS, connection.controller.signal)
         }
       }
 
@@ -352,7 +343,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       const messagesBeforeSnapshots = subscribeMessages.length === 0 ? 0 : subscribeMessages.length + 1
       // Wait for subscription acknowledgements and the first data message before fetching snapshots.
       while (shouldCancel() === false && connection.receivedMessagesCount < messagesBeforeSnapshots) {
-        await this._wait(100, connection.controller.signal)
+        await wait(100, connection.controller.signal)
       }
 
       if (shouldCancel()) {
@@ -411,16 +402,29 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       this.manualSnapshotsBuffer.length = 0
     }
   }
+}
 
-  private async _wait(delayMS: number, signal: AbortSignal) {
-    try {
-      await sleep(delayMS, undefined, { signal })
-    } catch (error) {
-      if (signal.aborted === false) {
-        throw error
-      }
+async function wait(delayMS: number, signal: AbortSignal) {
+  try {
+    await sleep(delayMS, undefined, { signal })
+  } catch (error) {
+    if (signal.aborted === false) {
+      throw error
     }
   }
+}
+
+function getRetryDelay(error: Error, retries: number) {
+  const MAX_DELAY = 32 * 1000
+  const httpError = error instanceof HttpClientError ? error : undefined
+  const isRateLimited = httpError?.status === 418 || httpError?.status === 429 || error.message.includes('429')
+
+  if (isRateLimited) {
+    const fallbackDelay = httpError?.status === 418 ? 2 * 60 * 1000 : (MAX_DELAY / 2) * retries
+    return httpError?.retryAfterMS ?? fallbackDelay
+  }
+
+  return Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
 }
 
 function resolveOrAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T | typeof ABORTED> {
@@ -449,7 +453,12 @@ function resolveOrAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T 
   })
 }
 
+// A disconnect resets all normalized state, so when any connection drops, the feed closes all its connections and pollers,
+// yields one disconnect and opens them again after the retry delay of the failed connection.
 export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIterable {
+  private readonly _closeController = new AbortController()
+  private _connections?: ManagedRealTimeIterator<any>
+
   constructor(
     private readonly _exchange: string,
     private readonly _filters: Filter<string>[],
@@ -458,8 +467,44 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
   ) {}
 
   [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
-    const realTimeFeeds = Array.from(this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError))
-    return mergeRealTime(realTimeFeeds)
+    return createManagedRealTimeIterator(this._stream(), () => {
+      this._closeController.abort()
+      return this._connections?.return()
+    })
+  }
+
+  private async *_stream() {
+    let retries = 0
+
+    while (this._closeController.signal.aborted === false) {
+      this._connections = mergeRealTime(
+        Array.from(this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError), untilDisconnect)
+      )
+      let disconnect: { error?: Error; delivered?: boolean } | undefined
+
+      for await (const message of this._connections) {
+        if (message.__disconnect__ === true) {
+          disconnect = message
+          break
+        }
+        yield message
+      }
+
+      if (disconnect === undefined) {
+        return
+      }
+
+      yield { __disconnect__: true }
+
+      if (disconnect.delivered === true) {
+        retries = 0
+      }
+
+      if (disconnect.error !== undefined) {
+        retries++
+        await wait(getRetryDelay(disconnect.error, retries), this._closeController.signal)
+      }
+    }
   }
 
   protected abstract _getRealTimeFeeds(
@@ -468,6 +513,22 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     timeoutIntervalMS?: number,
     onError?: (error: Error) => void
   ): IterableIterator<RealTimeFeedIterable>
+}
+
+// A connection stops at its disconnect, so it cannot reconnect on its own before the feed restarts all connections.
+function untilDisconnect(feed: RealTimeFeedIterable) {
+  const messages = feed[Symbol.asyncIterator]()
+
+  async function* stream() {
+    for await (const message of messages) {
+      yield message
+      if (message.__disconnect__ === true) {
+        return
+      }
+    }
+  }
+
+  return createManagedRealTimeIterator(stream(), () => closeIterator(messages))
 }
 
 export abstract class PoolingClientBase implements RealTimeFeedIterable {
