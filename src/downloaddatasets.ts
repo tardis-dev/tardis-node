@@ -11,9 +11,8 @@ const MILLISECONDS_IN_SINGLE_DAY = 24 * 60 * 60 * 1000
 const DEFAULT_DOWNLOAD_DIR = './datasets'
 const DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS = 120_000
 
-const options = getOptions()
-
 export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasetsOptions) {
+  const options = getOptions()
   const { exchange, dataTypes, from, to, symbols } = downloadDatasetsOptions
   const apiKey = downloadDatasetsOptions.apiKey !== undefined ? downloadDatasetsOptions.apiKey : options.apiKey
   const downloadDir = downloadDatasetsOptions.downloadDir !== undefined ? downloadDatasetsOptions.downloadDir : DEFAULT_DOWNLOAD_DIR
@@ -37,6 +36,8 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
             exchange,
             symbol,
             apiKey,
+            datasetsEndpoint: options.datasetsEndpoint,
+            userAgent: options._userAgent,
             downloadDir,
             dataType,
             format,
@@ -53,6 +54,8 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
           exchange,
           symbol,
           apiKey,
+          datasetsEndpoint: options.datasetsEndpoint,
+          userAgent: options._userAgent,
           downloadDir,
           dataType,
           format,
@@ -72,6 +75,8 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
               exchange,
               symbol,
               apiKey,
+              datasetsEndpoint: options.datasetsEndpoint,
+              userAgent: options._userAgent,
               downloadDir,
               dataType,
               format,
@@ -99,6 +104,8 @@ async function downloadDataSet(downloadOptions: DownloadOptions, skipIfExists: b
 
 function getDownloadOptions({
   apiKey,
+  datasetsEndpoint,
+  userAgent,
   exchange,
   dataType,
   date,
@@ -113,6 +120,8 @@ function getDownloadOptions({
   date: Date
   format: string
   apiKey: string
+  datasetsEndpoint: string
+  userAgent: string
   downloadDir: string
   getFilename: (options: GetFilenameOptions) => string
 }): DownloadOptions {
@@ -120,7 +129,7 @@ function getDownloadOptions({
   const month = doubleDigit(date.getUTCMonth() + 1)
   const day = doubleDigit(date.getUTCDate())
 
-  const url = `${options.datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${encodeURIComponent(symbol)}.${format}.gz`
+  const url = `${datasetsEndpoint}/${exchange}/${dataType}/${year}/${month}/${day}/${encodeURIComponent(symbol)}.${format}.gz`
   const filename = getFilename({
     dataType,
     date,
@@ -134,7 +143,7 @@ function getDownloadOptions({
   return {
     url,
     downloadPath,
-    userAgent: options._userAgent,
+    userAgent,
     apiKey,
     attemptTimeoutMS: DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS
   }
