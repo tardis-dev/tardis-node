@@ -45,7 +45,7 @@ class BitgetTradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetTradeMessage) {
-    return message.arg.channel === 'trade' && message.action === 'update'
+    return message.arg?.channel === 'trade' && message.action === 'update'
   }
 
   getFilters(symbols?: string[]) {
@@ -86,7 +86,7 @@ class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures', Book
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetOrderbookMessage) {
-    return message.arg.channel === 'books15' && message.action === 'snapshot'
+    return message.arg?.channel === 'books15' && message.action === 'snapshot'
   }
 
   getFilters(symbols?: string[]) {
@@ -120,7 +120,7 @@ class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures', Book
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetBBoMessage) {
-    return message.arg.channel === 'books1' && message.action === 'snapshot'
+    return message.arg?.channel === 'books1' && message.action === 'snapshot'
   }
 
   getFilters(symbols?: string[]) {
@@ -159,7 +159,7 @@ class BitgetDerivativeTickerMapper implements Mapper<'bitget-futures', Derivativ
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitgetTickerMessage) {
-    return message.arg.channel === 'ticker' && message.action === 'snapshot'
+    return message.arg?.channel === 'ticker' && message.action === 'snapshot'
   }
 
   getFilters(symbols?: string[]) {
@@ -198,7 +198,7 @@ class BitgetV3TradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade>
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3TradeMessage) {
-    return message.arg.topic === 'publicTrade' && message.action === 'update'
+    return message.arg?.topic === 'publicTrade' && message.action === 'update'
   }
 
   getFilters(symbols?: string[]) {
@@ -233,7 +233,7 @@ class BitgetV3BookChangeMapper implements Mapper<'bitget' | 'bitget-futures', Bo
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3OrderbookMessage) {
-    return message.arg.topic === 'books' && (message.action === 'snapshot' || message.action === 'update')
+    return message.arg?.topic === 'books' && (message.action === 'snapshot' || message.action === 'update')
   }
 
   getFilters(symbols?: string[]) {
@@ -267,7 +267,7 @@ class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futures', Bo
   constructor(private readonly _exchange: Exchange) {}
 
   canHandle(message: BitgetV3BBoMessage) {
-    return message.arg.topic === 'books1' && message.action === 'snapshot'
+    return message.arg?.topic === 'books1' && message.action === 'snapshot'
   }
 
   getFilters(symbols?: string[]) {
@@ -302,7 +302,7 @@ class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', Derivat
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: BitgetV3TickerMessage) {
-    return message.arg.topic === 'ticker' && (message.action === 'snapshot' || message.action === 'update')
+    return message.arg?.topic === 'ticker' && (message.action === 'snapshot' || message.action === 'update')
   }
 
   getFilters(symbols?: string[]) {
@@ -340,7 +340,7 @@ class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', Derivat
 
 class BitgetV3LiquidationsMapper implements Mapper<'bitget-futures', Liquidation> {
   canHandle(message: BitgetV3LiquidationMessage) {
-    return message.arg.topic === 'liquidation' && message.action === 'update'
+    return message.arg?.topic === 'liquidation' && message.action === 'update'
   }
 
   getFilters() {
