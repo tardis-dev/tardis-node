@@ -29,7 +29,7 @@ import {
   HuobiDMOptionsRealTimeFeed
 } from './huobi.ts'
 import { KrakenRealTimeFeed } from './kraken.ts'
-import { OKCoinRealTimeFeed, OkexOptionsRealTimeFeed, OkexRealTimeFeed } from './okex.ts'
+import { OkexOptionsRealTimeFeed, OkexRealTimeFeed } from './okex.ts'
 import { RealTimeFeed } from './realtimefeed.ts'
 import { PhemexRealTimeFeed } from './phemex.ts'
 import { DeltaRealTimeFeed } from './delta.ts'
@@ -95,7 +95,6 @@ const realTimeFeedsMap: {
   'huobi-dm-linear-swap': HuobiDMLinearSwapRealTimeFeed,
   huobi: HuobiRealTimeFeed,
   bybit: BybitRealTimeDataFeed,
-  okcoin: OKCoinRealTimeFeed,
   hitbtc: HitBtcRealTimeFeed,
   phemex: PhemexRealTimeFeed,
   delta: DeltaRealTimeFeed,

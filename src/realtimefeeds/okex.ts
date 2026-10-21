@@ -102,12 +102,6 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
-export class OKCoinRealTimeFeed extends OkexSingleRealTimeFeed {
-  constructor(exchange: string, filters: Filter<string>[], timeoutIntervalMS: number | undefined, onError?: (error: Error) => void) {
-    super('wss://real.okcoin.com:8443/ws/v5/public', exchange, filters, timeoutIntervalMS, onError)
-  }
-}
-
 export class OkexOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
     const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
