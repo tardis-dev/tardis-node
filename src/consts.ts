@@ -314,7 +314,7 @@ const OKEX_OPTIONS_CHANNELS = [
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
 
-const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
+const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker'] as const
 
 const FTX_CHANNELS = [
   'orderbook',
