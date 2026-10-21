@@ -217,12 +217,13 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
 
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(entry.market_id.toString(), this.exchange)
 
-      pendingTickerInfo.updateMarkPrice(Number(entry.mark_price))
-      pendingTickerInfo.updateIndexPrice(Number(entry.index_price))
+      pendingTickerInfo.updateMarkPrice(asNonZeroNumberOrUndefined(entry.mark_price))
+      pendingTickerInfo.updateIndexPrice(asNonZeroNumberOrUndefined(entry.index_price))
       // WS funding is an hourly percentage; normalized fundingRate is a decimal fraction.
       // https://docs.lighter.xyz/trading/funding#funding-rate-calculation
       pendingTickerInfo.updateFundingRate(Number(entry.current_funding_rate) / 100)
-      pendingTickerInfo.updateLastPrice(Number(entry.last_trade_price))
+      // Lighter sends last_trade_price 0 for markets without trades and sometimes for traded markets.
+      pendingTickerInfo.updateLastPrice(asNonZeroNumberOrUndefined(entry.last_trade_price))
       pendingTickerInfo.updateOpenInterest(Number(entry.open_interest))
 
       if (pendingTickerInfo.hasChanged()) {

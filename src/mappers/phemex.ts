@@ -1,3 +1,4 @@
+import { asNonZeroNumberOrUndefined } from '../handy.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { Trade, BookChange, DerivativeTicker } from '../types.ts'
 import { exchangeMappers } from './registry.ts'
@@ -457,14 +458,20 @@ class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker>
         fundingRateRr,
         predFundingRateRr
       ] of message.data) {
+        // The pack keeps delisted contracts with zero prices.
+        if (Number(lastRp) === 0 && Number(indexRp) === 0 && Number(markRp) === 0) {
+          continue
+        }
+
         const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(symbol, 'phemex')
 
         pendingTickerInfo.updateFundingRate(Number(fundingRateRr))
         pendingTickerInfo.updatePredictedFundingRate(Number(predFundingRateRr))
-        pendingTickerInfo.updateIndexPrice(Number(indexRp))
-        pendingTickerInfo.updateMarkPrice(Number(markRp))
+        pendingTickerInfo.updateIndexPrice(asNonZeroNumberOrUndefined(indexRp))
+        pendingTickerInfo.updateMarkPrice(asNonZeroNumberOrUndefined(markRp))
         pendingTickerInfo.updateOpenInterest(Number(openInterestRv))
-        pendingTickerInfo.updateLastPrice(Number(lastRp))
+        // Contracts without trades in the last 24 hours report lastRp as 0.
+        pendingTickerInfo.updateLastPrice(asNonZeroNumberOrUndefined(lastRp))
         pendingTickerInfo.updateTimestamp(fromNanoSecondsToDate(message.timestamp))
 
         if (pendingTickerInfo.hasChanged()) {

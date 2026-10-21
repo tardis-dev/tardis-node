@@ -11542,6 +11542,84 @@ test('map dydx-v4 oracle prices only for markets with market data', () => {
   assert.equal(tickers[0].fundingRate, 0.0000125)
 })
 
+test('ignore dydx-v4 markets in final settlement', () => {
+  const localTimestamp = new Date('2026-10-17T12:08:09.293Z')
+  // Recorded v4_markets snapshot; keep only relevant fields and markets.
+  const snapshot = {
+    type: 'subscribed',
+    connection_id: '47328f9a-c969-4e6b-982b-ad4da3a5811c',
+    message_id: 19,
+    channel: 'v4_markets',
+    contents: {
+      markets: {
+        'BTC-USD': {
+          ticker: 'BTC-USD',
+          status: 'ACTIVE',
+          oraclePrice: '81464.40685',
+          nextFundingRate: '0.000003140625',
+          openInterest: '204.4022'
+        },
+        'MATIC-USD': {
+          ticker: 'MATIC-USD',
+          status: 'FINAL_SETTLEMENT',
+          oraclePrice: '0.3932407381',
+          nextFundingRate: '0',
+          openInterest: '0'
+        }
+      }
+    }
+  }
+
+  const mapped = createMapper('dydx-v4', localTimestamp).map(snapshot, localTimestamp)
+
+  assert.deepEqual(
+    mapped.map((ticker) => ticker.symbol),
+    ['BTC-USD']
+  )
+})
+
+test('ignore phemex zero prices', () => {
+  const localTimestamp = new Date('2026-10-17T08:23:03Z')
+  // Rows from recorded perp_market24h_pack_p snapshots; STARUSDT is from 2026-07-25 and XAIUSDT from 2026-09-02.
+  const snapshot = {
+    data: [
+      ['ARXUSDT', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+      ['STARUSDT', '0', '0', '0', '0', '0', '0', '0', '0.1505085', '0.15069', '0.00005', '0.00005', '0', '0'],
+      ['XAIUSDT', '0.00778', '0.00778', '0.00778', '0.00778', '88378', '687.58084', '329290', '0', '0', '0', '0', '0', '1.65'],
+      [
+        'LSKUSDT',
+        '0.19916',
+        '0.20672',
+        '0.1897',
+        '0.19431',
+        '3415465',
+        '673317.67363',
+        '2513383',
+        '0.1946352',
+        '0.1945',
+        '0.00005',
+        '0.00005',
+        '0.1943',
+        '0.19431'
+      ]
+    ],
+    method: 'perp_market24h_pack_p.update',
+    timestamp: 1792225382281873288,
+    type: 'snapshot'
+  }
+
+  const mapped = createMapper('phemex', localTimestamp).map(snapshot, localTimestamp)
+
+  assert.deepEqual(
+    mapped.map((ticker) => [ticker.symbol, ticker.lastPrice, ticker.markPrice, ticker.indexPrice]),
+    [
+      ['STARUSDT', undefined, 0.15069, 0.1505085],
+      ['XAIUSDT', 0.00778, undefined, undefined],
+      ['LSKUSDT', 0.19431, 0.1945, 0.1946352]
+    ]
+  )
+})
+
 test('map bitget messages', () => {
   const messages = [
     {
@@ -13374,11 +13452,14 @@ test('ignore inactive Lighter market stats without dropping a new market before 
   const initialMapped = createMapper('lighter', newMarketTimestamp).map(initialNewMarket, newMarketTimestamp)
   assert.equal(initialMapped.length, 1)
   assert.equal(initialMapped[0].fundingRate, 0.000002)
+  assert.equal(initialMapped[0].markPrice, undefined)
+  assert.equal(initialMapped[0].indexPrice, undefined)
 
   const mapped = createMapper('lighter', newMarketTimestamp).map(newMarket, newMarketTimestamp)
   assert.equal(mapped.length, 1)
   assert.equal(mapped[0].symbol, '4095')
   assert.equal(mapped[0].markPrice, 0.18163)
+  assert.equal(mapped[0].lastPrice, undefined)
 })
 
 test('ignore Lighter market stats with funding older than 12 hours', () => {
