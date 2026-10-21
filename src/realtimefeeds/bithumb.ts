@@ -21,6 +21,11 @@ export class BithumbRealTimeFeed extends RealTimeFeedBase {
         codes: filter.symbols
       }
 
+      // trade SNAPSHOT is the market's last trade, often hours old; Bithumb honours only the camelCase flag
+      if (filter.channel === 'trade') {
+        return { ...subscription, isOnlyRealtime: true }
+      }
+
       return filter.channel === 'orderbook' ? { ...subscription, level: 1 } : subscription
     })
 
