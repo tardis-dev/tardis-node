@@ -21,17 +21,52 @@ const fromNanoSecondsToDate = (nanos: number) => {
   return timestamp
 }
 
+// Phemex spot messages scale amounts by the base currency valueScale and prices by the quote currency valueScale from
+// /public/products. Spot pairs not listed here have a base currency valueScale of 8; TRY and BRZ are the only quote
+// currencies with a valueScale other than 8 (4).
+// prettier-ignore
+const SPOT_QTY_SCALE_GROUPS: [number, string[]][] = [
+  [1e2, ['s1000VINUUSDT', 'sLUNCUSDT', 'sPEPEUSDT', 'sSHIBUSDC', 'sSHIBUSDT', 'sSOSUSDT']],
+  [1e3, ['s1000000PITUSDT', 'sGUNUSDT']],
+  [1e4, [
+    's1000000BABYDOGEUSDT', 's10000LADYSUSDT', 's1000BONKUSDT', 's1000BRISEUSDT', 's1000CHEEMSUSDT', 's1000FLOKIUSDT', 's1000MADUSDT',
+    's1000MOGUSDT', 's1000SATSUSDT', 's1000TROLLUSDT', 's1000VOLTUSDT', 's1000WHYUSDT', 's1EARTHUSDT', 'sACHUSDT', 'sACSUSDT', 'sAMPUSDT',
+    'sANDYUSDT', 'sANKRUSDT', 'sARPAUSDT', 'sASTRUSDT', 'sASTUSDT', 'sBENDUSDT', 'sBLOKUSDT', 'sBRZUSDC', 'sBRZUSDT', 'sCATSUSDT',
+    'sCATUSDT', 'sCELRUSDT', 'sCELUSDT', 'sCRTSUSDT', 'sDCUSDT', 'sDENTUSDT', 'sDFUSDT', 'sDNTUSDT', 'sEPXUSDT', 'sFORUSDT', 'sGMMUSDT',
+    'sGTOUSDT', 'sHOTUSDT', 'sIDEXUSDT', 'sINGUSDT', 'sINSUSDC', 'sINSUSDT', 'sJASMYUSDT', 'sKEYUSDT', 'sLEVERUSDT', 'sLMRUSDT', 'sMDTUSDT',
+    'sMEMEUSDT', 'sMFTUSDT', 'sMXCUSDT', 'sNESTUSDT', 'sOMUSDT', 'sONSTONUSDT', 'sOOKIUSDT', 'sORBSUSDT', 'sPENGUUSDT', 'sPEOPLEUSDT',
+    'sPERLUSDT', 'sPONDUSDT', 'sPUFFYUSDT', 'sQIUSDT', 'sRACAUSDT', 'sRAMPUSDT', 'sRANKERUSDT', 'sRATSUSDT', 'sREAPUSDT', 'sREEFUSDT',
+    'sRSRUSDT', 'sSHILLUSDT', 'sSKLUSDT', 'sSLPUSDT', 'sSNTUSDT', 'sSPELLUSDT', 'sSTMXUSDT', 'sSTPTUSDT', 'sTELUSDT', 'sTLMUSDT',
+    'sTOSHIUSDT', 'sTRVLUSDT', 'sTURBOUSDT', 'sTUSDT', 'sTVKUSDT', 'sUMEEUSDT', 'sVPADUSDT', 'sVRAUSDT', 'sVRGWUSDT', 'sVRUSDT', 'sWENUSDT',
+    'sWOLFUSDT', 'sWWYUSDT', 'sXENUSDT', 'sXUSDT', 'sXYOUSDT', 'sZENIUSDT'
+  ]],
+  [1e6, [
+    's1000EBPTCUSDT', 'sBNKRUSDT', 'sCTXUSDT', 'sDEGENUSDT', 'sGOATUSDT', 'sJUPUSDT', 'sKMNOUSDT', 'sMAGAUSDT', 'sMEWUSDT', 'sPOLYXUSDT',
+    'sPYTHUSDT', 'sSEIUSDT', 'sWERUSDT', 'sWINUSDT', 'sZEROUSDT'
+  ]]
+]
+
+const SPOT_QTY_SCALES = new Map(SPOT_QTY_SCALE_GROUPS.flatMap(([scale, symbols]) => symbols.map((symbol) => [symbol, scale] as const)))
+
+// Phemex reused sREDUSDT: recorded RED TOKEN data (valueScale 4, now REDOLD) ends on 2023-07-13 and RedStone data
+// (valueScale 8) starts on 2025-03-06 at 13:08 UTC, before its 13:30 listTime.
+const RED_STONE_LISTING_DAY = new Date('2025-03-06T00:00:00.000Z')
+
 function getPriceScale(symbol: string) {
   if (symbol.startsWith('s')) {
-    return 1e8
+    return symbol.endsWith('TRY') || symbol.endsWith('BRZ') ? 1e4 : 1e8
   }
 
   return 1e4
 }
 
-function getQtyScale(symbol: string) {
+function getQtyScale(symbol: string, localTimestamp: Date) {
+  if (symbol === 'sREDUSDT' && localTimestamp < RED_STONE_LISTING_DAY) {
+    return 1e4
+  }
+
   if (symbol.startsWith('s')) {
-    return 1e8
+    return SPOT_QTY_SCALES.get(symbol) ?? 1e8
   }
 
   return 1
@@ -280,7 +315,7 @@ const phemexTradesMapper: Mapper<'phemex', Trade> = {
           exchange: 'phemex',
           id: undefined,
           price: priceEp / getPriceScale(symbol),
-          amount: qty / getQtyScale(symbol),
+          amount: qty / getQtyScale(symbol, localTimestamp),
           side: side === 'Buy' ? 'buy' : 'sell',
           timestamp: fromNanoSecondsToDate(timestamp),
           localTimestamp: localTimestamp
@@ -305,11 +340,11 @@ const phemexTradesMapper: Mapper<'phemex', Trade> = {
 }
 
 const mapBookLevelForSymbol =
-  (symbol: string) =>
+  (symbol: string, localTimestamp: Date) =>
   ([priceEp, qty]: PhemexBookLevel) => {
     return {
       price: priceEp / getPriceScale(symbol),
-      amount: qty / getQtyScale(symbol)
+      amount: qty / getQtyScale(symbol, localTimestamp)
     }
   }
 
@@ -363,7 +398,7 @@ const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
     }
 
     if ('book' in message) {
-      const mapBookLevel = mapBookLevelForSymbol(symbol)
+      const mapBookLevel = mapBookLevelForSymbol(symbol, localTimestamp)
       yield {
         type: 'book_change',
         symbol: symbol.toUpperCase(),

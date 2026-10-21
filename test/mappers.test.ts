@@ -11620,6 +11620,95 @@ test('ignore phemex zero prices', () => {
   )
 })
 
+test('map phemex spot amounts and prices with currency scales', () => {
+  // Recorded messages, books cut to their first levels. The sSHIBUSDT trade equals the volumeEv change in Phemex's own
+  // spot_market24h ticker; the 13:09 sREDUSDT trade is RedStone's first, before its 13:30 listTime.
+  const messages = [
+    {
+      localTimestamp: new Date('2026-10-17T12:00:10.2621182Z'),
+      message: { sequence: 27083468664, symbol: 'sSHIBUSDT', trades: [[1792238410209958259, 'Buy', 507, 660625000]], type: 'incremental' }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:00.9859800Z'),
+      message: { sequence: 320265182, symbol: 'sUSDTTRY', trades: [[1685620800936824764, 'Buy', 213030, 16876100000]], type: 'incremental' }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:14.4469322Z'),
+      message: {
+        book: { asks: [[213250, 14261900000]], bids: [] },
+        depth: 0,
+        sequence: 320265215,
+        symbol: 'sUSDTTRY',
+        timestamp: 1685620807110302805,
+        type: 'snapshot'
+      }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:00.6076010Z'),
+      message: {
+        book: { asks: [[3485, 4530800000]], bids: [] },
+        depth: 0,
+        sequence: 4510473013,
+        symbol: 'sREDUSDT',
+        timestamp: 1685620800452538778,
+        type: 'incremental'
+      }
+    },
+    {
+      localTimestamp: new Date('2025-03-06T13:09:15.5143498Z'),
+      message: {
+        sequence: 12441482889,
+        symbol: 'sREDUSDT',
+        trades: [[1741266555465747983, 'Buy', 83530000, 13526000000]],
+        type: 'incremental'
+      }
+    },
+    {
+      localTimestamp: new Date('2025-06-01T12:00:37.3080059Z'),
+      message: {
+        book: {
+          asks: [
+            [36080000, 28116000000],
+            [36090000, 55855000000],
+            [36100000, 28102000000]
+          ],
+          bids: []
+        },
+        depth: 0,
+        sequence: 15197432837,
+        symbol: 'sREDUSDT',
+        timestamp: 1748779237067041865,
+        type: 'incremental'
+      }
+    }
+  ]
+
+  const mapped = messages.flatMap(({ message, localTimestamp }) => [...createMapper('phemex', localTimestamp).map(message, localTimestamp)])
+
+  assert.deepEqual(
+    mapped.map((item: any) =>
+      item.type === 'trade'
+        ? [item.symbol, item.price, item.amount]
+        : [item.symbol, item.asks.map((level: any) => [level.price, level.amount])]
+    ),
+    [
+      ['SSHIBUSDT', 0.00000507, 6606250],
+      ['SUSDTTRY', 21.303, 168.761],
+      ['SUSDTTRY', [[21.325, 142.619]]],
+      ['SREDUSDT', [[0.00003485, 453080]]],
+      ['SREDUSDT', 0.8353, 135.26],
+      [
+        'SREDUSDT',
+        [
+          [0.3608, 281.16],
+          [0.3609, 558.55],
+          [0.361, 281.02]
+        ]
+      ]
+    ]
+  )
+})
+
 test('map bitget messages', () => {
   const messages = [
     {
