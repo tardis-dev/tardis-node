@@ -250,16 +250,7 @@ function isOption(symbol: string) {
 }
 
 type DeltaIndiaChannel =
-  | 'trades'
-  | 'ob_updates'
-  | 'ob_l1'
-  | 'ticker'
-  | 'mark_price'
-  | 'funding_rate'
-  | 'spot_price'
-  | 'spot_30mtwap_price'
-  | 'product_updates'
-  | 'system_status'
+  'trades' | 'ob_updates' | 'ob_l1' | 'ticker' | 'mark_price' | 'funding_rate' | 'spot_price' | 'product_updates' | 'system_status'
 
 type DeltaIndiaMessage<Channel extends DeltaIndiaChannel> = {
   type: Channel

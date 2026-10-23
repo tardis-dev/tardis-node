@@ -67,7 +67,7 @@ test('Delta India subscriptions preserve native mark identifiers and deduplicate
   )
 })
 
-test('Delta India sends all requested depth symbols on one connection and routes TWAP separately', { timeout: 10000 }, async () => {
+test('Delta India sends all requested depth symbols on one connection and routes market data separately', { timeout: 10000 }, async () => {
   const received: Array<{ ws: WebSocket; channels: Array<{ name: string; symbols?: string[] }> }> = []
   await localServer((ws) =>
     ws.on('message', (data) => {
@@ -82,22 +82,19 @@ test('Delta India sends all requested depth symbols on one connection and routes
     exchange: 'delta-india',
     filters: [
       { channel: 'ob_updates', symbols },
-      { channel: 'trades', symbols: ['BTCUSD'] },
-      { channel: 'spot_30mtwap_price', symbols: ['.DEXBTUSD'] }
+      { channel: 'trades', symbols: ['BTCUSD'] }
     ]
   })
   try {
     for await (const _message of iterator) {
-      if (received.length === 3) break
+      if (received.length === 2) break
     }
     const depthSubscription = received.find((r) => r.channels[0].name === 'ob_updates')!
     const depthChannel = depthSubscription.channels[0]
     assert.deepEqual(new Set(depthChannel.symbols), new Set(symbols))
     const marketSubscription = received.find((r) => r.channels[0].name === 'trades')!
     assert.deepEqual(marketSubscription.channels, [{ name: 'trades', symbols: ['BTCUSD'] }])
-    const twapSubscription = received.find((r) => r.channels[0].name === 'spot_30mtwap_price')!
-    assert.deepEqual(twapSubscription.channels, [{ name: 'spot_30mtwap_price', symbols: ['.DEXBTUSD'] }])
-    assert.equal(new Set(received.map((r) => r.ws)).size, 3)
+    assert.equal(new Set(received.map((r) => r.ws)).size, 2)
   } finally {
     await iterator.return?.()
   }

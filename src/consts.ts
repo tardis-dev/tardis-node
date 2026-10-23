@@ -484,7 +484,6 @@ const DELTA_INDIA_CHANNELS = [
   'mark_price',
   'funding_rate',
   'spot_price',
-  'spot_30mtwap_price',
   'product_updates',
   'system_status'
 ] as const

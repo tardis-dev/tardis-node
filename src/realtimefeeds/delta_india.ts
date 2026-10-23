@@ -8,7 +8,6 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
     const marketFilters: Filter<string>[] = []
     const depthFilters: Filter<string>[] = []
-    const twapFilters: Filter<string>[] = []
 
     for (const filter of optimizeFilters(filters)) {
       if (filter.channel !== 'product_updates' && filter.channel !== 'system_status' && !filter.symbols?.length) {
@@ -21,8 +20,6 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
           }
         }
         depthFilters.push(filter)
-      } else if (filter.channel === 'spot_30mtwap_price') {
-        twapFilters.push(filter)
       } else {
         marketFilters.push(filter)
       }
@@ -30,8 +27,7 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
     const feeds: DeltaIndiaWebSocketRealTimeFeed[] = [
       marketFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, onError) : undefined,
-      depthFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError) : undefined,
-      twapFilters.length ? new DeltaIndiaTwapRealTimeFeed(exchange, twapFilters, timeoutIntervalMS, onError) : undefined
+      depthFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError) : undefined
     ].filter((feed) => feed !== undefined)
 
     yield* feeds
@@ -136,8 +132,4 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected override messageIsHeartbeat(message: any) {
     return message.type === 'pong' || message.type === 'heartbeat'
   }
-}
-
-class DeltaIndiaTwapRealTimeFeed extends DeltaIndiaWebSocketRealTimeFeed {
-  protected readonly wssURL = 'wss://socket.india.delta.exchange'
 }
