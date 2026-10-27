@@ -1,11 +1,12 @@
 import crypto, { createHash } from 'crypto'
-import { createWriteStream, mkdirSync, rmSync } from 'node:fs'
+import { createReadStream, createWriteStream, mkdirSync, rmSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
 import { Agent as HttpAgent, request as httpRequest, type IncomingMessage } from 'node:http'
 import { Agent as HttpsAgent, request as httpsRequest, type RequestOptions } from 'node:https'
 import { pipeline } from 'node:stream/promises'
 import path from 'path'
 import { debug } from './debug.ts'
+import { forEachConcurrent } from './foreachconcurrent.ts'
 import { Mapper } from './mappers/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
 
@@ -500,7 +501,7 @@ async function openDownloadResponse(url: string, options: DownloadRequestOptions
   const statusCode = response.statusCode ?? 0
   const location = response.headers.location
   if (location === undefined || statusCode < 300 || statusCode >= 400) {
-    return response
+    return { response }
   }
 
   response.destroy()
@@ -512,10 +513,13 @@ async function openDownloadResponse(url: string, options: DownloadRequestOptions
     delete headers.authorization
   }
 
-  return sendHttpRequest(redirectUrl, {
-    ...options,
-    headers
-  })
+  return {
+    response: await sendHttpRequest(redirectUrl, {
+      ...options,
+      headers
+    }),
+    redirectUrl: redirectUrl.toString()
+  }
 }
 
 async function readResponseText(response: IncomingMessage) {
@@ -619,6 +623,12 @@ export async function download({
     }
   }
 
+  return withDownloadRetries(url, downloadPath, (attemptUrl) =>
+    _downloadFile(httpRequestOptions, attemptUrl, downloadPath, appendContentEncodingExtension)
+  )
+}
+
+async function withDownloadRetries<T>(url: string, downloadPath: string, attempt: (attemptUrl: string) => Promise<T>) {
   const MAX_ATTEMPTS = 30
   const MAX_RETRY_AFTER_MS = 300 * ONE_SEC_IN_MS
   let attempts = 0
@@ -628,11 +638,7 @@ export async function download({
     attempts++
     try {
       const addRetryAttempt = attempts - 1 > 0 && url.endsWith('gz')
-      if (addRetryAttempt) {
-        return await _downloadFile(httpRequestOptions, `${url}?retryAttempt=${attempts - 1}`, downloadPath, appendContentEncodingExtension)
-      } else {
-        return await _downloadFile(httpRequestOptions, url, downloadPath, appendContentEncodingExtension)
-      }
+      return await attempt(addRetryAttempt ? `${url}?retryAttempt=${attempts - 1}` : url)
     } catch (error) {
       const unsupportedDataFeedEncoding = error instanceof Error && error.message.startsWith('Unsupported data feed content encoding')
       const nonRetryableHttpError =
@@ -640,13 +646,20 @@ export async function download({
         ((error.status === 400 && error.message.includes('ISO 8601 format') === false) ||
           error.status === 401 ||
           error.status === 403 ||
-          error.status === 404)
+          error.status === 404 ||
+          error.status === 416)
       const tooManyRequests = error instanceof HttpError && error.status === 429
       const retryAfterMS = tooManyRequests ? error.retryAfterMS : undefined
       const retryAfterTooLong = retryAfterMS !== undefined && retryAfterMS > MAX_RETRY_AFTER_MS
       const internalServiceError = error instanceof HttpError && error.status === 500
       // do not retry when we've got bad or unauthorized request, too long Retry-After or enough attempts
-      if (unsupportedDataFeedEncoding || nonRetryableHttpError || retryAfterTooLong || attempts === MAX_ATTEMPTS) {
+      if (
+        unsupportedDataFeedEncoding ||
+        error instanceof DatasetMismatchError ||
+        nonRetryableHttpError ||
+        retryAfterTooLong ||
+        attempts === MAX_ATTEMPTS
+      ) {
         throw error
       }
 
@@ -703,7 +716,7 @@ async function _downloadFile(
 
   try {
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
-    const response = await openDownloadResponse(url, requestOptions)
+    const { response } = await openDownloadResponse(url, requestOptions)
     const { statusCode } = response
     const responseHeaders = parseNodeResponseHeaders(response.headers)
     if (statusCode !== 200) {
@@ -739,6 +752,233 @@ async function _downloadFile(
     tmpFileCleanups.delete(tmpFilePath)
     cleanup()
   }
+}
+
+const DATASET_RANGE_SIZE = 64 * 1024 * 1024
+// A dataset is rarely exported again while it downloads, so repeated mismatches mean another restart won't help.
+const MAX_DATASET_RESTARTS = 3
+
+// The downloaded ranges don't make up one dataset file, because it was exported again during the download or doesn't
+// match its announced MD5, so the download starts over.
+class DatasetMismatchError extends Error {}
+
+// One pool for all files and ranges of a download, so splitting files into ranges does not add connections.
+export class RequestSlots {
+  private active = 0
+  private readonly waiting: (() => void)[] = []
+
+  constructor(readonly limit: number) {}
+
+  async run<T>(request: () => Promise<T>) {
+    if (this.active < this.limit) {
+      this.active++
+    } else {
+      await new Promise<void>((resolve) => this.waiting.push(resolve))
+    }
+
+    try {
+      return await request()
+    } finally {
+      const next = this.waiting.shift()
+      if (next === undefined) {
+        this.active--
+      } else {
+        next()
+      }
+    }
+  }
+}
+
+// Downloads byte ranges in parallel into one temp file, and a failed range retries alone.
+export async function downloadDatasetFile({
+  apiKey,
+  downloadPath,
+  url,
+  userAgent,
+  attemptTimeoutMS,
+  verifyMd5,
+  requestSlots
+}: {
+  url: string
+  downloadPath: string
+  userAgent: string
+  apiKey: string
+  attemptTimeoutMS: number
+  verifyMd5: boolean
+  requestSlots: RequestSlots
+}) {
+  // The API key goes only to the API, never to the storage the API redirects to.
+  const storageRequestOptions = {
+    timeout: attemptTimeoutMS,
+    headers: {
+      'Accept-Encoding': 'gzip',
+      'User-Agent': userAgent
+    }
+  }
+  const apiRequestOptions = {
+    ...storageRequestOptions,
+    headers: { ...storageRequestOptions.headers, Authorization: apiKey ? `Bearer ${apiKey}` : '' }
+  }
+
+  mkdirSync(path.dirname(downloadPath), { recursive: true })
+  const tmpFilePath = `${downloadPath}${crypto.randomBytes(8).toString('hex')}.unconfirmed`
+  const cleanup = () => {
+    try {
+      rmSync(tmpFilePath, { force: true })
+    } catch {}
+  }
+  tmpFileCleanups.set(tmpFilePath, cleanup)
+
+  try {
+    for (let restarts = 0; ; restarts++) {
+      try {
+        const announcedMd5 = await downloadDatasetRanges(url, apiRequestOptions, storageRequestOptions, tmpFilePath, requestSlots)
+        if (verifyMd5) {
+          await checkDatasetMd5(tmpFilePath, announcedMd5, url)
+        }
+        break
+      } catch (error) {
+        if (!(error instanceof DatasetMismatchError) || restarts === MAX_DATASET_RESTARTS) {
+          throw error
+        }
+      }
+    }
+
+    await rename(tmpFilePath, downloadPath)
+  } finally {
+    tmpFileCleanups.delete(tmpFilePath)
+    cleanup()
+  }
+}
+
+async function downloadDatasetRanges(
+  url: string,
+  apiRequestOptions: DownloadRequestOptions,
+  storageRequestOptions: DownloadRequestOptions,
+  tmpFilePath: string,
+  requestSlots: RequestSlots
+) {
+  const first = await withDownloadRetries(url, tmpFilePath, (attemptUrl) =>
+    requestSlots.run(() => downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, 0))
+  )
+  const datasetSize = first.datasetSize
+  if (datasetSize === undefined || datasetSize <= DATASET_RANGE_SIZE) {
+    return first.md5
+  }
+
+  // A low-cost account gets a storage redirect that stays valid for two hours, and every redirect counts the whole
+  // dataset toward its transfer limit, so the remaining ranges reuse it and only an expired one is renewed.
+  let storageUrl = first.redirectUrl
+  let renewal: ReturnType<typeof downloadDatasetRange> | undefined
+
+  const downloadRemainingRange = async (attemptUrl: string, start: number) => {
+    // Read the URL only once the range has a slot, so a range that waited long uses the newest URL.
+    const rangeUrl = storageUrl
+    if (rangeUrl === undefined) {
+      return downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize)
+    }
+
+    try {
+      return await downloadDatasetRange(rangeUrl, storageRequestOptions, tmpFilePath, start, datasetSize)
+    } catch (error) {
+      if (!(error instanceof HttpError && error.status === 403)) {
+        throw error
+      }
+      // The first range to find the URL expired downloads through the API again, like the first range, and the
+      // redirect it gets replaces the URL. The others wait for it and retry with the new URL, or fail this attempt
+      // with its error.
+      if (renewal === undefined && storageUrl === rangeUrl) {
+        renewal = downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize)
+          .then((renewedRange) => {
+            storageUrl = renewedRange.redirectUrl
+            return renewedRange
+          })
+          .finally(() => {
+            renewal = undefined
+          })
+        return await renewal
+      }
+      await renewal
+      throw new Error('Dataset redirect expired')
+    }
+  }
+
+  const rangeStarts = [...sequence(Math.ceil(datasetSize / DATASET_RANGE_SIZE), 1)].map((index) => index * DATASET_RANGE_SIZE)
+  // Unlike Promise.all, forEachConcurrent rejects only after the ranges already started have finished, retries included,
+  // so a restart or cleanup never overlaps a range still writing.
+  await forEachConcurrent(rangeStarts, requestSlots.limit, (start) =>
+    withDownloadRetries(url, tmpFilePath, (attemptUrl) => requestSlots.run(() => downloadRemainingRange(attemptUrl, start)))
+  )
+
+  return first.md5
+}
+
+async function downloadDatasetRange(
+  url: string,
+  requestOptions: DownloadRequestOptions,
+  tmpFilePath: string,
+  start: number,
+  expectedDatasetSize?: number
+) {
+  const end = start + DATASET_RANGE_SIZE - 1
+  const { response, redirectUrl } = await openDownloadResponse(url, {
+    ...requestOptions,
+    headers: { ...requestOptions.headers, Range: `bytes=${start}-${end}` }
+  })
+  const statusCode = response.statusCode ?? 0
+  // A later range that comes back whole or out of bounds belongs to a dataset exported again with another size.
+  if (start > 0 && (statusCode === 200 || statusCode === 416)) {
+    response.destroy()
+    throw new DatasetMismatchError(`Dataset changed during download: bytes=${start}-${end} returned ${statusCode}`)
+  }
+  // 200 means the storage ignored the range and sends the whole dataset.
+  if (statusCode !== 206 && statusCode !== 200) {
+    throw new HttpError(statusCode, await readResponseText(response), url, parseNodeResponseHeaders(response.headers))
+  }
+
+  let datasetSize: number | undefined
+  if (statusCode === 206) {
+    const contentRange = /^bytes (\d+)-(\d+)\/(\d+)$/.exec(asSingleHeaderValue(response.headers['content-range']) ?? '')
+    datasetSize = Number(contentRange?.[3])
+    if (contentRange === null || Number(contentRange[1]) !== start || Number(contentRange[2]) !== Math.min(end, datasetSize - 1)) {
+      response.destroy()
+      throw new Error(`Unexpected Content-Range for bytes=${start}-${end}: ${response.headers['content-range']}`)
+    }
+    if (expectedDatasetSize !== undefined && datasetSize !== expectedDatasetSize) {
+      response.destroy()
+      throw new DatasetMismatchError(`Dataset size changed from ${expectedDatasetSize} to ${datasetSize} bytes during download`)
+    }
+  }
+
+  await pipeline(response, createWriteStream(tmpFilePath, { flags: start === 0 ? 'w' : 'r+', start }))
+  if (!response.complete) {
+    throw new Error('The connection was terminated while the message was still being sent')
+  }
+
+  return { datasetSize, redirectUrl, md5: getAnnouncedMd5(parseNodeResponseHeaders(response.headers)) }
+}
+
+// Ranges are written in parallel, so the MD5 is computed from the finished file.
+async function checkDatasetMd5(tmpFilePath: string, announcedMd5: string | undefined, url: string) {
+  if (announcedMd5 === undefined) {
+    return
+  }
+
+  const md5 = createHash('md5')
+  for await (const chunk of createReadStream(tmpFilePath)) {
+    md5.update(chunk)
+  }
+  const actualMd5 = md5.digest('hex')
+  if (actualMd5 !== announcedMd5) {
+    throw new DatasetMismatchError(`MD5 mismatch for ${url}: expected ${announcedMd5}, got ${actualMd5}`)
+  }
+}
+
+// The API sends x-md5, while a redirect to the storage returns the storage's x-amz-meta-md5 and ETag.
+// A multipart ETag ("<hash>-<parts>") is not the file MD5, so such a file is saved without a check.
+function getAnnouncedMd5(headers: Record<string, string>) {
+  const md5 = (headers['x-md5'] ?? headers['x-amz-meta-md5'] ?? headers['etag'] ?? '').replace(/"/g, '').toLowerCase()
+  return /^[0-9a-f]{32}$/.test(md5) ? md5 : undefined
 }
 
 function asSingleHeaderValue(headerValue: string | string[] | undefined) {
