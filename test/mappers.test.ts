@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'whitebit',
   'coinbase-derivatives',
   'bitstamp',
   'aster-futures',
@@ -48,6 +49,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'whitebit',
   'coinbase-derivatives',
   'aster',
   'aster-futures',
@@ -174,6 +176,61 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  test('map WhiteBIT captured spot and perpetual messages', () => {
+    const mapper = createMapper('whitebit')
+    const localTimestamp = new Date('2026-10-26T11:46:00.000Z')
+    const messages = [
+      { id: 1, error: null, result: { status: 'success' } },
+      { id: 2, error: { code: 1, message: 'invalid argument' }, result: null },
+      {
+        method: 'depth_update',
+        params: [true, { timestamp: '1793015158.6166', update_id: 10, asks: [['0.2811', '276.84']], bids: [['0.281', '42']] }, 'ZK_USDT']
+      },
+      {
+        method: 'depth_update',
+        params: [false, { timestamp: '1793015158.716601', update_id: 12, past_update_id: 10, asks: [['0.2811', '0']] }, 'ZK_USDT']
+      },
+      { method: 'depth_update', params: [true, { timestamp: '1793015168.716601', update_id: 20, bids: [], asks: [] }, 'ZK_USDT'] },
+      {
+        method: 'trades_update',
+        params: [
+          'ZK_EUR',
+          [
+            { id: 24437542964, time: '1793015103.541445', price: '0.01088', amount: '23552.2', type: 'buy' },
+            { id: 24437542963, time: '1793015103.541445', price: '0.01086', amount: '3379.8', type: 'buy' }
+          ]
+        ]
+      },
+      {
+        method: 'trades_update',
+        params: ['ZK_EUR', [{ id: 24437542965, time: '1793015160.123456', price: '0.01089', amount: '12', type: 'sell', rpi: true }]]
+      },
+      {
+        method: 'bookTicker_update',
+        params: [['1793015159.449317', '1793015159.486572', 'SOL_UAH', 5375485383, '4343.5701', '1.0835', '4363.1738', '1.4775']]
+      },
+      { method: 'bookTicker_update', params: [['1793015159.549317', '1793015159.586572', 'SOL_UAH', 5375485384, '0', '0', '', '0']] },
+      {
+        method: 'trades_update',
+        params: ['DASH_PERP', [{ id: 24437542966, time: '1793015159.541445', price: '52.7', amount: '0.5', type: 'buy' }]]
+      },
+      {
+        method: 'futures_update',
+        params: ['DASH_PERP', { open_interest: '7056491', mark_price: '1', funding_rate: '1' }],
+        generated: true
+      },
+      { method: 'premiumIndex_update', params: ['DASH_PERP', '52.69', '52.72', '0.0001', 1793030400000, '1793015159.820231'] },
+      { method: 'futures_update', params: ['DASH_PERP', { open_interest: '0' }], generated: true },
+      { method: 'premiumIndex_update', params: ['DASH_PERP', '52.69', '52.72', '0', 1793030400000, '1793015160.320231'] },
+      { method: 'premiumIndex_update', params: ['DASH_PERP', '52.69', '52.72', '0', 1793030400000, '1793015160.820231'] },
+      { method: 'premiumIndex_update', params: ['XAU_PERP', '4100.1', '4100', '-0.0001', 1793030400000, '1793015160.820231'] }
+    ]
+    for (const message of messages) {
+      snapshot(mapper.map(message, localTimestamp))
+    }
+    snapshot(createMapper('whitebit').map(messages[11], localTimestamp))
+  })
+
   test('map Coinbase derivatives captured messages', () => {
     const messages = [
       {

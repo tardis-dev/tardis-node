@@ -1,5 +1,7 @@
 export function getMessageParser(exchange: string): (message: string) => any {
   switch (exchange) {
+    case 'whitebit':
+      return parseWhiteBitMessage
     case 'bitvavo':
       return parseBitvavoMessage
     case 'huobi-dm':
@@ -13,6 +15,15 @@ export function getMessageParser(exchange: string): (message: string) => any {
     default:
       return JSON.parse
   }
+}
+
+function parseWhiteBitMessage(message: string) {
+  // JSON.parse can round WhiteBIT's fractional-second timestamps when converting them to floating-point numbers.
+  // Quote decimal number tokens first to preserve every digit. Match existing strings unchanged so prices, amounts,
+  // and escaped text are preserved; integer IDs and millisecond funding timestamps remain numbers.
+  return JSON.parse(
+    message.replace(/"(?:\\.|[^"\\])*"|([0-9]+\.[0-9]+)/g, (value, timestamp) => (timestamp === undefined ? value : `"${timestamp}"`))
+  )
 }
 
 function parseBitvavoMessage(message: string) {

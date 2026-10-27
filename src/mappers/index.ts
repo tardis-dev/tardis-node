@@ -47,6 +47,7 @@ import { serumMappers } from './serum.ts'
 import { MapperCollection, mergeExchangeMappers } from './registry.ts'
 import { upbitMappers } from './upbit.ts'
 import { wooxMappers } from './woox.ts'
+import { whitebitMappers } from './whitebit.ts'
 
 export * from './mapper.ts'
 
@@ -103,7 +104,8 @@ const registeredMappers = mergeExchangeMappers(
   polymarketMappers,
   serumMappers,
   upbitMappers,
-  wooxMappers
+  wooxMappers,
+  whitebitMappers
 )
 
 export const normalizeTrades = createNormalizer<typeof registeredMappers.trades, Trade>('normalizeTrades', registeredMappers.trades)
