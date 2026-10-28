@@ -875,11 +875,11 @@ async function downloadDatasetRanges(
     // Read the URL only once the range has a slot, so a range that waited long uses the newest URL.
     const rangeUrl = storageUrl
     if (rangeUrl === undefined) {
-      return downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize)
+      return downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize, first.md5)
     }
 
     try {
-      return await downloadDatasetRange(rangeUrl, storageRequestOptions, tmpFilePath, start, datasetSize)
+      return await downloadDatasetRange(rangeUrl, storageRequestOptions, tmpFilePath, start, datasetSize, first.md5)
     } catch (error) {
       if (!(error instanceof HttpError && error.status === 403)) {
         throw error
@@ -888,7 +888,7 @@ async function downloadDatasetRanges(
       // redirect it gets replaces the URL. The others wait for it and retry with the new URL, or fail this attempt
       // with its error.
       if (renewal === undefined && storageUrl === rangeUrl) {
-        renewal = downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize)
+        renewal = downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize, first.md5)
           .then((renewedRange) => {
             storageUrl = renewedRange.redirectUrl
             return renewedRange
@@ -918,7 +918,8 @@ async function downloadDatasetRange(
   requestOptions: DownloadRequestOptions,
   tmpFilePath: string,
   start: number,
-  expectedDatasetSize?: number
+  expectedDatasetSize?: number,
+  expectedMd5?: string
 ) {
   const end = start + DATASET_RANGE_SIZE - 1
   const { response, redirectUrl } = await openDownloadResponse(url, {
@@ -949,13 +950,19 @@ async function downloadDatasetRange(
       throw new DatasetMismatchError(`Dataset size changed from ${expectedDatasetSize} to ${datasetSize} bytes during download`)
     }
   }
+  // A dataset exported again with the same size announces another MD5.
+  const md5 = getAnnouncedMd5(parseNodeResponseHeaders(response.headers))
+  if (expectedMd5 !== undefined && md5 !== undefined && md5 !== expectedMd5) {
+    response.destroy()
+    throw new DatasetMismatchError(`Dataset MD5 changed from ${expectedMd5} to ${md5} during download`)
+  }
 
   await pipeline(response, createWriteStream(tmpFilePath, { flags: start === 0 ? 'w' : 'r+', start }))
   if (!response.complete) {
     throw new Error('The connection was terminated while the message was still being sent')
   }
 
-  return { datasetSize, redirectUrl, md5: getAnnouncedMd5(parseNodeResponseHeaders(response.headers)) }
+  return { datasetSize, redirectUrl, md5 }
 }
 
 // Ranges are written in parallel, so the MD5 is computed from the finished file.

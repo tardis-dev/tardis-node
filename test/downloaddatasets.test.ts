@@ -288,7 +288,8 @@ describe('downloadDatasets in byte ranges', () => {
 
   for (const [change, exportedAgainSize] of [
     ['larger', 2 * RANGE_SIZE + 2000],
-    ['smaller', RANGE_SIZE + 1000]
+    ['smaller', RANGE_SIZE + 1000],
+    ['with the same size', 2 * RANGE_SIZE + 1000]
   ] as const) {
     test(`starts over when the dataset is exported again ${change} during download`, async () => {
       const exported = randomBytes(2 * RANGE_SIZE + 1000)
@@ -296,7 +297,8 @@ describe('downloadDatasets in byte ranges', () => {
       let requests = 0
       const api = await listen((request, response) => {
         requests++
-        sendRange(request, response, requests === 1 ? exported : exportedAgain)
+        const dataset = requests === 1 ? exported : exportedAgain
+        sendRange(request, response, dataset, { 'x-md5': `"${createHash('md5').update(dataset).digest('hex')}"` })
       })
       const tempDir = createTempDir()
 
