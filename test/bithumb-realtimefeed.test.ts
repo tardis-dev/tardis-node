@@ -30,7 +30,7 @@ test('registers and maps Bithumb realtime subscriptions', () => {
   assert.equal(request.length, 4)
   assert.match(request[0].ticket, /^[0-9a-f-]{36}$/)
   assert.deepEqual(request.slice(1), [
-    { type: 'trade', codes: ['KRW-BTC'] },
+    { type: 'trade', codes: ['KRW-BTC'], isOnlyRealtime: true },
     { type: 'orderbook', codes: ['KRW-BTC', 'KRW-ETH'], level: 1 },
     { format: 'DEFAULT' }
   ])

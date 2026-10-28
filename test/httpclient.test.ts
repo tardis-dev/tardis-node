@@ -7,7 +7,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
-import { download, getJSON, HttpClientError, postJSON } from '../dist/handy.js'
+import { download, getJSON, HttpClientError, HttpError, postJSON } from '../dist/handy.js'
 import { assert } from './assertions.ts'
 
 const execFileAsync = promisify(execFile)
@@ -153,6 +153,53 @@ test('does not cache a response shorter than its content length', async () => {
     assert.strictEqual(requestsCount, 2)
     assert.strictEqual(existsSync(`${downloadPath}.zst`), false)
     assert.deepStrictEqual(readdirSync(tempDir), [])
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+    await server.close()
+  }
+})
+
+test('retries a rate-limited download after its Retry-After delay', { timeout: 10_000 }, async () => {
+  const requestTimes: number[] = []
+  const server = await startServer((_request, response) => {
+    requestTimes.push(performance.now())
+    if (requestTimes.length === 1) {
+      response.writeHead(429, { 'Retry-After': '1' }).end('rate limited')
+      return
+    }
+
+    response.writeHead(200).end('data')
+  })
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-'))
+  const downloadPath = path.join(tempDir, 'data.bin')
+
+  try {
+    await download({ url: `${server.url}/data`, downloadPath, userAgent: 'tardis-node-test', apiKey: '' })
+
+    assert.strictEqual(requestTimes.length, 2)
+    const retryDelayMS = requestTimes[1] - requestTimes[0]
+    assert.ok(retryDelayMS >= 950 && retryDelayMS < 5000, `retried after ${retryDelayMS} ms`)
+    assert.strictEqual(readFileSync(downloadPath, 'utf8'), 'data')
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+    await server.close()
+  }
+})
+
+test('fails a rate-limited download without retrying when Retry-After exceeds five minutes', { timeout: 10_000 }, async () => {
+  let requestsCount = 0
+  const server = await startServer((_request, response) => {
+    requestsCount++
+    response.writeHead(429, { 'Retry-After': '3600' }).end('transfer limit reached')
+  })
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-http-'))
+
+  try {
+    await assert.rejects(
+      download({ url: `${server.url}/data`, downloadPath: path.join(tempDir, 'data.bin'), userAgent: 'tardis-node-test', apiKey: '' }),
+      (error) => error instanceof HttpError && error.status === 429 && error.responseText === 'transfer limit reached'
+    )
+    assert.strictEqual(requestsCount, 1)
   } finally {
     rmSync(tempDir, { force: true, recursive: true })
     await server.close()

@@ -10,6 +10,7 @@ jobs:
   build:
     name: Build And Pack Release
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -37,10 +38,10 @@ jobs:
             exit 1
           fi
 
-      - name: Use Node.js v26.7.0
+      - name: Use Node.js v26.12.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 26.7.0
+          node-version: 26.12.1
           package-manager-cache: false
 
       - name: Install Dependencies
@@ -79,15 +80,16 @@ jobs:
     name: Publish Package To NPM
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       id-token: write
 
     steps:
-      - name: Use Node.js v26.7.0
+      - name: Use Node.js v26.12.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 26.7.0
+          node-version: 26.12.1
           registry-url: https://registry.npmjs.org/
 
       - name: Download Package Artifact
@@ -103,14 +105,15 @@ jobs:
     name: Commit Package Version
     needs: publish
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
 
     steps:
-      - name: Use Node.js v26.7.0
+      - name: Use Node.js v26.12.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 26.7.0
+          node-version: 26.12.1
           package-manager-cache: false
 
       - name: Checkout Default Branch

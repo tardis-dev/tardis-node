@@ -114,6 +114,7 @@ const exchangesWithOptionsSummary: Exchange[] = [
 ]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
+  'gate-io-futures',
   'aster-futures',
   'ftx',
   'bitmex',
@@ -9256,7 +9257,7 @@ describe('mappers', () => {
         result: { asks: [], bids: [], contract: 'ALICE_USDT', id: 0, t: 0 }
       }
     ]
-    const gateIOFuturesMapper = createMapper('gate-io-futures')
+    const gateIOFuturesMapper = createMapper('gate-io-futures', new Date('2020-07-01T00:00:00Z'))
 
     for (const message of messages) {
       const mappedMessages = gateIOFuturesMapper.map(message, new Date('2020-07-01T00:00:01.2750543Z'))
@@ -9265,7 +9266,7 @@ describe('mappers', () => {
   })
 
   test('map gate-io-futures decimal size messages', () => {
-    const gateIOFuturesMapper = createMapper('gate-io-futures')
+    const gateIOFuturesMapper = createMapper('gate-io-futures', new Date('2026-03-25T00:00:00Z'))
     const localTimestamp = new Date('2026-03-25T12:53:00.000Z')
 
     const tradeMessages = Array.from(
@@ -9316,6 +9317,288 @@ describe('mappers', () => {
     )
 
     snapshot(bookChangeMessages)
+  })
+
+  test('Gate normalizes only the selected book channel when legacy and OBU messages coexist', (t) => {
+    const previous = process.env.__NO_REAL_TIME__
+    process.env.__NO_REAL_TIME__ = '1'
+    t.after(() => {
+      if (previous === undefined) delete process.env.__NO_REAL_TIME__
+      else process.env.__NO_REAL_TIME__ = previous
+    })
+
+    const timestamp = Date.parse('2026-10-21T00:00:00Z')
+    const messages = [
+      {
+        channel: 'futures.order_book',
+        event: 'all',
+        result: {
+          t: timestamp,
+          contract: 'BTC_USDT',
+          bids: [{ p: '100', s: '1' }],
+          asks: [{ p: '101', s: '2' }]
+        }
+      },
+      {
+        channel: 'futures.obu',
+        event: 'update',
+        result: {
+          t: timestamp + 1,
+          s: 'ob.BTC_USDT.400',
+          full: true,
+          u: 100,
+          b: [['100', '3']],
+          a: [['101', '4']]
+        }
+      },
+      { channel: 'futures.order_book', event: 'update', result: [{ t: timestamp + 2, c: 'BTC_USDT', p: '100', s: '5' }] },
+      {
+        channel: 'futures.obu',
+        event: 'update',
+        result: {
+          t: timestamp + 3,
+          s: 'ob.BTC_USDT.400',
+          U: 101,
+          u: 101,
+          b: [['100', '6']]
+        }
+      },
+      // Legacy continues sending snapshots after the OBU book has initialized.
+      {
+        channel: 'futures.order_book',
+        event: 'all',
+        result: {
+          t: timestamp + 4,
+          contract: 'BTC_USDT',
+          bids: [{ p: '100', s: '7' }],
+          asks: [{ p: '101', s: '8' }]
+        }
+      },
+      {
+        channel: 'futures.obu',
+        event: 'update',
+        result: {
+          t: timestamp + 5,
+          s: 'ob.BTC_USDT.400',
+          U: 102,
+          u: 102,
+          b: [['100', '0']]
+        }
+      }
+    ]
+
+    for (const [at, expected] of [
+      [
+        '2026-10-20T23:59:59.999Z',
+        [
+          [true, 1, 0],
+          [false, 5, 2],
+          [true, 7, 4]
+        ]
+      ],
+      [
+        '2026-10-21T00:00:00.000Z',
+        [
+          [true, 3, 1],
+          [false, 6, 3],
+          [false, 0, 5]
+        ]
+      ],
+      [
+        '2026-10-21T00:00:00.000Z',
+        [
+          [true, 3, 1],
+          [false, 6, 3],
+          [false, 0, 5]
+        ]
+      ]
+    ] as const) {
+      const localTimestamp = new Date(at)
+      const mapper = normalizeBookChanges('gate-io-futures', localTimestamp)
+      const output = messages.flatMap((message) => (mapper.canHandle(message) ? [...mapper.map(message, localTimestamp)!] : []))
+      assert.deepStrictEqual(
+        output.map((change) => [change.isSnapshot, change.bids[0].amount, change.timestamp.valueOf() - timestamp]),
+        expected
+      )
+      assert.ok(output.every((change) => change.symbol === 'BTC_USDT' && change.localTimestamp === localTimestamp))
+    }
+  })
+
+  test('map Gate futures OBU snapshots, one-sided deltas, and delivery snapshots', () => {
+    const mapper = normalizeBookChanges('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
+    // Gate OBU docs: native full snapshot, followed by an incremental deletion.
+    const full = {
+      channel: 'futures.obu',
+      event: 'update',
+      result: { t: 1743673026995, full: true, s: 'ob.BTC_USDT.400', u: 79072179673, b: [['83705.9', '30166']], a: [['83706', '4208']] }
+    }
+    assert.strictEqual(mapper.canHandle(full), true)
+    assert.deepStrictEqual(
+      [...mapper.map(full, localTimestamp)!],
+      [
+        {
+          type: 'book_change',
+          symbol: 'BTC_USDT',
+          exchange: 'gate-io-futures',
+          isSnapshot: true,
+          bids: [{ price: 83705.9, amount: 30166 }],
+          asks: [{ price: 83706, amount: 4208 }],
+          timestamp: new Date(1743673026995),
+          localTimestamp
+        }
+      ]
+    )
+    const delta = {
+      channel: 'futures.obu',
+      event: 'update',
+      result: {
+        t: 1743673027017,
+        s: 'ob.BTC_USDT.400',
+        U: 79072179674,
+        u: 79072179694,
+        b: [
+          ['83705.9', '0'],
+          ['83702.2', '0.25']
+        ]
+      }
+    }
+    const [change] = [...mapper.map(delta, localTimestamp)!]
+    assert.strictEqual(change.isSnapshot, false)
+    assert.deepStrictEqual(change.bids, [
+      { price: 83705.9, amount: 0 },
+      { price: 83702.2, amount: 0.25 }
+    ])
+    assert.deepStrictEqual(change.asks, [])
+    assert.strictEqual(change.localTimestamp, localTimestamp)
+    // Live delivery capture, 2026-10-12: full snapshots use event=all.
+    const delivery = {
+      channel: 'futures.obu',
+      event: 'all',
+      result: {
+        t: 1791797252022,
+        full: true,
+        s: 'ob.ETH_USDT_20261023.100',
+        u: 520794,
+        b: [['2552.68', '2']],
+        a: [['2554.36', '163']]
+      }
+    }
+    assert.strictEqual(mapper.canHandle(delivery), true)
+    const [snapshot] = [...mapper.map(delivery, localTimestamp)!]
+    assert.strictEqual(snapshot.symbol, 'ETH_USDT_20261023')
+    assert.strictEqual(snapshot.isSnapshot, true)
+    assert.deepStrictEqual(snapshot.bids, [{ price: 2552.68, amount: 2 }])
+    assert.strictEqual(mapper.canHandle({ channel: 'futures.obu', event: 'subscribe', result: { status: 'success' } }), false)
+    assert.strictEqual(mapper.canHandle({ channel: 'futures.order_book', event: 'all', result: {} }), false)
+    assert.strictEqual([...mapper.map(full, localTimestamp)!][0].isSnapshot, true)
+  })
+
+  test('map every Gate liquidation in a batch using its own time and signed order size', () => {
+    const mapper = normalizeLiquidations('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
+    const message = {
+      channel: 'futures.public_liquidates',
+      event: 'update',
+      time_ms: 1541505434123,
+      result: [
+        { price: '215.1', size: '-124.5', time: 1541486601123, contract: 'BTC_USDT' },
+        { price: '215.2', size: '10.5', time: 1541486601456, contract: 'BTC_USDT' }
+      ]
+    }
+    assert.strictEqual(mapper.canHandle(message), true)
+    assert.deepStrictEqual(
+      [...mapper.map(message, localTimestamp)!],
+      [
+        {
+          type: 'liquidation',
+          exchange: 'gate-io-futures',
+          symbol: 'BTC_USDT',
+          id: undefined,
+          price: 215.1,
+          amount: 124.5,
+          side: 'sell',
+          timestamp: new Date(1541486601123),
+          localTimestamp
+        },
+        {
+          type: 'liquidation',
+          exchange: 'gate-io-futures',
+          symbol: 'BTC_USDT',
+          id: undefined,
+          price: 215.2,
+          amount: 10.5,
+          side: 'buy',
+          timestamp: new Date(1541486601456),
+          localTimestamp
+        }
+      ]
+    )
+    assert.strictEqual(mapper.canHandle({ channel: 'futures.public_liquidates', event: 'subscribe' }), false)
+    assert.deepStrictEqual([...mapper.map({ ...message, result: [] }, localTimestamp)!], [])
+  })
+
+  test('Gate tickers map next funding seconds and emit funding-time-only changes', () => {
+    const localTimestamp = new Date('2026-10-12T11:15:22.608Z')
+    for (const [contract, interval] of [
+      ['BTC_USD', 28800],
+      ['BTC_USDT', 14400],
+      ['BTC_USD1', 3600]
+    ] as const) {
+      const mapper = normalizeDerivativeTickers('gate-io-futures', localTimestamp)
+      // Perpetual ticker fields captured from Gate on 2026-10-12.
+      const ticker = {
+        contract,
+        last: '83389.7',
+        funding_rate: '0.000061',
+        funding_rate_indicative: '0.000061',
+        mark_price: '83389.6',
+        index_price: '83415.9',
+        total_size: '528972382'
+      }
+      const message = { channel: 'futures.tickers', event: 'update', time: 1791803722, time_ms: 1791803722334 }
+      const [historical] = [...mapper.map({ ...message, result: ticker }, localTimestamp)!]
+      assert.strictEqual(historical.fundingTimestamp, undefined)
+
+      const result = { ...ticker, funding_next_apply: 1791820800 }
+      const [initial] = [...mapper.map({ ...message, result: [result] }, localTimestamp)!]
+      assert.deepStrictEqual(initial.fundingTimestamp, new Date('2026-10-12T16:00:00Z'))
+      assert.strictEqual(initial.localTimestamp, localTimestamp)
+      assert.strictEqual(initial.timestamp.valueOf(), message.time_ms)
+      assert.deepStrictEqual([...mapper.map({ ...message, result: [result] }, localTimestamp)!], [])
+
+      const [next] = [...mapper.map({ ...message, result: { ...result, funding_next_apply: 1791820800 + interval } }, localTimestamp)!]
+      assert.strictEqual(next.fundingTimestamp?.valueOf(), Date.parse('2026-10-12T16:00:00Z') + interval * 1000)
+      assert.strictEqual(next.fundingRate, initial.fundingRate)
+    }
+  })
+
+  test('Gate delivery tickers leave empty funding fields undefined', () => {
+    const mapper = normalizeDerivativeTickers('gate-io-futures', new Date('2026-10-21T00:00:00Z'))
+    const localTimestamp = new Date('2026-10-21T00:00:01Z')
+    const message = {
+      time: 1791797256,
+      time_ms: 1791797256796,
+      channel: 'futures.tickers',
+      event: 'update',
+      result: [
+        {
+          contract: 'DOGE_USDT_20261023',
+          last: '0.08726',
+          funding_rate: '',
+          funding_rate_indicative: '',
+          mark_price: '0.08733',
+          index_price: '0.08723',
+          total_size: '235'
+        }
+      ]
+    }
+    const [ticker] = [...mapper.map(message, localTimestamp)!]
+    assert.strictEqual(ticker.fundingRate, undefined)
+    assert.strictEqual(ticker.predictedFundingRate, undefined)
+    assert.strictEqual(ticker.fundingTimestamp, undefined)
+    assert.strictEqual(ticker.openInterest, 235)
+    assert.strictEqual(ticker.timestamp.valueOf(), 1791797256796)
   })
 
   test('map poloniex messages', () => {
@@ -11447,6 +11730,173 @@ test('map dydx-v4 oracle prices only for markets with market data', () => {
   assert.equal(tickers[0].fundingRate, 0.0000125)
 })
 
+test('ignore dydx-v4 markets in final settlement', () => {
+  const localTimestamp = new Date('2026-10-17T12:08:09.293Z')
+  // Recorded v4_markets snapshot; keep only relevant fields and markets.
+  const snapshot = {
+    type: 'subscribed',
+    connection_id: '47328f9a-c969-4e6b-982b-ad4da3a5811c',
+    message_id: 19,
+    channel: 'v4_markets',
+    contents: {
+      markets: {
+        'BTC-USD': {
+          ticker: 'BTC-USD',
+          status: 'ACTIVE',
+          oraclePrice: '81464.40685',
+          nextFundingRate: '0.000003140625',
+          openInterest: '204.4022'
+        },
+        'MATIC-USD': {
+          ticker: 'MATIC-USD',
+          status: 'FINAL_SETTLEMENT',
+          oraclePrice: '0.3932407381',
+          nextFundingRate: '0',
+          openInterest: '0'
+        }
+      }
+    }
+  }
+
+  const mapped = createMapper('dydx-v4', localTimestamp).map(snapshot, localTimestamp)
+
+  assert.deepEqual(
+    mapped.map((ticker) => ticker.symbol),
+    ['BTC-USD']
+  )
+})
+
+test('ignore phemex zero prices', () => {
+  const localTimestamp = new Date('2026-10-17T08:23:03Z')
+  // Rows from recorded perp_market24h_pack_p snapshots; STARUSDT is from 2026-07-25 and XAIUSDT from 2026-09-02.
+  const snapshot = {
+    data: [
+      ['ARXUSDT', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+      ['STARUSDT', '0', '0', '0', '0', '0', '0', '0', '0.1505085', '0.15069', '0.00005', '0.00005', '0', '0'],
+      ['XAIUSDT', '0.00778', '0.00778', '0.00778', '0.00778', '88378', '687.58084', '329290', '0', '0', '0', '0', '0', '1.65'],
+      [
+        'LSKUSDT',
+        '0.19916',
+        '0.20672',
+        '0.1897',
+        '0.19431',
+        '3415465',
+        '673317.67363',
+        '2513383',
+        '0.1946352',
+        '0.1945',
+        '0.00005',
+        '0.00005',
+        '0.1943',
+        '0.19431'
+      ]
+    ],
+    method: 'perp_market24h_pack_p.update',
+    timestamp: 1792225382281873288,
+    type: 'snapshot'
+  }
+
+  const mapped = createMapper('phemex', localTimestamp).map(snapshot, localTimestamp)
+
+  assert.deepEqual(
+    mapped.map((ticker) => [ticker.symbol, ticker.lastPrice, ticker.markPrice, ticker.indexPrice]),
+    [
+      ['STARUSDT', undefined, 0.15069, 0.1505085],
+      ['XAIUSDT', 0.00778, undefined, undefined],
+      ['LSKUSDT', 0.19431, 0.1945, 0.1946352]
+    ]
+  )
+})
+
+test('map phemex spot amounts and prices with currency scales', () => {
+  // Recorded messages, books cut to their first levels. The sSHIBUSDT trade equals the volumeEv change in Phemex's own
+  // spot_market24h ticker; the 13:09 sREDUSDT trade is RedStone's first, before its 13:30 listTime.
+  const messages = [
+    {
+      localTimestamp: new Date('2026-10-17T12:00:10.2621182Z'),
+      message: { sequence: 27083468664, symbol: 'sSHIBUSDT', trades: [[1792238410209958259, 'Buy', 507, 660625000]], type: 'incremental' }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:00.9859800Z'),
+      message: { sequence: 320265182, symbol: 'sUSDTTRY', trades: [[1685620800936824764, 'Buy', 213030, 16876100000]], type: 'incremental' }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:14.4469322Z'),
+      message: {
+        book: { asks: [[213250, 14261900000]], bids: [] },
+        depth: 0,
+        sequence: 320265215,
+        symbol: 'sUSDTTRY',
+        timestamp: 1685620807110302805,
+        type: 'snapshot'
+      }
+    },
+    {
+      localTimestamp: new Date('2023-06-01T12:00:00.6076010Z'),
+      message: {
+        book: { asks: [[3485, 4530800000]], bids: [] },
+        depth: 0,
+        sequence: 4510473013,
+        symbol: 'sREDUSDT',
+        timestamp: 1685620800452538778,
+        type: 'incremental'
+      }
+    },
+    {
+      localTimestamp: new Date('2025-03-06T13:09:15.5143498Z'),
+      message: {
+        sequence: 12441482889,
+        symbol: 'sREDUSDT',
+        trades: [[1741266555465747983, 'Buy', 83530000, 13526000000]],
+        type: 'incremental'
+      }
+    },
+    {
+      localTimestamp: new Date('2025-06-01T12:00:37.3080059Z'),
+      message: {
+        book: {
+          asks: [
+            [36080000, 28116000000],
+            [36090000, 55855000000],
+            [36100000, 28102000000]
+          ],
+          bids: []
+        },
+        depth: 0,
+        sequence: 15197432837,
+        symbol: 'sREDUSDT',
+        timestamp: 1748779237067041865,
+        type: 'incremental'
+      }
+    }
+  ]
+
+  const mapped = messages.flatMap(({ message, localTimestamp }) => [...createMapper('phemex', localTimestamp).map(message, localTimestamp)])
+
+  assert.deepEqual(
+    mapped.map((item: any) =>
+      item.type === 'trade'
+        ? [item.symbol, item.price, item.amount]
+        : [item.symbol, item.asks.map((level: any) => [level.price, level.amount])]
+    ),
+    [
+      ['SSHIBUSDT', 0.00000507, 6606250],
+      ['SUSDTTRY', 21.303, 168.761],
+      ['SUSDTTRY', [[21.325, 142.619]]],
+      ['SREDUSDT', [[0.00003485, 453080]]],
+      ['SREDUSDT', 0.8353, 135.26],
+      [
+        'SREDUSDT',
+        [
+          [0.3608, 281.16],
+          [0.3609, 558.55],
+          [0.361, 281.02]
+        ]
+      ]
+    ]
+  )
+})
+
 test('map bitget messages', () => {
   const messages = [
     {
@@ -13279,11 +13729,14 @@ test('ignore inactive Lighter market stats without dropping a new market before 
   const initialMapped = createMapper('lighter', newMarketTimestamp).map(initialNewMarket, newMarketTimestamp)
   assert.equal(initialMapped.length, 1)
   assert.equal(initialMapped[0].fundingRate, 0.000002)
+  assert.equal(initialMapped[0].markPrice, undefined)
+  assert.equal(initialMapped[0].indexPrice, undefined)
 
   const mapped = createMapper('lighter', newMarketTimestamp).map(newMarket, newMarketTimestamp)
   assert.equal(mapped.length, 1)
   assert.equal(mapped[0].symbol, '4095')
   assert.equal(mapped[0].markPrice, 0.18163)
+  assert.equal(mapped[0].lastPrice, undefined)
 })
 
 test('ignore Lighter market stats with funding older than 12 hours', () => {

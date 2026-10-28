@@ -315,7 +315,7 @@ const OKEX_OPTIONS_CHANNELS = [
 
 const COINFLEX_CHANNELS = ['futures/depth', 'trade', 'ticker'] as const
 
-const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker', 'heartbeat'] as const
+const CRYPTOFACILITIES_CHANNELS = ['trade', 'trade_snapshot', 'book', 'book_snapshot', 'ticker'] as const
 
 const FTX_CHANNELS = [
   'orderbook',
@@ -489,7 +489,7 @@ const DELTA_INDIA_CHANNELS = [
 ] as const
 
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
-const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker'] as const
+const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker', 'obu', 'public_liquidates'] as const
 const MEXC_FUTURES_CHANNELS = [
   'push.deal',
   'push.depth',

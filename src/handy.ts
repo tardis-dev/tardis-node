@@ -67,12 +67,16 @@ export function* sequence(end: number, seed = 0) {
 export const ONE_SEC_IN_MS = 1000
 
 export class HttpError extends Error {
+  public readonly retryAfterMS: number | undefined
+
   constructor(
     public readonly status: number,
     public readonly responseText: string,
-    public readonly url: string
+    public readonly url: string,
+    headers: Record<string, string> = {}
   ) {
     super(`HttpError: status code: ${status}, response text: ${responseText}`)
+    this.retryAfterMS = getRetryAfterDelayMS(headers)
   }
 }
 
@@ -616,6 +620,7 @@ export async function download({
   }
 
   const MAX_ATTEMPTS = 30
+  const MAX_RETRY_AFTER_MS = 300 * ONE_SEC_IN_MS
   let attempts = 0
 
   while (true) {
@@ -637,9 +642,11 @@ export async function download({
           error.status === 403 ||
           error.status === 404)
       const tooManyRequests = error instanceof HttpError && error.status === 429
+      const retryAfterMS = tooManyRequests ? error.retryAfterMS : undefined
+      const retryAfterTooLong = retryAfterMS !== undefined && retryAfterMS > MAX_RETRY_AFTER_MS
       const internalServiceError = error instanceof HttpError && error.status === 500
-      // do not retry when we've got bad or unauthorized request or enough attempts
-      if (unsupportedDataFeedEncoding || nonRetryableHttpError || attempts === MAX_ATTEMPTS) {
+      // do not retry when we've got bad or unauthorized request, too long Retry-After or enough attempts
+      if (unsupportedDataFeedEncoding || nonRetryableHttpError || retryAfterTooLong || attempts === MAX_ATTEMPTS) {
         throw error
       }
 
@@ -647,8 +654,11 @@ export async function download({
       const attemptsDelayMS = Math.min(Math.pow(2, attempts) * ONE_SEC_IN_MS, 120 * ONE_SEC_IN_MS)
       let nextAttemptDelayMS = randomIngridient + attemptsDelayMS
 
-      if (tooManyRequests) {
-        // when too many requests received wait one minute
+      if (retryAfterMS !== undefined) {
+        // wait as long as the API asked, with jitter so concurrent downloads do not retry at the same time
+        nextAttemptDelayMS = retryAfterMS + Math.random() * ONE_SEC_IN_MS
+      } else if (tooManyRequests) {
+        // when too many requests received without Retry-After wait one minute
         nextAttemptDelayMS += 60 * ONE_SEC_IN_MS
       }
       if (internalServiceError) {
@@ -695,11 +705,11 @@ async function _downloadFile(
     // based on https://github.com/nodejs/node/issues/28172 - only reliable way to consume response stream and avoiding all the 'gotchas'
     const response = await openDownloadResponse(url, requestOptions)
     const { statusCode } = response
+    const responseHeaders = parseNodeResponseHeaders(response.headers)
     if (statusCode !== 200) {
-      throw new HttpError(statusCode ?? 0, await readResponseText(response), url)
+      throw new HttpError(statusCode ?? 0, await readResponseText(response), url, responseHeaders)
     }
 
-    const responseHeaders = parseNodeResponseHeaders(response.headers)
     if (appendContentEncodingExtension) {
       const contentEncoding = asSingleHeaderValue(response.headers['content-encoding'])
       if (contentEncoding === 'zstd') {

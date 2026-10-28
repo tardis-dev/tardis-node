@@ -10,10 +10,11 @@ export class UpbitRealTimeFeed extends RealTimeFeedBase {
         throw new Error('UpbitRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
 
+      // trade SNAPSHOT is the market's last trade, often hours old; orderbook and ticker SNAPSHOT give the current state
       return {
         type: filter.channel,
         codes: filter.symbols,
-        isOnlyRealtime: true
+        ...(filter.channel === 'trade' ? { isOnlyRealtime: true } : {})
       }
     })
 

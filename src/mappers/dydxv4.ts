@@ -145,6 +145,11 @@ class DydxV4DerivativeTickerMapper implements Mapper<'dydx-v4', DerivativeTicker
       for (const key in contents) {
         const marketInfo = (contents as any)[key] as DydxMarketsSnapshotContent | DydxMarketTradeUpdate
 
+        // Settled markets stay in the markets snapshot with a frozen oracle price.
+        if (marketInfo.status === 'FINAL_SETTLEMENT') {
+          continue
+        }
+
         const pendingTickerInfo = this._getMarketTickerInfo(key)
 
         if (marketInfo.oraclePrice !== undefined) {
@@ -291,7 +296,7 @@ type DydxMarketsSnapshot = {
 type DydxMarketsSnapshotContent = {
   clobPairId: '0'
   ticker: 'BTC-USD'
-  status: 'ACTIVE'
+  status: string
   oraclePrice: '60387.51779'
   priceChange24H: '-782.58326'
   volume24H: '247515340.0835'
@@ -347,6 +352,7 @@ type DydxMarketTradeUpdate = {
   clobPairId?: string
   ticker?: string
   marketId?: number
+  status?: string
   oraclePrice: undefined
   baseAsset?: string
   quoteAsset?: string

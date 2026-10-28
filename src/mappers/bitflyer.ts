@@ -13,7 +13,7 @@ export const bitflyerMappers = exchangeMappers({
 
 const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
-    return message.params.channel.startsWith('lightning_executions')
+    return message.params?.channel.startsWith('lightning_executions') === true
   },
 
   getFilters(symbols?: string[]) {
@@ -59,7 +59,7 @@ class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
   private readonly _snapshotsInfo: Map<string, boolean> = new Map()
 
   canHandle(message: BitflyerExecutions | BitflyerBoard) {
-    return message.params.channel.startsWith('lightning_board')
+    return message.params?.channel.startsWith('lightning_board') === true
   }
 
   getFilters(symbols?: string[]) {
@@ -106,7 +106,7 @@ class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
 
 const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
   canHandle(message: BitflyerTicker) {
-    return message.params.channel.startsWith('lightning_ticker')
+    return message.params?.channel.startsWith('lightning_ticker') === true
   },
 
   getFilters(symbols?: string[]) {

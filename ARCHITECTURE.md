@@ -32,6 +32,8 @@ Worker thread pre-fetches and caches slices while the main thread processes the 
 
 `RealTimeFeedBase` manages WebSocket connections to exchanges. Handles connection lifecycle (connect, subscribe, validate, reconnect on failure). Exchange-specific feeds extend the base class with subscription formats and message handling. Breaking real-time iteration or calling its standard `return()` closes the underlying feeds before finishing iterator cleanup, including quiet feeds whose `next()` is still pending.
 
+`MultiConnectionRealTimeFeedBase` merges several connections and REST pollers of one exchange. A disconnect resets all normalized state, so when any connection drops, the feed closes all its connections and pollers, yields one disconnect and opens them again after the retry delay of the failed connection.
+
 ## Mapper System
 
 Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange defines its mapper registry next to its mapper classes in `src/mappers/{exchange}.ts`; `src/mappers/index.ts` aggregates those registries for the public normalizers.

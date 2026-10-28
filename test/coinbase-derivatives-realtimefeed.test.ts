@@ -1,6 +1,6 @@
 import { once } from 'node:events'
 import { mock, test } from 'node:test'
-import { WebSocketServer } from 'ws'
+import { type WebSocket, WebSocketServer } from 'ws'
 import * as handy from '../dist/handy.js'
 import { assert } from './assertions.ts'
 
@@ -23,44 +23,31 @@ mock.module('../dist/handy.js', {
 
 const { stream } = await import('../dist/index.js')
 
-test('Coinbase derivatives groups books and reconnects only the connection with a sequence gap', { timeout: 15000 }, async () => {
+test('Coinbase derivatives subscribes all books on one connection and restarts it after a sequence gap', { timeout: 15000 }, async () => {
   const server = new WebSocketServer({ port: 0 })
   await once(server, 'listening')
   const address = server.address()
   assert.ok(typeof address === 'object' && address !== null)
   const oldUrl = process.env.WSS_URL_COINBASE_DERIVATIVES
   process.env.WSS_URL_COINBASE_DERIVATIVES = `ws://127.0.0.1:${address.port}`
-  let connections = 0
-  let injected = false
-  let failedSymbol: string | undefined
-  let healthySymbol: string | undefined
+  const connections: { socket: WebSocket; sequence: number }[] = []
   const errors: Error[] = []
   server.on('connection', (socket) => {
-    connections++
-    let sequence = 0
+    const connection = { socket, sequence: 0 }
+    connections.push(connection)
     socket.on('message', (bytes) => {
       const message = JSON.parse(bytes.toString())
-      socket.send(JSON.stringify({ channel: 'subscriptions', sequence_num: sequence++, events: [] }))
+      socket.send(JSON.stringify({ channel: 'subscriptions', sequence_num: connection.sequence++, events: [] }))
       if (message.channel === 'level2') {
-        assert.ok(message.product_ids.length <= 25)
-        if (!injected) {
-          failedSymbol = message.product_ids[0]
-        } else if (!message.product_ids.includes(failedSymbol)) {
-          healthySymbol = message.product_ids[0]
-        }
         for (const product_id of message.product_ids)
           socket.send(
             JSON.stringify({
               channel: 'l2_data',
-              sequence_num: sequence++,
+              sequence_num: connection.sequence++,
               timestamp: '2026-10-06T10:00:00Z',
               events: [{ type: 'snapshot', product_id, updates: [] }]
             })
           )
-        if (!injected) {
-          injected = true
-          socket.send(JSON.stringify({ channel: 'heartbeats', sequence_num: sequence + 1, events: [] }))
-        }
       }
     })
   })
@@ -68,19 +55,33 @@ test('Coinbase derivatives groups books and reconnects only the connection with 
   const feed = stream({
     exchange: 'coinbase-derivatives',
     filters: [{ channel: 'l2_data', symbols }],
+    withDisconnects: true,
     onError: (error) => errors.push(error)
   })
-  const seen = new Map<string, number>()
+  const snapshotsBeforeDisconnect = new Set<string>()
+  const snapshotsAfterDisconnect = new Set<string>()
+  let disconnects = 0
   try {
-    for await (const { message } of feed) {
-      if (message.channel !== 'l2_data') continue
-      const symbol = message.events[0].product_id
-      seen.set(symbol, (seen.get(symbol) ?? 0) + 1)
-      if (seen.size === 26 && failedSymbol !== undefined && seen.get(failedSymbol) === 2) break
+    for await (const item of feed) {
+      if (item === undefined) {
+        disconnects++
+        continue
+      }
+      if (item.message.channel !== 'l2_data') continue
+      const symbol = item.message.events[0].product_id
+      if (disconnects === 0) {
+        snapshotsBeforeDisconnect.add(symbol)
+        if (snapshotsBeforeDisconnect.size === symbols.length) {
+          const [first] = connections
+          first.socket.send(JSON.stringify({ channel: 'heartbeats', sequence_num: first.sequence + 1, events: [] }))
+        }
+      } else {
+        snapshotsAfterDisconnect.add(symbol)
+        if (snapshotsAfterDisconnect.size === symbols.length) break
+      }
     }
-    assert.equal(connections, 3)
-    assert.ok(healthySymbol !== undefined)
-    assert.equal(seen.get(healthySymbol), 1)
+    assert.equal(connections.length, 2)
+    assert.equal(disconnects, 1)
     assert.equal(errors.length, 1)
     assert.match(errors[0].message, /sequence gap/)
   } finally {
