@@ -298,7 +298,10 @@ describe('downloadDatasets in byte ranges', () => {
       const api = await listen((request, response) => {
         requests++
         const dataset = requests === 1 ? exported : exportedAgain
-        sendRange(request, response, dataset, { 'x-md5': `"${createHash('md5').update(dataset).digest('hex')}"` })
+        // Only an export with the same size depends on the announced MD5; the others must start over on the size alone.
+        const headers: Record<string, string> =
+          exportedAgainSize === exported.length ? { 'x-md5': `"${createHash('md5').update(dataset).digest('hex')}"` } : {}
+        sendRange(request, response, dataset, headers)
       })
       const tempDir = createTempDir()
 
