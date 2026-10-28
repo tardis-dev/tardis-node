@@ -3,6 +3,7 @@ import { RealTimeFeedBase } from './realtimefeed.ts'
 
 export class DydxV4RealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://indexer.dydx.trade/v4/ws'
+  protected readonly perMessageDeflate = true
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const subs = filters
