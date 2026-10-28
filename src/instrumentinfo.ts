@@ -162,7 +162,7 @@ export interface InstrumentInfo {
   contractMultiplier?: number
   /** only for quanto instruments */
   quanto?: boolean
-  /**  only for quanto instruments as settlement currency is different base/quote currency */
+  /** currency in which the derivative contract settles, when provided */
   settlementCurrency?: string
   /** strike price, only for options */
   strikePrice?: number
