@@ -59,10 +59,6 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
             if (filter.channel === 'mark_price') {
               return id.startsWith('MARK:') ? id : `MARK:${id}`
             }
-            if ((filter.channel === 'ticker' || filter.channel === 'ob_l1') && (id.startsWith('C-') || id.startsWith('P-'))) {
-              const parts = id.split('-')
-              return `${parts[1]}-${parts[3]}`
-            }
             return id
           })
         )

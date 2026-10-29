@@ -40,7 +40,7 @@ function depth(symbol: string, action = 'snapshot', seq = 1) {
   return { type: 'ob_updates', action, sy: symbol, seq, a: [['101', '1']], b: [['100', '2']], ts: 1792174097937549 }
 }
 
-test('Delta India subscriptions preserve native mark identifiers and deduplicate option chains', () => {
+test('Delta India subscriptions preserve native mark identifiers and individual option symbols', () => {
   const feed = new ProbeFeed('delta-india', [], undefined)
   const [subscription] = feed.map([
     { channel: 'ticker', symbols: ['C-BTC-80000-191026', 'P-BTC-80000-191026', 'BTCUSD'] },
@@ -49,8 +49,8 @@ test('Delta India subscriptions preserve native mark identifiers and deduplicate
     { channel: 'system_status', symbols: ['BTCUSD'] }
   ])
   assert.deepEqual(subscription.payload!.channels, [
-    { name: 'ticker', symbols: ['BTC-191026', 'BTCUSD'] },
-    { name: 'ob_l1', symbols: ['BTC-191026'] },
+    { name: 'ticker', symbols: ['C-BTC-80000-191026', 'P-BTC-80000-191026', 'BTCUSD'] },
+    { name: 'ob_l1', symbols: ['C-BTC-80000-191026'] },
     { name: 'mark_price', symbols: ['MARK:BTCUSD', 'MARK:ETHUSD', 'all'] },
     { name: 'system_status' }
   ])
