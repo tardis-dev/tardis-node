@@ -15729,7 +15729,10 @@ test('Delta India ticker mappings preserve zero values, option greeks and fundin
     )!
   ]
   assert.equal(put.optionType, 'put')
+  assert.equal(put.expirationDate.toISOString(), '2026-10-19T12:00:00.000Z')
   assert.equal(put.underlyingIndex, '.DEETHUSD')
   assert.equal(put.underlyingPrice, undefined)
   assert.equal(put.delta, undefined)
+  const [gold] = [...options.map({ type: 'ticker', ts, sp: '4100', d: [{ ...ticker, s: 'C-XAUT-4100-301026' }] }, now)!]
+  assert.equal(gold.expirationDate.toISOString(), '2026-10-30T16:00:00.000Z')
 })

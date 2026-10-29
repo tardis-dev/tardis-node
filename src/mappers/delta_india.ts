@@ -204,7 +204,7 @@ class DeltaIndiaOptionSummaryMapper implements Mapper<'delta-india', OptionSumma
         symbol: ticker.s,
         optionType: side === 'C' ? 'call' : 'put',
         strikePrice: Number(strike),
-        expirationDate: this.getExpirationDate(expiry),
+        expirationDate: this.parseExpirationDate(expiry, asset === 'XAUT' ? 16 : 12),
         bestAskPrice: asNonZeroNumberOrUndefined(ticker.q[0]),
         bestAskAmount: asNonZeroNumberOrUndefined(ticker.q[1]),
         bestBidPrice: asNonZeroNumberOrUndefined(ticker.q[2]),
@@ -228,12 +228,12 @@ class DeltaIndiaOptionSummaryMapper implements Mapper<'delta-india', OptionSumma
     }
   }
 
-  private getExpirationDate(expiry: string) {
+  /** DDMMYY encodes no time; the UTC expiry hour depends on the asset. */
+  private parseExpirationDate(expiry: string, expiryHour: number) {
     const day = Number(expiry.slice(0, 2))
     const month = Number(expiry.slice(2, 4))
     const year = 2000 + Number(expiry.slice(4))
-    // India options expire at 17:30 IST (12:00 UTC), encoded as DDMMYY in the native symbol.
-    return new Date(Date.UTC(year, month - 1, day, 12))
+    return new Date(Date.UTC(year, month - 1, day, expiryHour))
   }
 
   private mapIV(value: string | null) {
