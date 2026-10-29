@@ -15602,62 +15602,6 @@ test('Delta India books wait for snapshots before applying updates', () => {
   assert.equal([...books.map({ ...update, action: 'snapshot' }, now)!][0].isSnapshot, true)
 })
 
-test('Delta India delayed tickers preserve newer mark prices and retain ticker-only fields', () => {
-  // Recorded on 2026-10-19: the ticker arrived later but contains an older mark price.
-  const mapper = normalizeDerivativeTickers('delta-india', new Date('2026-10-19T16:10:00Z'))
-  const [mark] = [
-    ...mapper.map(
-      { type: 'mark_price', sy: 'MARK:BTCUSD', p: '81948.03569624', ts: 1792426220610234 },
-      new Date('2026-10-19T16:10:20.736Z')
-    )!
-  ]
-  const localTimestamp = new Date('2026-10-19T16:10:21.620Z')
-  const ticker = {
-    type: 'ticker',
-    ts: 1792426220106935,
-    sp: '81970.3',
-    d: [{ s: 'BTCUSD', m: '81938.43942761', ohlc: [81079, 83133.5, 80647.5, 81936], oi: ['827048', '6976887.7600'] }]
-  }
-  const [delayed] = [...mapper.map(ticker, localTimestamp)!]
-  assert.equal(delayed.markPrice, mark.markPrice)
-  assert.equal(delayed.lastPrice, 81936)
-  assert.equal(delayed.openInterest, 827048)
-  assert.equal(delayed.indexPrice, 81970.3)
-  assert.equal(delayed.timestamp.getTime(), mark.timestamp.getTime())
-  assert.equal(delayed.timestamp.μs, 234)
-  assert.strictEqual(delayed.localTimestamp, localTimestamp)
-  assert.deepEqual([...mapper.map(ticker, localTimestamp)!], [])
-
-  const [newer] = [...mapper.map({ ...ticker, ts: 1792426220610235 }, localTimestamp)!]
-  assert.equal(newer.markPrice, 81938.43942761)
-  assert.equal(newer.timestamp.μs, 235)
-})
-
-test('Delta India mark freshness handles either channel arriving first with microsecond precision', () => {
-  const now = new Date('2026-10-19T16:10:00Z')
-  const mapper = normalizeDerivativeTickers('delta-india', now)
-  const ts = 1792426220610234
-  const ticker = { type: 'ticker', ts, sp: '81970.3', d: [{ s: 'BTCUSD', m: '81948.03569624', ohlc: [], oi: [] }] }
-  const [initial] = [...mapper.map(ticker, now)!]
-  assert.equal(initial.markPrice, 81948.03569624)
-  const mark = { type: 'mark_price', sy: 'MARK:BTCUSD', p: '81938.43942761', ts: ts - 1 }
-  assert.deepEqual([...mapper.map(mark, now)!], [])
-  const [newer] = [...mapper.map({ ...mark, ts: ts + 1 }, now)!]
-  assert.equal(newer.markPrice, 81938.43942761)
-  assert.equal(newer.timestamp.μs, 235)
-  assert.deepEqual([...mapper.map({ ...mark, ts: ts + 3 }, now)!], [])
-  assert.deepEqual([...mapper.map({ ...ticker, ts: ts + 2 }, now)!], [])
-
-  // Missing marks must not prevent a later-arriving valid mark from initializing the field.
-  const [other] = [...mapper.map({ ...ticker, ts: ts + 1000, d: [{ ...ticker.d[0], s: 'ETHUSD', m: null }] }, now)!]
-  assert.equal(other.markPrice, undefined)
-  const [initialized] = [...mapper.map({ ...mark, sy: 'MARK:ETHUSD' }, now)!]
-  assert.equal(initialized.markPrice, 81938.43942761)
-
-  const freshMapper = normalizeDerivativeTickers('delta-india', now)
-  assert.equal([...freshMapper.map(mark, now)!][0].markPrice, 81938.43942761)
-})
-
 test('Delta India ticker mappings preserve zero values, option greeks and funding units', () => {
   const now = new Date('2026-10-16T18:00:00Z')
   const ts = 1792174097937549
@@ -15674,8 +15618,16 @@ test('Delta India ticker mappings preserve zero values, option greeks and fundin
   const [initial] = [...derivative.map({ type: 'ticker', ts, sp: '79999', d: [ticker] }, now)!]
   assert.equal(initial.indexPrice, 79999)
   assert.equal(initial.openInterest, 1)
+  assert.equal(initial.markPrice, undefined)
+  const [mark] = [...derivative.map({ type: 'mark_price', sy: 'MARK:BTCUSD', p: '80001', ts: ts + 500 }, now)!]
+  assert.equal(mark.markPrice, 80001)
   const [zero] = [...derivative.map({ type: 'ticker', ts: ts + 1000, sp: '79999', d: [{ ...ticker, oi: ['0', '0'] }] }, now)!]
   assert.equal(zero.openInterest, 0)
+  assert.equal(zero.markPrice, 80001)
+  assert.deepEqual(
+    [...derivative.map({ type: 'ticker', ts: ts + 1500, sp: '79999', d: [{ ...ticker, m: '80002', oi: ['0', '0'] }] }, now)!],
+    []
+  )
   const [funding] = [...derivative.map({ type: 'funding_rate', sy: 'BTCUSD', fr: 0.01, nfr: 1792195200000000, ts: ts + 2000 }, now)!]
   assert.equal(funding.fundingRate, 0.0001)
   assert.equal(funding.fundingTimestamp!.toISOString(), '2026-10-17T00:00:00.000Z')

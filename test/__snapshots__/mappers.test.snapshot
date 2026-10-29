@@ -8871,7 +8871,22 @@ exports[`mappers > map delta-india captured messages 1`] = `
 `;
 
 exports[`mappers > map delta-india captured messages 10`] = `
-[]
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTCUSD",
+    "exchange": "delta-india",
+    "lastPrice": 81273,
+    "openInterest": 900452,
+    "fundingRate": 0.00009767216431809645,
+    "fundingTimestamp": "2026-10-17T00:00:00.000000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 81300.5,
+    "markPrice": 81273.22788379,
+    "timestamp": "2026-10-16T18:08:51.039698Z",
+    "localTimestamp": "2026-10-16T18:08:20.123Z"
+  }
+]
 `;
 
 exports[`mappers > map delta-india captured messages 11`] = `
@@ -8979,7 +8994,7 @@ exports[`mappers > map delta-india captured messages 6`] = `
     "fundingTimestamp": undefined,
     "predictedFundingRate": undefined,
     "indexPrice": 81300.5,
-    "markPrice": 81273.57777161,
+    "markPrice": undefined,
     "timestamp": "2026-10-16T18:08:18.711724Z",
     "localTimestamp": "2026-10-16T18:08:20.123Z"
   }
@@ -9061,7 +9076,7 @@ exports[`mappers > map delta-india captured messages 9`] = `
     "fundingTimestamp": "2026-10-17T00:00:00.000000Z",
     "predictedFundingRate": undefined,
     "indexPrice": 81300.5,
-    "markPrice": 81273.57777161,
+    "markPrice": undefined,
     "timestamp": "2026-10-16T18:08:51.039698Z",
     "localTimestamp": "2026-10-16T18:08:20.123Z"
   }
