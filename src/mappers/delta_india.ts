@@ -40,20 +40,15 @@ class DeltaIndiaTradesMapper implements Mapper<'delta-india', Trade> {
 class DeltaIndiaBookChangeMapper implements Mapper<'delta-india', BookChange> {
   private readonly initialized = new Set<string>()
 
-  canHandle(message: DeltaIndiaDepth | DeltaIndiaDepthError) {
-    return message.type === 'ob_updates' && (message.action === 'snapshot' || message.action === 'update' || message.action === 'error')
+  canHandle(message: DeltaIndiaDepth) {
+    return message.type === 'ob_updates' && (message.action === 'snapshot' || message.action === 'update')
   }
 
   getFilters(symbols?: string[]) {
     return [{ channel: 'ob_updates', symbols: upperCaseSymbols(symbols) } as const]
   }
 
-  *map(message: DeltaIndiaDepth | DeltaIndiaDepthError, localTimestamp: Date): IterableIterator<BookChange> {
-    if (message.action === 'error') {
-      this.initialized.delete(message.symbol)
-      return
-    }
-
+  *map(message: DeltaIndiaDepth, localTimestamp: Date): IterableIterator<BookChange> {
     if (message.action === 'snapshot') {
       this.initialized.add(message.sy)
     }
@@ -309,12 +304,4 @@ type DeltaIndiaTickerContract = {
   qiv: [ask: string | null, bid: string | null, mark: string | null]
   g: [delta: string | null, gamma: string | null, rho: string | null, theta: string | null, vega: string | null]
   to: [turnover: number | null, turnoverUSD: number | null]
-}
-
-// Depth errors use `symbol` rather than `sy` and do not include a timestamp.
-type DeltaIndiaDepthError = {
-  type: 'ob_updates'
-  action: 'error'
-  symbol: string
-  msg: string
 }

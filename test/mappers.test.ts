@@ -15589,7 +15589,7 @@ test('Delta India maps trade event times, contract amounts, buyer role and empty
   assert.equal(quote.timestamp.μs, 549)
 })
 
-test('Delta India books wait for snapshots and reset after snapshot-load errors', () => {
+test('Delta India books wait for snapshots before applying updates', () => {
   const now = new Date('2026-10-16T18:00:00Z')
   const books = normalizeBookChanges('delta-india', now)
   const update = { type: 'ob_updates', action: 'update', sy: 'BTCUSD', a: [['101', '0']], b: [['100', '2']], ts: 1792174097937549 }
@@ -15599,8 +15599,6 @@ test('Delta India books wait for snapshots and reset after snapshot-load errors'
   const [delta] = [...books.map(update, now)!]
   assert.equal(delta.isSnapshot, false)
   assert.deepEqual(delta.asks, [{ price: 101, amount: 0 }])
-  assert.deepEqual([...books.map({ type: 'ob_updates', action: 'error', symbol: 'BTCUSD' }, now)!], [])
-  assert.deepEqual([...books.map(update, now)!], [])
   assert.equal([...books.map({ ...update, action: 'snapshot' }, now)!][0].isSnapshot, true)
 })
 

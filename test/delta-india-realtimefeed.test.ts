@@ -108,34 +108,46 @@ test('Delta India rejects absent, empty and aggregate depth symbols before openi
   }
 })
 
-test('Delta India retries a missing native snapshot before emitting normalized deltas', { timeout: 15000 }, async () => {
-  let subscriptions = 0
-  await localServer((ws) =>
-    ws.on('message', (data) => {
-      const message = JSON.parse(data.toString())
-      if (message.type !== 'subscribe') return
-      subscriptions++
-      ws.send(JSON.stringify({ type: 'subscriptions', channels: message.payload.channels }))
-      if (subscriptions === 1) {
-        // Acknowledgement plus updates without an initial snapshot is observed upstream.
-        ws.send(JSON.stringify(depth('BTCUSD', 'update', 2)))
-        ws.send(JSON.stringify(depth('BTCUSD', 'update', 3)))
-      } else {
-        ws.send(JSON.stringify(depth('BTCUSD', 'snapshot', 4)))
-        ws.send(JSON.stringify(depth('BTCUSD', 'update', 5)))
-      }
-    })
-  )
-  const iterator = streamNormalized({ exchange: 'delta-india', symbols: ['BTCUSD'], timeoutIntervalMS: 0 }, normalizeBookChanges)
-  try {
-    const first = await iterator.next()
-    assert.equal(first.value!.isSnapshot, true)
-    assert.equal((await iterator.next()).value!.isSnapshot, false)
-    assert.equal(subscriptions, 2)
-  } finally {
-    await iterator.return?.()
-  }
-})
+for (const snapshotFailure of ['missing', 'failed']) {
+  test(`Delta India retries a ${snapshotFailure} native snapshot before emitting normalized deltas`, { timeout: 15000 }, async () => {
+    let subscriptions = 0
+    await localServer((ws) =>
+      ws.on('message', (data) => {
+        const message = JSON.parse(data.toString())
+        if (message.type !== 'subscribe') return
+        subscriptions++
+        ws.send(JSON.stringify({ type: 'subscriptions', channels: message.payload.channels }))
+        if (subscriptions === 1) {
+          if (snapshotFailure === 'failed') {
+            ws.send(
+              JSON.stringify({
+                type: 'ob_updates',
+                action: 'error',
+                symbol: 'BTCUSD',
+                msg: 'Snapshot load failed. Verify if product is live and resubscribe after a few secs.'
+              })
+            )
+          }
+          // Updates must wait for a valid snapshot, with or without an explicit error.
+          ws.send(JSON.stringify(depth('BTCUSD', 'update', 2)))
+          ws.send(JSON.stringify(depth('BTCUSD', 'update', 3)))
+        } else {
+          ws.send(JSON.stringify(depth('BTCUSD', 'snapshot', 4)))
+          ws.send(JSON.stringify(depth('BTCUSD', 'update', 5)))
+        }
+      })
+    )
+    const iterator = streamNormalized({ exchange: 'delta-india', symbols: ['BTCUSD'], timeoutIntervalMS: 0 }, normalizeBookChanges)
+    try {
+      const first = await iterator.next()
+      assert.equal(first.value!.isSnapshot, true)
+      assert.equal((await iterator.next()).value!.isSnapshot, false)
+      assert.equal(subscriptions, 2)
+    } finally {
+      await iterator.return?.()
+    }
+  })
+}
 
 test('Delta India detects a depth gap and reinitializes subscribed books after reconnect', { timeout: 15000 }, async () => {
   const subscriptions: Array<{ ws: WebSocket; symbols: string[] }> = []
