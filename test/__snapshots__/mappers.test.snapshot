@@ -4177,6 +4177,230 @@ exports[`mappers > map Coinbase derivatives captured messages 1`] = `
 ]
 `;
 
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 1`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 10`] = `
+[
+  {
+    "type": "trade",
+    "exchange": "whitebit",
+    "symbol": "DASH_PERP",
+    "id": "24437542966",
+    "price": 52.7,
+    "amount": 0.5,
+    "side": "buy",
+    "timestamp": "2026-10-26T11:45:59.541445Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 11`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 12`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "DASH_PERP",
+    "exchange": "whitebit",
+    "lastPrice": 52.7,
+    "openInterest": 7056491,
+    "fundingRate": 0.0001,
+    "fundingTimestamp": "2026-10-26T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 52.72,
+    "markPrice": 52.69,
+    "timestamp": "2026-10-26T11:45:59.820231Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 13`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 14`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "DASH_PERP",
+    "exchange": "whitebit",
+    "lastPrice": 52.7,
+    "openInterest": 0,
+    "fundingRate": 0,
+    "fundingTimestamp": "2026-10-26T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 52.72,
+    "markPrice": 52.69,
+    "timestamp": "2026-10-26T11:46:00.320231Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 15`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 16`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "XAU_PERP",
+    "exchange": "whitebit",
+    "lastPrice": undefined,
+    "openInterest": undefined,
+    "fundingRate": -0.0001,
+    "fundingTimestamp": "2026-10-26T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 4100,
+    "markPrice": 4100.1,
+    "timestamp": "2026-10-26T11:46:00.820231Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 17`] = `
+[
+  {
+    "type": "derivative_ticker",
+    "symbol": "DASH_PERP",
+    "exchange": "whitebit",
+    "lastPrice": undefined,
+    "openInterest": undefined,
+    "fundingRate": 0.0001,
+    "fundingTimestamp": "2026-10-26T16:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 52.72,
+    "markPrice": 52.69,
+    "timestamp": "2026-10-26T11:45:59.820231Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 2`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 3`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "whitebit",
+    "symbol": "ZK_USDT",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 0.281,
+        "amount": 42
+      }
+    ],
+    "asks": [
+      {
+        "price": 0.2811,
+        "amount": 276.84
+      }
+    ],
+    "timestamp": "2026-10-26T11:45:58.616600Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 4`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "whitebit",
+    "symbol": "ZK_USDT",
+    "isSnapshot": false,
+    "bids": [],
+    "asks": [
+      {
+        "price": 0.2811,
+        "amount": 0
+      }
+    ],
+    "timestamp": "2026-10-26T11:45:58.716601Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 5`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "whitebit",
+    "symbol": "ZK_USDT",
+    "isSnapshot": true,
+    "bids": [],
+    "asks": [],
+    "timestamp": "2026-10-26T11:46:08.716601Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 6`] = `
+[]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 7`] = `
+[
+  {
+    "type": "trade",
+    "exchange": "whitebit",
+    "symbol": "ZK_EUR",
+    "id": "24437542965",
+    "price": 0.01089,
+    "amount": 12,
+    "side": "sell",
+    "timestamp": "2026-10-26T11:46:00.123456Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 8`] = `
+[
+  {
+    "type": "book_ticker",
+    "exchange": "whitebit",
+    "symbol": "SOL_UAH",
+    "bidPrice": 4343.5701,
+    "bidAmount": 1.0835,
+    "askPrice": 4363.1738,
+    "askAmount": 1.4775,
+    "timestamp": "2026-10-26T11:45:59.449317Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
+exports[`mappers > map WhiteBIT captured spot and perpetual messages 9`] = `
+[
+  {
+    "type": "book_ticker",
+    "exchange": "whitebit",
+    "symbol": "SOL_UAH",
+    "bidPrice": undefined,
+    "bidAmount": undefined,
+    "askPrice": undefined,
+    "askAmount": undefined,
+    "timestamp": "2026-10-26T11:45:59.549317Z",
+    "localTimestamp": "2026-10-26T11:46:00.000Z"
+  }
+]
+`;
+
 exports[`mappers > map ascendex messages 1`] = `
 [
   {
