@@ -22,6 +22,7 @@ import { coinflexMappers } from './coinflex.ts'
 import { cryptoComMappers } from './cryptocom.ts'
 import { cryptofacilitiesMappers } from './cryptofacilities.ts'
 import { deltaMappers } from './delta.ts'
+import { deltaIndiaMappers } from './delta_india.ts'
 import { deribitMappers } from './deribit.ts'
 import { dydxMappers } from './dydx.ts'
 import { dydxV4Mappers } from './dydxv4.ts'
@@ -81,6 +82,7 @@ const registeredMappers = mergeExchangeMappers(
   cryptoComMappers,
   cryptofacilitiesMappers,
   deltaMappers,
+  deltaIndiaMappers,
   deribitMappers,
   dydxMappers,
   dydxV4Mappers,

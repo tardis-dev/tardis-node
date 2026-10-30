@@ -35,6 +35,7 @@ export const EXCHANGES = [
   'bybit-spread',
   'phemex',
   'delta',
+  'delta-india',
   'ftx-us',
   'binance-us',
   'gate-io-futures',
@@ -475,6 +476,18 @@ const DELTA_CHANNELS = [
   'spot_30mtwap_price'
 ] as const
 
+const DELTA_INDIA_CHANNELS = [
+  'trades',
+  'ob_updates',
+  'ob_l1',
+  'ticker',
+  'mark_price',
+  'funding_rate',
+  'spot_price',
+  'product_updates',
+  'system_status'
+] as const
+
 const GATE_IO_CHANNELS = ['trades', 'depth', 'ticker', 'book_ticker', 'order_book_update', 'obu'] as const
 const GATE_IO_FUTURES_CHANNELS = ['trades', 'order_book', 'tickers', 'book_ticker', 'obu', 'public_liquidates'] as const
 const MEXC_FUTURES_CHANNELS = [
@@ -654,6 +667,7 @@ export const EXCHANGE_CHANNELS_INFO = {
   coinflex: COINFLEX_CHANNELS,
   phemex: PHEMEX_CHANNELS,
   delta: DELTA_CHANNELS,
+  'delta-india': DELTA_INDIA_CHANNELS,
   'gate-io': GATE_IO_CHANNELS,
   'gate-io-futures': GATE_IO_FUTURES_CHANNELS,
   'mexc-futures': MEXC_FUTURES_CHANNELS,
