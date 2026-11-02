@@ -4620,6 +4620,82 @@ exports[`mappers > map aster messages 5`] = `
 ]
 `;
 
+exports[`mappers > map backpack captured messages 1`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "backpack",
+    "symbol": "TRX_USDC",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 0.3325,
+        "amount": 427
+      },
+      {
+        "price": 0.33838,
+        "amount": 5880
+      }
+    ],
+    "asks": [
+      {
+        "price": 0.4858,
+        "amount": 5366
+      }
+    ],
+    "timestamp": "2026-10-30T14:16:13.514033Z",
+    "localTimestamp": "2026-10-30T14:16:20.000Z"
+  },
+  {
+    "type": "book_ticker",
+    "exchange": "backpack",
+    "symbol": "MU.US_USDC",
+    "askPrice": 892.87,
+    "askAmount": 0.59,
+    "bidPrice": 892.3,
+    "bidAmount": 0.52,
+    "timestamp": "2026-10-30T14:16:12.776562Z",
+    "localTimestamp": "2026-10-30T14:16:20.000Z"
+  },
+  {
+    "type": "trade",
+    "symbol": "BTC_USDC_PERP",
+    "exchange": "backpack",
+    "id": "100268487",
+    "price": 76651,
+    "amount": 0.0004,
+    "side": "buy",
+    "timestamp": "2026-10-30T14:16:13.767000Z",
+    "localTimestamp": "2026-10-30T14:16:20.000Z"
+  },
+  {
+    "type": "derivative_ticker",
+    "symbol": "BTC_USDC_PERP",
+    "exchange": "backpack",
+    "lastPrice": 76612.3,
+    "openInterest": 304.56952,
+    "fundingRate": 0.0000125,
+    "fundingTimestamp": "2026-10-30T15:00:00.000Z",
+    "predictedFundingRate": undefined,
+    "indexPrice": 76653.05933307,
+    "markPrice": 76630.3,
+    "timestamp": "2026-10-30T14:16:13.418975Z",
+    "localTimestamp": "2026-10-30T14:16:20.000Z"
+  },
+  {
+    "type": "liquidation",
+    "exchange": "backpack",
+    "symbol": "SOL_USDC_PERP",
+    "id": undefined,
+    "price": 18.7,
+    "amount": 10,
+    "side": "buy",
+    "timestamp": "2023-09-14T10:50:38.091000Z",
+    "localTimestamp": "2026-10-30T14:16:20.000Z"
+  }
+]
+`;
+
 exports[`mappers > map binance delivery messages 1`] = `
 []
 `;
