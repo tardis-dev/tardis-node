@@ -2377,7 +2377,19 @@ exports[`map dydx-v4 messages 8`] = `
 `;
 
 exports[`map hyperliquid messages 1`] = `
-[]
+[
+  {
+    "type": "trade",
+    "symbol": "FXS",
+    "exchange": "hyperliquid",
+    "id": "611279506717453",
+    "price": 1.9008,
+    "amount": 10.5,
+    "side": "sell",
+    "timestamp": "2024-10-29T00:00:15.113Z",
+    "localTimestamp": "2024-08-23T00:00:00.498Z"
+  }
+]
 `;
 
 exports[`map hyperliquid messages 10`] = `
@@ -2413,7 +2425,41 @@ exports[`map hyperliquid messages 2`] = `
 `;
 
 exports[`map hyperliquid messages 3`] = `
-[]
+[
+  {
+    "type": "trade",
+    "symbol": "BTC",
+    "exchange": "hyperliquid",
+    "id": "1016375172059570",
+    "price": 69997,
+    "amount": 0.38111,
+    "side": "buy",
+    "timestamp": "2024-10-29T00:00:06.192Z",
+    "localTimestamp": "2024-08-23T00:00:00.498Z"
+  },
+  {
+    "type": "trade",
+    "symbol": "BTC",
+    "exchange": "hyperliquid",
+    "id": "479312521152049",
+    "price": 69997,
+    "amount": 0.33458,
+    "side": "buy",
+    "timestamp": "2024-10-29T00:00:06.192Z",
+    "localTimestamp": "2024-08-23T00:00:00.498Z"
+  },
+  {
+    "type": "trade",
+    "symbol": "BTC",
+    "exchange": "hyperliquid",
+    "id": "229986151112628",
+    "price": 69997,
+    "amount": 0.83613,
+    "side": "buy",
+    "timestamp": "2024-10-29T00:00:06.192Z",
+    "localTimestamp": "2024-08-23T00:00:00.498Z"
+  }
+]
 `;
 
 exports[`map hyperliquid messages 4`] = `
@@ -2515,6 +2561,30 @@ exports[`map hyperliquid messages 9`] = `
     "askAmount": 50,
     "timestamp": "2025-06-26T14:41:59.838Z",
     "localTimestamp": "2024-08-23T00:00:00.498Z"
+  }
+]
+`;
+
+exports[`map hyperliquid recent-trades snapshots and delayed live trades 1`] = `
+[]
+`;
+
+exports[`map hyperliquid recent-trades snapshots and delayed live trades 2`] = `
+[]
+`;
+
+exports[`map hyperliquid recent-trades snapshots and delayed live trades 3`] = `
+[
+  {
+    "type": "trade",
+    "symbol": "@210",
+    "exchange": "hyperliquid",
+    "id": "933466204283953",
+    "price": 0.9485,
+    "amount": 1005.6,
+    "side": "sell",
+    "timestamp": "2025-10-01T17:26:02.513Z",
+    "localTimestamp": "2025-10-01T17:26:15.096Z"
   }
 ]
 `;
