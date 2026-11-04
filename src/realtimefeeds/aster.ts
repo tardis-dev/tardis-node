@@ -193,10 +193,16 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 }
 
 export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const webSocketFilters = filters.filter((filter) => filter.channel !== 'openInterest')
     if (webSocketFilters.length > 0) {
-      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError)
+      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, validateSequence, onError)
     }
 
     const openInterestFilters = filters.filter((filter) => filter.channel === 'openInterest')

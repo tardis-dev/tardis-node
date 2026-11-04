@@ -20,12 +20,19 @@ type NormalizedStreamState = {
 }
 
 async function* _stream<T extends Exchange, U extends boolean = false>(
-  { exchange, filters, timeoutIntervalMS = 10000, withDisconnects = undefined, onError = undefined }: StreamOptions<T, U>,
+  {
+    exchange,
+    filters,
+    timeoutIntervalMS = 10000,
+    validateSequence = false,
+    withDisconnects = undefined,
+    onError = undefined
+  }: StreamOptions<T, U>,
   state: StreamState
 ): AsyncIterableIterator<U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }> {
   validateStreamOptions(filters)
 
-  const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, onError)
+  const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   const messages = realTimeFeed[Symbol.asyncIterator]()
   state.activeIterator = messages
 
@@ -62,13 +69,14 @@ export function stream<T extends Exchange, U extends boolean = false>({
   exchange,
   filters,
   timeoutIntervalMS = 10000,
+  validateSequence = false,
   withDisconnects = undefined,
   onError = undefined
 }: StreamOptions<T, U>): AsyncIterableIterator<
   U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }
 > {
   const state: StreamState = {}
-  const iterator = _stream({ exchange, filters, timeoutIntervalMS, withDisconnects, onError }, state)
+  const iterator = _stream({ exchange, filters, timeoutIntervalMS, validateSequence, withDisconnects, onError }, state)
 
   return createManagedRealTimeIterator(iterator, () => {
     const activeIterator = state.activeIterator
@@ -78,7 +86,14 @@ export function stream<T extends Exchange, U extends boolean = false>({
 }
 
 async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
-  { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
+  {
+    exchange,
+    symbols,
+    timeoutIntervalMS = 10000,
+    validateSequence = false,
+    withDisconnectMessages = undefined,
+    onError = undefined
+  }: StreamNormalizedOptions<T, Z>,
   state: NormalizedStreamState,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
@@ -92,9 +107,10 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
 
       const messages = stream({
         exchange,
-        withDisconnects: true,
-        timeoutIntervalMS,
         filters,
+        timeoutIntervalMS,
+        validateSequence,
+        withDisconnects: true,
         onError
       }) as ManagedRealTimeIterator<any>
       state.activeIterator = messages
@@ -160,6 +176,7 @@ export type StreamOptions<T extends Exchange, U extends boolean = false> = {
   exchange: T
   filters: FilterForExchange[T][]
   timeoutIntervalMS?: number
+  validateSequence?: boolean
   withDisconnects?: U
   onError?: (error: Error) => void
 }
@@ -168,16 +185,28 @@ export type StreamNormalizedOptions<T extends Exchange, U extends boolean = fals
   exchange: T
   symbols?: string[]
   timeoutIntervalMS?: number
+  validateSequence?: boolean
   withDisconnectMessages?: U
   onError?: (error: Error) => void
 }
 
 export function streamNormalized<T extends Exchange, U extends MapperFactory<T, any>[], Z extends boolean = false>(
-  { exchange, symbols, timeoutIntervalMS = 10000, withDisconnectMessages = undefined, onError = undefined }: StreamNormalizedOptions<T, Z>,
+  {
+    exchange,
+    symbols,
+    timeoutIntervalMS = 10000,
+    validateSequence = false,
+    withDisconnectMessages = undefined,
+    onError = undefined
+  }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
   const state: NormalizedStreamState = { closed: false }
-  const iterator = _streamNormalized({ exchange, symbols, timeoutIntervalMS, withDisconnectMessages, onError }, state, ...normalizers)
+  const iterator = _streamNormalized(
+    { exchange, symbols, timeoutIntervalMS, validateSequence, withDisconnectMessages, onError },
+    state,
+    ...normalizers
+  )
 
   return createManagedRealTimeIterator(iterator, () => {
     state.closed = true

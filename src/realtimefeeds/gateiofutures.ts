@@ -2,7 +2,11 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
 
 export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+  ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('_USDT')),
       [] as Filter<string>[]
@@ -19,8 +23,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         400,
         exchange,
         linearContractsFilters,
-        timeoutIntervalMS,
-        onError
+        ...rest
       )
     }
 
@@ -30,8 +33,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         400,
         exchange,
         inverseContractsFilters,
-        timeoutIntervalMS,
-        onError
+        ...rest
       )
     }
 
@@ -40,14 +42,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
       [] as Filter<string>[]
     )
     if (usd1ContractsFilters.length > 0) {
-      yield new GateIOFuturesSingleConnectionRealTimeFeed(
-        'wss://fx-ws.gateio.ws/v4/ws/usd1',
-        400,
-        exchange,
-        usd1ContractsFilters,
-        timeoutIntervalMS,
-        onError
-      )
+      yield new GateIOFuturesSingleConnectionRealTimeFeed('wss://fx-ws.gateio.ws/v4/ws/usd1', 400, exchange, usd1ContractsFilters, ...rest)
     }
 
     // Gate has no public liquidations channel for delivery futures
@@ -66,8 +61,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         100,
         exchange,
         deliveryContractsFilters,
-        timeoutIntervalMS,
-        onError
+        ...rest
       )
     }
   }
@@ -102,12 +96,9 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   constructor(
     protected readonly wssURL: string,
     private readonly orderBookDepth: 100 | 400,
-    exchange: string,
-    filters: Filter<string>[],
-    timeoutIntervalMS?: number,
-    onError?: (error: Error) => void
+    ...rest: ConstructorParameters<typeof RealTimeFeedBase>
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(...rest)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {

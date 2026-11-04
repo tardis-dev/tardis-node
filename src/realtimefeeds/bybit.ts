@@ -3,7 +3,13 @@ import { Filter } from '../types.ts'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
 
 export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('USDT') || s.includes('-') || s.endsWith('PERP')),
       [] as Filter<string>[]
@@ -15,11 +21,11 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     if (linearContractsFilters.length > 0) {
-      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, validateSequence, onError)
     }
 
     if (inverseContractsFilters.length > 0) {
-      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, validateSequence, onError)
     }
   }
 

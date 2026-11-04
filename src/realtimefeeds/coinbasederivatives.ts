@@ -4,7 +4,13 @@ import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const wsFilters = optimizeFilters(filters.filter((f) => f.channel !== 'products'))
     for (const filter of wsFilters) {
       if (!['heartbeats', 'subscriptions'].includes(filter.channel) && !filter.symbols?.length) {
@@ -13,7 +19,7 @@ export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeed
     }
 
     if (wsFilters.length > 0) {
-      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError)
+      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, validateSequence, onError)
     }
 
     const productFilters = filters.filter((f) => f.channel === 'products')

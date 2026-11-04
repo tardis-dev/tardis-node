@@ -15,11 +15,17 @@ const kucoinHttpOptions = {
 export class KucoinFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   private _httpURL = 'https://api-futures.kucoin.com/api'
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const wsFilters = filters.filter((f) => f.channel !== 'contract/details')
 
     if (wsFilters.length > 0) {
-      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, onError)
+      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, validateSequence, onError)
     }
 
     const contractDetailsFilters = filters.filter((f) => f.channel === 'contract/details')
@@ -35,9 +41,10 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
     filters: Filter<string>[],
     private readonly _httpURL: string,
     timeoutIntervalMS: number | undefined,
+    validateSequence?: boolean,
     onError?: (error: Error) => void
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   }
   protected wssURL = ''
 

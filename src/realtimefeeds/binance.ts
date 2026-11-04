@@ -52,7 +52,13 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract suffixes: { [key: string]: string }
   protected abstract depthRequestRequestWeight: number
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const wsFilters = filters.filter(
       (f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades' && f.channel !== 'fundingInfo' && f.channel !== 'insuranceBalance'
     )
@@ -66,6 +72,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
+        validateSequence,
         onError
       )
     }
@@ -232,9 +239,10 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly _suffixes: { [key: string]: string },
     private readonly _depthRequestRequestWeight: number,
     timeoutIntervalMS: number | undefined,
+    validateSequence?: boolean,
     onError?: (error: Error) => void
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -372,6 +380,7 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
     suffixes: { [key: string]: string },
     depthRequestRequestWeight: number,
     timeoutIntervalMS: number | undefined,
+    validateSequence?: boolean,
     onError?: (error: Error) => void
   ) {
     super(
@@ -382,6 +391,7 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
       suffixes,
       depthRequestRequestWeight,
       timeoutIntervalMS,
+      validateSequence,
       onError
     )
   }
@@ -435,7 +445,13 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
 
   protected depthRequestRequestWeight = 20
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const wsFilters = filters.filter(
       (f) =>
         f.channel !== 'openInterest' &&
@@ -456,6 +472,7 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
+        validateSequence,
         onError
       )
     }
@@ -470,6 +487,7 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
+        validateSequence,
         onError
       )
     }

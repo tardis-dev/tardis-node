@@ -5,7 +5,13 @@ import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefee
 const productCategories = new Set(['all', 'call_options', 'put_options', 'move_options', 'spot', 'futures', 'perpetual_futures'])
 
 export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const marketFilters: Filter<string>[] = []
     const depthFilters: Filter<string>[] = []
 
@@ -26,8 +32,12 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     }
 
     const feeds: DeltaIndiaWebSocketRealTimeFeed[] = [
-      marketFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, onError) : undefined,
-      depthFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError) : undefined
+      marketFilters.length
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, validateSequence, onError)
+        : undefined,
+      depthFilters.length
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, validateSequence, onError)
+        : undefined
     ].filter((feed) => feed !== undefined)
 
     yield* feeds
