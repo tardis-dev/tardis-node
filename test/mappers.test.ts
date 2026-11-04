@@ -12,6 +12,7 @@ import {
 import type { Exchange, Mapper } from '../dist/index.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'backpack',
   'delta-india',
   'coinbase-derivatives',
   'bitstamp',
@@ -49,6 +50,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'backpack',
   'delta-india',
   'coinbase-derivatives',
   'aster',
@@ -114,6 +116,7 @@ const exchangesWithOptionsSummary: Exchange[] = [
 ]
 
 const exchangesWithLiquidationsSupport: Exchange[] = [
+  'backpack',
   'gate-io-futures',
   'aster-futures',
   'ftx',
@@ -177,6 +180,52 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  test('map backpack captured messages', () => {
+    // Recorder payloads captured on 2026-10-29/30 (unneeded fields trimmed), plus the documented liquidation sample.
+    const mapper = createMapper('backpack', new Date('2026-10-30T14:16:00Z'))
+    const localTimestamp = new Date('2026-10-30T14:16:20Z')
+    const messages = [
+      {
+        stream: 'depthSnapshot.TRX_USDC',
+        generated: true,
+        data: {
+          asks: [['0.4858', '5366']],
+          bids: [
+            ['0.3325', '427'],
+            ['0.33838', '5880']
+          ],
+          lastUpdateId: '7857556',
+          timestamp: 1793369773514033
+        }
+      },
+      {
+        stream: 'bookTicker.MU.US_USDC',
+        data: { A: '0.59', B: '0.52', E: 1793369772776562, T: 1793369772776272, a: '892.87', b: '892.30', s: 'MU.US_USDC', u: 113706708 }
+      },
+      {
+        stream: 'trade.BTC_USDC_PERP',
+        data: { E: 1793369773776242, T: 1793369773767000, m: false, p: '76651.0', q: '0.00040', s: 'BTC_USDC_PERP', t: 100268487 }
+      },
+      {
+        stream: 'openInterest.BTC_USDC_PERP',
+        data: { E: 1793284101384223, e: 'openInterest', s: 'BTC_USDC_PERP', o: '304.56952000000000000000000000' }
+      },
+      { stream: 'ticker.BTC_USDC_PERP', data: { E: 1793369773180613, s: 'BTC_USDC_PERP', c: '76612.3', o: '80341.7' } },
+      {
+        stream: 'markPrice.BTC_USDC_PERP',
+        data: { E: 1793369773418975, s: 'BTC_USDC_PERP', p: '76630.3', f: '0.0000125', i: '76653.05933307', n: 1793372400000 }
+      },
+      {
+        stream: 'liquidation.SOL_USDC_PERP',
+        data: { e: 'liquidation', E: 1694688638091000, q: '10', p: '18.70', S: 'Bid', s: 'SOL_USDC_PERP', T: 567 }
+      },
+      { stream: 'stockPrice.MU', data: { e: 'stockPrice', symbol: 'MU', mid: '892.277', timestamp: 1793369772565 } },
+      { stream: 'stockIndicativeQuote.MU', data: { symbol: 'MU', bid: '890.74', ask: '893.59' } },
+      { stream: 'externalTicker.MU.US_USDC', data: { s: 'MU.US_USDC', c: '892.223', E: 1793369773182663 } }
+    ]
+    snapshot(messages.flatMap((message) => mapper.map(message, localTimestamp)))
+  })
+
   test('map delta-india captured messages', () => {
     // Captured from the India public socket on 2026-10-16; book levels and option batches trimmed.
     const messages = [

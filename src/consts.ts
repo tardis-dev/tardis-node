@@ -1,4 +1,5 @@
 export const EXCHANGES = [
+  'backpack',
   'aster',
   'aster-futures',
   'bithumb',
@@ -69,6 +70,20 @@ export const EXCHANGES = [
   'bullish',
   'mexc',
   'polymarket'
+] as const
+
+const BACKPACK_CHANNELS = [
+  'depth',
+  'depthSnapshot',
+  'trade',
+  'bookTicker',
+  'ticker',
+  'markPrice',
+  'openInterest',
+  'liquidation',
+  'externalTicker',
+  'stockPrice',
+  'stockIndicativeQuote'
 ] as const
 
 const BINANCE_CHANNELS = [
@@ -626,6 +641,7 @@ const POLYMARKET_CHANNELS = [
 ] as const
 
 export const EXCHANGE_CHANNELS_INFO = {
+  backpack: BACKPACK_CHANNELS,
   aster: ASTER_CHANNELS,
   'aster-futures': ASTER_FUTURES_CHANNELS,
   bithumb: BITHUMB_CHANNELS,
