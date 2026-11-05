@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const binanceHttpOptions = {
@@ -64,7 +64,8 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     )
 
     if (wsFilters.length > 0) {
-      yield new BinanceSingleConnectionRealTimeFeed(
+      const Feed = exchange === 'binance-delivery' ? BinanceDeliverySingleConnectionRealTimeFeed : BinanceSingleConnectionRealTimeFeed
+      yield new Feed(
         exchange,
         wsFilters,
         this.wssURL,
@@ -245,6 +246,18 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   }
 
+  protected getSequence(message: any): SequenceInfo | undefined {
+    if ((this._exchange === 'binance' || this._exchange === 'binance-us') && message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequenceId: message.data.u,
+        previousSequenceId: message.data.U - 1
+      }
+    }
+
+    return undefined
+  }
+
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const payload = filters
       .filter((f) => f.channel !== 'depthSnapshot')
@@ -371,6 +384,26 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
+class BinanceDeliverySingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
+  protected getSequence(message: any): SequenceInfo | undefined {
+    if (message.data?.e === 'depthUpdate' && message.data.pu !== -1) {
+      return {
+        key: message.stream,
+        sequenceId: message.data.u,
+        previousSequenceId: message.data.pu
+      }
+    }
+
+    return undefined
+  }
+
+  protected onMessage(message: any) {
+    if (message.data?.e === 'depthUpdate' && message.data.pu === -1) {
+      throw new Error(`Binance delivery order book reinitialization required for ${message.data.s}: pu is -1`)
+    }
+  }
+}
+
 class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
   constructor(
     exchange: string,
@@ -398,6 +431,18 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
 
   protected async getWebSocketUrl() {
     return getBinanceFuturesWebSocketUrl(this._exchange, this._streamPath)
+  }
+
+  protected getSequence(message: any): SequenceInfo | undefined {
+    if (message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequenceId: message.data.u,
+        previousSequenceId: message.data.pu
+      }
+    }
+
+    return undefined
   }
 }
 

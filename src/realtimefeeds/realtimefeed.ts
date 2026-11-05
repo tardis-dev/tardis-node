@@ -77,7 +77,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     protected readonly _exchange: string,
     filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _validateSequence = false,
+    private readonly _validateSequence = true,
     private readonly _onError?: (error: Error) => void
   ) {
     this._filters = optimizeFilters(filters)
@@ -510,7 +510,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     private readonly _exchange: string,
     private readonly _filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _validateSequence = false,
+    private readonly _validateSequence = true,
     private readonly _onError?: (error: Error) => void
   ) {}
 

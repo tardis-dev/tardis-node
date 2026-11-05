@@ -111,23 +111,24 @@ test('raw validation accepts zero, duplicates, independent keys, unsequenced mes
   assert.strictEqual(errors[0].message, 'bybit-spot sequence gap on book: expected previous sequence 501, received 502 (sequence 503)')
 })
 
-for (const validateSequence of [undefined, false]) {
-  test(`new validation stays disabled with validateSequence=${validateSequence}`, { timeout: 10000 }, async (t) => {
-    const items = [message(1, 0), message(2, 2, 1)]
-    await serverFor(t, 'bybit-spot', (socket) => send(socket, ...items))
-    const iterator = stream({
-      exchange: 'bybit-spot',
-      filters: [{ channel: 'publicTrade', symbols: ['BTCUSDT'] }],
-      timeoutIntervalMS: 0,
-      validateSequence,
-      onError: (error) => assert.fail(error.message)
-    })
-    t.after(() => iterator.return?.())
-    for (const item of items) assert.deepStrictEqual((await iterator.next()).value.message, JSON.parse(JSON.stringify(item)))
+test('explicit opt-out disables the shared sequence check', { timeout: 10000 }, async (t) => {
+  const items = [message(1, 0), message(2, 2, 1)]
+  await serverFor(t, 'bybit-spot', (socket) => send(socket, ...items))
+  const iterator = stream({
+    exchange: 'bybit-spot',
+    filters: [{ channel: 'publicTrade', symbols: ['BTCUSDT'] }],
+    timeoutIntervalMS: 0,
+    validateSequence: false,
+    onError: (error) => assert.fail(error.message)
   })
-}
+  t.after(() => iterator.return?.())
+  for (const item of items) assert.deepStrictEqual((await iterator.next()).value.message, JSON.parse(JSON.stringify(item)))
+})
 
-for (const withDisconnects of [false, true]) {
+for (const { withDisconnects, validateSequence } of [
+  { withDisconnects: false, validateSequence: undefined },
+  { withDisconnects: true, validateSequence: true }
+]) {
   test(`raw gap reconnects with clean state (withDisconnects=${withDisconnects})`, { timeout: 10000 }, async (t) => {
     const errors: Error[] = []
     const sockets = await serverFor(t, 'bybit-spot', (socket, connection) => {
@@ -138,7 +139,7 @@ for (const withDisconnects of [false, true]) {
       exchange: 'bybit-spot',
       filters: [{ channel: 'publicTrade', symbols: ['BTCUSDT'] }],
       timeoutIntervalMS: 0,
-      validateSequence: true,
+      validateSequence,
       withDisconnects,
       onError: (error) => errors.push(error)
     })

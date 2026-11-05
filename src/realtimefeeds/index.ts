@@ -145,7 +145,7 @@ export function createRealTimeFeed(
   exchange: Exchange,
   filters: Filter<string>[],
   timeoutIntervalMS: number | undefined,
-  validateSequence = false,
+  validateSequence = true,
   onError?: (error: Error) => void
 ) {
   const RealTimeFeedFactory = getRealTimeFeedFactory(exchange)

@@ -24,7 +24,7 @@ async function* _stream<T extends Exchange, U extends boolean = false>(
     exchange,
     filters,
     timeoutIntervalMS = 10000,
-    validateSequence = false,
+    validateSequence = true,
     withDisconnects = undefined,
     onError = undefined
   }: StreamOptions<T, U>,
@@ -69,7 +69,7 @@ export function stream<T extends Exchange, U extends boolean = false>({
   exchange,
   filters,
   timeoutIntervalMS = 10000,
-  validateSequence = false,
+  validateSequence = true,
   withDisconnects = undefined,
   onError = undefined
 }: StreamOptions<T, U>): AsyncIterableIterator<
@@ -90,7 +90,7 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
     exchange,
     symbols,
     timeoutIntervalMS = 10000,
-    validateSequence = false,
+    validateSequence = true,
     withDisconnectMessages = undefined,
     onError = undefined
   }: StreamNormalizedOptions<T, Z>,
@@ -195,7 +195,7 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
     exchange,
     symbols,
     timeoutIntervalMS = 10000,
-    validateSequence = false,
+    validateSequence = true,
     withDisconnectMessages = undefined,
     onError = undefined
   }: StreamNormalizedOptions<T, Z>,
