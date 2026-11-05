@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const asterHttpOptions = {
@@ -37,6 +37,18 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
   ])
   protected readonly channelMappings: { [key: string]: string | undefined } = {
     [AsterRealTimeFeed.depthChannel]: this.depthStream
+  }
+
+  protected getSequence(message: any): SequenceInfo | undefined {
+    if (message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequenceId: message.data.u,
+        previousSequenceId: message.data.pu
+      }
+    }
+
+    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
