@@ -2,9 +2,11 @@ import type { AddressInfo } from 'net'
 import { createServer } from 'http'
 import { test } from 'node:test'
 import { assert, errorMessageIncludes } from './assertions.ts'
+import { createTestWebSocketServer } from './helpers/websocket.ts'
+import type { Filter } from '../dist/types.js'
+import { stream, SequenceGapError } from '../dist/index.js'
 import { AsterFuturesWebSocketRealTimeFeed, AsterRealTimeFeed } from '../dist/realtimefeeds/aster.js'
 import { getRealTimeFeedFactory } from '../dist/realtimefeeds/index.js'
-import type { Filter } from '../dist/types.js'
 
 class TestAsterRealTimeFeed extends AsterRealTimeFeed {
   protected readonly httpURL: string
@@ -254,4 +256,64 @@ type AsterTestDepthSnapshotResponse = {
   lastUpdateId: number
   bids: string[][]
   asks: string[][]
+}
+
+for (const exchangeId of ['aster', 'aster-futures'] as const) {
+  for (const validateSequence of [undefined, false]) {
+    test(`${exchangeId}: sequence validation ${validateSequence === false ? 'disabled' : 'default'}`, { timeout: 10000 }, async () => {
+      const depth = (u: number, pu: number, symbol = 'BTCUSDT', U = u) => ({
+        stream: `${symbol.toLowerCase()}@depth@0ms`,
+        data: { e: 'depthUpdate', E: 1793786400000, T: 1793786400000, s: symbol, U, u, pu, b: [['100', String(u)]], a: [] }
+      })
+
+      const errors: Error[] = []
+      const valid = [depth(100, 80), depth(110, 100, 'BTCUSDT', 105)]
+      const gap = depth(140, 130)
+
+      const { server, cleanup } = await createTestWebSocketServer(exchangeId)
+      server.on('connection', (socket) => {
+        socket.on('message', (bytes) => {
+          const { id } = JSON.parse(bytes.toString())
+          for (const message of [{ result: null, id }, ...valid, gap]) {
+            socket.send(JSON.stringify(message))
+          }
+        })
+      })
+
+      const messages = stream({
+        exchange: exchangeId,
+        filters: [{ channel: 'depth', symbols: ['btcusdt'] }],
+        timeoutIntervalMS: 0,
+        validateSequence,
+        withDisconnects: true,
+        onError: (error) => errors.push(error)
+      })
+
+      try {
+        await messages.next() // Subscription acknowledgement.
+        for (const item of valid) {
+          assert.deepStrictEqual((await messages.next()).value?.message, item)
+        }
+        const next = (await messages.next()).value
+        if (validateSequence === false) {
+          assert.deepStrictEqual(next?.message, gap)
+          assert.deepStrictEqual(errors, [])
+        } else {
+          assert.strictEqual(next, undefined)
+          assert.strictEqual(errors.length, 1)
+          assert.ok(errors[0] instanceof SequenceGapError)
+          assert.strictEqual(errors[0].expectedPreviousSequence, 110)
+          assert.strictEqual(errors[0].previousSequence, 130)
+          assert.strictEqual(errors[0].key, 'btcusdt@depth@0ms')
+          assert.strictEqual(errors[0].sequence, 140)
+        }
+      } finally {
+        try {
+          await messages.return?.()
+        } finally {
+          await cleanup()
+        }
+      }
+    })
+  }
 }
