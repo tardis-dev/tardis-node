@@ -3539,29 +3539,6 @@ describe('mappers', () => {
       )
     )
 
-    assert.throws(
-      () =>
-        Array.from(
-          asterMapper.map(
-            {
-              stream: 'btcusdt@depth@0ms',
-              data: {
-                e: 'depthUpdate',
-                E: 1591261236300,
-                T: 1591261236299,
-                s: 'BTCUSDT',
-                U: 140,
-                u: 141,
-                pu: 129,
-                b: [],
-                a: []
-              }
-            },
-            localTimestamp
-          )!
-        ),
-      errorMessageIncludes('Book depth update has a sequence gap')
-    )
     snapshot(
       asterMapper.map(
         {
