@@ -6,7 +6,7 @@ import { exchangeMappers, isRealTime } from './registry.ts'
 export const bitvavoMappers = exchangeMappers({
   bitvavo: {
     trades: () => new BitvavoTradesMapper(),
-    bookChanges: (localTimestamp) => new BitvavoBookChangeMapper({ validateSequence: isRealTime(localTimestamp) }),
+    bookChanges: (localTimestamp) => new BitvavoBookChangeMapper({ validateSnapshotOverlap: isRealTime(localTimestamp) }),
     bookTickers: () => new BitvavoBookTickerMapper()
   }
 })
@@ -38,7 +38,7 @@ class BitvavoTradesMapper implements Mapper<'bitvavo', Trade> {
 class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   private readonly depthInfoBySymbol = new Map<string, BitvavoDepthInfo>()
 
-  constructor(private readonly options: { validateSequence: boolean }) {}
+  constructor(private readonly options: { validateSnapshotOverlap: boolean }) {}
 
   canHandle(message: BitvavoMessage) {
     return message.event === 'book' || message.action === 'getBook'
@@ -52,13 +52,15 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   *map(message: BitvavoBookMessage | BitvavoBookSnapshotMessage, localTimestamp: Date): IterableIterator<BookChange> {
     if ('action' in message) {
       const snapshot = message.response
+      if (!Number.isSafeInteger(snapshot.mdSeqNo)) {
+        throw new Error('Bitvavo Market Data Pro snapshot mdSeqNo is missing or invalid')
+      }
       const depthInfo = this.getDepthInfo(snapshot.market)
       if (depthInfo.snapshotProcessed) {
         return
       }
 
-      const snapshotSequence = snapshot.mdSeqNo ?? snapshot.nonce
-      depthInfo.sequence = snapshotSequence
+      depthInfo.sequence = snapshot.mdSeqNo
       depthInfo.snapshotProcessed = true
 
       yield {
@@ -95,16 +97,21 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   }
 
   private mapUpdate(message: BitvavoBookMessage, localTimestamp: Date, depthInfo: BitvavoDepthInfo): BookChange | undefined {
-    const firstSequence = message.startMdSeqNo ?? message.nonce
-    const lastSequence = message.endMdSeqNo ?? message.nonce
+    const firstSequence = message.startMdSeqNo
+    const lastSequence = message.endMdSeqNo
+    if (!Number.isSafeInteger(firstSequence) || !Number.isSafeInteger(lastSequence)) {
+      throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
+    }
     if (lastSequence <= depthInfo.sequence!) {
       return
     }
-    // Recorder validates historical continuity; direct live feeds must detect gaps themselves.
-    if (this.options.validateSequence && firstSequence > depthInfo.sequence! + 1) {
-      throw new Error(
-        `Bitvavo book update sequence gap for ${message.market}: expected ${depthInfo.sequence! + 1}, received ${firstSequence}-${lastSequence}`
-      )
+    if (!depthInfo.validatedFirstUpdate) {
+      if (this.options.validateSnapshotOverlap && firstSequence > depthInfo.sequence! + 1) {
+        throw new Error(
+          `Bitvavo book snapshot has no overlap with first update for ${message.market}: expected ${depthInfo.sequence! + 1}, received ${firstSequence}-${lastSequence}`
+        )
+      }
+      depthInfo.validatedFirstUpdate = true
     }
 
     depthInfo.sequence = lastSequence
@@ -206,27 +213,27 @@ type BitvavoTradeMessage = {
   side: 'buy' | 'sell'
 }
 
-type BitvavoBookMessage = {
+export type BitvavoBookMessage = {
   event: 'book'
   market: string
-  nonce: number
+  nonce?: number
   bids: BitvavoBookLevel[]
   asks: BitvavoBookLevel[]
   timestamp: string
-  startMdSeqNo?: number
-  endMdSeqNo?: number
+  startMdSeqNo: number
+  endMdSeqNo: number
 }
 
-type BitvavoBookSnapshotMessage = {
+export type BitvavoBookSnapshotMessage = {
   action: 'getBook'
   requestId: number
   response: {
     market: string
-    nonce: number
+    nonce?: number
     bids: BitvavoBookLevel[]
     asks: BitvavoBookLevel[]
     timestamp: string
-    mdSeqNo?: number
+    mdSeqNo: number
   }
 }
 
@@ -252,5 +259,6 @@ type BitvavoQuote = {
 type BitvavoDepthInfo = {
   bufferedUpdates: CircularBuffer<BitvavoBookMessage>
   snapshotProcessed?: boolean
+  validatedFirstUpdate?: boolean
   sequence?: number
 }

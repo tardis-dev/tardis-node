@@ -1,9 +1,16 @@
 import { batch } from '../handy.ts'
+import type { BybitV5OrderBookMessage } from '../mappers/bybit.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('USDT') || s.includes('-') || s.endsWith('PERP')),
       [] as Filter<string>[]
@@ -15,11 +22,11 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     if (linearContractsFilters.length > 0) {
-      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, validateSequence, onError)
     }
 
     if (inverseContractsFilters.length > 0) {
-      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, validateSequence, onError)
     }
   }
 
@@ -43,6 +50,22 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
 
 abstract class BybitSingleConnectionRealTimeDataFeed extends RealTimeFeedBase {
   protected abstract readonly wssURL: string
+
+  protected getSequence({ topic, type, data }: BybitV5OrderBookMessage): SequenceInfo | undefined {
+    if (topic?.startsWith('orderbook.')) {
+      const full = topic.startsWith('orderbook.full.')
+      if (full && type !== 'delta') {
+        return undefined
+      }
+      return {
+        key: full ? data.s : topic,
+        sequenceId: data.u,
+        previousSequenceId: !full && (type === 'snapshot' || data.u === 1) ? null : data.u - 1
+      }
+    }
+
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters

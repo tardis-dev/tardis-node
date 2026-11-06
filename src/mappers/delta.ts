@@ -240,6 +240,8 @@ class DeltaBookTickerMapper implements Mapper<'delta', BookTicker> {
   }
 }
 
+export type DeltaMessage = DeltaTrade | DeltaL2OrderBook | DeltaL2UpdateMessage | DeltaMarkPrice | DeltaFundingRate | DeltaL1Message
+
 type DeltaTrade = {
   buyer_role: 'taker' | 'maker'
   price: string
@@ -285,7 +287,7 @@ type DeltaL2UpdateMessage =
       asks: DeltaL2Level[]
       bids: DeltaL2Level[]
       cs: 220729409
-      sequence_no: 3660223
+      sequence_no: number
       symbol: string
       timestamp: 1680307203021223
       type: 'l2_updates'
@@ -295,7 +297,7 @@ type DeltaL2UpdateMessage =
       asks: DeltaL2Level[]
       bids: DeltaL2Level[]
       cs: 2728204214
-      sequence_no: 3660224
+      sequence_no: number
       symbol: string
       timestamp: 1680307203771239
       type: 'l2_updates'

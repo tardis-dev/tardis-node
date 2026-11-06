@@ -2,7 +2,8 @@ import { once } from 'node:events'
 import { test } from 'node:test'
 import { WebSocketServer } from 'ws'
 import { assert } from './assertions.ts'
-import { stream, streamNormalized, normalizeBookChanges } from '../dist/index.js'
+import { createTestWebSocketServer } from './helpers/websocket.ts'
+import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
 
 test('Gate routes mixed markets into separate subscriptions and retains decimal sizes', async (t) => {
   const server = new WebSocketServer({ port: 0 })
@@ -152,7 +153,6 @@ test('Gate rejects absent symbols, unknown settlement and delivery liquidations'
 test('Gate OBU rejects discontinuities before output and recovers from a fresh snapshot', { timeout: 15000 }, async (t) => {
   for (const invalid of [
     { U: 104, u: 105 }, // missing update 103
-    { U: 102, u: 102 }, // duplicate
     { U: 103 }, // missing end sequence
     { U: 103, u: 102 } // reversed range
   ]) {
@@ -210,7 +210,9 @@ test('Gate OBU rejects discontinuities before output and recovers from a fresh s
         }
         assert.strictEqual(connections, 3)
         assert.strictEqual(errors.length, 2)
-        assert.ok(errors.every((error) => error.message.includes('OBU sequence gap')))
+        if (invalid.U === 104) assert.ok(errors[0] instanceof SequenceGapError)
+        else assert.match(errors[0].message, /Invalid Gate.io OBU sequence range/)
+        assert.match(errors[1].message, /OBU snapshot required/)
         assert.strictEqual(output.filter((message) => message.type === 'disconnect').length, 2)
         const books = output.filter((message) => message.type === 'book_change')
         assert.deepStrictEqual(
@@ -231,3 +233,213 @@ test('Gate OBU rejects discontinuities before output and recovers from a fresh s
     })
   }
 })
+
+function obu(u: number, U?: number, symbol = 'BTC_USDT', event = 'update') {
+  return {
+    channel: 'futures.obu',
+    event,
+    result: {
+      s: `ob.${symbol}.${/_USDT_\d{8}$/.test(symbol) ? 100 : 400}`,
+      t: 1793955600000,
+      u,
+      ...(U === undefined ? { full: true } : { U }),
+      b: [['100', '0.25']]
+    }
+  }
+}
+
+for (const event of ['update', 'all']) {
+  for (const validateSequence of [undefined, true, false]) {
+    test(`Gate futures ${event} ranges: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
+      const symbol = event === 'all' ? 'BTC_USDT_20261225' : 'BTC_USDT'
+      const valid = [
+        { channel: 'futures.obu', event: 'subscribe', result: { status: 'success' } },
+        obu(0, undefined, symbol, event),
+        obu(3, 1, symbol, event),
+        obu(3, 1, symbol, event),
+        { channel: 'futures.book_ticker', event: 'update', result: { s: symbol, u: 9999 } },
+        { channel: 'futures.order_book', event: 'all', result: { contract: symbol } },
+        { channel: 'futures.pong' },
+        obu(4, 4, symbol, event),
+        obu(900, undefined, symbol, event),
+        obu(903, 901, symbol, event)
+      ]
+      const gap = obu(906, 905, symbol, event),
+        errors: Error[] = []
+      const { server, cleanup } = await createTestWebSocketServer('gate-io-futures')
+      server.on('connection', (socket) =>
+        socket.once('message', () => {
+          for (const message of [...valid, gap]) socket.send(JSON.stringify(message))
+        })
+      )
+      const messages = stream({
+        exchange: 'gate-io-futures',
+        filters: [{ channel: 'obu', symbols: [symbol] }],
+        timeoutIntervalMS: 0,
+        validateSequence,
+        withDisconnects: true,
+        onError: (error) => errors.push(error)
+      })
+      try {
+        for (const message of valid) assert.deepStrictEqual((await messages.next()).value?.message, message)
+        const next = (await messages.next()).value
+        if (validateSequence === false) {
+          assert.deepStrictEqual(next?.message, gap)
+          assert.deepStrictEqual(errors, [])
+        } else {
+          assert.strictEqual(next, undefined)
+          assert.strictEqual(errors.length, 1)
+          assert.ok(errors[0] instanceof SequenceGapError)
+          assert.strictEqual(errors[0].exchange, 'gate-io-futures')
+          assert.strictEqual(errors[0].key, valid[1].result!.s)
+          assert.strictEqual(errors[0].expectedPreviousSequence, 903)
+          assert.strictEqual(errors[0].previousSequence, 904)
+          assert.strictEqual(errors[0].sequence, 906)
+        }
+      } finally {
+        try {
+          await messages.return?.()
+        } finally {
+          await cleanup()
+        }
+      }
+    })
+  }
+}
+
+for (const invalid of [{ U: 11 }, { U: 12, u: 11 }, { u: 11 }, { full: true, u: Number.MAX_SAFE_INTEGER + 1 }]) {
+  test(`Gate futures opt-out still rejects invalid range ${JSON.stringify(invalid)}`, { timeout: 10000 }, async () => {
+    const { server, cleanup } = await createTestWebSocketServer('gate-io-futures')
+    server.on('connection', (socket) =>
+      socket.once('message', () => {
+        socket.send(JSON.stringify(obu(10)))
+        socket.send(JSON.stringify({ channel: 'futures.obu', event: 'update', result: { s: 'ob.BTC_USDT.400', ...invalid } }))
+      })
+    )
+    const errors: Error[] = []
+    const messages = stream({
+      exchange: 'gate-io-futures',
+      filters: [{ channel: 'obu', symbols: ['BTC_USDT'] }],
+      timeoutIntervalMS: 0,
+      validateSequence: false,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      await messages.next()
+      assert.strictEqual((await messages.next()).value, undefined)
+      assert.strictEqual(errors.length, 1)
+      assert.match(errors[0].message, /Invalid Gate.io OBU sequence range/)
+    } finally {
+      try {
+        await messages.return?.()
+      } finally {
+        await cleanup()
+      }
+    }
+  })
+}
+
+for (const normalized of [false, true]) {
+  for (const validateSequence of [undefined, false]) {
+    test(
+      `Gate futures recovery across all settlements: normalized=${normalized}, validation=${validateSequence ?? 'default'}`,
+      { timeout: 10000 },
+      async () => {
+        const symbols = ['BTC_USDT', 'BTC_USD', 'BTC_USD1', 'BTC_USDT_20261225']
+        const connections: { socket: import('ws').WebSocket; symbol?: string }[] = []
+        const { server, cleanup } = await createTestWebSocketServer('gate-io-futures')
+        server.on('connection', (socket) => {
+          const first = connections.length < 4,
+            connection: { socket: import('ws').WebSocket; symbol?: string } = { socket }
+          connections.push(connection)
+          socket.once('message', (bytes) => {
+            const request = JSON.parse(bytes.toString()),
+              topic = request.payload[0]
+            const symbol = topic.slice(3, topic.lastIndexOf('.'))
+            connection.symbol = symbol
+            socket.send(JSON.stringify(obu(first ? 100 : 1, undefined, symbol)))
+          })
+        })
+        const errors: Error[] = []
+        const options = {
+          exchange: 'gate-io-futures' as const,
+          timeoutIntervalMS: 0,
+          validateSequence,
+          onError: (error: Error) => errors.push(error)
+        }
+        const messages = normalized
+          ? streamNormalized({ ...options, symbols, withDisconnectMessages: true }, normalizeBookChanges)
+          : stream({ ...options, filters: [{ channel: 'obu', symbols }], withDisconnects: true })
+        try {
+          const initial = new Set<string>()
+          while (initial.size < symbols.length) {
+            const item = (await messages.next()).value as any
+            initial.add(normalized ? item.symbol : item.message.result.s)
+          }
+          const original = connections.slice()
+          original.find((connection) => connection.symbol === 'BTC_USDT')!.socket.send(JSON.stringify(obu(103, 103)))
+          if (validateSequence === false) {
+            const item = (await messages.next()).value as any
+            assert.strictEqual(normalized ? item.isSnapshot : item.message.result.u, normalized ? false : 103)
+            assert.strictEqual(connections.length, 4)
+            assert.deepStrictEqual(errors, [])
+          } else {
+            const boundary = (await messages.next()).value as any
+            assert.strictEqual(normalized ? boundary.type : boundary, normalized ? 'disconnect' : undefined)
+            const recovered = new Set<string>()
+            while (recovered.size < symbols.length) {
+              const item = (await messages.next()).value as any
+              if (normalized) {
+                assert.strictEqual(item.isSnapshot, true)
+                recovered.add(item.symbol)
+              } else {
+                assert.strictEqual(item.message.result.full, true)
+                assert.strictEqual(item.message.result.u, 1)
+                recovered.add(item.message.result.s)
+              }
+            }
+            assert.deepStrictEqual(recovered, initial)
+            assert.strictEqual(connections.length, 8)
+            assert.ok(original.every((connection) => connection.socket.readyState === 3))
+            assert.strictEqual(errors.length, 1)
+            assert.ok(errors[0] instanceof SequenceGapError)
+          }
+        } finally {
+          try {
+            await messages.return?.()
+          } finally {
+            await cleanup()
+          }
+        }
+      }
+    )
+  }
+}
+
+for (const validateSequence of [undefined, false]) {
+  test(`Gate futures requires a snapshot even with validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
+    const { server, cleanup } = await createTestWebSocketServer('gate-io-futures')
+    server.on('connection', (socket) => socket.once('message', () => socket.send(JSON.stringify(obu(11, 11)))))
+    const errors: Error[] = []
+    const messages = stream({
+      exchange: 'gate-io-futures',
+      filters: [{ channel: 'obu', symbols: ['BTC_USDT'] }],
+      timeoutIntervalMS: 0,
+      validateSequence,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      assert.strictEqual((await messages.next()).value, undefined)
+      assert.strictEqual(errors.length, 1)
+      assert.match(errors[0].message, /OBU snapshot required/)
+    } finally {
+      try {
+        await messages.return?.()
+      } finally {
+        await cleanup()
+      }
+    }
+  })
+}

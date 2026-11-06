@@ -85,6 +85,8 @@ const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
   }
 }
 
+export type GeminiMessage = GeminiL2Updates | GeminiTrade | GeminiV3Trade | GeminiV3DepthUpdate | GeminiV3BookTicker
+
 type GeminiBookLevel = ['buy' | 'sell', string, string]
 
 type GeminiL2Updates = {

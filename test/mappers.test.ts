@@ -3539,29 +3539,6 @@ describe('mappers', () => {
       )
     )
 
-    assert.throws(
-      () =>
-        Array.from(
-          asterMapper.map(
-            {
-              stream: 'btcusdt@depth@0ms',
-              data: {
-                e: 'depthUpdate',
-                E: 1591261236300,
-                T: 1591261236299,
-                s: 'BTCUSDT',
-                U: 140,
-                u: 141,
-                pu: 129,
-                b: [],
-                a: []
-              }
-            },
-            localTimestamp
-          )!
-        ),
-      errorMessageIncludes('Book depth update has a sequence gap')
-    )
     snapshot(
       asterMapper.map(
         {
@@ -15346,7 +15323,7 @@ test('preserves unchanged Bitvavo ticker fields and handles explicit removals', 
   ])
 })
 
-test('Bitvavo checks sequence gaps in live feeds and retains snapshot alignment during replay', () => {
+test('Bitvavo checks live snapshot overlap and skips obsolete updates during replay', () => {
   for (const live of [false, true]) {
     const localTimestamp = live ? new Date() : new Date('2026-09-23T00:00:00Z')
     const mapper = normalizeBookChanges('bitvavo', localTimestamp)
@@ -15368,7 +15345,7 @@ test('Bitvavo checks sequence gaps in live feeds and retains snapshot alignment 
     assert.strictEqual([...mapper.map(snapshot, localTimestamp)!][0].isSnapshot, true)
     assert.deepStrictEqual([...mapper.map({ ...update, nonce: 100, startMdSeqNo: 100, endMdSeqNo: 100 }, localTimestamp)!], [])
     if (live) {
-      assert.throws(() => [...mapper.map(update, localTimestamp)!], /sequence gap/)
+      assert.throws(() => [...mapper.map(update, localTimestamp)!], /snapshot has no overlap/)
     } else {
       assert.deepStrictEqual([...mapper.map(update, localTimestamp)!][0].bids, [{ price: 75278, amount: 1 }])
     }

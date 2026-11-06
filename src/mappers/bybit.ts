@@ -729,16 +729,16 @@ type BybitV5Trade =
       type: 'snapshot'
     }
 
-type BybitV5OrderBookMessage = {
-  topic: 'orderbook.50.LTCUSD'
+export type BybitV5OrderBookMessage = {
+  topic: string
   type: 'snapshot' | 'delta'
-  ts: 1680673822478
+  ts: number
   data: {
     s: string
     b: [string, string][]
     a: [string, string][]
-    u: 11802648
-    seq: 941860281
+    u: number
+    seq: number
   }
 }
 
