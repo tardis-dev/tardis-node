@@ -14,7 +14,7 @@ export const coinbaseMappers = exchangeMappers({
 })
 
 const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
-  canHandle(message: CoinbaseMessage) {
+  canHandle(message: CoinbaseTrade | CoinbaseLevel2Snapshot | CoinbaseLevel2Update) {
     return message.type === 'match'
   },
 
@@ -75,7 +75,7 @@ const validAmountsOnly = (level: BookPriceLevel) => {
 class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
   private readonly _symbolLastTimestampMap = new Map<string, Date>()
 
-  canHandle(message: CoinbaseMessage) {
+  canHandle(message: CoinbaseTrade | CoinbaseLevel2Snapshot | CoinbaseLevel2Update) {
     return message.type === 'l2update' || message.type === 'snapshot'
   }
 
@@ -159,7 +159,7 @@ class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
 }
 
 const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
-  canHandle(message: CoinbaseMessage) {
+  canHandle(message: CoinbaseTicker) {
     return message.type === 'ticker'
   },
 
@@ -197,26 +197,15 @@ const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
   }
 }
 
-export type CoinbaseMessage =
-  | CoinbaseTrade
-  | (Omit<CoinbaseTrade, 'type'> & { type: 'last_match' })
-  | CoinbaseLevel2Snapshot
-  | CoinbaseLevel2Update
-  | CoinbaseTicker
-  | CoinbaseFullMessage
-  | CoinbaseOtherMessage
+export type CoinbaseMessage = CoinbaseBaseMessage | CoinbaseSequenceMessage
 
-type CoinbaseFullMessage = {
-  type: 'received' | 'open' | 'done' | 'change' | 'heartbeat'
+type CoinbaseBaseMessage = {
+  type: string
   product_id: string
-  sequence: number
 }
 
-// Only the header is needed for these events, which the mappers do not normalize.
-type CoinbaseOtherMessage = {
-  type: 'activate' | 'auction' | 'last_auction' | 'rfq_match'
-  product_id: string
-  sequence?: number
+type CoinbaseSequenceMessage = CoinbaseBaseMessage & {
+  sequence: number
 }
 
 type CoinbaseTrade = {
