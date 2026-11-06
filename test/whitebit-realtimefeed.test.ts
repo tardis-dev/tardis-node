@@ -17,7 +17,8 @@ import {
   normalizeDerivativeTickers,
   replay,
   replayNormalized,
-  stream
+  stream,
+  streamNormalized
 } from '../dist/index.js'
 import type { Filter } from '../dist/types.js'
 import { WhiteBitRealTimeFeed, WhiteBitWebSocketRealTimeFeed } from '../dist/realtimefeeds/whitebit.js'
@@ -362,10 +363,19 @@ test('WhiteBIT premium timestamp ordering is isolated per market and mapper inst
   assert.strictEqual([...freshMapper.map(premium('BTC_PERP', '1793015160.123900'), localTimestamp)!].length, 1)
 })
 
-test('WhiteBIT derivative filters exclude spot markets and cache the latest execution in either batch order', () => {
+test('WhiteBIT derivative filters retain spot trades and cache the latest execution in either batch order', () => {
   const mapper = normalizeDerivativeTickers('whitebit', new Date())
-  assert.deepStrictEqual(mapper.getFilters(['BTC_USDT']), [])
-  assert.ok(mapper.getFilters(['BTC_USDT', 'BTC_PERP']).every(({ symbols }) => symbols?.join() === 'BTC_PERP'))
+  assert.deepStrictEqual(mapper.getFilters(['btc_usdt']), [{ channel: 'trades_update', symbols: ['BTC_USDT'] }])
+  assert.deepStrictEqual(mapper.getFilters(['btc_usdt', 'btc_perp']), [
+    { channel: 'trades_update', symbols: ['BTC_USDT', 'BTC_PERP'] },
+    { channel: 'premiumIndex_update', symbols: ['BTC_PERP'] },
+    { channel: 'futures_update', symbols: ['BTC_PERP'] }
+  ])
+  assert.deepStrictEqual(mapper.getFilters(), [
+    { channel: 'trades_update', symbols: undefined },
+    { channel: 'premiumIndex_update', symbols: undefined },
+    { channel: 'futures_update', symbols: undefined }
+  ])
   const localTimestamp = new Date()
   for (const ids of [
     [10, 11],
@@ -378,6 +388,43 @@ test('WhiteBIT derivative filters exclude spot markets and cache the latest exec
       localTimestamp
     )!
     assert.strictEqual(ticker.lastPrice, Math.max(...ids))
+  }
+})
+
+test('WhiteBIT spot-only derivative streaming stays responsive and emits no tickers', { timeout: 10000 }, async () => {
+  const server = new WebSocketServer({ port: 0 })
+  await once(server, 'listening')
+  const originalURL = process.env.WSS_URL_WHITEBIT
+  process.env.WSS_URL_WHITEBIT = `ws://127.0.0.1:${(server.address() as AddressInfo).port}`
+  const subscriptions: unknown[] = []
+  server.on('connection', (socket) => {
+    socket.on('message', (data) => {
+      subscriptions.push(JSON.parse(data.toString()))
+      socket.send(JSON.stringify({ method: 'trades_update', params: ['BTC_USDT', [{ id: 1, price: '100' }]], id: null }))
+    })
+  })
+  const errors: Error[] = []
+  const iterator = streamNormalized(
+    { exchange: 'whitebit', symbols: ['btc_usdt'], onError: (error) => errors.push(error) },
+    normalizeDerivativeTickers
+  )
+  const tickers: unknown[] = []
+  const consume = (async () => {
+    for await (const ticker of iterator) tickers.push(ticker)
+  })()
+  try {
+    while (subscriptions.length === 0) await sleep(10)
+    await sleep(50)
+    assert.deepStrictEqual(subscriptions, [{ id: 1, method: 'trades_subscribe', params: ['BTC_USDT'] }])
+    assert.deepStrictEqual(tickers, [])
+    assert.deepStrictEqual(errors, [])
+  } finally {
+    await iterator.return!()
+    await consume
+    if (originalURL === undefined) delete process.env.WSS_URL_WHITEBIT
+    else process.env.WSS_URL_WHITEBIT = originalURL
+    for (const socket of server.clients) socket.terminate()
+    await new Promise<void>((resolve) => server.close(() => resolve()))
   }
 })
 
@@ -444,7 +491,10 @@ test('WhiteBIT replay preserves complete native timestamps and truncates only du
   const raw =
     '{"method":"trades_update","params":["BTC_PERP",[{"id":24449944864,"time":1793089243.4692869,"price":"100","amount":"1","type":"buy"}]],"id":null}'
   const slice = gzipSync(`2026-10-26T11:46:00.2237890Z ${raw}\n`)
-  const server = createServer((_, response) => {
+  const requestedFilters: unknown[] = []
+  const server = createServer((request, response) => {
+    const filters = new URL(request.url!, 'http://localhost').searchParams.get('filters')
+    requestedFilters.push(filters === null ? null : JSON.parse(filters))
     response.setHeader('content-type', 'application/octet-stream')
     response.setHeader('content-encoding', 'gzip')
     response.setHeader('x-slice-size', '1')
@@ -477,6 +527,13 @@ test('WhiteBIT replay preserves complete native timestamps and truncates only du
     assert.strictEqual(normalized[0].timestamp.valueOf(), 1793089243469)
     assert.strictEqual(normalized[0].timestamp.μs, 286)
     assert.strictEqual(normalized[0].localTimestamp.μs, 789)
+    requestedFilters.length = 0
+    const spotTickers = []
+    for await (const ticker of replayNormalized({ ...options, symbols: ['btc_usdt'] }, normalizeDerivativeTickers)) {
+      spotTickers.push(ticker)
+    }
+    assert.deepStrictEqual(spotTickers, [])
+    assert.deepStrictEqual(requestedFilters, [[{ channel: 'trades_update', symbols: ['BTC_USDT'] }]])
   } finally {
     init()
     rmSync(cacheDir, { recursive: true, force: true })

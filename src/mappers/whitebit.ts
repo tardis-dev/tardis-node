@@ -117,14 +117,13 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   }
 
   getFilters(symbols?: string[]) {
-    const perpetuals = upperCaseSymbols(symbols)?.filter((symbol) => symbol.endsWith('_PERP'))
-    if (perpetuals?.length === 0) {
-      return []
-    }
+    const uppercaseSymbols = upperCaseSymbols(symbols)
+    const perpetuals = uppercaseSymbols?.filter((symbol) => symbol.endsWith('_PERP'))
     return [
-      { channel: 'trades_update', symbols: perpetuals } as const,
-      { channel: 'premiumIndex_update', symbols: perpetuals } as const,
-      { channel: 'futures_update', symbols: perpetuals } as const
+      { channel: 'trades_update', symbols: uppercaseSymbols } as const,
+      ...(perpetuals?.length === 0
+        ? []
+        : [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const])
     ]
   }
 
