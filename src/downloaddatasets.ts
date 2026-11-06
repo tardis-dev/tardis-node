@@ -2,11 +2,11 @@ import { existsSync } from 'node:fs'
 import { debug } from './debug.ts'
 import { DatasetType } from './exchangedetails.ts'
 import { forEachConcurrent } from './foreachconcurrent.ts'
-import { addDays, doubleDigit, download, parseAsUTCDate, sequence } from './handy.ts'
+import { addDays, doubleDigit, downloadDatasetFile, parseAsUTCDate, RequestSlots, sequence } from './handy.ts'
 import { getOptions } from './options.ts'
 import { Exchange } from './types.ts'
 
-const CONCURRENCY_LIMIT = 20
+const DEFAULT_CONCURRENCY = 20
 const MILLISECONDS_IN_SINGLE_DAY = 24 * 60 * 60 * 1000
 const DEFAULT_DOWNLOAD_DIR = './datasets'
 const DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS = 120_000
@@ -19,6 +19,14 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
   const format = downloadDatasetsOptions.format !== undefined ? downloadDatasetsOptions.format : 'csv'
   const getFilename = downloadDatasetsOptions.getFilename !== undefined ? downloadDatasetsOptions.getFilename : getFilenameDefault
   const skipIfExists = downloadDatasetsOptions.skipIfExists === undefined ? true : downloadDatasetsOptions.skipIfExists
+  const verifyMd5 = downloadDatasetsOptions.verifyMd5 === true
+  const concurrency = downloadDatasetsOptions.concurrency !== undefined ? downloadDatasetsOptions.concurrency : DEFAULT_CONCURRENCY
+
+  if (concurrency < 1) {
+    throw new Error('Invalid "concurrency" argument. Please provide value greater than 0.')
+  }
+
+  const requestSlots = new RequestSlots(concurrency)
 
   // in case someone provided 'api/exchange' symbol, transform it to symbol that is accepted by datasets API
   const datasetsSymbols = symbols.map((s) => s.replace(/\/|:/g, '-').toUpperCase())
@@ -42,9 +50,11 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
             dataType,
             format,
             getFilename,
+            verifyMd5,
             date: addDays(startDate, daysCountToFetch - 1)
           }),
-          skipIfExists
+          skipIfExists,
+          requestSlots
         )
       }
 
@@ -60,15 +70,17 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
           dataType,
           format,
           getFilename,
+          verifyMd5,
           date: startDate
         }),
-        skipIfExists
+        skipIfExists,
+        requestSlots
       )
 
-      // download the rest concurrently up to the CONCURRENCY_LIMIT
+      // download the rest concurrently up to the concurrency limit
       await forEachConcurrent(
         sequence(daysCountToFetch - 1, 1), // this will produce Iterable sequence from 1 to daysCountToFetch - 1 (as we already downloaded data for the first and last day)
-        CONCURRENCY_LIMIT,
+        concurrency,
         (offset) =>
           downloadDataSet(
             getDownloadOptions({
@@ -81,9 +93,11 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
               dataType,
               format,
               getFilename,
+              verifyMd5,
               date: addDays(startDate, offset)
             }),
-            skipIfExists
+            skipIfExists,
+            requestSlots
           )
       )
       const elapsedSeconds = (new Date().valueOf() - startTimestamp) / 1000
@@ -93,12 +107,12 @@ export async function downloadDatasets(downloadDatasetsOptions: DownloadDatasets
   }
 }
 
-async function downloadDataSet(downloadOptions: DownloadOptions, skipIfExists: boolean) {
+async function downloadDataSet(downloadOptions: DownloadOptions, skipIfExists: boolean, requestSlots: RequestSlots) {
   if (skipIfExists && existsSync(downloadOptions.downloadPath)) {
     debug('dataset %s already exists, skipping download', downloadOptions.downloadPath)
     return
   } else {
-    return await download(downloadOptions)
+    return await downloadDatasetFile({ ...downloadOptions, requestSlots })
   }
 }
 
@@ -112,7 +126,8 @@ function getDownloadOptions({
   symbol,
   format,
   downloadDir,
-  getFilename
+  getFilename,
+  verifyMd5
 }: {
   exchange: Exchange
   dataType: DatasetType
@@ -124,6 +139,7 @@ function getDownloadOptions({
   userAgent: string
   downloadDir: string
   getFilename: (options: GetFilenameOptions) => string
+  verifyMd5: boolean
 }): DownloadOptions {
   const year = date.getUTCFullYear()
   const month = doubleDigit(date.getUTCMonth() + 1)
@@ -145,11 +161,12 @@ function getDownloadOptions({
     downloadPath,
     userAgent,
     apiKey,
-    attemptTimeoutMS: DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS
+    attemptTimeoutMS: DATASET_DOWNLOAD_ATTEMPT_TIMEOUT_MS,
+    verifyMd5
   }
 }
 
-type DownloadOptions = Parameters<typeof download>[0]
+type DownloadOptions = Omit<Parameters<typeof downloadDatasetFile>[0], 'requestSlots'>
 
 export function sanitizeForFilename(s: string) {
   return s.replace(/[:\\/?*<>|"]/g, '-')
@@ -201,4 +218,6 @@ type DownloadDatasetsOptions = {
   downloadDir?: string
   getFilename?: (options: GetFilenameOptions) => string
   skipIfExists?: boolean
+  verifyMd5?: boolean
+  concurrency?: number
 }

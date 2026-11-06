@@ -22,7 +22,9 @@ test('streams every frame from a standard concatenated zstd file', async () => {
   writeFileSync(slicePath, Buffer.concat(frames))
 
   try {
-    assert.deepStrictEqual(await decompress(slicePath), Buffer.concat(contents))
+    for (const chunkSize of [257, 1024 * 1024]) {
+      assert.deepStrictEqual(await decompress(slicePath, chunkSize), Buffer.concat(contents))
+    }
   } finally {
     rmSync(tempDir, { force: true, recursive: true })
   }
@@ -32,10 +34,25 @@ test('rejects a truncated zstd frame', async () => {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-zstd-'))
   const slicePath = path.join(tempDir, 'slice.json.zst')
   const frame = zstdCompressSync(randomBytes(300_000), { params: { [constants.ZSTD_c_checksumFlag]: 1 } })
-  writeFileSync(slicePath, frame.subarray(0, frame.length - 2))
+  try {
+    for (const prefix of [Buffer.alloc(0), zstdCompressSync('complete first frame')]) {
+      writeFileSync(slicePath, Buffer.concat([prefix, frame.subarray(0, frame.length - 2)]))
+      await assert.rejects(decompress(slicePath), { code: 'Z_BUF_ERROR' })
+    }
+  } finally {
+    rmSync(tempDir, { force: true, recursive: true })
+  }
+})
+
+test('rejects a damaged later frame instead of silently returning only earlier frames', async () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-zstd-'))
+  const slicePath = path.join(tempDir, 'slice.json.zst')
+  const damagedFrame = zstdCompressSync('second frame')
+  damagedFrame[0] = 0
+  writeFileSync(slicePath, Buffer.concat([zstdCompressSync('first frame'), damagedFrame]))
 
   try {
-    await assert.rejects(decompress(slicePath), /Truncated zstd frame/)
+    await assert.rejects(decompress(slicePath), { code: 'ERR_TRAILING_JUNK_AFTER_STREAM_END' })
   } finally {
     rmSync(tempDir, { force: true, recursive: true })
   }
@@ -51,9 +68,9 @@ async function compressAsStream(contents: Buffer) {
   return Buffer.concat(chunks)
 }
 
-async function decompress(path: string) {
+async function decompress(path: string, chunkSize = 257) {
   const chunks = []
-  for await (const chunk of createZstdDecompressionStream(path, 257)) {
+  for await (const chunk of createZstdDecompressionStream(path, chunkSize)) {
     chunks.push(chunk)
   }
   return Buffer.concat(chunks)

@@ -1,71 +1,73 @@
-import { EventEmitter } from 'node:events'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { mock, test } from 'node:test'
+import { once } from 'node:events'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { test } from 'node:test'
 import os from 'node:os'
 import path from 'node:path'
-import { zstdCompressSync } from 'node:zlib'
+import { gzipSync, zstdCompressSync } from 'node:zlib'
+import { init, replay } from '../dist/index.js'
 import { assert } from './assertions.ts'
 
-const tempDirs: string[] = []
-
-class MockWorker extends EventEmitter {
-  constructor(_url: URL, options: { workerData: { fromDate: Date } }) {
-    super()
-
-    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-zstd-multiframe-'))
-    tempDirs.push(tempDir)
-    const slicePath = path.join(tempDir, 'slice.json.zst')
-    const firstFrame = zstdCompressSync(Buffer.from('2026-07-01T00:00:00.0000000Z {"sequence":1}\n'))
-    const secondFrame = zstdCompressSync(Buffer.from('2026-07-01T00:01:00.0000000Z {"sequence":2}\n'))
-    writeFileSync(slicePath, Buffer.concat([firstFrame, secondFrame]))
-
-    setImmediate(() => {
-      this.emit('message', {
-        sliceKey: options.workerData.fromDate.toISOString(),
-        slicePath,
-        sliceSize: 2
+for (const compression of ['zstd', 'gzip'] as const) {
+  test(`replays every minute using Accept-Encoding: ${compression}`, { timeout: 10_000 }, async () => {
+    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-compression-'))
+    const requests: { query: URLSearchParams; encoding: string | undefined }[] = []
+    const server = createServer((request, response) => {
+      const query = new URL(request.url!, 'http://localhost').searchParams
+      requests.push({ query, encoding: request.headers['accept-encoding'] })
+      const offset = Number(query.get('offset'))
+      const sliceSize = Number(query.get('sliceSize') ?? 1)
+      const minutes = Array.from({ length: sliceSize }, (_, index) => {
+        const minute = offset + index
+        return Buffer.from(`2026-07-01T00:0${minute}:00.0000000Z {"sequence":${minute}}\n`)
       })
+      const body =
+        compression === 'gzip' ? gzipSync(Buffer.concat(minutes)) : Buffer.concat(minutes.map((minute) => zstdCompressSync(minute)))
+      response
+        .writeHead(200, {
+          'Content-Encoding': compression,
+          'X-Slice-Size': sliceSize,
+          'X-Suggested-Slice-Size': 2
+        })
+        .end(body)
     })
-  }
+    server.listen(0, '127.0.0.1')
+    await once(server, 'listening')
 
-  postMessage(signal: string) {
-    if (signal === 'BEFORE_TERMINATE') {
-      setImmediate(() => this.emit('message', 'READY_TO_TERMINATE'))
-    }
-  }
+    try {
+      init({
+        endpoint: `http://127.0.0.1:${(server.address() as AddressInfo).port}/v1`,
+        cacheDir: tempDir,
+        dataFeedCompression: compression
+      })
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const sequences = []
+        for await (const { message } of replay({
+          exchange: 'binance',
+          from: '2026-07-01T00:00:00.000Z',
+          to: '2026-07-01T00:04:00.000Z',
+          filters: [{ channel: 'trade', symbols: ['btcusdt'] }]
+        })) {
+          sequences.push(message.sequence)
+        }
+        assert.deepStrictEqual(sequences, [0, 1, 2, 3])
+        assert.strictEqual(requests.length, attempt === 0 ? 3 : 5)
+      }
 
-  async terminate() {
-    return 0
-  }
-}
-
-mock.module('worker_threads', {
-  exports: {
-    Worker: MockWorker,
-    isMainThread: true,
-    parentPort: undefined,
-    workerData: undefined
-  }
-})
-
-const { replay } = await import('../dist/index.js')
-
-test('replays every frame from a multi-frame zstd slice', async () => {
-  try {
-    const sequences = []
-    for await (const { message } of replay({
-      exchange: 'binance',
-      from: '2026-07-01T00:00:00.000Z',
-      to: '2026-07-01T00:02:00.000Z',
-      filters: []
-    })) {
-      sequences.push(message.sequence)
-    }
-
-    assert.deepStrictEqual(sequences, [1, 2])
-  } finally {
-    for (const tempDir of tempDirs.splice(0)) {
+      assert.deepStrictEqual(
+        requests.slice(3).map(({ query }) => query.get('offset')),
+        ['3', '0']
+      )
+      assert.ok(requests.some(({ query }) => query.get('sliceSize') === '2'))
+      for (const { query, encoding } of requests) {
+        assert.strictEqual(query.has('compression'), false)
+        assert.strictEqual(encoding, compression === 'gzip' ? 'gzip' : 'zstd, gzip')
+      }
+    } finally {
+      init()
+      await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
       rmSync(tempDir, { force: true, recursive: true })
     }
-  }
-})
+  })
+}
