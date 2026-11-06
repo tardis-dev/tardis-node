@@ -105,8 +105,7 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
 
 class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTicker> {
   private readonly _pendingTickers = new PendingTickerInfoHelper()
-  private readonly _lastAcceptedTradeIds = new Map<string, number>()
-  private readonly _lastPremiumTimestamps = new Map<string, number>()
+  private readonly _symbolsWithTrades = new Set<string>()
 
   canHandle(message: WhiteBitMessage) {
     return (
@@ -143,11 +142,7 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
         return
       }
 
-      const lastAcceptedTradeId = this._lastAcceptedTradeIds.get(symbol)
-      if (lastAcceptedTradeId !== undefined && latestTrade.id <= lastAcceptedTradeId) {
-        return
-      }
-      this._lastAcceptedTradeIds.set(symbol, latestTrade.id)
+      this._symbolsWithTrades.add(symbol)
       ticker.updateLastPrice(asNumberOrUndefined(latestTrade.price))
       return
     }
@@ -155,27 +150,18 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
     if (method === 'futures_update') {
       // REST has no trade timestamp, so use its price only until a WebSocket trade has been accepted.
       ticker.updateOpenInterest(asNumberOrUndefined(params[1].open_interest))
-      if (!this._lastAcceptedTradeIds.has(symbol)) {
+      if (!this._symbolsWithTrades.has(symbol)) {
         ticker.updateLastPrice(asNumberOrUndefined(params[1].last_price))
       }
       return
     }
 
     const [, markPrice, indexPrice, fundingRate, fundingTime, serverTime] = params
-    const timestamp = fromMicroSecondsToDate(Math.round(serverTime * 1e6))
-    const timestampMicros = timestamp.valueOf() * 1000 + (timestamp.μs ?? 0)
-    const lastTimestampMicros = this._lastPremiumTimestamps.get(symbol)
-    // Reject stale snapshots before changing cached values or flushing pending side-channel updates.
-    if (lastTimestampMicros !== undefined && timestampMicros < lastTimestampMicros) {
-      return
-    }
-    this._lastPremiumTimestamps.set(symbol, timestampMicros)
-
     ticker.updateMarkPrice(asNumberOrUndefined(markPrice))
     ticker.updateIndexPrice(asNumberOrUndefined(indexPrice))
     ticker.updateFundingRate(asNumberOrUndefined(fundingRate))
     ticker.updateFundingTimestamp(new Date(fundingTime))
-    ticker.updateTimestamp(timestamp)
+    ticker.updateTimestamp(fromMicroSecondsToDate(Math.round(serverTime * 1e6)))
     if (ticker.hasChanged()) {
       yield ticker.getSnapshot(localTimestamp)
     }

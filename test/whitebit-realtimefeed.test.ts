@@ -292,6 +292,7 @@ test('WhiteBIT initializes last price from REST and gives accepted WebSocket tra
     params: ['BTC_PERP', [{ id, price, amount: '1', type: 'buy', time: 1793017320.123456 }]]
   })
 
+  assert.deepStrictEqual(map({ method: 'trades_update', params: ['BTC_PERP', []] }), [])
   assert.deepStrictEqual(map(rest('BTC_PERP', '99')), [])
   const [initial] = map(premium())
   assert.strictEqual(initial.lastPrice, 99)
@@ -317,50 +318,6 @@ test('WhiteBIT initializes last price from REST and gives accepted WebSocket tra
   const freshMapper = normalizeDerivativeTickers('whitebit', localTimestamp)
   assert.deepStrictEqual([...freshMapper.map(rest('BTC_PERP', '95'), localTimestamp)!], [])
   assert.strictEqual([...freshMapper.map(premium(), localTimestamp)!][0].lastPrice, 95)
-})
-
-test('WhiteBIT rejects stale premium values without flushing pending updates, including within one millisecond', () => {
-  for (const staleTime of [1793015161.1239, 1793015162.1231]) {
-    const mapper = normalizeDerivativeTickers('whitebit', new Date())
-    const localTimestamp = new Date('2026-10-26T11:46:03Z')
-    const map = (message: any) => [...mapper.map(message, localTimestamp)!]
-    const premium = (time: number) => ({
-      method: 'premiumIndex_update',
-      params: ['BTC_PERP', '100', '101', '0.0001', 1793030400000, time]
-    })
-    const [initial] = map(premium(1793015160.1239))
-    assert.strictEqual(initial.markPrice, 100)
-    // A snapshot with unchanged values must still advance the accepted source timestamp.
-    assert.deepStrictEqual(map(premium(1793015162.1239)), [])
-    assert.deepStrictEqual(map({ method: 'futures_update', params: ['BTC_PERP', { open_interest: '10' }] }), [])
-    assert.deepStrictEqual(map({ method: 'trades_update', params: ['BTC_PERP', [{ id: 20, price: '102' }]] }), [])
-    assert.deepStrictEqual(map({ method: 'premiumIndex_update', params: ['BTC_PERP', '90', '91', '-0.01', 1793034000000, staleTime] }), [])
-    // Equal timestamps remain eligible to publish changes from REST and trades.
-    const [updated] = map(premium(1793015162.1239))
-    assert.strictEqual(updated.markPrice, 100)
-    assert.strictEqual(updated.indexPrice, 101)
-    assert.strictEqual(updated.fundingRate, 0.0001)
-    assert.strictEqual(updated.fundingTimestamp?.valueOf(), 1793030400000)
-    assert.strictEqual(updated.openInterest, 10)
-    assert.strictEqual(updated.lastPrice, 102)
-    assert.strictEqual(updated.timestamp.valueOf(), 1793015162123)
-    assert.strictEqual(updated.timestamp.μs, 900)
-    assert.strictEqual(updated.localTimestamp, localTimestamp)
-  }
-})
-
-test('WhiteBIT premium timestamp ordering is isolated per market and mapper instance', () => {
-  const localTimestamp = new Date()
-  const premium = (symbol: string, time: number) => ({
-    method: 'premiumIndex_update',
-    params: [symbol, '100', '101', '0', 1793030400000, time]
-  })
-  const mapper = normalizeDerivativeTickers('whitebit', localTimestamp)
-  assert.strictEqual([...mapper.map(premium('BTC_PERP', 1793015162.1239), localTimestamp)!].length, 1)
-  const [otherMarket] = mapper.map(premium('ETH_PERP', 1793015160.1239), localTimestamp)!
-  assert.strictEqual(otherMarket.symbol, 'ETH_PERP')
-  const freshMapper = normalizeDerivativeTickers('whitebit', localTimestamp)
-  assert.strictEqual([...freshMapper.map(premium('BTC_PERP', 1793015160.1239), localTimestamp)!].length, 1)
 })
 
 test('WhiteBIT derivative filters retain spot trades and cache the latest execution in either batch order', () => {
@@ -426,65 +383,6 @@ test('WhiteBIT spot-only derivative streaming stays responsive and emits no tick
     for (const socket of server.clients) socket.terminate()
     await new Promise<void>((resolve) => server.close(() => resolve()))
   }
-})
-
-test('WhiteBIT derivative last price rejects older and duplicate trade batches per market', () => {
-  const localTimestamp = new Date()
-  const mapper = normalizeDerivativeTickers('whitebit', localTimestamp)
-  const map = (message: any) => [...mapper.map(message, localTimestamp)!]
-  const trades = (symbol: string, values: [number, string][]) => ({
-    method: 'trades_update',
-    params: [symbol, values.map(([id, price]) => ({ id, price, amount: '1', type: 'buy', time: 1793015160 }))]
-  })
-  const premium = (symbol = 'BTC_PERP') => ({
-    method: 'premiumIndex_update',
-    params: [symbol, '100', '101', '0', 1793030400000, 1793015160.1239]
-  })
-  assert.deepStrictEqual(map(trades('BTC_PERP', [[20, '100']])), [])
-  assert.strictEqual(map(premium())[0].lastPrice, 100)
-  for (const batch of [
-    [
-      [19, '90'],
-      [18, '89']
-    ],
-    [[20, '90']],
-    [[22, '100']],
-    [[21, '90']]
-  ] as [number, string][][]) {
-    assert.deepStrictEqual(map(trades('BTC_PERP', batch)), [])
-    assert.deepStrictEqual(map(premium()), [])
-  }
-  assert.deepStrictEqual(
-    map(
-      trades('BTC_PERP', [
-        [21, '90'],
-        [23, '103']
-      ])
-    ),
-    []
-  )
-  // An older batch arriving before the next premium tick must not replace the pending price either.
-  assert.deepStrictEqual(map(trades('BTC_PERP', [[20, '80']])), [])
-  assert.strictEqual(map(premium())[0].lastPrice, 103)
-  assert.deepStrictEqual(
-    map(
-      trades('BTC_PERP', [
-        [25, '105'],
-        [24, '104']
-      ])
-    ),
-    []
-  )
-  assert.strictEqual(map(premium())[0].lastPrice, 105)
-  assert.deepStrictEqual(map(trades('BTC_PERP', [])), [])
-  assert.deepStrictEqual(map(premium()), [])
-
-  assert.deepStrictEqual(map(trades('ETH_PERP', [[1, '50']])), [])
-  assert.strictEqual(map(premium('ETH_PERP'))[0].lastPrice, 50)
-  const freshMapper = normalizeDerivativeTickers('whitebit', localTimestamp)
-  assert.deepStrictEqual([...freshMapper.map(trades('BTC_PERP', [[1, '40']]), localTimestamp)!], [])
-  const [fresh] = freshMapper.map(premium(), localTimestamp)!
-  assert.strictEqual(fresh.lastPrice, 40)
 })
 
 test('WhiteBIT replay decodes numeric timestamps, rounds microseconds and preserves raw bytes', { timeout: 10000 }, async () => {
