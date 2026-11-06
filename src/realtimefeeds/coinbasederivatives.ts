@@ -1,7 +1,8 @@
 import { Writable } from 'node:stream'
 import { getJSON, optimizeFilters } from '../handy.ts'
+import type { CoinbaseDerivativesMessage } from '../mappers/coinbasederivatives.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
@@ -36,7 +37,6 @@ export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeed
 
 class CoinbaseDerivativesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://advanced-trade-ws.coinbase.com'
-  private sequence?: number
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return [
@@ -54,20 +54,20 @@ class CoinbaseDerivativesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     ]
   }
 
-  protected async onConnected() {
-    this.sequence = undefined
-  }
-
   protected messageIsError(message: { type?: string }) {
     return message.type === 'error'
   }
 
-  protected onMessage(message: { sequence_num?: number }) {
-    if (message.sequence_num === undefined) return
-    if (this.sequence !== undefined && message.sequence_num !== this.sequence + 1) {
-      throw new Error(`Coinbase derivatives sequence gap: ${this.sequence} -> ${message.sequence_num}`)
+  protected getSequence(message: CoinbaseDerivativesMessage): SequenceInfo | undefined {
+    if ('sequence_num' in message) {
+      return {
+        key: 'connection',
+        sequenceId: message.sequence_num,
+        previousSequenceId: message.sequence_num - 1
+      }
     }
-    this.sequence = message.sequence_num
+
+    return undefined
   }
 }
 
