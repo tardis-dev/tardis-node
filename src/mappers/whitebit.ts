@@ -38,7 +38,7 @@ class WhiteBitTradesMapper implements Mapper<'whitebit', Trade> {
         price: Number(trade.price),
         amount: Number(trade.amount),
         side: trade.type,
-        timestamp: fromSecondsToDate(trade.time),
+        timestamp: fromMicroSecondsToDate(Math.round(trade.time * 1e6)),
         localTimestamp
       }
     }
@@ -64,7 +64,7 @@ class WhiteBitBookChangeMapper implements Mapper<'whitebit', BookChange> {
       isSnapshot,
       bids: (book.bids ?? []).map(this._mapBookLevel),
       asks: (book.asks ?? []).map(this._mapBookLevel),
-      timestamp: fromSecondsToDate(book.timestamp),
+      timestamp: fromMicroSecondsToDate(Math.round(book.timestamp * 1e6)),
       localTimestamp
     }
   }
@@ -96,7 +96,7 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
         bidAmount: asNonZeroNumberOrUndefined(bidAmount),
         askPrice: asNonZeroNumberOrUndefined(askPrice),
         askAmount: asNonZeroNumberOrUndefined(askAmount),
-        timestamp: fromSecondsToDate(transactionTime),
+        timestamp: fromMicroSecondsToDate(Math.round(transactionTime * 1e6)),
         localTimestamp
       }
     }
@@ -163,7 +163,7 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
     }
 
     const [, markPrice, indexPrice, fundingRate, fundingTime, serverTime] = params
-    const timestamp = fromSecondsToDate(serverTime)
+    const timestamp = fromMicroSecondsToDate(Math.round(serverTime * 1e6))
     const timestampMicros = timestamp.valueOf() * 1000 + (timestamp.μs ?? 0)
     const lastTimestampMicros = this._lastPremiumTimestamps.get(symbol)
     // Reject stale snapshots before changing cached values or flushing pending side-channel updates.
@@ -183,11 +183,6 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   }
 }
 
-function fromSecondsToDate(seconds: string | number) {
-  const [whole, fraction = ''] = String(seconds).split('.')
-  return fromMicroSecondsToDate(Number(whole) * 1e6 + Number(fraction.padEnd(6, '0').slice(0, 6)))
-}
-
 type WhiteBitMessage<TMethod extends string = string, TParams = unknown> = {
   method: TMethod
   params: TParams
@@ -201,7 +196,7 @@ type WhiteBitTrades = WhiteBitMessage<
     symbol: string,
     trades: {
       id: number
-      time: string | number
+      time: number
       price: string
       amount: string
       type: 'buy' | 'sell'
@@ -216,8 +211,8 @@ type WhiteBitDepth = WhiteBitMessage<
   [
     isSnapshot: boolean,
     book: {
-      timestamp: string | number
-      event_time: string | number
+      timestamp: number
+      event_time: number
       update_id: number
       past_update_id?: number
       bids?: [price: string, amount: string][]
@@ -231,8 +226,8 @@ type WhiteBitDepth = WhiteBitMessage<
 type WhiteBitBookTicker = WhiteBitMessage<
   'bookTicker_update',
   [
-    transactionTime: string | number,
-    messageTime: string | number,
+    transactionTime: number,
+    messageTime: number,
     symbol: string,
     updateId: number,
     bidPrice: string,
@@ -245,7 +240,7 @@ type WhiteBitBookTicker = WhiteBitMessage<
 /** @see https://docs.whitebit.com/websocket/market-streams/premium-index */
 type WhiteBitPremiumIndex = WhiteBitMessage<
   'premiumIndex_update',
-  [symbol: string, markPrice: string, indexPrice: string, fundingRate: string, fundingTime: number, serverTime: string | number]
+  [symbol: string, markPrice: string, indexPrice: string, fundingRate: string, fundingTime: number, serverTime: number]
 >
 
 /**
