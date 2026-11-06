@@ -25,7 +25,7 @@ class WhiteBitTradesMapper implements Mapper<'whitebit', Trade> {
     const [symbol, trades] = message.params
     // Subscription backfills are newest first; live executions are incremental.
     // A singleton has no snapshot marker, so retain it rather than discard a possible live trade at replay startup.
-    if (trades.length > 1 && BigInt(trades[0].id) > BigInt(trades[trades.length - 1].id)) {
+    if (trades.length > 1 && trades[0].id > trades[trades.length - 1].id) {
       return
     }
 
@@ -105,7 +105,7 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
 
 class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTicker> {
   private readonly _pendingTickers = new PendingTickerInfoHelper()
-  private readonly _lastAcceptedTradeIds = new Map<string, bigint>()
+  private readonly _lastAcceptedTradeIds = new Map<string, number>()
   private readonly _lastPremiumTimestamps = new Map<string, number>()
 
   canHandle(message: WhiteBitMessage) {
@@ -135,7 +135,7 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
       // Backfills can initialize the latest price, but never emit historical derivative ticker events.
       let latestTrade = params[1][0]
       for (const trade of params[1]) {
-        if (BigInt(trade.id) > BigInt(latestTrade.id)) {
+        if (trade.id > latestTrade.id) {
           latestTrade = trade
         }
       }
@@ -143,12 +143,11 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
         return
       }
 
-      const latestTradeId = BigInt(latestTrade.id)
       const lastAcceptedTradeId = this._lastAcceptedTradeIds.get(symbol)
-      if (lastAcceptedTradeId !== undefined && latestTradeId <= lastAcceptedTradeId) {
+      if (lastAcceptedTradeId !== undefined && latestTrade.id <= lastAcceptedTradeId) {
         return
       }
-      this._lastAcceptedTradeIds.set(symbol, latestTradeId)
+      this._lastAcceptedTradeIds.set(symbol, latestTrade.id)
       ticker.updateLastPrice(asNumberOrUndefined(latestTrade.price))
       return
     }
