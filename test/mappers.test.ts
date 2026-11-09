@@ -1,6 +1,7 @@
 import { describe, test } from 'node:test'
 import { assert, errorMessageIncludes, snapshot } from './assertions.ts'
 import {
+  EXCHANGES,
   EXCHANGE_CHANNELS_INFO,
   normalizeBookChanges,
   normalizeDerivativeTickers,
@@ -177,6 +178,43 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  test('empty and omitted symbols request the same channels for every exchange and normalizer', () => {
+    const timestamp = new Date('2026-11-01T00:00:00Z')
+    for (const normalize of [
+      normalizeTrades,
+      normalizeBookChanges,
+      normalizeBookTickers,
+      normalizeDerivativeTickers,
+      normalizeOptionsSummary,
+      normalizeLiquidations
+    ]) {
+      for (const exchange of EXCHANGES) {
+        let mapper: Mapper<any, any>
+        try {
+          mapper = normalize(exchange as never, timestamp)
+        } catch (error) {
+          assert.ok(error instanceof Error && error.message.endsWith(`${exchange} not supported`))
+          continue
+        }
+        assert.deepStrictEqual(
+          mapper.getFilters([]).map((filter) => filter.channel),
+          mapper.getFilters().map((filter) => filter.channel),
+          `${exchange}: ${normalize.name}`
+        )
+      }
+    }
+  })
+
+  test('Delta India restricts derivative channels to eligible explicitly requested symbols', () => {
+    const mapper = normalizeDerivativeTickers('delta-india', new Date('2026-11-01T00:00:00Z'))
+    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126']), [{ channel: 'ticker', symbols: ['C-BTC-100000-271126'] }])
+    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126', 'btcusd']), [
+      { channel: 'ticker', symbols: ['C-BTC-100000-271126', 'BTCUSD'] },
+      { channel: 'mark_price', symbols: ['MARK:BTCUSD'] },
+      { channel: 'funding_rate', symbols: ['BTCUSD'] }
+    ])
+  })
+
   test('map delta-india captured messages', () => {
     // Captured from the India public socket on 2026-10-16; book levels and option batches trimmed.
     const messages = [
