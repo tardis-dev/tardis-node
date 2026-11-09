@@ -330,8 +330,8 @@ test('WhiteBIT derivative filters retain spot trades and cache the latest execut
   ])
   assert.deepStrictEqual(mapper.getFilters(), [
     { channel: 'trades_update', symbols: undefined },
-    { channel: 'premiumIndex_update', symbols: undefined },
-    { channel: 'futures_update', symbols: undefined }
+    { channel: 'premiumIndex_update', symbols: [] },
+    { channel: 'futures_update', symbols: [] }
   ])
   const localTimestamp = new Date()
   for (const ids of [

@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, isNullOrEmptyArray, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -116,13 +116,14 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   }
 
   getFilters(symbols?: string[]) {
-    const uppercaseSymbols = upperCaseSymbols(symbols)
-    const perpetuals = uppercaseSymbols?.filter((symbol) => symbol.endsWith('_PERP'))
+    symbols = upperCaseSymbols(symbols)
+    const perpetuals = symbols?.filter((symbol) => symbol.endsWith('_PERP')) ?? []
+
     return [
-      { channel: 'trades_update', symbols: uppercaseSymbols } as const,
-      ...(perpetuals?.length === 0
-        ? []
-        : [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const])
+      { channel: 'trades_update', symbols } as const,
+      ...(isNullOrEmptyArray(symbols) || perpetuals.length > 0
+        ? [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const]
+        : [])
     ]
   }
 
