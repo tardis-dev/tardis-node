@@ -1,6 +1,7 @@
 import { unzipSync } from 'zlib'
+import type { HuobiMessage } from '../mappers/huobi.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase, type SequenceInfo } from './realtimefeed.ts'
 import { wait, ONE_SEC_IN_MS, batch, getJSON } from '../handy.ts'
 import { Writable } from 'stream'
 
@@ -172,6 +173,32 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
 
   protected messageIsHeartbeat(message: any) {
     return message.ping !== undefined
+  }
+
+  protected getSequence(message: HuobiMessage): SequenceInfo | undefined {
+    if (
+      (this._exchange === 'huobi-dm' || this._exchange === 'huobi-dm-swap' || this._exchange === 'huobi-dm-linear-swap') &&
+      'ch' in message &&
+      message.ch.endsWith('.high_freq') &&
+      'tick' in message &&
+      'version' in message.tick
+    ) {
+      return {
+        key: message.ch.split('.')[1],
+        sequenceId: message.tick.version,
+        previousSequenceId: 'event' in message.tick && message.tick.event === 'snapshot' ? null : message.tick.version - 1
+      }
+    }
+
+    if ('ch' in message && message.ch.includes('.mbp.') && 'tick' in message && 'prevSeqNum' in message.tick) {
+      return {
+        key: message.ch.split('.')[1],
+        sequenceId: message.tick.seqNum,
+        previousSequenceId: message.tick.prevSeqNum
+      }
+    }
+
+    return undefined
   }
 }
 

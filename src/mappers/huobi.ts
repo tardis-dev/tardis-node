@@ -620,6 +620,8 @@ class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-s
   }
 }
 
+export type HuobiMessage = HuobiTradeDataMessage | HuobiDepthDataMessage | HuobiMBPDataMessage | HuobiMBPSnapshot | HuobiBBOMessage
+
 type HuobiDataMessage = {
   ch: string
 }
@@ -655,6 +657,7 @@ type HuobiDepthDataMessage = HuobiDataMessage &
           bids?: HuobiBookLevel[] | null
           asks?: HuobiBookLevel[] | null
           event: 'snapshot' | 'update'
+          version: number
         }
       }
   )
