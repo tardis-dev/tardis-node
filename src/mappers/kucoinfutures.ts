@@ -360,6 +360,13 @@ class KucoinFuturesDerivativeTickerMapper implements Mapper<'kucoin-futures', De
   }
 }
 
+export type KucoinFuturesMessage =
+  | KucoinFuturesTradeMessage
+  | KucoinFuturesLevel2SnapshotMessage
+  | KucoinFuturesLevel2UpdateMessage
+  | KucoinFuturesTickerMessage
+  | KucoinFuturesInstrumentMessage
+
 type KucoinFuturesTradeMessage = {
   topic: '/contractMarket/execution:COMPUSDTM'
   type: 'message'
