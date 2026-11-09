@@ -1,6 +1,7 @@
 import { getRandomString, getJSON, postJSON, wait } from '../handy.ts'
+import type { KucoinMessage } from '../mappers/kucoin.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 export class KucoinRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = ''
@@ -65,6 +66,17 @@ export class KucoinRealTimeFeed extends RealTimeFeedBase {
 
   protected messageIsError(message: any): boolean {
     return message.type === 'error'
+  }
+
+  protected getSequence(message: KucoinMessage): SequenceInfo | undefined {
+    if (message.subject === 'trade.l2update') {
+      return {
+        key: message.data.symbol,
+        sequenceId: message.data.sequenceEnd,
+        previousSequenceId: message.data.sequenceStart - 1
+      }
+    }
+    return undefined
   }
 
   protected sendCustomPing = () => {
