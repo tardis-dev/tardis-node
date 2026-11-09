@@ -1104,6 +1104,10 @@ export function asNonZeroNumberOrUndefined(val: string | number | undefined | nu
   return Number.isFinite(asNumber) && asNumber !== 0 ? asNumber : undefined
 }
 
+export function isNullOrEmptyArray(array: readonly unknown[] | null | undefined) {
+  return !array?.length
+}
+
 export function upperCaseSymbols(symbols?: string[]) {
   if (symbols !== undefined) {
     return symbols.map((s) => s.toUpperCase())
