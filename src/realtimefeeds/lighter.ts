@@ -27,10 +27,6 @@ abstract class RealTimeFeed extends RealTimeFeedBase {
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
   }
-}
-
-export class LighterRealTimeFeed extends RealTimeFeed {
-  protected wssURL = 'wss://mainnet.zklighter.elliot.ai/stream'
 
   protected getSequence(message: LighterMessage): SequenceInfo | undefined {
     if (message.type === 'subscribed/order_book' || message.type === 'update/order_book') {
@@ -42,6 +38,10 @@ export class LighterRealTimeFeed extends RealTimeFeed {
     }
     return undefined
   }
+}
+
+export class LighterRealTimeFeed extends RealTimeFeed {
+  protected wssURL = 'wss://mainnet.zklighter.elliot.ai/stream'
 }
 
 export class LighterRhRealTimeFeed extends RealTimeFeed {
