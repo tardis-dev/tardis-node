@@ -7,7 +7,13 @@ import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } 
 export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected readonly httpURL: string = 'https://whitebit.com/api/v4/public'
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     filters = filters.map((filter) => ({
       ...filter,
       symbols: filter.symbols?.map((symbol) => symbol.toUpperCase())
@@ -31,6 +37,7 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
             .map((filter) => ({ ...filter, symbols: filter.symbols!.filter((symbol) => group.includes(symbol)) }))
             .filter((filter) => filter.symbols.length > 0),
           timeoutIntervalMS,
+          validateSequence,
           onError,
           connectionIndex++ * 50
         )
@@ -58,10 +65,11 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
+    validateSequence?: boolean,
     onError?: (error: Error) => void,
     private readonly _startDelayMS = 0
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   }
 
   protected async getWebSocketUrl() {
