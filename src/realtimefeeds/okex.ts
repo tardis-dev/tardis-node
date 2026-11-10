@@ -2,7 +2,8 @@ import crypto from 'crypto'
 import { wait } from '../handy.ts'
 import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../okexsymbols.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
+import type { OkexV5BookMessage } from '../mappers/okex.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, SequenceGapError, SequenceInfo } from './realtimefeed.ts'
 
 export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
@@ -33,6 +34,24 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
   }
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
+
+  protected getSequence({ arg, action, data }: OkexV5BookMessage): SequenceInfo | undefined {
+    if (arg?.channel === 'books' && arg.instId && (action === 'snapshot' || action === 'update')) {
+      if (action === 'update') {
+        for (let i = 1; i < data.length; i++) {
+          if (data[i].prevSeqId !== data[i - 1].seqId) {
+            throw new SequenceGapError(this._exchange, arg.instId, data[i - 1].seqId, data[i].prevSeqId, data[i].seqId)
+          }
+        }
+      }
+      return {
+        key: arg.instId,
+        sequenceId: data[data.length - 1].seqId,
+        previousSequenceId: action === 'snapshot' ? null : data[0].prevSeqId
+      }
+    }
+    return undefined
+  }
 
   private secondsSinceEpoch() {
     return Math.floor(Date.now() / 1000)

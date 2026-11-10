@@ -750,23 +750,20 @@ type OkexV5TradesAllMessage = {
 
 type OkexV5BookLevel = [string, string, string, string]
 
-type OkexV5BookMessage =
-  | {
-      arg: { channel: 'books-l2-tbt'; instId: string }
-      action: 'snapshot'
-      data: [
-        {
-          asks: OkexV5BookLevel[]
-          bids: OkexV5BookLevel[]
-          ts: string
-        }
-      ]
-    }
-  | {
-      arg: { channel: 'books-l2-tbt'; instId: string }
-      action: 'update'
-      data: [{ asks: OkexV5BookLevel[]; bids: OkexV5BookLevel[]; ts: string }]
-    }
+export type OkexV5BookMessage = {
+  arg: {
+    channel: 'books' | 'books-l2-tbt' | 'books50-l2-tbt'
+    instId: string
+  }
+  action: 'snapshot' | 'update'
+  data: {
+    asks: OkexV5BookLevel[]
+    bids: OkexV5BookLevel[]
+    ts: string
+    seqId: number
+    prevSeqId: number
+  }[]
+}
 
 type OkexV5TickerMessage = {
   arg: { channel: 'tickers'; instId: string }
