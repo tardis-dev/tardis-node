@@ -4,6 +4,8 @@ import { assert } from './assertions.ts'
 import { createServer } from 'http'
 import type { Filter } from '../dist/types.js'
 import { MexcRealTimeFeed } from '../dist/realtimefeeds/mexc.js'
+import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { createTestWebSocketServer } from './helpers/websocket.ts'
 
 class TestMexcRealTimeFeed extends MexcRealTimeFeed {
   protected readonly httpURL: string
@@ -262,3 +264,173 @@ type MexcTestDepthSnapshotResponse = {
   asks: string[][]
   timestamp: number
 }
+
+function depthFrame(channel: string, fromVersion: number | string, toVersion: number | string, symbol = 'BTCUSDT', empty = false) {
+  const bids = empty ? [] : [bytesField(2, message(stringField(1, '100'), stringField(2, String(toVersion))))]
+  return message(
+    stringField(1, `${channel}@${symbol}`),
+    stringField(3, symbol),
+    varintField(6, Date.now()),
+    bytesField(313, message(...bids, stringField(3, channel), stringField(4, String(fromVersion)), stringField(5, String(toVersion))))
+  )
+}
+function depthSnapshot(lastUpdateId: number) {
+  return {
+    channel: 'spot@public.aggre.depth.snapshot.v3.api.pb@10ms@BTCUSDT',
+    symbol: 'BTCUSDT',
+    generated: true,
+    publicAggreDepthsSnapshot: { lastUpdateId, bids: [['100', String(lastUpdateId)]], asks: [], timestamp: Date.now() }
+  }
+}
+
+for (const validateSequence of [undefined, true, false]) {
+  test(`MEXC protobuf depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
+    const depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
+    const errors: Error[] = []
+    const native = [
+      Buffer.from(JSON.stringify({ code: 0, msg: `${depthChannel}@BTCUSDT` })),
+      Buffer.from(JSON.stringify({ code: 0, msg: 'PONG' })),
+      depthFrame(depthChannel, 100, 105),
+      depthFrame(depthChannel, 106, 110),
+      depthFrame(depthChannel, 106, 110),
+      depthFrame(depthChannel, 500, 501, 'ETHUSDT'),
+      Buffer.from(JSON.stringify(depthSnapshot(50))),
+      message(
+        stringField(1, 'spot@public.aggre.bookTicker.v3.api.pb@10ms@BTCUSDT'),
+        stringField(3, 'BTCUSDT'),
+        bytesField(315, stringField(5, '999999'))
+      ),
+      depthFrame(depthChannel, 'not-a-version', '999999'),
+      depthFrame(depthChannel, '', '999999'),
+      depthFrame(depthChannel, 111, 115, 'BTCUSDT', true),
+      depthFrame(depthChannel, 502, 505, 'ETHUSDT')
+    ]
+    const gap = depthFrame(depthChannel, 117, 120)
+    const parser = new TestMexcRealTimeFeed('mexc', [], undefined)
+    const expected = native.map((bytes) => parser.parse(bytes))
+    const { server, cleanup } = await createTestWebSocketServer('mexc')
+    let subscription: unknown
+    server.on('connection', (socket) =>
+      socket.once('message', (bytes) => {
+        subscription = JSON.parse(bytes.toString())
+        for (const frame of [...native, gap]) socket.send(frame)
+      })
+    )
+    const feed = stream({
+      exchange: 'mexc',
+      filters: [{ channel: depthChannel, symbols: ['BTCUSDT', 'ETHUSDT'] }],
+      timeoutIntervalMS: 0,
+      validateSequence,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      for (const decoded of expected) assert.deepStrictEqual((await feed.next()).value?.message, decoded)
+      assert.deepStrictEqual(subscription, { method: 'SUBSCRIPTION', params: [`${depthChannel}@BTCUSDT`, `${depthChannel}@ETHUSDT`] })
+      const next = (await feed.next()).value
+      if (validateSequence === false) {
+        assert.deepStrictEqual(next?.message, parser.parse(gap))
+        assert.deepStrictEqual(errors, [])
+      } else {
+        assert.strictEqual(next, undefined)
+        assert.strictEqual(errors.length, 1)
+        assert.ok(errors[0] instanceof SequenceGapError)
+        assert.strictEqual(errors[0].exchange, 'mexc')
+        assert.strictEqual(errors[0].key, 'BTCUSDT')
+        assert.strictEqual(errors[0].expectedPreviousSequence, 115)
+        assert.strictEqual(errors[0].previousSequence, 116)
+        assert.strictEqual(errors[0].sequence, 120)
+      }
+    } finally {
+      await feed.return?.()
+      await cleanup()
+    }
+  })
+}
+
+for (const normalized of [false, true]) {
+  for (const withDisconnects of [false, true]) {
+    test(`MEXC sequence recovery: normalized=${normalized}, disconnects=${withDisconnects}`, { timeout: 10000 }, async () => {
+      const depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
+      const errors: Error[] = []
+      let connections = 0
+      const initial = [
+        Buffer.from(JSON.stringify(depthSnapshot(100))),
+        depthFrame(depthChannel, 101, 105),
+        depthFrame(depthChannel, 107, 110)
+      ]
+      const recovered = [Buffer.from(JSON.stringify(depthSnapshot(0))), depthFrame(depthChannel, 1, 2)]
+      const { server, cleanup } = await createTestWebSocketServer('mexc')
+      server.on('connection', (socket) => {
+        const first = ++connections === 1
+        socket.once('message', () => {
+          for (const frame of first ? initial : recovered) socket.send(frame)
+        })
+      })
+      const options = { exchange: 'mexc' as const, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
+      const feed = normalized
+        ? streamNormalized({ ...options, symbols: ['BTCUSDT'], withDisconnectMessages: withDisconnects }, normalizeBookChanges)
+        : stream({ ...options, filters: [{ channel: depthChannel, symbols: ['BTCUSDT'] }], withDisconnects })
+      const output: any[] = []
+      try {
+        for await (const value of feed) {
+          output.push(value)
+          if (output.length === (withDisconnects ? 5 : 4)) break
+        }
+        if (withDisconnects) {
+          assert.strictEqual(normalized ? output[2].type : output[2], normalized ? 'disconnect' : undefined)
+          output.splice(2, 1)
+        }
+        if (normalized) {
+          assert.deepStrictEqual(
+            output.map((item) => item.isSnapshot),
+            [true, false, true, false]
+          )
+          assert.deepStrictEqual(
+            output.map((item) => item.bids),
+            [100, 105, 0, 2].map((amount) => [{ price: 100, amount }])
+          )
+        } else {
+          const parser = new TestMexcRealTimeFeed('mexc', [], undefined)
+          assert.deepStrictEqual(
+            output.map((item) => item.message),
+            [...initial.slice(0, 2), ...recovered].map((bytes) => parser.parse(bytes))
+          )
+        }
+        assert.strictEqual(connections, 2)
+        assert.strictEqual(errors.length, 1)
+        assert.ok(errors[0] instanceof SequenceGapError)
+      } finally {
+        await feed.return?.()
+        await cleanup()
+      }
+    })
+  }
+}
+
+test('MEXC normalized opt-out preserves snapshot mapping across a gap', { timeout: 10000 }, async () => {
+  const depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
+  const errors: Error[] = []
+  const { server, cleanup } = await createTestWebSocketServer('mexc')
+  server.on('connection', (socket) =>
+    socket.once('message', () => {
+      for (const frame of [
+        Buffer.from(JSON.stringify(depthSnapshot(100))),
+        depthFrame(depthChannel, 101, 105),
+        depthFrame(depthChannel, 107, 110)
+      ])
+        socket.send(frame)
+    })
+  )
+  const feed = streamNormalized(
+    { exchange: 'mexc', symbols: ['BTCUSDT'], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
+    normalizeBookChanges
+  )
+  try {
+    for (const amount of [100, 105, 110]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
+    assert.deepStrictEqual(errors, [])
+  } finally {
+    await feed.return?.()
+    await cleanup()
+  }
+})
