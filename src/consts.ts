@@ -68,7 +68,8 @@ export const EXCHANGES = [
   'lighter-rh',
   'bullish',
   'mexc',
-  'polymarket'
+  'polymarket',
+  'whitebit'
 ] as const
 
 const BINANCE_CHANNELS = [
@@ -625,6 +626,8 @@ const POLYMARKET_CHANNELS = [
   'market_resolved'
 ] as const
 
+const WHITEBIT_CHANNELS = ['depth_update', 'bookTicker_update', 'trades_update', 'premiumIndex_update', 'futures_update'] as const
+
 export const EXCHANGE_CHANNELS_INFO = {
   aster: ASTER_CHANNELS,
   'aster-futures': ASTER_FUTURES_CHANNELS,
@@ -695,5 +698,6 @@ export const EXCHANGE_CHANNELS_INFO = {
   'lighter-rh': LIGHTER_CHANNELS,
   bullish: BULLISH_CHANNELS,
   mexc: MEXC_CHANNELS,
-  polymarket: POLYMARKET_CHANNELS
+  polymarket: POLYMARKET_CHANNELS,
+  whitebit: WHITEBIT_CHANNELS
 }
