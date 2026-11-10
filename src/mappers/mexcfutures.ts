@@ -252,15 +252,23 @@ const MEXC_FUTURES_MAPPED_PUSH_CHANNELS = [
   'push.fair.price',
   'push.funding.rate'
 ] as const
+export type MexcFuturesMessage =
+  | MexcFuturesDealMessage
+  | MexcFuturesDepthMessage
+  | MexcFuturesTickerMessage
+  | MexcFuturesIndexPriceMessage
+  | MexcFuturesFairPriceMessage
+  | MexcFuturesFundingRateMessage
+
 type MexcFuturesMappedPushChannel = (typeof MEXC_FUTURES_MAPPED_PUSH_CHANNELS)[number]
-type MexcFuturesMessage<TChannel extends MexcFuturesMappedPushChannel, TData> = {
+type MexcFuturesBaseMessage<TChannel extends MexcFuturesMappedPushChannel, TData> = {
   channel: TChannel
   symbol: string
   ts: number
   data: TData
 }
 
-type MexcFuturesDealMessage = MexcFuturesMessage<
+type MexcFuturesDealMessage = MexcFuturesBaseMessage<
   'push.deal',
   {
     p: number
@@ -312,7 +320,7 @@ export type MexcFuturesDepthSnapshotData = {
   version: number
 }
 
-type MexcFuturesDepthUpdateMessage = MexcFuturesMessage<'push.depth', MexcFuturesDepthUpdateData> & { generated?: undefined }
+type MexcFuturesDepthUpdateMessage = MexcFuturesBaseMessage<'push.depth', MexcFuturesDepthUpdateData> & { generated?: undefined }
 
 export type MexcFuturesDepthUpdateData = {
   asks: MexcFuturesDepthLevel[]
@@ -325,7 +333,7 @@ export type MexcFuturesDepthUpdateData = {
 
 export type MexcFuturesDepthLevel = [price: number, quantity: number, ordersCount: number]
 
-type MexcFuturesTickerMessage = MexcFuturesMessage<
+type MexcFuturesTickerMessage = MexcFuturesBaseMessage<
   'push.ticker',
   {
     ask1: number
@@ -352,12 +360,12 @@ type MexcFuturesTickerMessage = MexcFuturesMessage<
   }
 >
 
-type MexcFuturesIndexPriceMessage = MexcFuturesMessage<'push.index.price', MexcFuturesPriceData>
-type MexcFuturesFairPriceMessage = MexcFuturesMessage<'push.fair.price', MexcFuturesPriceData>
+type MexcFuturesIndexPriceMessage = MexcFuturesBaseMessage<'push.index.price', MexcFuturesPriceData>
+type MexcFuturesFairPriceMessage = MexcFuturesBaseMessage<'push.fair.price', MexcFuturesPriceData>
 
 type MexcFuturesPriceData = {
   price: number
   symbol: string
 }
 
-type MexcFuturesFundingRateMessage = MexcFuturesMessage<'push.funding.rate', { rate: number; symbol: string; nextSettleTime?: number }>
+type MexcFuturesFundingRateMessage = MexcFuturesBaseMessage<'push.funding.rate', { rate: number; symbol: string; nextSettleTime?: number }>
