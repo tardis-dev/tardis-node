@@ -169,14 +169,16 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   }
 }
 
-type WhiteBitMessage<TMethod extends string = string, TParams = unknown> = {
+export type WhiteBitMessage = WhiteBitTrades | WhiteBitDepth | WhiteBitBookTicker | WhiteBitPremiumIndex | WhiteBitFutures
+
+type WhiteBitBaseMessage<TMethod extends string, TParams> = {
   method: TMethod
   params: TParams
   id: null
 }
 
 /** @see https://docs.whitebit.com/websocket/market-streams/trades */
-type WhiteBitTrades = WhiteBitMessage<
+type WhiteBitTrades = WhiteBitBaseMessage<
   'trades_update',
   [
     symbol: string,
@@ -192,7 +194,7 @@ type WhiteBitTrades = WhiteBitMessage<
 >
 
 /** @see https://docs.whitebit.com/websocket/market-streams/depth */
-type WhiteBitDepth = WhiteBitMessage<
+type WhiteBitDepth = WhiteBitBaseMessage<
   'depth_update',
   [
     isSnapshot: boolean,
@@ -209,7 +211,7 @@ type WhiteBitDepth = WhiteBitMessage<
 >
 
 /** @see https://docs.whitebit.com/websocket/market-streams/book-ticker */
-type WhiteBitBookTicker = WhiteBitMessage<
+type WhiteBitBookTicker = WhiteBitBaseMessage<
   'bookTicker_update',
   [
     transactionTime: number,
@@ -224,7 +226,7 @@ type WhiteBitBookTicker = WhiteBitMessage<
 >
 
 /** @see https://docs.whitebit.com/websocket/market-streams/premium-index */
-type WhiteBitPremiumIndex = WhiteBitMessage<
+type WhiteBitPremiumIndex = WhiteBitBaseMessage<
   'premiumIndex_update',
   [symbol: string, markPrice: string, indexPrice: string, fundingRate: string, fundingTime: number, serverTime: number]
 >
@@ -233,7 +235,7 @@ type WhiteBitPremiumIndex = WhiteBitMessage<
  * Recorder-generated envelope containing the original REST market record.
  * @see https://docs.whitebit.com/api-reference/market-data/available-futures-markets-list
  */
-type WhiteBitFutures = WhiteBitMessage<
+type WhiteBitFutures = WhiteBitBaseMessage<
   'futures_update',
   [
     symbol: string,

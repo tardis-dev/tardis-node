@@ -2,7 +2,8 @@ import { Writable } from 'stream'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { batch, getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import type { WhiteBitMessage } from '../mappers/whitebit.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, SequenceInfo } from './realtimefeed.ts'
 
 export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected readonly httpURL: string = 'https://whitebit.com/api/v4/public'
@@ -59,7 +60,6 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://wss.whitebit.com/ws'
-  private readonly _lastUpdateIds = new Map<string, number>()
 
   constructor(
     exchange: string,
@@ -78,7 +78,6 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
-    this._lastUpdateIds.clear()
     let id = 0
     return filters.flatMap(({ channel, symbols }) => {
       const method = channel.replace('_update', '_subscribe')
@@ -113,16 +112,20 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
     return message.error !== undefined && message.error !== null
   }
 
-  protected onMessage(message: { method?: string; params?: [boolean, { update_id: number; past_update_id?: number }, string] }) {
-    if (message.method !== 'depth_update') {
-      return
+  protected getSequence({ method, params }: WhiteBitMessage): SequenceInfo | undefined {
+    if (method === 'depth_update') {
+      const [isSnapshot, book, symbol] = params
+      const previousSequenceId = isSnapshot ? null : book.past_update_id
+      if (book.update_id === undefined || previousSequenceId === undefined) {
+        throw new Error('WhiteBIT depth message is missing its sequence identifiers.')
+      }
+      return {
+        key: symbol,
+        sequenceId: book.update_id,
+        previousSequenceId
+      }
     }
-    const [isSnapshot, book, symbol] = message.params!
-    // Snapshot resets may jump over changes outside the subscribed depth; only deltas must link to the previous update.
-    if (!isSnapshot && book.past_update_id !== this._lastUpdateIds.get(symbol)) {
-      throw new Error(`WhiteBIT depth sequence gap for ${symbol}`)
-    }
-    this._lastUpdateIds.set(symbol, book.update_id)
+    return undefined
   }
 }
 
