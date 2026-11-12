@@ -1,5 +1,6 @@
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import type { LighterMessage } from '../mappers/lighter.ts'
+import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 abstract class RealTimeFeed extends RealTimeFeedBase {
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -25,6 +26,17 @@ abstract class RealTimeFeed extends RealTimeFeedBase {
 
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
+  }
+
+  protected getSequence(message: LighterMessage): SequenceInfo | undefined {
+    if (message.type === 'subscribed/order_book' || message.type === 'update/order_book') {
+      return {
+        key: message.channel,
+        sequenceId: message.order_book.nonce,
+        previousSequenceId: message.type === 'update/order_book' ? message.order_book.begin_nonce : null
+      }
+    }
+    return undefined
   }
 }
 

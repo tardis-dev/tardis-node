@@ -1,5 +1,6 @@
+import type { BullishLevel2Message } from '../mappers/bullish.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 type BullishSubscriptionTarget = {
   readonly topic: string
@@ -45,9 +46,15 @@ function getBullishSubscriptionTarget(channel: string) {
 }
 
 export class BullishRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     for (const [path, pathFilters] of this.groupByPath(filters)) {
-      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, onError)
+      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, validateSequence, onError)
     }
   }
 
@@ -74,14 +81,28 @@ export class BullishSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly path: string,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
+    validateSequence?: boolean,
     onError?: (error: Error) => void
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
   }
 
   protected async getWebSocketUrl() {
     const baseURL = await super.getWebSocketUrl()
     return `${baseURL.replace(/\/$/, '')}${this.path}`
+  }
+
+  protected getSequence(message: BullishLevel2Message): SequenceInfo | undefined {
+    if (message.dataType === 'V1TALevel2') {
+      const [first, last] = message.data.sequenceNumberRange
+      return {
+        key: message.data.symbol,
+        sequenceId: last,
+        previousSequenceId: first - 1
+      }
+    }
+
+    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {

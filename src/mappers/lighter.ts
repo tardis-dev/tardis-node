@@ -245,6 +245,9 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
   }
 }
 
+export type LighterMessage =
+  LighterOrderBookMessage | LighterTickerMessage | LighterTradeMessage | LighterMarketStatsMessage | LighterSpotMarketStatsMessage
+
 export type LighterLevel = {
   price: string
   size: string

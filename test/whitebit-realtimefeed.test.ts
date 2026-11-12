@@ -9,6 +9,7 @@ import { setTimeout as sleep } from 'node:timers/promises'
 import { test } from 'node:test'
 import { WebSocketServer } from 'ws'
 import { assert } from './assertions.ts'
+import { createTestWebSocketServer } from './helpers/websocket.ts'
 import {
   init,
   normalizeTrades,
@@ -18,15 +19,45 @@ import {
   replay,
   replayNormalized,
   stream,
-  streamNormalized
+  streamNormalized,
+  SequenceGapError
 } from '../dist/index.js'
 import type { Filter } from '../dist/types.js'
 import { WhiteBitRealTimeFeed, WhiteBitWebSocketRealTimeFeed } from '../dist/realtimefeeds/whitebit.js'
 
+for (const validateSequence of [undefined, false]) {
+  test(`WhiteBIT forwards stream errors: validateSequence=${validateSequence}`, { timeout: 10000 }, async () => {
+    const { server, cleanup } = await createTestWebSocketServer('whitebit')
+    const errors: Error[] = []
+    const snapshot = { method: 'depth_update', params: [true, { update_id: 100, bids: [], asks: [] }, 'BTC_USDT'] }
+    const error = { error: { code: 1, message: 'Subscription failed' }, id: 1 }
+    server.on('connection', (socket) =>
+      socket.once('message', () => {
+        socket.send(JSON.stringify(snapshot))
+        socket.send(JSON.stringify(error))
+      })
+    )
+    const messages = stream({
+      exchange: 'whitebit',
+      filters: [{ channel: 'depth_update', symbols: ['BTC_USDT'] }],
+      timeoutIntervalMS: 0,
+      validateSequence,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      assert.deepStrictEqual((await messages.next()).value?.message, snapshot)
+      assert.strictEqual((await messages.next()).value, undefined)
+      assert.strictEqual(errors.length, 1)
+      assert.ok(errors[0].message.includes('Subscription failed'))
+    } finally {
+      await messages.return?.()
+      await cleanup()
+    }
+  })
+}
+
 class TestWhiteBitWebSocketFeed extends WhiteBitWebSocketRealTimeFeed {
-  observe(message: any) {
-    this.onMessage(message)
-  }
   map(filters: Filter<string>[]) {
     return this.mapToSubscribeMessages(filters)
   }
@@ -117,23 +148,6 @@ test('WhiteBIT rounds depth, BBO and premium-index timestamps without changing c
     feed.parse('{"id":1,"result":{"message":"Example: 1793089243.4692869, keep \\"quoted\\" text","price":"100.1234567"}}'),
     { id: 1, result: { message: 'Example: 1793089243.4692869, keep "quoted" text', price: '100.1234567' } }
   )
-})
-
-test('WhiteBIT live depth detects gaps and accepts snapshot resets', () => {
-  const feed = new TestWhiteBitWebSocketFeed('whitebit', [], undefined)
-  const depth = (isSnapshot: boolean, update_id: number, past_update_id?: number) => ({
-    method: 'depth_update',
-    params: [isSnapshot, { update_id, past_update_id }, 'BTC_PERP']
-  })
-  feed.observe(depth(true, 10))
-  feed.observe(depth(false, 12, 10))
-  feed.observe(depth(true, 20))
-  feed.observe(depth(false, 21, 20))
-  assert.throws(() => feed.observe(depth(false, 23, 22)), /WhiteBIT depth sequence gap for BTC_PERP/)
-  feed.map([{ channel: 'depth_update', symbols: ['BTC_PERP'] }])
-  assert.throws(() => feed.observe(depth(false, 22, 21)), /WhiteBIT depth sequence gap for BTC_PERP/)
-  feed.observe(depth(true, 30))
-  feed.observe(depth(false, 31, 30))
 })
 
 test('WhiteBIT splits spot and perpetual markets into batches without replacing other subscriptions', { timeout: 10000 }, async () => {
@@ -439,3 +453,204 @@ test('WhiteBIT replay decodes numeric timestamps, rounds microseconds and preser
     await new Promise<void>((resolve) => server.close(() => resolve()))
   }
 })
+
+for (const validateSequence of [undefined, true, false]) {
+  test(`WhiteBIT depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
+    const depth = (snapshot: boolean, update_id: number, past_update_id?: number, symbol = 'BTC_USDT') => ({
+      method: 'depth_update',
+      params: [snapshot, { update_id, ...(past_update_id === undefined ? {} : { past_update_id }) }, symbol],
+      id: null
+    })
+    const native = [
+      { id: 1, result: { status: 'success' }, error: null },
+      depth(false, 10, 9),
+      depth(false, 12, 10),
+      depth(false, 12, 10),
+      depth(true, 100),
+      depth(false, 105, 100),
+      depth(true, 0),
+      depth(false, 1, 0),
+      depth(true, 500, undefined, 'ETH_USDT'),
+      depth(false, 501, 500, 'ETH_USDT'),
+      { method: 'bookTicker_update', params: [[0, 0, 'BTC_USDT', 999999]], id: null },
+      depth(false, 2, 1)
+    ]
+    const gap = depth(false, 4, 3)
+    const errors: Error[] = []
+    const { server, cleanup } = await createTestWebSocketServer('whitebit')
+    server.on('connection', (socket) =>
+      socket.once('message', () => {
+        for (const message of [...native, gap]) socket.send(JSON.stringify(message))
+      })
+    )
+    const messages = stream({
+      exchange: 'whitebit',
+      filters: [{ channel: 'depth_update', symbols: ['BTC_USDT', 'ETH_USDT'] }],
+      timeoutIntervalMS: 0,
+      validateSequence,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      for (const message of native) assert.deepStrictEqual((await messages.next()).value?.message, message)
+      const next = (await messages.next()).value
+      if (validateSequence === false) {
+        assert.deepStrictEqual(next?.message, gap)
+        assert.deepStrictEqual(errors, [])
+      } else {
+        assert.strictEqual(next, undefined)
+        assert.strictEqual(errors.length, 1)
+        assert.ok(errors[0] instanceof SequenceGapError)
+        assert.strictEqual(errors[0].exchange, 'whitebit')
+        assert.strictEqual(errors[0].key, 'BTC_USDT')
+        assert.strictEqual(errors[0].expectedPreviousSequence, 2)
+        assert.strictEqual(errors[0].previousSequence, 3)
+        assert.strictEqual(errors[0].sequence, 4)
+      }
+    } finally {
+      await messages.return?.()
+      await cleanup()
+    }
+  })
+}
+
+for (const normalized of [false, true]) {
+  for (const withDisconnects of [false, true]) {
+    test(`WhiteBIT sequence recovery: normalized=${normalized}, disconnects=${withDisconnects}`, { timeout: 10000 }, async () => {
+      const errors: Error[] = []
+      const connections = new Map<string, number>()
+      let sendGap: (() => void) | undefined
+      const depth = (symbol: string, snapshot: boolean, update_id: number, past_update_id?: number) => ({
+        method: 'depth_update',
+        params: [snapshot, { timestamp: 1794300000, update_id, past_update_id, bids: [['100', String(update_id)]], asks: [] }, symbol],
+        id: null
+      })
+      const { server, cleanup } = await createTestWebSocketServer('whitebit')
+      server.on('connection', (socket) =>
+        socket.once('message', (bytes) => {
+          const { method, params } = JSON.parse(bytes.toString())
+          assert.strictEqual(method, 'depth_subscribe')
+          const symbol = params[0]
+          const attempt = (connections.get(symbol) ?? 0) + 1
+          connections.set(symbol, attempt)
+          socket.send(JSON.stringify(depth(symbol, true, attempt === 1 ? 100 : 0)))
+          socket.send(JSON.stringify(depth(symbol, false, attempt === 1 ? 105 : 2, attempt === 1 ? 100 : 0)))
+          if (attempt === 1 && symbol === 'BTC_USDT') {
+            sendGap = () => socket.send(JSON.stringify(depth(symbol, false, 110, 109)))
+          }
+        })
+      )
+      const symbols = ['BTC_USDT', 'BTC_PERP']
+      const options = { exchange: 'whitebit' as const, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
+      const messages = normalized
+        ? streamNormalized({ ...options, symbols, withDisconnectMessages: withDisconnects }, normalizeBookChanges)
+        : stream({ ...options, filters: [{ channel: 'depth_update', symbols }], withDisconnects })
+      const output = new Map<string, { snapshot: boolean; amount: number }[]>()
+      let boundaries = 0
+      try {
+        for await (const message of messages) {
+          if (message === undefined || ('type' in message && message.type === 'disconnect')) {
+            boundaries++
+            continue
+          }
+          const { symbol, snapshot, amount } =
+            'message' in message
+              ? { symbol: message.message.params[2], snapshot: message.message.params[0], amount: message.message.params[1].update_id }
+              : { symbol: message.symbol, snapshot: message.isSnapshot, amount: message.bids[0].amount }
+          const values = output.get(symbol) ?? []
+          values.push({ snapshot, amount })
+          output.set(symbol, values)
+          if (symbols.every((symbol) => output.get(symbol)?.length === 2)) sendGap!()
+          if (symbols.every((symbol) => output.get(symbol)?.at(-1)?.amount === 2)) break
+        }
+        for (const symbol of symbols) {
+          assert.deepStrictEqual(output.get(symbol), [
+            { snapshot: true, amount: 100 },
+            { snapshot: false, amount: 105 },
+            { snapshot: true, amount: 0 },
+            { snapshot: false, amount: 2 }
+          ])
+          assert.strictEqual(connections.get(symbol), 2)
+        }
+        assert.strictEqual(boundaries, withDisconnects ? 1 : 0)
+        assert.strictEqual(errors.length, 1)
+        assert.ok(errors[0] instanceof SequenceGapError)
+      } finally {
+        await messages.return?.()
+        await cleanup()
+      }
+    })
+  }
+}
+
+test('WhiteBIT normalized opt-out preserves snapshot resets and gaps', { timeout: 10000 }, async () => {
+  const errors: Error[] = []
+  const { server, cleanup } = await createTestWebSocketServer('whitebit')
+  server.on('connection', (socket) =>
+    socket.once('message', () => {
+      for (const [snapshot, update_id, past_update_id] of [
+        [true, 100],
+        [false, 110, 109],
+        [true, 0],
+        [false, 2, 0]
+      ]) {
+        socket.send(
+          JSON.stringify({
+            method: 'depth_update',
+            params: [snapshot, { timestamp: 1794300000, update_id, past_update_id, bids: [['100', String(update_id)]] }, 'BTC_PERP'],
+            id: null
+          })
+        )
+      }
+    })
+  )
+  const messages = streamNormalized(
+    { exchange: 'whitebit', symbols: ['BTC_PERP'], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
+    normalizeBookChanges
+  )
+  try {
+    for (const amount of [100, 110, 0, 2]) assert.deepStrictEqual((await messages.next()).value.bids, [{ price: 100, amount }])
+    assert.deepStrictEqual(errors, [])
+  } finally {
+    await messages.return?.()
+    await cleanup()
+  }
+})
+
+for (const missing of ['update_id', 'past_update_id']) {
+  test(`WhiteBIT rejects depth without ${missing}, matching recorder`, { timeout: 10000 }, async () => {
+    const errors: Error[] = []
+    const { server, cleanup } = await createTestWebSocketServer('whitebit')
+    server.on('connection', (socket) =>
+      socket.once('message', () => {
+        socket.send(JSON.stringify({ method: 'depth_update', params: [true, { update_id: 100 }, 'BTC_USDT'] }))
+        socket.send(
+          JSON.stringify({
+            method: 'depth_update',
+            params: [
+              false,
+              { ...(missing === 'update_id' ? {} : { update_id: 101 }), ...(missing === 'past_update_id' ? {} : { past_update_id: 100 }) },
+              'BTC_USDT'
+            ]
+          })
+        )
+      })
+    )
+    const messages = stream({
+      exchange: 'whitebit',
+      filters: [{ channel: 'depth_update', symbols: ['BTC_USDT'] }],
+      timeoutIntervalMS: 0,
+      withDisconnects: true,
+      onError: (error) => errors.push(error)
+    })
+    try {
+      assert.ok((await messages.next()).value)
+      assert.strictEqual((await messages.next()).value, undefined)
+      assert.strictEqual(errors.length, 1)
+      assert.strictEqual(errors[0].message, 'WhiteBIT depth message is missing its sequence identifiers.')
+    } finally {
+      await messages.return?.()
+      await cleanup()
+    }
+  })
+}

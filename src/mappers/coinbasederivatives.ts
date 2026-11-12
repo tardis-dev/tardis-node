@@ -168,12 +168,19 @@ class CoinbaseDerivativesTickerMapper implements Mapper<'coinbase-derivatives', 
   }
 }
 
-type CoinbaseDerivativesMessage<Channel extends string, Event> = {
+export type CoinbaseDerivativesMessage =
+  CoinbaseDerivativesBaseMessage<string, unknown> | CoinbaseDerivativesSequenceMessage<string, unknown>
+
+type CoinbaseDerivativesBaseMessage<Channel extends string, Event> = {
   channel: Channel
   events: Event[]
 }
 
-type CoinbaseDerivativesTrade = CoinbaseDerivativesMessage<
+type CoinbaseDerivativesSequenceMessage<Channel extends string, Event> = CoinbaseDerivativesBaseMessage<Channel, Event> & {
+  sequence_num: number
+}
+
+type CoinbaseDerivativesTrade = CoinbaseDerivativesSequenceMessage<
   'market_trades',
   {
     type: CoinbaseDerivativesMessageType
@@ -187,7 +194,7 @@ type CoinbaseDerivativesTrade = CoinbaseDerivativesMessage<
     }[]
   }
 >
-type CoinbaseDerivativesBook = CoinbaseDerivativesMessage<
+type CoinbaseDerivativesBook = CoinbaseDerivativesSequenceMessage<
   'l2_data',
   {
     type: CoinbaseDerivativesMessageType
@@ -201,7 +208,7 @@ type CoinbaseDerivativesBook = CoinbaseDerivativesMessage<
   }
 > & { timestamp: string }
 
-type CoinbaseDerivativesTicker = CoinbaseDerivativesMessage<
+type CoinbaseDerivativesTicker = CoinbaseDerivativesSequenceMessage<
   'ticker',
   {
     tickers: {
@@ -215,7 +222,7 @@ type CoinbaseDerivativesTicker = CoinbaseDerivativesMessage<
   }
 > & { timestamp: string }
 
-type CoinbaseDerivativesProducts = CoinbaseDerivativesMessage<
+type CoinbaseDerivativesProducts = CoinbaseDerivativesBaseMessage<
   'products',
   {
     product_id: string

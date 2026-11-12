@@ -1,8 +1,11 @@
 import crypto from 'crypto'
+import type { CoinbaseMessage } from '../mappers/coinbase.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
 
 export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
+  private _fullChannelSymbols = new Set<string>()
+
   private _hasCredentials =
     process.env.COINBASE_API_KEY !== undefined &&
     process.env.COINBASE_API_SECRET !== undefined &&
@@ -18,6 +21,34 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
     level2: ['snapshot', 'l2update'],
     matches: ['match', 'last_match'],
     ticker: ['ticker']
+  }
+
+  protected getSequence(message: CoinbaseMessage): SequenceInfo | undefined {
+    if (
+      this._fullChannelSymbols.has(message.product_id) === false ||
+      !('sequence' in message) ||
+      message.sequence === undefined ||
+      !this.shouldValidateSequenceFor(message.type)
+    ) {
+      return undefined
+    }
+
+    return {
+      key: message.product_id,
+      sequenceId: message.sequence,
+      previousSequenceId: message.sequence - 1
+    }
+  }
+
+  private shouldValidateSequenceFor(type: CoinbaseMessage['type']): boolean {
+    return (
+      type !== 'ticker' &&
+      type !== 'l2update' &&
+      type !== 'snapshot' &&
+      type !== 'auction' &&
+      type !== 'last_auction' &&
+      type !== 'rfq_match'
+    )
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -70,6 +101,10 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
         },
         [] as { name: string; product_ids: string[] }[]
       )
+
+    this._fullChannelSymbols = new Set(
+      channelsToSubscribe.filter((channel) => channel.name === 'full').flatMap((channel) => channel.product_ids)
+    )
 
     if (this._hasCredentials) {
       const authParams = this.getAuthParams()

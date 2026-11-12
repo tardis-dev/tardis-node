@@ -271,34 +271,18 @@ type PoloniexV2TradesMessage = {
   ]
 }
 
-type PoloniexV2BookMessage =
-  | {
-      channel: 'book_lv2'
-      data: [
-        {
-          symbol: 'AAVE_BTC'
-          createTime: 1659916859818
-          asks: [string, string][]
-          bids: [string, string][]
-          lastId: 20251
-          id: 20252
-          ts: 1659916859824
-        }
-      ]
-      action: 'update'
+export type PoloniexV2BookMessage = {
+  channel: 'book_lv2'
+  data: [
+    {
+      symbol: string
+      createTime: number
+      asks: [string, string][]
+      bids: [string, string][]
+      lastId: number
+      id: number
+      ts: number
     }
-  | {
-      channel: 'book_lv2'
-      data: [
-        {
-          symbol: 'AAVE_BTC'
-          createTime: 1659900600092
-          asks: [string, string][]
-          bids: [string, string][]
-          lastId: 85
-          id: 86
-          ts: 1659916800614
-        }
-      ]
-      action: 'snapshot'
-    }
+  ]
+  action: 'snapshot' | 'update'
+}

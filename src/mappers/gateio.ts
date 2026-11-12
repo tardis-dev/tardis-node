@@ -426,6 +426,9 @@ class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
   }
 }
 
+export type GateIOMessage =
+  GateIOTrades | GateIODepth | GateV4Trade | GateV4BookTicker | Gatev4OrderBookSnapshot | GateV4OrderBookUpdate | GateV4OrderBookV2Message
+
 type GateIOTrade = {
   id: number
   time: number

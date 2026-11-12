@@ -279,7 +279,7 @@ type BullishDataMessage<TDataType extends string, TData> = {
 type BullishMessageRole = 'snapshot' | 'update'
 
 type BullishAnonymousTradeUpdateMessage = BullishDataMessage<'V1TAAnonymousTradeUpdate', BullishAnonymousTradeUpdateData>
-type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
+export type BullishLevel2Message = BullishDataMessage<'V1TALevel2', BullishLevel2Data>
 type BullishLevel1Message = BullishDataMessage<'V1TALevel1', BullishLevel1Data>
 type BullishTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishTickerData | null>
 type BullishDerivativeTickerMessage = BullishDataMessage<'V1TATickerResponse', BullishDerivativeTickerData>

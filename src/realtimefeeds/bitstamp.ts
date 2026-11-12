@@ -6,10 +6,16 @@ import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } 
 const BITSTAMP_HTTP_URL = 'https://www.bitstamp.net/api/v2'
 
 export class BitstampRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    validateSequence?: boolean,
+    onError?: (error: Error) => void
+  ) {
     const wsFilters = filters.filter((f) => f.channel !== 'ticker')
     if (wsFilters.length > 0) {
-      yield new BitstampWebSocketRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError)
+      yield new BitstampWebSocketRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, validateSequence, onError)
     }
 
     const tickerFilters = filters.filter((f) => f.channel === 'ticker')

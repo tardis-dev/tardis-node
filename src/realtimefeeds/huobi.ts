@@ -1,6 +1,7 @@
 import { unzipSync } from 'zlib'
+import type { HuobiMessage } from '../mappers/huobi.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, PoolingClientBase, type SequenceInfo } from './realtimefeed.ts'
 import { wait, ONE_SEC_IN_MS, batch, getJSON } from '../handy.ts'
 import { Writable } from 'stream'
 
@@ -12,13 +13,17 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   private _marketDataChannels = ['depth', 'detail', 'trade', 'bbo']
   private _notificationsChannels = ['funding_rate', 'liquidation_orders', 'contract_info']
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+  ) {
     const marketByPriceFilters = filters.filter((f) => f.channel === 'mbp')
 
     if (marketByPriceFilters.length > 0) {
       // https://huobiapi.github.io/docs/spot/v1/en/#market-by-price-incremental-update
       const marketByPriceWSUrl = this.wssURL.replace('/ws', '/feed')
-      yield new HuobiMarketDataRealTimeFeed(exchange, marketByPriceFilters, marketByPriceWSUrl, this.suffixes, timeoutIntervalMS, onError)
+      yield new HuobiMarketDataRealTimeFeed(exchange, marketByPriceFilters, marketByPriceWSUrl, this.suffixes, ...rest)
     }
 
     const basisFilters = filters.filter((f) => f.channel === 'basis')
@@ -26,13 +31,13 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     if (basisFilters.length > 0) {
       const basisWSURL = this.wssURL.replace('/ws', '/ws_index').replace('/swap-ws', '/ws_index').replace('/linear-swap-ws', '/ws_index')
 
-      yield new HuobiMarketDataRealTimeFeed(exchange, basisFilters, basisWSURL, this.suffixes, timeoutIntervalMS, onError)
+      yield new HuobiMarketDataRealTimeFeed(exchange, basisFilters, basisWSURL, this.suffixes, ...rest)
     }
 
     const marketDataFilters = filters.filter((f) => this._marketDataChannels.includes(f.channel))
 
     if (marketDataFilters.length > 0) {
-      yield new HuobiMarketDataRealTimeFeed(exchange, marketDataFilters, this.wssURL, this.suffixes, timeoutIntervalMS, onError)
+      yield new HuobiMarketDataRealTimeFeed(exchange, marketDataFilters, this.wssURL, this.suffixes, ...rest)
     }
 
     const notificationsFilters = filters.filter((f) => this._notificationsChannels.includes(f.channel))
@@ -43,7 +48,7 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
         .replace('/ws', '/notification')
         .replace('/linear-swap-ws', '/linear-swap-notification')
 
-      yield new HuobiNotificationsRealTimeFeed(exchange, notificationsFilters, notificationsWSURL, timeoutIntervalMS, onError)
+      yield new HuobiNotificationsRealTimeFeed(exchange, notificationsFilters, notificationsWSURL, ...rest)
     }
 
     const openInterestFilters = filters.filter((f) => f.channel === 'open_interest')
@@ -81,10 +86,9 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
     filters: Filter<string>[],
     protected wssURL: string,
     private readonly _suffixes: { [key: string]: string },
-    timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, ...rest)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -170,6 +174,32 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
   protected messageIsHeartbeat(message: any) {
     return message.ping !== undefined
   }
+
+  protected getSequence(message: HuobiMessage): SequenceInfo | undefined {
+    if (
+      (this._exchange === 'huobi-dm' || this._exchange === 'huobi-dm-swap' || this._exchange === 'huobi-dm-linear-swap') &&
+      'ch' in message &&
+      message.ch.endsWith('.high_freq') &&
+      'tick' in message &&
+      'version' in message.tick
+    ) {
+      return {
+        key: message.ch.split('.')[1],
+        sequenceId: message.tick.version,
+        previousSequenceId: 'event' in message.tick && message.tick.event === 'snapshot' ? null : message.tick.version - 1
+      }
+    }
+
+    if ('ch' in message && message.ch.includes('.mbp.') && 'tick' in message && 'prevSeqNum' in message.tick) {
+      return {
+        key: message.ch.split('.')[1],
+        sequenceId: message.tick.seqNum,
+        previousSequenceId: message.tick.prevSeqNum
+      }
+    }
+
+    return undefined
+  }
 }
 
 class HuobiNotificationsRealTimeFeed extends RealTimeFeedBase {
@@ -177,10 +207,9 @@ class HuobiNotificationsRealTimeFeed extends RealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     protected wssURL: string,
-    timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, ...rest)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
