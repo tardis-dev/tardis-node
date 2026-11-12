@@ -24,23 +24,31 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected getSequence(message: CoinbaseMessage): SequenceInfo | undefined {
-    const { type, product_id } = message
     if (
-      this._fullChannelSymbols.has(product_id) === false ||
+      this._fullChannelSymbols.has(message.product_id) === false ||
       !('sequence' in message) ||
       message.sequence === undefined ||
-      type === 'ticker' ||
-      type === 'l2update' ||
-      type === 'snapshot' ||
-      type === 'auction' ||
-      type === 'last_auction' ||
-      type === 'rfq_match'
+      !this.shouldValidateSequenceFor(message.type)
     ) {
       return undefined
     }
 
-    const { sequence } = message
-    return { key: product_id, sequenceId: sequence, previousSequenceId: sequence - 1 }
+    return {
+      key: message.product_id,
+      sequenceId: message.sequence,
+      previousSequenceId: message.sequence - 1
+    }
+  }
+
+  private shouldValidateSequenceFor(type: CoinbaseMessage['type']): boolean {
+    return (
+      type !== 'ticker' &&
+      type !== 'l2update' &&
+      type !== 'snapshot' &&
+      type !== 'auction' &&
+      type !== 'last_auction' &&
+      type !== 'rfq_match'
+    )
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
