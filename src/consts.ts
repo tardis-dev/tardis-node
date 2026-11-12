@@ -81,7 +81,6 @@ const BACKPACK_CHANNELS = [
   'markPrice',
   'openInterest',
   'liquidation',
-  'externalTicker',
   'stockPrice',
   'stockIndicativeQuote'
 ] as const

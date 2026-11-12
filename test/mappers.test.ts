@@ -220,8 +220,7 @@ describe('mappers', () => {
         data: { e: 'liquidation', E: 1694688638091000, q: '10', p: '18.70', S: 'Bid', s: 'SOL_USDC_PERP', T: 567 }
       },
       { stream: 'stockPrice.MU', data: { e: 'stockPrice', symbol: 'MU', mid: '892.277', timestamp: 1793369772565 } },
-      { stream: 'stockIndicativeQuote.MU', data: { symbol: 'MU', bid: '890.74', ask: '893.59' } },
-      { stream: 'externalTicker.MU.US_USDC', data: { s: 'MU.US_USDC', c: '892.223', E: 1793369773182663 } }
+      { stream: 'stockIndicativeQuote.MU', data: { symbol: 'MU', bid: '890.74', ask: '893.59' } }
     ]
     snapshot(messages.flatMap((message) => mapper.map(message, localTimestamp)))
   })
