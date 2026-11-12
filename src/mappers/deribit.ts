@@ -106,11 +106,11 @@ class DeribitBookChangeMapper implements Mapper<'deribit', BookChange> {
 
   *map(message: DeribitBookMessage, localTimestamp: Date): IterableIterator<BookChange> {
     const deribitBookChange = message.params.data
-    // snapshots do not have prev_change_id set
+    // Preserve legacy zero-ID snapshots; explicit changes may omit the link on duplicates.
     const isSnapshot =
-      (deribitBookChange.type !== undefined && deribitBookChange.type === 'snapshot') ||
-      deribitBookChange.prev_change_id === undefined ||
-      deribitBookChange.prev_change_id === 0
+      deribitBookChange.type === 'snapshot' ||
+      deribitBookChange.prev_change_id === 0 ||
+      (deribitBookChange.type === undefined && deribitBookChange.prev_change_id === undefined)
 
     if (isSnapshot) {
       this._snapshotChangeIds.set(deribitBookChange.instrument_name, deribitBookChange.change_id)
@@ -368,13 +368,13 @@ type DeribitTradesMessage = DeribitMessage & {
 
 type DeribitBookLevel = ['new' | 'change' | 'delete', number, number]
 
-type DeribitBookMessage = DeribitMessage & {
+export type DeribitBookMessage = DeribitMessage & {
   params: {
     data: {
       timestamp: number
       instrument_name: string
       change_id: number
-      prev_change_id?: number
+      prev_change_id?: number | null
       bids: DeribitBookLevel[]
       asks: DeribitBookLevel[]
       type?: 'snapshot' | 'change'
