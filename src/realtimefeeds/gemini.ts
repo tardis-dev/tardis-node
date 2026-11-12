@@ -9,25 +9,29 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
 
   protected getSequence(message: GeminiMessage): SequenceInfo | undefined {
     if ('e' in message && message.e === 'depthUpdate') {
-      const previous = this.previousUpdateIds.get(message.s)
-      if (previous === undefined) {
-        this.previousUpdateIds.set(message.s, message.u)
+      const previousSequenceId = this.resolvePreviousSequenceId(message.s, message.U, message.u)
+      if (previousSequenceId !== undefined) {
         return {
           key: message.s,
           sequenceId: message.u,
-          previousSequenceId: null
-        }
-      }
-      if (previous < message.u) {
-        this.previousUpdateIds.set(message.s, message.u)
-        return {
-          key: message.s,
-          sequenceId: message.u,
-          previousSequenceId: previous + 1 >= message.U ? previous : message.U - 1
+          previousSequenceId
         }
       }
     }
 
+    return undefined
+  }
+
+  private resolvePreviousSequenceId(symbol: string, firstSequenceId: number, lastSequenceId: number): number | null | undefined {
+    const previous = this.previousUpdateIds.get(symbol)
+    if (previous === undefined) {
+      this.previousUpdateIds.set(symbol, lastSequenceId)
+      return null
+    }
+    if (previous < lastSequenceId) {
+      this.previousUpdateIds.set(symbol, lastSequenceId)
+      return previous + 1 >= firstSequenceId ? previous : firstSequenceId - 1
+    }
     return undefined
   }
 

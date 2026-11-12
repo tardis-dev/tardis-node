@@ -38,11 +38,7 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
   protected getSequence({ arg, action, data }: OkexV5BookMessage): SequenceInfo | undefined {
     if (arg?.channel === 'books' && arg.instId && (action === 'snapshot' || action === 'update')) {
       if (action === 'update') {
-        for (let i = 1; i < data.length; i++) {
-          if (data[i].prevSeqId !== data[i - 1].seqId) {
-            throw new SequenceGapError(this._exchange, arg.instId, data[i - 1].seqId, data[i].prevSeqId, data[i].seqId)
-          }
-        }
+        this.validateBookSequence(arg.instId, data)
       }
       return {
         key: arg.instId,
@@ -51,6 +47,14 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
       }
     }
     return undefined
+  }
+
+  private validateBookSequence(symbol: string, data: OkexV5BookMessage['data']): void {
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].prevSeqId !== data[i - 1].seqId) {
+        throw new SequenceGapError(this._exchange, symbol, data[i - 1].seqId, data[i].prevSeqId, data[i].seqId)
+      }
+    }
   }
 
   private secondsSinceEpoch() {

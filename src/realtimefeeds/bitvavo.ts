@@ -33,24 +33,28 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
 
     if ('action' in message && message.action === 'getBook') {
       const snapshot = message.response
-      let sequenceId = snapshot.mdSeqNo
-      if (!Number.isSafeInteger(sequenceId)) {
-        throw new Error('Bitvavo Market Data Pro snapshot mdSeqNo is missing or invalid')
-      }
-      const received = this.receivedBookUpdates.get(snapshot.market)
-      // A delayed snapshot can include a contiguous range already received on this connection.
-      if (received !== undefined && received.firstSequenceId <= sequenceId + 1 && sequenceId <= received.lastSequenceId) {
-        sequenceId = received.lastSequenceId
-      }
-
       return {
         key: snapshot.market,
-        sequenceId,
+        sequenceId: this.resolveSnapshotSequenceId(snapshot, this.receivedBookUpdates.get(snapshot.market)),
         previousSequenceId: null
       }
     }
 
     return undefined
+  }
+
+  private resolveSnapshotSequenceId(
+    snapshot: BitvavoBookSnapshotMessage['response'],
+    received: { firstSequenceId: number; lastSequenceId: number } | undefined
+  ): number {
+    if (!Number.isSafeInteger(snapshot.mdSeqNo)) {
+      throw new Error('Bitvavo Market Data Pro snapshot mdSeqNo is missing or invalid')
+    }
+    // A delayed snapshot can include a contiguous range already received on this connection.
+    if (received !== undefined && received.firstSequenceId <= snapshot.mdSeqNo + 1 && snapshot.mdSeqNo <= received.lastSequenceId) {
+      return received.lastSequenceId
+    }
+    return snapshot.mdSeqNo
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
