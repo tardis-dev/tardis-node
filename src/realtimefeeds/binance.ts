@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const binanceHttpOptions = {
@@ -246,12 +246,12 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
-  protected getSequence(message: any): SequenceInfo | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if ((this._exchange === 'binance' || this._exchange === 'binance-us') && message.data?.e === 'depthUpdate') {
       return {
         key: message.stream,
-        sequenceId: message.data.u,
-        previousSequenceId: message.data.U - 1
+        sequence: message.data.u,
+        previousSequence: message.data.U - 1
       }
     }
 
@@ -385,12 +385,12 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 }
 
 class BinanceDeliverySingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
-  protected getSequence(message: any): SequenceInfo | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.data?.e === 'depthUpdate' && message.data.pu !== -1) {
       return {
         key: message.stream,
-        sequenceId: message.data.u,
-        previousSequenceId: message.data.pu
+        sequence: message.data.u,
+        previousSequence: message.data.pu
       }
     }
 
@@ -433,12 +433,12 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
     return getBinanceFuturesWebSocketUrl(this._exchange, this._streamPath)
   }
 
-  protected getSequence(message: any): SequenceInfo | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.data?.e === 'depthUpdate') {
       return {
         key: message.stream,
-        sequenceId: message.data.u,
-        previousSequenceId: message.data.pu
+        sequence: message.data.u,
+        previousSequence: message.data.pu
       }
     }
 

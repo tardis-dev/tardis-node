@@ -1,13 +1,13 @@
 import type { DeltaMessage } from '../mappers/delta.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class DeltaRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://socket.delta.exchange'
 
-  protected getSequence(message: DeltaMessage): SequenceInfo | undefined {
+  protected getSequence(message: DeltaMessage): Sequence | undefined {
     if (message.type === 'l2_updates' && (message.action === 'snapshot' || message.action === 'update')) {
-      return { key: message.symbol, sequenceId: message.sequence_no, previousSequenceId: message.sequence_no - 1 }
+      return { key: message.symbol, sequence: message.sequence_no, previousSequence: message.sequence_no - 1 }
     }
 
     return undefined

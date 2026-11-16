@@ -1,20 +1,20 @@
 import type { GeminiMessage } from '../mappers/gemini.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class GeminiRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.gemini.com?snapshot=-1'
   private readonly channels = new Set(['trade', 'depth', 'bookTicker'])
   private readonly previousUpdateIds = new Map<string, number>()
 
-  protected getSequence(message: GeminiMessage): SequenceInfo | undefined {
+  protected getSequence(message: GeminiMessage): Sequence | undefined {
     if ('e' in message && message.e === 'depthUpdate') {
-      const previousSequenceId = this.resolvePreviousSequenceId(message.s, message.U, message.u)
-      if (previousSequenceId !== undefined) {
+      const previousSequence = this.resolvePreviousSequence(message.s, message.U, message.u)
+      if (previousSequence !== undefined) {
         return {
           key: message.s,
-          sequenceId: message.u,
-          previousSequenceId
+          sequence: message.u,
+          previousSequence
         }
       }
     }
@@ -22,7 +22,7 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
     return undefined
   }
 
-  private resolvePreviousSequenceId(symbol: string, firstSequenceId: number, lastSequenceId: number): number | null | undefined {
+  private resolvePreviousSequence(symbol: string, firstSequenceId: number, lastSequenceId: number): number | null | undefined {
     const previous = this.previousUpdateIds.get(symbol)
     if (previous === undefined) {
       this.previousUpdateIds.set(symbol, lastSequenceId)

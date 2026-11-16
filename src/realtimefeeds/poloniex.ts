@@ -1,16 +1,16 @@
 import { Filter } from '../types.ts'
 import type { PoloniexV2BookMessage } from '../mappers/poloniex.ts'
-import { RealTimeFeedBase, SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class PoloniexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.poloniex.com/ws/public'
 
-  protected getSequence({ channel, action, data }: PoloniexV2BookMessage): SequenceInfo | undefined {
+  protected getSequence({ channel, action, data }: PoloniexV2BookMessage): Sequence | undefined {
     if (channel === 'book_lv2' && (action === 'snapshot' || action === 'update')) {
       return {
         key: data[0].symbol,
-        sequenceId: data[0].id,
-        previousSequenceId: action === 'snapshot' ? null : data[0].lastId
+        sequence: data[0].id,
+        previousSequence: action === 'snapshot' ? null : data[0].lastId
       }
     }
     return undefined

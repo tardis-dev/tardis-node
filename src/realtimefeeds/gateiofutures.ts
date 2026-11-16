@@ -1,6 +1,6 @@
 import type { GateIOFuturesMessage } from '../mappers/gateiofutures.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
@@ -149,12 +149,12 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     return payload
   }
 
-  protected getSequence(message: GateIOFuturesMessage): SequenceInfo | undefined {
+  protected getSequence(message: GateIOFuturesMessage): Sequence | undefined {
     if (message.channel === 'futures.obu' && (message.event === 'update' || message.event === 'all')) {
       return {
         key: message.result.s,
-        sequenceId: message.result.u,
-        previousSequenceId: message.result.full === true ? null : message.result.U! - 1
+        sequence: message.result.u,
+        previousSequence: message.result.full === true ? null : message.result.U! - 1
       }
     }
 

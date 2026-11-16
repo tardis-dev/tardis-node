@@ -3,12 +3,7 @@ import { test } from 'node:test'
 import type { WebSocket } from 'ws'
 import { assert } from './assertions.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
-import {
-  RealTimeFeedBase,
-  MultiConnectionRealTimeFeedBase,
-  SequenceGapError,
-  type SequenceInfo
-} from '../dist/realtimefeeds/realtimefeed.js'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, SequenceGapError, type Sequence } from '../dist/realtimefeeds/realtimefeed.js'
 import type { Filter } from '../dist/types.js'
 import { createRealTimeFeed } from '../dist/index.js'
 
@@ -27,7 +22,7 @@ class TestSequenceFeed extends RealTimeFeedBase {
   protected messageIsError() {
     return false
   }
-  protected getSequence(message: { testSequence?: SequenceInfo }) {
+  protected getSequence(message: { testSequence?: Sequence }) {
     return message.testSequence
   }
   protected onMessage(message: { id: number }) {
@@ -55,8 +50,8 @@ class TestMultiConnectionFeed extends MultiConnectionRealTimeFeedBase {
   }
 }
 
-function message(id: number, sequenceId?: number, previousSequenceId: number | null = null, key = 'book') {
-  return { id, ...(sequenceId === undefined ? {} : { testSequence: { key, sequenceId, previousSequenceId } }) }
+function message(id: number, sequence?: number, previousSequence: number | null = null, key = 'book') {
+  return { id, ...(sequence === undefined ? {} : { testSequence: { key, sequence, previousSequence } }) }
 }
 
 function send(socket: WebSocket, ...messages: object[]) {

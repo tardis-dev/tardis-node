@@ -1,7 +1,7 @@
 import { CircularBuffer, getJSON, wait } from '../handy.ts'
 import type { MexcDepthSnapshotMessage, MexcMessage } from '../mappers/mexc.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 import { decodeMexcProtobufMessage } from './mexcprotobuf.ts'
 
 export class MexcRealTimeFeed extends RealTimeFeedBase {
@@ -67,7 +67,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
     return message.msg === 'PONG'
   }
 
-  protected override getSequence(message: MexcMessage): SequenceInfo | undefined {
+  protected override getSequence(message: MexcMessage): Sequence | undefined {
     if (message.channel?.startsWith(`${MexcRealTimeFeed.depthChannel}@`) === true && 'publicAggreDepths' in message) {
       const firstVersion = Number(message.publicAggreDepths?.fromVersion)
       const lastVersion = Number(message.publicAggreDepths?.toVersion)
@@ -78,7 +78,7 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
         Number.isSafeInteger(firstVersion) &&
         Number.isSafeInteger(lastVersion)
       ) {
-        return { key: message.symbol, sequenceId: lastVersion, previousSequenceId: firstVersion - 1 }
+        return { key: message.symbol, sequence: lastVersion, previousSequence: firstVersion - 1 }
       }
     }
     return undefined

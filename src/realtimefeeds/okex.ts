@@ -3,7 +3,7 @@ import { wait } from '../handy.ts'
 import { getOkexOptionsFamilyOrIndex, getOkexOptionsUnderlyingIndex } from '../okexsymbols.ts'
 import { Filter } from '../types.ts'
 import type { OkexV5BookMessage } from '../mappers/okex.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, SequenceGapError, SequenceInfo } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, SequenceGapError, Sequence } from './realtimefeed.ts'
 
 export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
@@ -55,15 +55,15 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
 
-  protected getSequence({ arg, action, data }: OkexV5BookMessage): SequenceInfo | undefined {
+  protected getSequence({ arg, action, data }: OkexV5BookMessage): Sequence | undefined {
     if (arg?.channel === 'books' && arg.instId && (action === 'snapshot' || action === 'update')) {
       if (action === 'update') {
         this.validateBookSequence(arg.instId, data)
       }
       return {
         key: arg.instId,
-        sequenceId: data[data.length - 1].seqId,
-        previousSequenceId: action === 'snapshot' ? null : data[0].prevSeqId
+        sequence: data[data.length - 1].seqId,
+        previousSequence: action === 'snapshot' ? null : data[0].prevSeqId
       }
     }
     return undefined

@@ -2,7 +2,7 @@ import { Writable } from 'stream'
 import { getJSON, getRandomString, ONE_SEC_IN_MS, postJSON, wait } from '../handy.ts'
 import type { KucoinFuturesMessage } from '../mappers/kucoinfutures.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 const kucoinHttpOptions = {
   timeout: 10 * 1000,
@@ -113,7 +113,7 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
     return message.type === 'error'
   }
 
-  protected getSequence(message: KucoinFuturesMessage): SequenceInfo | undefined {
+  protected getSequence(message: KucoinFuturesMessage): Sequence | undefined {
     if (message.subject === 'level2') {
       const separatorIndex = message.topic.indexOf(':')
       if (separatorIndex === -1) {
@@ -121,8 +121,8 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
       }
       return {
         key: message.topic.slice(separatorIndex + 1),
-        sequenceId: message.data.sequence,
-        previousSequenceId: message.data.sequence - 1
+        sequence: message.data.sequence,
+        previousSequence: message.data.sequence - 1
       }
     }
     return undefined

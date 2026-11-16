@@ -3,7 +3,7 @@ import { setTimeout as sleep } from 'node:timers/promises'
 import { batch, getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
 import type { WhiteBitMessage } from '../mappers/whitebit.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, SequenceInfo } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected readonly httpURL: string = 'https://whitebit.com/api/v4/public'
@@ -112,17 +112,17 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
     return message.error !== undefined && message.error !== null
   }
 
-  protected getSequence({ method, params }: WhiteBitMessage): SequenceInfo | undefined {
+  protected getSequence({ method, params }: WhiteBitMessage): Sequence | undefined {
     if (method === 'depth_update') {
       const [isSnapshot, book, symbol] = params
-      const previousSequenceId = isSnapshot ? null : book.past_update_id
-      if (book.update_id === undefined || previousSequenceId === undefined) {
+      const previousSequence = isSnapshot ? null : book.past_update_id
+      if (book.update_id === undefined || previousSequence === undefined) {
         throw new Error('WhiteBIT depth message is missing its sequence identifiers.')
       }
       return {
         key: symbol,
-        sequenceId: book.update_id,
-        previousSequenceId
+        sequence: book.update_id,
+        previousSequence
       }
     }
     return undefined

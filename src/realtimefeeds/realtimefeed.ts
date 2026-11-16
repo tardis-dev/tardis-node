@@ -22,13 +22,10 @@ let connectionCounter = 1
 
 export type RealTimeFeedIterable = { [Symbol.asyncIterator](): ManagedRealTimeIterator<any> }
 
-export type SequenceInfo = {
-  /** Recorder: SequenceInfo.Channel. */
+export type Sequence = {
   key: string
-  /** Recorder v2: SequenceUpdate.Last, or SnapshotSequence.Last for a snapshot. */
-  sequenceId: number
-  /** Recorder v2: SequenceUpdate.Previous; null maps to MessageInfo.Snapshot. */
-  previousSequenceId: number | null
+  sequence: number
+  previousSequence: number | null
 }
 
 export class SequenceGapError extends Error {
@@ -204,13 +201,13 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
               const previous = sequences.get(sequence.key)
               if (
                 previous !== undefined &&
-                sequence.previousSequenceId !== null &&
-                sequence.previousSequenceId !== previous &&
-                sequence.sequenceId !== previous
+                sequence.previousSequence !== null &&
+                sequence.previousSequence !== previous &&
+                sequence.sequence !== previous
               ) {
-                throw new SequenceGapError(this._exchange, sequence.key, previous, sequence.previousSequenceId, sequence.sequenceId)
+                throw new SequenceGapError(this._exchange, sequence.key, previous, sequence.previousSequence, sequence.sequence)
               }
-              sequences.set(sequence.key, sequence.sequenceId)
+              sequences.set(sequence.key, sequence.sequence)
             }
           }
 
@@ -319,7 +316,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
   protected onMessage(_msg: any) {}
 
-  protected getSequence(_message: any): SequenceInfo | undefined {
+  protected getSequence(_message: any): Sequence | undefined {
     return undefined
   }
 

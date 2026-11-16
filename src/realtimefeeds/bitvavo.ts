@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import type { BitvavoBookMessage, BitvavoBookSnapshotMessage } from '../mappers/bitvavo.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws-mdpro.bitvavo.com/v2/'
@@ -13,7 +13,7 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
     reject: (error: Error) => void
   }
 
-  protected getSequence(message: BitvavoBookMessage | BitvavoBookSnapshotMessage): SequenceInfo | undefined {
+  protected getSequence(message: BitvavoBookMessage | BitvavoBookSnapshotMessage): Sequence | undefined {
     if ('event' in message && message.event === 'book') {
       if (!Number.isSafeInteger(message.startMdSeqNo) || !Number.isSafeInteger(message.endMdSeqNo)) {
         throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
@@ -26,8 +26,8 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
 
       return {
         key: message.market,
-        sequenceId: message.endMdSeqNo,
-        previousSequenceId: message.startMdSeqNo - 1
+        sequence: message.endMdSeqNo,
+        previousSequence: message.startMdSeqNo - 1
       }
     }
 
@@ -35,8 +35,8 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
       const snapshot = message.response
       return {
         key: snapshot.market,
-        sequenceId: this.resolveSnapshotSequenceId(snapshot, this.receivedBookUpdates.get(snapshot.market)),
-        previousSequenceId: null
+        sequence: this.resolveSnapshotSequenceId(snapshot, this.receivedBookUpdates.get(snapshot.market)),
+        previousSequence: null
       }
     }
 

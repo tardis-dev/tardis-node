@@ -1,7 +1,7 @@
 import { optimizeFilters, wait } from '../handy.ts'
 import type { DeltaIndiaMessage } from '../mappers/delta_india.ts'
 import type { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type SequenceInfo } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 const productCategories = new Set(['all', 'call_options', 'put_options', 'move_options', 'spot', 'futures', 'perpetual_futures'])
 
@@ -95,13 +95,13 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
     )
   }
 
-  protected getSequence(message: DeltaIndiaMessage): SequenceInfo | undefined {
+  protected getSequence(message: DeltaIndiaMessage): Sequence | undefined {
     if (message.type === 'ob_updates') {
       if (message.action === 'snapshot') {
-        return { key: message.sy, sequenceId: message.seq, previousSequenceId: null }
+        return { key: message.sy, sequence: message.seq, previousSequence: null }
       }
       if (message.action === 'update' && this.receivedSnapshots.has(message.sy)) {
-        return { key: message.sy, sequenceId: message.seq, previousSequenceId: message.seq - 1 }
+        return { key: message.sy, sequence: message.seq, previousSequence: message.seq - 1 }
       }
     }
 
