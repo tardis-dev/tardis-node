@@ -9,18 +9,34 @@ export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
     exchange: string,
     filters: Filter<string>[],
-    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
 
     if (nonBusinessFilters.length > 0) {
-      yield new OkexSingleRealTimeFeed('wss://ws.okx.com/ws/v5/public', exchange, nonBusinessFilters, ...rest)
+      yield new OkexSingleRealTimeFeed(
+        'wss://ws.okx.com/ws/v5/public',
+        exchange,
+        nonBusinessFilters,
+        timeoutIntervalMS,
+        onError,
+        validateSequence
+      )
     }
 
     const businessFilters = filters.filter((f) => f.channel === 'trades-all')
 
     if (businessFilters.length > 0) {
-      yield new OkexSingleRealTimeFeed('wss://ws.okx.com/ws/v5/business', exchange, businessFilters, ...rest)
+      yield new OkexSingleRealTimeFeed(
+        'wss://ws.okx.com/ws/v5/business',
+        exchange,
+        businessFilters,
+        timeoutIntervalMS,
+        onError,
+        validateSequence
+      )
     }
   }
 }
@@ -28,9 +44,13 @@ export class OkexRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 class OkexSingleRealTimeFeed extends RealTimeFeedBase {
   constructor(
     protected wssURL: string,
-    ...rest: ConstructorParameters<typeof RealTimeFeedBase>
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(...rest)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   private _hasCredentials = process.env.OKX_API_KEY !== undefined
@@ -130,21 +150,50 @@ export class OkexOptionsRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
     exchange: string,
     filters: Filter<string>[],
-    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const nonBusinessFilters = filters.filter((f) => f.channel !== 'trades-all')
+
     if (nonBusinessFilters.length > 0) {
-      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com/ws/v5/public', exchange, nonBusinessFilters, ...rest)
+      yield new OkexOptionsSingleRealTimeFeed(
+        'wss://ws.okx.com/ws/v5/public',
+        exchange,
+        nonBusinessFilters,
+        timeoutIntervalMS,
+        onError,
+        validateSequence
+      )
     }
 
     const businessFilters = filters.filter((f) => f.channel === 'trades-all')
+
     if (businessFilters.length > 0) {
-      yield new OkexOptionsSingleRealTimeFeed('wss://ws.okx.com/ws/v5/business', exchange, businessFilters, ...rest)
+      yield new OkexOptionsSingleRealTimeFeed(
+        'wss://ws.okx.com/ws/v5/business',
+        exchange,
+        businessFilters,
+        timeoutIntervalMS,
+        onError,
+        validateSequence
+      )
     }
   }
 }
 
 class OkexOptionsSingleRealTimeFeed extends OkexSingleRealTimeFeed {
+  constructor(
+    protected wssURL: string,
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS: number | undefined,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
+    super(wssURL, exchange, filters, timeoutIntervalMS, onError, validateSequence)
+  }
+
   private _defaultIndexes = ['BTC-USD', 'ETH-USD', 'SOL-USD']
   private _defaultOptionSummaryInstrumentFamilies = ['BTC-USD', 'BTC-USD_UM', 'ETH-USD', 'ETH-USD_UM', 'SOL-USD_UM']
 

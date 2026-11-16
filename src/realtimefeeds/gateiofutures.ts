@@ -6,7 +6,9 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
     exchange: string,
     filters: Filter<string>[],
-    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('_USDT')),
@@ -24,7 +26,9 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         400,
         exchange,
         linearContractsFilters,
-        ...rest
+        timeoutIntervalMS,
+        onError,
+        validateSequence
       )
     }
 
@@ -34,7 +38,9 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         400,
         exchange,
         inverseContractsFilters,
-        ...rest
+        timeoutIntervalMS,
+        onError,
+        validateSequence
       )
     }
 
@@ -43,7 +49,15 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
       [] as Filter<string>[]
     )
     if (usd1ContractsFilters.length > 0) {
-      yield new GateIOFuturesSingleConnectionRealTimeFeed('wss://fx-ws.gateio.ws/v4/ws/usd1', 400, exchange, usd1ContractsFilters, ...rest)
+      yield new GateIOFuturesSingleConnectionRealTimeFeed(
+        'wss://fx-ws.gateio.ws/v4/ws/usd1',
+        400,
+        exchange,
+        usd1ContractsFilters,
+        timeoutIntervalMS,
+        onError,
+        validateSequence
+      )
     }
 
     // Gate has no public liquidations channel for delivery futures
@@ -62,7 +76,9 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         100,
         exchange,
         deliveryContractsFilters,
-        ...rest
+        timeoutIntervalMS,
+        onError,
+        validateSequence
       )
     }
   }
@@ -97,9 +113,13 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   constructor(
     protected readonly wssURL: string,
     private readonly orderBookDepth: 100 | 400,
-    ...rest: ConstructorParameters<typeof RealTimeFeedBase>
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(...rest)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
