@@ -10,7 +10,7 @@ export class PoloniexRealTimeFeed extends RealTimeFeedBase {
       return {
         key: data[0].symbol,
         sequence: data[0].id,
-        previousSequence: action === 'snapshot' ? null : data[0].lastId
+        previousSequence: action === 'snapshot' ? undefined : data[0].lastId
       }
     }
     return undefined

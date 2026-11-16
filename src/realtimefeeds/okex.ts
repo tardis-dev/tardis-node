@@ -63,7 +63,7 @@ class OkexSingleRealTimeFeed extends RealTimeFeedBase {
       return {
         key: arg.instId,
         sequence: data[data.length - 1].seqId,
-        previousSequence: action === 'snapshot' ? null : data[0].prevSeqId
+        previousSequence: action === 'snapshot' ? undefined : data[0].prevSeqId
       }
     }
     return undefined

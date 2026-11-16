@@ -10,7 +10,7 @@ export class HitBtcRealTimeFeed extends RealTimeFeedBase {
       return {
         key: message.params.symbol,
         sequence: message.params.sequence,
-        previousSequence: message.method === 'snapshotOrderbook' ? null : message.params.sequence - 1
+        previousSequence: message.method === 'snapshotOrderbook' ? undefined : message.params.sequence - 1
       }
     }
 

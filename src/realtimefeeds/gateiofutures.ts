@@ -154,7 +154,7 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
       return {
         key: message.result.s,
         sequence: message.result.u,
-        previousSequence: message.result.full === true ? null : message.result.U! - 1
+        previousSequence: message.result.full === true ? undefined : message.result.U! - 1
       }
     }
 

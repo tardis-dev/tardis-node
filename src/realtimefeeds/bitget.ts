@@ -11,7 +11,7 @@ abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
       return {
         key: `${message.arg.instType}:${message.arg.topic}:${message.arg.symbol}`,
         sequence: message.data[0].seq,
-        previousSequence: message.data[0].pseq === 0 ? null : message.data[0].pseq
+        previousSequence: message.data[0].pseq === 0 ? undefined : message.data[0].pseq
       }
     }
 

@@ -25,7 +25,7 @@ export type RealTimeFeedIterable = { [Symbol.asyncIterator](): ManagedRealTimeIt
 export type Sequence = {
   key: string
   sequence: number
-  previousSequence: number | null
+  previousSequence: number | undefined
 }
 
 export class SequenceGapError extends Error {
@@ -201,7 +201,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
               const previous = sequences.get(sequence.key)
               if (
                 previous !== undefined &&
-                sequence.previousSequence !== null &&
+                sequence.previousSequence !== undefined &&
                 sequence.previousSequence !== previous &&
                 sequence.sequence !== previous
               ) {

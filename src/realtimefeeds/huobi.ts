@@ -213,7 +213,7 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
       return {
         key: message.ch.split('.')[1],
         sequence: message.tick.version,
-        previousSequence: 'event' in message.tick && message.tick.event === 'snapshot' ? null : message.tick.version - 1
+        previousSequence: 'event' in message.tick && message.tick.event === 'snapshot' ? undefined : message.tick.version - 1
       }
     }
 

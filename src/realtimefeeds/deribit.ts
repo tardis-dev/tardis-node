@@ -52,23 +52,17 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   }
 
   protected getSequence({ params: { channel, data } = {} as DeribitBookMessage['params'] }: DeribitBookMessage): Sequence | undefined {
-    if (channel?.startsWith('book.')) {
-      const previousSequence = this.resolvePreviousSequence(data)
-      if (previousSequence !== undefined) {
-        return {
-          key: data.instrument_name,
-          sequence: data.change_id,
-          previousSequence
-        }
-      }
-    }
-    return undefined
+    return channel?.startsWith('book.') ? this.resolveSequence(data) : undefined
   }
 
-  private resolvePreviousSequence(data: DeribitBookMessage['params']['data']): number | null | undefined {
+  private resolveSequence(data: DeribitBookMessage['params']['data']): Sequence | undefined {
     if (data.type === 'snapshot') {
       this._bookSequenceStates.set(data.instrument_name, { changeId: data.change_id, allowOverlap: true })
-      return null
+      return {
+        key: data.instrument_name,
+        sequence: data.change_id,
+        previousSequence: undefined
+      }
     }
     const state = this._bookSequenceStates.get(data.instrument_name)
     if (!!state && (!state.allowOverlap || data.change_id >= state.changeId)) {
@@ -79,7 +73,11 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
       const previousSequence = state.allowOverlap && previousChangeId <= state.changeId ? state.changeId : previousChangeId
       state.allowOverlap = false
       state.changeId = data.change_id
-      return previousSequence
+      return {
+        key: data.instrument_name,
+        sequence: data.change_id,
+        previousSequence
+      }
     }
     return undefined
   }

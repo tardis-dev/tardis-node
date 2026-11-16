@@ -50,7 +50,7 @@ class TestMultiConnectionFeed extends MultiConnectionRealTimeFeedBase {
   }
 }
 
-function message(id: number, sequence?: number, previousSequence: number | null = null, key = 'book') {
+function message(id: number, sequence?: number, previousSequence?: number, key = 'book') {
   return { id, ...(sequence === undefined ? {} : { testSequence: { key, sequence, previousSequence } }) }
 }
 

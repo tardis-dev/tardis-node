@@ -36,7 +36,7 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
       return {
         key: snapshot.market,
         sequence: this.resolveSnapshotSequenceId(snapshot, this.receivedBookUpdates.get(snapshot.market)),
-        previousSequence: null
+        previousSequence: undefined
       }
     }
 

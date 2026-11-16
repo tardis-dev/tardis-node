@@ -98,7 +98,7 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected getSequence(message: DeltaIndiaMessage): Sequence | undefined {
     if (message.type === 'ob_updates') {
       if (message.action === 'snapshot') {
-        return { key: message.sy, sequence: message.seq, previousSequence: null }
+        return { key: message.sy, sequence: message.seq, previousSequence: undefined }
       }
       if (message.action === 'update' && this.receivedSnapshots.has(message.sy)) {
         return { key: message.sy, sequence: message.seq, previousSequence: message.seq - 1 }

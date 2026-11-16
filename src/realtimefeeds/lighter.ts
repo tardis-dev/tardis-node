@@ -33,7 +33,7 @@ abstract class RealTimeFeed extends RealTimeFeedBase {
       return {
         key: message.channel,
         sequence: message.order_book.nonce,
-        previousSequence: message.type === 'update/order_book' ? message.order_book.begin_nonce : null
+        previousSequence: message.type === 'update/order_book' ? message.order_book.begin_nonce : undefined
       }
     }
     return undefined

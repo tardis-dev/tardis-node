@@ -8,29 +8,26 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
   private readonly previousUpdateIds = new Map<string, number>()
 
   protected getSequence(message: GeminiMessage): Sequence | undefined {
-    if ('e' in message && message.e === 'depthUpdate') {
-      const previousSequence = this.resolvePreviousSequence(message.s, message.U, message.u)
-      if (previousSequence !== undefined) {
-        return {
-          key: message.s,
-          sequence: message.u,
-          previousSequence
-        }
-      }
-    }
-
-    return undefined
+    return 'e' in message && message.e === 'depthUpdate' ? this.resolveSequence(message.s, message.U, message.u) : undefined
   }
 
-  private resolvePreviousSequence(symbol: string, firstSequenceId: number, lastSequenceId: number): number | null | undefined {
+  private resolveSequence(symbol: string, firstSequenceId: number, lastSequenceId: number): Sequence | undefined {
     const previous = this.previousUpdateIds.get(symbol)
     if (previous === undefined) {
       this.previousUpdateIds.set(symbol, lastSequenceId)
-      return null
+      return {
+        key: symbol,
+        sequence: lastSequenceId,
+        previousSequence: undefined
+      }
     }
     if (previous < lastSequenceId) {
       this.previousUpdateIds.set(symbol, lastSequenceId)
-      return previous + 1 >= firstSequenceId ? previous : firstSequenceId - 1
+      return {
+        key: symbol,
+        sequence: lastSequenceId,
+        previousSequence: previous + 1 >= firstSequenceId ? previous : firstSequenceId - 1
+      }
     }
     return undefined
   }

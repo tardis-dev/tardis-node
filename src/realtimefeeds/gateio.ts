@@ -11,7 +11,7 @@ export class GateIORealTimeFeed extends RealTimeFeedBase {
       return {
         key: message.result.s.split('.')[1],
         sequence: message.result.u,
-        previousSequence: message.result.U == null ? null : message.result.U - 1
+        previousSequence: message.result.U == null ? undefined : message.result.U - 1
       }
     }
 

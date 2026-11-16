@@ -60,7 +60,7 @@ abstract class BybitSingleConnectionRealTimeDataFeed extends RealTimeFeedBase {
       return {
         key: full ? data.s : topic,
         sequence: data.u,
-        previousSequence: !full && (type === 'snapshot' || data.u === 1) ? null : data.u - 1
+        previousSequence: !full && (type === 'snapshot' || data.u === 1) ? undefined : data.u - 1
       }
     }
 

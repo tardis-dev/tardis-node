@@ -115,14 +115,13 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected getSequence({ method, params }: WhiteBitMessage): Sequence | undefined {
     if (method === 'depth_update') {
       const [isSnapshot, book, symbol] = params
-      const previousSequence = isSnapshot ? null : book.past_update_id
-      if (book.update_id === undefined || previousSequence === undefined) {
+      if (book.update_id === undefined || (!isSnapshot && book.past_update_id === undefined)) {
         throw new Error('WhiteBIT depth message is missing its sequence identifiers.')
       }
       return {
         key: symbol,
         sequence: book.update_id,
-        previousSequence
+        previousSequence: isSnapshot ? undefined : book.past_update_id
       }
     }
     return undefined
