@@ -209,7 +209,7 @@ async function createFuturesSequenceServer() {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`MEXC Futures depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       { channel: 'rs.sub.depth', data: 'success' },

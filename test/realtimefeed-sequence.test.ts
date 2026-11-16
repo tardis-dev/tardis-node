@@ -10,13 +10,14 @@ import {
   type SequenceInfo
 } from '../dist/realtimefeeds/realtimefeed.js'
 import type { Filter } from '../dist/types.js'
+import { createRealTimeFeed } from '../dist/index.js'
 
 class TestSequenceFeed extends RealTimeFeedBase {
   readonly handledMessages: number[] = []
   protected wssURL: string
 
   constructor(wssURL: string, validateSequence?: boolean, onError?: (error: Error) => void) {
-    super('test', [], 0, validateSequence, onError)
+    super('test', [], 0, onError, validateSequence)
     this.wssURL = wssURL
   }
 
@@ -38,7 +39,7 @@ class TestMultiConnectionFeed extends MultiConnectionRealTimeFeedBase {
   private readonly wssURL: string
 
   constructor(wssURL: string, validateSequence?: boolean, onError?: (error: Error) => void) {
-    super('test', [], 0, validateSequence, onError)
+    super('test', [], 0, onError, validateSequence)
     this.wssURL = wssURL
   }
 
@@ -46,8 +47,8 @@ class TestMultiConnectionFeed extends MultiConnectionRealTimeFeedBase {
     _exchange: string,
     _filters: Filter<string>[],
     _timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     yield new TestSequenceFeed(this.wssURL, validateSequence, onError)
     yield new TestSequenceFeed(this.wssURL, validateSequence, onError)
@@ -213,6 +214,34 @@ test('return cancels the retry after a sequence gap', { timeout: 10000 }, async 
     await iterator.return?.()
     assert.deepStrictEqual(await pending, { done: true, value: undefined })
     assert.strictEqual(connections, 1)
+  } finally {
+    try {
+      await iterator.return?.()
+    } finally {
+      await cleanup()
+    }
+  }
+})
+
+test('createRealTimeFeed keeps the published positional onError argument', { timeout: 10000 }, async (context) => {
+  const errors: Error[] = []
+  const { server, wssURL, cleanup } = await createTestWebSocketServer()
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ data: { token: 'test', instanceServers: [{ endpoint: wssURL }] } }))
+  const update = (sequence: number) => ({
+    type: 'message',
+    topic: '/contractMarket/level2:XBTUSDTM',
+    subject: 'level2',
+    data: { sequence, change: '100,buy,1', timestamp: 0 }
+  })
+  server.on('connection', (socket) => socket.once('message', () => send(socket, update(100), update(102))))
+  const filters = [{ channel: 'contractMarket/level2', symbols: ['XBTUSDTM'] }]
+  // tardis-dev 18.x signature: (exchange, filters, timeoutIntervalMS, onError); validation stays on by default.
+  const iterator = createRealTimeFeed('kucoin-futures', filters, 0, (error) => errors.push(error))[Symbol.asyncIterator]()
+  try {
+    assert.strictEqual((await iterator.next()).value.data.sequence, 100)
+    assert.strictEqual((await iterator.next()).value.__disconnect__, true)
+    assert.strictEqual(errors.length, 1)
+    assert.ok(errors[0] instanceof SequenceGapError)
   } finally {
     try {
       await iterator.return?.()

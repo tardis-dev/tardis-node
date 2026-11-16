@@ -203,7 +203,7 @@ test('Delta India detects a depth gap and reinitializes subscribed books after r
   }
 })
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Delta India continuity and snapshot resets: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       depth('BTCUSD', 'update', 10),

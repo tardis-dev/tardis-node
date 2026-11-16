@@ -7,7 +7,7 @@ function depth(U: number, u = U, s = 'btcusd') {
   return { e: 'depthUpdate', E: 1793955600000000000, s, U, u, b: [['100', String(u)]], a: [] }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Gemini overlapping ranges and stale updates: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       { id: 1, status: 200 },

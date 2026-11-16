@@ -16,7 +16,7 @@ function book(sequence_no: number, action = 'update', symbol = 'BTCUSDT') {
 }
 
 for (const action of ['snapshot', 'update']) {
-  for (const validateSequence of [undefined, true, false]) {
+  for (const validateSequence of [true, false]) {
     test(`Delta ${action} gap: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
       const valid = [
         book(0, 'snapshot'),

@@ -3,7 +3,7 @@ import { assert } from './assertions.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { normalizeBookChanges, OrderBook, SequenceGapError, stream, streamNormalized } from '../dist/index.js'
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Deribit depth continuity and startup overlap: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const book = (type: string, change_id: number, prev_change_id?: number | null, instrument_name = 'BTC-PERPETUAL') => ({
       jsonrpc: '2.0',

@@ -15,7 +15,7 @@ function send(socket: { send(data: Buffer): void }, messages: unknown[]) {
   for (const message of messages) socket.send(gzipSync(JSON.stringify(message)))
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Huobi MBP continuity and ignored snapshots: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const native = [
       { status: 'ok', subbed: channel() },

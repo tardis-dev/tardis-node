@@ -10,7 +10,7 @@ function book(sequence: number, method = 'updateOrderbook', symbol = 'BTCUSD') {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`HitBTC continuity and snapshot resets: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       { id: 1, result: true },

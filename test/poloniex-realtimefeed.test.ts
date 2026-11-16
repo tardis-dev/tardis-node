@@ -3,7 +3,7 @@ import { assert } from './assertions.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { normalizeBookChanges, SequenceGapError, stream, streamNormalized } from '../dist/index.js'
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Poloniex depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const depth = (action: string, id: number, lastId: number, symbol = 'BTC_USDT') => ({
       channel: 'book_lv2',

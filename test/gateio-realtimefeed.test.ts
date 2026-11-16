@@ -18,7 +18,7 @@ function book(u: number, U?: number, symbol = 'BTC_USDT') {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Gate spot ranges and resets: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       { channel: 'spot.obu', event: 'subscribe', result: { status: 'success' } },

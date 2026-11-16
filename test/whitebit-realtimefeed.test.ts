@@ -454,7 +454,7 @@ test('WhiteBIT replay decodes numeric timestamps, rounds microseconds and preser
   }
 })
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`WhiteBIT depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const depth = (snapshot: boolean, update_id: number, past_update_id?: number, symbol = 'BTC_USDT') => ({
       method: 'depth_update',

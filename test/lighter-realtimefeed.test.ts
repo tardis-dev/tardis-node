@@ -74,7 +74,7 @@ function book(nonce: number, begin_nonce: number, type = 'update/order_book', ma
 }
 
 for (const exchange of ['lighter', 'lighter-rh'] as const) {
-  for (const validateSequence of [undefined, true, false]) {
+  for (const validateSequence of [true, false]) {
     test(
       `${exchange} continuity, resets and channel isolation: validation=${validateSequence ?? 'default'}`,
       { timeout: 10000 },

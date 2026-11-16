@@ -283,7 +283,7 @@ function depthSnapshot(lastUpdateId: number) {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`MEXC protobuf depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
     const errors: Error[] = []

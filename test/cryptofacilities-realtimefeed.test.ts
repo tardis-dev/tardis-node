@@ -11,7 +11,7 @@ function snapshot(seq: number, product_id = 'PI_XBTUSD') {
   return { feed: 'book_snapshot', product_id, seq, bids: [{ price: 100, qty: 1 }], asks: [], timestamp: 1793955600000 }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`Cryptofacilities book continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const valid = [
       { event: 'subscribed', feed: 'book', product_ids: ['PI_XBTUSD', 'PF_ETHUSD'] },

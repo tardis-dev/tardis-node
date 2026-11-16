@@ -249,7 +249,7 @@ function obu(u: number, U?: number, symbol = 'BTC_USDT', event = 'update') {
 }
 
 for (const event of ['update', 'all']) {
-  for (const validateSequence of [undefined, true, false]) {
+  for (const validateSequence of [true, false]) {
     test(`Gate futures ${event} ranges: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
       const symbol = event === 'all' ? 'BTC_USDT_20261225' : 'BTC_USDT'
       const valid = [

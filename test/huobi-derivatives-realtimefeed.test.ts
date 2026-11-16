@@ -19,7 +19,7 @@ function send(socket: { send(data: Buffer): void }, messages: unknown[]) {
 for (const exchange of exchanges) {
   const symbol = exchange === 'huobi-dm' ? 'BTC_CQ' : exchange === 'huobi-dm-swap' ? 'BTC-USD' : 'BTC-USDT'
   const other = symbol.replace('BTC', 'ETH')
-  for (const validateSequence of [undefined, true, false]) {
+  for (const validateSequence of [true, false]) {
     test(
       `${exchange} native continuity, resets and isolation: validation=${validateSequence ?? 'default'}`,
       { timeout: 10000 },

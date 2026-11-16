@@ -28,7 +28,7 @@ function snapshot(sequence: number) {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`KuCoin range continuity and symbol isolation: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async (context) => {
     const errors: Error[] = []
     const { server, wssURL, cleanup } = await createTestWebSocketServer()

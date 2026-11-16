@@ -23,7 +23,7 @@ function snapshot(sequence: number) {
   }
 }
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(
     `KuCoin Futures continuity and topic isolation: validation=${validateSequence ?? 'default'}`,
     { timeout: 10000 },

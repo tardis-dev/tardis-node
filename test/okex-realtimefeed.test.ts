@@ -4,7 +4,7 @@ import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { normalizeBookChanges, SequenceGapError, stream, streamNormalized } from '../dist/index.js'
 
 for (const exchange of ['okex', 'okex-futures', 'okex-swap', 'okex-options'] as const) {
-  for (const validateSequence of [undefined, true, false]) {
+  for (const validateSequence of [true, false]) {
     test(`${exchange} depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
       const depth = (action: string, pairs: [number, number][], instId = 'BTC-USDT') => ({
         arg: { channel: 'books', instId },

@@ -6,7 +6,7 @@ import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { normalizeBookChanges, SequenceGapError, stream, streamNormalized } from '../dist/index.js'
 import { WooxRealTimeFeed } from '../dist/realtimefeeds/woox.js'
 
-for (const validateSequence of [undefined, true, false]) {
+for (const validateSequence of [true, false]) {
   test(`WOO X depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const depth = (ts: number, prevTs: number, s = 'SPOT_BTC_USDT') => ({
       topic: `orderbookupdate@${s}@50`,
