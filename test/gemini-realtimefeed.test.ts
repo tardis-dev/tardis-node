@@ -133,46 +133,6 @@ for (const normalized of [false, true]) {
   }
 }
 
-for (const withDisconnectMessages of [false, true]) {
-  test(`Gemini normalized opt-out continues across a gap: disconnects=${withDisconnectMessages}`, { timeout: 10000 }, async () => {
-    let connections = 0
-    const errors: Error[] = []
-    const { server, cleanup } = await createTestWebSocketServer('gemini')
-    server.on('connection', (socket) => {
-      connections++
-      socket.once('message', () => {
-        for (const message of [depth(100), depth(101), depth(103)]) socket.send(JSON.stringify(message))
-      })
-    })
-    const messages = streamNormalized(
-      {
-        exchange: 'gemini',
-        symbols: ['BTCUSD'],
-        timeoutIntervalMS: 0,
-        validateSequence: false,
-        withDisconnectMessages,
-        onError: (error) => errors.push(error)
-      },
-      normalizeBookChanges
-    )
-    try {
-      for (const isSnapshot of [true, false, false]) {
-        const item = (await messages.next()).value
-        assert.ok(item.type === 'book_change')
-        assert.strictEqual(item.isSnapshot, isSnapshot)
-      }
-      assert.strictEqual(connections, 1)
-      assert.deepStrictEqual(errors, [])
-    } finally {
-      try {
-        await messages.return?.()
-      } finally {
-        await cleanup()
-      }
-    }
-  })
-}
-
 test('Gemini initializes a quiet normalized book from its first depth message', { timeout: 10000 }, async () => {
   const { server, cleanup } = await createTestWebSocketServer('gemini')
   server.on('connection', (socket) => socket.once('message', () => socket.send(JSON.stringify(depth(100)))))

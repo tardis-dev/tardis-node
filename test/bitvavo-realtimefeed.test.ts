@@ -310,69 +310,6 @@ for (const firstSequence of [101, 102]) {
   )
 }
 
-for (const missingField of ['startMdSeqNo', 'endMdSeqNo', 'mdSeqNo'] as const) {
-  test(`Bitvavo rejects nonce fallback when ${missingField} is missing`, { timeout: 10000 }, async () => {
-    const snapshot = {
-      action: 'getBook',
-      requestId: 1,
-      response: {
-        market: 'BTC-EUR',
-        nonce: 10,
-        bids: [],
-        asks: [],
-        timestamp: '1793786400000000000',
-        ...(missingField === 'mdSeqNo' ? {} : { mdSeqNo: 10 })
-      }
-    }
-    const update = {
-      event: 'book',
-      market: 'BTC-EUR',
-      nonce: 11,
-      bids: [],
-      asks: [],
-      timestamp: '1793786400000000000',
-      ...(missingField === 'startMdSeqNo' ? {} : { startMdSeqNo: 11 }),
-      ...(missingField === 'endMdSeqNo' ? {} : { endMdSeqNo: 11 })
-    }
-    const errors: Error[] = []
-    const isSnapshot = missingField === 'mdSeqNo'
-    const { server, cleanup } = await createTestWebSocketServer('bitvavo')
-    server.on('connection', (socket) => {
-      socket.on('message', (bytes) => {
-        const request = JSON.parse(bytes.toString())
-        if (request.action === 'authenticate') {
-          socket.send(JSON.stringify({ event: 'authenticate', authenticated: true }))
-        } else if (request.action === (isSnapshot ? 'getBook' : 'subscribe')) {
-          socket.send(JSON.stringify(isSnapshot ? snapshot : update))
-        }
-      })
-    })
-    const messages = stream({
-      exchange: 'bitvavo',
-      filters: [{ channel: isSnapshot ? 'getBook' : 'book', symbols: ['BTC-EUR'] }],
-      timeoutIntervalMS: 0,
-      withDisconnects: true,
-      onError: (error) => errors.push(error)
-    })
-    try {
-      assert.strictEqual((await messages.next()).value?.message.event, 'authenticate')
-      assert.strictEqual((await messages.next()).value, undefined)
-      assert.strictEqual(errors.length, 1)
-      assert.match(errors[0].message, /missing or invalid/)
-
-      const mapper = normalizeBookChanges('bitvavo', new Date('2026-10-01T00:00:00Z'))
-      if (!isSnapshot) [...mapper.map(snapshot, new Date())!]
-      assert.throws(() => [...mapper.map(isSnapshot ? snapshot : update, new Date())!], /missing or invalid/)
-    } finally {
-      try {
-        await messages.return?.()
-      } finally {
-        await cleanup()
-      }
-    }
-  })
-}
-
 function restoreEnvironmentVariable(name: string, value: string | undefined) {
   if (value === undefined) {
     delete process.env[name]

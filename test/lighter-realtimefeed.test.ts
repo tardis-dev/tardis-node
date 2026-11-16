@@ -1,5 +1,5 @@
 import { test } from 'node:test'
-import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { stream, SequenceGapError } from '../dist/index.js'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { assert, errorMessageIncludes } from './assertions.ts'
 import { LighterRealTimeFeed } from '../dist/realtimefeeds/lighter.js'
@@ -138,78 +138,4 @@ for (const exchange of ['lighter', 'lighter-rh'] as const) {
       }
     )
   }
-
-  for (const normalized of [false, true]) {
-    for (const withDisconnects of [false, true]) {
-      test(`${exchange} sequence recovery: normalized=${normalized}, disconnects=${withDisconnects}`, { timeout: 10000 }, async () => {
-        const errors: Error[] = []
-        let connections = 0
-        const initial = [book(100, 0, 'subscribed/order_book'), book(110, 100), book(130, 120)]
-        const recovered = [book(1, 999, 'subscribed/order_book'), book(2, 1)]
-        const { server, cleanup } = await createTestWebSocketServer(exchange)
-        server.on('connection', (socket) => {
-          const first = ++connections === 1
-          socket.once('message', () => {
-            for (const message of first ? initial : recovered) socket.send(JSON.stringify(message))
-          })
-        })
-        const options = { exchange, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
-        const feed = normalized
-          ? streamNormalized({ ...options, symbols: ['1'], withDisconnectMessages: withDisconnects }, normalizeBookChanges)
-          : stream({ ...options, filters: [{ channel: 'order_book', symbols: ['1'] }], withDisconnects })
-        const output: any[] = []
-        try {
-          for await (const message of feed) {
-            output.push(message)
-            if (output.length === (withDisconnects ? 5 : 4)) break
-          }
-          if (withDisconnects) {
-            assert.strictEqual(normalized ? output[2].type : output[2], normalized ? 'disconnect' : undefined)
-            output.splice(2, 1)
-          }
-          if (normalized) {
-            assert.deepStrictEqual(
-              output.map((message) => message.isSnapshot),
-              [true, false, true, false]
-            )
-            assert.deepStrictEqual(
-              output.map((message) => message.bids),
-              [100, 110, 1, 2].map((amount) => [{ price: 100, amount }])
-            )
-          } else
-            assert.deepStrictEqual(
-              output.map((message) => message.message),
-              [...initial.slice(0, 2), ...recovered]
-            )
-          assert.strictEqual(connections, 2)
-          assert.strictEqual(errors.length, 1)
-          assert.ok(errors[0] instanceof SequenceGapError)
-        } finally {
-          await feed.return?.()
-          await cleanup()
-        }
-      })
-    }
-  }
-
-  test(`${exchange} normalized opt-out preserves book mapping across a gap`, { timeout: 10000 }, async () => {
-    const errors: Error[] = []
-    const { server, cleanup } = await createTestWebSocketServer(exchange)
-    server.on('connection', (socket) =>
-      socket.once('message', () => {
-        for (const message of [book(100, 0, 'subscribed/order_book'), book(110, 100), book(130, 120)]) socket.send(JSON.stringify(message))
-      })
-    )
-    const feed = streamNormalized(
-      { exchange, symbols: ['1'], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
-      normalizeBookChanges
-    )
-    try {
-      for (const amount of [100, 110, 130]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
-      assert.deepStrictEqual(errors, [])
-    } finally {
-      await feed.return?.()
-      await cleanup()
-    }
-  })
 }

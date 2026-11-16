@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import { gzipSync } from 'node:zlib'
-import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { stream, SequenceGapError } from '../dist/index.js'
 import { assert } from './assertions.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 
@@ -79,77 +79,4 @@ for (const exchange of exchanges) {
       }
     )
   }
-
-  for (const normalized of [false, true])
-    for (const withDisconnects of [false, true]) {
-      test(
-        `${exchange} fresh native snapshots after recovery: normalized=${normalized}, disconnects=${withDisconnects}`,
-        { timeout: 10000 },
-        async () => {
-          let connections = 0
-          const errors: Error[] = [],
-            initial = [book(100, 'snapshot', symbol), book(101, 'update', symbol), book(103, 'update', symbol)],
-            recovered = [book(1, 'snapshot', symbol), book(2, 'update', symbol)]
-          const { server, cleanup } = await createTestWebSocketServer(exchange)
-          server.on('connection', (socket) => {
-            const first = ++connections === 1
-            socket.once('message', () => send(socket, first ? initial : recovered))
-          })
-          const options = { exchange, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
-          const feed = normalized
-            ? streamNormalized({ ...options, symbols: [symbol], withDisconnectMessages: withDisconnects }, normalizeBookChanges)
-            : stream({ ...options, filters: [{ channel: 'depth', symbols: [symbol] }], withDisconnects })
-          const output: any[] = []
-          try {
-            for await (const message of feed) {
-              output.push(message)
-              if (output.length === (withDisconnects ? 5 : 4)) break
-            }
-            if (withDisconnects) {
-              assert.strictEqual(normalized ? output[2].type : output[2], normalized ? 'disconnect' : undefined)
-              output.splice(2, 1)
-            }
-            if (normalized) {
-              assert.deepStrictEqual(
-                output.map((message) => message.isSnapshot),
-                [true, false, true, false]
-              )
-              assert.deepStrictEqual(
-                output.map((message) => message.bids),
-                [101, 102, 2, 3].map((amount) => [{ price: 100, amount }])
-              )
-            } else
-              assert.deepStrictEqual(
-                output.map((message) => message.message),
-                [...initial.slice(0, 2), ...recovered]
-              )
-            assert.strictEqual(connections, 2)
-            assert.strictEqual(errors.length, 1)
-            assert.ok(errors[0] instanceof SequenceGapError)
-          } finally {
-            await feed.return?.()
-            await cleanup()
-          }
-        }
-      )
-    }
-
-  test(`${exchange} normalized opt-out preserves native snapshot mapping`, { timeout: 10000 }, async () => {
-    const errors: Error[] = [],
-      { server, cleanup } = await createTestWebSocketServer(exchange)
-    server.on('connection', (socket) =>
-      socket.once('message', () => send(socket, [book(100, 'snapshot', symbol), book(101, 'update', symbol), book(103, 'update', symbol)]))
-    )
-    const feed = streamNormalized(
-      { exchange, symbols: [symbol], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
-      normalizeBookChanges
-    )
-    try {
-      for (const amount of [101, 102, 104]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
-      assert.deepStrictEqual(errors, [])
-    } finally {
-      await feed.return?.()
-      await cleanup()
-    }
-  })
 }

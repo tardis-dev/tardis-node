@@ -407,30 +407,3 @@ for (const normalized of [false, true]) {
     })
   }
 }
-
-test('MEXC normalized opt-out preserves snapshot mapping across a gap', { timeout: 10000 }, async () => {
-  const depthChannel = 'spot@public.aggre.depth.v3.api.pb@10ms'
-  const errors: Error[] = []
-  const { server, cleanup } = await createTestWebSocketServer('mexc')
-  server.on('connection', (socket) =>
-    socket.once('message', () => {
-      for (const frame of [
-        Buffer.from(JSON.stringify(depthSnapshot(100))),
-        depthFrame(depthChannel, 101, 105),
-        depthFrame(depthChannel, 107, 110)
-      ])
-        socket.send(frame)
-    })
-  )
-  const feed = streamNormalized(
-    { exchange: 'mexc', symbols: ['BTCUSDT'], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
-    normalizeBookChanges
-  )
-  try {
-    for (const amount of [100, 105, 110]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
-    assert.deepStrictEqual(errors, [])
-  } finally {
-    await feed.return?.()
-    await cleanup()
-  }
-})

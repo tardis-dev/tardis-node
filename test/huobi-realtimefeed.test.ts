@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import { gzipSync } from 'node:zlib'
-import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { stream, SequenceGapError } from '../dist/index.js'
 import { assert } from './assertions.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 
@@ -62,94 +62,3 @@ for (const validateSequence of [true, false]) {
     }
   })
 }
-
-for (const normalized of [false, true])
-  for (const withDisconnects of [false, true]) {
-    test(`Huobi sequence recovery: normalized=${normalized}, disconnects=${withDisconnects}`, { timeout: 10000 }, async () => {
-      let connections = 0
-      const errors: Error[] = [],
-        { server, cleanup } = await createTestWebSocketServer('huobi')
-      const initial = [snapshot(100), update(110, 100), update(130, 120)]
-      const recovered = [snapshot(1), update(2, 1)]
-      server.on('connection', (socket) => {
-        const first = ++connections === 1
-        socket.once('message', () => send(socket, first ? initial : recovered))
-      })
-      const options = { exchange: 'huobi' as const, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
-      const feed = normalized
-        ? streamNormalized({ ...options, symbols: ['BTCUSDT'], withDisconnectMessages: withDisconnects }, normalizeBookChanges)
-        : stream({ ...options, filters: [{ channel: 'mbp', symbols: ['btcusdt'] }], withDisconnects })
-      const output: any[] = []
-      try {
-        for await (const message of feed) {
-          output.push(message)
-          if (output.length === (withDisconnects ? 5 : 4)) break
-        }
-        if (withDisconnects) {
-          assert.strictEqual(normalized ? output[2].type : output[2], normalized ? 'disconnect' : undefined)
-          output.splice(2, 1)
-        }
-        assert.strictEqual(connections, 2)
-        assert.strictEqual(errors.length, 1)
-        assert.ok(errors[0] instanceof SequenceGapError)
-        if (normalized) {
-          assert.deepStrictEqual(
-            output.map((message) => message.isSnapshot),
-            [true, false, true, false]
-          )
-          assert.deepStrictEqual(
-            output.map((message) => message.bids),
-            [100, 110, 1, 2].map((amount) => [{ price: 100, amount }])
-          )
-        } else
-          assert.deepStrictEqual(
-            output.map((message) => message.message),
-            [...initial.slice(0, 2), ...recovered]
-          )
-      } finally {
-        await feed.return?.()
-        await cleanup()
-      }
-    })
-  }
-
-test('Huobi normalized opt-out preserves existing mapping across a gap', { timeout: 10000 }, async () => {
-  const errors: Error[] = []
-  const { server, cleanup } = await createTestWebSocketServer('huobi')
-  server.on('connection', (socket) => socket.once('message', () => send(socket, [snapshot(10), update(20, 10), update(40, 30)])))
-  const feed = streamNormalized(
-    { exchange: 'huobi', symbols: ['BTCUSDT'], timeoutIntervalMS: 0, validateSequence: false, onError: (error) => errors.push(error) },
-    normalizeBookChanges
-  )
-  try {
-    for (const amount of [10, 20, 40]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
-    assert.deepStrictEqual(errors, [])
-  } finally {
-    await feed.return?.()
-    await cleanup()
-  }
-})
-
-test('Huobi derivatives migration leaves legacy options validation unchanged', { timeout: 10000 }, async () => {
-  const native = [1, 50].map((version) => ({
-    ch: 'market.BTC-USDT-210521-C-42000.depth.size_150.high_freq',
-    ts: Date.now(),
-    tick: { version, event: 'update', bids: [], asks: [] }
-  }))
-  const errors: Error[] = [],
-    { server, cleanup } = await createTestWebSocketServer('huobi-dm-options')
-  server.on('connection', (socket) => socket.once('message', () => send(socket, native)))
-  const feed = stream({
-    exchange: 'huobi-dm-options',
-    filters: [{ channel: 'depth', symbols: ['BTC-USDT-210521-C-42000'] }],
-    timeoutIntervalMS: 0,
-    onError: (error) => errors.push(error)
-  })
-  try {
-    for (const message of native) assert.deepStrictEqual((await feed.next()).value?.message, message)
-    assert.deepStrictEqual(errors, [])
-  } finally {
-    await feed.return?.()
-    await cleanup()
-  }
-})

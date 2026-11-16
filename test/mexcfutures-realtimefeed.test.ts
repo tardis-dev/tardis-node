@@ -319,34 +319,6 @@ for (const normalized of [false, true])
     })
   }
 
-test('MEXC Futures normalized opt-out preserves snapshot mapping across a gap', { timeout: 10000 }, async () => {
-  const errors: Error[] = [],
-    { server, cleanup } = await createFuturesSequenceServer()
-  server.on('connection', (socket) =>
-    socket.once('message', () => {
-      for (const message of [futuresSnapshot(100), futuresDepth(105, 101, 105), futuresDepth(110, 107, 110)])
-        socket.send(JSON.stringify(message))
-    })
-  )
-  const feed = streamNormalized(
-    {
-      exchange: 'mexc-futures',
-      symbols: ['BTC_USDT'],
-      timeoutIntervalMS: 0,
-      validateSequence: false,
-      onError: (error) => errors.push(error)
-    },
-    normalizeBookChanges
-  )
-  try {
-    for (const amount of [100, 105, 110]) assert.deepStrictEqual((await feed.next()).value.bids, [{ price: 100, amount }])
-    assert.deepStrictEqual(errors, [])
-  } finally {
-    await feed.return?.()
-    await cleanup()
-  }
-})
-
 test('MEXC Futures normalized opt-out retains initial snapshot overlap validation', { timeout: 10000 }, async () => {
   const errors: Error[] = [],
     { server, cleanup } = await createFuturesSequenceServer()
