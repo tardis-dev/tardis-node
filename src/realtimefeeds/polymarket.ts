@@ -17,8 +17,8 @@ export class PolymarketRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ): IterableIterator<RealTimeFeedIterable> {
     const clobFilters: Filter<string>[] = []
     const sportsFilters: Filter<string>[] = []
@@ -38,10 +38,10 @@ export class PolymarketRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         throw new Error('PolymarketRealTimeFeed requires explicitly specified symbols when subscribing to CLOB live feed')
       }
 
-      yield new PolymarketClobRealTimeFeed(exchange, clobFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new PolymarketClobRealTimeFeed(exchange, clobFilters, timeoutIntervalMS, onError, validateSequence)
     }
     if (sportsFilters.length > 0) {
-      yield new PolymarketSportsRealTimeFeed(exchange, sportsFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new PolymarketSportsRealTimeFeed(exchange, sportsFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 }

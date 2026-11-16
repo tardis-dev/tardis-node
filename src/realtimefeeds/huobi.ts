@@ -16,7 +16,7 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
     exchange: string,
     filters: Filter<string>[],
-    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
   ) {
     const marketByPriceFilters = filters.filter((f) => f.channel === 'mbp')
 
@@ -86,7 +86,7 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
     filters: Filter<string>[],
     protected wssURL: string,
     private readonly _suffixes: { [key: string]: string },
-    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
   ) {
     super(exchange, filters, ...rest)
   }
@@ -207,7 +207,7 @@ class HuobiNotificationsRealTimeFeed extends RealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     protected wssURL: string,
-    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
   ) {
     super(exchange, filters, ...rest)
   }

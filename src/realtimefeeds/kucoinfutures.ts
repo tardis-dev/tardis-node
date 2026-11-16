@@ -20,13 +20,13 @@ export class KucoinFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const wsFilters = filters.filter((f) => f.channel !== 'contract/details')
 
     if (wsFilters.length > 0) {
-      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, validateSequence, onError)
+      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, onError, validateSequence)
     }
 
     const contractDetailsFilters = filters.filter((f) => f.channel === 'contract/details')
@@ -42,10 +42,10 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
     filters: Filter<string>[],
     private readonly _httpURL: string,
     timeoutIntervalMS: number | undefined,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
   protected wssURL = ''
 

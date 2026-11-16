@@ -32,7 +32,7 @@ async function* _stream<T extends Exchange, U extends boolean = false>(
 ): AsyncIterableIterator<U extends true ? { localTimestamp: Date; message: any } | undefined : { localTimestamp: Date; message: any }> {
   validateStreamOptions(filters)
 
-  const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, validateSequence, onError)
+  const realTimeFeed = createRealTimeFeed(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   const messages = realTimeFeed[Symbol.asyncIterator]()
   state.activeIterator = messages
 

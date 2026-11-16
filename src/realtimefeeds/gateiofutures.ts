@@ -6,7 +6,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   protected *_getRealTimeFeeds(
     exchange: string,
     filters: Filter<string>[],
-    ...rest: [timeoutIntervalMS?: number, validateSequence?: boolean, onError?: (error: Error) => void]
+    ...rest: [timeoutIntervalMS?: number, onError?: (error: Error) => void, validateSequence?: boolean]
   ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('_USDT')),

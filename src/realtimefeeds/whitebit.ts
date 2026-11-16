@@ -12,8 +12,8 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     filters = filters.map((filter) => ({
       ...filter,
@@ -38,8 +38,8 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
             .map((filter) => ({ ...filter, symbols: filter.symbols!.filter((symbol) => group.includes(symbol)) }))
             .filter((filter) => filter.symbols.length > 0),
           timeoutIntervalMS,
-          validateSequence,
           onError,
+          validateSequence,
           connectionIndex++ * 50
         )
       }
@@ -65,11 +65,11 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    validateSequence?: boolean,
     onError?: (error: Error) => void,
+    validateSequence?: boolean,
     private readonly _startDelayMS = 0
   ) {
-    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected async getWebSocketUrl() {

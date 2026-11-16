@@ -8,8 +8,8 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('USDT') || s.includes('-') || s.endsWith('PERP')),
@@ -22,11 +22,11 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     if (linearContractsFilters.length > 0) {
-      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     if (inverseContractsFilters.length > 0) {
-      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 

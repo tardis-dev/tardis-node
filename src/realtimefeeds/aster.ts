@@ -209,12 +209,12 @@ export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const webSocketFilters = filters.filter((filter) => filter.channel !== 'openInterest')
     if (webSocketFilters.length > 0) {
-      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     const openInterestFilters = filters.filter((filter) => filter.channel === 'openInterest')

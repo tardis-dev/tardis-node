@@ -50,11 +50,11 @@ export class BullishRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     for (const [path, pathFilters] of this.groupByPath(filters)) {
-      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 
@@ -81,10 +81,10 @@ export class BullishSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly path: string,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected async getWebSocketUrl() {

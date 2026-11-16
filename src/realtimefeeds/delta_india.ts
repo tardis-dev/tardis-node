@@ -10,8 +10,8 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const marketFilters: Filter<string>[] = []
     const depthFilters: Filter<string>[] = []
@@ -34,10 +34,10 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
     const feeds: DeltaIndiaWebSocketRealTimeFeed[] = [
       marketFilters.length
-        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, validateSequence, onError)
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, onError, validateSequence)
         : undefined,
       depthFilters.length
-        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, validateSequence, onError)
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError, validateSequence)
         : undefined
     ].filter((feed) => feed !== undefined)
 

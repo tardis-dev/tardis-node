@@ -13,8 +13,8 @@ export type RealTimeFeed = {
     exchange: Exchange,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ): RealTimeFeedIterable
 }
 
@@ -77,8 +77,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     protected readonly _exchange: string,
     filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _validateSequence = true,
-    private readonly _onError?: (error: Error) => void
+    private readonly _onError?: (error: Error) => void,
+    private readonly _validateSequence = true
   ) {
     this._filters = optimizeFilters(filters)
     this._parseJson = getMessageParser(_exchange)
@@ -510,8 +510,8 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     private readonly _exchange: string,
     private readonly _filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _validateSequence = true,
-    private readonly _onError?: (error: Error) => void
+    private readonly _onError?: (error: Error) => void,
+    private readonly _validateSequence = true
   ) {}
 
   [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
@@ -527,7 +527,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     while (this._closeController.signal.aborted === false) {
       this._connections = mergeRealTime(
         Array.from(
-          this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._validateSequence, this._onError),
+          this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError, this._validateSequence),
           untilDisconnect
         )
       )
@@ -562,8 +562,8 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ): IterableIterator<RealTimeFeedIterable>
 }
 

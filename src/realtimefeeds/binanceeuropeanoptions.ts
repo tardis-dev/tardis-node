@@ -7,8 +7,8 @@ export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeF
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     // V2 API uses two separate WebSocket endpoints:
     // 1. Public path: for optionTrade, depth20, bookTicker, optionTicker
@@ -27,8 +27,8 @@ export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeF
         publicFilters,
         filters, // Pass all filters so we can look up optionTicker when processing optionOpenInterest
         timeoutIntervalMS,
-        validateSequence,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -39,8 +39,8 @@ export class BinanceEuropeanOptionsRealTimeFeed extends MultiConnectionRealTimeF
         marketFilters,
         filters, // Pass all filters so we can look up optionTicker when processing optionOpenInterest
         timeoutIntervalMS,
-        validateSequence,
-        onError
+        onError,
+        validateSequence
       )
     }
   }
@@ -53,10 +53,10 @@ class BinanceEuropeanOptionsSingleFeed extends RealTimeFeedBase {
     filters: Filter<string>[],
     private readonly _allFilters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, validateSequence, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {

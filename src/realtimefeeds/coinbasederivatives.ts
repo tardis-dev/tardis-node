@@ -9,8 +9,8 @@ export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeed
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const wsFilters = optimizeFilters(filters.filter((f) => f.channel !== 'products'))
     for (const filter of wsFilters) {
@@ -20,7 +20,7 @@ export class CoinbaseDerivativesRealTimeFeed extends MultiConnectionRealTimeFeed
     }
 
     if (wsFilters.length > 0) {
-      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new CoinbaseDerivativesSingleConnectionRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     const productFilters = filters.filter((f) => f.channel === 'products')

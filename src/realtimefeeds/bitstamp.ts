@@ -10,12 +10,12 @@ export class BitstampRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    validateSequence?: boolean,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     const wsFilters = filters.filter((f) => f.channel !== 'ticker')
     if (wsFilters.length > 0) {
-      yield new BitstampWebSocketRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, validateSequence, onError)
+      yield new BitstampWebSocketRealTimeFeed(exchange, wsFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     const tickerFilters = filters.filter((f) => f.channel === 'ticker')
