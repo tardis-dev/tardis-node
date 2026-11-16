@@ -60,6 +60,7 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - WebSocket URL
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
+- `getSequence` when the exchange sends sequence numbers, following the recorder's `GetSequenceInfo` for the same exchange (same messages, key and previous/current fields)
 
 Register in `src/realtimefeeds/index.ts`.
 

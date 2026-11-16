@@ -32,6 +32,8 @@ Worker thread pre-fetches and caches slices while the main thread processes the 
 
 `RealTimeFeedBase` manages WebSocket connections to exchanges. Handles connection lifecycle (connect, subscribe, validate, reconnect on failure). Exchange-specific feeds extend the base class with subscription formats and message handling. Breaking real-time iteration or calling its standard `return()` closes the underlying feeds before finishing iterator cleanup, including quiet feeds whose `next()` is still pending.
 
+Sequence validation runs in `RealTimeFeedBase` before a message reaches `onMessage`, the output or the mappers. An exchange feed overrides `getSequence(message)` and returns a `Sequence` (`key`, `sequence`, `previousSequence`) for sequenced messages, or `undefined` for the rest; `previousSequence: undefined` marks a snapshot that starts a new chain. The base keeps the last `sequence` per `key` for the current connection: a repeated `sequence` is accepted, any other `previousSequence` mismatch throws `SequenceGapError` and reconnects like a connection error. `validateSequence: false` skips `getSequence` entirely.
+
 `MultiConnectionRealTimeFeedBase` merges several connections and REST pollers of one exchange. A disconnect resets all normalized state, so when any connection drops, the feed closes all its connections and pollers, yields one disconnect and opens them again after the retry delay of the failed connection.
 
 ## Mapper System
