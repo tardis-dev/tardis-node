@@ -5,6 +5,13 @@ export type Mapper<T extends Exchange, U extends NormalizedData> = {
 
   map(message: any, localTimestamp: Date): IterableIterator<U> | undefined
 
+  /**
+   * Returns the channel filters this mapper needs for the requested symbols.
+   *
+   * `undefined` and `[]` both mean all symbols, in the argument and in returned filters.
+   * Mappers that narrow symbols per channel must check `isNullOrEmptyArray(symbols)` before filtering,
+   * so that an empty request is not mistaken for "no matching symbols".
+   */
   getFilters: (symbols?: string[]) => FilterForExchange[T][]
 }
 
