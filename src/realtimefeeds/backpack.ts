@@ -1,11 +1,17 @@
 import { EXCHANGE_CHANNELS_INFO } from '../consts.ts'
 import { batch, getJSON } from '../handy.ts'
-import type { BackpackSnapshotMessage } from '../mappers/backpack.ts'
+import type { BackpackDepthMessage, BackpackMessage, BackpackSnapshotMessage } from '../mappers/backpack.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class BackpackRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     for (const filter of filters) {
       if (!filter.symbols?.length) {
         throw new Error('Backpack requires explicitly specified symbols for live subscriptions')
@@ -22,7 +28,7 @@ export class BackpackRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         }))
         .filter((filter) => filter.symbols.length > 0)
 
-      yield new BackpackSingleConnectionRealTimeFeed(exchange, connectionFilters, timeoutIntervalMS, onError)
+      yield new BackpackSingleConnectionRealTimeFeed(exchange, connectionFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 }
@@ -31,6 +37,14 @@ export class BackpackSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.backpack.exchange'
   protected readonly httpURL: string = 'https://api.backpack.exchange'
   private readonly channels = new Set<string>(EXCHANGE_CHANNELS_INFO.backpack)
+
+  protected getSequence(message: BackpackMessage<unknown>): Sequence | undefined {
+    if (message.stream?.startsWith('depth.')) {
+      const { s, U, u } = message.data as BackpackDepthMessage['data']
+      return { key: s, sequence: u, previousSequence: U - 1 }
+    }
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     const depthSymbols = new Set(filters.filter((filter) => filter.channel === 'depth').flatMap((filter) => filter.symbols ?? []))

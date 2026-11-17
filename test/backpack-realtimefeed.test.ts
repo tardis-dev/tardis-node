@@ -4,6 +4,7 @@ import { mock, test } from 'node:test'
 import { WebSocketServer } from 'ws'
 import * as handy from '../dist/handy.js'
 import { assert } from './assertions.ts'
+import { createTestWebSocketServer } from './helpers/websocket.ts'
 
 const requests: string[] = []
 const observedSubscriptions: { method: string; params: string[] }[] = []
@@ -16,12 +17,107 @@ mock.module('../dist/handy.js', {
     }
   }
 })
-const { stream, streamNormalized, normalizeBookChanges } = await import('../dist/index.js')
+const { stream, streamNormalized, normalizeBookChanges, SequenceGapError } = await import('../dist/index.js')
 const { BackpackSingleConnectionRealTimeFeed } = await import('../dist/realtimefeeds/backpack.js')
 
 class TestFeed extends BackpackSingleConnectionRealTimeFeed {
   map(filters: { channel: string; symbols?: string[] }[]) {
     return this.mapToSubscribeMessages(filters)
+  }
+}
+
+function depth(symbol: string, U: number, u = U) {
+  return { stream: `depth.${symbol}`, data: { s: symbol, U, u, a: [], b: [['99', String(u)]], E: 1793369773514033 + u } }
+}
+
+for (const normalized of [false, true]) {
+  for (const validateSequence of [undefined, true, false]) {
+    test(
+      `Backpack ${normalized ? 'normalized' : 'native'} continuity with validateSequence=${validateSequence}`,
+      { timeout: 15000 },
+      async () => {
+        const { server, cleanup } = await createTestWebSocketServer('backpack')
+        const errors: Error[] = []
+        let connections = 0
+        let socket: import('ws').WebSocket
+        let startupTimer: NodeJS.Timeout | undefined
+        server.on('connection', (client) => {
+          socket = client
+          connections++
+          client.once('message', () => {
+            client.send(JSON.stringify(depth('BTC_USDC_PERP', 100)))
+            if (normalized) {
+              startupTimer = setInterval(() => client.send(JSON.stringify(depth('BTC_USDC_PERP', 100))), 10)
+              client.once('close', () => clearInterval(startupTimer))
+            }
+          })
+        })
+        const options = {
+          exchange: 'backpack' as const,
+          timeoutIntervalMS: 0,
+          withDisconnectMessages: true,
+          withDisconnects: true,
+          validateSequence,
+          onError: (error: Error) => errors.push(error)
+        }
+        const feed = normalized
+          ? streamNormalized({ ...options, symbols: ['BTC_USDC_PERP'] }, normalizeBookChanges)
+          : stream({ ...options, filters: [{ channel: 'depth', symbols: ['BTC_USDC_PERP'] }] })
+        try {
+          const first = (await feed.next()).value
+          clearInterval(startupTimer)
+          if (normalized) assert.strictEqual(first.isSnapshot, true)
+          else assert.strictEqual(first.message.data.u, 100)
+
+          socket!.send(JSON.stringify(depth('BTC_USDC_PERP', 101, 103)))
+          const contiguous = (await feed.next()).value
+          if (normalized) {
+            assert.strictEqual(contiguous.isSnapshot, false)
+            assert.deepEqual(contiguous.bids, [{ price: 99, amount: 103 }])
+          } else assert.strictEqual(contiguous.message.data.u, 103)
+
+          // A duplicate must not reset the cursor or reach normalized book output twice.
+          socket!.send(JSON.stringify(depth('BTC_USDC_PERP', 101, 103)))
+          if (!normalized) assert.strictEqual((await feed.next()).value.message.data.u, 103)
+          socket!.send(JSON.stringify(depth('BTC_USDC_PERP', 104)))
+          const afterDuplicate = (await feed.next()).value
+          if (normalized) assert.deepEqual(afterDuplicate.bids, [{ price: 99, amount: 104 }])
+          else assert.strictEqual(afterDuplicate.message.data.u, 104)
+
+          socket!.send(JSON.stringify(depth('BTC_USDC_PERP', 106)))
+          const afterGap = (await feed.next()).value
+          if (validateSequence === false) {
+            if (normalized) assert.deepEqual(afterGap.bids, [{ price: 99, amount: 106 }])
+            else assert.strictEqual(afterGap.message.data.u, 106)
+            assert.deepEqual(errors, [])
+            assert.strictEqual(connections, 1)
+          } else {
+            if (normalized) assert.strictEqual(afterGap.type, 'disconnect')
+            else assert.strictEqual(afterGap, undefined)
+            assert.strictEqual(errors.length, 1)
+            assert.ok(errors[0] instanceof SequenceGapError)
+            assert.strictEqual(errors[0].key, 'BTC_USDC_PERP')
+            assert.strictEqual(errors[0].expectedPreviousSequence, 104)
+            assert.strictEqual(errors[0].previousSequence, 105)
+            const restarted = (await feed.next()).value
+            clearInterval(startupTimer)
+            if (normalized) assert.strictEqual(restarted.isSnapshot, true)
+            else assert.strictEqual(restarted.message.data.u, 100)
+            socket!.send(JSON.stringify(depth('BTC_USDC_PERP', 101)))
+            const resumed = (await feed.next()).value
+            if (normalized) {
+              assert.strictEqual(resumed.isSnapshot, false)
+              assert.deepEqual(resumed.bids, [{ price: 99, amount: 101 }])
+            } else assert.strictEqual(resumed.message.data.u, 101)
+            assert.strictEqual(connections, 2)
+            assert.strictEqual(errors.length, 1)
+          }
+        } finally {
+          await feed.return?.()
+          await cleanup()
+        }
+      }
+    )
   }
 }
 
@@ -32,6 +128,52 @@ test('Backpack rejects missing symbols and snapshot-only subscriptions', () => {
   assert.throws(() => feed.map([{ channel: 'depthSnapshot', symbols: ['BTC_USDC'] }]), /requires a depth subscription/)
   assert.throws(() => feed.map([{ channel: 'unsupported', symbols: ['BTC_USDC'] }]), /Unsupported Backpack channel/)
 })
+
+for (const validateSequence of [true, false]) {
+  test(
+    `Backpack keeps symbol counters independent across connections with validateSequence=${validateSequence}`,
+    { timeout: 15000 },
+    async () => {
+      const { server, cleanup } = await createTestWebSocketServer('backpack')
+      const symbols = Array.from({ length: 21 }, (_, i) => `COIN${i}_USDC`)
+      const errors: Error[] = []
+      let connections = 0
+      server.on('connection', (socket) => {
+        connections++
+        socket.once('message', (bytes) => {
+          const { params } = JSON.parse(bytes.toString()) as { params: string[] }
+          for (const topic of params) {
+            const symbol = topic.slice('depth.'.length)
+            const id = symbols.indexOf(symbol) * 1000
+            socket.send(JSON.stringify(depth(symbol, id)))
+            socket.send(JSON.stringify(depth(symbol, id + (validateSequence ? 1 : 2))))
+          }
+        })
+      })
+      const feed = stream({
+        exchange: 'backpack',
+        filters: [{ channel: 'depth', symbols }],
+        timeoutIntervalMS: 0,
+        validateSequence,
+        onError: (error) => errors.push(error)
+      })
+      try {
+        const counts = new Map<string, number>()
+        for (let i = 0; i < symbols.length * 2; i++) {
+          const { message } = (await feed.next()).value
+          counts.set(message.data.s, (counts.get(message.data.s) ?? 0) + 1)
+        }
+        assert.strictEqual(connections, 2)
+        assert.strictEqual(counts.size, symbols.length)
+        assert.ok([...counts.values()].every((count) => count === 2))
+        assert.deepEqual(errors, [])
+      } finally {
+        await feed.return?.()
+        await cleanup()
+      }
+    }
+  )
+}
 
 test('Backpack initializes a quiet symbol alongside an active symbol and reinitializes after reconnect', { timeout: 15000 }, async () => {
   const server = new WebSocketServer({ port: 0 })
