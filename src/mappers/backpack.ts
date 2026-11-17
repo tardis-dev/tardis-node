@@ -1,4 +1,4 @@
-import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate } from '../handy.ts'
+import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate, isNullOrEmptyArray } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -153,9 +153,11 @@ class BackpackDerivativeTickerMapper implements Mapper<'backpack', DerivativeTic
   }
 
   getFilters(symbols?: string[]) {
-    symbols = symbols?.filter((symbol) => symbol.endsWith('_PERP'))
-    if (symbols?.length === 0) {
-      return []
+    if (!isNullOrEmptyArray(symbols)) {
+      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
+      if (symbols.length === 0) {
+        return []
+      }
     }
     return [
       { channel: 'markPrice', symbols } as const,
@@ -201,9 +203,11 @@ class BackpackLiquidationsMapper implements Mapper<'backpack', Liquidation> {
   }
 
   getFilters(symbols?: string[]) {
-    symbols = symbols?.filter((symbol) => symbol.endsWith('_PERP'))
-    if (symbols?.length === 0) {
-      return []
+    if (!isNullOrEmptyArray(symbols)) {
+      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
+      if (symbols.length === 0) {
+        return []
+      }
     }
     return [{ channel: 'liquidation', symbols } as const]
   }
