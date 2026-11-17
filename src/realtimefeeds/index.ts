@@ -60,6 +60,7 @@ import { BullishRealTimeFeed } from './bullish.ts'
 import { MexcFuturesRealTimeFeed } from './mexcfutures.ts'
 import { MexcRealTimeFeed } from './mexc.ts'
 import { PolymarketRealTimeFeed } from './polymarket.ts'
+import { WhiteBitRealTimeFeed } from './whitebit.ts'
 
 export * from './realtimefeed.ts'
 
@@ -132,7 +133,8 @@ const realTimeFeedsMap: {
   'lighter-rh': LighterRhRealTimeFeed,
   bullish: BullishRealTimeFeed,
   mexc: MexcRealTimeFeed,
-  polymarket: PolymarketRealTimeFeed
+  polymarket: PolymarketRealTimeFeed,
+  whitebit: WhiteBitRealTimeFeed
 }
 
 export function getRealTimeFeedFactory(exchange: Exchange): RealTimeFeed {
