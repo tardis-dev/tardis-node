@@ -1,6 +1,7 @@
 import { describe, test } from 'node:test'
 import { assert, errorMessageIncludes, snapshot } from './assertions.ts'
 import {
+  EXCHANGES,
   EXCHANGE_CHANNELS_INFO,
   normalizeBookChanges,
   normalizeDerivativeTickers,
@@ -223,6 +224,43 @@ describe('mappers', () => {
       { stream: 'stockIndicativeQuote.MU', data: { symbol: 'MU', bid: '890.74', ask: '893.59' } }
     ]
     snapshot(messages.flatMap((message) => mapper.map(message, localTimestamp)))
+  })
+
+  test('empty and omitted symbols request the same channels for every exchange and normalizer', () => {
+    const timestamp = new Date('2026-11-01T00:00:00Z')
+    for (const normalize of [
+      normalizeTrades,
+      normalizeBookChanges,
+      normalizeBookTickers,
+      normalizeDerivativeTickers,
+      normalizeOptionsSummary,
+      normalizeLiquidations
+    ]) {
+      for (const exchange of EXCHANGES) {
+        let mapper: Mapper<any, any>
+        try {
+          mapper = normalize(exchange as never, timestamp)
+        } catch (error) {
+          assert.ok(error instanceof Error && error.message.endsWith(`${exchange} not supported`))
+          continue
+        }
+        assert.deepStrictEqual(
+          mapper.getFilters([]).map((filter) => filter.channel),
+          mapper.getFilters().map((filter) => filter.channel),
+          `${exchange}: ${normalize.name}`
+        )
+      }
+    }
+  })
+
+  test('Delta India restricts derivative channels to eligible explicitly requested symbols', () => {
+    const mapper = normalizeDerivativeTickers('delta-india', new Date('2026-11-01T00:00:00Z'))
+    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126']), [{ channel: 'ticker', symbols: ['C-BTC-100000-271126'] }])
+    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126', 'btcusd']), [
+      { channel: 'ticker', symbols: ['C-BTC-100000-271126', 'BTCUSD'] },
+      { channel: 'mark_price', symbols: ['MARK:BTCUSD'] },
+      { channel: 'funding_rate', symbols: ['BTCUSD'] }
+    ])
   })
 
   test('map delta-india captured messages', () => {
@@ -12588,6 +12626,81 @@ test('map hyperliquid messages', () => {
 
   for (const message of messages) {
     const mappedMessages = mapper.map(message, new Date('2024-08-23T00:00:00.4985250Z'))
+    snapshot(mappedMessages)
+  }
+})
+
+test('map hyperliquid recent-trades snapshots and delayed live trades', () => {
+  const messages = [
+    // recent-trades snapshot sent after subscribing, its trades have different times - should emit nothing
+    {
+      localTimestamp: '2025-06-01T11:22:13.1303934Z',
+      message: {
+        channel: 'trades',
+        data: [
+          {
+            coin: '@174',
+            side: 'A',
+            px: '6.6',
+            sz: '1.0',
+            time: 1748543587420,
+            hash: '0xcd36afc8739e46cb3a190424730c4601eb00ae72a6d4694c77c60e9334773459',
+            tid: 1105490727896992
+          },
+          {
+            coin: '@174',
+            side: 'A',
+            px: '6.6',
+            sz: '4.0',
+            time: 1748544445534,
+            hash: '0x564620d6233573c59f9b042473381801cb00504ca0a839f6c37d1f208f477ecd',
+            tid: 1058101789131812
+          }
+        ]
+      }
+    },
+    // recent-trades snapshot of a single old block sent after subscribing - should emit nothing
+    {
+      localTimestamp: '2026-11-01T00:00:00.7353905Z',
+      message: {
+        channel: 'trades',
+        data: [
+          {
+            coin: '@203',
+            side: 'A',
+            px: '1.0',
+            sz: '25.0',
+            time: 1759745111900,
+            hash: '0xe65bc994da527905e7d5042cf17350020135007a755597d78a2474e7995652f0',
+            tid: 164288228201404
+          }
+        ]
+      }
+    },
+    // live trade received 13 s after its block - should be mapped
+    {
+      localTimestamp: '2025-10-01T17:26:15.0961626Z',
+      message: {
+        channel: 'trades',
+        data: [
+          {
+            coin: '@210',
+            side: 'A',
+            px: '0.9485',
+            sz: '1005.6',
+            time: 1759339562513,
+            hash: '0x0c57ee0fc4bcbfa20dd1042ca43fb80204c300f55fbfde74b020996283b0998c',
+            tid: 933466204283953
+          }
+        ]
+      }
+    }
+  ]
+
+  const mapper = createMapper('hyperliquid', new Date('2025-06-01T11:22:13.1303934Z'))
+
+  for (const { localTimestamp, message } of messages) {
+    const mappedMessages = mapper.map(message, new Date(localTimestamp))
     snapshot(mappedMessages)
   }
 })

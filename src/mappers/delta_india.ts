@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, isNullOrEmptyArray, upperCaseSymbols } from '../handy.ts'
 import type { BookChange, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
 import { type Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -106,13 +106,17 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
   }
 
   getFilters(symbols?: string[]) {
-    const uppercaseSymbols = upperCaseSymbols(symbols)
-    const markPriceSymbols = uppercaseSymbols?.filter(isDerivative).map((symbol) => `MARK:${symbol}`)
-    const perpetualSymbols = uppercaseSymbols?.filter((symbol) => !symbol.includes('-') && !symbol.includes('_'))
+    symbols = upperCaseSymbols(symbols)
+    const markPriceSymbols = symbols?.filter(isDerivative).map((symbol) => `MARK:${symbol}`) ?? []
+    const perpetualSymbols = symbols?.filter((symbol) => !symbol.includes('-') && !symbol.includes('_')) ?? []
     return [
-      { channel: 'ticker', symbols: uppercaseSymbols } as const,
-      ...(markPriceSymbols?.length === 0 ? [] : [{ channel: 'mark_price', symbols: markPriceSymbols } as const]),
-      ...(perpetualSymbols?.length === 0 ? [] : [{ channel: 'funding_rate', symbols: perpetualSymbols } as const])
+      { channel: 'ticker', symbols } as const,
+      ...(isNullOrEmptyArray(symbols) || markPriceSymbols.length > 0
+        ? [{ channel: 'mark_price', symbols: markPriceSymbols } as const]
+        : []),
+      ...(isNullOrEmptyArray(symbols) || perpetualSymbols.length > 0
+        ? [{ channel: 'funding_rate', symbols: perpetualSymbols } as const]
+        : [])
     ]
   }
 

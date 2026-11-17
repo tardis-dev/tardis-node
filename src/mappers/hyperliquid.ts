@@ -3,6 +3,8 @@ import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, mapper } from './registry.ts'
 
 const HYPERLIQUID_FAST_BOOK_SWITCH_DATE = new Date('2026-06-17T00:00:00.000Z')
+// recorded live trades arrive within seconds of their block time (at most 13 s in sampled days of 2024-2026)
+const HYPERLIQUID_MAX_LIVE_TRADE_DELAY_MS = 30 * 1000
 
 export const hyperliquidMappers = exchangeMappers({
   hyperliquid: {
@@ -38,8 +40,6 @@ function getSymbols(symbols?: string[]) {
   return
 }
 class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
-  private readonly _seenSymbols = new Set<string>()
-
   canHandle(message: HyperliquidTradeMessage) {
     return message.channel === 'trades'
   }
@@ -56,11 +56,19 @@ class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
   }
 
   *map(message: HyperliquidTradeMessage, localTimestamp: Date): IterableIterator<Trade> {
+    // A live message carries the trades of one block, which share one time. After subscribing, Hyperliquid
+    // sends the most recent trades as one message. That recent-trades snapshot is skipped: it has different
+    // trade times, or, when its trades come from one block, that block is older than any live trade.
+    const firstTradeTime = message.data[0]?.time
+    const isRecentTradesSnapshot =
+      message.data.some((hyperliquidTrade) => hyperliquidTrade.time !== firstTradeTime) ||
+      localTimestamp.valueOf() - firstTradeTime > HYPERLIQUID_MAX_LIVE_TRADE_DELAY_MS
+
+    if (isRecentTradesSnapshot) {
+      return
+    }
+
     for (const hyperliquidTrade of message.data) {
-      if (this._seenSymbols.has(hyperliquidTrade.coin) === false) {
-        this._seenSymbols.add(hyperliquidTrade.coin)
-        break
-      }
       yield {
         type: 'trade',
         symbol: hyperliquidTrade.coin.toUpperCase(),
