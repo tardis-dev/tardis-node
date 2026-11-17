@@ -283,7 +283,7 @@ describe('mappers', () => {
     snapshot(createMapper('whitebit').map(messages[11], localTimestamp))
   })
 
-  test('empty and omitted symbols request the same channels for every exchange and normalizer', () => {
+  test('empty and omitted symbols request the same replay coverage for every exchange and normalizer', () => {
     const timestamp = new Date('2026-11-01T00:00:00Z')
     for (const normalize of [
       normalizeTrades,
@@ -301,9 +301,10 @@ describe('mappers', () => {
           assert.ok(error instanceof Error && error.message.endsWith(`${exchange} not supported`))
           continue
         }
+        // undefined and [] filter symbols both mean all symbols.
         assert.deepStrictEqual(
-          mapper.getFilters([]).map((filter) => filter.channel),
-          mapper.getFilters().map((filter) => filter.channel),
+          mapper.getFilters([]).map(({ channel, symbols }) => ({ channel, symbols: symbols ?? [] })),
+          mapper.getFilters().map(({ channel, symbols }) => ({ channel, symbols: symbols ?? [] })),
           `${exchange}: ${normalize.name}`
         )
       }
