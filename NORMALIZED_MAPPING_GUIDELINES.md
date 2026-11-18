@@ -27,7 +27,7 @@ First identify where the initial book snapshot comes from:
 
 - Native snapshot plus deltas: map the exchange snapshot as `isSnapshot=true`, then map later deltas as `isSnapshot=false`.
 - Snapshot-only feed, such as a full L2 book pushed repeatedly: map each full book message as `isSnapshot=true`.
-- Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels, buffer deltas until the snapshot arrives, emit one snapshot, then emit deltas.
+- Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels and buffer deltas until the snapshot arrives. Apply the buffered deltas newer than the snapshot to its levels, removing a level when a delta sets its amount to zero. Then emit one snapshot with the snapshot message's `localTimestamp`, followed by later deltas. Do not emit buffered deltas as separate messages after the snapshot; with their own earlier `localTimestamp` they would also break monotonic output order.
 - Delta-only feed without a snapshot channel: do not mark a delta as a snapshot. Add a snapshot source first or leave the channel out of `normalizeBookChanges`.
 
 For generated or REST-backed snapshots, verify the snapshot shape against recorder output and the exchange docs. Use the deepest documented snapshot level only after checking that the snapshot version still overlaps buffered deltas and does not introduce obvious rate-limit or retry issues. Historical replay should not repeat full sequence validation already performed by recorder; keep client-side logic to the minimal alignment needed to combine the snapshot with later deltas.

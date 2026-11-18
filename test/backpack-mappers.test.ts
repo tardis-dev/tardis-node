@@ -35,18 +35,31 @@ function depth(U: number, u: number, amount = '2') {
   return { stream: 'depth.MU.US_USDC_PERP', data: { s: 'MU.US_USDC_PERP', U, u, E: timestamp + u, a: [], b: [['99', amount]] } }
 }
 
-test('Backpack aligns buffered updates without dropping their timestamps or deletion events', () => {
+test('Backpack applies buffered updates to the snapshot and removes levels updated to zero', () => {
   const mapper = normalizeBookChanges('backpack', new Date())
   const updateTimestamp = new Date('2026-10-30T14:16:14Z')
-  assert.deepEqual([...mapper.map(depth(99, 100), updateTimestamp)!], [])
-  assert.deepEqual([...mapper.map(depth(101, 103, '0'), updateTimestamp)!], [])
-  const messages = [...mapper.map(snapshot, new Date('2026-10-30T14:16:15Z'))!]
+  const snapshotTimestamp = new Date('2026-10-30T14:16:15Z')
+  assert.deepEqual([...mapper.map({ ...depth(99, 100), data: { ...depth(99, 100).data, a: [['101', '9']] } }, updateTimestamp)!], [])
+  // Recorded REST snapshots drop trailing zeros ("99") while depth keeps them ("99.00").
   assert.deepEqual(
-    messages.map((message) => message.isSnapshot),
-    [true, false]
+    [...mapper.map({ ...depth(101, 102), data: { ...depth(101, 102).data, b: [['99.00', '0.000']] } }, updateTimestamp)!],
+    []
   )
-  assert.strictEqual(messages[1].localTimestamp, updateTimestamp)
-  assert.deepEqual(messages[1].bids, [{ price: 99, amount: 0 }])
+  const asks = [
+    ['101.00', '5'],
+    ['102.00', '4']
+  ]
+  assert.deepEqual([...mapper.map({ ...depth(103, 103), data: { ...depth(103, 103).data, b: [], a: asks } }, updateTimestamp)!], [])
+  const messages = [...mapper.map(snapshot, snapshotTimestamp)!]
+  // One snapshot holds the book after the buffered updates, at the snapshot's local time.
+  assert.strictEqual(messages.length, 1)
+  assert.strictEqual(messages[0].isSnapshot, true)
+  assert.strictEqual(messages[0].localTimestamp, snapshotTimestamp)
+  assert.deepEqual(messages[0].bids, [])
+  assert.deepEqual(messages[0].asks, [
+    { price: 101, amount: 5 },
+    { price: 102, amount: 4 }
+  ])
   assert.strictEqual(messages[0].timestamp.valueOf(), Math.trunc(timestamp / 1000))
   assert.strictEqual(messages[0].timestamp.μs, 33)
   assert.deepEqual([...mapper.map(snapshot, new Date())!], [])
@@ -69,8 +82,9 @@ test('Backpack bounds pending updates and requires the snapshot to cover any dis
   }
   assert.throws(() => [...mapper.map(snapshot, new Date())!], errorMessageIncludes('does not cover discarded'))
   const messages = [...mapper.map({ ...snapshot, data: { ...snapshot.data, lastUpdateId: '2100' } }, new Date())!]
-  assert.strictEqual(messages.length, 1001)
-  assert.ok(messages.slice(1).every((message) => message.localTimestamp === localTimestamp))
+  assert.strictEqual(messages.length, 1)
+  assert.deepEqual(messages[0].bids, [{ price: 99, amount: 2 }])
+  assert.deepEqual([...mapper.map(depth(3101, 3101), localTimestamp)!].length, 1)
 })
 
 test('Backpack replay aligns against the snapshot without repeating recorder sequence validation', () => {

@@ -69,42 +69,64 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
         throw new Error(`Backpack snapshot for ${symbol} does not cover discarded buffered updates`)
       }
       bookState.sequence = Number(data.lastUpdateId)
+      // REST snapshot prices drop trailing zeros ("74.8") while depth prices keep them ("74.80"), so match levels by number.
+      const bidsByPrice = new Map(data.bids.map((level) => [Number(level[0]), level]))
+      const asksByPrice = new Map(data.asks.map((level) => [Number(level[0]), level]))
+
+      // Updates received before the snapshot are applied to it, so output starts with one current book
+      // and never goes back in local time.
+      for (const update of bookState.buffered.items()) {
+        if (this.advanceSequence(update, bookState)) {
+          this.applyLevelUpdates(bidsByPrice, update.b)
+          this.applyLevelUpdates(asksByPrice, update.a)
+        }
+      }
+
+      bookState.buffered.clear()
 
       yield {
         type: 'book_change',
         exchange: 'backpack',
         symbol: symbol.toUpperCase(),
         isSnapshot: true,
-        bids: data.bids.map(this.mapLevel),
-        asks: data.asks.map(this.mapLevel),
+        bids: [...bidsByPrice.values()].map(this.mapLevel),
+        asks: [...asksByPrice.values()].map(this.mapLevel),
         timestamp: fromMicroSecondsToDate(data.timestamp),
         localTimestamp
       }
-
-      for (const update of bookState.buffered.items()) {
-        yield* this.mapUpdate(update.data, update.localTimestamp, bookState)
-      }
-
-      bookState.buffered.clear()
     } else if (bookState.sequence === undefined) {
-      const discarded = bookState.buffered.append({ data, localTimestamp })
-      if (discarded !== undefined) bookState.discardedThrough = discarded.data.u
-    } else {
-      yield* this.mapUpdate(data, localTimestamp, bookState)
+      const discarded = bookState.buffered.append(data)
+      if (discarded !== undefined) bookState.discardedThrough = discarded.u
+    } else if (this.advanceSequence(data, bookState)) {
+      yield this.mapUpdate(data, localTimestamp)
     }
   }
 
-  private *mapUpdate(data: BackpackDepthMessage['data'], localTimestamp: Date, bookState: BackpackBookState): IterableIterator<BookChange> {
+  private advanceSequence(data: BackpackDepthMessage['data'], bookState: BackpackBookState) {
     if (data.u <= bookState.sequence!) {
-      return
+      return false
     }
 
     if (this.validateSequences && (data.U <= bookState.sequence! + 1 && data.u >= bookState.sequence! + 1) == false) {
       throw new Error(`Backpack depth sequence gap for ${data.s}: expected ${bookState.sequence! + 1}, received ${data.U}-${data.u}`)
     }
     bookState.sequence = data.u
+    return true
+  }
 
-    yield {
+  private applyLevelUpdates(levelsByPrice: Map<number, [string, string]>, updates: BackpackLevels) {
+    for (const level of updates) {
+      const price = Number(level[0])
+      if (Number(level[1]) === 0) {
+        levelsByPrice.delete(price)
+      } else {
+        levelsByPrice.set(price, level)
+      }
+    }
+  }
+
+  private mapUpdate(data: BackpackDepthMessage['data'], localTimestamp: Date): BookChange {
+    return {
       type: 'book_change',
       exchange: 'backpack',
       symbol: data.s.toUpperCase(),
@@ -230,7 +252,7 @@ class BackpackLiquidationsMapper implements Mapper<'backpack', Liquidation> {
 type BackpackBookState = {
   sequence?: number
   discardedThrough?: number
-  buffered: CircularBuffer<{ data: BackpackDepthMessage['data']; localTimestamp: Date }>
+  buffered: CircularBuffer<BackpackDepthMessage['data']>
 }
 
 type BackpackMessage<T> = {
