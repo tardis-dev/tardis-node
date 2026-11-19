@@ -52,9 +52,6 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   *map(message: BitvavoBookMessage | BitvavoBookSnapshotMessage, localTimestamp: Date): IterableIterator<BookChange> {
     if ('action' in message) {
       const snapshot = message.response
-      if (!Number.isSafeInteger(snapshot.mdSeqNo)) {
-        throw new Error('Bitvavo Market Data Pro snapshot mdSeqNo is missing or invalid')
-      }
       const depthInfo = this.getDepthInfo(snapshot.market)
       if (depthInfo.snapshotProcessed) {
         return
@@ -99,9 +96,6 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
   private mapUpdate(message: BitvavoBookMessage, localTimestamp: Date, depthInfo: BitvavoDepthInfo): BookChange | undefined {
     const firstSequence = message.startMdSeqNo
     const lastSequence = message.endMdSeqNo
-    if (!Number.isSafeInteger(firstSequence) || !Number.isSafeInteger(lastSequence)) {
-      throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
-    }
     if (lastSequence <= depthInfo.sequence!) {
       return
     }

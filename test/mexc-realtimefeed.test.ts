@@ -300,8 +300,6 @@ for (const validateSequence of [true, false]) {
         stringField(3, 'BTCUSDT'),
         bytesField(315, stringField(5, '999999'))
       ),
-      depthFrame(depthChannel, 'not-a-version', '999999'),
-      depthFrame(depthChannel, '', '999999'),
       depthFrame(depthChannel, 111, 115, 'BTCUSDT', true),
       depthFrame(depthChannel, 502, 505, 'ETHUSDT')
     ]

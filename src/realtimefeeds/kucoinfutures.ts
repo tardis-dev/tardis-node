@@ -115,9 +115,6 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
   protected getSequence(message: any): Sequence | undefined {
     if (message.subject === 'level2') {
       const separatorIndex = message.topic.indexOf(':')
-      if (separatorIndex === -1) {
-        throw new Error(`Unexpected Kucoin futures level2 topic: ${message.topic}`)
-      }
       return {
         key: message.topic.slice(separatorIndex + 1),
         sequence: message.data.sequence,

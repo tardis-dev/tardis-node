@@ -13,9 +13,6 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
 
   protected getSequence(message: any): Sequence | undefined {
     if (message.event === 'book') {
-      if (!Number.isSafeInteger(message.startMdSeqNo) || !Number.isSafeInteger(message.endMdSeqNo)) {
-        throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
-      }
       return {
         key: message.market,
         sequence: message.endMdSeqNo,

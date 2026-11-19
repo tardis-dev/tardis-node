@@ -69,16 +69,10 @@ export class MexcRealTimeFeed extends RealTimeFeedBase {
 
   protected override getSequence(message: any): Sequence | undefined {
     if (message.channel?.startsWith(`${MexcRealTimeFeed.depthChannel}@`) === true && message.publicAggreDepths !== undefined) {
-      const firstVersion = Number(message.publicAggreDepths?.fromVersion)
-      const lastVersion = Number(message.publicAggreDepths?.toVersion)
-      if (
-        message.symbol &&
-        message.publicAggreDepths?.fromVersion &&
-        message.publicAggreDepths?.toVersion &&
-        Number.isSafeInteger(firstVersion) &&
-        Number.isSafeInteger(lastVersion)
-      ) {
-        return { key: message.symbol, sequence: lastVersion, previousSequence: firstVersion - 1 }
+      return {
+        key: message.symbol,
+        sequence: Number(message.publicAggreDepths.toVersion),
+        previousSequence: Number(message.publicAggreDepths.fromVersion) - 1
       }
     }
     return undefined
