@@ -107,12 +107,10 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
 
   getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const markPriceSymbols = symbols.filter(isDerivative).map((symbol) => `MARK:${symbol}`)
-    const perpetualSymbols = symbols.filter((symbol) => !symbol.includes('-') && !symbol.includes('_'))
     return [
       { channel: 'ticker', symbols } as const,
-      ...(symbols.length === 0 || markPriceSymbols.length > 0 ? [{ channel: 'mark_price', symbols: markPriceSymbols } as const] : []),
-      ...(symbols.length === 0 || perpetualSymbols.length > 0 ? [{ channel: 'funding_rate', symbols: perpetualSymbols } as const] : [])
+      { channel: 'mark_price', symbols: symbols.map((symbol) => `MARK:${symbol}`) } as const,
+      { channel: 'funding_rate', symbols } as const
     ]
   }
 

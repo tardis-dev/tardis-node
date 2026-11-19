@@ -108,22 +108,16 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   private readonly _symbolsWithTrades = new Set<string>()
 
   canHandle(message: WhiteBitMessage) {
-    return (
-      message.method === 'premiumIndex_update' ||
-      message.method === 'futures_update' ||
-      (message.method === 'trades_update' && (message as WhiteBitTrades).params[0].endsWith('_PERP'))
-    )
+    return message.method === 'premiumIndex_update' || message.method === 'futures_update' || message.method === 'trades_update'
   }
 
   getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const perpetuals = symbols.filter((symbol) => symbol.endsWith('_PERP'))
 
     return [
       { channel: 'trades_update', symbols } as const,
-      ...(symbols.length === 0 || perpetuals.length > 0
-        ? [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const]
-        : [])
+      { channel: 'premiumIndex_update', symbols } as const,
+      { channel: 'futures_update', symbols } as const
     ]
   }
 

@@ -167,11 +167,6 @@ class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coinbase-in
   private readonly pendingTickerInfoHelper = new PendingTickerInfoHelper()
 
   canHandle(message: CoinbaseInternationalTradeMessage | CoinbaseInternationalRiskMessage | CoinbaseInternationalFundingMessage) {
-    // perps only
-    if (message.product_id === undefined || message.product_id.endsWith('-PERP') === false) {
-      return false
-    }
-
     if (message.channel === 'MATCH' && message.type === 'UPDATE') {
       return true
     }
@@ -210,6 +205,11 @@ class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coinbase-in
     message: CoinbaseInternationalTradeMessage | CoinbaseInternationalRiskMessage | CoinbaseInternationalFundingMessage,
     localTimestamp: Date
   ): IterableIterator<DerivativeTicker> {
+    // RISK, FUNDING and MATCH also carry spot products.
+    if (message.product_id === undefined || message.product_id.endsWith('-PERP') === false) {
+      return
+    }
+
     if (message.channel === 'MATCH') {
       const pendingTickerInfo = this.pendingTickerInfoHelper.getPendingTickerInfo(message.product_id, 'coinbase-international')
       pendingTickerInfo.updateLastPrice(Number(message.trade_price))

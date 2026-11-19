@@ -315,13 +315,12 @@ describe('mappers', () => {
     }
   })
 
-  test('Delta India restricts derivative channels to eligible explicitly requested symbols', () => {
+  test('Delta India derivative tickers request every symbol on each channel', () => {
     const mapper = normalizeDerivativeTickers('delta-india', new Date('2026-11-01T00:00:00Z'))
-    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126']), [{ channel: 'ticker', symbols: ['C-BTC-100000-271126'] }])
-    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126', 'btcusd']), [
-      { channel: 'ticker', symbols: ['C-BTC-100000-271126', 'BTCUSD'] },
-      { channel: 'mark_price', symbols: ['MARK:BTCUSD'] },
-      { channel: 'funding_rate', symbols: ['BTCUSD'] }
+    assert.deepStrictEqual(mapper.getFilters(['btc_inr', 'btcusd']), [
+      { channel: 'ticker', symbols: ['BTC_INR', 'BTCUSD'] },
+      { channel: 'mark_price', symbols: ['MARK:BTC_INR', 'MARK:BTCUSD'] },
+      { channel: 'funding_rate', symbols: ['BTC_INR', 'BTCUSD'] }
     ])
   })
 
