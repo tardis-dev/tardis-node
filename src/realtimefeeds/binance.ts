@@ -386,7 +386,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
 
 class BinanceDeliverySingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
   protected getSequence(message: any): Sequence | undefined {
-    if (message.data?.e === 'depthUpdate' && message.data.pu !== -1) {
+    if (message.data?.e === 'depthUpdate') {
       return {
         key: message.stream,
         sequence: message.data.u,
@@ -395,12 +395,6 @@ class BinanceDeliverySingleConnectionRealTimeFeed extends BinanceSingleConnectio
     }
 
     return undefined
-  }
-
-  protected onMessage(message: any) {
-    if (message.data?.e === 'depthUpdate' && message.data.pu === -1) {
-      throw new Error(`Binance delivery order book reinitialization required for ${message.data.s}: pu is -1`)
-    }
   }
 }
 

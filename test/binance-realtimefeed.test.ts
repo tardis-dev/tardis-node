@@ -187,17 +187,21 @@ test('Binance futures gap restarts public and market sockets and accepts the new
 })
 
 for (const validateSequence of [true, false]) {
-  test(`Binance delivery pu=-1 requires reinitialization even with validation=${validateSequence}`, { timeout: 10000 }, async () => {
+  test(`Binance delivery pu=-1 follows continuity: validation=${validateSequence}`, { timeout: 10000 }, async () => {
     const errors: Error[] = []
+    const depth = (u: number, pu: number) => ({
+      stream: 'btcusd_perp@depth@0ms',
+      data: { e: 'depthUpdate', E: 1793786400000, T: 1793786400000, s: 'BTCUSD_PERP', U: u, u, pu, b: [['100', '1']], a: [] }
+    })
+    const initial = [depth(1, -1), depth(2, 1)]
+    const gap = depth(3, -1)
+    let connections = 0
     const { server, cleanup } = await createTestWebSocketServer('binance-delivery')
     server.on('connection', (socket) => {
+      const first = connections++ === 0
       socket.on('message', (bytes) => {
         const { id } = JSON.parse(bytes.toString())
-        const update = {
-          stream: 'btcusd_perp@depth@0ms',
-          data: { e: 'depthUpdate', E: 1793786400000, T: 1793786400000, s: 'BTCUSD_PERP', U: 1, u: 1, pu: -1, b: [['100', '1']], a: [] }
-        }
-        for (const message of [{ result: null, id }, update]) socket.send(JSON.stringify(message))
+        for (const message of [{ result: null, id }, ...initial, ...(first ? [gap] : [])]) socket.send(JSON.stringify(message))
       })
     })
     const messages = stream({
@@ -209,10 +213,24 @@ for (const validateSequence of [true, false]) {
       onError: (error) => errors.push(error)
     })
     try {
-      await messages.next()
-      assert.strictEqual((await messages.next()).value, undefined)
-      assert.strictEqual(errors.length, 1)
-      assert.match(errors[0].message, /reinitialization required.*BTCUSD_PERP.*pu is -1/)
+      await messages.next() // Subscription acknowledgement.
+      for (const message of initial) assert.deepStrictEqual((await messages.next()).value?.message, message)
+      const next = (await messages.next()).value
+      if (validateSequence === false) {
+        assert.deepStrictEqual(next?.message, gap)
+        assert.deepStrictEqual(errors, [])
+      } else {
+        assert.strictEqual(next, undefined)
+        assert.strictEqual(errors.length, 1)
+        assert.ok(errors[0] instanceof SequenceGapError)
+        assert.strictEqual(errors[0].key, 'btcusd_perp@depth@0ms')
+        assert.strictEqual(errors[0].expectedPreviousSequence, 2)
+        assert.strictEqual(errors[0].previousSequence, -1)
+        assert.strictEqual(errors[0].sequence, 3)
+        await messages.next() // Reconnected subscription acknowledgement.
+        assert.deepStrictEqual((await messages.next()).value?.message, initial[0])
+        assert.strictEqual(errors.length, 1)
+      }
     } finally {
       try {
         await messages.return?.()
