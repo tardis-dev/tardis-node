@@ -148,7 +148,7 @@ test('requests Bitvavo book snapshots over the WebSocket connection', () => {
 })
 
 for (const validateSequence of [undefined, false]) {
-  test(`Bitvavo: sequence validation ${validateSequence === false ? 'disabled' : 'default'}`, { timeout: 10000 }, async () => {
+  test(`Bitvavo ignores snapshots: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
     const book = (startMdSeqNo: number, endMdSeqNo: number) => ({
       event: 'book',
       market: 'BTC-EUR',
@@ -165,7 +165,7 @@ for (const validateSequence of [undefined, false]) {
       requestId,
       response: { market: 'BTC-EUR', nonce: 9999, mdSeqNo, bids: [['100', '1']], asks: [], timestamp: '1793786400000000000' }
     })
-    const valid = [book(101, 102), book(103, 105), snapshot(102), book(106, 106)]
+    const valid = [book(101, 102), book(103, 105), snapshot(102), snapshot(99), snapshot(200), book(106, 106), snapshot(107)]
     const recovered = [book(1, 3), snapshot(1, 2), book(4, 4)]
     const gap = book(108, 109)
     const errors: Error[] = []

@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import type { BitvavoBookMessage, BitvavoBookSnapshotMessage } from '../mappers/bitvavo.ts'
+import type { BitvavoBookMessage } from '../mappers/bitvavo.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -7,23 +7,16 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws-mdpro.bitvavo.com/v2/'
   protected readonly throttleSubscribeMS = 25
   private nextRequestId = 1
-  private readonly receivedBookUpdates = new Map<string, { firstSequenceId: number; lastSequenceId: number }>()
   private pendingAuthentication?: {
     resolve: () => void
     reject: (error: Error) => void
   }
 
-  protected getSequence(message: BitvavoBookMessage | BitvavoBookSnapshotMessage): Sequence | undefined {
+  protected getSequence(message: BitvavoBookMessage): Sequence | undefined {
     if ('event' in message && message.event === 'book') {
       if (!Number.isSafeInteger(message.startMdSeqNo) || !Number.isSafeInteger(message.endMdSeqNo)) {
         throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
       }
-      const received = this.receivedBookUpdates.get(message.market)
-      this.receivedBookUpdates.set(message.market, {
-        firstSequenceId: received?.firstSequenceId ?? message.startMdSeqNo,
-        lastSequenceId: message.endMdSeqNo
-      })
-
       return {
         key: message.market,
         sequence: message.endMdSeqNo,
@@ -31,30 +24,7 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
       }
     }
 
-    if ('action' in message && message.action === 'getBook') {
-      const snapshot = message.response
-      return {
-        key: snapshot.market,
-        sequence: this.resolveSnapshotSequenceId(snapshot, this.receivedBookUpdates.get(snapshot.market)),
-        previousSequence: undefined
-      }
-    }
-
     return undefined
-  }
-
-  private resolveSnapshotSequenceId(
-    snapshot: BitvavoBookSnapshotMessage['response'],
-    received: { firstSequenceId: number; lastSequenceId: number } | undefined
-  ): number {
-    if (!Number.isSafeInteger(snapshot.mdSeqNo)) {
-      throw new Error('Bitvavo Market Data Pro snapshot mdSeqNo is missing or invalid')
-    }
-    // A delayed snapshot can include a contiguous range already received on this connection.
-    if (received !== undefined && received.firstSequenceId <= snapshot.mdSeqNo + 1 && snapshot.mdSeqNo <= received.lastSequenceId) {
-      return received.lastSequenceId
-    }
-    return snapshot.mdSeqNo
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
@@ -84,7 +54,6 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected async onConnected() {
-    this.receivedBookUpdates.clear()
     const { key, secret } = this.getCredentials()
     const timestamp = Date.now()
     const signature = crypto.createHmac('sha256', secret).update(`${timestamp}GET/v2/websocket`).digest('hex')
