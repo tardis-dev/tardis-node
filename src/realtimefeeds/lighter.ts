@@ -1,5 +1,4 @@
 import { Filter } from '../types.ts'
-import type { LighterMessage } from '../mappers/lighter.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 abstract class RealTimeFeed extends RealTimeFeedBase {
@@ -28,7 +27,7 @@ abstract class RealTimeFeed extends RealTimeFeedBase {
     return message.error !== undefined
   }
 
-  protected getSequence(message: LighterMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.type === 'subscribed/order_book' || message.type === 'update/order_book') {
       return {
         key: message.channel,

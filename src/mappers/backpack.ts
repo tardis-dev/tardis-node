@@ -239,7 +239,7 @@ type BackpackBookState = {
   buffered: CircularBuffer<{ data: BackpackDepthMessage['data']; localTimestamp: Date }>
 }
 
-export type BackpackMessage<T> = {
+type BackpackMessage<T> = {
   stream: string
   data: T
 }
@@ -253,7 +253,7 @@ type BackpackTradeMessage = BackpackMessage<{
   T: number
 }>
 
-export type BackpackDepthMessage = BackpackMessage<{
+type BackpackDepthMessage = BackpackMessage<{
   s: string
   U: number
   u: number

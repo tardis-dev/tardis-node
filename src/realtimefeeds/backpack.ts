@@ -1,6 +1,6 @@
 import { EXCHANGE_CHANNELS_INFO } from '../consts.ts'
 import { batch, getJSON } from '../handy.ts'
-import type { BackpackDepthMessage, BackpackMessage, BackpackSnapshotMessage } from '../mappers/backpack.ts'
+import type { BackpackSnapshotMessage } from '../mappers/backpack.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -38,9 +38,9 @@ export class BackpackSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected readonly httpURL: string = 'https://api.backpack.exchange'
   private readonly channels = new Set<string>(EXCHANGE_CHANNELS_INFO.backpack)
 
-  protected getSequence(message: BackpackMessage<unknown>): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.stream?.startsWith('depth.')) {
-      const { s, U, u } = message.data as BackpackDepthMessage['data']
+      const { s, U, u } = message.data
       return { key: s, sequence: u, previousSequence: U - 1 }
     }
     return undefined

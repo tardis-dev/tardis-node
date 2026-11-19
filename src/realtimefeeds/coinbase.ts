@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import type { CoinbaseMessage } from '../mappers/coinbase.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -23,10 +22,9 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
     ticker: ['ticker']
   }
 
-  protected getSequence(message: CoinbaseMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (
       this._fullChannelSymbols.has(message.product_id) === false ||
-      !('sequence' in message) ||
       message.sequence === undefined ||
       !this.shouldValidateSequenceFor(message.type)
     ) {
@@ -40,7 +38,7 @@ export class CoinbaseRealTimeFeed extends RealTimeFeedBase {
     }
   }
 
-  private shouldValidateSequenceFor(type: CoinbaseMessage['type']): boolean {
+  private shouldValidateSequenceFor(type: string): boolean {
     return (
       type !== 'ticker' &&
       type !== 'l2update' &&

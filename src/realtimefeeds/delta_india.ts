@@ -1,5 +1,4 @@
 import { optimizeFilters, wait } from '../handy.ts'
-import type { DeltaIndiaMessage } from '../mappers/delta_india.ts'
 import type { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -95,7 +94,7 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
     )
   }
 
-  protected getSequence(message: DeltaIndiaMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.type === 'ob_updates') {
       if (message.action === 'snapshot') {
         return { key: message.sy, sequence: message.seq, previousSequence: undefined }

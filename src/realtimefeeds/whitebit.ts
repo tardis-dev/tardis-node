@@ -2,7 +2,6 @@ import { Writable } from 'stream'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { batch, getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
-import type { WhiteBitMessage } from '../mappers/whitebit.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
@@ -112,7 +111,8 @@ export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
     return message.error !== undefined && message.error !== null
   }
 
-  protected getSequence({ method, params }: WhiteBitMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
+    const { method, params } = message
     if (method === 'depth_update') {
       const [isSnapshot, book, symbol] = params
       if (book.update_id === undefined || (!isSnapshot && book.past_update_id === undefined)) {

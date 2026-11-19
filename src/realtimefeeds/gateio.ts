@@ -1,4 +1,3 @@
-import type { GateIOMessage } from '../mappers/gateio.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -6,8 +5,8 @@ export class GateIORealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://api.gateio.ws/ws/v4/'
   protected httpURL = 'https://api.gateio.ws/api/v4'
 
-  protected getSequence(message: GateIOMessage): Sequence | undefined {
-    if ('channel' in message && message.channel === 'spot.obu' && message.event === 'update') {
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.channel === 'spot.obu' && message.event === 'update') {
       return {
         key: message.result.s.split('.')[1],
         sequence: message.result.u,

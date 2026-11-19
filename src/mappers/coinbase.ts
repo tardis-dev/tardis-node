@@ -197,20 +197,8 @@ const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
   }
 }
 
-export type CoinbaseMessage = CoinbaseBaseMessage | CoinbaseSequenceMessage
-
-type CoinbaseBaseMessage = {
-  type: string
-  product_id: string
-}
-
-type CoinbaseSequenceMessage = CoinbaseBaseMessage & {
-  sequence: number
-}
-
 type CoinbaseTrade = {
   type: 'match'
-  sequence: number
   trade_id: number
   time: string
   product_id: string

@@ -271,8 +271,6 @@ class KucoinBookTickerMapper implements Mapper<'kucoin', BookTicker> {
   }
 }
 
-export type KucoinMessage = KucoinTickerMessage | KucoinTradeMessage | KucoinLevel2SnapshotMessage | KucoinLevel2UpdateMessage
-
 type KucoinTickerMessage = {
   type: 'message'
   topic: '/market/ticker:ADA-USDT'

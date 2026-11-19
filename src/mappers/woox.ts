@@ -632,7 +632,7 @@ type WooxV3LocalDepthInfo = {
 
 type WooxV3BookLevel = [string, string]
 
-export type WooxV3OrderbookupdateMessage = {
+type WooxV3OrderbookupdateMessage = {
   topic: string
   ts: number
   data: {

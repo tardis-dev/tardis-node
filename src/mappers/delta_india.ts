@@ -231,25 +231,23 @@ function isOption(symbol: string) {
   return symbol.startsWith('C-') || symbol.startsWith('P-')
 }
 
-export type DeltaIndiaMessage = DeltaIndiaTrade | DeltaIndiaDepth | DeltaIndiaBBO | DeltaIndiaPrice | DeltaIndiaFunding | DeltaIndiaTicker
-
 type DeltaIndiaChannel =
   'trades' | 'ob_updates' | 'ob_l1' | 'ticker' | 'mark_price' | 'funding_rate' | 'spot_price' | 'product_updates' | 'system_status'
 
-type DeltaIndiaBaseMessage<Channel extends DeltaIndiaChannel> = {
+type DeltaIndiaMessage<Channel extends DeltaIndiaChannel> = {
   type: Channel
   sy: string
   ts: number
 }
 
-type DeltaIndiaTrade = DeltaIndiaBaseMessage<'trades'> & {
+type DeltaIndiaTrade = DeltaIndiaMessage<'trades'> & {
   p: string
   s: number
   r: 't' | 'm'
   t: number
 }
 
-type DeltaIndiaDepth = DeltaIndiaBaseMessage<'ob_updates'> & {
+type DeltaIndiaDepth = DeltaIndiaMessage<'ob_updates'> & {
   action: 'snapshot' | 'update'
   a: DeltaIndiaBookLevel[]
   b: DeltaIndiaBookLevel[]
@@ -258,7 +256,7 @@ type DeltaIndiaDepth = DeltaIndiaBaseMessage<'ob_updates'> & {
 }
 type DeltaIndiaBookLevel = [price: string, size: string]
 
-type DeltaIndiaBBO = DeltaIndiaBaseMessage<'ob_l1'> & {
+type DeltaIndiaBBO = DeltaIndiaMessage<'ob_l1'> & {
   ap: string | null
   as: string | null
   bp: string | null
@@ -266,17 +264,17 @@ type DeltaIndiaBBO = DeltaIndiaBaseMessage<'ob_l1'> & {
   lts: number
 }
 
-type DeltaIndiaPrice = DeltaIndiaBaseMessage<'mark_price'> & {
+type DeltaIndiaPrice = DeltaIndiaMessage<'mark_price'> & {
   p: string
 }
 
-type DeltaIndiaFunding = DeltaIndiaBaseMessage<'funding_rate'> & {
+type DeltaIndiaFunding = DeltaIndiaMessage<'funding_rate'> & {
   fr: number
   fi: number
   nfr: number
 }
 
-type DeltaIndiaTicker = DeltaIndiaBaseMessage<'ticker'> & {
+type DeltaIndiaTicker = DeltaIndiaMessage<'ticker'> & {
   sp: string | null
   d: DeltaIndiaTickerContract[]
 }

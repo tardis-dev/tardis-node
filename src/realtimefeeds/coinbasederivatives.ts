@@ -1,6 +1,5 @@
 import { Writable } from 'node:stream'
 import { getJSON, optimizeFilters } from '../handy.ts'
-import type { CoinbaseDerivativesMessage } from '../mappers/coinbasederivatives.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -58,8 +57,8 @@ class CoinbaseDerivativesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     return message.type === 'error'
   }
 
-  protected getSequence(message: CoinbaseDerivativesMessage): Sequence | undefined {
-    if ('sequence_num' in message) {
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.sequence_num !== undefined) {
       return {
         key: 'connection',
         sequence: message.sequence_num,

@@ -228,8 +228,6 @@ export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
   }
 }
 
-export type MexcMessage = MexcControlMessage | MexcTradeMessage | MexcDepthSnapshotMessage | MexcDepthUpdateMessage | MexcBookTickerMessage
-
 type MexcControlMessage = {
   channel?: undefined
   id?: number

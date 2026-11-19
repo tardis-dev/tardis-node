@@ -368,7 +368,7 @@ type DeribitTradesMessage = DeribitMessage & {
 
 type DeribitBookLevel = ['new' | 'change' | 'delete', number, number]
 
-export type DeribitBookMessage = DeribitMessage & {
+type DeribitBookMessage = DeribitMessage & {
   params: {
     data: {
       timestamp: number

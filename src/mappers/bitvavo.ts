@@ -213,7 +213,7 @@ type BitvavoTradeMessage = {
   side: 'buy' | 'sell'
 }
 
-export type BitvavoBookMessage = {
+type BitvavoBookMessage = {
   event: 'book'
   market: string
   nonce?: number
@@ -224,7 +224,7 @@ export type BitvavoBookMessage = {
   endMdSeqNo: number
 }
 
-export type BitvavoBookSnapshotMessage = {
+type BitvavoBookSnapshotMessage = {
   action: 'getBook'
   requestId: number
   response: {

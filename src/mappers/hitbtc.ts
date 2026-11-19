@@ -90,13 +90,11 @@ const hitBtcBookChangeMapper: Mapper<'hitbtc', BookChange> = {
   }
 }
 
-export type HitBtcMessage = HitBtcTradesMessage | HitBtcBookMessage
-
-type HitBtcBaseMessage = {
+type HitBtcMessage = {
   method?: string
 }
 
-type HitBtcTradesMessage = HitBtcBaseMessage & {
+type HitBtcTradesMessage = HitBtcMessage & {
   method: 'updateTrades'
   params: {
     data: {
@@ -115,13 +113,12 @@ type HitBtcBookLevel = {
   size: string
 }
 
-type HitBtcBookMessage = HitBtcBaseMessage & {
+type HitBtcBookMessage = HitBtcMessage & {
   method: 'snapshotOrderbook' | 'updateOrderbook'
   params: {
     ask: HitBtcBookLevel[]
     bid: HitBtcBookLevel[]
     symbol: string
     timestamp: string
-    sequence: number
   }
 }

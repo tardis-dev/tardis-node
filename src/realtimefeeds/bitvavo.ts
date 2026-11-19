@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import type { BitvavoBookMessage } from '../mappers/bitvavo.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -12,8 +11,8 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
     reject: (error: Error) => void
   }
 
-  protected getSequence(message: BitvavoBookMessage): Sequence | undefined {
-    if ('event' in message && message.event === 'book') {
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.event === 'book') {
       if (!Number.isSafeInteger(message.startMdSeqNo) || !Number.isSafeInteger(message.endMdSeqNo)) {
         throw new Error('Bitvavo Market Data Pro startMdSeqNo or endMdSeqNo is missing or invalid')
       }

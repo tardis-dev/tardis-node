@@ -1,6 +1,5 @@
 import { Writable } from 'stream'
 import { getJSON, getRandomString, ONE_SEC_IN_MS, postJSON, wait } from '../handy.ts'
-import type { KucoinFuturesMessage } from '../mappers/kucoinfutures.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -113,7 +112,7 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
     return message.type === 'error'
   }
 
-  protected getSequence(message: KucoinFuturesMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.subject === 'level2') {
       const separatorIndex = message.topic.indexOf(':')
       if (separatorIndex === -1) {

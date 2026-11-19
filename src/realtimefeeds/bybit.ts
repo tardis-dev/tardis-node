@@ -1,5 +1,4 @@
 import { batch } from '../handy.ts'
-import type { BybitV5OrderBookMessage } from '../mappers/bybit.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -51,7 +50,8 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
 abstract class BybitSingleConnectionRealTimeDataFeed extends RealTimeFeedBase {
   protected abstract readonly wssURL: string
 
-  protected getSequence({ topic, type, data }: BybitV5OrderBookMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
+    const { topic, type, data } = message
     if (topic?.startsWith('orderbook.')) {
       const full = topic.startsWith('orderbook.full.')
       if (full && type !== 'delta') {

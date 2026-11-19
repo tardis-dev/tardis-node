@@ -1,11 +1,11 @@
 import { Filter } from '../types.ts'
-import type { PoloniexV2BookMessage } from '../mappers/poloniex.ts'
 import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class PoloniexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.poloniex.com/ws/public'
 
-  protected getSequence({ channel, action, data }: PoloniexV2BookMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
+    const { channel, action, data } = message
     if (channel === 'book_lv2' && (action === 'snapshot' || action === 'update')) {
       return {
         key: data[0].symbol,

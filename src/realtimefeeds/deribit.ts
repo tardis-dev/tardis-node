@@ -1,6 +1,5 @@
 import { wait } from '../handy.ts'
 import { Filter, FilterForExchange } from '../types.ts'
-import type { DeribitBookMessage } from '../mappers/deribit.ts'
 import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
@@ -49,8 +48,9 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
     return message.error !== undefined
   }
 
-  protected getSequence({ params: { channel, data } = {} as DeribitBookMessage['params'] }: DeribitBookMessage): Sequence | undefined {
-    if (channel?.startsWith('book.')) {
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.params?.channel?.startsWith('book.')) {
+      const { data } = message.params
       return {
         key: data.instrument_name,
         sequence: data.change_id,

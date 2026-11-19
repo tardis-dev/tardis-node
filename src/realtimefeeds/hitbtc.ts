@@ -1,11 +1,10 @@
-import type { HitBtcMessage } from '../mappers/hitbtc.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class HitBtcRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://api.hitbtc.com/api/2/ws'
 
-  protected getSequence(message: HitBtcMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.method === 'snapshotOrderbook' || message.method === 'updateOrderbook') {
       return {
         key: message.params.symbol,

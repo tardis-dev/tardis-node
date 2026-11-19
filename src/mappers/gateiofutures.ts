@@ -269,15 +269,6 @@ class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', BookTic
   }
 }
 
-export type GateIOFuturesMessage =
-  | GateIOFuturesTrades
-  | GateIOFuturesOrderBookSnapshot
-  | GateIOFuturesOrderBookUpdate
-  | GateIOFuturesTicker
-  | GateIOFuturesBookTicker
-  | GateIOFuturesOrderBookV2
-  | GateIOFuturesLiquidations
-
 type GateIOFuturesTrade = {
   size: number | string
   id: number
@@ -368,8 +359,6 @@ type GateIOFuturesOrderBookV2 = {
   result: {
     s: string
     t: number
-    U?: number
-    u: number
     full?: boolean
     b?: [string, string][]
     a?: [string, string][]

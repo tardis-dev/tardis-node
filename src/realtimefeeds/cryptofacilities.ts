@@ -1,11 +1,10 @@
-import type { CryptofacilitiesMessage } from '../mappers/cryptofacilities.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class CryptofacilitiesRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://futures.kraken.com/ws/v1'
 
-  protected getSequence(message: CryptofacilitiesMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.feed === 'book' && message.event === undefined) {
       return { key: message.product_id, sequence: message.seq, previousSequence: message.seq - 1 }
     }

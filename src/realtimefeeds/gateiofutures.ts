@@ -1,4 +1,3 @@
-import type { GateIOFuturesMessage } from '../mappers/gateiofutures.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -149,25 +148,25 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     return payload
   }
 
-  protected getSequence(message: GateIOFuturesMessage): Sequence | undefined {
+  protected getSequence(message: any): Sequence | undefined {
     if (message.channel === 'futures.obu' && (message.event === 'update' || message.event === 'all')) {
       return {
         key: message.result.s,
         sequence: message.result.u,
-        previousSequence: message.result.full === true ? undefined : message.result.U! - 1
+        previousSequence: message.result.full === true ? undefined : message.result.U - 1
       }
     }
 
     return undefined
   }
 
-  protected onMessage(message: GateIOFuturesMessage) {
+  protected onMessage(message: any) {
     if (message.channel !== 'futures.obu' || (message.event !== 'update' && message.event !== 'all')) {
       return
     }
 
     const { result } = message
-    if (!Number.isSafeInteger(result.u) || (result.full !== true && (!Number.isSafeInteger(result.U) || result.u < result.U!))) {
+    if (!Number.isSafeInteger(result.u) || (result.full !== true && (!Number.isSafeInteger(result.U) || result.u < result.U))) {
       throw new Error(`Invalid Gate.io OBU sequence range for ${result.s}: U=${result.U}, u=${result.u}`)
     }
     if (result.full === true) {

@@ -1,4 +1,3 @@
-import type { GeminiMessage } from '../mappers/gemini.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
@@ -7,8 +6,8 @@ export class GeminiRealTimeFeed extends RealTimeFeedBase {
   private readonly channels = new Set(['trade', 'depth', 'bookTicker'])
   private readonly previousUpdateIds = new Map<string, number>()
 
-  protected getSequence(message: GeminiMessage): Sequence | undefined {
-    return 'e' in message && message.e === 'depthUpdate' ? this.resolveSequence(message.s, message.U, message.u) : undefined
+  protected getSequence(message: any): Sequence | undefined {
+    return message.e === 'depthUpdate' ? this.resolveSequence(message.s, message.U, message.u) : undefined
   }
 
   private resolveSequence(symbol: string, firstSequenceId: number, lastSequenceId: number): Sequence | undefined {

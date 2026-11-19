@@ -282,8 +282,7 @@ class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', Boo
   }
 }
 
-export type CryptofacilitiesMessage =
-  CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate
+type CryptofacilitiesMessage = CryptofacilitiesTrade | CryptofacilitiesTicker | CryptofacilitiesBookSnapshot | CryptofacilitiesBookUpdate
 
 type CryptofacilitiesTrade = {
   feed: 'trade'
@@ -409,7 +408,6 @@ type CryptofacilitiesBookUpdate = {
   feed: 'book'
   event: undefined
   product_id: string
-  seq: number
   side: 'buy' | 'sell'
   price: number
   qty: number
