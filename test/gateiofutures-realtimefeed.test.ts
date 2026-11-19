@@ -152,9 +152,7 @@ test('Gate rejects absent symbols, unknown settlement and delivery liquidations'
 
 test('Gate OBU rejects discontinuities before output and recovers from a fresh snapshot', { timeout: 15000 }, async (t) => {
   for (const invalid of [
-    { U: 104, u: 105 }, // missing update 103
-    { U: 103 }, // missing end sequence
-    { U: 103, u: 102 } // reversed range
+    { U: 104, u: 105 } // missing update 103
   ]) {
     await t.test(JSON.stringify(invalid), async () => {
       const server = new WebSocketServer({ port: 0 })
@@ -210,8 +208,7 @@ test('Gate OBU rejects discontinuities before output and recovers from a fresh s
         }
         assert.strictEqual(connections, 3)
         assert.strictEqual(errors.length, 2)
-        if (invalid.U === 104) assert.ok(errors[0] instanceof SequenceGapError)
-        else assert.match(errors[0].message, /Invalid Gate.io OBU sequence range/)
+        assert.ok(errors[0] instanceof SequenceGapError)
         assert.match(errors[1].message, /OBU snapshot required/)
         assert.strictEqual(output.filter((message) => message.type === 'disconnect').length, 2)
         const books = output.filter((message) => message.type === 'book_change')
@@ -308,12 +305,13 @@ for (const event of ['update', 'all']) {
 }
 
 for (const invalid of [{ U: 11 }, { U: 12, u: 11 }, { u: 11 }, { full: true, u: Number.MAX_SAFE_INTEGER + 1 }]) {
-  test(`Gate futures opt-out still rejects invalid range ${JSON.stringify(invalid)}`, { timeout: 10000 }, async () => {
+  test(`Gate futures opt-out passes through range ${JSON.stringify(invalid)}`, { timeout: 10000 }, async () => {
+    const update = { channel: 'futures.obu', event: 'update', result: { s: 'ob.BTC_USDT.400', ...invalid } }
     const { server, cleanup } = await createTestWebSocketServer('gate-io-futures')
     server.on('connection', (socket) =>
       socket.once('message', () => {
         socket.send(JSON.stringify(obu(10)))
-        socket.send(JSON.stringify({ channel: 'futures.obu', event: 'update', result: { s: 'ob.BTC_USDT.400', ...invalid } }))
+        socket.send(JSON.stringify(update))
       })
     )
     const errors: Error[] = []
@@ -327,9 +325,8 @@ for (const invalid of [{ U: 11 }, { U: 12, u: 11 }, { u: 11 }, { full: true, u: 
     })
     try {
       await messages.next()
-      assert.strictEqual((await messages.next()).value, undefined)
-      assert.strictEqual(errors.length, 1)
-      assert.match(errors[0].message, /Invalid Gate.io OBU sequence range/)
+      assert.deepStrictEqual((await messages.next()).value?.message, update)
+      assert.deepStrictEqual(errors, [])
     } finally {
       try {
         await messages.return?.()

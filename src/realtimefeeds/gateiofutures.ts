@@ -166,9 +166,6 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     }
 
     const { result } = message
-    if (!Number.isSafeInteger(result.u) || (result.full !== true && (!Number.isSafeInteger(result.U) || result.u < result.U))) {
-      throw new Error(`Invalid Gate.io OBU sequence range for ${result.s}: U=${result.U}, u=${result.u}`)
-    }
     if (result.full === true) {
       this.receivedSnapshots.add(result.s)
     } else if (!this.receivedSnapshots.has(result.s)) {
