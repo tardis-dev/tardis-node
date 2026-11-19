@@ -374,7 +374,7 @@ export type DeribitBookMessage = DeribitMessage & {
       timestamp: number
       instrument_name: string
       change_id: number
-      prev_change_id?: number | null
+      prev_change_id?: number
       bids: DeribitBookLevel[]
       asks: DeribitBookLevel[]
       type?: 'snapshot' | 'change'

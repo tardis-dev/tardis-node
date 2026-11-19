@@ -13,12 +13,10 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   }
 
   private _hasCredentials = process.env.DERIBIT_API_CLIENT_ID !== undefined && process.env.DERIBIT_API_CLIENT_SECRET !== undefined
-  private readonly _bookSequenceStates = new Map<string, { changeId: number; allowOverlap: boolean }>()
 
   protected channelsWithIntervals: FilterForExchange['deribit']['channel'][] = ['book', 'perpetual', 'trades', 'ticker']
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    this._bookSequenceStates.clear()
     const hasCredentials = this._hasCredentials
 
     const channels = filters
@@ -52,31 +50,11 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   }
 
   protected getSequence({ params: { channel, data } = {} as DeribitBookMessage['params'] }: DeribitBookMessage): Sequence | undefined {
-    return channel?.startsWith('book.') ? this.resolveSequence(data) : undefined
-  }
-
-  private resolveSequence(data: DeribitBookMessage['params']['data']): Sequence | undefined {
-    if (data.type === 'snapshot') {
-      this._bookSequenceStates.set(data.instrument_name, { changeId: data.change_id, allowOverlap: true })
+    if (channel?.startsWith('book.')) {
       return {
         key: data.instrument_name,
         sequence: data.change_id,
-        previousSequence: undefined
-      }
-    }
-    const state = this._bookSequenceStates.get(data.instrument_name)
-    if (!!state && (!state.allowOverlap || data.change_id >= state.changeId)) {
-      if (data.change_id !== state.changeId && (data.prev_change_id === undefined || data.prev_change_id === null)) {
-        throw new Error('Deribit book change is missing prev_change_id')
-      }
-      const previousChangeId = data.prev_change_id ?? state.changeId
-      const previousSequence = state.allowOverlap && previousChangeId <= state.changeId ? state.changeId : previousChangeId
-      state.allowOverlap = false
-      state.changeId = data.change_id
-      return {
-        key: data.instrument_name,
-        sequence: data.change_id,
-        previousSequence
+        previousSequence: data.type === 'snapshot' ? undefined : data.prev_change_id
       }
     }
     return undefined
