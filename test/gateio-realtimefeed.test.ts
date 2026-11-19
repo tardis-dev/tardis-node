@@ -59,7 +59,7 @@ for (const validateSequence of [true, false]) {
         assert.strictEqual(errors.length, 1)
         assert.ok(errors[0] instanceof SequenceGapError)
         assert.strictEqual(errors[0].exchange, 'gate-io')
-        assert.strictEqual(errors[0].key, 'BTC_USDT')
+        assert.strictEqual(errors[0].key, gap.result.s)
         assert.strictEqual(errors[0].expectedPreviousSequence, 502)
         assert.strictEqual(errors[0].previousSequence, 503)
         assert.strictEqual(errors[0].sequence, 505)

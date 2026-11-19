@@ -208,7 +208,7 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
       message.tick?.version !== undefined
     ) {
       return {
-        key: message.ch.split('.')[1],
+        key: message.ch,
         sequence: message.tick.version,
         previousSequence: message.tick.event === 'snapshot' ? undefined : message.tick.version - 1
       }
@@ -216,7 +216,7 @@ class HuobiMarketDataRealTimeFeed extends RealTimeFeedBase {
 
     if (message.ch?.includes('.mbp.') && message.tick?.prevSeqNum !== undefined) {
       return {
-        key: message.ch.split('.')[1],
+        key: message.ch,
         sequence: message.tick.seqNum,
         previousSequence: message.tick.prevSeqNum
       }

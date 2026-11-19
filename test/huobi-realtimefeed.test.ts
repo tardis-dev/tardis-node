@@ -51,7 +51,7 @@ for (const validateSequence of [true, false]) {
         assert.strictEqual(next, undefined)
         assert.strictEqual(errors.length, 1)
         assert.ok(errors[0] instanceof SequenceGapError)
-        assert.strictEqual(errors[0].key, 'btcusdt')
+        assert.strictEqual(errors[0].key, gap.ch)
         assert.strictEqual(errors[0].expectedPreviousSequence, 30)
         assert.strictEqual(errors[0].previousSequence, 40)
         assert.strictEqual(errors[0].sequence, 50)

@@ -67,7 +67,7 @@ for (const exchange of exchanges) {
             assert.strictEqual(errors.length, 1)
             assert.ok(errors[0] instanceof SequenceGapError)
             assert.strictEqual(errors[0].exchange, exchange)
-            assert.strictEqual(errors[0].key, symbol)
+            assert.strictEqual(errors[0].key, gap.ch)
             assert.strictEqual(errors[0].expectedPreviousSequence, 1)
             assert.strictEqual(errors[0].previousSequence, 2)
             assert.strictEqual(errors[0].sequence, 3)

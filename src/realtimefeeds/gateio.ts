@@ -8,7 +8,7 @@ export class GateIORealTimeFeed extends RealTimeFeedBase {
   protected getSequence(message: any): Sequence | undefined {
     if (message.channel === 'spot.obu' && message.event === 'update') {
       return {
-        key: message.result.s.split('.')[1],
+        key: message.result.s,
         sequence: message.result.u,
         previousSequence: message.result.U == null ? undefined : message.result.U - 1
       }
