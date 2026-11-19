@@ -61,7 +61,7 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
 
-When a channel subscription or REST poller needs symbols, throw `requires explicitly specified symbols` for both missing and empty `filter.symbols` instead of sending an empty list or `undefined`. Exchanges may accept an empty list and then send no data. Global channels that take no symbols subscribe without them.
+When a channel subscription or REST poller needs symbols, throw `requires explicitly specified symbols` for both missing and empty `filter.symbols` instead of sending an empty list or `undefined`. Exchanges may accept an empty list and then send no data. Global channels that take no symbols subscribe without them. If the exchange rejects a subscription that lists other instrument types, such as spot symbols on a perpetual-only channel, drop those symbols in the real-time feed, not in `getFilters()`.
 
 Register in `src/realtimefeeds/index.ts`.
 

@@ -17,7 +17,7 @@ Use this when implementing or reviewing `src/mappers/{exchange}.ts`. [ADD_NEW_EX
 `getFilters(symbols)` receives an array; `[]` requests all symbols. Every returned filter carries a `symbols` array, and `[]` there also means all symbols.
 
 - `getFilters` lists channels; it does not choose instruments. Pass the requested symbols to every channel the normalizer reads, including side channels such as mark price, index, funding or open interest. Do not filter requested symbols by instrument type: a spot symbol on a perpetual-only channel yields no data.
-- Transform symbols only when a channel uses a different identifier, such as an underlying index or a `MARK:` prefix. Use `symbols.map(...)` so `[]` stays `[]`.
+- Transform symbols only when a channel publishes the same instrument under a different identifier, such as an underlying index or a `MARK:` prefix. Use `symbols.map(...)` so `[]` stays `[]`.
 - For a global channel that takes no symbols, such as Bitfinex liquidations, return `symbols: []`; the real-time feed subscribes globally.
 - `canHandle` routes messages by channel, not by symbol pattern.
 - `map` decides output. Let one channel that exists only for the relevant instruments own the emitted message, and let other channels only update cached state.
