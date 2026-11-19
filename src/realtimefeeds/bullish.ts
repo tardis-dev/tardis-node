@@ -1,6 +1,5 @@
-import type { BullishLevel2Message } from '../mappers/bullish.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
 
 type BullishSubscriptionTarget = {
   readonly topic: string
@@ -90,19 +89,6 @@ export class BullishSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected async getWebSocketUrl() {
     const baseURL = await super.getWebSocketUrl()
     return `${baseURL.replace(/\/$/, '')}${this.path}`
-  }
-
-  protected getSequence(message: BullishLevel2Message): Sequence | undefined {
-    if (message.dataType === 'V1TALevel2') {
-      const [first, last] = message.data.sequenceNumberRange
-      return {
-        key: message.data.symbol,
-        sequence: last,
-        previousSequence: first - 1
-      }
-    }
-
-    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
