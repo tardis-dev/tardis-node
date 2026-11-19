@@ -29,7 +29,7 @@ const cryptofacilitiesTradesMapper: Mapper<'cryptofacilities', Trade> = {
     return message.feed === 'trade' && message.event === undefined
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -64,7 +64,7 @@ const cryptofacilitiesBookChangeMapper: Mapper<'cryptofacilities', BookChange> =
     return message.event === undefined && (message.feed === 'book' || message.feed === 'book_snapshot')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -126,7 +126,7 @@ class CryptofacilitiesDerivativeTickerMapper implements Mapper<'cryptofacilities
     return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_') === false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -171,7 +171,7 @@ class CryptofacilitiesOptionsSummaryMapper implements Mapper<'cryptofacilities',
     return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'ticker',
@@ -226,7 +226,7 @@ const cryptofacilitiesLiquidationsMapper: Mapper<'cryptofacilities', Liquidation
     return message.feed === 'trade' && message.event === undefined && message.type === 'liquidation'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -258,7 +258,7 @@ class CryptofacilitiesBookTickerMapper implements Mapper<'cryptofacilities', Boo
     return message.feed === 'ticker' && message.event === undefined && message.product_id.startsWith('OF_') === false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'ticker',

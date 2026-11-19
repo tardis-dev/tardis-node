@@ -10,7 +10,7 @@ export class OkexSpreadsTradesMapper implements Mapper<'okex-spreads', Trade> {
     return message.arg.channel === 'sprd-public-trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -54,7 +54,7 @@ export class OkexSpreadsBookChangeMapper implements Mapper<'okex-spreads', BookC
     return message.arg.channel === 'sprd-books5'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -95,7 +95,7 @@ export class OkexSpreadsBookTickerMapper implements Mapper<'okex-spreads', BookT
     return message.arg.channel === 'sprd-bbo-tbt'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

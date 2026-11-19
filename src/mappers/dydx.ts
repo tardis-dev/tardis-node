@@ -16,7 +16,7 @@ class DydxTradesMapper implements Mapper<'dydx', Trade> {
     return message.channel === 'v3_trades' && message.type === 'channel_data'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -52,7 +52,7 @@ class DydxBookChangeMapper implements Mapper<'dydx', BookChange> {
     return message.channel === 'v3_orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -164,7 +164,7 @@ class DydxDerivativeTickerMapper implements Mapper<'dydx', DerivativeTicker> {
     return message.channel === 'v3_markets' || (message.channel === 'v3_trades' && message.type === 'channel_data')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

@@ -328,8 +328,8 @@ test('WhiteBIT derivative filters retain spot trades and cache the latest execut
     { channel: 'premiumIndex_update', symbols: ['BTC_PERP'] },
     { channel: 'futures_update', symbols: ['BTC_PERP'] }
   ])
-  assert.deepStrictEqual(mapper.getFilters(), [
-    { channel: 'trades_update', symbols: undefined },
+  assert.deepStrictEqual(mapper.getFilters([]), [
+    { channel: 'trades_update', symbols: [] },
     { channel: 'premiumIndex_update', symbols: [] },
     { channel: 'futures_update', symbols: [] }
   ])

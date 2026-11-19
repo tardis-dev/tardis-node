@@ -20,7 +20,7 @@ class PolymarketBookChangeMapper implements Mapper<'polymarket', BookChange> {
     return isPolymarketClobPriceChangeMessage(message) || isPolymarketClobBookMessage(message)
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       { channel: 'book' as const, symbols },
       { channel: 'price_change' as const, symbols }
@@ -90,7 +90,7 @@ class PolymarketTradesMapper implements Mapper<'polymarket', Trade> {
     return message.event_type === 'last_trade_price'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'last_trade_price' as const, symbols }]
   }
 
@@ -114,7 +114,7 @@ class PolymarketBookTickerMapper implements Mapper<'polymarket', BookTicker> {
     return message.event_type === 'best_bid_ask'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'best_bid_ask' as const, symbols }]
   }
 

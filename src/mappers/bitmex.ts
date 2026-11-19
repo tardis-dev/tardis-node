@@ -20,7 +20,7 @@ const bitmexTradesMapper: Mapper<'bitmex', Trade> = {
     return message.table === 'trade' && message.action === 'insert'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -57,7 +57,7 @@ class BitmexBookChangeMapper implements Mapper<'bitmex', BookChange> {
     return message.table === 'orderBookL2'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -176,7 +176,7 @@ class BitmexDerivativeTickerMapper implements Mapper<'bitmex', DerivativeTicker>
     return message.table === 'instrument'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -226,7 +226,7 @@ const bitmexLiquidationsMapper: Mapper<'bitmex', Liquidation> = {
     return message.table === 'liquidation' && message.action === 'insert'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -261,7 +261,7 @@ const bitmexBookTickerMapper: Mapper<'bitmex', BookTicker> = {
     return message.table === 'quote' && message.action === 'insert'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

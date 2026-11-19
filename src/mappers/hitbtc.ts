@@ -17,7 +17,7 @@ const hitBtcTradesMapper: Mapper<'hitbtc', Trade> = {
     return message.method !== undefined && message.method === 'updateTrades'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -60,7 +60,7 @@ const hitBtcBookChangeMapper: Mapper<'hitbtc', BookChange> = {
     return message.method === 'snapshotOrderbook' || message.method === 'updateOrderbook'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

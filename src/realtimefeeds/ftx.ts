@@ -17,11 +17,9 @@ abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
 
     const instrumentInfoFilters = filters.filter((f) => f.channel === 'instrument')
     if (instrumentInfoFilters.length > 0) {
-      const instruments = instrumentInfoFilters.flatMap((s) => s.symbols!)
+      const instruments = instrumentInfoFilters.flatMap((s) => s.symbols ?? [])
 
-      if (instruments.length > 0) {
-        yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments, onError)
-      }
+      yield new FTXInstrumentInfoClient(exchange, this.httpURL, instruments, onError)
     }
   }
 }
@@ -84,6 +82,10 @@ class FTXInstrumentInfoClient extends PoolingClientBase {
   }
 
   protected async poolDataToStream(outputStream: Writable) {
+    if (this._instruments.length === 0) {
+      throw new Error('FTXRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+    }
+
     for (const instruments of batch(this._instruments, 10)) {
       await Promise.allSettled(
         instruments.map(async (instrument) => {

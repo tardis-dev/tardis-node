@@ -23,7 +23,7 @@ class BullishTradesMapper implements Mapper<'bullish', Trade> {
     return message.dataType === 'V1TAAnonymousTradeUpdate' && message.type === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'V1TAAnonymousTradeUpdate' as const,
@@ -64,7 +64,7 @@ class BullishBookChangeMapper implements Mapper<'bullish', BookChange> {
     return message.dataType === 'V1TALevel2'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'V1TALevel2' as const,
@@ -104,7 +104,7 @@ class BullishBookTickerMapper implements Mapper<'bullish', BookTicker> {
     return message.dataType === 'V1TALevel1' && (message.type === 'snapshot' || message.type === 'update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'V1TALevel1' as const,
@@ -147,7 +147,7 @@ class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicke
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'V1TATickerResponse' as const,
@@ -155,7 +155,7 @@ class BullishDerivativeTickerMapper implements Mapper<'bullish', DerivativeTicke
       },
       {
         channel: 'V1TAIndexPrice' as const,
-        symbols: symbols === undefined ? undefined : [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
+        symbols: [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
       }
     ]
   }
@@ -208,7 +208,7 @@ class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'V1TATickerResponse' as const,
@@ -216,7 +216,7 @@ class BullishOptionSummaryMapper implements Mapper<'bullish', OptionSummary> {
       },
       {
         channel: 'V1TAIndexPrice' as const,
-        symbols: symbols === undefined ? undefined : [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
+        symbols: [...new Set(symbols.map((symbol) => symbol.split('-')[0]))]
       }
     ]
   }

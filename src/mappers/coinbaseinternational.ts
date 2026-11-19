@@ -17,7 +17,7 @@ const coinbaseInternationalTradesMapper: Mapper<'coinbase-international', Trade>
     return message.channel === 'MATCH' && message.type === 'UPDATE'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -73,7 +73,7 @@ class CoinbaseInternationalBookChangMapper implements Mapper<'coinbase-internati
     return message.channel === 'LEVEL2' && (message.type === 'SNAPSHOT' || message.type === 'UPDATE')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -131,7 +131,7 @@ const coinbaseInternationalBookTickerMapper: Mapper<'coinbase-international', Bo
     return message.channel === 'LEVEL1' && (message.type === 'SNAPSHOT' || message.type === 'UPDATE')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -187,7 +187,7 @@ class CoinbaseInternationalDerivativeTickerMapper implements Mapper<'coinbase-in
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

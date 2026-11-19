@@ -39,7 +39,7 @@ class LighterTradesMapper<T extends LighterExchange> implements Mapper<T, Trade>
     return message.type === 'update/trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'trade' as const,
@@ -72,7 +72,7 @@ class LighterLiquidationMapper<T extends LighterExchange> implements Mapper<T, L
     return message.type === 'update/trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'trade' as const,
@@ -113,7 +113,7 @@ class LighterBookChangeMapper<T extends LighterExchange> implements Mapper<T, Bo
     return message.type === 'subscribed/order_book' || message.type === 'update/order_book'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'order_book' as const,
@@ -153,7 +153,7 @@ class LighterBookTickerMapper<T extends LighterExchange> implements Mapper<T, Bo
     return message.type === 'update/ticker' || message.type === 'subscribed/ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'ticker' as const,
@@ -189,7 +189,7 @@ class LighterDerivativeTickerMapper<T extends LighterExchange> implements Mapper
     return message.type === 'update/market_stats' || message.type === 'subscribed/market_stats'
   }
 
-  getFilters(_symbols?: string[]) {
+  getFilters(_symbols: string[] = []) {
     return [
       {
         channel: 'market_stats' as const,

@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import { assert } from './assertions.ts'
-import { parseμs } from '../dist/handy.js'
+import { getFilters, parseμs } from '../dist/handy.js'
 
 test('parses microseconds from supported exchange timestamp formats', () => {
   assert.strictEqual(parseμs('2019-06-01T00:03:03.123878Z'), 878)
@@ -40,4 +40,18 @@ test('preserves variable-width ISO fractions through microsecond precision', () 
       assert.strictEqual(parsed.μs, microseconds, input)
     }
   }
+})
+
+test('mapper requests receive arrays for omitted, empty and explicit symbols', () => {
+  const mapper = {
+    canHandle: () => true,
+    *map() {},
+    getFilters(symbols: string[] = ['unexpected-default']) {
+      return [{ channel: 'trade' as const, symbols: symbols.map((symbol) => symbol) }]
+    }
+  }
+  assert.deepEqual(getFilters<'backpack'>([mapper]), [{ channel: 'trade', symbols: [] }])
+  assert.deepEqual(getFilters<'backpack'>([mapper], undefined), [{ channel: 'trade', symbols: [] }])
+  assert.deepEqual(getFilters<'backpack'>([mapper], []), [{ channel: 'trade', symbols: [] }])
+  assert.deepEqual(getFilters<'backpack'>([mapper], ['kBONK_USDC_PERP']), [{ channel: 'trade', symbols: ['kBONK_USDC_PERP'] }])
 })

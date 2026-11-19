@@ -8,7 +8,7 @@ export class BybitSpotTradesMapper implements Mapper<'bybit-spot', Trade> {
     return message.topic === 'trade' && message.data !== undefined
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -42,7 +42,7 @@ export class BybitSpotBookChangeMapper implements Mapper<'bybit-spot', BookChang
     return message.topic === 'depth' && message.data !== undefined
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -77,7 +77,7 @@ export class BybitSpotBookTickerMapper implements Mapper<'bybit-spot', BookTicke
     return message.topic === 'bookTicker' && message.data !== undefined
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {

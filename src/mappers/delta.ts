@@ -35,7 +35,7 @@ class DeltaTradesMapper implements Mapper<'delta', Trade> {
     return message.type === (this._useV2Channels ? 'all_trades' : 'recent_trade')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -89,7 +89,7 @@ class DeltaBookChangeMapper implements Mapper<'delta', BookChange> {
     return message.type === 'l2_orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     if (this._useL2UpdatesChannel) {
@@ -156,7 +156,7 @@ class DeltaDerivativeTickerMapper implements Mapper<'delta', DerivativeTicker> {
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -212,7 +212,7 @@ class DeltaBookTickerMapper implements Mapper<'delta', BookTicker> {
     return message.type === 'l1_orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

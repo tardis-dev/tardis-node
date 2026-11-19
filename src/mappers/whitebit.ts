@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, isNullOrEmptyArray, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -17,7 +17,7 @@ class WhiteBitTradesMapper implements Mapper<'whitebit', Trade> {
     return message.method === 'trades_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trades_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -50,7 +50,7 @@ class WhiteBitBookChangeMapper implements Mapper<'whitebit', BookChange> {
     return message.method === 'depth_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'depth_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -82,7 +82,7 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
     return message.method === 'bookTicker_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -115,13 +115,13 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const perpetuals = symbols?.filter((symbol) => symbol.endsWith('_PERP')) ?? []
+    const perpetuals = symbols.filter((symbol) => symbol.endsWith('_PERP'))
 
     return [
       { channel: 'trades_update', symbols } as const,
-      ...(isNullOrEmptyArray(symbols) || perpetuals.length > 0
+      ...(symbols.length === 0 || perpetuals.length > 0
         ? [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const]
         : [])
     ]

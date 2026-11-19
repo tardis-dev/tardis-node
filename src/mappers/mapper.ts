@@ -8,9 +8,11 @@ export type Mapper<T extends Exchange, U extends NormalizedData> = {
   /**
    * Returns the channel filters this mapper needs for the requested symbols.
    *
-   * `undefined` and `[]` both mean all symbols, in the argument and in returned filters.
-   * Mappers that narrow symbols per channel must check `isNullOrEmptyArray(symbols)` before filtering,
-   * so that an empty request is not mistaken for "no matching symbols".
+   * Replay and streaming convert omitted symbols to `[]` before calling this method.
+   * Built-in mappers default omitted or undefined inputs to `[]`, which means all symbols.
+   * Check `symbols.length` before narrowing symbols per channel: an empty request
+   * must not be mistaken for "no matching symbols". Returned filters may omit symbols
+   * when the exchange subscription requires it.
    */
   getFilters: (symbols?: string[]) => FilterForExchange[T][]
 }

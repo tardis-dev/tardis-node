@@ -269,8 +269,8 @@ const phemexTradesMapper: Mapper<'phemex', Trade> = {
     return message.type === 'incremental' && ('trades' in message || 'trades_p' in message)
   },
 
-  getFilters(symbols?: string[]) {
-    if (symbols == undefined || symbols.length === 0) {
+  getFilters(symbols: string[] = []) {
+    if (symbols.length === 0) {
       return [
         {
           channel: 'trades'
@@ -360,8 +360,8 @@ const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
     return 'book' in message || 'orderbook_p' in message
   },
 
-  getFilters(symbols?: string[]) {
-    if (symbols == undefined || symbols.length === 0) {
+  getFilters(symbols: string[] = []) {
+    if (symbols.length === 0) {
       return [
         {
           channel: 'book'
@@ -432,8 +432,8 @@ class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker>
     return 'market24h' in message || message.method === 'perp_market24h_pack_p.update'
   }
 
-  getFilters(symbols?: string[]) {
-    if (symbols == undefined || symbols.length === 0) {
+  getFilters(symbols: string[] = []) {
+    if (symbols.length === 0) {
       return [
         {
           channel: 'market24h'

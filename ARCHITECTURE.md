@@ -38,6 +38,8 @@ Worker thread pre-fetches and caches slices while the main thread processes the 
 
 Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange defines its mapper registry next to its mapper classes in `src/mappers/{exchange}.ts`; `src/mappers/index.ts` aggregates those registries for the public normalizers.
 
+Normalized replay and streaming convert omitted symbol requests to `[]` before calling mapper `getFilters()`. The public mapper parameter is optional; built-in `getFilters(symbols: string[] = [])` implementations also convert omitted or undefined inputs to `[]` for direct calls. An empty array means unrestricted symbols; exchange-specific filters may still omit symbols when their subscription protocol requires it. Equivalent unrestricted normalized replay requests use the same filter representation and cache key; cache entries previously created with omitted filter symbols remain on disk. Native replay and stream filters retain their existing behavior.
+
 Some exchanges have date-based mapper versioning through `mapper()` entries — different mapper implementations for different time periods when the exchange changed its API format.
 
 ## Key Abstractions

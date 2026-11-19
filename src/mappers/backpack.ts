@@ -1,4 +1,4 @@
-import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate, isNullOrEmptyArray } from '../handy.ts'
+import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -18,7 +18,7 @@ class BackpackTradesMapper implements Mapper<'backpack', Trade> {
     return message.stream?.startsWith('trade.') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols } as const]
   }
 
@@ -46,7 +46,7 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
     return message.stream?.startsWith('depth.') === true || message.stream?.startsWith('depthSnapshot.') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'depth', symbols } as const, { channel: 'depthSnapshot', symbols } as const]
   }
 
@@ -149,7 +149,7 @@ class BackpackBookTickerMapper implements Mapper<'backpack', BookTicker> {
   canHandle(message: BackpackMessage<unknown>) {
     return message.stream?.startsWith('bookTicker.') === true
   }
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker', symbols } as const]
   }
   *map({ data }: BackpackBookTickerMessage, localTimestamp: Date) {
@@ -171,16 +171,10 @@ class BackpackDerivativeTickerMapper implements Mapper<'backpack', DerivativeTic
   private readonly pending = new PendingTickerInfoHelper()
 
   canHandle(message: BackpackMessage<unknown>) {
-    return /^(markPrice|openInterest|ticker)\..+_PERP$/.test(message.stream)
+    return /^(markPrice|openInterest|ticker)\./.test(message.stream)
   }
 
-  getFilters(symbols?: string[]) {
-    if (!isNullOrEmptyArray(symbols)) {
-      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
-      if (symbols.length === 0) {
-        return []
-      }
-    }
+  getFilters(symbols: string[] = []) {
     return [
       { channel: 'markPrice', symbols } as const,
       { channel: 'openInterest', symbols } as const,
@@ -224,13 +218,7 @@ class BackpackLiquidationsMapper implements Mapper<'backpack', Liquidation> {
     return message.stream?.startsWith('liquidation.') === true
   }
 
-  getFilters(symbols?: string[]) {
-    if (!isNullOrEmptyArray(symbols)) {
-      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
-      if (symbols.length === 0) {
-        return []
-      }
-    }
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'liquidation', symbols } as const]
   }
 

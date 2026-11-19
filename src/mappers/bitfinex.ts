@@ -49,7 +49,7 @@ class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives'
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -125,7 +125,7 @@ class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivati
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -207,7 +207,7 @@ class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivatives', D
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -369,7 +369,7 @@ class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-derivati
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
