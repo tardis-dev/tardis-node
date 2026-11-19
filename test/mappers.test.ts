@@ -304,6 +304,9 @@ describe('mappers', () => {
         }
         const filters = mapper.getFilters([])
         assert.ok(filters.length > 0, `${exchange}: ${normalize.name}`)
+        for (const filter of filters) {
+          assert.ok(Array.isArray(filter.symbols), `${exchange}: ${normalize.name} ${filter.channel} symbols`)
+        }
         assert.deepStrictEqual(mapper.getFilters(), filters, `${exchange}: ${normalize.name}`)
         assert.deepStrictEqual(mapper.getFilters(undefined), filters, `${exchange}: ${normalize.name}`)
         assert.deepStrictEqual(getFilters([mapper]), filters, `${exchange}: ${normalize.name}`)

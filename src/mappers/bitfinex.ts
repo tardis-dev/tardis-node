@@ -292,11 +292,7 @@ class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liqui
 
   getFilters() {
     // liquidations channel is global, not per symbol
-    return [
-      {
-        channel: 'liquidations'
-      } as const
-    ]
+    return [{ channel: 'liquidations' as const, symbols: [] }]
   }
 
   *map(message: BitfinexLiquidation, localTimestamp: Date) {

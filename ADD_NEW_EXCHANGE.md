@@ -40,7 +40,7 @@ Mappers to implement depend on what the exchange provides: trades, book changes,
 Mapper decisions to make explicit:
 
 - **Symbols** — `availableSymbols[].id` from the Exchanges API is the case-sensitive public symbol used in native replay filters and real-time subscriptions. Normalized output uses the uppercase canonical instrument ID. Keep any subscription conversion explicit.
-- **Filters** — implement `getFilters()` for each mapper to request the channels needed by that normalizer in `replayNormalized()` and `streamNormalized()`. Return only channels defined for that exchange in `src/consts.ts`.
+- **Filters** — implement `getFilters()` for each mapper to request the channels needed by that normalizer in `replayNormalized()` and `streamNormalized()`. Return only channels defined for that exchange in `src/consts.ts`. Follow the [filter rules](NORMALIZED_MAPPING_GUIDELINES.md#filters) for `getFilters()`, `canHandle()` and which channel emits output.
 - **Message roles** — map snapshots, deltas, trades, ticker updates, status messages, and acknowledgements according to the exchange contract, not the channel name alone.
 - **Generated snapshots** — when `normalizeBookChanges()` needs a generated or REST-backed snapshot, prove the snapshot can synchronize with buffered deltas in both real-time and replay paths.
 - **Partial feeds** — when a normalized output is built from multiple partial messages, document which message owns the output timestamp, which messages only update cached state, and any partial message intentionally chosen as an output source.
@@ -60,6 +60,8 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - WebSocket URL
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
+
+When a channel subscription or REST poller needs symbols, throw `requires explicitly specified symbols` for both missing and empty `filter.symbols` instead of sending an empty list or `undefined`. Exchanges may accept an empty list and then send no data. Global channels that take no symbols subscribe without them.
 
 Register in `src/realtimefeeds/index.ts`.
 

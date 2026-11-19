@@ -273,10 +273,12 @@ const phemexTradesMapper: Mapper<'phemex', Trade> = {
     if (symbols.length === 0) {
       return [
         {
-          channel: 'trades'
+          channel: 'trades',
+          symbols
         } as const,
         {
-          channel: 'trades_p'
+          channel: 'trades_p',
+          symbols
         } as const
       ]
     }
@@ -364,10 +366,12 @@ const phemexBookChangeMapper: Mapper<'phemex', BookChange> = {
     if (symbols.length === 0) {
       return [
         {
-          channel: 'book'
+          channel: 'book',
+          symbols
         } as const,
         {
-          channel: 'orderbook_p'
+          channel: 'orderbook_p',
+          symbols
         } as const
       ]
     }
@@ -436,10 +440,12 @@ class PhemexDerivativeTickerMapper implements Mapper<'phemex', DerivativeTicker>
     if (symbols.length === 0) {
       return [
         {
-          channel: 'market24h'
+          channel: 'market24h',
+          symbols
         } as const,
         {
-          channel: 'perp_market24h_pack_p'
+          channel: 'perp_market24h_pack_p',
+          symbols
         } as const
       ]
     }

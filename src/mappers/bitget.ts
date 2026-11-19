@@ -344,12 +344,7 @@ class BitgetV3LiquidationsMapper implements Mapper<'bitget-futures', Liquidation
   }
 
   getFilters() {
-    return [
-      {
-        channel: 'liquidation',
-        symbols: undefined
-      } as const
-    ]
+    return [{ channel: 'liquidation' as const, symbols: [] }]
   }
 
   *map(message: BitgetV3LiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {
