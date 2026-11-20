@@ -60,7 +60,7 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - WebSocket URL
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
-- `getSequence` when the exchange sends sequence numbers, following the recorder's `GetSequenceInfo` for the same exchange (same messages, key and previous/current fields)
+- `getSequence` when the exchange documents a continuity rule for incremental messages. Use the documented previous/current fields and an unparsed channel or symbol key. Independent full-book snapshots do not need continuity checks.
 
 Register in `src/realtimefeeds/index.ts`.
 
