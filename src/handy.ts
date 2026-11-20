@@ -171,7 +171,7 @@ export async function* normalizeMessages(
   }
 }
 
-export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols?: string[]) {
+export function getFilters<T extends Exchange>(mappers: Mapper<T, any>[], symbols: string[] = []) {
   const filters = mappers.flatMap((mapper) => mapper.getFilters(symbols))
 
   const deduplicatedFilters = filters.reduce(
@@ -1104,15 +1104,8 @@ export function asNonZeroNumberOrUndefined(val: string | number | undefined | nu
   return Number.isFinite(asNumber) && asNumber !== 0 ? asNumber : undefined
 }
 
-export function isNullOrEmptyArray(array: readonly unknown[] | null | undefined) {
-  return !array?.length
-}
-
-export function upperCaseSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((s) => s.toUpperCase())
-  }
-  return
+export function upperCaseSymbols(symbols: string[]) {
+  return symbols.map((s) => s.toUpperCase())
 }
 
 export function createNormalizedSymbolFilter(symbols: string[] | undefined, filters: Filter<any>[]) {
@@ -1137,11 +1130,8 @@ export function createNormalizedSymbolFilter(symbols: string[] | undefined, filt
   return (symbol: string) => allowedSymbols.has(symbol)
 }
 
-export function lowerCaseSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((s) => s.toLowerCase())
-  }
-  return
+export function lowerCaseSymbols(symbols: string[]) {
+  return symbols.map((s) => s.toLowerCase())
 }
 
 export const fromMicroSecondsToDate = (micros: number) => {

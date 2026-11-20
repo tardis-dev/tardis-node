@@ -15,7 +15,7 @@ class UpbitTradesMapper implements Mapper<'upbit', Trade> {
     return message.type === 'trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -46,7 +46,7 @@ class UpbitBookChangeMapper implements Mapper<'upbit', BookChange> {
     return message.type === 'orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

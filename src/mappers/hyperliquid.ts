@@ -33,18 +33,15 @@ function getApiSymbolId(symbol: string) {
 
   return symbol
 }
-function getSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map(getApiSymbolId)
-  }
-  return
+function getSymbols(symbols: string[]) {
+  return symbols.map(getApiSymbolId)
 }
 class HyperliquidTradesMapper implements Mapper<'hyperliquid', Trade> {
   canHandle(message: HyperliquidTradeMessage) {
     return message.channel === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = getSymbols(symbols)
 
     return [
@@ -101,7 +98,7 @@ class HyperliquidBookChangeMapper implements Mapper<'hyperliquid', BookChange> {
     return this.filterChannel === 'fastBook' ? isFastBook : message.channel === 'l2Book' && isFastBook === false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = getSymbols(symbols)
 
     return [
@@ -131,7 +128,7 @@ class HyperliquidBookTickerMapper implements Mapper<'hyperliquid', BookTicker> {
     return message.channel === 'bbo'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = getSymbols(symbols)
 
     return [
@@ -170,7 +167,7 @@ class HyperliquidDerivativeTickerMapper implements Mapper<'hyperliquid', Derivat
     return message.channel === 'activeAssetCtx'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = getSymbols(symbols)
 
     return [

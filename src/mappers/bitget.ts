@@ -48,7 +48,7 @@ class BitgetTradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade> {
     return message.arg?.channel === 'trade' && message.action === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -89,7 +89,7 @@ class BitgetBookChangeMapper implements Mapper<'bitget' | 'bitget-futures', Book
     return message.arg?.channel === 'books15' && message.action === 'snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -123,7 +123,7 @@ class BitgetBookTickerMapper implements Mapper<'bitget' | 'bitget-futures', Book
     return message.arg?.channel === 'books1' && message.action === 'snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -162,7 +162,7 @@ class BitgetDerivativeTickerMapper implements Mapper<'bitget-futures', Derivativ
     return message.arg?.channel === 'ticker' && message.action === 'snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'ticker',
@@ -201,7 +201,7 @@ class BitgetV3TradesMapper implements Mapper<'bitget' | 'bitget-futures', Trade>
     return message.arg?.topic === 'publicTrade' && message.action === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -236,7 +236,7 @@ class BitgetV3BookChangeMapper implements Mapper<'bitget' | 'bitget-futures', Bo
     return message.arg?.topic === 'books' && (message.action === 'snapshot' || message.action === 'update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -270,7 +270,7 @@ class BitgetV3BookTickerMapper implements Mapper<'bitget' | 'bitget-futures', Bo
     return message.arg?.topic === 'books1' && message.action === 'snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -305,7 +305,7 @@ class BitgetV3DerivativeTickerMapper implements Mapper<'bitget-futures', Derivat
     return message.arg?.topic === 'ticker' && (message.action === 'snapshot' || message.action === 'update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -344,12 +344,7 @@ class BitgetV3LiquidationsMapper implements Mapper<'bitget-futures', Liquidation
   }
 
   getFilters() {
-    return [
-      {
-        channel: 'liquidation',
-        symbols: undefined
-      } as const
-    ]
+    return [{ channel: 'liquidation' as const, symbols: [] }]
   }
 
   *map(message: BitgetV3LiquidationMessage, localTimestamp: Date): IterableIterator<Liquidation> {

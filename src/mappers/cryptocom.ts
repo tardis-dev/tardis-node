@@ -18,7 +18,7 @@ class CryptoComTradesMapper implements Mapper<'crypto-com', Trade> {
     return message.result !== undefined && message.result.channel === 'trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -57,7 +57,7 @@ class CryptoComBookChangeMapper implements Mapper<'crypto-com', BookChange> {
     return message.result !== undefined && message.result.channel.startsWith('book')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -99,7 +99,7 @@ class CryptoComBookTickerMapper implements Mapper<'crypto-com', BookTicker> {
     return message.result !== undefined && message.result.channel === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -161,13 +161,10 @@ class CryptoComDerivativeTickerMapper implements Mapper<'crypto-com', Derivative
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
-    let indexes: string[] = []
-    if (symbols !== undefined) {
-      indexes = [...new Set(symbols.map((s) => `${s.split('-')[0]}-INDEX`))]
-    }
+    const indexes = [...new Set(symbols.map((s) => `${s.split('-')[0]}-INDEX`))]
     const filters = [
       {
         channel: 'ticker',

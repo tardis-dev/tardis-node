@@ -22,7 +22,7 @@ const bitstampTradesMapper: Mapper<'bitstamp', Trade> = {
     return message.channel.startsWith('live_trades') && message.event === 'trade'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -70,7 +70,7 @@ class BitstampDerivativeTickerMapper implements Mapper<'bitstamp', DerivativeTic
     return message.event === 'trade' && message.channel.startsWith('live_trades_') && message.channel.endsWith('-perp')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
     return [
       { channel: 'funding_rate', symbols } as const,
@@ -115,7 +115,7 @@ class BitstampBookChangeMapper implements Mapper<'bitstamp', BookChange> {
     return message.channel.startsWith('diff_order_book') && (message.event === 'data' || message.event === 'snapshot')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [

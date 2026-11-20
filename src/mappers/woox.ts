@@ -30,7 +30,7 @@ const wooxTradesMapper: Mapper<'woo-x', Trade> = {
     return message.topic !== undefined && message.topic.endsWith('@trade')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -67,7 +67,7 @@ const wooxV3TradesMapper: Mapper<'woo-x', Trade> = {
     return message.topic !== undefined && message.topic.startsWith('trade@')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -112,7 +112,7 @@ class WooxBookChangeMapper implements Mapper<'woo-x', BookChange> {
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -222,7 +222,7 @@ class WooxV3BookChangeMapper implements Mapper<'woo-x', BookChange> {
     return message.topic.startsWith('orderbookupdate@')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -350,9 +350,8 @@ class WooxDerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> {
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const spotSymbols = symbols !== undefined ? symbols.map((s) => s.replace('PERP_', 'SPOT_')) : []
     return [
       {
         channel: 'trade',
@@ -372,7 +371,7 @@ class WooxDerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> {
       },
       {
         channel: 'indexprice',
-        symbols: spotSymbols
+        symbols: symbols.map((s) => s.replace('PERP_', 'SPOT_'))
       }
     ]
   }
@@ -437,10 +436,8 @@ class WooxV3DerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> 
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const spotSymbols = symbols !== undefined ? symbols.map((s) => s.replace('PERP_', 'SPOT_')) : []
-
     return [
       {
         channel: 'trade',
@@ -460,7 +457,7 @@ class WooxV3DerivativeTickerMapper implements Mapper<'woo-x', DerivativeTicker> 
       },
       {
         channel: 'indexprice',
-        symbols: spotSymbols
+        symbols: symbols.map((s) => s.replace('PERP_', 'SPOT_'))
       }
     ]
   }
@@ -515,7 +512,7 @@ class WooxBookTickerMapper implements Mapper<'woo-x', BookTicker> {
     return message.topic !== undefined && message.topic.endsWith('@bbo')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -551,7 +548,7 @@ class WooxV3BookTickerMapper implements Mapper<'woo-x', BookTicker> {
     return message.topic !== undefined && message.topic.startsWith('bbo@')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

@@ -15,7 +15,7 @@ const bitnomialTradesMapper: Mapper<'bitnomial', Trade> = {
     return message.type === 'trade'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -53,7 +53,7 @@ class BitnomialBookChangMapper implements Mapper<'bitnomial', BookChange> {
     return message.type === 'book' || message.type === 'level'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

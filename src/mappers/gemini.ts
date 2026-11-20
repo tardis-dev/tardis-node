@@ -21,7 +21,7 @@ const geminiTradesMapper: Mapper<'gemini', Trade> = {
     return message.type === 'trade'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -59,7 +59,7 @@ const geminiBookChangeMapper: Mapper<'gemini', BookChange> = {
     return message.type === 'l2_updates'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -109,7 +109,7 @@ class GeminiV3TradesMapper implements Mapper<'gemini', Trade> {
     return 't' in message
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -135,7 +135,7 @@ class GeminiV3BookChangeMapper implements Mapper<'gemini', BookChange> {
     return message.e === 'depthUpdate'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'depth', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -170,7 +170,7 @@ class GeminiV3BookTickerMapper implements Mapper<'gemini', BookTicker> {
     return 'B' in message
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker', symbols: upperCaseSymbols(symbols) } as const]
   }
 

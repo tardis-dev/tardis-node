@@ -16,24 +16,20 @@ export const deribitMappers = exchangeMappers({
   }
 })
 
-function deribitCasing(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((symbol) => {
-      if (symbol.endsWith('-C') || symbol.endsWith('-P')) {
-        const parts = symbol.split('-')
-        if (parts[2] !== undefined && parts[2].toUpperCase().includes('D')) {
-          parts[2] = parts[2].replace('D', 'd')
-          return parts.join('-')
-        } else {
-          return symbol.toUpperCase()
-        }
+function deribitCasing(symbols: string[]) {
+  return symbols.map((symbol) => {
+    if (symbol.endsWith('-C') || symbol.endsWith('-P')) {
+      const parts = symbol.split('-')
+      if (parts[2] !== undefined && parts[2].toUpperCase().includes('D')) {
+        parts[2] = parts[2].replace('D', 'd')
+        return parts.join('-')
       } else {
         return symbol.toUpperCase()
       }
-    })
-  }
-
-  return
+    } else {
+      return symbol.toUpperCase()
+    }
+  })
 }
 
 const deribitTradesMapper: Mapper<'deribit', Trade> = {
@@ -46,7 +42,7 @@ const deribitTradesMapper: Mapper<'deribit', Trade> = {
     return channel.startsWith('trades')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [
@@ -93,7 +89,7 @@ class DeribitBookChangeMapper implements Mapper<'deribit', BookChange> {
     return channel.startsWith('book')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [
@@ -147,7 +143,7 @@ class DeribitDerivativeTickerMapper implements Mapper<'deribit', DerivativeTicke
     return channel.startsWith('ticker') && (message.params.data.greeks === undefined || message.params.data.combo_state === 'active')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [
@@ -176,7 +172,7 @@ class DeribitDerivativeTickerMapper implements Mapper<'deribit', DerivativeTicke
 }
 
 class DeribitOptionSummaryMapper implements Mapper<'deribit', OptionSummary> {
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [
@@ -265,7 +261,7 @@ const deribitLiquidationsMapper: Mapper<'deribit', Liquidation> = {
     return channel.startsWith('trades')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [
@@ -313,7 +309,7 @@ const deribitBookTickerMapper: Mapper<'deribit', BookTicker> = {
     return channel.startsWith('ticker')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = deribitCasing(symbols)
 
     return [

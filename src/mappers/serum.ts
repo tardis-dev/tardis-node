@@ -28,7 +28,7 @@ class SerumTradesMapper implements Mapper<'serum' | 'star-atlas', Trade> {
     return message.type === 'trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     if (this._exchange === 'serum') {
       symbols = upperCaseSymbols(symbols)
     }
@@ -63,7 +63,7 @@ class SerumBookChangeMapper implements Mapper<'serum' | 'star-atlas', BookChange
     return message.type === 'l2snapshot' || message.type === 'l2update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     if (this._exchange === 'serum') {
       symbols = upperCaseSymbols(symbols)
     }
@@ -107,7 +107,7 @@ class SerumBookTickerMapper implements Mapper<'serum' | 'star-atlas', BookTicker
     return message.type === 'quote'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     if (this._exchange === 'serum') {
       symbols = upperCaseSymbols(symbols)
     }

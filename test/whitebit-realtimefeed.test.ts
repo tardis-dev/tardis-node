@@ -161,7 +161,7 @@ test('WhiteBIT splits spot and perpetual markets into batches without replacing 
       { channel: 'trades_update', symbols: spots.map((symbol) => symbol.toLowerCase()) },
       { channel: 'trades_update', symbols: [...perpetuals, spots[0].toLowerCase()] },
       { channel: 'bookTicker_update', symbols },
-      { channel: 'premiumIndex_update', symbols: perpetuals }
+      { channel: 'premiumIndex_update', symbols }
     ]
   })
   const consume = (async () => {
@@ -183,6 +183,14 @@ test('WhiteBIT splits spot and perpetual markets into batches without replacing 
       assert.strictEqual(new Set(connection.map(({ id }) => id)).size, connection.length)
     }
     assert.deepStrictEqual(subscribedTrades.sort(), symbols.sort())
+    assert.deepStrictEqual(
+      subscriptions
+        .flat()
+        .filter(({ method }) => method === 'premiumIndex_subscribe')
+        .flatMap(({ params }) => params)
+        .sort(),
+      [...perpetuals].sort()
+    )
     server.clients.values().next().value!.terminate()
     while (subscriptions.flat().length < 420) {
       await sleep(10)
@@ -322,18 +330,21 @@ test('WhiteBIT initializes last price from REST and gives accepted WebSocket tra
 
 test('WhiteBIT derivative filters retain spot trades and cache the latest execution in either batch order', () => {
   const mapper = normalizeDerivativeTickers('whitebit', new Date())
-  assert.deepStrictEqual(mapper.getFilters(['btc_usdt']), [{ channel: 'trades_update', symbols: ['BTC_USDT'] }])
   assert.deepStrictEqual(mapper.getFilters(['btc_usdt', 'btc_perp']), [
     { channel: 'trades_update', symbols: ['BTC_USDT', 'BTC_PERP'] },
-    { channel: 'premiumIndex_update', symbols: ['BTC_PERP'] },
-    { channel: 'futures_update', symbols: ['BTC_PERP'] }
-  ])
-  assert.deepStrictEqual(mapper.getFilters(), [
-    { channel: 'trades_update', symbols: undefined },
-    { channel: 'premiumIndex_update', symbols: [] },
-    { channel: 'futures_update', symbols: [] }
+    { channel: 'premiumIndex_update', symbols: ['BTC_USDT', 'BTC_PERP'] },
+    { channel: 'futures_update', symbols: ['BTC_USDT', 'BTC_PERP'] }
   ])
   const localTimestamp = new Date()
+  assert.deepStrictEqual(
+    [
+      ...mapper.map(
+        { method: 'trades_update', params: ['BTC_USDT', [{ id: 1, price: '1', amount: '1', type: 'buy', time: 1 }]] },
+        localTimestamp
+      )!
+    ],
+    []
+  )
   for (const ids of [
     [10, 11],
     [13, 12]
@@ -431,7 +442,13 @@ test('WhiteBIT replay decodes numeric timestamps, rounds microseconds and preser
       spotTickers.push(ticker)
     }
     assert.deepStrictEqual(spotTickers, [])
-    assert.deepStrictEqual(requestedFilters, [[{ channel: 'trades_update', symbols: ['BTC_USDT'] }]])
+    assert.deepStrictEqual(requestedFilters, [
+      [
+        { channel: 'futures_update', symbols: ['BTC_USDT'] },
+        { channel: 'premiumIndex_update', symbols: ['BTC_USDT'] },
+        { channel: 'trades_update', symbols: ['BTC_USDT'] }
+      ]
+    ])
   } finally {
     init()
     rmSync(cacheDir, { recursive: true, force: true })

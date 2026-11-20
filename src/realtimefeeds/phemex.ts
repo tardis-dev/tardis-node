@@ -22,6 +22,7 @@ export class PhemexRealTimeFeed extends RealTimeFeedBase {
       .map((filter) => {
         if (
           filter.symbols !== undefined &&
+          filter.symbols.length > 0 &&
           filter.channel !== 'market24h' &&
           filter.channel !== 'spot_market24h' &&
           filter.channel !== 'perp_market24h_pack_p'

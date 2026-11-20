@@ -16,7 +16,7 @@ const bitflyerTradesMapper: Mapper<'bitflyer', Trade> = {
     return message.params?.channel.startsWith('lightning_executions') === true
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -62,7 +62,7 @@ class BitflyerBookChangeMapper implements Mapper<'bitflyer', BookChange> {
     return message.params?.channel.startsWith('lightning_board') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -109,7 +109,7 @@ const bitflyerBookTickerMapper: Mapper<'bitflyer', BookTicker> = {
     return message.params?.channel.startsWith('lightning_ticker') === true
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

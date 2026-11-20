@@ -49,7 +49,7 @@ class BitfinexTradesMapper implements Mapper<'bitfinex' | 'bitfinex-derivatives'
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -125,7 +125,7 @@ class BitfinexBookChangeMapper implements Mapper<'bitfinex' | 'bitfinex-derivati
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -207,7 +207,7 @@ class BitfinexDerivativeTickerMapper implements Mapper<'bitfinex-derivatives', D
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -292,11 +292,7 @@ class BitfinexLiquidationsMapper implements Mapper<'bitfinex-derivatives', Liqui
 
   getFilters() {
     // liquidations channel is global, not per symbol
-    return [
-      {
-        channel: 'liquidations'
-      } as const
-    ]
+    return [{ channel: 'liquidations' as const, symbols: [] }]
   }
 
   *map(message: BitfinexLiquidation, localTimestamp: Date) {
@@ -369,7 +365,7 @@ class BitfinexBookTickerMapper implements Mapper<'bitfinex' | 'bitfinex-derivati
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

@@ -12,6 +12,18 @@ Use this when implementing or reviewing `src/mappers/{exchange}.ts`. [ADD_NEW_EX
 - For numeric parsing, follow [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md). Missing, empty, null, or non-finite optional values should normalize to `undefined`.
 - When normalized output is built from multiple partial messages, use existing state helper patterns and pick one payload type to own the output timestamp. Side-channel updates should update cached state only unless they are intentionally chosen as normalized output sources and their timestamp and field semantics are validated.
 
+## Filters
+
+`getFilters(symbols)` receives an array; `[]` requests all symbols. Every returned filter carries a `symbols` array, and `[]` there also means all symbols.
+
+- `getFilters` lists channels; it does not choose instruments. Pass the requested symbols to every channel the normalizer reads, including side channels such as mark price, index, funding or open interest. Do not filter requested symbols by instrument type: a spot symbol on a perpetual-only channel yields no data.
+- Transform symbols only when a channel publishes the same instrument under a different identifier, such as an underlying index or a `MARK:` prefix. Use `symbols.map(...)` so `[]` stays `[]`.
+- For a global channel that takes no symbols, such as Bitfinex liquidations, return `symbols: []`; the real-time feed subscribes globally.
+- `canHandle` routes messages by channel, not by symbol pattern.
+- `map` decides output. Let one channel that exists only for the relevant instruments own the emitted message, and let other channels only update cached state.
+
+Backpack derivative tickers are the reference implementation: `markPrice` emits; `ticker` and `openInterest` only update cached state.
+
 ## Type Semantics
 
 - **Trades**: `side` is liquidity taker side. `buy` means the aggressor bought; `sell` means the aggressor sold. Invert maker-side flags when needed. If a trade channel sends a recent-trades snapshot followed by updates, map only updates unless the exchange has no incremental trade variant.

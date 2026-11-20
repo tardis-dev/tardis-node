@@ -31,7 +31,7 @@ class FTXTradesMapper implements Mapper<'ftx' | 'ftx-us', Trade> {
     return message.channel === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -80,7 +80,7 @@ class FTXBookChangeMapper implements Mapper<'ftx' | 'ftx-us', BookChange> {
     return message.channel === 'orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -126,7 +126,7 @@ class FTXDerivativeTickerMapper implements Mapper<'ftx', DerivativeTicker> {
     return message.channel === 'instrument'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -181,7 +181,7 @@ class FTXLiquidationsMapper implements Mapper<'ftx', Liquidation> {
     return message.channel === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -225,7 +225,7 @@ class FTXBookTickerMapper implements Mapper<'ftx' | 'ftx-us', BookTicker> {
     return message.channel === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

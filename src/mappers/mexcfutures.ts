@@ -18,7 +18,7 @@ export class MexcFuturesTradesMapper implements Mapper<'mexc-futures', Trade> {
     return message.channel === 'push.deal'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'push.deal', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -51,7 +51,7 @@ export class MexcFuturesBookChangeMapper implements Mapper<'mexc-futures', BookC
     return message.channel === 'push.depth' || message.channel === 'push.depth.snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     const normalizedSymbols = upperCaseSymbols(symbols)
 
     return [
@@ -200,7 +200,7 @@ export class MexcFuturesDerivativeTickerMapper implements Mapper<'mexc-futures',
     return message.channel === 'push.ticker' || message.channel === 'push.funding.rate'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     const normalizedSymbols = upperCaseSymbols(symbols)
 
     return [

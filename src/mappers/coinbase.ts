@@ -18,7 +18,7 @@ const coinbaseTradesMapper: Mapper<'coinbase', Trade> = {
     return message.type === 'match'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -79,7 +79,7 @@ class CoinbaseBookChangMapper implements Mapper<'coinbase', BookChange> {
     return message.type === 'l2update' || message.type === 'snapshot'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -163,7 +163,7 @@ const coinbaseBookTickerMapper: Mapper<'coinbase', BookTicker> = {
     return message.type === 'ticker'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

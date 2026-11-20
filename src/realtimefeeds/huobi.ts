@@ -49,24 +49,24 @@ abstract class HuobiRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
     const openInterestFilters = filters.filter((f) => f.channel === 'open_interest')
 
     if (openInterestFilters.length > 0) {
-      const instruments = openInterestFilters.flatMap((s) => s.symbols!)
+      const instruments = openInterestFilters.flatMap((s) => s.symbols ?? [])
 
-      yield new HuobiOpenInterestClient(exchange, this.httpURL, instruments, this.getOpenInterestURLPath.bind(this))
+      yield new HuobiOpenInterestClient(exchange, this.httpURL, instruments, this.getOpenInterestURLPath.bind(this), onError)
     }
 
     const optionMarketIndexFilters = filters.filter((f) => f.channel === 'option_market_index')
     if (optionMarketIndexFilters.length > 0) {
-      const instruments = optionMarketIndexFilters.flatMap((s) => s.symbols!)
+      const instruments = optionMarketIndexFilters.flatMap((s) => s.symbols ?? [])
 
-      yield new HuobiOptionsMarketIndexClient(exchange, this.httpURL, instruments)
+      yield new HuobiOptionsMarketIndexClient(exchange, this.httpURL, instruments, onError)
     }
 
     const optionIndexFilters = filters.filter((f) => f.channel === 'option_index')
 
     if (optionIndexFilters.length > 0) {
-      const instruments = optionIndexFilters.flatMap((s) => s.symbols!)
+      const instruments = optionIndexFilters.flatMap((s) => s.symbols ?? [])
 
-      yield new HuobiOptionsIndexClient(exchange, this.httpURL, instruments)
+      yield new HuobiOptionsIndexClient(exchange, this.httpURL, instruments, onError)
     }
   }
 
@@ -239,12 +239,17 @@ class HuobiOpenInterestClient extends PoolingClientBase {
     exchange: string,
     private readonly _httpURL: string,
     private readonly _instruments: string[],
-    private readonly _getURLPath: (symbol: string) => string
+    private readonly _getURLPath: (symbol: string) => string,
+    onError?: (error: Error) => void
   ) {
-    super(exchange, 4)
+    super(exchange, 4, onError)
   }
 
   protected async poolDataToStream(outputStream: Writable) {
+    if (this._instruments.length === 0) {
+      throw new Error('HuobiRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+    }
+
     for (const instruments of batch(this._instruments, 10)) {
       await Promise.allSettled(
         instruments.map(async (instrument) => {
@@ -278,12 +283,17 @@ class HuobiOptionsMarketIndexClient extends PoolingClientBase {
   constructor(
     exchange: string,
     private readonly _httpURL: string,
-    private readonly _instruments: string[]
+    private readonly _instruments: string[],
+    onError?: (error: Error) => void
   ) {
-    super(exchange, 4)
+    super(exchange, 4, onError)
   }
 
   protected async poolDataToStream(outputStream: Writable) {
+    if (this._instruments.length === 0) {
+      throw new Error('HuobiRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+    }
+
     for (const instruments of batch(this._instruments, 10)) {
       await Promise.all(
         instruments.map(async (instrument) => {
@@ -317,12 +327,17 @@ class HuobiOptionsIndexClient extends PoolingClientBase {
   constructor(
     exchange: string,
     private readonly _httpURL: string,
-    private readonly _instruments: string[]
+    private readonly _instruments: string[],
+    onError?: (error: Error) => void
   ) {
-    super(exchange, 4)
+    super(exchange, 4, onError)
   }
 
   protected async poolDataToStream(outputStream: Writable) {
+    if (this._instruments.length === 0) {
+      throw new Error('HuobiRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+    }
+
     for (const instruments of batch(this._instruments, 10)) {
       await Promise.allSettled(
         instruments.map(async (instrument) => {

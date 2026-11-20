@@ -19,7 +19,7 @@ class KucoinTradesMapper implements Mapper<'kucoin', Trade> {
     return message.type === 'message' && message.topic.startsWith('/market/match')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -69,7 +69,7 @@ class KucoinBookChangeMapper implements Mapper<'kucoin', BookChange> {
     return message.type === 'message' && message.topic.startsWith('/market/level2')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -242,7 +242,7 @@ class KucoinBookTickerMapper implements Mapper<'kucoin', BookTicker> {
     return message.type === 'message' && message.topic.startsWith('/market/ticker')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {

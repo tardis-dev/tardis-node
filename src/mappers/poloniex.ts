@@ -23,7 +23,7 @@ class PoloniexV2TradesMapper implements Mapper<'poloniex', Trade> {
     return message.channel === 'trades' && message.data !== undefined && message.data.length > 0
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -62,7 +62,7 @@ class PoloniexV2BookChangeMapper implements Mapper<'poloniex', BookChange> {
     return message.channel === 'book_lv2' && message.data !== undefined && message.data.length > 0
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -110,7 +110,7 @@ class PoloniexTradesMapper implements Mapper<'poloniex', Trade> {
     return message[2].some((m) => m[0] === 't')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -186,7 +186,7 @@ class PoloniexBookChangeMapper implements Mapper<'poloniex', BookChange> {
     return message[2].some((m) => m[0] === 'i' || m[0] === 'o')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

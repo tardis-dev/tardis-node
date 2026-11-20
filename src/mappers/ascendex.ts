@@ -17,7 +17,7 @@ class AscendexTradesMapper implements Mapper<'ascendex', Trade> {
     return message.m === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -49,7 +49,7 @@ class AscendexBookChangeMapper implements Mapper<'ascendex', BookChange> {
     return message.m === 'depth-realtime' || message.m === 'depth-snapshot-realtime'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -94,7 +94,7 @@ class AscendexDerivativeTickerMapper implements Mapper<'ascendex', DerivativeTic
     return message.m === 'futures-pricing-data' || message.m === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -137,7 +137,7 @@ class AscendexBookTickerMapper implements Mapper<'ascendex', BookTicker> {
     return message.m === 'bbo'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {

@@ -18,7 +18,7 @@ const coinflexTradesMapper: Mapper<'coinflex', Trade> = {
     return message.table === 'trade'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -58,7 +58,7 @@ const coinflexBookChangeMapper: Mapper<'coinflex', BookChange> = {
     return message.table === 'futures/depth'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -92,7 +92,7 @@ class CoinflexDerivativeTickerMapper implements Mapper<'coinflex', DerivativeTic
     return message.table === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

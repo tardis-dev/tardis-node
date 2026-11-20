@@ -23,7 +23,7 @@ class GateIOFuturesOrderBookV2Mapper implements Mapper<'gate-io-futures', BookCh
     return message.channel === 'futures.obu' && (message.event === 'update' || message.event === 'all')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'obu', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -50,7 +50,7 @@ class GateIOFuturesLiquidationsMapper implements Mapper<'gate-io-futures', Liqui
     return message.channel === 'futures.public_liquidates' && message.event === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'public_liquidates', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -79,7 +79,7 @@ class GateIOFuturesTradesMapper implements Mapper<'gate-io-futures', Trade> {
     return message.channel === 'futures.trades' && message.event === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -124,7 +124,7 @@ class GateIOFuturesBookChangeMapper implements Mapper<'gate-io-futures', BookCha
     return message.channel === 'futures.order_book' && (message.event === 'all' || message.event === 'update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -183,7 +183,7 @@ class GateIOFuturesDerivativeTickerMapper implements Mapper<'gate-io-futures', D
     return message.channel === 'futures.tickers' && message.event === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -234,7 +234,7 @@ class GateIOFuturesBookTickerMapper implements Mapper<'gate-io-futures', BookTic
     return message.channel === 'futures.book_ticker' && message.event === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

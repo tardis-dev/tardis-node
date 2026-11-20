@@ -114,10 +114,8 @@ test('Backpack preserves native filter case, dotted symbols, maker-side inversio
   assert.strictEqual(quote.bidAmount, 0)
 })
 
-test('Backpack derivative output uses mark timestamps, caches zero values and excludes spot subscriptions', () => {
+test('Backpack derivative output uses mark timestamps and caches zero values', () => {
   const mapper = normalizeDerivativeTickers('backpack', new Date())
-  assert.deepEqual(mapper.getFilters(['BTC_USDC']), [])
-  assert.ok(mapper.getFilters(['BTC_USDC', 'BTC_USDC_PERP']).every((filter) => filter.symbols?.join() === 'BTC_USDC_PERP'))
   const map = (stream: string, data: object) => [...mapper.map({ stream, data: { s: 'BTC_USDC_PERP', ...data } }, new Date())!]
   assert.deepEqual(map('openInterest.BTC_USDC_PERP', { o: '0' }), [])
   assert.deepEqual(map('ticker.BTC_USDC_PERP', { c: '100', o: '90', E: timestamp + 1000 }), [])
@@ -126,4 +124,27 @@ test('Backpack derivative output uses mark timestamps, caches zero values and ex
   assert.strictEqual(ticker.fundingRate, 0)
   assert.strictEqual(ticker.lastPrice, 100)
   assert.strictEqual(ticker.timestamp.valueOf(), Math.trunc(timestamp / 1000))
+})
+
+test('Backpack preserves requested symbols for derivative and liquidation filters', () => {
+  for (const symbols of [[], ['BTC_USDC'], ['BTC_USDC', 'BTC_USDC_PERP', 'MU.US_USDC_PERP']]) {
+    assert.deepEqual(normalizeDerivativeTickers('backpack', new Date()).getFilters(symbols), [
+      { channel: 'markPrice', symbols },
+      { channel: 'openInterest', symbols },
+      { channel: 'ticker', symbols }
+    ])
+    assert.deepEqual(normalizeLiquidations('backpack', new Date()).getFilters(symbols), [{ channel: 'liquidation', symbols }])
+  }
+})
+
+test('Backpack derivative routing depends on the channel rather than the symbol suffix', () => {
+  const mapper = normalizeDerivativeTickers('backpack', new Date())
+  for (const symbol of ['BTC_USDC', 'BTC_USDC_PERP', 'MU.US_USDC_PERP', 'FUTURE_SYMBOL']) {
+    for (const channel of ['markPrice', 'openInterest', 'ticker']) {
+      assert.strictEqual(mapper.canHandle({ stream: `${channel}.${symbol}` }), true)
+    }
+  }
+  for (const stream of ['trade.BTC_USDC_PERP', 'bookTicker.BTC_USDC_PERP', 'markPriceOther.BTC_USDC_PERP', 'ticker']) {
+    assert.strictEqual(mapper.canHandle({ stream }), false)
+  }
 })
