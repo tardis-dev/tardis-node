@@ -13,13 +13,34 @@ export type RealTimeFeed = {
     exchange: Exchange,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ): RealTimeFeedIterable
 }
 
 let connectionCounter = 1
 
 export type RealTimeFeedIterable = { [Symbol.asyncIterator](): ManagedRealTimeIterator<any> }
+
+export type Sequence = {
+  key: string
+  sequence: number
+  previousSequence: number | undefined
+}
+
+export class SequenceGapError extends Error {
+  constructor(
+    readonly exchange: string,
+    readonly key: string,
+    readonly expectedPreviousSequence: number,
+    readonly previousSequence: number,
+    readonly sequence: number
+  ) {
+    var message = `${exchange} sequence gap on ${key}: expected previous sequence ${expectedPreviousSequence}, received ${previousSequence} (sequence ${sequence})`
+    super(message)
+    this.name = 'SequenceGapError'
+  }
+}
 
 type RealTimeFeedConnection = {
   id: number
@@ -53,7 +74,8 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     protected readonly _exchange: string,
     filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _onError?: (error: Error) => void
+    private readonly _onError?: (error: Error) => void,
+    private readonly _validateSequence = true
   ) {
     this._filters = optimizeFilters(filters)
     this._parseJson = getMessageParser(_exchange)
@@ -90,6 +112,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
     let retries = 0
 
     while (this._closed === false) {
+      const sequences = new Map<string, number>()
       const connectionId = connectionCounter++
       let connection: RealTimeFeedConnection | undefined
       let staleConnectionTimerId: NodeJS.Timeout | undefined
@@ -170,6 +193,22 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
           // connection could still be stale even if only heartbeats are provided without any data
           if (this.messageIsHeartbeat(messageDeserialized) === false) {
             currentConnection.receivedMessagesCount++
+          }
+
+          if (this._validateSequence) {
+            const sequence = this.getSequence(messageDeserialized)
+            if (sequence !== undefined) {
+              const previous = sequences.get(sequence.key)
+              if (
+                previous !== undefined &&
+                sequence.previousSequence !== undefined &&
+                sequence.previousSequence !== previous &&
+                sequence.sequence !== previous
+              ) {
+                throw new SequenceGapError(this._exchange, sequence.key, previous, sequence.previousSequence, sequence.sequence)
+              }
+              sequences.set(sequence.key, sequence.sequence)
+            }
           }
 
           this.onMessage(messageDeserialized)
@@ -276,6 +315,10 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
   protected async provideManualSnapshots(_filters: Filter<string>[], _shouldCancel: () => boolean) {}
 
   protected onMessage(_msg: any) {}
+
+  protected getSequence(_message: any): Sequence | undefined {
+    return undefined
+  }
 
   protected async onConnected() {}
 
@@ -464,7 +507,8 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     private readonly _exchange: string,
     private readonly _filters: Filter<string>[],
     private readonly _timeoutIntervalMS: number | undefined,
-    private readonly _onError?: (error: Error) => void
+    private readonly _onError?: (error: Error) => void,
+    private readonly _validateSequence = true
   ) {}
 
   [Symbol.asyncIterator](): ManagedRealTimeIterator<any> {
@@ -479,7 +523,10 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
 
     while (this._closeController.signal.aborted === false) {
       this._connections = mergeRealTime(
-        Array.from(this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError), untilDisconnect)
+        Array.from(
+          this._getRealTimeFeeds(this._exchange, this._filters, this._timeoutIntervalMS, this._onError, this._validateSequence),
+          untilDisconnect
+        )
       )
       let disconnect: { error?: Error; delivered?: boolean } | undefined
 
@@ -512,7 +559,8 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ): IterableIterator<RealTimeFeedIterable>
 }
 

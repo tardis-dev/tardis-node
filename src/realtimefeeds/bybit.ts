@@ -1,9 +1,15 @@
 import { batch } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('USDT') || s.includes('-') || s.endsWith('PERP')),
       [] as Filter<string>[]
@@ -15,11 +21,11 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
     )
 
     if (linearContractsFilters.length > 0) {
-      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitLinearRealTimeDataFeed(exchange, linearContractsFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     if (inverseContractsFilters.length > 0) {
-      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, onError)
+      yield new BybitInverseRealTimeDataFeed(exchange, inverseContractsFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 
@@ -43,6 +49,23 @@ export class BybitRealTimeDataFeed extends MultiConnectionRealTimeFeedBase {
 
 abstract class BybitSingleConnectionRealTimeDataFeed extends RealTimeFeedBase {
   protected abstract readonly wssURL: string
+
+  protected getSequence(message: any): Sequence | undefined {
+    const { topic, type, data } = message
+    if (topic?.startsWith('orderbook.')) {
+      const full = topic.startsWith('orderbook.full.')
+      if (full && type !== 'delta') {
+        return undefined
+      }
+      return {
+        key: full ? data.s : topic,
+        sequence: data.u,
+        previousSequence: !full && (type === 'snapshot' || data.u === 1) ? undefined : data.u - 1
+      }
+    }
+
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const args = filters

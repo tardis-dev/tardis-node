@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { getJSON, getRandomString, ONE_SEC_IN_MS, postJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 const kucoinHttpOptions = {
   timeout: 10 * 1000,
@@ -15,11 +15,17 @@ const kucoinHttpOptions = {
 export class KucoinFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
   private _httpURL = 'https://api-futures.kucoin.com/api'
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const wsFilters = filters.filter((f) => f.channel !== 'contract/details')
 
     if (wsFilters.length > 0) {
-      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, onError)
+      yield new KucoinFuturesSingleConnectionRealTimeFeed(exchange, wsFilters, this._httpURL, timeoutIntervalMS, onError, validateSequence)
     }
 
     const contractDetailsFilters = filters.filter((f) => f.channel === 'contract/details')
@@ -35,9 +41,10 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
     filters: Filter<string>[],
     private readonly _httpURL: string,
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
   protected wssURL = ''
 
@@ -103,6 +110,18 @@ export class KucoinFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase 
 
   protected messageIsError(message: any): boolean {
     return message.type === 'error'
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.subject === 'level2') {
+      const separatorIndex = message.topic.indexOf(':')
+      return {
+        key: message.topic.slice(separatorIndex + 1),
+        sequence: message.data.sequence,
+        previousSequence: message.data.sequence - 1
+      }
+    }
+    return undefined
   }
 
   protected sendCustomPing = () => {

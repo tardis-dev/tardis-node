@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const asterHttpOptions = {
@@ -37,6 +37,18 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
   ])
   protected readonly channelMappings: { [key: string]: string | undefined } = {
     [AsterRealTimeFeed.depthChannel]: this.depthStream
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequence: message.data.u,
+        previousSequence: message.data.pu
+      }
+    }
+
+    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -193,10 +205,16 @@ export class AsterRealTimeFeed extends RealTimeFeedBase {
 }
 
 export class AsterFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const webSocketFilters = filters.filter((filter) => filter.channel !== 'openInterest')
     if (webSocketFilters.length > 0) {
-      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError)
+      yield new AsterFuturesWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     const openInterestFilters = filters.filter((filter) => filter.channel === 'openInterest')

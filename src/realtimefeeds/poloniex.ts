@@ -1,8 +1,20 @@
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class PoloniexRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.poloniex.com/ws/public'
+
+  protected getSequence(message: any): Sequence | undefined {
+    const { channel, action, data } = message
+    if (channel === 'book_lv2' && (action === 'snapshot' || action === 'update')) {
+      return {
+        key: data[0].symbol,
+        sequence: data[0].id,
+        previousSequence: action === 'snapshot' ? undefined : data[0].lastId
+      }
+    }
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters.flatMap((filter) => {

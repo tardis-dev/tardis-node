@@ -1,7 +1,7 @@
 import { Writable } from 'stream'
 import { batch, getJSON, wait } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 import { getExchangeScopedNumberEnv, getRequestWeightLimit, parseRequestWeightHeader, RequestWeightLimiter } from './requestweight.ts'
 
 const binanceHttpOptions = {
@@ -52,13 +52,20 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract suffixes: { [key: string]: string }
   protected abstract depthRequestRequestWeight: number
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const wsFilters = filters.filter(
       (f) => f.channel !== 'openInterest' && f.channel !== 'recentTrades' && f.channel !== 'fundingInfo' && f.channel !== 'insuranceBalance'
     )
 
     if (wsFilters.length > 0) {
-      yield new BinanceSingleConnectionRealTimeFeed(
+      const Feed = exchange === 'binance-delivery' ? BinanceDeliverySingleConnectionRealTimeFeed : BinanceSingleConnectionRealTimeFeed
+      yield new Feed(
         exchange,
         wsFilters,
         this.wssURL,
@@ -66,7 +73,8 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -232,9 +240,22 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly _suffixes: { [key: string]: string },
     private readonly _depthRequestRequestWeight: number,
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if ((this._exchange === 'binance' || this._exchange === 'binance-us') && message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequence: message.data.u,
+        previousSequence: message.data.U - 1
+      }
+    }
+
+    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -363,6 +384,20 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   }
 }
 
+class BinanceDeliverySingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequence: message.data.u,
+        previousSequence: message.data.pu
+      }
+    }
+
+    return undefined
+  }
+}
+
 class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnectionRealTimeFeed {
   constructor(
     exchange: string,
@@ -372,7 +407,8 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
     suffixes: { [key: string]: string },
     depthRequestRequestWeight: number,
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
     super(
       exchange,
@@ -382,12 +418,25 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
       suffixes,
       depthRequestRequestWeight,
       timeoutIntervalMS,
-      onError
+      onError,
+      validateSequence
     )
   }
 
   protected async getWebSocketUrl() {
     return getBinanceFuturesWebSocketUrl(this._exchange, this._streamPath)
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.data?.e === 'depthUpdate') {
+      return {
+        key: message.stream,
+        sequence: message.data.u,
+        previousSequence: message.data.pu
+      }
+    }
+
+    return undefined
   }
 }
 
@@ -435,7 +484,13 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
 
   protected depthRequestRequestWeight = 20
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const wsFilters = filters.filter(
       (f) =>
         f.channel !== 'openInterest' &&
@@ -456,7 +511,8 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -470,7 +526,8 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.suffixes,
         this.depthRequestRequestWeight,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 

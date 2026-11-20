@@ -60,6 +60,7 @@ Create `src/realtimefeeds/{exchange}.ts`. Extend `RealTimeFeedBase` with:
 - WebSocket URL
 - Subscription message format
 - Any exchange-specific hooks (decompression, heartbeat handling, error filtering)
+- `getSequence` when the exchange documents a continuity rule for incremental messages. Use the documented previous/current fields and an unparsed channel or symbol key. Independent full-book snapshots do not need continuity checks.
 
 When a channel subscription or REST poller needs symbols, throw `requires explicitly specified symbols` for both missing and empty `filter.symbols` instead of sending an empty list or `undefined`. Exchanges may accept an empty list and then send no data. Global channels that take no symbols subscribe without them. If the exchange rejects a subscription that lists other instrument types, such as spot symbols on a perpetual-only channel, drop those symbols in the real-time feed, not in `getFilters()`.
 

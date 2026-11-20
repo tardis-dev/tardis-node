@@ -1,12 +1,24 @@
 import { getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 const ORDER_BOOK_DEPTH = 50
 
 export class WooxRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://wss.woox.io/v3/public'
   protected readonly httpURL = 'https://api.woox.io'
+
+  protected getSequence(message: any): Sequence | undefined {
+    const { topic, data } = message
+    if (topic?.startsWith('orderbookupdate@')) {
+      return {
+        key: data.s,
+        sequence: data.ts,
+        previousSequence: data.prevTs
+      }
+    }
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const symbolToTopics = new Map<string, string[]>()

@@ -1,11 +1,17 @@
 import { optimizeFilters, wait } from '../handy.ts'
 import type { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase } from './realtimefeed.ts'
+import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 const productCategories = new Set(['all', 'call_options', 'put_options', 'move_options', 'spot', 'futures', 'perpetual_futures'])
 
 export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const marketFilters: Filter<string>[] = []
     const depthFilters: Filter<string>[] = []
 
@@ -26,8 +32,12 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     }
 
     const feeds: DeltaIndiaWebSocketRealTimeFeed[] = [
-      marketFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, onError) : undefined,
-      depthFilters.length ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError) : undefined
+      marketFilters.length
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, marketFilters, timeoutIntervalMS, onError, validateSequence)
+        : undefined,
+      depthFilters.length
+        ? new DeltaIndiaWebSocketRealTimeFeed(exchange, depthFilters, timeoutIntervalMS, onError, validateSequence)
+        : undefined
     ].filter((feed) => feed !== undefined)
 
     yield* feeds
@@ -36,12 +46,12 @@ export class DeltaIndiaRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL: string = 'wss://public-socket.india.delta.exchange'
-  private readonly sequences = new Map<string, number>()
+  private readonly receivedSnapshots = new Set<string>()
   private readonly pendingSnapshots = new Set<string>()
   private retrySnapshotsAt = 0
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
-    this.sequences.clear()
+    this.receivedSnapshots.clear()
     this.pendingSnapshots.clear()
     this.retrySnapshotsAt = Date.now() + 5000
 
@@ -84,26 +94,30 @@ export class DeltaIndiaWebSocketRealTimeFeed extends RealTimeFeedBase {
     )
   }
 
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.type === 'ob_updates') {
+      if (message.action === 'snapshot') {
+        return { key: message.sy, sequence: message.seq, previousSequence: undefined }
+      }
+      if (message.action === 'update' && this.receivedSnapshots.has(message.sy)) {
+        return { key: message.sy, sequence: message.seq, previousSequence: message.seq - 1 }
+      }
+    }
+
+    return undefined
+  }
+
   protected override onMessage(message: any) {
     if (message.type !== 'ob_updates') {
       return
     }
     if (message.action === 'error') {
       const symbol = message.symbol
-      this.sequences.delete(symbol)
+      this.receivedSnapshots.delete(symbol)
       this.pendingSnapshots.add(symbol)
     } else if (message.action === 'snapshot') {
-      this.sequences.set(message.sy, message.seq)
+      this.receivedSnapshots.add(message.sy)
       this.pendingSnapshots.delete(message.sy)
-    } else if (message.action === 'update') {
-      const previous = this.sequences.get(message.sy)
-      if (previous === undefined) {
-        return
-      }
-      if (message.seq !== previous + 1) {
-        throw new Error(`Delta India order book sequence gap for ${message.sy}: ${previous} -> ${message.seq}`)
-      }
-      this.sequences.set(message.sy, message.seq)
     }
   }
 

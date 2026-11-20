@@ -1,8 +1,14 @@
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const linearContractsFilters = filters.reduce(
       this._only((s) => s.endsWith('_USDT')),
       [] as Filter<string>[]
@@ -20,7 +26,8 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         exchange,
         linearContractsFilters,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -31,7 +38,8 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         exchange,
         inverseContractsFilters,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -46,7 +54,8 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         exchange,
         usd1ContractsFilters,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
 
@@ -67,7 +76,8 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         exchange,
         deliveryContractsFilters,
         timeoutIntervalMS,
-        onError
+        onError,
+        validateSequence
       )
     }
   }
@@ -97,7 +107,7 @@ export class GateIOFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
   protected readonly extraHeaders = { 'X-Gate-Size-Decimal': '1' }
-  private readonly bookSequences = new Map<string, number>()
+  private readonly receivedSnapshots = new Set<string>()
 
   constructor(
     protected readonly wssURL: string,
@@ -105,13 +115,14 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     exchange: string,
     filters: Filter<string>[],
     timeoutIntervalMS?: number,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
-    this.bookSequences.clear()
+    this.receivedSnapshots.clear()
     const payload = filters.flatMap((filter) => {
       if (filter.channel === 'order_book' || filter.channel === 'obu') {
         return filter.symbols!.map((symbol) => {
@@ -137,20 +148,29 @@ class GateIOFuturesSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     return payload
   }
 
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.channel === 'futures.obu' && (message.event === 'update' || message.event === 'all')) {
+      return {
+        key: message.result.s,
+        sequence: message.result.u,
+        previousSequence: message.result.full === true ? undefined : message.result.U - 1
+      }
+    }
+
+    return undefined
+  }
+
   protected onMessage(message: any) {
     if (message.channel !== 'futures.obu' || (message.event !== 'update' && message.event !== 'all')) {
       return
     }
 
     const { result } = message
-    const previous = this.bookSequences.get(result.s)
-    if (
-      !Number.isSafeInteger(result.u) ||
-      (result.full !== true && (previous === undefined || result.U !== previous + 1 || result.u < result.U))
-    ) {
-      throw new Error(`Gate.io OBU sequence gap for ${result.s}: previous=${previous}, U=${result.U}, u=${result.u}`)
+    if (result.full === true) {
+      this.receivedSnapshots.add(result.s)
+    } else if (!this.receivedSnapshots.has(result.s)) {
+      throw new Error(`Gate.io OBU snapshot required for ${result.s}`)
     }
-    this.bookSequences.set(result.s, result.u)
   }
 
   protected messageIsError(message: any): boolean {

@@ -63,15 +63,22 @@ test('Backpack applies buffered updates to the snapshot and removes levels updat
   assert.strictEqual(messages[0].timestamp.valueOf(), Math.trunc(timestamp / 1000))
   assert.strictEqual(messages[0].timestamp.μs, 33)
   assert.deepEqual([...mapper.map(snapshot, new Date())!], [])
-  assert.throws(() => [...mapper.map(depth(105, 105), new Date())!], errorMessageIncludes('sequence gap'))
+  assert.strictEqual([...mapper.map(depth(105, 105), new Date())!].length, 1)
+  assert.deepEqual([...mapper.map(depth(105, 105), new Date())!], [])
 })
 
 test('Backpack quiet books initialize, keep the boundary cursor and reset with a new mapper', () => {
   const mapper = normalizeBookChanges('backpack', new Date())
   assert.strictEqual([...mapper.map(snapshot, new Date())!][0].isSnapshot, true)
   assert.deepEqual([...mapper.map(depth(100, 100), new Date())!], [])
-  assert.throws(() => [...mapper.map(depth(102, 102), new Date())!], errorMessageIncludes('sequence gap'))
+  assert.throws(() => [...mapper.map(depth(102, 102), new Date())!], errorMessageIncludes('snapshot has no overlap'))
   assert.strictEqual([...normalizeBookChanges('backpack', new Date()).map(snapshot, new Date())!][0].isSnapshot, true)
+})
+
+test('Backpack rejects a buffered first update that cannot join its snapshot', () => {
+  const mapper = normalizeBookChanges('backpack', new Date())
+  assert.deepEqual([...mapper.map(depth(102, 102), new Date())!], [])
+  assert.throws(() => [...mapper.map(snapshot, new Date())!], errorMessageIncludes('snapshot has no overlap'))
 })
 
 test('Backpack bounds pending updates and requires the snapshot to cover any discarded updates', () => {

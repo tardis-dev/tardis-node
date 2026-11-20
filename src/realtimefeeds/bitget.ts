@@ -1,10 +1,22 @@
 import { batchObjects } from '../handy.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 abstract class BitgetRealTimeFeedBase extends RealTimeFeedBase {
   protected throttleSubscribeMS = 100
   protected readonly wssURL = 'wss://ws.bitget.com/v3/ws/public'
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.arg?.topic === 'books' && message.action === 'update') {
+      return {
+        key: `${message.arg.instType}:${message.arg.topic}:${message.arg.symbol}`,
+        sequence: message.data[0].seq,
+        previousSequence: message.data[0].pseq === 0 ? undefined : message.data[0].pseq
+      }
+    }
+
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
     const argsInputs = filters.flatMap((filter) => {

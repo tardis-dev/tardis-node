@@ -249,6 +249,8 @@ for await (const { localTimestamp, message } of messages) {
 
 Bitvavo real-time streaming uses Market Data Pro and requires `BITVAVO_API_KEY` and `BITVAVO_API_SECRET` environment variables.
 
+`stream()` and `streamNormalized()` validate exchange sequence numbers by default. On a gap the message is dropped, `onError` receives a `SequenceGapError`, and the connection reconnects with fresh subscriptions and order book snapshots. Pass `validateSequence: false` to disable the check.
+
 <br/>
 
 ### Replay historical market data in exchange native data format

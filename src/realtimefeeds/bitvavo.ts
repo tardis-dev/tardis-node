@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws-mdpro.bitvavo.com/v2/'
@@ -9,6 +9,18 @@ export class BitvavoRealTimeFeed extends RealTimeFeedBase {
   private pendingAuthentication?: {
     resolve: () => void
     reject: (error: Error) => void
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.event === 'book') {
+      return {
+        key: message.market,
+        sequence: message.endMdSeqNo,
+        previousSequence: message.startMdSeqNo - 1
+      }
+    }
+
+    return undefined
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {

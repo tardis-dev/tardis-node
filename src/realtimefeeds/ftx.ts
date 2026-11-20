@@ -8,11 +8,17 @@ abstract class FTXRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract wssURL: string
   protected abstract httpURL: string
 
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     const wsFilters = filters.filter((f) => f.channel !== 'instrument')
 
     if (wsFilters.length > 0) {
-      yield new FtxSingleConnectionRealTimeFeed(exchange, wsFilters, this.wssURL, timeoutIntervalMS, onError)
+      yield new FtxSingleConnectionRealTimeFeed(exchange, wsFilters, this.wssURL, timeoutIntervalMS, onError, validateSequence)
     }
 
     const instrumentInfoFilters = filters.filter((f) => f.channel === 'instrument')
@@ -30,9 +36,10 @@ class FtxSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     filters: Filter<string>[],
     protected wssURL: string,
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {

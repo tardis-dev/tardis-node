@@ -1,5 +1,5 @@
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 abstract class RealTimeFeed extends RealTimeFeedBase {
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -25,6 +25,17 @@ abstract class RealTimeFeed extends RealTimeFeedBase {
 
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.type === 'subscribed/order_book' || message.type === 'update/order_book') {
+      return {
+        key: message.channel,
+        sequence: message.order_book.nonce,
+        previousSequence: message.type === 'update/order_book' ? message.order_book.begin_nonce : undefined
+      }
+    }
+    return undefined
   }
 }
 

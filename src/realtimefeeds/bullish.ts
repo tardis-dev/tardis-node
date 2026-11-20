@@ -45,9 +45,15 @@ function getBullishSubscriptionTarget(channel: string) {
 }
 
 export class BullishRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(exchange: string, filters: Filter<string>[], timeoutIntervalMS?: number, onError?: (error: Error) => void) {
+  protected *_getRealTimeFeeds(
+    exchange: string,
+    filters: Filter<string>[],
+    timeoutIntervalMS?: number,
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
+  ) {
     for (const [path, pathFilters] of this.groupByPath(filters)) {
-      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, onError)
+      yield new BullishSingleConnectionRealTimeFeed(exchange, path, pathFilters, timeoutIntervalMS, onError, validateSequence)
     }
   }
 
@@ -74,9 +80,10 @@ export class BullishSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly path: string,
     filters: Filter<string>[],
     timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void
+    onError?: (error: Error) => void,
+    validateSequence?: boolean
   ) {
-    super(exchange, filters, timeoutIntervalMS, onError)
+    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
   }
 
   protected async getWebSocketUrl() {

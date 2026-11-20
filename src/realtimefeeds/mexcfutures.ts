@@ -1,7 +1,7 @@
 import { CircularBuffer, getJSON, wait } from '../handy.ts'
 import type { MexcFuturesDepthSnapshotData, MexcFuturesDepthSnapshotMessage } from '../mappers/mexcfutures.ts'
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   private readonly pendingDepthSnapshotSymbols = new Set<string>()
@@ -93,6 +93,18 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
         }
       }
     }
+  }
+
+  protected override getSequence(message: any): Sequence | undefined {
+    const { data, channel, symbol } = message
+    if (channel === 'push.depth') {
+      return {
+        key: symbol,
+        sequence: data.end != null && data.end !== 0 ? data.end : data.version,
+        previousSequence: (data.begin != null && data.begin !== 0 ? data.begin : data.version) - 1
+      }
+    }
+    return undefined
   }
 
   protected override onMessage(message: any) {

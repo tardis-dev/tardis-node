@@ -1,6 +1,6 @@
 import { wait } from '../handy.ts'
 import { Filter, FilterForExchange } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
 export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
   protected get wssURL() {
@@ -46,6 +46,18 @@ export class DeribitRealTimeDataFeed extends RealTimeFeedBase {
 
   protected messageIsError(message: any): boolean {
     return message.error !== undefined
+  }
+
+  protected getSequence(message: any): Sequence | undefined {
+    if (message.params?.channel?.startsWith('book.')) {
+      const { data } = message.params
+      return {
+        key: data.instrument_name,
+        sequence: data.change_id,
+        previousSequence: data.type === 'snapshot' ? undefined : data.prev_change_id
+      }
+    }
+    return undefined
   }
 
   protected async onConnected() {

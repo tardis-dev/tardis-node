@@ -1,11 +1,38 @@
 import { Filter } from '../types.ts'
-import { RealTimeFeedBase } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
 export class GeminiRealTimeFeed extends RealTimeFeedBase {
   protected wssURL = 'wss://ws.gemini.com?snapshot=-1'
   private readonly channels = new Set(['trade', 'depth', 'bookTicker'])
+  private readonly previousUpdateIds = new Map<string, number>()
+
+  protected getSequence(message: any): Sequence | undefined {
+    return message.e === 'depthUpdate' ? this.resolveSequence(message.s, message.U, message.u) : undefined
+  }
+
+  private resolveSequence(symbol: string, firstSequenceId: number, lastSequenceId: number): Sequence | undefined {
+    const previous = this.previousUpdateIds.get(symbol)
+    if (previous === undefined) {
+      this.previousUpdateIds.set(symbol, lastSequenceId)
+      return {
+        key: symbol,
+        sequence: lastSequenceId,
+        previousSequence: undefined
+      }
+    }
+    if (previous < lastSequenceId) {
+      this.previousUpdateIds.set(symbol, lastSequenceId)
+      return {
+        key: symbol,
+        sequence: lastSequenceId,
+        previousSequence: previous + 1 >= firstSequenceId ? previous : firstSequenceId - 1
+      }
+    }
+    return undefined
+  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]): any[] {
+    this.previousUpdateIds.clear()
     const params = filters
       .flatMap((filter) => {
         if (!this.channels.has(filter.channel)) {

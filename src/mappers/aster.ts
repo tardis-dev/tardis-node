@@ -160,12 +160,6 @@ class AsterBookChangeMapper implements Mapper<'aster' | 'aster-futures', BookCha
       } else {
         throw new Error(this.getSnapshotOverlapError(depthUpdateData, lastUpdateId))
       }
-    } else if (depthUpdateData.pu !== lastUpdateId) {
-      throw new Error(
-        `Book depth update has a sequence gap, update ${JSON.stringify(
-          depthUpdateData
-        )}, lastUpdateId: ${lastUpdateId}, exchange ${this.exchange}`
-      )
     }
 
     depthContext.lastUpdateId = depthUpdateData.u

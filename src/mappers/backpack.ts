@@ -6,7 +6,7 @@ import { exchangeMappers, isRealTime } from './registry.ts'
 export const backpackMappers = exchangeMappers({
   backpack: {
     trades: () => new BackpackTradesMapper(),
-    bookChanges: (localTimestamp) => new BackpackBookChangeMapper(isRealTime(localTimestamp)),
+    bookChanges: (localTimestamp) => new BackpackBookChangeMapper({ validateSnapshotOverlap: isRealTime(localTimestamp) }),
     bookTickers: () => new BackpackBookTickerMapper(),
     derivativeTickers: () => new BackpackDerivativeTickerMapper(),
     liquidations: () => new BackpackLiquidationsMapper()
@@ -40,7 +40,7 @@ class BackpackTradesMapper implements Mapper<'backpack', Trade> {
 class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
   private readonly bookStates = new Map<string, BackpackBookState>()
 
-  constructor(private readonly validateSequences: boolean) {}
+  constructor(private readonly options: { validateSnapshotOverlap: boolean }) {}
 
   canHandle(message: BackpackMessage<unknown>) {
     return message.stream?.startsWith('depth.') === true || message.stream?.startsWith('depthSnapshot.') === true
@@ -107,8 +107,13 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
       return false
     }
 
-    if (this.validateSequences && (data.U <= bookState.sequence! + 1 && data.u >= bookState.sequence! + 1) == false) {
-      throw new Error(`Backpack depth sequence gap for ${data.s}: expected ${bookState.sequence! + 1}, received ${data.U}-${data.u}`)
+    if (!bookState.validatedFirstUpdate) {
+      if (this.options.validateSnapshotOverlap && data.U > bookState.sequence! + 1) {
+        throw new Error(
+          `Backpack book snapshot has no overlap with first update for ${data.s}: expected ${bookState.sequence! + 1}, received ${data.U}-${data.u}`
+        )
+      }
+      bookState.validatedFirstUpdate = true
     }
     bookState.sequence = data.u
     return true
@@ -239,6 +244,7 @@ class BackpackLiquidationsMapper implements Mapper<'backpack', Liquidation> {
 
 type BackpackBookState = {
   sequence?: number
+  validatedFirstUpdate?: boolean
   discardedThrough?: number
   buffered: CircularBuffer<BackpackDepthMessage['data']>
 }
