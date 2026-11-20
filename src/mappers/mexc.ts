@@ -19,7 +19,7 @@ export class MexcTradesMapper implements Mapper<'mexc', Trade> {
     return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDeals' in message
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: this.channel, symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -56,7 +56,7 @@ export class MexcBookChangeMapper implements Mapper<'mexc', BookChange> {
       : message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreDepths' in message
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     const normalizedSymbols = upperCaseSymbols(symbols)
 
     return [
@@ -209,7 +209,7 @@ export class MexcBookTickerMapper implements Mapper<'mexc', BookTicker> {
     return message.channel?.startsWith(`${this.channel}@`) === true && 'publicAggreBookTicker' in message
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: this.channel, symbols: upperCaseSymbols(symbols) } as const]
   }
 

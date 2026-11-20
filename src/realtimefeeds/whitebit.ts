@@ -14,10 +14,15 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     onError?: (error: Error) => void,
     validateSequence?: boolean
   ) {
-    filters = filters.map((filter) => ({
-      ...filter,
-      symbols: filter.symbols?.map((symbol) => symbol.toUpperCase())
-    }))
+    filters = filters.flatMap((filter) => {
+      const symbols = filter.symbols?.map((symbol) => symbol.toUpperCase())
+      if (symbols?.length && (filter.channel === 'premiumIndex_update' || filter.channel === 'futures_update')) {
+        // Perpetual-only channels: WhiteBIT rejects a premiumIndex subscription that lists any spot market.
+        const perpetuals = symbols.filter((symbol) => symbol.endsWith('_PERP'))
+        return perpetuals.length > 0 ? [{ ...filter, symbols: perpetuals }] : []
+      }
+      return [{ ...filter, symbols }]
+    })
     const webSocketFilters = filters.filter((filter) => filter.channel !== 'futures_update')
     for (const filter of webSocketFilters) {
       if (filter.symbols === undefined || filter.symbols.length === 0) {

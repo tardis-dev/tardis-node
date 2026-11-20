@@ -14,6 +14,10 @@ export class DeltaRealTimeFeed extends RealTimeFeedBase {
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     return filters.map((filter) => {
+      if (filter.channel !== 'product_updates' && filter.channel !== 'announcements' && !filter.symbols?.length) {
+        throw new Error('DeltaRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
+      }
+
       return {
         type: 'subscribe',
         payload: {

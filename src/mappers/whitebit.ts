@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, isNullOrEmptyArray, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -17,7 +17,7 @@ class WhiteBitTradesMapper implements Mapper<'whitebit', Trade> {
     return message.method === 'trades_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trades_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -50,7 +50,7 @@ class WhiteBitBookChangeMapper implements Mapper<'whitebit', BookChange> {
     return message.method === 'depth_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'depth_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -82,7 +82,7 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
     return message.method === 'bookTicker_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker_update', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -108,22 +108,16 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
   private readonly _symbolsWithTrades = new Set<string>()
 
   canHandle(message: WhiteBitMessage) {
-    return (
-      message.method === 'premiumIndex_update' ||
-      message.method === 'futures_update' ||
-      (message.method === 'trades_update' && (message as WhiteBitTrades).params[0].endsWith('_PERP'))
-    )
+    return message.method === 'premiumIndex_update' || message.method === 'futures_update' || message.method === 'trades_update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const perpetuals = symbols?.filter((symbol) => symbol.endsWith('_PERP')) ?? []
 
     return [
       { channel: 'trades_update', symbols } as const,
-      ...(isNullOrEmptyArray(symbols) || perpetuals.length > 0
-        ? [{ channel: 'premiumIndex_update', symbols: perpetuals } as const, { channel: 'futures_update', symbols: perpetuals } as const]
-        : [])
+      { channel: 'premiumIndex_update', symbols } as const,
+      { channel: 'futures_update', symbols } as const
     ]
   }
 

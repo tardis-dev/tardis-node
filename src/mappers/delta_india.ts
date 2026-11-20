@@ -1,4 +1,4 @@
-import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, isNullOrEmptyArray, upperCaseSymbols } from '../handy.ts'
+import { asNonZeroNumberOrUndefined, asNumberOrUndefined, fromMicroSecondsToDate, upperCaseSymbols } from '../handy.ts'
 import type { BookChange, BookTicker, DerivativeTicker, OptionSummary, Trade } from '../types.ts'
 import { type Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers } from './registry.ts'
@@ -18,7 +18,7 @@ class DeltaIndiaTradesMapper implements Mapper<'delta-india', Trade> {
     return message.type === 'trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trades', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -44,7 +44,7 @@ class DeltaIndiaBookChangeMapper implements Mapper<'delta-india', BookChange> {
     return message.type === 'ob_updates' && (message.action === 'snapshot' || message.action === 'update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ob_updates', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -79,7 +79,7 @@ class DeltaIndiaBookTickerMapper implements Mapper<'delta-india', BookTicker> {
     return message.type === 'ob_l1'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ob_l1', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -105,18 +105,12 @@ class DeltaIndiaDerivativeTickerMapper implements Mapper<'delta-india', Derivati
     return message.type === 'ticker' || message.type === 'mark_price' || message.type === 'funding_rate'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-    const markPriceSymbols = symbols?.filter(isDerivative).map((symbol) => `MARK:${symbol}`) ?? []
-    const perpetualSymbols = symbols?.filter((symbol) => !symbol.includes('-') && !symbol.includes('_')) ?? []
     return [
       { channel: 'ticker', symbols } as const,
-      ...(isNullOrEmptyArray(symbols) || markPriceSymbols.length > 0
-        ? [{ channel: 'mark_price', symbols: markPriceSymbols } as const]
-        : []),
-      ...(isNullOrEmptyArray(symbols) || perpetualSymbols.length > 0
-        ? [{ channel: 'funding_rate', symbols: perpetualSymbols } as const]
-        : [])
+      { channel: 'mark_price', symbols: symbols.map((symbol) => `MARK:${symbol}`) } as const,
+      { channel: 'funding_rate', symbols } as const
     ]
   }
 
@@ -169,7 +163,7 @@ class DeltaIndiaOptionSummaryMapper implements Mapper<'delta-india', OptionSumma
     return message.type === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ticker', symbols: upperCaseSymbols(symbols) } as const]
   }
 

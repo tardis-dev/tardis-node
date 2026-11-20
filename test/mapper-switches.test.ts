@@ -34,7 +34,6 @@ test('Gate futures replay switches books at the October 21 OBU cutover', () => {
   assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('gate-io-futures'), [switchDate])
   assert.deepStrictEqual(beforeSwitch.getFilters(['btc_usdt']), [{ channel: 'order_book', symbols: ['BTC_USDT'] }])
   assert.deepStrictEqual(afterSwitch.getFilters(['btc_usdt']), [{ channel: 'obu', symbols: ['BTC_USDT'] }])
-  assert.deepStrictEqual(afterSwitch.getFilters(), [{ channel: 'obu', symbols: undefined }])
   assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), true)
   assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), false)
   assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), false)

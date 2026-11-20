@@ -32,7 +32,7 @@ class GateIOV4OrderBookV2ChangeMapper implements Mapper<'gate-io', BookChange> {
     return message.channel === 'spot.obu' && message.event === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -102,7 +102,7 @@ class GateIOV4BookChangeMapper implements Mapper<'gate-io', BookChange> {
     return message.channel.endsWith('order_book_update')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -256,7 +256,7 @@ class GateIOV4BookTickerMapper implements Mapper<'gate-io', BookTicker> {
     return message.channel.endsWith('book_ticker')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -300,7 +300,7 @@ class GateIOV4TradesMapper implements Mapper<'gate-io', Trade> {
     return message.channel.endsWith('trades')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -337,7 +337,7 @@ class GateIOTradesMapper implements Mapper<'gate-io', Trade> {
     return message.method === 'trades.update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -394,7 +394,7 @@ class GateIOBookChangeMapper implements Mapper<'gate-io', BookChange> {
     return message.method === 'depth.update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

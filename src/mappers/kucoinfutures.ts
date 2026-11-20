@@ -19,7 +19,7 @@ class KucoinFuturesTradesMapper implements Mapper<'kucoin-futures', Trade> {
     return message.type === 'message' && message.topic.startsWith('/contractMarket/execution')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -64,7 +64,7 @@ class KucoinFuturesBookChangeMapper implements Mapper<'kucoin-futures', BookChan
     return message.type === 'message' && message.topic.startsWith('/contractMarket/level2')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -249,7 +249,7 @@ class KucoinFuturesBookTickerMapper implements Mapper<'kucoin-futures', BookTick
     return message.type === 'message' && message.topic.startsWith('/contractMarket/tickerV2')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -296,7 +296,7 @@ class KucoinFuturesDerivativeTickerMapper implements Mapper<'kucoin-futures', De
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {

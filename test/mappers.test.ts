@@ -11,6 +11,7 @@ import {
   normalizeBookTickers
 } from '../dist/index.js'
 import type { Exchange, Mapper } from '../dist/index.js'
+import { getFilters } from '../dist/handy.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
   'backpack',
@@ -283,7 +284,7 @@ describe('mappers', () => {
     snapshot(createMapper('whitebit').map(messages[11], localTimestamp))
   })
 
-  test('empty and omitted symbols request the same replay coverage for every exchange and normalizer', () => {
+  test('direct and normalized requests preserve unrestricted channel coverage for every exchange and normalizer', () => {
     const timestamp = new Date('2026-11-01T00:00:00Z')
     for (const normalize of [
       normalizeTrades,
@@ -301,23 +302,25 @@ describe('mappers', () => {
           assert.ok(error instanceof Error && error.message.endsWith(`${exchange} not supported`))
           continue
         }
-        // undefined and [] filter symbols both mean all symbols.
-        assert.deepStrictEqual(
-          mapper.getFilters([]).map(({ channel, symbols }) => ({ channel, symbols: symbols ?? [] })),
-          mapper.getFilters().map(({ channel, symbols }) => ({ channel, symbols: symbols ?? [] })),
-          `${exchange}: ${normalize.name}`
-        )
+        const filters = mapper.getFilters([])
+        assert.ok(filters.length > 0, `${exchange}: ${normalize.name}`)
+        for (const filter of filters) {
+          assert.ok(Array.isArray(filter.symbols), `${exchange}: ${normalize.name} ${filter.channel} symbols`)
+        }
+        assert.deepStrictEqual(mapper.getFilters(), filters, `${exchange}: ${normalize.name}`)
+        assert.deepStrictEqual(mapper.getFilters(undefined), filters, `${exchange}: ${normalize.name}`)
+        assert.deepStrictEqual(getFilters([mapper]), filters, `${exchange}: ${normalize.name}`)
+        assert.deepStrictEqual(getFilters([mapper], []), filters, `${exchange}: ${normalize.name}`)
       }
     }
   })
 
-  test('Delta India restricts derivative channels to eligible explicitly requested symbols', () => {
+  test('Delta India derivative tickers request every symbol on each channel', () => {
     const mapper = normalizeDerivativeTickers('delta-india', new Date('2026-11-01T00:00:00Z'))
-    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126']), [{ channel: 'ticker', symbols: ['C-BTC-100000-271126'] }])
-    assert.deepStrictEqual(mapper.getFilters(['c-btc-100000-271126', 'btcusd']), [
-      { channel: 'ticker', symbols: ['C-BTC-100000-271126', 'BTCUSD'] },
-      { channel: 'mark_price', symbols: ['MARK:BTCUSD'] },
-      { channel: 'funding_rate', symbols: ['BTCUSD'] }
+    assert.deepStrictEqual(mapper.getFilters(['btc_inr', 'btcusd']), [
+      { channel: 'ticker', symbols: ['BTC_INR', 'BTCUSD'] },
+      { channel: 'mark_price', symbols: ['MARK:BTC_INR', 'MARK:BTCUSD'] },
+      { channel: 'funding_rate', symbols: ['BTC_INR', 'BTCUSD'] }
     ])
   })
 

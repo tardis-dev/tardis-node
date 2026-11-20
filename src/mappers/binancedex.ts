@@ -18,7 +18,7 @@ const binanceDexTradesMapper: Mapper<'binance-dex', Trade> = {
     return message.stream === 'trades'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -57,7 +57,7 @@ const binanceDexBookChangeMapper: Mapper<'binance-dex', BookChange> = {
     return message.stream === 'marketDiff' || message.stream === 'depthSnapshot'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -108,7 +108,7 @@ const binanceDexBookTickerMapper: Mapper<'binance-dex', BookTicker> = {
     return message.stream === 'ticker'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {

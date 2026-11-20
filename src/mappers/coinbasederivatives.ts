@@ -20,7 +20,7 @@ class CoinbaseDerivativesTradesMapper implements Mapper<'coinbase-derivatives', 
     return message.channel === 'market_trades'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'market_trades', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -60,7 +60,7 @@ class CoinbaseDerivativesBookChangeMapper implements Mapper<'coinbase-derivative
     return message.channel === 'l2_data'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'l2_data', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -94,7 +94,7 @@ class CoinbaseDerivativesBookTickerMapper implements Mapper<'coinbase-derivative
     return message.channel === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ticker', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -130,7 +130,7 @@ class CoinbaseDerivativesTickerMapper implements Mapper<'coinbase-derivatives', 
     return message.channel === 'products' || message.channel === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       { channel: 'products', symbols: upperCaseSymbols(symbols) } as const,
       { channel: 'ticker', symbols: upperCaseSymbols(symbols) } as const

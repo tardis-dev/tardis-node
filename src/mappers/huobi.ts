@@ -54,7 +54,7 @@ class HuobiTradesMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-swap'
     return message.ch.endsWith('.trade.detail')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = normalizeSymbols(symbols)
 
     return [
@@ -98,7 +98,7 @@ class HuobiBookChangeMapper implements Mapper<
     return message.ch.includes('.depth.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = normalizeSymbols(symbols)
 
     return [
@@ -156,7 +156,7 @@ class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
     return channel.includes('.mbp.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = normalizeSymbols(symbols)
 
     return [
@@ -266,18 +266,15 @@ class HuobiMBPBookChangeMapper implements Mapper<'huobi', BookChange> {
   }
 }
 
-function normalizeSymbols(symbols?: string[]) {
-  if (symbols !== undefined) {
-    return symbols.map((s) => {
-      // huobi-dm and huobi-dm-swap expect symbols to be upper cased
-      if (s.includes('_') || s.includes('-')) {
-        return s.toUpperCase()
-      }
-      // huobi global expects lower cased symbols
-      return s.toLowerCase()
-    })
-  }
-  return
+function normalizeSymbols(symbols: string[]) {
+  return symbols.map((s) => {
+    // huobi-dm and huobi-dm-swap expect symbols to be upper cased
+    if (s.includes('_') || s.includes('-')) {
+      return s.toUpperCase()
+    }
+    // huobi global expects lower cased symbols
+    return s.toLowerCase()
+  })
 }
 
 class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | 'huobi-dm-linear-swap', DerivativeTicker> {
@@ -297,7 +294,7 @@ class HuobiDerivativeTickerMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap'
     return false
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     const filters: FilterForExchange['huobi-dm-swap'][] = [
@@ -381,7 +378,7 @@ class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | '
     return message.topic.endsWith('.liquidation_orders')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     if (this._exchange === 'huobi-dm') {
@@ -389,9 +386,7 @@ class HuobiLiquidationsMapper implements Mapper<'huobi-dm' | 'huobi-dm-swap' | '
       // not futures names like 'BTC_NW'
       // see https://huobiapi.github.io/docs/dm/v1/en/#subscribe-liquidation-order-data-no-authentication-sub
 
-      if (symbols !== undefined) {
-        symbols = symbols.map((s) => s.split('_')[0])
-      }
+      symbols = symbols.map((s) => s.split('_')[0])
 
       // we also need to subscribe to contract_info which will provide us information that will allow us to map
       // liquidation message symbol and contract code to symbols we expect (BTC_NW etc)
@@ -463,14 +458,11 @@ class HuobiOptionsSummaryMapper implements Mapper<'huobi-dm-options', OptionSumm
     return message.ch.endsWith('.open_interest') || message.ch.endsWith('.option_index') || message.ch.endsWith('.option_market_index')
   }
 
-  getFilters(symbols?: string[]) {
-    const indexes =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}-${symbolParts[1]}`
-          })
-        : undefined
+  getFilters(symbols: string[] = []) {
+    const indexes = symbols.map((s) => {
+      const symbolParts = s.split('-')
+      return `${symbolParts[0]}-${symbolParts[1]}`
+    })
 
     return [
       {
@@ -571,7 +563,7 @@ class HuobiBookTickerMapper implements Mapper<'huobi' | 'huobi-dm' | 'huobi-dm-s
     return message.ch.endsWith('.bbo')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = normalizeSymbols(symbols)
 
     return [

@@ -1,4 +1,4 @@
-import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate, isNullOrEmptyArray } from '../handy.ts'
+import { asNumberOrUndefined, CircularBuffer, fromMicroSecondsToDate } from '../handy.ts'
 import { BookChange, BookTicker, DerivativeTicker, Liquidation, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
 import { exchangeMappers, isRealTime } from './registry.ts'
@@ -18,7 +18,7 @@ class BackpackTradesMapper implements Mapper<'backpack', Trade> {
     return message.stream?.startsWith('trade.') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols } as const]
   }
 
@@ -46,7 +46,7 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
     return message.stream?.startsWith('depth.') === true || message.stream?.startsWith('depthSnapshot.') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'depth', symbols } as const, { channel: 'depthSnapshot', symbols } as const]
   }
 
@@ -69,34 +69,42 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
         throw new Error(`Backpack snapshot for ${symbol} does not cover discarded buffered updates`)
       }
       bookState.sequence = Number(data.lastUpdateId)
+      // REST snapshot prices drop trailing zeros ("74.8") while depth prices keep them ("74.80"), so match levels by number.
+      const bidsByPrice = new Map(data.bids.map((level) => [Number(level[0]), level]))
+      const asksByPrice = new Map(data.asks.map((level) => [Number(level[0]), level]))
+
+      // Updates received before the snapshot are applied to it, so output starts with one current book
+      // and never goes back in local time.
+      for (const update of bookState.buffered.items()) {
+        if (this.advanceSequence(update, bookState)) {
+          this.applyLevelUpdates(bidsByPrice, update.b)
+          this.applyLevelUpdates(asksByPrice, update.a)
+        }
+      }
+
+      bookState.buffered.clear()
 
       yield {
         type: 'book_change',
         exchange: 'backpack',
         symbol: symbol.toUpperCase(),
         isSnapshot: true,
-        bids: data.bids.map(this.mapLevel),
-        asks: data.asks.map(this.mapLevel),
+        bids: [...bidsByPrice.values()].map(this.mapLevel),
+        asks: [...asksByPrice.values()].map(this.mapLevel),
         timestamp: fromMicroSecondsToDate(data.timestamp),
         localTimestamp
       }
-
-      for (const update of bookState.buffered.items()) {
-        yield* this.mapUpdate(update.data, update.localTimestamp, bookState)
-      }
-
-      bookState.buffered.clear()
     } else if (bookState.sequence === undefined) {
-      const discarded = bookState.buffered.append({ data, localTimestamp })
-      if (discarded !== undefined) bookState.discardedThrough = discarded.data.u
-    } else {
-      yield* this.mapUpdate(data, localTimestamp, bookState)
+      const discarded = bookState.buffered.append(data)
+      if (discarded !== undefined) bookState.discardedThrough = discarded.u
+    } else if (this.advanceSequence(data, bookState)) {
+      yield this.mapUpdate(data, localTimestamp)
     }
   }
 
-  private *mapUpdate(data: BackpackDepthMessage['data'], localTimestamp: Date, bookState: BackpackBookState): IterableIterator<BookChange> {
+  private advanceSequence(data: BackpackDepthMessage['data'], bookState: BackpackBookState) {
     if (data.u <= bookState.sequence!) {
-      return
+      return false
     }
 
     if (!bookState.validatedFirstUpdate) {
@@ -108,8 +116,22 @@ class BackpackBookChangeMapper implements Mapper<'backpack', BookChange> {
       bookState.validatedFirstUpdate = true
     }
     bookState.sequence = data.u
+    return true
+  }
 
-    yield {
+  private applyLevelUpdates(levelsByPrice: Map<number, [string, string]>, updates: BackpackLevels) {
+    for (const level of updates) {
+      const price = Number(level[0])
+      if (Number(level[1]) === 0) {
+        levelsByPrice.delete(price)
+      } else {
+        levelsByPrice.set(price, level)
+      }
+    }
+  }
+
+  private mapUpdate(data: BackpackDepthMessage['data'], localTimestamp: Date): BookChange {
+    return {
       type: 'book_change',
       exchange: 'backpack',
       symbol: data.s.toUpperCase(),
@@ -132,7 +154,7 @@ class BackpackBookTickerMapper implements Mapper<'backpack', BookTicker> {
   canHandle(message: BackpackMessage<unknown>) {
     return message.stream?.startsWith('bookTicker.') === true
   }
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker', symbols } as const]
   }
   *map({ data }: BackpackBookTickerMessage, localTimestamp: Date) {
@@ -154,16 +176,10 @@ class BackpackDerivativeTickerMapper implements Mapper<'backpack', DerivativeTic
   private readonly pending = new PendingTickerInfoHelper()
 
   canHandle(message: BackpackMessage<unknown>) {
-    return /^(markPrice|openInterest|ticker)\..+_PERP$/.test(message.stream)
+    return /^(markPrice|openInterest|ticker)\./.test(message.stream)
   }
 
-  getFilters(symbols?: string[]) {
-    if (!isNullOrEmptyArray(symbols)) {
-      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
-      if (symbols.length === 0) {
-        return []
-      }
-    }
+  getFilters(symbols: string[] = []) {
     return [
       { channel: 'markPrice', symbols } as const,
       { channel: 'openInterest', symbols } as const,
@@ -207,13 +223,7 @@ class BackpackLiquidationsMapper implements Mapper<'backpack', Liquidation> {
     return message.stream?.startsWith('liquidation.') === true
   }
 
-  getFilters(symbols?: string[]) {
-    if (!isNullOrEmptyArray(symbols)) {
-      symbols = symbols!.filter((symbol) => symbol.endsWith('_PERP'))
-      if (symbols.length === 0) {
-        return []
-      }
-    }
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'liquidation', symbols } as const]
   }
 
@@ -236,7 +246,7 @@ type BackpackBookState = {
   sequence?: number
   validatedFirstUpdate?: boolean
   discardedThrough?: number
-  buffered: CircularBuffer<{ data: BackpackDepthMessage['data']; localTimestamp: Date }>
+  buffered: CircularBuffer<BackpackDepthMessage['data']>
 }
 
 type BackpackMessage<T> = {

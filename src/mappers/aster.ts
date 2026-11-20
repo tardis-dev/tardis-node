@@ -40,7 +40,7 @@ class AsterTradesMapper implements Mapper<'aster' | 'aster-futures', Trade> {
     return message.stream?.endsWith('@trade') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols: lowerCaseSymbols(symbols) } as const]
   }
 
@@ -83,7 +83,7 @@ class AsterBookChangeMapper implements Mapper<'aster' | 'aster-futures', BookCha
     return message.stream?.includes('@depth') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       { channel: 'depth', symbols: lowerCaseSymbols(symbols) } as const,
       { channel: 'depthSnapshot', symbols: lowerCaseSymbols(symbols) } as const
@@ -217,7 +217,7 @@ class AsterBookTickerMapper implements Mapper<'aster' | 'aster-futures', BookTic
     return message.stream?.endsWith('@bookTicker') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'bookTicker', symbols: lowerCaseSymbols(symbols) } as const]
   }
 
@@ -266,7 +266,7 @@ class AsterFuturesDerivativeTickerMapper implements Mapper<'aster-futures', Deri
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     const normalizedSymbols = lowerCaseSymbols(symbols)
 
     return [
@@ -318,7 +318,7 @@ class AsterFuturesLiquidationsMapper implements Mapper<'aster-futures', Liquidat
     return message.stream?.endsWith('@forceOrder') === true
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'forceOrder', symbols: lowerCaseSymbols(symbols) } as const]
   }
 

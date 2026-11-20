@@ -30,7 +30,7 @@ const krakenTradesMapper: Mapper<'kraken', Trade> = {
     return channel === 'trade'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'trade',
@@ -88,7 +88,7 @@ const krakenBookChangeMapper: Mapper<'kraken', BookChange> = {
     return channel.startsWith('book')
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'book',
@@ -144,7 +144,7 @@ const krakenBookTickerMapper: Mapper<'kraken', BookTicker> = {
     return channel === 'spread'
   },
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [
       {
         channel: 'spread',
@@ -234,7 +234,7 @@ class KrakenV2TradesMapper implements Mapper<'kraken', Trade> {
     return message.channel === 'trade' && message.type === 'update'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols } as const]
   }
 
@@ -264,7 +264,7 @@ class KrakenV2BookChangeMapper implements Mapper<'kraken', BookChange> {
     return message.channel === 'book'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'book', symbols } as const]
   }
 
@@ -300,7 +300,7 @@ class KrakenV2BookTickerMapper implements Mapper<'kraken', BookTicker> {
     return message.channel === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ticker', symbols } as const]
   }
 

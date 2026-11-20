@@ -65,7 +65,7 @@ class BinanceTradesMapper implements Mapper<'binance' | 'binance-jersey' | 'bina
     return message.stream.endsWith('@trade')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -125,7 +125,7 @@ class BinanceBookChangeMapper implements Mapper<
     return message.stream.includes('@depth')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -334,7 +334,7 @@ class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures' |
     )
   }
 
-  getFilters(symbols?: string[]): FilterForExchange['binance-futures' | 'binance-delivery'][] {
+  getFilters(symbols: string[] = []): FilterForExchange['binance-futures' | 'binance-delivery'][] {
     symbols = lowerCaseSymbols(symbols)
 
     const filters = [
@@ -356,7 +356,7 @@ class BinanceFuturesDerivativeTickerMapper implements Mapper<'binance-futures' |
       // index channel requires index symbol
       filters.push({
         channel: 'indexPrice' as any,
-        symbols: symbols !== undefined ? symbols.map((s) => s.split('_')[0]) : undefined
+        symbols: symbols.map((s) => s.split('_')[0])
       })
     }
 
@@ -422,7 +422,7 @@ class BinanceLiquidationsMapper implements Mapper<'binance-futures' | 'binance-d
     return message.stream.endsWith('@forceOrder')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -467,7 +467,7 @@ class BinanceBookTickerMapper implements Mapper<'binance-futures' | 'binance-del
     return message.stream.endsWith('@bookTicker')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [

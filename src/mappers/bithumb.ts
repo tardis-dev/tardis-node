@@ -15,7 +15,7 @@ class BithumbTradesMapper implements Mapper<'bithumb', Trade> {
     return message.type === 'trade' && message.stream_type === 'REALTIME'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -39,7 +39,7 @@ class BithumbBookChangeMapper implements Mapper<'bithumb', BookChange> {
     return message.type === 'orderbook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'orderbook', symbols: upperCaseSymbols(symbols) } as const]
   }
 

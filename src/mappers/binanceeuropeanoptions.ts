@@ -34,15 +34,10 @@ class BinanceEuropeanOptionsTradesMapper implements Mapper<'binance-european-opt
     return message.stream.endsWith('@trade')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
-    return [
-      {
-        channel: 'trade',
-        symbols
-      } as const
-    ]
+    return [{ channel: 'trade', symbols } as const]
   }
 
   *map(binanceTradeResponse: BinanceResponse<BinanceOptionsTradeData>, localTimestamp: Date) {
@@ -71,7 +66,7 @@ class BinanceEuropeanOptionsTradesMapperV2 implements Mapper<'binance-european-o
     return message.stream.endsWith('@optionTrade')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -108,7 +103,7 @@ class BinanceEuropeanOptionsBookChangeMapper implements Mapper<'binance-european
     return message.stream.includes('@depth100')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -150,7 +145,7 @@ class BinanceEuropeanOptionsBookChangeMapperV2 implements Mapper<'binance-europe
     return message.stream.includes('@depth20')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -192,7 +187,7 @@ class BinanceEuropeanOptionsBookTickerMapper implements Mapper<'binance-european
     return message.stream.endsWith('@bookTicker')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
 
     return [
@@ -237,24 +232,8 @@ class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-european-opt
     return message.stream.endsWith('@ticker') || message.stream.endsWith('@index') || message.stream.includes('@openInterest')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
-
-    const indexes =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}USDT`
-          })
-        : undefined
-
-    const underlyings =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}`
-          })
-        : undefined
 
     return [
       {
@@ -263,11 +242,11 @@ class BinanceEuropeanOptionSummaryMapper implements Mapper<'binance-european-opt
       } as const,
       {
         channel: 'index',
-        symbols: indexes
+        symbols: symbols.map((symbol) => `${symbol.split('-')[0]}USDT`)
       } as const,
       {
         channel: 'openInterest',
-        symbols: underlyings
+        symbols: symbols.map((symbol) => `${symbol.split('-')[0]}`)
       } as const
     ]
   }
@@ -367,16 +346,9 @@ class BinanceEuropeanOptionSummaryMapperV2 implements Mapper<'binance-european-o
     )
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = lowerCaseSymbols(symbols)
-
-    const underlyings =
-      symbols !== undefined
-        ? symbols.map((s) => {
-            const symbolParts = s.split('-')
-            return `${symbolParts[0]}usdt`
-          })
-        : undefined
+    const underlyings = symbols.map((symbol) => `${symbol.split('-')[0]}usdt`)
 
     return [
       {

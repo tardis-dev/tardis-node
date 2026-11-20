@@ -12,6 +12,18 @@ Use this when implementing or reviewing `src/mappers/{exchange}.ts`. [ADD_NEW_EX
 - For numeric parsing, follow [EXCHANGE_NUMERIC_FIELDS.md](EXCHANGE_NUMERIC_FIELDS.md). Missing, empty, null, or non-finite optional values should normalize to `undefined`.
 - When normalized output is built from multiple partial messages, use existing state helper patterns and pick one payload type to own the output timestamp. Side-channel updates should update cached state only unless they are intentionally chosen as normalized output sources and their timestamp and field semantics are validated.
 
+## Filters
+
+`getFilters(symbols)` receives an array; `[]` requests all symbols. Every returned filter carries a `symbols` array, and `[]` there also means all symbols.
+
+- `getFilters` lists channels; it does not choose instruments. Pass the requested symbols to every channel the normalizer reads, including side channels such as mark price, index, funding or open interest. Do not filter requested symbols by instrument type: a spot symbol on a perpetual-only channel yields no data.
+- Transform symbols only when a channel publishes the same instrument under a different identifier, such as an underlying index or a `MARK:` prefix. Use `symbols.map(...)` so `[]` stays `[]`.
+- For a global channel that takes no symbols, such as Bitfinex liquidations, return `symbols: []`; the real-time feed subscribes globally.
+- `canHandle` routes messages by channel, not by symbol pattern.
+- `map` decides output. Let one channel that exists only for the relevant instruments own the emitted message, and let other channels only update cached state.
+
+Backpack derivative tickers are the reference implementation: `markPrice` emits; `ticker` and `openInterest` only update cached state.
+
 ## Type Semantics
 
 - **Trades**: `side` is liquidity taker side. `buy` means the aggressor bought; `sell` means the aggressor sold. Invert maker-side flags when needed. If a trade channel sends a recent-trades snapshot followed by updates, map only updates unless the exchange has no incremental trade variant.
@@ -27,7 +39,7 @@ First identify where the initial book snapshot comes from:
 
 - Native snapshot plus deltas: map the exchange snapshot as `isSnapshot=true`, then map later deltas as `isSnapshot=false`.
 - Snapshot-only feed, such as a full L2 book pushed repeatedly: map each full book message as `isSnapshot=true`.
-- Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels, buffer deltas until the snapshot arrives, emit one snapshot, then emit deltas.
+- Delta feed with a snapshot channel, such as Binance `depthSnapshot` plus `depth`: `getFilters()` must request both channels and buffer deltas until the snapshot arrives. Apply the buffered deltas newer than the snapshot to its levels, removing a level when a delta sets its amount to zero. Then emit one snapshot with the snapshot message's `localTimestamp`, followed by later deltas. Do not emit buffered deltas as separate messages after the snapshot; with their own earlier `localTimestamp` they would also break monotonic output order.
 - Delta-only feed without a snapshot channel: do not mark a delta as a snapshot. Add a snapshot source first or leave the channel out of `normalizeBookChanges`.
 
 For generated or REST-backed snapshots, verify the snapshot shape against recorder output and the exchange docs. Use the deepest documented snapshot level only after checking that the snapshot version still overlaps buffered deltas and does not introduce obvious rate-limit or retry issues. Historical replay should not repeat full sequence validation already performed by recorder; keep client-side logic to the minimal alignment needed to combine the snapshot with later deltas.

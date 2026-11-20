@@ -16,7 +16,7 @@ class BitvavoTradesMapper implements Mapper<'bitvavo', Trade> {
     return message.event === 'trade'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'trade', symbols: upperCaseSymbols(symbols) } as const]
   }
 
@@ -44,7 +44,7 @@ class BitvavoBookChangeMapper implements Mapper<'bitvavo', BookChange> {
     return message.event === 'book' || message.action === 'getBook'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     const normalizedSymbols = upperCaseSymbols(symbols)
     return [{ channel: 'book', symbols: normalizedSymbols } as const, { channel: 'getBook', symbols: normalizedSymbols } as const]
   }
@@ -138,7 +138,7 @@ class BitvavoBookTickerMapper implements Mapper<'bitvavo', BookTicker> {
     return message.event === 'ticker'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     return [{ channel: 'ticker', symbols: upperCaseSymbols(symbols) } as const]
   }
 

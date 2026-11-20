@@ -66,7 +66,7 @@ class BybitV5TradesMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-opti
     return message.topic.startsWith('publicTrade.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -111,7 +111,7 @@ class BybitV5BookChangeMapper implements Mapper<'bybit' | 'bybit-spot' | 'bybit-
     return message.topic.startsWith(`orderbook.${this._depth}.`)
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -158,7 +158,7 @@ class BybitV5BookTickerMapper implements Mapper<'bybit' | 'bybit-spot', BookTick
     return message.topic.startsWith(`orderbook.1.`)
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -220,7 +220,7 @@ class BybitV5DerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker>
     return message.topic.startsWith('tickers.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -278,7 +278,7 @@ class BybitV5LiquidationsMapper implements Mapper<'bybit', Liquidation> {
     return message.topic.startsWith('liquidation.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -319,7 +319,7 @@ class BybitV5AllLiquidationsMapper implements Mapper<'bybit', Liquidation> {
     return message.topic.startsWith('allLiquidation.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -358,7 +358,7 @@ class BybitV5OptionSummaryMapper implements Mapper<'bybit-options', OptionSummar
     return message.topic.startsWith('tickers.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -429,7 +429,7 @@ class BybitTradesMapper implements Mapper<'bybit', Trade> {
     return message.topic.startsWith('trade.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -486,7 +486,7 @@ class BybitBookChangeMapper implements Mapper<'bybit', BookChange> {
     }
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     if (this._canUseBook200Channel) {
@@ -550,7 +550,7 @@ class BybitDerivativeTickerMapper implements Mapper<'bybit', DerivativeTicker> {
     return message.topic.startsWith('instrument_info.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [
@@ -647,7 +647,7 @@ class BybitLiquidationsMapper implements Mapper<'bybit', Liquidation> {
     return message.topic.startsWith('liquidation.')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
 
     return [

@@ -15,7 +15,7 @@ class BlockchainComTradesMapper implements Mapper<'blockchain-com', Trade> {
     return message.channel === 'trades' && message.event === 'updated'
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
@@ -45,7 +45,7 @@ class BlockchainComBookChangeMapper implements Mapper<'blockchain-com', BookChan
     return message.channel == 'l2' && (message.event === 'snapshot' || message.event === 'updated')
   }
 
-  getFilters(symbols?: string[]) {
+  getFilters(symbols: string[] = []) {
     symbols = upperCaseSymbols(symbols)
     return [
       {
