@@ -284,6 +284,32 @@ describe('mappers', () => {
     snapshot(createMapper('whitebit').map(messages[11], localTimestamp))
   })
 
+  test('WhiteBIT book tickers skip rows without a positive transaction time and retain valid rows in a batch', () => {
+    const localTimestamp = new Date('2026-11-20T12:02:02.300Z')
+    const mapper = normalizeBookTickers('whitebit', localTimestamp)
+    const emptyRow = [0, 1795176122.3, 'SNDKX_PERP', 1, '0', '0', '0', '0']
+    const nullTimeRow = [null, 1795176122.3, 'SNDKX_PERP', 2, '0', '0', '0', '0']
+    const validRow = [1795176122, 1795176122.3, 'BTC_USDT', 3, '90000', '1', '90001', '2']
+
+    for (const row of [emptyRow, nullTimeRow]) {
+      assert.deepEqual([...mapper.map({ method: 'bookTicker_update', params: [row] }, localTimestamp)!], [])
+    }
+
+    const tickers = [...mapper.map({ method: 'bookTicker_update', params: [emptyRow, validRow, nullTimeRow, validRow] }, localTimestamp)!]
+    const expectedTicker = {
+      type: 'book_ticker',
+      exchange: 'whitebit',
+      symbol: 'BTC_USDT',
+      bidPrice: 90000,
+      bidAmount: 1,
+      askPrice: 90001,
+      askAmount: 2,
+      timestamp: Object.assign(new Date('2026-11-20T12:02:02.000Z'), { μs: 0 }),
+      localTimestamp
+    }
+    assert.deepEqual(tickers, [expectedTicker, expectedTicker])
+  })
+
   test('direct and normalized requests preserve unrestricted channel coverage for every exchange and normalizer', () => {
     const timestamp = new Date('2026-11-01T00:00:00Z')
     for (const normalize of [

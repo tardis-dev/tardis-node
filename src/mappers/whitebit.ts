@@ -88,6 +88,10 @@ class WhiteBitBookTickerMapper implements Mapper<'whitebit', BookTicker> {
 
   *map(message: WhiteBitBookTicker, localTimestamp: Date): IterableIterator<BookTicker> {
     for (const [transactionTime, , symbol, , bidPrice, bidAmount, askPrice, askAmount] of message.params) {
+      if (transactionTime <= 0) {
+        continue
+      }
+
       yield {
         type: 'book_ticker',
         exchange: 'whitebit',
