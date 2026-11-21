@@ -310,6 +310,28 @@ describe('mappers', () => {
     assert.deepEqual(tickers, [expectedTicker, expectedTicker])
   })
 
+  test('WhiteBIT derivative tickers leave index price, last price and funding unset before a market starts trading', () => {
+    // SNDKX_PERP messages recorded on 2026-11-20, right after the market was listed and after trading started.
+    const mapper = normalizeDerivativeTickers('whitebit', new Date('2026-11-20T12:02:02.720Z'))
+    const messages = [
+      [{ method: 'premiumIndex_update', params: ['SNDKX_PERP', '88.34', '0', '0', 0, 1795176122.697975] }, '2026-11-20T12:02:02.720Z'],
+      [{ method: 'futures_update', params: ['SNDKX_PERP', { last_price: '0', open_interest: '0' }] }, '2026-11-20T12:02:10.161Z'],
+      [
+        { method: 'premiumIndex_update', params: ['SNDKX_PERP', '88.19', '88.19', '-0.0001', 1795190400000, 1795177201.294693] },
+        '2026-11-20T12:20:01.321Z'
+      ]
+    ] as const
+    const tickers = messages.flatMap(([message, localTimestamp]) => [...mapper.map(message, new Date(localTimestamp))!])
+
+    assert.deepEqual(
+      tickers.map(({ indexPrice, lastPrice, fundingRate, fundingTimestamp }) => ({ indexPrice, lastPrice, fundingRate, fundingTimestamp })),
+      [
+        { indexPrice: undefined, lastPrice: undefined, fundingRate: undefined, fundingTimestamp: undefined },
+        { indexPrice: 88.19, lastPrice: undefined, fundingRate: -0.0001, fundingTimestamp: new Date(1795190400000) }
+      ]
+    )
+  })
+
   test('direct and normalized requests preserve unrestricted channel coverage for every exchange and normalizer', () => {
     const timestamp = new Date('2026-11-01T00:00:00Z')
     for (const normalize of [

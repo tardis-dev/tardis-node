@@ -150,16 +150,19 @@ class WhiteBitDerivativeTickerMapper implements Mapper<'whitebit', DerivativeTic
       // REST has no trade timestamp, so use its price only until a WebSocket trade has been accepted.
       ticker.updateOpenInterest(asNumberOrUndefined(params[1].open_interest))
       if (!this._symbolsWithTrades.has(symbol)) {
-        ticker.updateLastPrice(asNumberOrUndefined(params[1].last_price))
+        ticker.updateLastPrice(asNonZeroNumberOrUndefined(params[1].last_price))
       }
       return
     }
 
     const [, markPrice, indexPrice, fundingRate, fundingTime, serverTime] = params
     ticker.updateMarkPrice(asNumberOrUndefined(markPrice))
-    ticker.updateIndexPrice(asNumberOrUndefined(indexPrice))
-    ticker.updateFundingRate(asNumberOrUndefined(fundingRate))
-    ticker.updateFundingTimestamp(new Date(fundingTime))
+    ticker.updateIndexPrice(asNonZeroNumberOrUndefined(indexPrice))
+    // Markets that have not started trading report zero index price and funding fields.
+    if (fundingTime > 0) {
+      ticker.updateFundingRate(asNumberOrUndefined(fundingRate))
+      ticker.updateFundingTimestamp(new Date(fundingTime))
+    }
     ticker.updateTimestamp(fromMicroSecondsToDate(Math.round(serverTime * 1e6)))
     if (ticker.hasChanged()) {
       yield ticker.getSnapshot(localTimestamp)
