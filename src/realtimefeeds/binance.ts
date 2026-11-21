@@ -51,6 +51,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
   protected abstract httpURL: string
   protected abstract suffixes: { [key: string]: string }
   protected abstract depthRequestRequestWeight: number
+  protected depthSnapshotLimit = 1000
 
   protected *_getRealTimeFeeds(
     exchange: string,
@@ -72,6 +73,7 @@ abstract class BinanceRealTimeFeedBase extends MultiConnectionRealTimeFeedBase {
         this.httpURL,
         this.suffixes,
         this.depthRequestRequestWeight,
+        this.depthSnapshotLimit,
         timeoutIntervalMS,
         onError,
         validateSequence
@@ -239,6 +241,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
     private readonly _httpURL: string,
     private readonly _suffixes: { [key: string]: string },
     private readonly _depthRequestRequestWeight: number,
+    private readonly _depthSnapshotLimit: number,
     timeoutIntervalMS: number | undefined,
     onError?: (error: Error) => void,
     validateSequence?: boolean
@@ -350,7 +353,7 @@ class BinanceSingleConnectionRealTimeFeed extends RealTimeFeedBase {
           }
 
           const depthSnapshotResponse = await getJSON<any>(
-            `${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=1000`,
+            `${this._httpURL}/depth?symbol=${symbol.toUpperCase()}&limit=${this._depthSnapshotLimit}`,
             binanceHttpOptions
           )
           if (shouldCancel()) {
@@ -406,6 +409,7 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
     httpURL: string,
     suffixes: { [key: string]: string },
     depthRequestRequestWeight: number,
+    depthSnapshotLimit: number,
     timeoutIntervalMS: number | undefined,
     onError?: (error: Error) => void,
     validateSequence?: boolean
@@ -417,6 +421,7 @@ class BinanceFuturesSingleConnectionRealTimeFeed extends BinanceSingleConnection
       httpURL,
       suffixes,
       depthRequestRequestWeight,
+      depthSnapshotLimit,
       timeoutIntervalMS,
       onError,
       validateSequence
@@ -448,7 +453,10 @@ export class BinanceRealTimeFeed extends BinanceRealTimeFeedBase {
     depth: '100ms'
   }
 
-  protected depthRequestRequestWeight = 10
+  protected depthSnapshotLimit = getExchangeScopedNumberEnv('binance', 'DEPTH_SNAPSHOT_LIMIT', 1000)
+  // https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints#order-book
+  protected depthRequestRequestWeight =
+    this.depthSnapshotLimit <= 100 ? 5 : this.depthSnapshotLimit <= 500 ? 25 : this.depthSnapshotLimit <= 1000 ? 50 : 250
 }
 
 export class BinanceJerseyRealTimeFeed extends BinanceRealTimeFeedBase {
@@ -510,6 +518,7 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.httpURL,
         this.suffixes,
         this.depthRequestRequestWeight,
+        this.depthSnapshotLimit,
         timeoutIntervalMS,
         onError,
         validateSequence
@@ -525,6 +534,7 @@ export class BinanceFuturesRealTimeFeed extends BinanceRealTimeFeedBase {
         this.httpURL,
         this.suffixes,
         this.depthRequestRequestWeight,
+        this.depthSnapshotLimit,
         timeoutIntervalMS,
         onError,
         validateSequence
