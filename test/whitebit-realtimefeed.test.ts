@@ -150,87 +150,85 @@ test('WhiteBIT rounds depth, BBO and premium-index timestamps without changing c
   )
 })
 
-test('WhiteBIT splits spot and perpetual markets into batches without replacing other subscriptions', { timeout: 10000 }, async () => {
-  const server = new WebSocketServer({ port: 0 })
-  await once(server, 'listening')
-  const originalURL = process.env.WSS_URL_WHITEBIT
-  process.env.WSS_URL_WHITEBIT = `ws://127.0.0.1:${(server.address() as AddressInfo).port}`
-  const subscriptions: any[][] = []
-  server.on('connection', (socket) => {
-    const messages: any[] = []
-    subscriptions.push(messages)
-    socket.on('message', (data) => {
-      const message = JSON.parse(data.toString())
-      messages.push(message)
-      socket.send(JSON.stringify({ id: message.id, error: null, result: { status: 'success' } }))
+test(
+  'WhiteBIT subscribes spot and perpetual markets on one connection without replacing other subscriptions',
+  { timeout: 10000 },
+  async () => {
+    const server = new WebSocketServer({ port: 0 })
+    await once(server, 'listening')
+    const originalURL = process.env.WSS_URL_WHITEBIT
+    process.env.WSS_URL_WHITEBIT = `ws://127.0.0.1:${(server.address() as AddressInfo).port}`
+    const subscriptions: any[][] = []
+    server.on('connection', (socket) => {
+      const messages: any[] = []
+      subscriptions.push(messages)
+      socket.on('message', (data) => {
+        const message = JSON.parse(data.toString())
+        messages.push(message)
+        socket.send(JSON.stringify({ id: message.id, error: null, result: { status: 'success' } }))
+      })
     })
-  })
-  const spots = Array.from({ length: 51 }, (_, index) => `COIN${index}_USDT`)
-  const perpetuals = ['BTC_PERP', 'XAU_PERP', ...Array.from({ length: 49 }, (_, index) => `COIN${index}_PERP`)]
-  const symbols = [...spots, ...perpetuals]
-  const iterator = stream({
-    exchange: 'whitebit',
-    filters: [
-      { channel: 'depth_update', symbols },
-      { channel: 'trades_update', symbols: spots.map((symbol) => symbol.toLowerCase()) },
-      { channel: 'trades_update', symbols: [...perpetuals, spots[0].toLowerCase()] },
-      { channel: 'bookTicker_update', symbols },
-      { channel: 'premiumIndex_update', symbols }
-    ]
-  })
-  const consume = (async () => {
-    for await (const _ of iterator) {
-    }
-  })()
-  try {
-    while (subscriptions.flat().length < 210) {
-      await sleep(10)
-    }
-    assert.strictEqual(subscriptions.length, 4)
-    const subscribedTrades: string[] = []
-    for (const connection of subscriptions) {
-      const trades = connection.filter((message) => message.method === 'trades_subscribe')
+    const spots = Array.from({ length: 50 }, (_, index) => `COIN${index}_USDT`)
+    const perpetuals = ['BTC_PERP', 'XAU_PERP', ...Array.from({ length: 48 }, (_, index) => `COIN${index}_PERP`)]
+    const symbols = [...spots, ...perpetuals]
+    const iterator = stream({
+      exchange: 'whitebit',
+      filters: [
+        { channel: 'depth_update', symbols },
+        { channel: 'trades_update', symbols: spots.map((symbol) => symbol.toLowerCase()) },
+        { channel: 'trades_update', symbols: [...perpetuals, spots[0].toLowerCase()] },
+        { channel: 'bookTicker_update', symbols },
+        { channel: 'premiumIndex_update', symbols }
+      ]
+    })
+    const consume = (async () => {
+      for await (const _ of iterator) {
+      }
+    })()
+    try {
+      while (subscriptions.flat().length < 202) {
+        await sleep(10)
+      }
+      assert.strictEqual(subscriptions.length, 1)
+      const trades = subscriptions[0]!.filter((message) => message.method === 'trades_subscribe')
       assert.strictEqual(trades.length, 1)
-      assert.ok(trades[0].params.length <= 50)
-      assert.strictEqual(new Set(trades[0].params.map((symbol: string) => symbol.endsWith('_PERP'))).size, 1)
-      subscribedTrades.push(...trades[0].params)
-      assert.strictEqual(new Set(connection.map(({ id }) => id)).size, connection.length)
+      assert.deepStrictEqual([...trades[0].params].sort(), [...symbols].sort())
+      assert.strictEqual(new Set(subscriptions[0]!.map(({ id }) => id)).size, subscriptions[0]!.length)
+      assert.deepStrictEqual(
+        subscriptions
+          .flat()
+          .filter(({ method }) => method === 'premiumIndex_subscribe')
+          .flatMap(({ params }) => params)
+          .sort(),
+        [...perpetuals].sort()
+      )
+      server.clients.values().next().value!.terminate()
+      while (subscriptions.flat().length < 404) {
+        await sleep(10)
+      }
+      assert.strictEqual(subscriptions.length, 2)
+      assert.deepStrictEqual(
+        subscriptions
+          .slice(1)
+          .flatMap((messages) => messages.filter(({ method }) => method === 'trades_subscribe').flatMap(({ params }) => params))
+          .sort(),
+        symbols.sort()
+      )
+    } finally {
+      await iterator.return!()
+      await consume
+      if (originalURL === undefined) {
+        delete process.env.WSS_URL_WHITEBIT
+      } else {
+        process.env.WSS_URL_WHITEBIT = originalURL
+      }
+      for (const socket of server.clients) {
+        socket.terminate()
+      }
+      await new Promise<void>((resolve) => server.close(() => resolve()))
     }
-    assert.deepStrictEqual(subscribedTrades.sort(), symbols.sort())
-    assert.deepStrictEqual(
-      subscriptions
-        .flat()
-        .filter(({ method }) => method === 'premiumIndex_subscribe')
-        .flatMap(({ params }) => params)
-        .sort(),
-      [...perpetuals].sort()
-    )
-    server.clients.values().next().value!.terminate()
-    while (subscriptions.flat().length < 420) {
-      await sleep(10)
-    }
-    assert.strictEqual(subscriptions.length, 8)
-    assert.deepStrictEqual(
-      subscriptions
-        .slice(4)
-        .flatMap((messages) => messages.filter(({ method }) => method === 'trades_subscribe').flatMap(({ params }) => params))
-        .sort(),
-      symbols.sort()
-    )
-  } finally {
-    await iterator.return!()
-    await consume
-    if (originalURL === undefined) {
-      delete process.env.WSS_URL_WHITEBIT
-    } else {
-      process.env.WSS_URL_WHITEBIT = originalURL
-    }
-    for (const socket of server.clients) {
-      socket.terminate()
-    }
-    await new Promise<void>((resolve) => server.close(() => resolve()))
   }
-})
+)
 
 test('WhiteBIT rejects missing or empty WebSocket symbols', async () => {
   for (const symbols of [undefined, []]) {

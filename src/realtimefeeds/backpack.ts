@@ -2,38 +2,9 @@ import { EXCHANGE_CHANNELS_INFO } from '../consts.ts'
 import { batch, getJSON } from '../handy.ts'
 import type { BackpackSnapshotMessage } from '../mappers/backpack.ts'
 import { Filter } from '../types.ts'
-import { MultiConnectionRealTimeFeedBase, RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
+import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
 
-export class BackpackRealTimeFeed extends MultiConnectionRealTimeFeedBase {
-  protected *_getRealTimeFeeds(
-    exchange: string,
-    filters: Filter<string>[],
-    timeoutIntervalMS?: number,
-    onError?: (error: Error) => void,
-    validateSequence?: boolean
-  ) {
-    for (const filter of filters) {
-      if (!filter.symbols?.length) {
-        throw new Error('Backpack requires explicitly specified symbols for live subscriptions')
-      }
-    }
-
-    const symbols = [...new Set(filters.flatMap((filter) => filter.symbols!))]
-    for (const instruments of batch(symbols, 20)) {
-      const selected = new Set(instruments)
-      const connectionFilters = filters
-        .map((filter) => ({
-          channel: filter.channel,
-          symbols: filter.symbols!.filter((symbol) => selected.has(symbol))
-        }))
-        .filter((filter) => filter.symbols.length > 0)
-
-      yield new BackpackSingleConnectionRealTimeFeed(exchange, connectionFilters, timeoutIntervalMS, onError, validateSequence)
-    }
-  }
-}
-
-export class BackpackSingleConnectionRealTimeFeed extends RealTimeFeedBase {
+export class BackpackRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://ws.backpack.exchange'
   protected readonly httpURL: string = 'https://api.backpack.exchange'
   private readonly channels = new Set<string>(EXCHANGE_CHANNELS_INFO.backpack)

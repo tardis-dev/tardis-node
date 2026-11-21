@@ -18,9 +18,9 @@ mock.module('../dist/handy.js', {
   }
 })
 const { stream, streamNormalized, normalizeBookChanges, SequenceGapError } = await import('../dist/index.js')
-const { BackpackSingleConnectionRealTimeFeed } = await import('../dist/realtimefeeds/backpack.js')
+const { BackpackRealTimeFeed } = await import('../dist/realtimefeeds/backpack.js')
 
-class TestFeed extends BackpackSingleConnectionRealTimeFeed {
+class TestFeed extends BackpackRealTimeFeed {
   map(filters: { channel: string; symbols?: string[] }[]) {
     return this.mapToSubscribeMessages(filters)
   }
@@ -131,7 +131,7 @@ test('Backpack rejects missing symbols and snapshot-only subscriptions', () => {
 
 for (const validateSequence of [true, false]) {
   test(
-    `Backpack keeps symbol counters independent across connections with validateSequence=${validateSequence}`,
+    `Backpack keeps sequence counters independent per symbol with validateSequence=${validateSequence}`,
     { timeout: 15000 },
     async () => {
       const { server, cleanup } = await createTestWebSocketServer('backpack')
@@ -163,7 +163,7 @@ for (const validateSequence of [true, false]) {
           const { message } = (await feed.next()).value
           counts.set(message.data.s, (counts.get(message.data.s) ?? 0) + 1)
         }
-        assert.strictEqual(connections, 2)
+        assert.strictEqual(connections, 1)
         assert.strictEqual(counts.size, symbols.length)
         assert.ok([...counts.values()].every((count) => count === 2))
         assert.deepEqual(errors, [])
@@ -239,65 +239,60 @@ test('Backpack initializes a quiet symbol alongside an active symbol and reiniti
   }
 })
 
-test(
-  'Backpack batches mixed subscriptions across twenty-symbol boundaries and requests one snapshot per symbol',
-  { timeout: 15000 },
-  async () => {
-    const server = new WebSocketServer({ port: 0 })
-    await once(server, 'listening')
-    const previousUrl = process.env.WSS_URL_BACKPACK
-    process.env.WSS_URL_BACKPACK = `ws://127.0.0.1:${(server.address() as AddressInfo).port}`
-    requests.length = 0
-    const subscriptions = observedSubscriptions
-    subscriptions.length = 0
-    server.on('connection', (socket) =>
-      socket.on('message', (bytes) => {
-        subscriptions.push(JSON.parse(bytes.toString()))
-        const stream = subscriptions.at(-1)!.params.find((param) => param.startsWith('trade.'))!
-        const timer = setInterval(
-          () =>
-            socket.send(
-              JSON.stringify({
-                stream,
-                data: { s: stream.slice('trade.'.length), t: 1, p: '99', q: '1', m: false, T: 1793369773514033 }
-              })
-            ),
-          10
-        )
-        socket.once('close', () => clearInterval(timer))
-      })
-    )
-    const symbols = [...Array.from({ length: 20 }, (_, i) => `COIN${i}_USDC`), 'MU.US_USDC_PERP']
-    const feed = stream({
-      exchange: 'backpack',
-      timeoutIntervalMS: 0,
-      filters: [
-        { channel: 'depth', symbols },
-        { channel: 'depthSnapshot', symbols },
-        { channel: 'trade', symbols }
-      ]
+test('Backpack subscribes all symbols on one connection and requests one snapshot per symbol', { timeout: 15000 }, async () => {
+  const server = new WebSocketServer({ port: 0 })
+  await once(server, 'listening')
+  const previousUrl = process.env.WSS_URL_BACKPACK
+  process.env.WSS_URL_BACKPACK = `ws://127.0.0.1:${(server.address() as AddressInfo).port}`
+  requests.length = 0
+  const subscriptions = observedSubscriptions
+  subscriptions.length = 0
+  server.on('connection', (socket) =>
+    socket.on('message', (bytes) => {
+      subscriptions.push(JSON.parse(bytes.toString()))
+      const stream = subscriptions.at(-1)!.params.find((param) => param.startsWith('trade.'))!
+      const timer = setInterval(
+        () =>
+          socket.send(
+            JSON.stringify({
+              stream,
+              data: { s: stream.slice('trade.'.length), t: 1, p: '99', q: '1', m: false, T: 1793369773514033 }
+            })
+          ),
+        10
+      )
+      socket.once('close', () => clearInterval(timer))
     })
-    try {
-      const snapshots = new Set<string>()
-      for await (const { message } of feed) {
-        if (message.stream.startsWith('depthSnapshot.')) snapshots.add(message.stream)
-        if (snapshots.size === symbols.length) break
-      }
-      assert.strictEqual(subscriptions.length, 2)
-      assert.ok(subscriptions.every((subscription) => subscription.params.length <= 40))
-      assert.strictEqual(requests.length, symbols.length)
-      assert.strictEqual(new Set(requests).size, symbols.length)
-      for (const symbol of symbols) {
-        assert.ok(snapshots.has(`depthSnapshot.${symbol}`))
-        assert.ok(subscriptions.some(({ params }) => params.includes(`depth.${symbol}`) && params.includes(`trade.${symbol}`)))
-      }
-      assert.ok(subscriptions.every(({ params }) => !params.some((param) => param.startsWith('depthSnapshot.'))))
-    } finally {
-      await feed.return?.()
-      if (previousUrl === undefined) delete process.env.WSS_URL_BACKPACK
-      else process.env.WSS_URL_BACKPACK = previousUrl
-      for (const socket of server.clients) socket.terminate()
-      await new Promise<void>((resolve) => server.close(() => resolve()))
+  )
+  const symbols = [...Array.from({ length: 20 }, (_, i) => `COIN${i}_USDC`), 'MU.US_USDC_PERP']
+  const feed = stream({
+    exchange: 'backpack',
+    timeoutIntervalMS: 0,
+    filters: [
+      { channel: 'depth', symbols },
+      { channel: 'depthSnapshot', symbols },
+      { channel: 'trade', symbols }
+    ]
+  })
+  try {
+    const snapshots = new Set<string>()
+    for await (const { message } of feed) {
+      if (message.stream.startsWith('depthSnapshot.')) snapshots.add(message.stream)
+      if (snapshots.size === symbols.length) break
     }
+    assert.strictEqual(subscriptions.length, 1)
+    assert.strictEqual(requests.length, symbols.length)
+    assert.strictEqual(new Set(requests).size, symbols.length)
+    for (const symbol of symbols) {
+      assert.ok(snapshots.has(`depthSnapshot.${symbol}`))
+      assert.ok(subscriptions.some(({ params }) => params.includes(`depth.${symbol}`) && params.includes(`trade.${symbol}`)))
+    }
+    assert.ok(subscriptions.every(({ params }) => !params.some((param) => param.startsWith('depthSnapshot.'))))
+  } finally {
+    await feed.return?.()
+    if (previousUrl === undefined) delete process.env.WSS_URL_BACKPACK
+    else process.env.WSS_URL_BACKPACK = previousUrl
+    for (const socket of server.clients) socket.terminate()
+    await new Promise<void>((resolve) => server.close(() => resolve()))
   }
-)
+})

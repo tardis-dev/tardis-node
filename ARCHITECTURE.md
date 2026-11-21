@@ -36,6 +36,8 @@ Sequence validation runs in `RealTimeFeedBase` before a message reaches `onMessa
 
 `MultiConnectionRealTimeFeedBase` merges several connections and REST pollers of one exchange. A disconnect resets all normalized state, so when any connection drops, the feed closes all its connections and pollers, yields one disconnect and opens them again after the retry delay of the failed connection.
 
+A feed subscribes everything the caller requested on one connection per exchange endpoint. It splits a subscription into several subscribe messages only where the exchange limits the arguments per message. Feeds do not open extra connections to spread symbols, balance load or keep quiet markets apart from active ones. The caller is responsible for requesting a set of symbols that fits the exchange's limits for one connection.
+
 ## Mapper System
 
 Mappers transform raw exchange messages into normalized types (trades, book changes, tickers, liquidations, etc.). Each exchange defines its mapper registry next to its mapper classes in `src/mappers/{exchange}.ts`; `src/mappers/index.ts` aggregates those registries for the public normalizers.

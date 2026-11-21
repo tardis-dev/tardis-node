@@ -1,6 +1,5 @@
 import { Writable } from 'stream'
-import { setTimeout as sleep } from 'node:timers/promises'
-import { batch, getJSON } from '../handy.ts'
+import { getJSON } from '../handy.ts'
 import { Filter } from '../types.ts'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase, Sequence } from './realtimefeed.ts'
 
@@ -29,24 +28,8 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
         throw new Error('WhiteBitRealTimeFeed requires explicitly specified symbols when subscribing to live feed')
       }
     }
-    const webSocketSymbols = [...new Set(webSocketFilters.flatMap((filter) => filter.symbols!))]
-    const spotSymbols = webSocketSymbols.filter((symbol) => !symbol.endsWith('_PERP'))
-    const perpetualSymbols = webSocketSymbols.filter((symbol) => symbol.endsWith('_PERP'))
-    let connectionIndex = 0
-
-    for (const marketSymbols of [spotSymbols, perpetualSymbols]) {
-      for (const group of batch(marketSymbols, 50)) {
-        yield new WhiteBitWebSocketRealTimeFeed(
-          exchange,
-          webSocketFilters
-            .map((filter) => ({ ...filter, symbols: filter.symbols!.filter((symbol) => group.includes(symbol)) }))
-            .filter((filter) => filter.symbols.length > 0),
-          timeoutIntervalMS,
-          onError,
-          validateSequence,
-          connectionIndex++ * 50
-        )
-      }
+    if (webSocketFilters.length > 0) {
+      yield new WhiteBitWebSocketRealTimeFeed(exchange, webSocketFilters, timeoutIntervalMS, onError, validateSequence)
     }
 
     const futuresFilters = filters.filter((filter) => filter.channel === 'futures_update')
@@ -64,22 +47,6 @@ export class WhiteBitRealTimeFeed extends MultiConnectionRealTimeFeedBase {
 
 export class WhiteBitWebSocketRealTimeFeed extends RealTimeFeedBase {
   protected readonly wssURL = 'wss://wss.whitebit.com/ws'
-
-  constructor(
-    exchange: string,
-    filters: Filter<string>[],
-    timeoutIntervalMS: number | undefined,
-    onError?: (error: Error) => void,
-    validateSequence?: boolean,
-    private readonly _startDelayMS = 0
-  ) {
-    super(exchange, filters, timeoutIntervalMS, onError, validateSequence)
-  }
-
-  protected async getWebSocketUrl() {
-    await sleep(this._startDelayMS)
-    return super.getWebSocketUrl()
-  }
 
   protected mapToSubscribeMessages(filters: Filter<string>[]) {
     let id = 0
