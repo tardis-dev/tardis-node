@@ -1,5 +1,5 @@
 import { debug } from './debug.ts'
-import { createNormalizedSymbolFilter, getFilters, normalizeMessages } from './handy.ts'
+import { abortableWait, createNormalizedSymbolFilter, getFilters, getRetryDelay, normalizeMessages } from './handy.ts'
 import { MapperFactory } from './mappers/index.ts'
 import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from './realtimeiterator.ts'
 import { createRealTimeFeed, getRealTimeFeedFactory } from './realtimefeeds/index.ts'
@@ -15,7 +15,7 @@ type StreamState = {
 }
 
 type NormalizedStreamState = {
-  closed: boolean
+  closeController: AbortController
   activeIterator?: ManagedRealTimeIterator<any>
 }
 
@@ -98,8 +98,9 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
   getRealTimeFeedFactory(exchange)
+  let retries = 0
 
-  while (state.closed === false) {
+  while (state.closeController.signal.aborted === false) {
     try {
       const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
       const mappers = createMappers(new Date())
@@ -132,17 +133,20 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
       )
 
       for await (const message of normalizedMessages) {
+        retries = 0
         yield message
       }
     } catch (error: any) {
-      if (state.closed) {
+      if (state.closeController.signal.aborted) {
         return
       }
 
       if (onError !== undefined) {
         onError(error)
       }
-      debug('%s normalize messages error: %o, retrying with new connection...', exchange, error)
+      retries++
+      const retryDelay = getRetryDelay(error instanceof Error ? error : new Error(String(error)), retries)
+      debug('%s normalize messages error: %o, retrying with new connection in %dms...', exchange, error, retryDelay)
       if (withDisconnectMessages) {
         // yield it as disconnect as well if flag is set
         const disconnect: Disconnect = {
@@ -154,6 +158,8 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
 
         yield disconnect as any
       }
+
+      await abortableWait(retryDelay, state.closeController.signal)
     }
   }
 }
@@ -201,7 +207,7 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
   }: StreamNormalizedOptions<T, Z>,
   ...normalizers: U
 ): AsyncIterableIterator<StreamNormalizedMessage<U, Z>> {
-  const state: NormalizedStreamState = { closed: false }
+  const state: NormalizedStreamState = { closeController: new AbortController() }
   const iterator = _streamNormalized(
     { exchange, symbols, timeoutIntervalMS, validateSequence, withDisconnectMessages, onError },
     state,
@@ -209,7 +215,7 @@ export function streamNormalized<T extends Exchange, U extends MapperFactory<T, 
   )
 
   return createManagedRealTimeIterator(iterator, () => {
-    state.closed = true
+    state.closeController.abort()
     const activeIterator = state.activeIterator
     state.activeIterator = undefined
     return activeIterator?.return?.()

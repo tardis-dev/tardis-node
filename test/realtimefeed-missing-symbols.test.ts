@@ -1,7 +1,7 @@
 import { once } from 'node:events'
 import { test } from 'node:test'
 import { WebSocketServer } from 'ws'
-import { stream } from '../dist/index.js'
+import { normalizeTrades, stream, streamNormalized } from '../dist/index.js'
 import type { Exchange, Filter } from '../dist/index.js'
 import { assert } from './assertions.ts'
 
@@ -35,6 +35,28 @@ for (const symbols of [undefined, []]) {
     })
   }
 }
+
+test('streamNormalized waits before retrying a feed that rejects missing symbols', { timeout: 10000 }, async () => {
+  const errorTimes: number[] = []
+  let reportSecondError: () => void
+  const secondError = new Promise<void>((resolve) => (reportSecondError = resolve))
+  const messages = streamNormalized(
+    {
+      exchange: 'whitebit',
+      onError: () => {
+        if (errorTimes.push(Date.now()) === 2) reportSecondError()
+      }
+    },
+    normalizeTrades
+  )
+  try {
+    void messages.next()
+    await secondError
+  } finally {
+    await messages.return?.()
+  }
+  assert.ok(errorTimes[1]! - errorTimes[0]! >= 900, `retried after ${errorTimes[1]! - errorTimes[0]!}ms`)
+})
 
 test('Delta subscribes symbol-free channels without symbols', { timeout: 10000 }, async () => {
   const server = new WebSocketServer({ host: '127.0.0.1', port: 0 })

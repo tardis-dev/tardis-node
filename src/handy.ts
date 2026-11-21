@@ -1,6 +1,7 @@
 import crypto, { createHash } from 'crypto'
 import { createReadStream, createWriteStream, mkdirSync, rmSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { Agent as HttpAgent, request as httpRequest, type IncomingMessage } from 'node:http'
 import { Agent as HttpsAgent, request as httpsRequest, type RequestOptions } from 'node:https'
 import { pipeline } from 'node:stream/promises'
@@ -23,6 +24,29 @@ export function wait(delayMS: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, delayMS)
   })
+}
+
+export async function abortableWait(delayMS: number, signal: AbortSignal) {
+  try {
+    await sleep(delayMS, undefined, { signal })
+  } catch (error) {
+    if (signal.aborted === false) {
+      throw error
+    }
+  }
+}
+
+export function getRetryDelay(error: Error, retries: number) {
+  const MAX_DELAY = 32 * 1000
+  const httpError = error instanceof HttpClientError ? error : undefined
+  const isRateLimited = httpError?.status === 418 || httpError?.status === 429 || error.message.includes('429')
+
+  if (isRateLimited) {
+    const fallbackDelay = httpError?.status === 418 ? 2 * 60 * 1000 : (MAX_DELAY / 2) * retries
+    return httpError?.retryAfterMS ?? fallbackDelay
+  }
+
+  return Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
 }
 
 export function getRandomString() {

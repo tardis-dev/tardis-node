@@ -1,9 +1,8 @@
 import WebSocket, { createWebSocketStream } from 'ws'
 import type { ClientRequestArgs } from 'http'
 import { PassThrough, Writable } from 'stream'
-import { setTimeout as sleep } from 'node:timers/promises'
 import { createDebug, type DebugLogger } from '../debug.ts'
-import { getProxyAgent, HttpClientError, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
+import { abortableWait, getProxyAgent, getRetryDelay, ONE_SEC_IN_MS, optimizeFilters } from '../handy.ts'
 import { getMessageParser } from '../parsemessage.ts'
 import { closeIterator, createManagedRealTimeIterator, mergeRealTime, type ManagedRealTimeIterator } from '../realtimeiterator.ts'
 import { Exchange, Filter } from '../types.ts'
@@ -273,7 +272,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       yield { __disconnect__: true, error: connectionError, delivered }
 
       if (retryDelay !== undefined) {
-        await wait(retryDelay, this._closeController.signal)
+        await abortableWait(retryDelay, this._closeController.signal)
       }
     }
   }
@@ -378,7 +377,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
 
         this._send(connection, message)
         if (this.throttleSubscribeMS > 0) {
-          await wait(this.throttleSubscribeMS, connection.controller.signal)
+          await abortableWait(this.throttleSubscribeMS, connection.controller.signal)
         }
       }
 
@@ -387,7 +386,7 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       const messagesBeforeSnapshots = subscribeMessages.length === 0 ? 0 : subscribeMessages.length + 1
       // Wait for subscription acknowledgements and the first data message before fetching snapshots.
       while (shouldCancel() === false && connection.receivedMessagesCount < messagesBeforeSnapshots) {
-        await wait(100, connection.controller.signal)
+        await abortableWait(100, connection.controller.signal)
       }
 
       if (shouldCancel()) {
@@ -446,29 +445,6 @@ export abstract class RealTimeFeedBase implements RealTimeFeedIterable {
       this.manualSnapshotsBuffer.length = 0
     }
   }
-}
-
-async function wait(delayMS: number, signal: AbortSignal) {
-  try {
-    await sleep(delayMS, undefined, { signal })
-  } catch (error) {
-    if (signal.aborted === false) {
-      throw error
-    }
-  }
-}
-
-function getRetryDelay(error: Error, retries: number) {
-  const MAX_DELAY = 32 * 1000
-  const httpError = error instanceof HttpClientError ? error : undefined
-  const isRateLimited = httpError?.status === 418 || httpError?.status === 429 || error.message.includes('429')
-
-  if (isRateLimited) {
-    const fallbackDelay = httpError?.status === 418 ? 2 * 60 * 1000 : (MAX_DELAY / 2) * retries
-    return httpError?.retryAfterMS ?? fallbackDelay
-  }
-
-  return Math.min(Math.pow(2, retries - 1) * 1000, MAX_DELAY)
 }
 
 function resolveOrAbort<T>(promise: Promise<T>, signal: AbortSignal): Promise<T | typeof ABORTED> {
@@ -550,7 +526,7 @@ export abstract class MultiConnectionRealTimeFeedBase implements RealTimeFeedIte
 
       if (disconnect.error !== undefined) {
         retries++
-        await wait(getRetryDelay(disconnect.error, retries), this._closeController.signal)
+        await abortableWait(getRetryDelay(disconnect.error, retries), this._closeController.signal)
       }
     }
   }
