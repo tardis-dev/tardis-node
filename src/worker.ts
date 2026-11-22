@@ -67,7 +67,7 @@ async function getDataFeedSlices(payload: WorkerJobPayload) {
 
       await wait(waitTime)
     }
-    await getDataFeedSlice(payload, offset, filters, cacheDir)
+    parentPort!.postMessage((await getDataFeedSlice(payload, offset, filters, cacheDir)).message)
   }
 }
 
@@ -110,9 +110,9 @@ async function getAvailableDataFeedSlices(
   }
 
   // Fetch both range ends concurrently to verify access to the full range and get suggested slice sizes.
-  const lastSlicePromise = fetchDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+  const lastSlicePromise = getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
   const firstSlicePromise =
-    minutesCountToFetch === 1 ? lastSlicePromise : fetchDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+    minutesCountToFetch === 1 ? lastSlicePromise : getDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
 
   // Report a first-slice failure after lastSlice, matching prior error order; attach a handler so it does not kill the worker early.
   firstSlicePromise.catch(() => {})
@@ -136,27 +136,11 @@ async function getAvailableDataFeedSlices(
   // it both begining and end date of the range is accessible fetch all remaning slices concurently with CONCURRENCY_LIMIT
   await forEachConcurrent(sliceOffsets, concurrencyLimit, async (offset) => {
     const requestedSliceSize = Math.min(replaySliceSize, minutesCountToFetch - 1 - offset)
-    await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)
+    parentPort!.postMessage((await getDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize)).message)
   })
 }
 
 async function getDataFeedSlice(
-  payload: WorkerJobPayload,
-  offset: number,
-  filters: object[],
-  cacheDir: string,
-  requestedSliceSize = DEFAULT_DATA_FEED_SLICE_SIZE,
-  useCache = true
-) {
-  const slice = await fetchDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize, useCache)
-  parentPort!.postMessage(slice.message)
-  return {
-    sliceSize: slice.sliceSize,
-    suggestedSliceSize: slice.suggestedSliceSize
-  }
-}
-
-async function fetchDataFeedSlice(
   { exchange, fromDate, endpoint, apiKey, dataFeedCompression, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
@@ -184,7 +168,6 @@ async function fetchDataFeedSlice(
     }
     return {
       message,
-      sliceSize: requestedSliceSize,
       suggestedSliceSize: DEFAULT_DATA_FEED_SLICE_SIZE
     }
   }
@@ -219,7 +202,6 @@ async function fetchDataFeedSlice(
 
   return {
     message,
-    sliceSize: responseSliceSize,
     suggestedSliceSize
   }
 }
