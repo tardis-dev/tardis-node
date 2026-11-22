@@ -1,8 +1,12 @@
-import { describe, test } from 'node:test'
+import { once } from 'node:events'
 import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
-import { assert, snapshot } from './assertions.ts'
+import { createServer, type ServerResponse } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { describe, test } from 'node:test'
 import os from 'node:os'
 import path from 'node:path'
+import { gzipSync } from 'node:zlib'
+import { assert, snapshot } from './assertions.ts'
 import { init, normalizeTrades, replay, replayNormalized } from '../dist/index.js'
 
 describe('replay validation', () => {
@@ -77,6 +81,124 @@ describe('replay validation', () => {
       rmSync(cacheDir, { force: true, recursive: true })
     }
   })
+
+  for (const firstStatus of [200, 400] as const) {
+    test(
+      `overlaps boundary checks and fails with last slice error before yielding (first=${firstStatus})`,
+      { timeout: 10_000 },
+      async () => {
+        const cacheDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-boundary-'))
+        let sawFirst = false
+        let firstFinished = false
+        let pendingLastResponse: ServerResponse | undefined
+        let releaseTimer: ReturnType<typeof setTimeout> | undefined
+        let deadlockTimer: ReturnType<typeof setTimeout> | undefined
+
+        const sendLastResponse = (status: number, body: string) => {
+          if (pendingLastResponse === undefined) {
+            return
+          }
+          if (deadlockTimer !== undefined) {
+            clearTimeout(deadlockTimer)
+            deadlockTimer = undefined
+          }
+          const response = pendingLastResponse
+          pendingLastResponse = undefined
+          response.writeHead(status, { 'Content-Type': 'text/plain' }).end(body)
+        }
+
+        const scheduleLast401 = () => {
+          if (!firstFinished || pendingLastResponse === undefined || releaseTimer !== undefined) {
+            return
+          }
+          // When offset 0 succeeds, wait briefly after its response finishes so a premature publish would yield before the 401.
+          const delayMs = firstStatus === 200 ? 400 : 0
+          releaseTimer = setTimeout(() => {
+            releaseTimer = undefined
+            sendLastResponse(401, 'last denied')
+          }, delayMs)
+        }
+
+        const server = createServer((request, response) => {
+          const offset = new URL(request.url!, 'http://localhost').searchParams.get('offset')
+          if (offset === '0') {
+            sawFirst = true
+            response.once('finish', () => {
+              firstFinished = true
+              scheduleLast401()
+            })
+            if (firstStatus === 200) {
+              const body = gzipSync(Buffer.from('2026-07-01T00:00:00.0000000Z {"sequence":0}\n'))
+              response
+                .writeHead(200, {
+                  'Content-Encoding': 'gzip',
+                  'X-Slice-Size': 1,
+                  'X-Suggested-Slice-Size': 1
+                })
+                .end(body)
+            } else {
+              response.writeHead(400, { 'Content-Type': 'text/plain' }).end('first denied')
+            }
+            return
+          }
+
+          if (offset === '2') {
+            // Hold offset 2 until offset 0 arrives so sequential boundary checks fail instead of passing silently.
+            pendingLastResponse = response
+            deadlockTimer = setTimeout(() => {
+              sendLastResponse(400, 'offset 0 never arrived concurrently')
+            }, 3_000)
+            scheduleLast401()
+            return
+          }
+
+          response.writeHead(500).end(`unexpected offset ${offset}`)
+        })
+
+        server.listen(0, '127.0.0.1')
+        await once(server, 'listening')
+
+        try {
+          init({
+            endpoint: `http://127.0.0.1:${(server.address() as AddressInfo).port}/v1`,
+            cacheDir,
+            dataFeedCompression: 'gzip'
+          })
+
+          const yielded = []
+          await assert.rejects(
+            async () => {
+              for await (const message of replay({
+                exchange: 'binance',
+                from: '2026-07-01T00:00:00.000Z',
+                to: '2026-07-01T00:03:00.000Z',
+                filters: [{ channel: 'trade', symbols: ['btcusdt'] }]
+              })) {
+                yielded.push(message)
+              }
+            },
+            (err: any) => {
+              assert.ok(String(err?.message ?? err).includes('401'))
+              assert.ok(String(err?.message ?? err).includes('last denied'))
+              return true
+            }
+          )
+          assert.strictEqual(sawFirst, true)
+          assert.strictEqual(yielded.length, 0)
+        } finally {
+          if (releaseTimer !== undefined) {
+            clearTimeout(releaseTimer)
+          }
+          if (deadlockTimer !== undefined) {
+            clearTimeout(deadlockTimer)
+          }
+          init()
+          await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
+          rmSync(cacheDir, { force: true, recursive: true })
+        }
+      }
+    )
+  }
 })
 
 function listFiles(directory: string): string[] {

@@ -56,8 +56,11 @@ for (const compression of ['zstd', 'gzip'] as const) {
       }
 
       assert.deepStrictEqual(
-        requests.slice(3).map(({ query }) => query.get('offset')),
-        ['3', '0']
+        requests
+          .slice(3)
+          .map(({ query }) => query.get('offset'))
+          .sort(),
+        ['0', '3']
       )
       assert.ok(requests.some(({ query }) => query.get('sliceSize') === '2'))
       for (const { query, encoding } of requests) {

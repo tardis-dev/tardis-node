@@ -24,6 +24,7 @@ if (isMainThread) {
 
 process.on('unhandledRejection', (err, promise) => {
   debug('Unhandled Rejection at: %o, reason: %o', promise, err)
+  cleanTempFiles()
   throw err
 })
 
@@ -108,13 +109,22 @@ async function getAvailableDataFeedSlices(
     return
   }
 
-  // fetch last slice - it will tell us if user has access to the end of requested date range and data is available
-  // also fetch it from API to get current suggested slice size headers
-  const lastSlice = await getDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+  // Fetch both range ends concurrently to verify access to the full range and get suggested slice sizes.
+  const lastSlicePromise = fetchDataFeedSlice(payload, minutesCountToFetch - 1, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+  const firstSlicePromise =
+    minutesCountToFetch === 1 ? lastSlicePromise : fetchDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
 
-  // fetch first slice - it will tell us if user has access to the beginning of requested date range
-  const firstSlice =
-    minutesCountToFetch === 1 ? lastSlice : await getDataFeedSlice(payload, 0, filters, cacheDir, DEFAULT_DATA_FEED_SLICE_SIZE, false)
+  // Report a first-slice failure after lastSlice, matching prior error order; attach a handler so it does not kill the worker early.
+  firstSlicePromise.catch(() => {})
+
+  const lastSlice = await lastSlicePromise
+  const firstSlice = await firstSlicePromise
+
+  // Publish only once both boundary checks pass so a denied range never yields partial data.
+  parentPort!.postMessage(firstSlice.message)
+  if (minutesCountToFetch > 1) {
+    parentPort!.postMessage(lastSlice.message)
+  }
 
   const replaySliceSize =
     filters.length === 0 ? DEFAULT_DATA_FEED_SLICE_SIZE : Math.max(firstSlice.suggestedSliceSize, lastSlice.suggestedSliceSize)
@@ -131,6 +141,22 @@ async function getAvailableDataFeedSlices(
 }
 
 async function getDataFeedSlice(
+  payload: WorkerJobPayload,
+  offset: number,
+  filters: object[],
+  cacheDir: string,
+  requestedSliceSize = DEFAULT_DATA_FEED_SLICE_SIZE,
+  useCache = true
+) {
+  const slice = await fetchDataFeedSlice(payload, offset, filters, cacheDir, requestedSliceSize, useCache)
+  parentPort!.postMessage(slice.message)
+  return {
+    sliceSize: slice.sliceSize,
+    suggestedSliceSize: slice.suggestedSliceSize
+  }
+}
+
+async function fetchDataFeedSlice(
   { exchange, fromDate, endpoint, apiKey, dataFeedCompression, userAgent }: WorkerJobPayload,
   offset: number,
   filters: object[],
@@ -156,8 +182,8 @@ async function getDataFeedSlice(
       slicePath: cachedSlicePath,
       sliceSize: requestedSliceSize
     }
-    parentPort!.postMessage(message)
     return {
+      message,
       sliceSize: requestedSliceSize,
       suggestedSliceSize: DEFAULT_DATA_FEED_SLICE_SIZE
     }
@@ -190,9 +216,9 @@ async function getDataFeedSlice(
     slicePath: downloadResult.downloadPath,
     sliceSize: responseSliceSize
   }
-  parentPort!.postMessage(message)
 
   return {
+    message,
     sliceSize: responseSliceSize,
     suggestedSliceSize
   }
