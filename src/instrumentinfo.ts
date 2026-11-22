@@ -111,6 +111,8 @@ export type ContractType =
   | 'index'
   | 'linear_xperp'
   | 'inverse_xperp'
+  | 'binary_put_option'
+  | 'binary_call_option'
 
 export type UnderlyingType = 'native' | 'equity' | 'commodity' | 'fixed_income' | 'fx' | 'index' | 'pre_market'
 
