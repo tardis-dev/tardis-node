@@ -4,6 +4,7 @@ import { test } from 'node:test'
 import { type Writable } from 'node:stream'
 import { type WebSocket, WebSocketServer } from 'ws'
 import { assert } from './assertions.ts'
+import { requestedWaits, useRealWaits } from './instant-waits.ts'
 import { combine, compute, normalizeLiquidations, normalizeTrades, stream, streamNormalized } from '../dist/index.js'
 import { MultiConnectionRealTimeFeedBase, PoolingClientBase, RealTimeFeedBase } from '../dist/realtimefeeds/realtimefeed.js'
 import { createManagedRealTimeIterator, type ManagedRealTimeIterator } from '../dist/realtimeiterator.js'
@@ -404,7 +405,7 @@ test('return does not wait for WebSocket URL discovery', async () => {
   }
 })
 
-test('backs off after an HTTP 418 snapshot error and cancels the wait when closed', async () => {
+test('backs off after an HTTP 418 snapshot error and cancels the wait when closed', async (context) => {
   const server = new WebSocketServer({ host: '127.0.0.1', port: 0 })
   await once(server, 'listening')
 
@@ -440,8 +441,10 @@ test('backs off after an HTTP 418 snapshot error and cancels the wait when close
     } while (message.value?.__disconnect__ !== true)
     assert.strictEqual(feed.snapshotCalls, 1)
 
+    useRealWaits(context)
     pendingReconnect = iterator.next()
-    await sleep(1100)
+    await sleep(50)
+    assert.strictEqual(requestedWaits.at(-1), 2 * 60 * 1000)
     assert.strictEqual(connections, 1)
 
     await withTimeout(iterator.return(), 500)

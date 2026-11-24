@@ -1,15 +1,26 @@
-import { describe, test } from 'node:test'
+import { after, before, describe, mock, test } from 'node:test'
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash, randomBytes } from 'node:crypto'
 import { createServer, type IncomingMessage, type RequestListener, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { assert } from './assertions.ts'
+import { requestedWaits } from './instant-waits.ts'
 import os from 'os'
 import path from 'path'
 import { gunzipSync } from 'node:zlib'
-import { downloadDatasets, sanitizeForFilename } from '../dist/downloaddatasets.js'
+import * as handy from '../dist/handy.js'
 import { init } from '../dist/options.js'
 import { describeLive } from './live.ts'
+
+let testRangeSize: number | undefined
+mock.module('../dist/handy.js', {
+  exports: {
+    ...handy,
+    downloadDatasetFile: (options: Parameters<typeof handy.downloadDatasetFile>[0]) =>
+      handy.downloadDatasetFile(testRangeSize === undefined ? options : { ...options, rangeSize: testRangeSize })
+  }
+})
+const { downloadDatasets, sanitizeForFilename } = await import('../dist/downloaddatasets.js')
 
 const LIVE_DATASET: Parameters<typeof downloadDatasets>[0] = {
   exchange: 'deribit' as const,
@@ -19,7 +30,7 @@ const LIVE_DATASET: Parameters<typeof downloadDatasets>[0] = {
   to: '2024-01-02'
 }
 
-const RANGE_SIZE = 64 * 1024 * 1024
+const RANGE_SIZE = 64 * 1024
 const LARGE_DATASET_PATH = 'deribit_trades_2024-01-01_BTC-PERPETUAL.csv.gz'
 
 function createTempDir() {
@@ -108,6 +119,13 @@ describe('downloadDatasets', () => {
 })
 
 describe('downloadDatasets in byte ranges', () => {
+  before(() => {
+    testRangeSize = RANGE_SIZE
+  })
+  after(() => {
+    testRangeSize = undefined
+  })
+
   test('downloads a large dataset in byte ranges through the API', async () => {
     const dataset = randomBytes(2 * RANGE_SIZE + 1000)
     const ranges: (string | undefined)[] = []
@@ -208,9 +226,9 @@ describe('downloadDatasets in byte ranges', () => {
 
   test('waits for Retry-After when a range is rate limited', async () => {
     const dataset = randomBytes(RANGE_SIZE + 1000)
-    const requests: { request: string; at: number }[] = []
+    const requests: string[] = []
     const api = await listen((request, response) => {
-      requests.push({ request: `${request.url} ${request.headers.range}`, at: performance.now() })
+      requests.push(`${request.url} ${request.headers.range}`)
       if (requests.length === 2) {
         response.writeHead(429, { 'Retry-After': '1' }).end('rate limited')
         return
@@ -221,17 +239,22 @@ describe('downloadDatasets in byte ranges', () => {
 
     try {
       init({ datasetsEndpoint: `${api.url}/v1`, apiKey: 'api-key' })
+      const waitsBefore = requestedWaits.length
       await downloadDatasets({ ...LIVE_DATASET, downloadDir: tempDir })
 
       assert.strictEqual(readFileSync(path.join(tempDir, LARGE_DATASET_PATH)).equals(dataset), true)
       const datasetUrl = '/v1/deribit/trades/2024/01/01/BTC-PERPETUAL.csv.gz'
       const secondRange = `bytes=${RANGE_SIZE}-${2 * RANGE_SIZE - 1}`
-      assert.deepStrictEqual(
-        requests.map(({ request }) => request),
-        [`${datasetUrl} bytes=0-${RANGE_SIZE - 1}`, `${datasetUrl} ${secondRange}`, `${datasetUrl}?retryAttempt=1 ${secondRange}`]
+      assert.deepStrictEqual(requests, [
+        `${datasetUrl} bytes=0-${RANGE_SIZE - 1}`,
+        `${datasetUrl} ${secondRange}`,
+        `${datasetUrl}?retryAttempt=1 ${secondRange}`
+      ])
+      const waits = requestedWaits.slice(waitsBefore)
+      assert.ok(
+        waits.some((delayMS) => delayMS >= 1000 && delayMS < 2000),
+        `retries after Retry-After plus jitter, waited ${waits}`
       )
-      const retryDelayMS = requests[2].at - requests[1].at
-      assert.ok(retryDelayMS >= 950 && retryDelayMS < 5000, `retried after ${retryDelayMS} ms`)
     } finally {
       init()
       rmSync(tempDir, { force: true, recursive: true })

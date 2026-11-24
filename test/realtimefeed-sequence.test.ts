@@ -2,6 +2,7 @@ import { setTimeout as sleep } from 'node:timers/promises'
 import { test } from 'node:test'
 import type { WebSocket } from 'ws'
 import { assert } from './assertions.ts'
+import { useRealWaits } from './instant-waits.ts'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { RealTimeFeedBase, MultiConnectionRealTimeFeedBase, SequenceGapError, type Sequence } from '../dist/realtimefeeds/realtimefeed.js'
 import type { Filter } from '../dist/types.js'
@@ -192,7 +193,7 @@ for (const failedChild of [0, 1]) {
   })
 }
 
-test('return cancels the retry after a sequence gap', { timeout: 10000 }, async () => {
+test('return cancels the retry after a sequence gap', { timeout: 10000 }, async (context) => {
   let connections = 0
   const { server, wssURL, cleanup } = await createTestWebSocketServer()
   server.on('connection', (socket) => {
@@ -204,6 +205,7 @@ test('return cancels the retry after a sequence gap', { timeout: 10000 }, async 
   try {
     await iterator.next()
     assert.strictEqual((await iterator.next()).value.__disconnect__, true)
+    useRealWaits(context)
     const pending = iterator.next()
     await sleep(10)
     await iterator.return?.()
