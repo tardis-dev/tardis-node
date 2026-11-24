@@ -46,7 +46,6 @@ import { StarAtlasRealTimeFeed } from './staratlas.ts'
 import { MangoRealTimeFeed } from './mango.ts'
 import { CryptoComRealTimeFeed } from './cryptocom.ts'
 import { KucoinRealTimeFeed } from './kucoin.ts'
-import { BitnomialRealTimeFeed } from './bitnomial.ts'
 import { WooxRealTimeFeed } from './woox.ts'
 import { BlockchainComRealTimeFeed } from './blockchaincom.ts'
 import { BinanceEuropeanOptionsRealTimeFeed } from './binanceeuropeanoptions.ts'
@@ -119,7 +118,6 @@ const realTimeFeedsMap: {
   'bybit-spread': BybitSpreadRealTimeDataFeed,
   'crypto-com': CryptoComRealTimeFeed,
   kucoin: KucoinRealTimeFeed,
-  bitnomial: BitnomialRealTimeFeed,
   'woo-x': WooxRealTimeFeed,
   'blockchain-com': BlockchainComRealTimeFeed,
   'binance-european-options': BinanceEuropeanOptionsRealTimeFeed,
