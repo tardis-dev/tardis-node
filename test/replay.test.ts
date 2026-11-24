@@ -201,6 +201,47 @@ describe('replay validation', () => {
       }
     )
   }
+
+  test('fails immediately without retrying on unsupported content encoding in real worker', { timeout: 10_000 }, async (context) => {
+    useRealWaits(context)
+    const cacheDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-unsupported-encoding-'))
+    let requestsCount = 0
+    const server = createServer((_request, response) => {
+      requestsCount++
+      response
+        .writeHead(200, {
+          'Content-Encoding': 'br',
+          'X-Slice-Size': 1,
+          'X-Suggested-Slice-Size': 1
+        })
+        .end('unsupported')
+    })
+
+    server.listen(0, '127.0.0.1')
+    await once(server, 'listening')
+
+    try {
+      init({
+        endpoint: `http://127.0.0.1:${(server.address() as AddressInfo).port}/v1`,
+        cacheDir
+      })
+
+      await assert.rejects(
+        replay({
+          exchange: 'binance',
+          from: '2026-07-01T00:00:00.000Z',
+          to: '2026-07-01T00:01:00.000Z',
+          filters: [{ channel: 'trade', symbols: ['btcusdt'] }]
+        }).next(),
+        (err: unknown) => err instanceof Error && err.message.includes('Unsupported data feed content encoding: br')
+      )
+      assert.strictEqual(requestsCount, 1)
+    } finally {
+      init()
+      await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
+      rmSync(cacheDir, { force: true, recursive: true })
+    }
+  })
 })
 
 function listFiles(directory: string): string[] {

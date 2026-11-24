@@ -1,11 +1,11 @@
 import { randomBytes } from 'node:crypto'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { createReadStream, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { Readable } from 'node:stream'
+import { pipeline, Readable } from 'node:stream'
 import { test } from 'node:test'
 import { constants, createZstdCompress, zstdCompressSync } from 'node:zlib'
-import { createZstdDecompressionStream } from '../dist/zstd.js'
+import { createZstdDecompressor } from '../dist/zstd.js'
 import { assert } from './assertions.ts'
 
 test('streams every frame from a standard concatenated zstd file', async () => {
@@ -70,7 +70,8 @@ async function compressAsStream(contents: Buffer) {
 
 async function decompress(path: string, chunkSize = 257) {
   const chunks = []
-  for await (const chunk of createZstdDecompressionStream(path, chunkSize)) {
+  const stream = pipeline(createReadStream(path, { highWaterMark: chunkSize }), createZstdDecompressor(chunkSize), () => {})
+  for await (const chunk of stream) {
     chunks.push(chunk)
   }
   return Buffer.concat(chunks)

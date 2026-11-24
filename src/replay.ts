@@ -1,19 +1,20 @@
 import { createReadStream } from 'node:fs'
 import { rm } from 'node:fs/promises'
-import { EventEmitter, once } from 'events'
+import { pipeline } from 'node:stream'
+import { once } from 'events'
 import { Worker } from 'worker_threads'
 import { constants, createGunzip } from 'zlib'
 import { BinarySplitBatchStream } from './binarysplit.ts'
 import { clearCacheSync } from './clearcache.ts'
 import { EXCHANGES, EXCHANGE_CHANNELS_INFO } from './consts.ts'
 import { debug } from './debug.ts'
-import { addDays, createNormalizedSymbolFilter, getFilters, parseAsUTCDate, wait } from './handy.ts'
+import { addDays, createNormalizedSymbolFilter, getFilters, parseAsUTCDate } from './handy.ts'
 import { Mapper, MapperFactory, normalizeBookChanges } from './mappers/index.ts'
 import { getOptions } from './options.ts'
 import { getMessageParser } from './parsemessage.ts'
 import { Disconnect, Exchange, FilterForExchange } from './types.ts'
 import { WorkerJobPayload, WorkerMessage, WorkerSignal } from './worker.ts'
-import { createZstdDecompressionStream } from './zstd.ts'
+import { createZstdDecompressor } from './zstd.ts'
 
 type MapperOutput<T> = T extends MapperFactory<any, infer U> ? U : never
 type ReplayNormalizedMessage<U extends readonly MapperFactory<any, any>[], Z extends boolean> = Z extends true
@@ -130,9 +131,17 @@ async function* replayLineBatches<T extends Exchange>({
     waitWhenDataNotYetAvailable
   }
 
-  const worker = new ReliableWorker(payload)
+  const worker = new Worker(new URL('./worker.js', import.meta.url), {
+    workerData: payload
+  })
 
-  worker.on('message', (message: WorkerMessage) => {
+  let workerExited = false
+
+  worker.on('message', (message: WorkerMessage | WorkerSignal.READY_TO_TERMINATE) => {
+    if (message === WorkerSignal.READY_TO_TERMINATE) {
+      return
+    }
+
     cachedSlicePaths.set(message.sliceKey, {
       slicePath: message.slicePath,
       sliceSize: message.sliceSize
@@ -143,6 +152,11 @@ async function* replayLineBatches<T extends Exchange>({
     debug('worker error %o', err)
 
     replayError = err
+  })
+
+  worker.on('exit', (code) => {
+    workerExited = true
+    debug('worker finished with code: %d', code)
   })
 
   try {
@@ -173,26 +187,29 @@ async function* replayLineBatches<T extends Exchange>({
       // response is a path to file on disk let' read it as stream
       const { slicePath: cachedSlicePath, sliceSize } = cachedSlice
       const isZstdSlice = cachedSlicePath.endsWith('.zst')
-      const decompressedStream = isZstdSlice
-        ? createZstdDecompressionStream(cachedSlicePath, CHUNK_SIZE)
-        : createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE }).pipe(createGunzip(GZIP_OPTIONS))
-      const linesStream = decompressedStream
-        .on('error', function onDecompressionError(err) {
-          debug('%s decompression error %o', isZstdSlice ? 'zstd' : 'gzip', err)
-          linesStream.destroy(err)
-        })
-        // and split by new line
-        .pipe(new BinarySplitBatchStream())
-        .on('error', function onBinarySplitStreamError(err) {
-          debug('binary split stream error %o', err)
-          linesStream.destroy(err)
-        })
+      const { promise: pipelineDone, resolve: onPipelineDone } = Promise.withResolvers<void>()
+      const linesStream = pipeline(
+        createReadStream(cachedSlicePath, { highWaterMark: CHUNK_SIZE }),
+        isZstdSlice ? createZstdDecompressor(CHUNK_SIZE) : createGunzip(GZIP_OPTIONS),
+        new BinarySplitBatchStream(),
+        (err) => {
+          if (err && err.code !== 'ERR_STREAM_PREMATURE_CLOSE') {
+            debug('%s slice pipeline error %o', isZstdSlice ? 'zstd' : 'gzip', err)
+          }
+          onPipelineDone()
+        }
+      )
 
       let linesCount = 0
 
-      for await (const bufferLines of linesStream as AsyncIterable<Buffer[]>) {
-        linesCount += bufferLines.length
-        yield bufferLines
+      try {
+        for await (const bufferLines of linesStream.iterator({ destroyOnReturn: false }) as AsyncIterable<Buffer[]>) {
+          linesCount += bufferLines.length
+          yield bufferLines
+        }
+      } finally {
+        linesStream.destroy()
+        await pipelineDone
       }
 
       debug('processed slice: %s, exchange: %s, count: %d', sliceKey, exchange, linesCount)
@@ -239,9 +256,8 @@ async function* replayLineBatches<T extends Exchange>({
       )
     }
 
-    const underlyingWorker = worker.getUnderlyingWorker()
-    if (underlyingWorker !== undefined) {
-      await terminateWorker(underlyingWorker, 500)
+    if (workerExited === false) {
+      await terminateWorker(worker, 500)
     }
   }
 }
@@ -283,18 +299,26 @@ function parseReplayThreeDigits(bufferLine: Buffer, start: number) {
 
 // gracefully terminate worker
 async function terminateWorker(worker: Worker, waitTimeout: number) {
-  let cancelWait = () => {}
-  const maxWaitGuard = new Promise((resolve) => {
-    const timeoutId = setTimeout(resolve, waitTimeout)
-    cancelWait = () => clearTimeout(timeoutId)
+  await new Promise<void>((resolve) => {
+    const finish = () => {
+      clearTimeout(timeoutId)
+      worker.off('message', onMessage)
+      worker.off('exit', finish)
+      resolve()
+    }
+
+    const onMessage = (signal: unknown) => {
+      if (signal === WorkerSignal.READY_TO_TERMINATE) {
+        finish()
+      }
+    }
+
+    const timeoutId = setTimeout(finish, waitTimeout)
+    worker.on('message', onMessage)
+    worker.once('exit', finish)
+    worker.postMessage(WorkerSignal.BEFORE_TERMINATE)
   })
 
-  const readyToTerminate = new Promise<void>((resolve) => {
-    worker.once('message', (signal) => signal === WorkerSignal.READY_TO_TERMINATE && resolve())
-  }).then(cancelWait)
-
-  worker.postMessage(WorkerSignal.BEFORE_TERMINATE)
-  await Promise.race([readyToTerminate, maxWaitGuard])
   await worker.terminate()
 }
 
@@ -532,52 +556,6 @@ function validateReplayNormalizedOptions(fromDate: Date, normalizers: MapperFact
 
   if (hasBookChangeNormalizer && dateDoesNotStartAtTheBeginningOfTheDay) {
     debug('Initial order book snapshots are available only at 00:00 UTC')
-  }
-}
-
-class ReliableWorker extends EventEmitter {
-  private _errorsCount = 0
-  private _worker: Worker | undefined = undefined
-
-  constructor(private readonly _payload: WorkerJobPayload) {
-    super()
-
-    this._initWorker()
-  }
-
-  private _initWorker() {
-    this._worker = new Worker(new URL('./worker.js', import.meta.url), {
-      workerData: this._payload
-    })
-
-    this._worker.on('message', (message: WorkerMessage) => {
-      this.emit('message', message)
-    })
-
-    this._worker.on('error', this._handleError)
-
-    this._worker.on('exit', (code) => {
-      debug('worker finished with code: %d', code)
-    })
-  }
-
-  private _handleError = async (err: Error) => {
-    debug('underlying worker error %o', err)
-
-    if (err.message.includes('HttpError') === false && this._errorsCount < 30) {
-      this._errorsCount++
-      const delayMS = Math.min(Math.pow(2, this._errorsCount) * 1000, 120 * 1000)
-      debug('re-init worker after: %d ms', delayMS)
-      await wait(delayMS)
-      // it was most likely unhandled socket hang up error, let's retry first with new worker and don't emit error right away
-      this._initWorker()
-    } else {
-      this.emit('error', err)
-    }
-  }
-
-  public getUnderlyingWorker() {
-    return this._worker
   }
 }
 
