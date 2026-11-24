@@ -75,3 +75,41 @@ describeLive('bingx spot live', () => {
     assert.deepEqual([...seen].sort(), ['book_ticker', 'delta', 'snapshot', 'trade'])
   })
 })
+
+describeLive('bingx futures live', () => {
+  test('streams required numeric derivative fields', { timeout: 40_000 }, async () => {
+    const fields = {
+      ticker: ['c'],
+      markPrice: ['p', 'E'],
+      premiumIndex: ['indexPrice', 'lastFundingRate', 'nextFundingTime'],
+      openInterest: ['openInterest', 'time']
+    }
+    const symbols = ['BTC-USDT', 'ETH-USDT']
+    const messages = stream({
+      exchange: 'bingx-futures',
+      filters: Object.keys(fields).map((channel) => ({ channel, symbols })),
+      timeoutIntervalMS: 20_000,
+      withDisconnects: true
+    })
+    const seen = new Set<string>()
+    try {
+      for await (const result of messages) {
+        assert.ok(result, 'BingX futures disconnected before all derivative channels produced data')
+        const { dataType, data } = result.message
+        if (!dataType || !data) continue
+        const [symbol, channel] = dataType.split('@') as [string, keyof typeof fields]
+        assert.ok(symbols.includes(symbol))
+        for (const field of fields[channel]) {
+          assert.ok(Object.hasOwn(data, field), `${dataType} omitted ${field}`)
+          assert.ok(data[field] !== null && data[field] !== '', `${dataType} sent an empty ${field}`)
+          assert.ok(Number.isFinite(Number(data[field])), `${dataType} sent a non-finite ${field}`)
+        }
+        seen.add(dataType)
+        if (seen.size === symbols.length * Object.keys(fields).length) break
+      }
+    } finally {
+      await messages.return?.()
+    }
+    assert.strictEqual(seen.size, 8)
+  })
+})

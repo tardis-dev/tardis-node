@@ -14,6 +14,7 @@ import type { Exchange, Mapper } from '../dist/index.js'
 import { getFilters } from '../dist/handy.js'
 
 const exchangesWithDerivativeInfo: Exchange[] = [
+  'bingx-futures',
   'backpack',
   'whitebit',
   'delta-india',
@@ -54,6 +55,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 
 const exchangesWithBookTickerInfo: Exchange[] = [
   'bingx',
+  'bingx-futures',
   'backpack',
   'whitebit',
   'delta-india',
@@ -185,9 +187,9 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
-  for (const exchange of ['bingx'] as const) {
+  for (const exchange of ['bingx', 'bingx-futures'] as const) {
     test(`map ${exchange} captured messages`, () => {
-      // Recorder captures from 2026-11-18, with depth levels trimmed.
+      // Recorder captures from 2026-11-18/23, with depth levels trimmed.
       const fixtures = {
         bingx: [
           {
@@ -283,6 +285,160 @@ describe('mappers', () => {
               a: 0.004057,
               B: 64621.92,
               b: 0.007133
+            }
+          }
+        ],
+        'bingx-futures': [
+          {
+            id: '1',
+            code: 0,
+            msg: '',
+            dataType: '',
+            data: null
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@incrDepth',
+            data: {
+              action: 'all',
+              lastUpdateId: 789424784,
+              time: 1795426539740,
+              bids: [
+                ['61573.7', '28.6485'],
+                ['61573.5', '0.0134']
+              ],
+              asks: [
+                ['61573.8', '18.7314'],
+                ['61574.0', '7.5855']
+              ]
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@incrDepth',
+            data: {
+              action: 'update',
+              lastUpdateId: 789424785,
+              time: 1795426539775,
+              bids: [
+                ['61573.7', '0.0000'],
+                ['61573.5', '0.0000']
+              ],
+              asks: [
+                ['61816.9', '0.0000'],
+                ['61815.1', '0.0000']
+              ]
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@trade',
+            data: [
+              {
+                t: '766441347',
+                q: '0.0004',
+                p: '61571.2',
+                T: 1795426539746,
+                m: true,
+                s: 'BTC-USDT'
+              }
+            ]
+          },
+          {
+            code: 0,
+            dataType: 'NCSKMSFT2USD-USDT@trade',
+            data: [
+              {
+                t: '139498775',
+                q: '0.006',
+                p: '500.43',
+                T: 1795426540214,
+                m: true,
+                s: 'NCSKMSFT2USD-USDT'
+              },
+              {
+                t: '139498776',
+                q: '0.005',
+                p: '500.44',
+                T: 1795426540214,
+                m: false,
+                s: 'NCSKMSFT2USD-USDT'
+              }
+            ]
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@bookTicker',
+            data: {
+              e: 'bookTicker',
+              u: 267380417,
+              E: 1795426539790,
+              T: 1795426539655,
+              s: 'BTC-USDT',
+              b: '61571.2',
+              B: '24.7217',
+              a: '61571.3',
+              A: '21.7630'
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@ticker',
+            data: {
+              e: '24hTicker',
+              E: 1795426540703,
+              s: 'BTC-USDT',
+              p: '12.1',
+              P: '0.02',
+              c: '61572.8',
+              L: '0.0008',
+              h: '61945.5',
+              l: '59885.9',
+              v: '23978.1900',
+              q: '1464540629.71',
+              o: '61560.7',
+              O: 1795426363333,
+              C: 1795426540341,
+              A: '61581.9',
+              a: '9.0777',
+              B: '61572.7',
+              b: '46.2796'
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@premiumIndex',
+            generated: true,
+            data: {
+              symbol: 'BTC-USDT',
+              markPrice: '61581.6',
+              indexPrice: '61607.7',
+              lastFundingRate: '0.00004100',
+              nextFundingTime: 1795449600000,
+              fundingIntervalHours: 8,
+              minFundingRate: '-0.003000',
+              maxFundingRate: '0.003000',
+              updateTime: 1795420800000
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@openInterest',
+            generated: true,
+            data: {
+              openInterest: '613901942.7',
+              symbol: 'BTC-USDT',
+              time: 1795426541142
+            }
+          },
+          {
+            code: 0,
+            dataType: 'BTC-USDT@markPrice',
+            data: {
+              e: 'markPriceUpdate',
+              E: 1795426540489,
+              s: 'BTC-USDT',
+              p: '61580.8'
             }
           }
         ]
