@@ -1,7 +1,6 @@
 import crypto, { createHash } from 'crypto'
 import { createReadStream, createWriteStream, mkdirSync, rmSync } from 'node:fs'
 import { rename } from 'node:fs/promises'
-import { setTimeout as sleep } from 'node:timers/promises'
 import { Agent as HttpAgent, request as httpRequest, type IncomingMessage } from 'node:http'
 import { Agent as HttpsAgent, request as httpsRequest, type RequestOptions } from 'node:https'
 import { pipeline } from 'node:stream/promises'
@@ -10,6 +9,9 @@ import { debug } from './debug.ts'
 import { forEachConcurrent } from './foreachconcurrent.ts'
 import { Mapper } from './mappers/index.ts'
 import { Disconnect, Exchange, Filter, FilterForExchange } from './types.ts'
+import { wait } from './wait.ts'
+
+export { abortableWait, wait } from './wait.ts'
 
 export function parseAsUTCDate(val: string) {
   // Treat date-only and minute-level strings as UTC instead of local time.
@@ -18,22 +20,6 @@ export function parseAsUTCDate(val: string) {
   }
   const date = new Date(val)
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes()))
-}
-
-export function wait(delayMS: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delayMS)
-  })
-}
-
-export async function abortableWait(delayMS: number, signal: AbortSignal) {
-  try {
-    await sleep(delayMS, undefined, { signal })
-  } catch (error) {
-    if (signal.aborted === false) {
-      throw error
-    }
-  }
 }
 
 export function getRetryDelay(error: Error, retries: number) {
@@ -821,7 +807,8 @@ export async function downloadDatasetFile({
   userAgent,
   attemptTimeoutMS,
   verifyMd5,
-  requestSlots
+  requestSlots,
+  rangeSize = DATASET_RANGE_SIZE
 }: {
   url: string
   downloadPath: string
@@ -830,6 +817,7 @@ export async function downloadDatasetFile({
   attemptTimeoutMS: number
   verifyMd5: boolean
   requestSlots: RequestSlots
+  rangeSize?: number
 }) {
   // The API key goes only to the API, never to the storage the API redirects to.
   const storageRequestOptions = {
@@ -856,7 +844,14 @@ export async function downloadDatasetFile({
   try {
     for (let restarts = 0; ; restarts++) {
       try {
-        const announcedMd5 = await downloadDatasetRanges(url, apiRequestOptions, storageRequestOptions, tmpFilePath, requestSlots)
+        const announcedMd5 = await downloadDatasetRanges(
+          url,
+          apiRequestOptions,
+          storageRequestOptions,
+          tmpFilePath,
+          requestSlots,
+          rangeSize
+        )
         if (verifyMd5) {
           await checkDatasetMd5(tmpFilePath, announcedMd5, url)
         }
@@ -880,13 +875,14 @@ async function downloadDatasetRanges(
   apiRequestOptions: DownloadRequestOptions,
   storageRequestOptions: DownloadRequestOptions,
   tmpFilePath: string,
-  requestSlots: RequestSlots
+  requestSlots: RequestSlots,
+  rangeSize: number
 ) {
   const first = await withDownloadRetries(url, tmpFilePath, (attemptUrl) =>
-    requestSlots.run(() => downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, 0))
+    requestSlots.run(() => downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, 0, rangeSize))
   )
   const datasetSize = first.datasetSize
-  if (datasetSize === undefined || datasetSize <= DATASET_RANGE_SIZE) {
+  if (datasetSize === undefined || datasetSize <= rangeSize) {
     return first.md5
   }
 
@@ -899,11 +895,11 @@ async function downloadDatasetRanges(
     // Read the URL only once the range has a slot, so a range that waited long uses the newest URL.
     const rangeUrl = storageUrl
     if (rangeUrl === undefined) {
-      return downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize, first.md5)
+      return downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, rangeSize, datasetSize, first.md5)
     }
 
     try {
-      return await downloadDatasetRange(rangeUrl, storageRequestOptions, tmpFilePath, start, datasetSize, first.md5)
+      return await downloadDatasetRange(rangeUrl, storageRequestOptions, tmpFilePath, start, rangeSize, datasetSize, first.md5)
     } catch (error) {
       if (!(error instanceof HttpError && error.status === 403)) {
         throw error
@@ -912,7 +908,7 @@ async function downloadDatasetRanges(
       // redirect it gets replaces the URL. The others wait for it and retry with the new URL, or fail this attempt
       // with its error.
       if (renewal === undefined && storageUrl === rangeUrl) {
-        renewal = downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, datasetSize, first.md5)
+        renewal = downloadDatasetRange(attemptUrl, apiRequestOptions, tmpFilePath, start, rangeSize, datasetSize, first.md5)
           .then((renewedRange) => {
             storageUrl = renewedRange.redirectUrl
             return renewedRange
@@ -927,7 +923,7 @@ async function downloadDatasetRanges(
     }
   }
 
-  const rangeStarts = [...sequence(Math.ceil(datasetSize / DATASET_RANGE_SIZE), 1)].map((index) => index * DATASET_RANGE_SIZE)
+  const rangeStarts = [...sequence(Math.ceil(datasetSize / rangeSize), 1)].map((index) => index * rangeSize)
   // Unlike Promise.all, forEachConcurrent rejects only after the ranges already started have finished, retries included,
   // so a restart or cleanup never overlaps a range still writing.
   await forEachConcurrent(rangeStarts, requestSlots.limit, (start) =>
@@ -942,10 +938,11 @@ async function downloadDatasetRange(
   requestOptions: DownloadRequestOptions,
   tmpFilePath: string,
   start: number,
+  rangeSize: number,
   expectedDatasetSize?: number,
   expectedMd5?: string
 ) {
-  const end = start + DATASET_RANGE_SIZE - 1
+  const end = start + rangeSize - 1
   const { response, redirectUrl } = await openDownloadResponse(url, {
     ...requestOptions,
     headers: { ...requestOptions.headers, Range: `bytes=${start}-${end}` }

@@ -7,6 +7,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { assert, snapshot } from './assertions.ts'
+import { useRealWaits } from './instant-waits.ts'
 import { init, normalizeTrades, replay, replayNormalized } from '../dist/index.js'
 
 describe('replay validation', () => {
@@ -49,7 +50,8 @@ describe('replay validation', () => {
     )
   })
 
-  test('replays and normalizes a fixed two-minute Coinbase slice from the Tardis API', { timeout: 60_000 }, async () => {
+  test('replays and normalizes a fixed two-minute Coinbase slice from the Tardis API', { timeout: 60_000 }, async (context) => {
+    useRealWaits(context)
     const cacheDir = mkdtempSync(path.join(os.tmpdir(), 'tardis-node-replay-e2e-'))
     const from = '2019-06-01T00:00:00.000Z'
     const to = '2019-06-01T00:02:00.000Z'
