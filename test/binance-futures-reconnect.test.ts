@@ -4,6 +4,7 @@ import { mock, test } from 'node:test'
 import { type WebSocket, WebSocketServer } from 'ws'
 import * as handy from '../dist/handy.js'
 import { assert } from './assertions.ts'
+import { requestedWaits } from './instant-waits.ts'
 
 // Each depth update sets one of ten bid levels to an amount equal to its update id, so the book at any update id is known.
 const books = new Map(['BTCUSDT', 'ETHUSDT'].map((symbol) => [symbol, { updateId: 0, levels: new Map<string, string>() }]))
@@ -101,7 +102,7 @@ test('a dropped Binance futures connection restarts every connection and book fr
   )
 
   const output: any[] = []
-  const receivedAt: number[] = []
+  const waitsBefore: number[] = []
   let dropped: ExchangeConnection | undefined
   let connectionsBeforeLastDisconnect = 0
   const bookChangesFrom = (index: number, symbol: string) =>
@@ -116,7 +117,7 @@ test('a dropped Binance futures connection restarts every connection and book fr
     const deadline = Date.now() + 5_000
     for await (const message of messages) {
       output.push(message)
-      receivedAt.push(Date.now())
+      waitsBefore.push(requestedWaits.length)
       if (Date.now() > deadline) break
       if (message.type === 'disconnect') connectionsBeforeLastDisconnect = connections.length
 
@@ -175,7 +176,7 @@ test('a dropped Binance futures connection restarts every connection and book fr
   assert.equal(disconnects.length, 2, 'the dropped connection and the rejected reconnect each restart the feed once')
   const [, rejected] = disconnects
   assert.ok(
-    receivedAt[rejected + 1] - receivedAt[rejected] >= 900,
+    Math.max(...requestedWaits.slice(waitsBefore[rejected], waitsBefore[rejected + 1])) >= 1000,
     'the feed opens again only after the retry delay of the rejected connection'
   )
 })

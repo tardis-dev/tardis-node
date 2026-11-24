@@ -9,6 +9,7 @@ import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import { download, getJSON, HttpClientError, HttpError, postJSON } from '../dist/handy.js'
 import { assert } from './assertions.ts'
+import { requestedWaits } from './instant-waits.ts'
 
 const execFileAsync = promisify(execFile)
 
@@ -160,10 +161,10 @@ test('does not cache a response shorter than its content length', async () => {
 })
 
 test('retries a rate-limited download after its Retry-After delay', { timeout: 10_000 }, async () => {
-  const requestTimes: number[] = []
+  let requestsCount = 0
   const server = await startServer((_request, response) => {
-    requestTimes.push(performance.now())
-    if (requestTimes.length === 1) {
+    requestsCount++
+    if (requestsCount === 1) {
       response.writeHead(429, { 'Retry-After': '1' }).end('rate limited')
       return
     }
@@ -174,11 +175,15 @@ test('retries a rate-limited download after its Retry-After delay', { timeout: 1
   const downloadPath = path.join(tempDir, 'data.bin')
 
   try {
+    const waitsBefore = requestedWaits.length
     await download({ url: `${server.url}/data`, downloadPath, userAgent: 'tardis-node-test', apiKey: '' })
 
-    assert.strictEqual(requestTimes.length, 2)
-    const retryDelayMS = requestTimes[1] - requestTimes[0]
-    assert.ok(retryDelayMS >= 950 && retryDelayMS < 5000, `retried after ${retryDelayMS} ms`)
+    assert.strictEqual(requestsCount, 2)
+    const waits = requestedWaits.slice(waitsBefore)
+    assert.ok(
+      waits.some((delayMS) => delayMS >= 1000 && delayMS < 2000),
+      `retries after Retry-After plus jitter, waited ${waits}`
+    )
     assert.strictEqual(readFileSync(downloadPath, 'utf8'), 'data')
   } finally {
     rmSync(tempDir, { force: true, recursive: true })

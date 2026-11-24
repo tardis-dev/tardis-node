@@ -4,6 +4,7 @@ import { WebSocketServer } from 'ws'
 import { normalizeTrades, stream, streamNormalized } from '../dist/index.js'
 import type { Exchange, Filter } from '../dist/index.js'
 import { assert } from './assertions.ts'
+import { requestedWaits } from './instant-waits.ts'
 
 async function reportedError(exchange: Exchange, filters: Filter<string>[]) {
   let reportError: (error: Error) => void
@@ -37,14 +38,14 @@ for (const symbols of [undefined, []]) {
 }
 
 test('streamNormalized waits before retrying a feed that rejects missing symbols', { timeout: 10000 }, async () => {
-  const errorTimes: number[] = []
+  const waitsAtErrors: number[] = []
   let reportSecondError: () => void
   const secondError = new Promise<void>((resolve) => (reportSecondError = resolve))
   const messages = streamNormalized(
     {
       exchange: 'whitebit',
       onError: () => {
-        if (errorTimes.push(Date.now()) === 2) reportSecondError()
+        if (waitsAtErrors.push(requestedWaits.length) === 2) reportSecondError()
       }
     },
     normalizeTrades
@@ -55,7 +56,8 @@ test('streamNormalized waits before retrying a feed that rejects missing symbols
   } finally {
     await messages.return?.()
   }
-  assert.ok(errorTimes[1]! - errorTimes[0]! >= 900, `retried after ${errorTimes[1]! - errorTimes[0]!}ms`)
+  const waits = requestedWaits.slice(waitsAtErrors[0], waitsAtErrors[1])
+  assert.ok(Math.max(...waits) >= 1000, `retried after waiting ${waits}`)
 })
 
 test('Delta subscribes symbol-free channels without symbols', { timeout: 10000 }, async () => {

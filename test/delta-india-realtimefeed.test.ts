@@ -3,6 +3,7 @@ import { once } from 'node:events'
 import type { AddressInfo } from 'node:net'
 import { WebSocketServer, type WebSocket } from 'ws'
 import { assert } from './assertions.ts'
+import { requestedWaits } from './instant-waits.ts'
 import { normalizeBookChanges, stream, streamNormalized, SequenceGapError } from '../dist/index.js'
 import { DeltaIndiaWebSocketRealTimeFeed } from '../dist/realtimefeeds/delta_india.js'
 import type { Filter } from '../dist/types.js'
@@ -113,8 +114,12 @@ for (const snapshotFailure of ['missing', 'failed']) {
     test(
       `Delta India retries a ${snapshotFailure} native snapshot: validation=${validateSequence ?? 'default'}`,
       { timeout: 15000 },
-      async () => {
+      async (context) => {
+        const baseNow = Date.now()
+        const waitsBefore = requestedWaits.length
+        context.mock.method(Date, 'now', () => baseNow + requestedWaits.slice(waitsBefore).reduce((total, delay) => total + delay, 0))
         let subscriptions = 0
+        let retriedAfterMS = 0
         await localServer((ws) =>
           ws.on('message', (data) => {
             const message = JSON.parse(data.toString())
@@ -136,6 +141,7 @@ for (const snapshotFailure of ['missing', 'failed']) {
               ws.send(JSON.stringify(depth('BTCUSD', 'update', 2)))
               ws.send(JSON.stringify(depth('BTCUSD', 'update', 99)))
             } else {
+              retriedAfterMS = Date.now() - baseNow
               ws.send(JSON.stringify(depth('BTCUSD', 'snapshot', 4)))
               ws.send(JSON.stringify(depth('BTCUSD', 'update', 5)))
             }
@@ -150,6 +156,7 @@ for (const snapshotFailure of ['missing', 'failed']) {
           assert.equal(first.value!.isSnapshot, true)
           assert.equal((await iterator.next()).value!.isSnapshot, false)
           assert.equal(subscriptions, 2)
+          assert.ok(retriedAfterMS >= 5000, `retried after ${retriedAfterMS} ms`)
         } finally {
           await iterator.return?.()
         }
