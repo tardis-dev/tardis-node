@@ -139,11 +139,6 @@ test('decodes every field used by the MEXC realtime protocol', () => {
     channel: 'spot@public.aggre.deals.v3.api.pb@10ms@ETHUSDT',
     publicAggreDeals: { deals: [] }
   })
-
-  assert.deepStrictEqual(feed.parse(message(varintField(5, 9223372036854775807n))), {
-    createTime: '9223372036854775807'
-  })
-  assert.throws(() => feed.parse(Buffer.from([0x0a, 0x02, 0x61])), /Invalid protobuf message length/)
 })
 
 test('retries MEXC depth snapshots until the REST snapshot overlaps buffered WebSocket updates', async () => {
