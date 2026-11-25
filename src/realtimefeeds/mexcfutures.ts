@@ -2,6 +2,7 @@ import { CircularBuffer, getJSON, wait } from '../handy.ts'
 import type { MexcFuturesDepthSnapshotData, MexcFuturesDepthSnapshotMessage } from '../mappers/mexcfutures.ts'
 import { Filter } from '../types.ts'
 import { RealTimeFeedBase, type Sequence } from './realtimefeed.ts'
+import { decodeMexcFuturesProtobufMessage } from './mexcfuturesprotobuf.ts'
 
 export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   private readonly pendingDepthSnapshotSymbols = new Set<string>()
@@ -23,7 +24,7 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected override async getWebSocketUrl() {
-    return 'wss://contract.mexc.com/edge'
+    return 'wss://contract.mexc.com/edge?Trans-Protocol=Protobuf'
   }
 
   protected override mapToSubscribeMessages(filters: Filter<string>[]): any[] {
@@ -58,10 +59,22 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
 
       return filter.symbols.map((symbol) => ({
         method: this.channelToSubscriptionMethod.get(filter.channel),
-        param: { symbol },
+        param: {
+          symbol,
+          ...(filter.channel === 'push.deal' ? { reduce: false } : {}),
+          ...(filter.channel === 'push.depth' ? { compress: true } : {})
+        },
         gzip: false
       }))
     })
+  }
+
+  protected override parseMessage(message: Buffer<ArrayBufferLike>): any {
+    const buffer = Buffer.isBuffer(message) ? message : Buffer.from(message)
+    if (buffer.length > 0 && buffer[0] === 0x7b) {
+      return JSON.parse(buffer.toString())
+    }
+    return decodeMexcFuturesProtobufMessage(buffer)
   }
 
   private resetDepthSnapshotTracking(filters: Required<Filter<string>>[]) {
@@ -96,12 +109,12 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected override getSequence(message: any): Sequence | undefined {
-    const { data, channel, symbol } = message
+    const { depthMerge, channel, symbol } = message
     if (channel === 'push.depth') {
       return {
         key: symbol,
-        sequence: data.end != null && data.end !== 0 ? data.end : data.version,
-        previousSequence: (data.begin != null && data.begin !== 0 ? data.begin : data.version) - 1
+        sequence: Number(depthMerge.endVersion ?? '0'),
+        previousSequence: Number(depthMerge.beginVersion ?? '0') - 1
       }
     }
     return undefined
@@ -116,14 +129,8 @@ export class MexcFuturesRealTimeFeed extends RealTimeFeedBase {
       return
     }
 
-    const firstVersion = Number(
-      message.data?.begin !== undefined && message.data.begin !== null && message.data.begin !== 0
-        ? message.data.begin
-        : message.data?.version
-    )
-    const lastVersion = Number(
-      message.data?.end !== undefined && message.data.end !== null && message.data.end !== 0 ? message.data.end : message.data?.version
-    )
+    const firstVersion = Number(message.depthMerge?.beginVersion)
+    const lastVersion = Number(message.depthMerge?.endVersion)
     if (Number.isFinite(firstVersion) === false || Number.isFinite(lastVersion) === false) {
       return
     }

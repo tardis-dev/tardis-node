@@ -15351,12 +15351,10 @@ test('map mexc futures realtime depth update throws when first update has no sna
       mapper.map(
         {
           channel: 'push.depth',
-          data: {
-            asks: [[101, 1, 1]],
-            bids: [],
-            begin: 102,
-            end: 102,
-            version: 102
+          depthMerge: {
+            asks: [{ price: '101', vol: '1', count: 1 }],
+            beginVersion: '102',
+            endVersion: '102'
           },
           symbol: 'BTC_USDT',
           ts: Date.now()
@@ -15932,4 +15930,132 @@ test('Delta India ticker mappings preserve zero values, option greeks and fundin
   assert.equal(put.delta, undefined)
   const [gold] = [...options.map({ type: 'ticker', ts, sp: '4100', d: [{ ...ticker, s: 'C-XAUT-4100-301026' }] }, now)!]
   assert.equal(gold.expirationDate.toISOString(), '2026-10-30T16:00:00.000Z')
+})
+
+test('MEXC Futures selects the recorded format at the November 27 UTC cutoff', (context) => {
+  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-12-01T00:00:00Z') })
+  const before = new Date('2026-11-26T23:59:59.999Z')
+  const after = new Date('2026-11-27T00:00:00.000Z')
+  const old = { channel: 'push.deal', symbol: 'BTC_USDT', data: [{ p: 100, v: 2, T: 1, t: 1795737599999, i: '9007199254740993' }] }
+  const native = {
+    channel: 'push.deal',
+    symbol: 'BTC_USDT',
+    ts: '1795737600000',
+    deal: { p: '100', v: '2', t: 1, ts: '1795737600000', i: '9007199254740993' }
+  }
+  const [oldTrade] = createMapper('mexc-futures', before).map(old, before)
+  const [newTrade] = createMapper('mexc-futures', after).map(native, after)
+  assert.deepStrictEqual(newTrade, { ...oldTrade, timestamp: after, localTimestamp: after })
+  for (const normalizer of [normalizeTrades, normalizeBookChanges, normalizeDerivativeTickers]) {
+    assert.deepStrictEqual(normalizer.getSwitchDates('mexc-futures'), [after])
+  }
+})
+
+test('map MEXC Futures Protobuf single and batched trades preserves ids and aggressor side', () => {
+  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+  const deal = { p: '83232.2', v: '0.25', t: 1, ts: '1795737600000', i: '9223372036854775807' }
+  const [buy] = mapper.map({ channel: 'push.deal', symbol: 'BTC_USDT', deal }, localTimestamp)
+  assert.deepStrictEqual(buy, {
+    type: 'trade',
+    symbol: 'BTC_USDT',
+    exchange: 'mexc-futures',
+    id: deal.i,
+    price: 83232.2,
+    amount: 0.25,
+    side: 'buy',
+    timestamp: localTimestamp,
+    localTimestamp
+  })
+  const trades = mapper.map(
+    { channel: 'push.deal', symbol: 'BTC_USDT', deals: { deals: [deal, { ...deal, t: 2, i: '9223372036854775806' }] } },
+    localTimestamp
+  )
+  assert.deepStrictEqual(trades, [buy, { ...buy, side: 'sell', id: '9223372036854775806' }])
+  assert.deepStrictEqual(mapper.map({ channel: 'push.deal', symbol: 'BTC_USDT', deals: {} }, localTimestamp), [])
+})
+
+test('map MEXC Futures Protobuf buffers depth, deletes levels and preserves the raw snapshot', () => {
+  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+  const update = {
+    channel: 'push.depth',
+    symbol: 'BTC_USDT',
+    ts: '1795737600000',
+    depthMerge: {
+      beginVersion: '100',
+      endVersion: '102',
+      bids: [
+        { price: '100', vol: '0' },
+        { price: '99', vol: '3' }
+      ]
+    }
+  }
+  assert.deepStrictEqual(mapper.map(update, localTimestamp), [])
+  const snapshot = {
+    channel: 'push.depth.snapshot',
+    symbol: 'BTC_USDT',
+    generated: true,
+    data: { version: 100, timestamp: 1795737600000, bids: [[100, 2, 1]], asks: [[101, 1, 1]] }
+  }
+  const raw = structuredClone(snapshot)
+  const [book] = mapper.map(snapshot, localTimestamp)
+  assert.deepStrictEqual(book, {
+    type: 'book_change',
+    symbol: 'BTC_USDT',
+    exchange: 'mexc-futures',
+    isSnapshot: true,
+    bids: [{ price: 99, amount: 3 }],
+    asks: [{ price: 101, amount: 1 }],
+    timestamp: localTimestamp,
+    localTimestamp
+  })
+  assert.deepStrictEqual(snapshot, raw)
+  const [delta] = mapper.map(
+    { ...update, depthMerge: { beginVersion: '103', endVersion: '104', asks: [{ price: '101', vol: '0' }] } },
+    localTimestamp
+  )
+  assert.deepStrictEqual(delta, { ...book, isSnapshot: false, bids: [], asks: [{ price: 101, amount: 0 }] })
+  assert.deepStrictEqual(mapper.map(update, localTimestamp), [])
+})
+
+test('map MEXC Futures Protobuf tickers carries funding state and preserves zero open interest', () => {
+  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const mapper = createMapper('mexc-futures', localTimestamp)
+  assert.deepStrictEqual(
+    mapper.map(
+      { channel: 'push.funding.rate', symbol: 'BTC_USDT', fundingRate: { rate: '0', nextSettleTime: '1795737600000' } },
+      localTimestamp
+    ),
+    []
+  )
+  const ticker = {
+    channel: 'push.ticker',
+    symbol: 'BTC_USDT',
+    tickerDetail: { lastPrice: '83232.2', holdVol: '123', indexPrice: '83279.1', fairPrice: '83234.7', timestamp: '1795737600000' }
+  }
+  const [initial] = mapper.map(ticker, localTimestamp)
+  assert.deepStrictEqual(initial, {
+    type: 'derivative_ticker',
+    symbol: 'BTC_USDT',
+    exchange: 'mexc-futures',
+    lastPrice: 83232.2,
+    openInterest: 123,
+    indexPrice: 83279.1,
+    markPrice: 83234.7,
+    fundingRate: 0,
+    fundingTimestamp: localTimestamp,
+    predictedFundingRate: undefined,
+    timestamp: localTimestamp,
+    localTimestamp
+  })
+  const [updated] = mapper.map({ ...ticker, tickerDetail: { ...ticker.tickerDetail, holdVol: '0' } }, localTimestamp)
+  assert.deepStrictEqual(updated, { ...initial, openInterest: 0 })
+  assert.deepStrictEqual(
+    mapper.map(
+      { channel: 'push.ticker', symbol: 'UNOPENED_USDT', tickerDetail: { lastPrice: '0', holdVol: '0', timestamp: '1795737600000' } },
+      localTimestamp
+    ),
+    []
+  )
 })
