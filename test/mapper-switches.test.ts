@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, test } from 'node:test'
+import { afterEach, beforeEach, describe, test } from 'node:test'
 import { assert } from './assertions.ts'
 import {
   normalizeBookChanges,
@@ -16,146 +16,148 @@ const originalEnv = {
   OKX_USE_TRADES_CHANNEL: process.env.OKX_USE_TRADES_CHANNEL
 }
 
-beforeEach(() => {
-  process.env.__NO_REAL_TIME__ = '1'
-  delete process.env.OKX_API_KEY
-  delete process.env.OKX_API_VIP_5
-  delete process.env.OKX_API_COLO
-  delete process.env.OKX_USE_TRADES_CHANNEL
-})
+describe('mapper switches', () => {
+  beforeEach(() => {
+    process.env.__NO_REAL_TIME__ = '1'
+    delete process.env.OKX_API_KEY
+    delete process.env.OKX_API_VIP_5
+    delete process.env.OKX_API_COLO
+    delete process.env.OKX_USE_TRADES_CHANNEL
+  })
 
-afterEach(() => restoreEnv(originalEnv))
+  afterEach(() => restoreEnv(originalEnv))
 
-test('Gate futures replay switches books at the October 21 OBU cutover', () => {
-  const switchDate = date('2026-10-21T00:00:00.000Z')
-  const beforeSwitch = normalizeBookChanges('gate-io-futures', date('2026-10-20T23:59:59.999Z'))
-  const afterSwitch = normalizeBookChanges('gate-io-futures', switchDate)
+  test('Gate futures replay switches books at the October 21 OBU cutover', () => {
+    const switchDate = date('2026-10-21T00:00:00.000Z')
+    const beforeSwitch = normalizeBookChanges('gate-io-futures', date('2026-10-20T23:59:59.999Z'))
+    const afterSwitch = normalizeBookChanges('gate-io-futures', switchDate)
 
-  assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('gate-io-futures'), [switchDate])
-  assert.deepStrictEqual(beforeSwitch.getFilters(['btc_usdt']), [{ channel: 'order_book', symbols: ['BTC_USDT'] }])
-  assert.deepStrictEqual(afterSwitch.getFilters(['btc_usdt']), [{ channel: 'obu', symbols: ['BTC_USDT'] }])
-  assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), true)
-  assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), false)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), false)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), true)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'all' }), true)
-  assert.deepStrictEqual(normalizeLiquidations('gate-io-futures', switchDate).getFilters(['btc_usd1']), [
-    { channel: 'public_liquidates', symbols: ['BTC_USD1'] }
-  ])
-})
+    assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('gate-io-futures'), [switchDate])
+    assert.deepStrictEqual(beforeSwitch.getFilters(['btc_usdt']), [{ channel: 'order_book', symbols: ['BTC_USDT'] }])
+    assert.deepStrictEqual(afterSwitch.getFilters(['btc_usdt']), [{ channel: 'obu', symbols: ['BTC_USDT'] }])
+    assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), true)
+    assert.strictEqual(beforeSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), false)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.order_book', event: 'all' }), false)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'update' }), true)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'futures.obu', event: 'all' }), true)
+    assert.deepStrictEqual(normalizeLiquidations('gate-io-futures', switchDate).getFilters(['btc_usd1']), [
+      { channel: 'public_liquidates', symbols: ['BTC_USD1'] }
+    ])
+  })
 
-test('Bybit replay uses the raw channels recorded on each side of its API migrations', () => {
-  assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
-    { channel: 'trade', symbols: ['BTCUSD'] }
-  ])
-  assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
-    { channel: 'publicTrade', symbols: ['BTCUSDT'] }
-  ])
+  test('Bybit replay uses the raw channels recorded on each side of its API migrations', () => {
+    assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
+      { channel: 'trade', symbols: ['BTCUSD'] }
+    ])
+    assert.deepStrictEqual(normalizeTrades('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
+      { channel: 'publicTrade', symbols: ['BTCUSDT'] }
+    ])
 
-  assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
-    { channel: 'orderBookL2_25', symbols: ['BTCUSD'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
-    { channel: 'orderbook.50', symbols: ['BTCUSDT'] }
-  ])
+    assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-04T23:59:59.999Z')).getFilters(['BTCUSD']), [
+      { channel: 'orderBookL2_25', symbols: ['BTCUSD'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('bybit', date('2023-04-05T00:00:00.000Z')).getFilters(['BTCUSDT']), [
+      { channel: 'orderbook.50', symbols: ['BTCUSDT'] }
+    ])
 
-  assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-25T23:59:59.999Z')).getFilters(['BTCUSDT']), [
-    { channel: 'liquidation', symbols: ['BTCUSDT'] }
-  ])
-  assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-26T00:00:00.000Z')).getFilters(['BTCUSDT']), [
-    { channel: 'allLiquidation', symbols: ['BTCUSDT'] }
-  ])
-})
+    assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-25T23:59:59.999Z')).getFilters(['BTCUSDT']), [
+      { channel: 'liquidation', symbols: ['BTCUSDT'] }
+    ])
+    assert.deepStrictEqual(normalizeLiquidations('bybit', date('2025-02-26T00:00:00.000Z')).getFilters(['BTCUSDT']), [
+      { channel: 'allLiquidation', symbols: ['BTCUSDT'] }
+    ])
+  })
 
-test('Kraken replay switches book ticker channels without changing mixed-case symbols', () => {
-  const beforeSwitch = date('2026-07-09T23:59:59.999Z')
-  const switchDate = date('2026-07-10T00:00:00.000Z')
-  const symbols = ['AAPLx/USD']
+  test('Kraken replay switches book ticker channels without changing mixed-case symbols', () => {
+    const beforeSwitch = date('2026-07-09T23:59:59.999Z')
+    const switchDate = date('2026-07-10T00:00:00.000Z')
+    const symbols = ['AAPLx/USD']
 
-  assert.deepStrictEqual(normalizeTrades('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'trade', symbols }])
-  assert.deepStrictEqual(normalizeTrades('kraken', switchDate).getFilters(symbols), [{ channel: 'trade', symbols }])
-  assert.deepStrictEqual(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'book', symbols }])
-  assert.deepStrictEqual(normalizeBookChanges('kraken', switchDate).getFilters(symbols), [{ channel: 'book', symbols }])
-  assert.deepStrictEqual(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'spread', symbols }])
-  assert.deepStrictEqual(normalizeBookTickers('kraken', switchDate).getFilters(symbols), [{ channel: 'ticker', symbols }])
-})
+    assert.deepStrictEqual(normalizeTrades('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'trade', symbols }])
+    assert.deepStrictEqual(normalizeTrades('kraken', switchDate).getFilters(symbols), [{ channel: 'trade', symbols }])
+    assert.deepStrictEqual(normalizeBookChanges('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'book', symbols }])
+    assert.deepStrictEqual(normalizeBookChanges('kraken', switchDate).getFilters(symbols), [{ channel: 'book', symbols }])
+    assert.deepStrictEqual(normalizeBookTickers('kraken', beforeSwitch).getFilters(symbols), [{ channel: 'spread', symbols }])
+    assert.deepStrictEqual(normalizeBookTickers('kraken', switchDate).getFilters(symbols), [{ channel: 'ticker', symbols }])
+  })
 
-test('Gemini replay uses the v3 depth channel after the recorded API switch', () => {
-  const beforeSwitch = date('2026-07-23T23:59:59.999Z')
-  const switchDate = date('2026-07-24T00:00:00.000Z')
-  const symbols = ['BTCUSD']
+  test('Gemini replay uses the v3 depth channel after the recorded API switch', () => {
+    const beforeSwitch = date('2026-07-23T23:59:59.999Z')
+    const switchDate = date('2026-07-24T00:00:00.000Z')
+    const symbols = ['BTCUSD']
 
-  assert.deepStrictEqual(normalizeTrades('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
-  assert.deepStrictEqual(normalizeTrades('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
-  assert.deepStrictEqual(normalizeBookChanges('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'l2_updates', symbols }])
-  assert.deepStrictEqual(normalizeBookChanges('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'depth', symbols }])
-  assert.deepStrictEqual(normalizeBookTickers('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
-  assert.deepStrictEqual(normalizeBookTickers('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
-})
+    assert.deepStrictEqual(normalizeTrades('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
+    assert.deepStrictEqual(normalizeTrades('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'trade', symbols }])
+    assert.deepStrictEqual(normalizeBookChanges('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'l2_updates', symbols }])
+    assert.deepStrictEqual(normalizeBookChanges('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'depth', symbols }])
+    assert.deepStrictEqual(normalizeBookTickers('gemini', beforeSwitch).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
+    assert.deepStrictEqual(normalizeBookTickers('gemini', switchDate).getFilters(['btcusd']), [{ channel: 'bookTicker', symbols }])
+  })
 
-test('Hyperliquid replay switches from l2Book to fastBook on 2026-06-17', () => {
-  const switchDate = date('2026-06-17T00:00:00.000Z')
-  const beforeSwitch = normalizeBookChanges('hyperliquid', date('2026-06-16T23:59:59.999Z'))
-  const afterSwitch = normalizeBookChanges('hyperliquid', switchDate)
-  const data = { coin: 'BTC', time: switchDate.valueOf(), levels: [[], []] }
+  test('Hyperliquid replay switches from l2Book to fastBook on 2026-06-17', () => {
+    const switchDate = date('2026-06-17T00:00:00.000Z')
+    const beforeSwitch = normalizeBookChanges('hyperliquid', date('2026-06-16T23:59:59.999Z'))
+    const afterSwitch = normalizeBookChanges('hyperliquid', switchDate)
+    const data = { coin: 'BTC', time: switchDate.valueOf(), levels: [[], []] }
 
-  assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('hyperliquid'), [switchDate])
-  assert.deepStrictEqual(beforeSwitch.getFilters(['BTC']), [{ channel: 'l2Book', symbols: ['BTC'] }])
-  assert.deepStrictEqual(afterSwitch.getFilters(['BTC']), [{ channel: 'fastBook', symbols: ['BTC'] }])
-  assert.strictEqual(beforeSwitch.canHandle({ channel: 'l2Book', data }), true)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data }), false)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data: { ...data, fast: true } }), true)
-  assert.strictEqual(afterSwitch.canHandle({ channel: 'fastBook', data: { ...data, fast: true } }), true)
-})
+    assert.deepStrictEqual(normalizeBookChanges.getSwitchDates('hyperliquid'), [switchDate])
+    assert.deepStrictEqual(beforeSwitch.getFilters(['BTC']), [{ channel: 'l2Book', symbols: ['BTC'] }])
+    assert.deepStrictEqual(afterSwitch.getFilters(['BTC']), [{ channel: 'fastBook', symbols: ['BTC'] }])
+    assert.strictEqual(beforeSwitch.canHandle({ channel: 'l2Book', data }), true)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data }), false)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'l2Book', data: { ...data, fast: true } }), true)
+    assert.strictEqual(afterSwitch.canHandle({ channel: 'fastBook', data: { ...data, fast: true } }), true)
+  })
 
-test('OKX replay follows the historical public book-channel windows', () => {
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT']), [
-    { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] },
-    { channel: 'spot/depth', symbols: ['BTC-USDT'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-10T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2021-12-23T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-02-25T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'books', symbols: ['BTC-USDT'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-03-09T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
-  ])
-  assert.deepStrictEqual(normalizeBookChanges('okex', date('2026-05-21T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'books', symbols: ['BTC-USDT'] }
-  ])
-})
+  test('OKX replay follows the historical public book-channel windows', () => {
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-09T23:59:59.999Z')).getFilters(['BTC-USDT']), [
+      { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] },
+      { channel: 'spot/depth', symbols: ['BTC-USDT'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2020-04-10T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'spot/depth_l2_tbt', symbols: ['BTC-USDT'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2021-12-23T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-02-25T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'books', symbols: ['BTC-USDT'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2023-03-09T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'books-l2-tbt', symbols: ['BTC-USDT'] }
+    ])
+    assert.deepStrictEqual(normalizeBookChanges('okex', date('2026-05-21T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'books', symbols: ['BTC-USDT'] }
+    ])
+  })
 
-test('OKX replay keeps the explicit trades channel override', () => {
-  assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'trades-all', symbols: ['BTC-USDT'] }
-  ])
+  test('OKX replay keeps the explicit trades channel override', () => {
+    assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'trades-all', symbols: ['BTC-USDT'] }
+    ])
 
-  process.env.OKX_USE_TRADES_CHANNEL = '1'
+    process.env.OKX_USE_TRADES_CHANNEL = '1'
 
-  assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
-    { channel: 'trades', symbols: ['BTC-USDT'] }
-  ])
-})
+    assert.deepStrictEqual(normalizeTrades('okex', date('2023-10-19T00:00:00.000Z')).getFilters(['BTC-USDT']), [
+      { channel: 'trades', symbols: ['BTC-USDT'] }
+    ])
+  })
 
-test('OKX options replay derives the correct instrument families', () => {
-  assert.deepStrictEqual(
-    normalizeOptionsSummary('okex-options', date('2026-06-17T00:00:00.000Z')).getFilters([
-      'SOL-USD_UM-260618-67-C',
-      'SOL-USD_UM-260618-67-P'
-    ]),
-    [
-      { channel: 'opt-summary', symbols: ['SOL-USD_UM'] },
-      { channel: 'index-tickers', symbols: ['SOL-USD'] },
-      { channel: 'tickers', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
-      { channel: 'open-interest', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
-      { channel: 'mark-price', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] }
-    ]
-  )
+  test('OKX options replay derives the correct instrument families', () => {
+    assert.deepStrictEqual(
+      normalizeOptionsSummary('okex-options', date('2026-06-17T00:00:00.000Z')).getFilters([
+        'SOL-USD_UM-260618-67-C',
+        'SOL-USD_UM-260618-67-P'
+      ]),
+      [
+        { channel: 'opt-summary', symbols: ['SOL-USD_UM'] },
+        { channel: 'index-tickers', symbols: ['SOL-USD'] },
+        { channel: 'tickers', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+        { channel: 'open-interest', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] },
+        { channel: 'mark-price', symbols: ['SOL-USD_UM-260618-67-C', 'SOL-USD_UM-260618-67-P'] }
+      ]
+    )
+  })
 })
 
 function date(value: string) {
