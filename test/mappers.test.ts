@@ -15932,16 +15932,16 @@ test('Delta India ticker mappings preserve zero values, option greeks and fundin
   assert.equal(gold.expirationDate.toISOString(), '2026-10-30T16:00:00.000Z')
 })
 
-test('MEXC Futures selects the recorded format at the November 27 UTC cutoff', (context) => {
-  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-12-01T00:00:00Z') })
-  const before = new Date('2026-11-26T23:59:59.999Z')
-  const after = new Date('2026-11-27T00:00:00.000Z')
-  const old = { channel: 'push.deal', symbol: 'BTC_USDT', data: [{ p: 100, v: 2, T: 1, t: 1795737599999, i: '9007199254740993' }] }
+test('MEXC Futures selects the recorded format at the December 1 UTC cutoff', (context) => {
+  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-12-02T00:00:00Z') })
+  const before = new Date('2026-11-30T23:59:59.999Z')
+  const after = new Date('2026-12-01T00:00:00.000Z')
+  const old = { channel: 'push.deal', symbol: 'BTC_USDT', data: [{ p: 100, v: 2, T: 1, t: 1796083199999, i: '9007199254740993' }] }
   const native = {
     channel: 'push.deal',
     symbol: 'BTC_USDT',
-    ts: '1795737600000',
-    deal: { p: '100', v: '2', t: 1, ts: '1795737600000', i: '9007199254740993' }
+    ts: '1796083200000',
+    deal: { p: '100', v: '2', t: 1, ts: '1796083200000', i: '9007199254740993' }
   }
   const [oldTrade] = createMapper('mexc-futures', before).map(old, before)
   const [newTrade] = createMapper('mexc-futures', after).map(native, after)
@@ -15952,9 +15952,9 @@ test('MEXC Futures selects the recorded format at the November 27 UTC cutoff', (
 })
 
 test('map MEXC Futures Protobuf single and batched trades preserves ids and aggressor side', () => {
-  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const localTimestamp = new Date('2026-12-01T00:00:00Z')
   const mapper = createMapper('mexc-futures', localTimestamp)
-  const deal = { p: '83232.2', v: '0.25', t: 1, ts: '1795737600000', i: '9223372036854775807' }
+  const deal = { p: '83232.2', v: '0.25', t: 1, ts: '1796083200000', i: '9223372036854775807' }
   const [buy] = mapper.map({ channel: 'push.deal', symbol: 'BTC_USDT', deal }, localTimestamp)
   assert.deepStrictEqual(buy, {
     type: 'trade',
@@ -15976,12 +15976,12 @@ test('map MEXC Futures Protobuf single and batched trades preserves ids and aggr
 })
 
 test('map MEXC Futures Protobuf buffers depth, deletes levels and preserves the raw snapshot', () => {
-  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const localTimestamp = new Date('2026-12-01T00:00:00Z')
   const mapper = createMapper('mexc-futures', localTimestamp)
   const update = {
     channel: 'push.depth',
     symbol: 'BTC_USDT',
-    ts: '1795737600000',
+    ts: '1796083200000',
     depthMerge: {
       beginVersion: '100',
       endVersion: '102',
@@ -15996,7 +15996,7 @@ test('map MEXC Futures Protobuf buffers depth, deletes levels and preserves the 
     channel: 'push.depth.snapshot',
     symbol: 'BTC_USDT',
     generated: true,
-    data: { version: 100, timestamp: 1795737600000, bids: [[100, 2, 1]], asks: [[101, 1, 1]] }
+    data: { version: 100, timestamp: 1796083200000, bids: [[100, 2, 1]], asks: [[101, 1, 1]] }
   }
   const raw = structuredClone(snapshot)
   const [book] = mapper.map(snapshot, localTimestamp)
@@ -16020,11 +16020,11 @@ test('map MEXC Futures Protobuf buffers depth, deletes levels and preserves the 
 })
 
 test('map MEXC Futures Protobuf tickers carries funding state and preserves zero open interest', () => {
-  const localTimestamp = new Date('2026-11-27T00:00:00Z')
+  const localTimestamp = new Date('2026-12-01T00:00:00Z')
   const mapper = createMapper('mexc-futures', localTimestamp)
   assert.deepStrictEqual(
     mapper.map(
-      { channel: 'push.funding.rate', symbol: 'BTC_USDT', fundingRate: { rate: '0', nextSettleTime: '1795737600000' } },
+      { channel: 'push.funding.rate', symbol: 'BTC_USDT', fundingRate: { rate: '0', nextSettleTime: '1796083200000' } },
       localTimestamp
     ),
     []
@@ -16032,7 +16032,7 @@ test('map MEXC Futures Protobuf tickers carries funding state and preserves zero
   const ticker = {
     channel: 'push.ticker',
     symbol: 'BTC_USDT',
-    tickerDetail: { lastPrice: '83232.2', holdVol: '123', indexPrice: '83279.1', fairPrice: '83234.7', timestamp: '1795737600000' }
+    tickerDetail: { lastPrice: '83232.2', holdVol: '123', indexPrice: '83279.1', fairPrice: '83234.7', timestamp: '1796083200000' }
   }
   const [initial] = mapper.map(ticker, localTimestamp)
   assert.deepStrictEqual(initial, {
@@ -16053,7 +16053,7 @@ test('map MEXC Futures Protobuf tickers carries funding state and preserves zero
   assert.deepStrictEqual(updated, { ...initial, openInterest: 0 })
   assert.deepStrictEqual(
     mapper.map(
-      { channel: 'push.ticker', symbol: 'UNOPENED_USDT', tickerDetail: { lastPrice: '0', holdVol: '0', timestamp: '1795737600000' } },
+      { channel: 'push.ticker', symbol: 'UNOPENED_USDT', tickerDetail: { lastPrice: '0', holdVol: '0', timestamp: '1796083200000' } },
       localTimestamp
     ),
     []
