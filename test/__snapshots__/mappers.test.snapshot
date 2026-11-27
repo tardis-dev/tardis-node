@@ -5704,6 +5704,80 @@ exports[`mappers > map binance messages 9`] = `
 ]
 `;
 
+exports[`mappers > map bingx captured messages 1`] = `
+[
+  {
+    "type": "book_change",
+    "exchange": "bingx",
+    "symbol": "BTC-USDT",
+    "isSnapshot": true,
+    "bids": [
+      {
+        "price": 64619.92,
+        "amount": 0.004298
+      },
+      {
+        "price": 64617.87,
+        "amount": 8.254757
+      }
+    ],
+    "asks": [
+      {
+        "price": 65584.98,
+        "amount": 0.000004
+      },
+      {
+        "price": 65584.42,
+        "amount": 0.00004
+      }
+    ],
+    "timestamp": "2026-11-18T08:21:14.978Z",
+    "localTimestamp": "2026-11-24T00:00:00.000Z"
+  },
+  {
+    "type": "book_change",
+    "exchange": "bingx",
+    "symbol": "BTC-USDT",
+    "isSnapshot": false,
+    "bids": [],
+    "asks": [
+      {
+        "price": 65584.98,
+        "amount": 0.000004
+      },
+      {
+        "price": 65584.42,
+        "amount": 0.00004
+      }
+    ],
+    "timestamp": "2026-11-18T08:21:15.090Z",
+    "localTimestamp": "2026-11-24T00:00:00.000Z"
+  },
+  {
+    "type": "trade",
+    "exchange": "bingx",
+    "symbol": "BTC-USDT",
+    "id": "248444076",
+    "price": 64621.93,
+    "amount": 0.006856,
+    "side": "sell",
+    "timestamp": "2026-11-18T08:21:15.307Z",
+    "localTimestamp": "2026-11-24T00:00:00.000Z"
+  },
+  {
+    "type": "book_ticker",
+    "exchange": "bingx",
+    "symbol": "BTC-USDT",
+    "bidPrice": 64621.92,
+    "bidAmount": 0.007133,
+    "askPrice": 64621.94,
+    "askAmount": 0.004057,
+    "timestamp": "2026-11-18T08:21:15.389Z",
+    "localTimestamp": "2026-11-24T00:00:00.000Z"
+  }
+]
+`;
+
 exports[`mappers > map bitfinex book ticker messages with trailing null placeholder 1`] = `
 [
   {

@@ -53,6 +53,7 @@ const exchangesWithDerivativeInfo: Exchange[] = [
 ]
 
 const exchangesWithBookTickerInfo: Exchange[] = [
+  'bingx',
   'backpack',
   'whitebit',
   'delta-india',
@@ -184,6 +185,114 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
 }
 
 describe('mappers', () => {
+  for (const exchange of ['bingx'] as const) {
+    test(`map ${exchange} captured messages`, () => {
+      // Recorder captures from 2026-11-18, with depth levels trimmed.
+      const fixtures = {
+        bingx: [
+          {
+            code: 0,
+            id: '1',
+            msg: 'SUCCESS',
+            timestamp: 1794990074978
+          },
+          {
+            code: 0,
+            timestamp: 1794990074978,
+            dataType: 'BTC-USDT@incrDepth',
+            data: {
+              action: 'all',
+              lastUpdateId: 1101304,
+              sourceUpdateId: 16609235752,
+              bids: {
+                '64619.92': '0.004298',
+                '64617.87': '8.254757'
+              },
+              asks: {
+                '65584.98': '0.000004',
+                '65584.42': '0.000040'
+              }
+            }
+          },
+          {
+            code: 0,
+            data: {
+              action: 'update',
+              asks: {
+                '65584.98': '0.000004',
+                '65584.42': '0.000040'
+              },
+              bids: {},
+              lastUpdateId: 1101305,
+              sourceUpdateId: 16609235756
+            },
+            dataType: 'BTC-USDT@incrDepth',
+            success: true,
+            timestamp: 1794990075090
+          },
+          {
+            code: 0,
+            data: {
+              E: 1794990075328,
+              T: 1794990075307,
+              e: 'trade',
+              m: true,
+              p: '64621.93',
+              q: '0.006856',
+              s: 'BTC-USDT',
+              t: '248444076'
+            },
+            dataType: 'BTC-USDT@trade',
+            success: true,
+            timestamp: 1794990075328
+          },
+          {
+            code: 0,
+            data: {
+              A: '0.004057',
+              B: '0.007133',
+              E: 1794990075389,
+              a: '64621.94',
+              b: '64621.92',
+              e: 'bookTicker',
+              s: 'BTC-USDT'
+            },
+            dataType: 'BTC-USDT@bookTicker',
+            success: true,
+            timestamp: 1794990075389
+          },
+          {
+            code: 0,
+            timestamp: 1794990076136,
+            dataType: 'BTC-USDT@ticker',
+            data: {
+              e: '24hTicker',
+              E: 1794990076134,
+              s: 'BTC-USDT',
+              p: 96.92,
+              P: '0.15%',
+              o: 64525.02,
+              h: 65441.24,
+              l: 63339.9,
+              c: 64621.94,
+              v: 2490.28,
+              q: 160451750.55,
+              O: 1794903676134,
+              C: 1794990076134,
+              A: 64621.94,
+              a: 0.004057,
+              B: 64621.92,
+              b: 0.007133
+            }
+          }
+        ]
+      }
+      const localTimestamp = new Date('2026-11-24T00:00:00Z')
+      const mapper = createMapper(exchange, localTimestamp)
+      snapshot(fixtures[exchange].flatMap((message: unknown) => mapper.map(message, localTimestamp)))
+    })
+  }
+
   test('map backpack captured messages', () => {
     // Recorder payloads captured on 2026-10-29/30 (unneeded fields trimmed), plus the documented liquidation sample.
     const mapper = createMapper('backpack', new Date('2026-10-30T14:16:00Z'))
