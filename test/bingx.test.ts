@@ -570,5 +570,16 @@ test('BingX futures retains zero-price empty-side handling', () => {
   assert.strictEqual(ticker.bidPrice, 25000)
   assert.strictEqual(ticker.bidAmount, 3.7144)
   assert.strictEqual(ticker.askPrice, undefined)
-  assert.strictEqual(ticker.askAmount, 0)
+  assert.strictEqual(ticker.askAmount, undefined)
+
+  const [emptyBook] = [
+    ...normalizeBookTickers('bingx-futures', localTimestamp).map(
+      { ...message, data: { ...message.data, b: '0.00', B: '0.0000000' } },
+      localTimestamp
+    )!
+  ]
+  assert.strictEqual(emptyBook.bidPrice, undefined)
+  assert.strictEqual(emptyBook.bidAmount, undefined)
+  assert.strictEqual(emptyBook.askPrice, undefined)
+  assert.strictEqual(emptyBook.askAmount, undefined)
 })

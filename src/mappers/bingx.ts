@@ -111,9 +111,9 @@ class BingxBookTickerMapper implements Mapper<BingxExchange, BookTicker> {
       exchange: this._exchange,
       symbol: data.s.toUpperCase(),
       bidPrice: this._isSpot ? asNumberOrUndefined(data.b) : asNonZeroNumberOrUndefined(data.b),
-      bidAmount: asNumberOrUndefined(data.B),
+      bidAmount: this._isSpot ? asNumberOrUndefined(data.B) : asNonZeroNumberOrUndefined(data.B),
       askPrice: this._isSpot ? asNumberOrUndefined(data.a) : asNonZeroNumberOrUndefined(data.a),
-      askAmount: asNumberOrUndefined(data.A),
+      askAmount: this._isSpot ? asNumberOrUndefined(data.A) : asNonZeroNumberOrUndefined(data.A),
       timestamp: new Date(this._isSpot ? data.E : (data as BingxFuturesBookTickerMessage['data']).T),
       localTimestamp
     }
