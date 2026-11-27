@@ -126,6 +126,7 @@ for (const exchange of ['bingx'] as const) {
       const errors: Error[] = []
       let connections = 0
       let pong = false
+      const ping = { ping: '85181e7361b34b1f8d97cad15cefbd0a', time: '2026-11-27T17:21:51.374+0800' }
       const depth = (sequence: number, action: string) => ({
         code: 0,
         dataType: 'BTC-USDT@incrDepth',
@@ -134,14 +135,15 @@ for (const exchange of ['bingx'] as const) {
       server.on('connection', (socket) => {
         connections++
         socket.on('message', (bytes) => {
-          if (bytes.toString() === 'Pong') {
+          const sub = JSON.parse(bytes.toString())
+          if (sub.pong !== undefined) {
+            assert.deepEqual(sub, { pong: ping.ping, time: ping.time })
             pong = true
             return
           }
-          const sub = JSON.parse(bytes.toString())
           assert.strictEqual(sub.reqType, 'sub')
           assert.strictEqual(sub.dataType, 'BTC-USDT@incrDepth')
-          socket.send(gzipSync('Ping'))
+          socket.send(gzipSync(JSON.stringify(ping)))
           for (const message of [depth(100, 'all'), depth(101, 'update'), depth(103, 'update')]) {
             socket.send(gzipSync(JSON.stringify(message)))
           }
@@ -156,14 +158,14 @@ for (const exchange of ['bingx'] as const) {
         onError: (e) => errors.push(e)
       })
       try {
-        assert.strictEqual((await feed.next()).value?.message, 'Ping')
+        assert.deepEqual((await feed.next()).value?.message, ping)
         assert.strictEqual((await feed.next()).value?.message.data.action, 'all')
         assert.strictEqual((await feed.next()).value?.message.data.lastUpdateId, 101)
         const next = (await feed.next()).value
         if (validateSequence) {
           assert.strictEqual(next, undefined)
           assert.ok(errors[0] instanceof SequenceGapError)
-          assert.strictEqual((await feed.next()).value?.message, 'Ping')
+          assert.deepEqual((await feed.next()).value?.message, ping)
           assert.strictEqual((await feed.next()).value?.message.data.action, 'all')
           assert.strictEqual(connections, 2)
         } else {
@@ -178,6 +180,46 @@ for (const exchange of ['bingx'] as const) {
       }
     })
   }
+}
+
+for (const ping of ['Ping', { ping: 'heartbeat-only', time: '2026-11-27T17:21:51.374+0800' }]) {
+  test(`BingX ${typeof ping === 'string' ? 'plain' : 'JSON'} heartbeats do not keep a stale feed alive`, { timeout: 5000 }, async () => {
+    const { server, cleanup } = await createTestWebSocketServer('bingx')
+    let pongReceived = false
+    server.on('connection', (socket) => {
+      const timer = setInterval(() => socket.send(gzipSync(typeof ping === 'string' ? ping : JSON.stringify(ping))), 10)
+      socket.once('close', () => clearInterval(timer))
+      socket.on('message', (bytes) => {
+        const expected = typeof ping === 'string' ? 'Pong' : JSON.stringify({ pong: ping.ping, time: ping.time })
+        if (bytes.toString() === expected) pongReceived = true
+      })
+    })
+    const feed = stream({
+      exchange: 'bingx',
+      filters: [{ channel: 'trade', symbols: ['BTC-USDT'] }],
+      timeoutIntervalMS: 80,
+      withDisconnects: true
+    })
+    let deadline: ReturnType<typeof setTimeout> | undefined
+    try {
+      await Promise.race([
+        (async () => {
+          for await (const message of feed) {
+            if (message === undefined) return
+          }
+          assert.fail('Feed ended without reporting a stale connection')
+        })(),
+        new Promise<never>((_, reject) => {
+          deadline = setTimeout(() => reject(new Error('Heartbeats prevented stale-feed timeout')), 1500)
+        })
+      ])
+      assert.strictEqual(pongReceived, true)
+    } finally {
+      clearTimeout(deadline)
+      await feed.return?.()
+      await cleanup()
+    }
+  })
 }
 
 test('BingX preserves native book roles when replay starts between snapshots', () => {

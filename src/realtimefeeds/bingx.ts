@@ -41,11 +41,15 @@ export class BingxRealTimeFeed extends RealTimeFeedBase {
   }
 
   protected messageIsHeartbeat(message: any) {
-    return message === 'Ping'
+    return message === 'Ping' || message?.ping !== undefined
   }
 
   protected onMessage(message: any) {
-    if (message === 'Ping') this.sendRaw('Pong')
+    if (message === 'Ping') {
+      this.sendRaw('Pong')
+    } else if (message?.ping !== undefined) {
+      this.send({ pong: message.ping, time: message.time })
+    }
   }
 
   protected getSequence(message: any): Sequence | undefined {
