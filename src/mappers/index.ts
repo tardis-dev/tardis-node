@@ -57,6 +57,7 @@ type Normalizer<M extends MapperCollection, U extends NormalizedData> = (<T exte
   exchange: T,
   localTimestamp: Date
 ) => Mapper<T, U>) & {
+  getLatest: <T extends keyof M & Exchange>(exchange: T) => Mapper<T, U>
   getSwitchDates: (exchange: keyof M & Exchange) => readonly Date[]
 }
 
@@ -145,6 +146,13 @@ function createNormalizer<M extends MapperCollection, U extends NormalizedData>(
     return createMapper(localTimestamp) as Mapper<T, U>
   }) as Normalizer<M, U>
 
+  normalize.getLatest = <T extends keyof M & Exchange>(exchange: T) => {
+    if (mappers[exchange] === undefined) {
+      throw new Error(`${name}: ${exchange} not supported`)
+    }
+
+    return (mappers[exchange].getLatest ?? mappers[exchange])(new Date()) as Mapper<T, U>
+  }
   normalize.getSwitchDates = (exchange) => getMapperSwitchDates(mappers, exchange)
   return normalize
 }

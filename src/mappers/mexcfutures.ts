@@ -2,14 +2,36 @@ import { debug } from '../debug.ts'
 import { CircularBuffer, upperCaseSymbols } from '../handy.ts'
 import { BookChange, DerivativeTicker, Trade } from '../types.ts'
 import { Mapper, PendingTickerInfoHelper } from './mapper.ts'
-import { exchangeMappers, isRealTime } from './registry.ts'
+import { exchangeMappers, isRealTime, mapper } from './registry.ts'
+
+import {
+  MexcFuturesProtobufTradesMapper,
+  MexcFuturesProtobufBookChangeMapper,
+  MexcFuturesProtobufDerivativeTickerMapper
+} from './mexcfuturesprotobuf.ts'
+
+const MEXC_FUTURES_PROTOBUF_SWITCH_DATE = new Date('2026-11-30T00:00:00.000Z')
 
 export const mexcFuturesMappers = exchangeMappers({
   'mexc-futures': {
-    trades: () => new MexcFuturesTradesMapper(),
-    bookChanges: (localTimestamp) =>
-      new MexcFuturesBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false }),
-    derivativeTickers: () => new MexcFuturesDerivativeTickerMapper()
+    trades: mapper([
+      { until: MEXC_FUTURES_PROTOBUF_SWITCH_DATE, use: () => new MexcFuturesTradesMapper() },
+      { use: () => new MexcFuturesProtobufTradesMapper() }
+    ]),
+    bookChanges: mapper([
+      {
+        until: MEXC_FUTURES_PROTOBUF_SWITCH_DATE,
+        use: (localTimestamp) => new MexcFuturesBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false })
+      },
+      {
+        use: (localTimestamp) =>
+          new MexcFuturesProtobufBookChangeMapper({ ignoreBookSnapshotOverlapError: isRealTime(localTimestamp) === false })
+      }
+    ]),
+    derivativeTickers: mapper([
+      { until: MEXC_FUTURES_PROTOBUF_SWITCH_DATE, use: () => new MexcFuturesDerivativeTickerMapper() },
+      { use: () => new MexcFuturesProtobufDerivativeTickerMapper() }
+    ])
   }
 })
 

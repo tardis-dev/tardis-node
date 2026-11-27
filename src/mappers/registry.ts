@@ -8,6 +8,7 @@ const THREE_MINUTES_IN_MS = 3 * 60 * ONE_SEC_IN_MS
 export type MapperCreator<T extends Exchange = any, U extends NormalizedData = NormalizedData> = ((
   localTimestamp?: Date
 ) => Mapper<T, U>) & {
+  getLatest?: (localTimestamp: Date) => Mapper<T, U>
   switchDates?: readonly Date[]
 }
 export type MapperCollection = Record<string, MapperCreator>
@@ -78,8 +79,8 @@ export function mapper<T extends Exchange, U extends NormalizedData>(
   validateMapperEntries(entries)
 
   const createMapper = ((localTimestamp?: Date) => {
-    if (localTimestamp === undefined || isRealTime(localTimestamp)) {
-      return entries[entries.length - 1].use(localTimestamp)
+    if (localTimestamp === undefined) {
+      return entries[entries.length - 1].use(new Date())
     }
 
     for (const entry of entries) {
@@ -91,6 +92,7 @@ export function mapper<T extends Exchange, U extends NormalizedData>(
     return entries[entries.length - 1].use(localTimestamp)
   }) as MapperCreator<T, U>
 
+  createMapper.getLatest = entries[entries.length - 1].use
   createMapper.switchDates = entries.flatMap((entry) => (entry.until === undefined ? [] : [entry.until]))
   return createMapper
 }

@@ -4,8 +4,10 @@ import { assert } from './assertions.ts'
 import { createServer } from 'http'
 import type { Filter } from '../dist/types.js'
 import { MexcFuturesRealTimeFeed } from '../dist/realtimefeeds/mexcfutures.js'
-import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { stream, streamNormalized, normalizeBookChanges, normalizeTrades, SequenceGapError } from '../dist/index.js'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
+import { message, stringField, bytesField, varintField } from './helpers/protobuf.ts'
+import { decodeMexcFuturesProtobufMessage } from '../dist/realtimefeeds/mexcfuturesprotobuf.js'
 
 class TestMexcFuturesRealTimeFeed extends MexcFuturesRealTimeFeed {
   protected readonly httpURL: string
@@ -34,7 +36,45 @@ class TestMexcFuturesRealTimeFeed extends MexcFuturesRealTimeFeed {
   }
 }
 
-test('aligns MEXC Futures updates that omit begin and end with a REST snapshot', async () => {
+for (const custom of [false, true]) {
+  test(`normalized MEXC streaming uses Protobuf before the recorder cutoff (custom=${custom})`, { timeout: 10000 }, async (context) => {
+    context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-29T23:59:00Z') })
+    const { server, cleanup } = await createFuturesSequenceServer()
+    // Captured MEXC Futures Protobuf trade from 2026-11-25; also checked against official schemas in mexcfutures-protobuf.test.ts.
+    const frame = Buffer.from('CghCVENfVVNEVBIJcHVzaC5kZWFsGIvXx5ihNKp9JQoFNTgzMDASAjEzGAIgAygBMIXXx5ihNDjswJn4P0CF18eYoTQ=', 'base64')
+    server.on('connection', (socket) => socket.once('message', () => socket.send(frame)))
+    const normalizer = custom
+      ? (exchange: 'mexc-futures', localTimestamp: Date) => {
+          assert.strictEqual(localTimestamp.toISOString(), '2026-11-29T23:59:00.000Z')
+          return normalizeTrades.getLatest(exchange)
+        }
+      : normalizeTrades
+    const feed = streamNormalized(
+      { exchange: 'mexc-futures', symbols: ['BTC_USDT'], timeoutIntervalMS: 0, onError: (error) => assert.fail(error.message) },
+      normalizer
+    )
+
+    try {
+      const { value: trade } = await feed.next()
+      assert.deepStrictEqual(trade, {
+        type: 'trade',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        id: '17163509868',
+        price: 58300,
+        amount: 13,
+        side: 'sell',
+        timestamp: new Date(1795616271237),
+        localTimestamp: new Date('2026-11-29T23:59:00Z')
+      })
+    } finally {
+      await feed.return?.()
+      await cleanup()
+    }
+  })
+}
+
+test('aligns MEXC Futures Protobuf depth updates with a REST snapshot', async () => {
   const server = await startSnapshotServer()
   const feed = new TestMexcFuturesRealTimeFeed('mexc-futures', [], undefined, server.url)
 
@@ -51,17 +91,7 @@ test('aligns MEXC Futures updates that omit begin and end with a REST snapshot',
     ]
 
     feed.map(filters)
-    feed.observe({
-      symbol: 'BTC_USDT',
-      data: {
-        asks: [],
-        bids: [[75228, 32, 4]],
-        cts: 1779703618130,
-        version: 1
-      },
-      channel: 'push.depth',
-      ts: 1779703618133
-    })
+    feed.observe(futuresDepth(1))
 
     const snapshots = await feed.provideSnapshots(filters)
 
@@ -104,19 +134,7 @@ test('retries MEXC Futures depth snapshots until the REST snapshot overlaps buff
     ]
 
     feed.map(filters)
-    feed.observe({
-      symbol: 'BTC_USDT',
-      data: {
-        asks: [],
-        bids: [[75228, 32, 4]],
-        begin: 105,
-        cts: 1779703618130,
-        end: 105,
-        version: 105
-      },
-      channel: 'push.depth',
-      ts: 1779703618133
-    })
+    feed.observe(futuresDepth(105))
 
     const snapshots = await feed.provideSnapshots(filters)
 
@@ -179,13 +197,24 @@ type MexcFuturesTestDepthSnapshotResponse = {
   }
 }
 
-function futuresDepth(version: number, begin?: number | null, end?: number | null, symbol = 'BTC_USDT', empty = false) {
-  return {
-    channel: 'push.depth',
-    symbol,
-    ts: 1794300000000,
-    data: { version, begin, end, bids: empty ? [] : [[100, version, 1]], asks: [] }
-  }
+// ContractWrapper + DepthMerge field numbers from MEXC's official .proto files.
+function futuresDepthFrame(begin: number, end: number, symbol = 'BTC_USDT', empty = false) {
+  const bids = empty ? [] : [bytesField(2, message(stringField(1, '100'), stringField(2, String(end)), varintField(3, 1)))]
+  const depth = message(...bids, varintField(3, begin), varintField(4, end))
+  return message(stringField(1, symbol), stringField(2, 'push.depth'), varintField(3, 1794300000000), bytesField(2016, depth))
+}
+
+function futuresDepth(endVersion: number, beginVersion = endVersion, symbol = 'BTC_USDT', empty = false) {
+  return decodeMexcFuturesProtobufMessage(futuresDepthFrame(beginVersion, endVersion, symbol, empty))
+}
+function encodeFuturesMessage(message: any) {
+  if (message.channel !== 'push.depth') return JSON.stringify(message)
+  return futuresDepthFrame(
+    Number(message.depthMerge.beginVersion),
+    Number(message.depthMerge.endVersion),
+    message.symbol,
+    !message.depthMerge.bids?.length
+  )
 }
 function futuresSnapshot(version: number) {
   return {
@@ -211,29 +240,33 @@ async function createFuturesSequenceServer() {
 
 for (const validateSequence of [true, false]) {
   test(`MEXC Futures depth continuity: validation=${validateSequence ?? 'default'}`, { timeout: 10000 }, async () => {
-    const valid = [
+    const valid: any[] = [
       { channel: 'rs.sub.depth', data: 'success' },
       { channel: 'pong', data: 1794300000000 },
-      futuresDepth(105, 100, 105),
-      futuresDepth(110, 106, 110),
-      futuresDepth(110, 106, 110),
-      futuresDepth(115, 111, 115, 'BTC_USDT', true),
-      futuresDepth(116, 0, 0),
-      futuresDepth(117, null, null),
+      futuresDepth(105, 100),
+      futuresDepth(110, 106),
+      futuresDepth(110, 106),
+      futuresDepth(115, 111, 'BTC_USDT', true),
+      futuresDepth(116),
+      futuresDepth(117),
       futuresDepth(120, 118),
-      futuresDepth(121, undefined, 122),
-      futuresDepth(999, 500, 505, 'ETH_USDT'),
+      futuresDepth(122, 121),
+      futuresDepth(505, 500, 'ETH_USDT'),
       futuresSnapshot(50),
       { channel: 'push.ticker', symbol: 'BTC_USDT', data: { version: 999999 } },
-      futuresDepth(506, 0, 0, 'ETH_USDT')
+      futuresDepth(506, 506, 'ETH_USDT')
     ].map((message) => JSON.parse(JSON.stringify(message)))
-    const gap = futuresDepth(125, 124, 125),
+    const gap = futuresDepth(125, 124),
       errors: Error[] = []
     const { server, cleanup } = await createFuturesSequenceServer()
     server.on('connection', (socket) =>
       socket.once('message', (bytes) => {
-        assert.deepStrictEqual(JSON.parse(bytes.toString()), { method: 'sub.depth', param: { symbol: 'BTC_USDT' }, gzip: false })
-        for (const message of [...valid, gap]) socket.send(JSON.stringify(message))
+        assert.deepStrictEqual(JSON.parse(bytes.toString()), {
+          method: 'sub.depth',
+          param: { symbol: 'BTC_USDT', compress: true },
+          gzip: false
+        })
+        for (const message of [...valid, gap]) socket.send(encodeFuturesMessage(message))
       })
     )
     const feed = stream({
@@ -245,7 +278,11 @@ for (const validateSequence of [true, false]) {
       onError: (error) => errors.push(error)
     })
     try {
-      for (const message of valid) assert.deepStrictEqual((await feed.next()).value?.message, message)
+      for (const message of valid) {
+        const next = await feed.next()
+        assert.deepStrictEqual(errors, [])
+        assert.deepStrictEqual(next.value?.message, message)
+      }
       const next = (await feed.next()).value
       if (validateSequence === false) {
         assert.deepStrictEqual(next?.message, gap)
@@ -272,13 +309,13 @@ for (const normalized of [false, true])
     test(`MEXC Futures sequence recovery: normalized=${normalized}, disconnects=${withDisconnects}`, { timeout: 10000 }, async () => {
       let connections = 0
       const errors: Error[] = [],
-        initial = [futuresSnapshot(100), futuresDepth(105, 101, 105), futuresDepth(110, 107, 110)],
-        recovered = [futuresSnapshot(0), futuresDepth(2, 1, 2)]
+        initial = [futuresSnapshot(100), futuresDepth(105, 101), futuresDepth(110, 107)],
+        recovered = [futuresSnapshot(0), futuresDepth(2, 1)]
       const { server, cleanup } = await createFuturesSequenceServer()
       server.on('connection', (socket) => {
         const first = ++connections === 1
         socket.once('message', () => {
-          for (const message of first ? initial : recovered) socket.send(JSON.stringify(message))
+          for (const message of (first ? initial : recovered) as any[]) socket.send(encodeFuturesMessage(message))
         })
       })
       const options = { exchange: 'mexc-futures' as const, timeoutIntervalMS: 0, onError: (error: Error) => errors.push(error) }
@@ -324,7 +361,7 @@ test('MEXC Futures normalized opt-out retains initial snapshot overlap validatio
     { server, cleanup } = await createFuturesSequenceServer()
   server.on('connection', (socket) =>
     socket.once('message', () => {
-      for (const message of [futuresSnapshot(100), futuresDepth(110, 102, 110)]) socket.send(JSON.stringify(message))
+      for (const message of [futuresSnapshot(100), futuresDepth(110, 102)] as any[]) socket.send(encodeFuturesMessage(message))
     })
   )
   const feed = streamNormalized(
