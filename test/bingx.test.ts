@@ -487,11 +487,22 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
             { symbol: 'ETH-USDT' }
           ]
         }
-      : symbol === 'BAD-USDT'
-        ? { code: 100400, msg: 'invalid symbol' }
-        : symbol === 'PAUSED-USDT'
-          ? { code: 109415, msg: 'paused market' }
-          : { code: 0, data: { symbol, openInterest: '0', time: 1795426541142 } }
+      : url.pathname.endsWith('contracts')
+        ? {
+            code: 0,
+            data: [
+              { symbol: 'BAD-USDT', status: 1 },
+              { symbol: 'PAUSED-USDT', status: 25 },
+              { symbol: 'RACE-USDT', status: 1 },
+              { symbol: 'BTC-USDT', status: 1 },
+              { symbol: 'SOL-USDT', status: 1 }
+            ]
+          }
+        : symbol === 'BAD-USDT'
+          ? { code: 100400, msg: 'invalid symbol' }
+          : symbol === 'RACE-USDT'
+            ? { code: 109415, msg: 'paused market' }
+            : { code: 0, data: { symbol, openInterest: '0', time: 1795426541142 } }
     response.end(JSON.stringify(result))
   })
   server.listen(0, '127.0.0.1')
@@ -507,7 +518,7 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
     [
       { channel: 'premiumIndex', symbols: ['BTC-USDT', 'BTC-USDT'] },
       { channel: 'premiumIndex', symbols: ['ETH-USDT', 'BTC-USDT'] },
-      { channel: 'openInterest', symbols: ['BAD-USDT', 'PAUSED-USDT', 'BTC-USDT'] }
+      { channel: 'openInterest', symbols: ['BAD-USDT', 'PAUSED-USDT', 'MISSING-USDT', 'RACE-USDT', 'BTC-USDT'] }
     ],
     0,
     (error) => errors.push(error)
@@ -527,11 +538,76 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
     assert.strictEqual(messages[2].dataType, 'ETH-USDT@premiumIndex')
     assert.strictEqual(errors.length, 1)
     assert.match(errors[0].message, /BAD-USDT.*100400/)
-    assert.strictEqual(requests.length, 4)
+    assert.strictEqual(requests.length, 5)
+    assert.ok(requests.includes('/openApi/swap/v2/quote/contracts'))
+    assert.ok(requests.every((request) => !/PAUSED-USDT|MISSING-USDT|SOL-USDT/.test(request)))
   } finally {
     await feed.return?.()
     server.closeAllConnections()
     await new Promise<void>((resolve) => server.close(() => resolve()))
+  }
+})
+
+test('BingX futures refreshes requested OI symbols and recovers after discovery fails', { timeout: 10000 }, async (context) => {
+  const { setTimeout: sleep } = await import('node:timers/promises')
+  context.mock.timers.enable({ apis: ['setTimeout'] })
+  let phase = 0
+  const requests: { phase: number; symbol: string }[] = []
+  const errors: Error[] = []
+  let reportError!: (error: Error) => void
+  const reportedError = new Promise<Error>((resolve) => {
+    reportError = resolve
+  })
+  context.mock.method(globalThis, 'fetch', async (input: Parameters<typeof fetch>[0]) => {
+    const url = new URL(String(input))
+    if (url.pathname.endsWith('/contracts')) {
+      return Response.json({
+        code: phase === 2 ? 100500 : 0,
+        data:
+          phase === 2
+            ? null
+            : [
+                { symbol: 'BTC-USDT', status: phase === 1 ? 25 : 1 },
+                { symbol: 'ETH-USDT', status: phase === 1 ? 1 : 25 },
+                { symbol: 'SOL-USDT', status: 1 }
+              ]
+      })
+    }
+    const symbol = url.searchParams.get('symbol')!
+    requests.push({ phase, symbol })
+    return Response.json({ code: 0, data: { symbol, openInterest: '100', time: localTimestamp.valueOf() } })
+  })
+  const feed = new BingxFuturesRealTimeFeed(
+    'bingx-futures',
+    [{ channel: 'openInterest', symbols: ['BTC-USDT', 'ETH-USDT'] }],
+    0,
+    (error) => {
+      errors.push(error)
+      reportError(error)
+    }
+  )[Symbol.asyncIterator]()
+  try {
+    assert.strictEqual((await feed.next()).value.dataType, 'BTC-USDT@openInterest')
+    await sleep(10)
+    phase = 1
+    context.mock.timers.tick(30000)
+    assert.strictEqual((await feed.next()).value.dataType, 'ETH-USDT@openInterest')
+    await sleep(10)
+    phase = 2
+    context.mock.timers.tick(30000)
+    await reportedError
+    await sleep(10)
+    phase = 3
+    context.mock.timers.tick(30000)
+    assert.strictEqual((await feed.next()).value.dataType, 'BTC-USDT@openInterest')
+    assert.deepEqual(requests, [
+      { phase: 0, symbol: 'BTC-USDT' },
+      { phase: 1, symbol: 'ETH-USDT' },
+      { phase: 3, symbol: 'BTC-USDT' }
+    ])
+    assert.strictEqual(errors.length, 1)
+  } finally {
+    await feed.return?.()
   }
 })
 

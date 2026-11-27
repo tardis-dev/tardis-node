@@ -129,6 +129,9 @@ class BingxFuturesPremiumIndexClient extends PoolingClientBase {
     const { data: response } = await getJSON<BingxResponse<{ symbol: string }[]>>(`${this._httpURL}/openApi/swap/v2/quote/premiumIndex`, {
       timeout: 5000
     })
+    // if (response.code !== 0 || !Array.isArray(response.data)) {
+    //   throw new Error(`BingX premiumIndex: ${response.code} ${response.msg}`)
+    // }
     for (const data of response.data) {
       if (!output.destroyed && this._symbols.has(data.symbol)) {
         output.write({
@@ -160,8 +163,9 @@ class BingxFuturesOpenInterestClient extends PoolingClientBase {
 
   protected async poolDataToStream(output: Writable) {
     this._pollStarted = Date.now()
+    const activeSymbols = await this._getOpenInterestSymbols()
     // The public market-data REST limit is 500 requests per 10 seconds per IP.
-    for (const symbol of this._symbols) {
+    for (const symbol of this._symbols.filter((symbol) => activeSymbols.has(symbol))) {
       if (output.destroyed) return
       try {
         const { data: response } = await getJSON<BingxResponse<{ symbol: string; openInterest: string; time: number }>>(
@@ -190,6 +194,14 @@ class BingxFuturesOpenInterestClient extends PoolingClientBase {
         await wait(25)
       }
     }
+  }
+
+  private async _getOpenInterestSymbols() {
+    const { data: response } = await getJSON<BingxResponse<{ symbol: string; status: number }[]>>(
+      `${this._httpURL}/openApi/swap/v2/quote/contracts`,
+      { timeout: 5000 }
+    )
+    return new Set(response.data.filter((contract) => contract.status === 1).map((contract) => contract.symbol))
   }
 }
 
