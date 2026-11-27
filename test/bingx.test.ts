@@ -481,7 +481,11 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
     const result = url.pathname.endsWith('premiumIndex')
       ? {
           code: 0,
-          data: [{ symbol: 'BTC-USDT', indexPrice: '60001', lastFundingRate: '0', nextFundingTime: 1795449600000 }, { symbol: 'ETH-USDT' }]
+          data: [
+            { symbol: 'SOL-USDT' },
+            { symbol: 'BTC-USDT', indexPrice: '60001', lastFundingRate: '0', nextFundingTime: 1795449600000 },
+            { symbol: 'ETH-USDT' }
+          ]
         }
       : symbol === 'BAD-USDT'
         ? { code: 100400, msg: 'invalid symbol' }
@@ -501,14 +505,15 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
   const feed = new Feed(
     'bingx-futures',
     [
-      { channel: 'premiumIndex', symbols: ['BTC-USDT'] },
+      { channel: 'premiumIndex', symbols: ['BTC-USDT', 'BTC-USDT'] },
+      { channel: 'premiumIndex', symbols: ['ETH-USDT', 'BTC-USDT'] },
       { channel: 'openInterest', symbols: ['BAD-USDT', 'PAUSED-USDT', 'BTC-USDT'] }
     ],
     0,
     (error) => errors.push(error)
   )[Symbol.asyncIterator]()
   try {
-    const messages = [(await feed.next()).value, (await feed.next()).value]
+    const messages = [(await feed.next()).value, (await feed.next()).value, (await feed.next()).value]
     messages.sort((a, b) => a.dataType.localeCompare(b.dataType))
     assert.deepEqual(messages[0], {
       code: 0,
@@ -519,6 +524,7 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
     assert.strictEqual(messages[1].dataType, 'BTC-USDT@premiumIndex')
     assert.strictEqual(messages[1].generated, true)
     assert.strictEqual(messages[1].data.lastFundingRate, '0')
+    assert.strictEqual(messages[2].dataType, 'ETH-USDT@premiumIndex')
     assert.strictEqual(errors.length, 1)
     assert.match(errors[0].message, /BAD-USDT.*100400/)
     assert.strictEqual(requests.length, 4)
@@ -528,6 +534,45 @@ test('BingX futures REST envelopes survive paused markets and per-symbol errors'
     await new Promise<void>((resolve) => server.close(() => resolve()))
   }
 })
+
+for (const response of [
+  { code: 109429, msg: 'rate limited', data: null },
+  { code: 109429, msg: 'rate limited', data: [] },
+  { code: 109429, msg: 'rate limited', data: [{ symbol: 'BTC-USDT' }] },
+  { code: 0, msg: 'invalid payload', data: null },
+  { code: 0, msg: 'invalid payload', data: {} }
+]) {
+  test(`BingX premiumIndex reports invalid responses (${response.code}, ${JSON.stringify(response.data)})`, { timeout: 5000 }, async () => {
+    const { createServer } = await import('node:http')
+    const { once } = await import('node:events')
+    const server = createServer((_request, output) => {
+      output.setHeader('content-type', 'application/json')
+      output.end(JSON.stringify(response))
+    })
+    server.listen(0, '127.0.0.1')
+    await once(server, 'listening')
+    const address = server.address()
+    assert.ok(address && typeof address === 'object')
+    class Feed extends BingxFuturesRealTimeFeed {
+      protected readonly httpURL = `http://127.0.0.1:${(address as { port: number }).port}`
+    }
+    let reportError!: (error: Error) => void
+    const reportedError = new Promise<Error>((resolve) => {
+      reportError = resolve
+    })
+    const feed = new Feed('bingx-futures', [{ channel: 'premiumIndex', symbols: ['BTC-USDT'] }], 0, reportError)[Symbol.asyncIterator]()
+    const next = feed.next()
+    try {
+      const error = await reportedError
+      assert.strictEqual(error.message, `BingX premiumIndex: ${response.code} ${response.msg}`)
+    } finally {
+      await feed.return?.()
+      assert.strictEqual((await next).done, true)
+      server.closeAllConnections()
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+    }
+  })
+}
 
 test('BingX spot book tickers preserve missing fields and zero amounts', () => {
   const mapper = normalizeBookTickers('bingx', localTimestamp)

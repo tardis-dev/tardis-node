@@ -70,7 +70,7 @@ class BingxFuturesWebSocketFeed extends BingxRealTimeFeed {
   protected readonly wssURL = 'wss://open-api-swap.bingx.com/swap-market'
 
   protected override getSequence(): undefined {
-    // Futures lastUpdateId skips values even on matching parallel connections (see BingX integration issue).
+    // Futures lastUpdateId skips values even on matching parallel connections.
     return undefined
   }
 }
@@ -97,8 +97,8 @@ export class BingxFuturesRealTimeFeed extends MultiConnectionRealTimeFeedBase {
     if (wsFilters.length) {
       yield new BingxFuturesWebSocketFeed(exchange, wsFilters, timeoutIntervalMS, onError, validateSequence)
     }
-    const premiumIndexSymbols = [...new Set(filters.filter((f) => f.channel === 'premiumIndex').flatMap((f) => f.symbols!))]
-    if (premiumIndexSymbols.length) {
+    const premiumIndexSymbols = new Set(filters.filter((f) => f.channel === 'premiumIndex').flatMap((f) => f.symbols!))
+    if (premiumIndexSymbols.size) {
       yield new BingxFuturesPremiumIndexClient(exchange, premiumIndexSymbols, this.httpURL, onError)
     }
     const openInterestSymbols = [...new Set(filters.filter((f) => f.channel === 'openInterest').flatMap((f) => f.symbols!))]
@@ -113,7 +113,7 @@ class BingxFuturesPremiumIndexClient extends PoolingClientBase {
 
   constructor(
     exchange: string,
-    private readonly _symbols: string[],
+    private readonly _symbols: ReadonlySet<string>,
     private readonly _httpURL: string,
     onError?: (error: Error) => void
   ) {
@@ -130,7 +130,7 @@ class BingxFuturesPremiumIndexClient extends PoolingClientBase {
       timeout: 5000
     })
     for (const data of response.data) {
-      if (!output.destroyed && this._symbols.includes(data.symbol)) {
+      if (!output.destroyed && this._symbols.has(data.symbol)) {
         output.write({
           code: 0,
           dataType: `${data.symbol}@premiumIndex`,

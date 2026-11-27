@@ -162,7 +162,7 @@ class BingxDerivativeTickerMapper {
 
     if (message.dataType.endsWith('@openInterest')) {
       const { data } = message as BingxFuturesOpenInterestMessage
-      // BingX reports open interest in USDT; preserve the exchange's units.
+      // Preserve the exchange's units.
       ticker.updateOpenInterest(Number(data.openInterest))
       return
     }
