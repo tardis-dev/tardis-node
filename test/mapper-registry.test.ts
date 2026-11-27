@@ -1,6 +1,6 @@
 import { afterEach, test } from 'node:test'
 import { assert } from './assertions.ts'
-import { exchangeMappers, mapper } from '../dist/mappers/registry.js'
+import { exchangeMappers, isRealTime, mapper } from '../dist/mappers/registry.js'
 
 const originalNoRealTime = process.env.__NO_REAL_TIME__
 
@@ -30,7 +30,7 @@ test('selects mappers at switch boundaries and exposes the switch dates', () => 
   assert.deepStrictEqual(createMapper.switchDates, [firstSwitch, secondSwitch])
 })
 
-test('uses the latest mapper for realtime and omitted timestamps', () => {
+test('uses timestamps for recorded versions and omits them for the latest version', () => {
   delete process.env.__NO_REAL_TIME__
 
   const createMapper = mapper<any, any>([
@@ -38,8 +38,33 @@ test('uses the latest mapper for realtime and omitted timestamps', () => {
     { use: () => createTestMapper('latest') }
   ])
 
-  assert.strictEqual(mapperId(createMapper(new Date())), 'latest')
+  assert.strictEqual(mapperId(createMapper(new Date())), 'historical')
   assert.strictEqual(mapperId(createMapper()), 'latest')
+})
+
+test('replay selects by timestamp even for recent or future data', (context) => {
+  delete process.env.__NO_REAL_TIME__
+  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-29T23:59:00Z') })
+  const cutover = new Date('2026-11-30T00:00:00Z')
+  const createMapper = mapper<any, any>([
+    { until: cutover, use: () => createTestMapper('legacy') },
+    { use: () => createTestMapper('protobuf') }
+  ])
+
+  assert.strictEqual(mapperId(createMapper(new Date('2026-11-29T23:58:00Z'))), 'legacy')
+  assert.strictEqual(mapperId(createMapper(new Date('2026-11-29T23:59:59.999Z'))), 'legacy')
+  assert.strictEqual(mapperId(createMapper(cutover)), 'protobuf')
+  assert.strictEqual(mapperId(createMapper(new Date('2026-11-30T00:00:00.001Z'))), 'protobuf')
+  assert.strictEqual(mapperId(createMapper()), 'protobuf')
+})
+
+test('only actual recent timestamps are classified as real time', (context) => {
+  context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-29T23:59:00Z') })
+  delete process.env.__NO_REAL_TIME__
+  assert.strictEqual(isRealTime(), false)
+  assert.strictEqual(isRealTime(new Date()), true)
+  process.env.__NO_REAL_TIME__ = '1'
+  assert.strictEqual(isRealTime(), false)
 })
 
 test('rejects invalid mapper switch definitions', () => {

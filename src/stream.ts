@@ -102,7 +102,8 @@ async function* _streamNormalized<T extends Exchange, U extends MapperFactory<T,
 
   while (state.closeController.signal.aborted === false) {
     try {
-      const createMappers = (localTimestamp: Date) => normalizers.map((m) => m(exchange, localTimestamp))
+      const createMappers = (localTimestamp: Date) =>
+        normalizers.map((m) => (m.getLatest === undefined ? m(exchange, localTimestamp) : m.getLatest(exchange)))
       const mappers = createMappers(new Date())
       const filters = getFilters(mappers, symbols)
 

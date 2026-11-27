@@ -16,6 +16,7 @@ export type Mapper<T extends Exchange, U extends NormalizedData> = {
 }
 
 export type MapperFactory<T extends Exchange, U extends NormalizedData> = ((exchange: T, localTimestamp: Date) => Mapper<T, U>) & {
+  getLatest?: (exchange: T) => Mapper<T, U>
   getSwitchDates?: (exchange: T) => readonly Date[]
 }
 

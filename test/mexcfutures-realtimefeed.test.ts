@@ -4,7 +4,7 @@ import { assert } from './assertions.ts'
 import { createServer } from 'http'
 import type { Filter } from '../dist/types.js'
 import { MexcFuturesRealTimeFeed } from '../dist/realtimefeeds/mexcfutures.js'
-import { stream, streamNormalized, normalizeBookChanges, SequenceGapError } from '../dist/index.js'
+import { stream, streamNormalized, normalizeBookChanges, normalizeTrades, SequenceGapError } from '../dist/index.js'
 import { createTestWebSocketServer } from './helpers/websocket.ts'
 import { message, stringField, bytesField, varintField } from './helpers/protobuf.ts'
 import { decodeMexcFuturesProtobufMessage } from '../dist/realtimefeeds/mexcfuturesprotobuf.js'
@@ -34,6 +34,44 @@ class TestMexcFuturesRealTimeFeed extends MexcFuturesRealTimeFeed {
     await this.provideManualSnapshots(filters, shouldCancel)
     return this.manualSnapshotsBuffer
   }
+}
+
+for (const custom of [false, true]) {
+  test(`normalized MEXC streaming uses Protobuf before the recorder cutoff (custom=${custom})`, { timeout: 10000 }, async (context) => {
+    context.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-29T23:59:00Z') })
+    const { server, cleanup } = await createFuturesSequenceServer()
+    // Captured MEXC Futures Protobuf trade from 2026-11-25; also checked against official schemas in mexcfutures-protobuf.test.ts.
+    const frame = Buffer.from('CghCVENfVVNEVBIJcHVzaC5kZWFsGIvXx5ihNKp9JQoFNTgzMDASAjEzGAIgAygBMIXXx5ihNDjswJn4P0CF18eYoTQ=', 'base64')
+    server.on('connection', (socket) => socket.once('message', () => socket.send(frame)))
+    const normalizer = custom
+      ? (exchange: 'mexc-futures', localTimestamp: Date) => {
+          assert.strictEqual(localTimestamp.toISOString(), '2026-11-29T23:59:00.000Z')
+          return normalizeTrades.getLatest(exchange)
+        }
+      : normalizeTrades
+    const feed = streamNormalized(
+      { exchange: 'mexc-futures', symbols: ['BTC_USDT'], timeoutIntervalMS: 0, onError: (error) => assert.fail(error.message) },
+      normalizer
+    )
+
+    try {
+      const { value: trade } = await feed.next()
+      assert.deepStrictEqual(trade, {
+        type: 'trade',
+        symbol: 'BTC_USDT',
+        exchange: 'mexc-futures',
+        id: '17163509868',
+        price: 58300,
+        amount: 13,
+        side: 'sell',
+        timestamp: new Date(1795616271237),
+        localTimestamp: new Date('2026-11-29T23:59:00Z')
+      })
+    } finally {
+      await feed.return?.()
+      await cleanup()
+    }
+  })
 }
 
 test('aligns MEXC Futures Protobuf depth updates with a REST snapshot', async () => {

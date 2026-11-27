@@ -160,7 +160,9 @@ const createMapper = (exchange: Exchange, localTimestamp?: Date) => {
     normalizers.push(normalizeBookTickers)
   }
 
-  const mappersForExchange = normalizers.map((m: any) => m(exchange, localTimestamp)) as Mapper<any, any>[]
+  const mappersForExchange = normalizers.map((m: any) =>
+    localTimestamp === undefined ? m.getLatest(exchange) : m(exchange, localTimestamp)
+  ) as Mapper<any, any>[]
 
   return {
     map(message: any, localTimestamp: Date) {
@@ -15328,7 +15330,7 @@ test('map mexc futures preserves an open interest update to zero', () => {
 
 test('map mexc futures realtime depth update throws when first update has no snapshot overlap', () => {
   const localTimestamp = new Date()
-  const mapper = createMapper('mexc-futures', localTimestamp)
+  const mapper = createMapper('mexc-futures')
 
   mapper.map(
     {

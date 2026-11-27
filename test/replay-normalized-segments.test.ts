@@ -93,6 +93,46 @@ test('replayNormalized creates replay segments at mapper switch dates', async ()
   )
 })
 
+for (const now of ['2026-11-27T12:00:00Z', '2026-11-29T23:59:30Z', '2026-11-30T00:00:30Z']) {
+  test(`MEXC replay uses recorded formats across the cutoff when now is ${now}`, async (context) => {
+    context.mock.timers.enable({ apis: ['Date'], now: new Date(now) })
+    const messages = []
+    for await (const message of replayNormalized(
+      {
+        exchange: 'mexc-futures',
+        symbols: ['BTC_USDT'],
+        from: '2026-11-29T23:59:00Z',
+        to: '2026-11-30T00:01:00Z',
+        waitWhenDataNotYetAvailable: true
+      },
+      normalizeTrades
+    )) {
+      messages.push(message)
+    }
+
+    assert.deepStrictEqual(
+      messages.map(({ id, price, amount, side, timestamp, localTimestamp }) => ({
+        id,
+        price,
+        amount,
+        side,
+        timestamp: timestamp.toISOString(),
+        localTimestamp: localTimestamp.toISOString()
+      })),
+      ['2026-11-29T23:59:00Z', '2026-11-30T00:00:00Z'].map((date) => ({
+        id: String(new Date(date).valueOf()),
+        price: 100,
+        amount: 2,
+        side: 'buy',
+        timestamp: new Date(date).toISOString(),
+        localTimestamp: new Date(date).toISOString()
+      }))
+    )
+    assert.strictEqual(workerPayloads.length, 2)
+    assert.ok(workerPayloads.every((payload) => payload.waitWhenDataNotYetAvailable === true))
+  })
+}
+
 test('replayNormalized segments OKX book changes at public books channel boundaries', async () => {
   const okxEnv = {
     OKX_API_KEY: process.env.OKX_API_KEY,
@@ -233,6 +273,13 @@ function createMessage(payload: any) {
         asks: [['101', '2']]
       }
     }
+  }
+
+  if (payload.exchange === 'mexc-futures') {
+    const ts = payload.fromDate.valueOf()
+    return ts < Date.parse('2026-11-30T00:00:00Z')
+      ? { channel: 'push.deal', symbol, data: [{ p: 100, v: 2, T: 1, t: ts, i: String(ts) }] }
+      : { channel: 'push.deal', symbol, deal: { p: '100', v: '2', t: 1, ts: String(ts), i: String(ts) } }
   }
 
   if (filter.channel === 'trade') {
