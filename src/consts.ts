@@ -1,5 +1,6 @@
 export const EXCHANGES = [
   'bingx',
+  'bingx-futures',
   'backpack',
   'aster',
   'aster-futures',
@@ -647,6 +648,7 @@ const WHITEBIT_CHANNELS = ['depth_update', 'bookTicker_update', 'trades_update',
 
 export const EXCHANGE_CHANNELS_INFO = {
   bingx: BINGX_CHANNELS,
+  'bingx-futures': ['incrDepth', 'trade', 'bookTicker', 'markPrice', 'ticker', 'premiumIndex', 'openInterest'],
   backpack: BACKPACK_CHANNELS,
   aster: ASTER_CHANNELS,
   'aster-futures': ASTER_FUTURES_CHANNELS,

@@ -1,6 +1,6 @@
 import { Exchange, Filter } from '../types.ts'
 import { AsterFuturesRealTimeFeed, AsterRealTimeFeed } from './aster.ts'
-import { BingxRealTimeFeed } from './bingx.ts'
+import { BingxRealTimeFeed, BingxFuturesRealTimeFeed } from './bingx.ts'
 import { BackpackRealTimeFeed } from './backpack.ts'
 import {
   BinanceFuturesRealTimeFeed,
@@ -70,6 +70,7 @@ const realTimeFeedsMap: {
 } = {
   aster: AsterRealTimeFeed,
   bingx: BingxRealTimeFeed,
+  'bingx-futures': BingxFuturesRealTimeFeed,
   backpack: BackpackRealTimeFeed,
   'aster-futures': AsterFuturesRealTimeFeed,
   binance: BinanceRealTimeFeed,
