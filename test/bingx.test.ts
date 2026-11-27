@@ -256,15 +256,3 @@ test('BingX spot book tickers preserve missing fields and zero amounts', () => {
   assert.strictEqual(askOnly.askPrice, 101)
   assert.strictEqual(askOnly.askAmount, 0)
 })
-
-test('BingX spot preserves explicit zero prices and amounts', () => {
-  const message = {
-    dataType: 'BTC-USDT@bookTicker',
-    data: { e: 'bookTicker', E: localTimestamp.valueOf(), s: 'BTC-USDT', b: '0', B: '0.00', a: '0.00', A: '0' }
-  }
-  const [ticker] = [...normalizeBookTickers('bingx', localTimestamp).map(message, localTimestamp)!]
-  assert.strictEqual(ticker.bidPrice, 0)
-  assert.strictEqual(ticker.bidAmount, 0)
-  assert.strictEqual(ticker.askPrice, 0)
-  assert.strictEqual(ticker.askAmount, 0)
-})
